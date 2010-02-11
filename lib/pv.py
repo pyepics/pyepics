@@ -48,7 +48,7 @@ class PV(object):
         self.callbacks = []
         self.precision = None
         self.enum_strs = None
-
+        self.verbose   = False
         self.chid = ca.create_channel(self.pvname,
                                       userfcn=self._onConnect)
 
@@ -71,16 +71,19 @@ class PV(object):
         return
             
 
-    def connect(self,timeout=10.0):
-        if not self.connected:
-            ca.connect_channel(self.chid, timeout=timeout)
-            self.poll()
-            # print self.pvname, self.connected
-        if self.auto_monitor and self.__mondata is None:
+    def _automonitor(self):
+        if (self.connected and self.auto_monitor and
+            self.__mondata is None):
             self.__mondata = ca.subscribe(self.chid,
                                           userfcn=self._onChanges,
                                           use_ctrl=self._form['ctrl'],
                                           use_time=self._form['time'])
+            
+    def connect(self,timeout=5.0):
+        if not self.connected:
+            ca.connect_channel(self.chid, timeout=timeout)
+            self.poll()
+        self._automonitor()
         return self.connected
 
     def get(self,**kw):
@@ -153,13 +156,14 @@ class PV(object):
         
     def _onChanges(self, value=None, chid=None,
                    ftype=None, count=1, status=1, **kw):
-        
         self.__set_ctrl_attrs(kw)
         self.timestamp = kw.get('timestamp',time.time())
         self.count  = count
         self.status = status
         self._val   = value
         self.set_charval(value,ca_calls=False)
+        if self.verbose:
+            print '  Event ', self.pvname,self._val, fmt_time(self.timestamp)
         
         for fcn in self.callbacks:
             if callable(fcn):  fcn(pv=self)
