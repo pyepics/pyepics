@@ -3,15 +3,14 @@
    Matthew Newville <newville@cars.uchicago.edu>
    CARS, University of Chicago
 
-   version    :  2.99.0 (working toward 3.0)
-   last update:  18-Jan-2010
+   version    :  3.0.1 (beta version of epics Py3)
+   last update:  11-Feb-2010
          
 == Overview:
    rewrite of EpicsCA v 2.*, with major goals of:
       a) replacing swig interface with ctypes
       b) better support for thread safety
       c) more complete low-level support to epics channel access interface
-      
       
    major classes will be:
       PV -- Process Variable which will work largely as in EpicsCA 2.*

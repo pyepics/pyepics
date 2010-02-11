@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from distutils.core import setup
 import os
+import lib
+
 
 data_files = None
 if os.name == 'nt':
@@ -9,7 +11,7 @@ if os.name == 'nt':
 
 setup(
     name = 'epics',
-    version = '3.0',
+    version = lib.__version__,
     author = 'Matthew Newville',
     author_email = 'newville@cars.uchicago.edu',
     license = 'Python',
