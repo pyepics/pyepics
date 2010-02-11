@@ -1,0 +1,6 @@
+This module provides Python access to the EPICS Channnel Access (CA)
+protocol.  This library uses ctypes to wrap the basic CA functionality and
+provides a higher level interface that encapsulates an EPICS Process
+Variable (PV) as a class.
+
+This is under active development and the implementation is incomplete.
