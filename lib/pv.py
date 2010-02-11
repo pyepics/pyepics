@@ -37,18 +37,20 @@ class PV(object):
     def __init__(self,pvname, callback=None, form='native',
                  use_cache=True, auto_monitor=True, **kw):
 
-        self.pvname = pvn  = pvname.strip()
+        self.pvname = pvname.strip()
 
         self.connected  = False
         self.auto_monitor = auto_monitor
 
-        self._val = None
-        self.__mon_data = None
+        self._val      = None
+        self._charval  = None
+        self.__mondata = None
         self.callbacks = []
         self.precision = None
         self.enum_strs = None
 
-        self.chid = ca.create_channel(pvn,userfcn=self._onConnect)
+        self.chid = ca.create_channel(self.pvname,
+                                      userfcn=self._onConnect)
 
         self.ftype = 0
         self._form = {'ctrl': (form.lower() =='ctrl'),
@@ -74,14 +76,11 @@ class PV(object):
             ca.connect_channel(self.chid, timeout=timeout)
             self.poll()
             # print self.pvname, self.connected
-        if self.auto_monitor and self.__mon_data is None:
-            ret = ca.create_subscription(self.chid,
-                                         userfcn=self._onChanges,
-                                         use_ctrl=self._form['ctrl'],
-                                         use_time=self._form['time'])
-            self.__mon_data = ret
-
-
+        if self.auto_monitor and self.__mondata is None:
+            self.__mondata = ca.subscribe(self.chid,
+                                          userfcn=self._onChanges,
+                                          use_ctrl=self._form['ctrl'],
+                                          use_time=self._form['time'])
         return self.connected
 
     def get(self,**kw):
@@ -238,7 +237,7 @@ class PV(object):
             for i,s in enumerate(self.enum_strs):
                 out.append("       %i = %s " % (i,s))
 
-        if self.__mon_data is not None:
+        if self.__mondata is not None:
             out.append('   PV is monitored internally')
             # list callbacks
             if len(self.callbacks) > 0:

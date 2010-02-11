@@ -55,8 +55,11 @@ def initialize_libca():
         load_dll = ctypes.windll.LoadLibrary
         dllname  = 'ca.dll'
         path_sep = ';'
-
-        os.environ['PATH'] = ".%s%s" % (path_sep,os_path)
+        path_dirs = os.environ['PATH'].split(path_sep)
+        for p in (sys.prefix,
+                  os.path.join(sys.prefix,'DLLs')):
+            path_dirs.insert(0,p)
+        os.environ['PATH'] = ';'.join(path_dirs)
 
 
     libca = load_dll(dllname)
@@ -365,7 +368,7 @@ def put(chid,value, wait=False, wait_timeout=20, callback=None):
     if count == 1:
         rawdata[0] = value
     else:
-        # automatically convvert strings to data arrays for character waveforms
+        # automatically convert strings to data arrays for character waveforms
         if ftype == dbr.CHAR and isinstance(value,(str,unicode)):
             value = _str_to_bytearray(value,maxlen=count)
         rawdata[:]  = list(value)
@@ -373,24 +376,21 @@ def put(chid,value, wait=False, wait_timeout=20, callback=None):
     if wait:
         pvname= name(chid)
         _put_done[pvname] = False
-        
-
         poll()
-        
-        r = libca.ca_array_put_callback(ftype,count,chid, rawdata, put_wait, 0)
+        r = libca.ca_array_put_callback(ftype,count,chid,
+                                        rawdata, _CB_putwait, 0)
 
         t0 = time.time()
         while time.time()-t0 < wait_timeout:
             time.sleep(1.e-4)
             poll()
-            if _putwait_done[pvname]: break
+            if _put_done[pvname]: break
         return r
     
     elif callback is not None:
         _cb = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(callback)   
         poll()
         r = libca.ca_array_put_callback(ftype,count,chid, rawdata, _cb, 0)
-        
     else:
         r =  libca.ca_array_put(ftype,count,chid, rawdata)
     poll()
@@ -398,6 +398,7 @@ def put(chid,value, wait=False, wait_timeout=20, callback=None):
 
 @withConnectedCHID
 def get_ctrlvars(chid):
+    """return the CTRL fields for a PV """
     ftype = promote_type(chid, use_ctrl=True)
     d = (1*dbr.Map[ftype])()
     ret = libca.ca_array_get(ftype, 1, chid, d)
@@ -443,15 +444,16 @@ def _onGetEvent(args):
             if hasattr(v0,attr):        
                 kw[attr] = getattr(v0,attr)
         if hasattr(v0,'strs'):
-            n = v0.no_str
-            kw['enum_strs'] = tuple([v0.strs[i].value for i in range(n)])
+            s = [v0.strs[i].value for i in range(v0.no_str)]
+            kw['enum_strs'] = tuple(s)
 
     elif args.type >= dbr.TIME_STRING:
         v0 = value[0]
-        kw['timestamp'] = (dbr.EPICS2UNIX_EPOCH + 1.e-9*v0.stamp.nsec + v0.stamp.secs)
         kw['status']    = v0.status
         kw['severity']  = v0.severity
-        
+        kw['timestamp'] = (dbr.EPICS2UNIX_EPOCH +
+                           v0.stamp.nsec*1.e-9* +
+                           v0.stamp.secs)
 
     nelem = args.count
     if args.type in (dbr.STRING,dbr.TIME_STRING,dbr.CTRL_STRING):
@@ -478,8 +480,8 @@ def create_subscription(chid, use_time=False,use_ctrl=False,
     poll(1.e-3,1.0)
     return (cb, uarg, evid, ret)
 
+subscribe = create_subscription
 def clear_subscription(evid): return libca.ca_clear_subscription(evid)
-
 
 ##
 ## several methods are not yet implemented:
