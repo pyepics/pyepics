@@ -25,83 +25,99 @@ class PV(object):
       >>>p.count            # number of elements in array pvs
       >>>p.type             # EPICS data type: 'string','double','enum','long',....
 """
-    connect_ErrorMsg   = "cannot connect to %s -- may need a connection timeout longer than %f seconds"
-    enumrange_ErrorMsg = "value %i out of range for enum PV %s"
-    callback_ErrorMsg  = "severe error with get callback for %s"
-    setattr_ErrorMsg   = "cannot set %s for %s"
-    
-    repr_Normal        = "<PV: '%s', count=%i, type=%s, access=%s>"
-    repr_unnamed       = "<PV: unnamed>"
-    repr_unconnected   = "<PV '%s': unconnectd>" 
+
+    _fields_ = ('pvname','value','char_value', 'status','ftype',
+                'chid', 'host','count','access','write_access',
+                'severity', 'timestamp', 'precision',
+                'units', 'enum_strs','no_str',
+                'upper_disp_limit', 'lower_disp_limit',
+                'upper_alarm_limit', 'lower_alarm_limit',
+                'lower_warning_limit','upper_warning_limit',
+                'upper_ctrl_limit', 'lower_ctrl_limit')
 
     def __init__(self,pvname, callback=None, form='native',
-                 use_cache=True, auto_monitor=True, **kw):
+                 verbose=False, auto_monitor=True):
 
-        self.pvname = pvname.strip()
+        self.pvname  = pvname.strip()
+        self.verbose = verbose
+        self.auto_monitor = auto_monitor
+        self._form   = {'ctrl': (form.lower() =='ctrl'),
+                        'time': (form.lower() =='time')}
+
+        self.callbacks = []
+        if callable(callback): self.callbacks = [callback]
 
         self.connected  = False
-        self.auto_monitor = auto_monitor
+        self._args     = {}.fromkeys(self._fields_)
 
-        self._val      = None
-        self._charval  = None
+        self._args['pvname'] = self.pvname
         self.__mondata = None
-        self.callbacks = []
-        self.precision = None
-        self.enum_strs = None
-        self.verbose   = False
         self.chid = ca.create_channel(self.pvname,
                                       userfcn=self._onConnect)
-
-        self.ftype = 0
-        self._form = {'ctrl': (form.lower() =='ctrl'),
-                      'time': (form.lower() =='time')}
-
+        self._args['chid'] = self.chid
 
     def _onConnect(self,chid=0):
         self.connected = ca._cache[self.pvname][1]        
         if self.connected:
-            self.host   = ca.host_name(self.chid)
-            self.count  = ca.element_count(self.chid)
-            self.access = ca.access(self.chid)
-            self.write_access = ca.write_access(self.chid)
-            self.ftype  = ca.promote_type(self.chid,
-                                          use_ctrl=self._form['ctrl'],
-                                          use_time=self._form['time'])
-        # print 'onConnect done ', self.pvname, self.connected
+            self._args['host']   = ca.host_name(self.chid)
+            self._args['count']  = ca.element_count(self.chid)
+            self._args['access'] = ca.access(self.chid)
+            self._args['write_access'] = ca.write_access(self.chid)
+            ftype  = ca.promote_type(self.chid,
+                                     use_ctrl=self._form['ctrl'],
+                                     use_time=self._form['time'])
+            self._args['ftype'] = ftype
+            self._args['type']  = dbr.Name(ftype).lower()
         return
-            
 
-    def _automonitor(self):
-        if (self.connected and self.auto_monitor and
+    def connect(self,timeout=5.0):
+        if not self.connected:
+            ca.connect_channel(self.chid, timeout=timeout)
+            self.poll()
+        if (self.connected and
+            self.auto_monitor and
             self.__mondata is None):
             self.__mondata = ca.subscribe(self.chid,
                                           userfcn=self._onChanges,
                                           use_ctrl=self._form['ctrl'],
                                           use_time=self._form['time'])
-            
-    def connect(self,timeout=5.0):
-        if not self.connected:
-            ca.connect_channel(self.chid, timeout=timeout)
-            self.poll()
-        self._automonitor()
         return self.connected
 
-    def get(self,**kw):
+    def poll(self,t1=1.e-3,t2=1.0):    ca.poll(t1,t2)
+
+    def get(self, as_string=False):
+        """returns current value of PV
+        use argument 'as_string=True' to
+        return string representation
+
+        >>> p.get('13BMD:m1.DIR')
+        0
+        >>> p.get('13BMD:m1.DIR',as_string=True)
+        'Pos'
+        
+        """
         if not self.connect():  return None
-        val = ca.get(self.chid,ftype=self.ftype, **kw)
+        self._args['value'] = ca.get(self.chid,
+                                    ftype=self.ftype)
         self.poll() 
-        self.set_charval(val)
-        return val
+        self._set_charval(self._args['value'])
 
-    def put(self,value,**kw):
+        field = 'value'
+        if as_string: field = 'char_value'
+        return self._args[field]
+
+    def put(self,value,wait=False,timeout=30.0):
+        """set value for PV, optionally waiting until
+        the processing is complete.
+        """
         if not self.connect():  return None
-        return ca.put(self.chid,value,**kw)
+        return ca.put(self.chid,value,wait=wait,timeout=timeout)
 
-    def set_charval(self,val,ca_calls=True):
+    def _set_charval(self,val,ca_calls=True):
         """ set the character representation of the value"""
         cval = repr(val)       
-        ftype = self.ftype 
-        if self.count > 1:
+        ftype = self._args['ftype']
+        if self._args['count'] > 1:
             if ftype == dbr.CHAR:
                 cval = ''.join([chr(i) for i in val]).rstrip()
             else:
@@ -109,114 +125,73 @@ class PV(object):
                                                      dbr.Name(ftype))
         elif ftype in (dbr.FLOAT, dbr.DOUBLE):
             fmt  = "%%.%if"
-            if ca_calls and self.precision is None:
+            if ca_calls and self._args['precision'] is None:
                 self.get_ctrlvars()
             try: 
                 if 4 < abs(int(math.log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
-                cval = (fmt % self.precision) % val                    
+                cval = (fmt % self._args['precision']) % val                    
             except:
                 cval = repr(val)
         elif ftype == dbr.ENUM:
-            if ca_calls and self.enum_strs in ([], None):
+            if ca_calls and self._args['enum_strs'] in ([], None):
                 self.get_ctrlvars()
             try:
-                cval = self.enum_strs[val]
+                cval = self._args['enum_strs'][val]
             except:
                 pass
             
-        self._charval =cval
-        return self._charval
+        self._args['char_value'] =cval
+        return cval
 
-
-    def _getval(self):      return self._val
-    def _putval(self,val):  return self.put(val)
-    def _getchar(self):
-        """ fetch the string representation of the value"""
-        return self._charval
-
-    value       = property(_getval,_putval,None,'value property')
-    char_value  = property(_getchar,None,None,'value property')
-
+    
     def get_ctrlvars(self):
         if not self.connect():  return None
         kw = ca.get_ctrlvars(self.chid)
-        self.__set_ctrl_attrs(kw)
+        self._args.update(kw)
         return kw
-    
-    def __set_ctrl_attrs(self,kw):
-        for attr in ('severity', 'timestamp', 'precision',
-                     'units', 'enum_strs','no_str',
-                     'upper_disp_limit', 'lower_disp_limit',
-                     'upper_alarm_limit', 'upper_warning_limit',
-                     'lower_warning_limit','lower_alarm_limit',
-                     'upper_ctrl_limit', 'lower_ctrl_limit'):
-            if attr in kw: setattr(self,attr,kw[attr])        
 
-        
-    def _onChanges(self, value=None, chid=None,
-                   ftype=None, count=1, status=1, **kw):
-        self.__set_ctrl_attrs(kw)
-        self.timestamp = kw.get('timestamp',time.time())
-        self.count  = count
-        self.status = status
-        self._val   = value
-        self.set_charval(value,ca_calls=False)
+    def _onChanges(self, value=None, **kw):
+        """built-in callback function: this should not be overwritten!!"""
+        self._args.update(kw)
+        self._args['value']  = value
+        self._args['timestamp'] = kw.get('timestamp',time.time())
+
+        self._set_charval(self._args['value'],ca_calls=False)
+
         if self.verbose:
-            print '  Event ', self.pvname,self._val, fmt_time(self.timestamp)
+            print '  Event ', self.pvname,self.value, fmt_time(self._args['timestamp'])
         
         for fcn in self.callbacks:
-            if callable(fcn):  fcn(pv=self)
-            
-    def poll(self,t1=1.e-3,t2=1.0):
-        ca.poll(t1,t2)
+            if callable(fcn):  fcn(**self._args)
             
     def add_callback(self,callback=None):
         if callable(callback):
             self.callbacks.append(callback)
 
-    def __repr__(self):
-        if self.pvname is None: return self.repr_unnamed
-        if not self.connected:   return self.repr_unconnected % self.pvname
-        return self.repr_Normal % (self.pvname, self.count,
-                                   dbr.Name(self.ftype).lower(),
-                                   self.access)
-    
-    def __str__(self):
-        return self.__repr__()
-
-    def __eq__(self,other):
-        try:
-            return (self._chid  == other._chid)
-        except:
-            return False
-
-    def get_info(self):
+    def _getinfo(self):
         if not self.connect():  return None
-        kw = ca.get_ctrlvars(self.chid)
-        self.__set_ctrl_attrs(kw)
+        if self._args['precision'] is None: self.get_ctrlvars()
 
         out = []
-
         # list basic attributes
-        ftype = vtype = dbr.Name(self.ftype).lower()
         mod   = 'native'
+        xtype = self._args['type']
+        if '_' in xtype: mod,xtype = ftype.split('_')
 
-        if '_' in ftype: mod,vtype = ftype.split('_')
-
-        out.append("== %s  (%s)" % (self.pvname,ftype))
+        out.append("== %s  (%s) ==" % (self.pvname,xtype))
 
         if self.count==1:
-            if vtype in  ('int','short','long','enum'):
-                out.append('   value        = %i' % self._val)
-            elif vtype in ('float','double'):
-                out.append('   value        = %g' % self._val)
-            elif vtype in ('string','char'):
-                out.append('   value        = %s' % self._val)
+            val = self._args['value']
+            fmt = '%i'
+            if   xtype in ('float','double'): fmt = '%g'
+            elif xtype in ('string','char'):  fmt = '%s'
+            out.append('   value        = %s' % fmt % val)
+
         else:
             aval,ext,fmt = [],'',"%i,"
             if self._count>5: ext = '...'
-            if vtype in  ('float','double'): fmt = "%g,"
+            if xtype in  ('float','double'): fmt = "%g,"
             for i in range(min(5,self._count)):
                 aval.append(fmt % self._val[i])
             out.append("   value        = array  [%s%s]" % ("".join(aval),ext))
@@ -227,23 +202,20 @@ class PV(object):
                   'upper_ctrl_limit', 'lower_ctrl_limit',
                   'upper_disp_limit', 'lower_disp_limit',
                   'upper_alarm_limit', 'lower_alarm_limit',
-                  'upper_warning_limit','lower_warning_limit',
-                  ):
+                  'upper_warning_limit','lower_warning_limit'):
             if hasattr(self,i):
                 att = getattr(self,i)
                 if i == 'timestamp': att = "%.3f (%s)" % (att,fmt_time(att))
                 if att is not None:
                     out.append('   %.13s= %s' % (i+' '*16, str(att)))
 
-        # list enum strings
-        if vtype == 'enum':
+        if xtype == 'enum':  # list enum strings
             out.append('   enum strings: ')
             for i,s in enumerate(self.enum_strs):
                 out.append("       %i = %s " % (i,s))
 
         if self.__mondata is not None:
             out.append('   PV is monitored internally')
-            # list callbacks
             if len(self.callbacks) > 0:
                 out.append("   user-defined callbacks:")
                 for i in cbs:  out.append('      %s' % (i.func_name))
@@ -251,6 +223,94 @@ class PV(object):
                 out.append("   no user callbacks defined.")
         else:
             out.append('   PV is not monitored internally')
-        out.append('==')
+        out.append('=============================')
         return '\n'.join(out)
         
+    @property
+    def value(self):     return self._args['value']
+
+    @value.setter
+    def value(self,v):   return self.put(v)
+
+    @property
+    def char_value(self): return self._args['char_value']
+
+    @property
+    def status(self): return self._args['status']
+
+    @property
+    def ftype(self): return self._args['ftype']
+
+    @property
+    def type(self):  return self._args['type']
+
+    @property
+    def host(self): return self._args['host']
+
+    @property
+    def count(self): return self._args['count']
+
+    @property
+    def access(self): return self._args['access']
+
+    @property
+    def write_access(self): return self._args['write_access']
+
+    @property
+    def severity(self): return self._args['severity']
+
+    @property
+    def timestamp(self): return self._args['timestamp']
+
+    @property
+    def precision(self): return self._args['precision']
+
+    @property
+    def units(self): return self._args['units']
+
+    @property
+    def enum_strs(self): return self._args['enum_strs']
+
+    @property
+    def no_str(self): return self._args['no_str']
+
+    @property
+    def upper_disp_limit(self): return self._args['upper_disp_limit']
+
+    @property
+    def lower_disp_limit(self): return self._args['lower_disp_limit']
+
+    @property
+    def upper_alarm_limit(self): return self._args['upper_alarm_limit']
+
+    @property
+    def lower_alarm_limit(self): return self._args['lower_alarm_limit']
+
+    @property
+    def lower_warning_limit(self): return self._args['lower_warning_limit']
+
+    @property
+    def upper_warning_limit(self): return self._args['upper_warning_limit']
+
+    @property
+    def upper_ctrl_limit(self): return self._args['upper_ctrl_limit']
+
+    @property
+    def lower_ctrl_limit(self): return self._args['lower_ctrl_limit']
+
+    @property
+    def info(self): return self._getinfo()
+
+    def __repr__(self):
+        if not self.connected:  return "<PV '%s': unconnectd>" % self.pvname
+
+        return "<PV: '%(pvname)s', count=%(count)i, type=%(type)s, access=%(access)s>" % self._args
+    
+    def __str__(self): return self.__repr__()
+
+    def __eq__(self,other):
+        try:
+            return (self._chid  == other._chid)
+        except:
+            return False
+

@@ -4,7 +4,7 @@ import pv
 import time
 import operator
    
-class alarm:
+class Alarm(object):
     """ alarm class for a PV:
     run a user-supplied callback when a PV's value goes out of an acceptable range
 
@@ -87,26 +87,32 @@ class alarm:
           'gt': operator.__gt__,
           '>' : operator.__gt__ }
     
-    def __init__(self, pv, trip_point=None, comparison=None,
+    def __init__(self, pvname, trip_point=None, comparison=None,
                  callback=None,  alert_delay=10, **kw):
 
-        self.pv = pv
+        if isinstance(pvname, pv.PV):
+            self.pv = pvname
+        elif isinstance(pvname, (str,unicode)):
+            self.pv = pv.PV(pvname)
+            self.pv.connect()
+        
+        if self.pv is None: return
+
         self.trip_point  = trip_point
         self.last_alert  = 0
         self.alert_delay = alert_delay
-
-        if self.pv is None: return
 
         self.cmp   = self.ops.get(comparison.replace('_',''),None)
         self.alarm_state = False
         self.pv.add_callback(self.check_alarm)
         self.check_alarm()
         
-    def check_alarm(self,pv=None,**kw):
-        if pv is None: pv = self.pv
-        if pv is None or self.cmp is None or self.trip_point is None:      return
+    def check_alarm(self,pvname=None,value=None, char_value=None, **kw):
+        if (pvname is None or value is None or
+            self.cmp is None or self.trip_point is None):
+            return
 
-        val = pv._val
+        val = value
         old_alarm_state  = self.alarm_state
         self.alarm_state =  self.cmp(val,self.trip_point)
 
@@ -115,7 +121,8 @@ class alarm:
 
         if notify:
             self.last_alert = now
-            print 'Alarm: ', pv.pvname, pv._charval, time.ctime()            
+            if char_value is None: char_value = value
+            print 'Alarm: ', pvname, char_value, time.ctime()            
             # self.callback(pv=self.pv, comparison=self.cmp, trip_point=self.trip_point)
           
 

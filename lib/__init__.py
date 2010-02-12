@@ -26,13 +26,14 @@ import pv
 import alarm
 
 PV = pv.PV
+Alarm  = alarm.Alarm
 poll = ca.poll
 
 def __createPV(pvname,timeout=5.0):
     "create PV, wait for connection: "
 
     t0 = time.time()
-    thispv = PV(pvname,use_cache=False)
+    thispv = PV(pvname)
     if not thispv.connected:
         thispv.connect()
     while not thispv.connected:
@@ -59,25 +60,25 @@ def caput(pvname, value, wait=False, timeout=60):
         ca.poll()
         return ret
 
-def caget(pvname, use_char=False):
-    """caget(pvname, use_char=False)
+def caget(pvname, as_string=False):
+    """caget(pvname, as_string=False)
     simple get of a pv's value..
        >>> x = caget('xx.VAL')
 
     to get the character string representation (formatted double, enum string, etc):
-       >>> x = caget('xx.VAL', use_char=True)
+       >>> x = caget('xx.VAL', as_string=True)
     """
     pv = __createPV(pvname,timeout=10.0)
     if pv is not None:
         val = pv.get()
         ca.poll()
-        if use_char: return pv.char_value
+        if as_string: return pv.char_value
         return val
 
-def cainfo(pvname,noprint=False):
+def cainfo(pvname):
     """cainfo(pvname,noprint=False)
 
-    print information about pv
+    return printable information about pv
        >>>cainfo('xx.VAL')
 
     will print out a status report for the pv.  If True, the optional  'noprint' flag
@@ -87,8 +88,5 @@ def cainfo(pvname,noprint=False):
     if pv is not None:
         pv.get()
         pv.get_ctrlvars()
-        info = pv.get_info()
-        if noprint: return info
-        print info
-        return None
+        return pv.info
     

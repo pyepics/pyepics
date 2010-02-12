@@ -42,7 +42,7 @@ caget(), caput(), and cainfo() for the simplest of interaction with EPICS:
     >>> caput('XXX:m1.VAL',2.30)
     1  
     >>> cainfo('XXX.m1.VAL')
-    == XXX:m1.VAL  (double)
+    == XXX:m1.VAL  (double) ==
        value        = 2.3
        char_value   = 2.3000
        count        = 1
@@ -63,7 +63,7 @@ caget(), caput(), and cainfo() for the simplest of interaction with EPICS:
        lower_warning= 0.0
        PV is monitored internally
        no user callbacks defined.
-    ==
+    =============================
 
 
 The ca module provides a low-level 
