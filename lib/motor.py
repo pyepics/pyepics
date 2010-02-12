@@ -14,7 +14,6 @@
 #                 1. improved setting / checking of monitors on motor attributes
 #                 2. add 'RTYP' and 'DTYP' to motor parameters.
 #                 3. make sure the motor is a motor object, else raise a MotorException.
-
 #   May 11, 2003  MN
 #                 1. added get_pv(attribute) to return PV for attribute
 #                 2. added __check_attr_stored(attr) method to
@@ -251,7 +250,6 @@ class Motor:
             if rectype is None:  rectype = p.get() # try again for unconnected PVs
         except:
             rectype = None
-        print ' RECTYPE: ', rectype
             
         if rectype != 'motor':
             raise MotorException, "%s is not an Epics Motor" % name
@@ -261,14 +259,13 @@ class Motor:
         if not isEnabled: self._dat['enable'].put(0)        
         
 
-        for attr in self.__init_list:
-            self.store_attr(attr)
-        connect_all()
-
+        for attr in self.__init_list:   self.store_attr(attr)
+        self.connect_all()
+        
         self._dat['drive'].get()
 
     def connect_all(self):
-        for pv in self._dat.values():  pv.get()
+        for p in self._dat.values():  p.get()
 
     def __repr__(self):
         return "<EpicsCA.Motor:  %s '%s'>" % (self.pvname, self.get_field('description'))
@@ -297,8 +294,9 @@ class Motor:
     
     def store_attr(self,attr):
         if not self._dat.has_key(attr) and self.__motor_params.has_key(attr):
-            pv = "%s.%s" % (self.pvname,self.__motor_params[attr][0])
-            self._dat[attr] = pv.PV(pv,connect=True,connect_time=1.0)
+            pvname = "%s.%s" % (self.pvname,self.__motor_params[attr][0])
+            self._dat[attr] = pv.PV(pvname)
+            self._dat[attr].connect()
         return self._dat.has_key(attr)
     
 
@@ -367,12 +365,15 @@ class Motor:
             limits_ok = self.within_limits(val,lims)
             if not limits_ok: return -1
             
-        self.put_field(drv,val,wait=wait)
-        self.check_limits()
-        if wait:
-            put_complete = self.wait_for_put(drv,timeout=timeout)
-            if not put_complete: return -2
-        return 0
+        stat = self.put_field(drv,val,wait=wait,timeout=timeout)
+        ret = stat
+        if stat == 1:  ret = 0
+        if stat == -2: ret = -1
+        try:
+            self.check_limits()
+        except:
+            ret = -1
+        return ret
 
     def wait_for_put(self,field,timeout=3600.):
         """ wait for put on a field to complete:
@@ -380,9 +381,9 @@ class Motor:
            returns True  if put completed before timeout
            returns False if put timed out
            """
-        t0 = time.time()
-        pv = self._dat[field]
-        while not pv.put_complete:
+        t0  = time.time()
+        pvn = self._dat[field]
+        while not pvn.put_complete:
             ca.poll()
             time.sleep(0.001)
             if time.time()-t0 > timeout:  return False
@@ -443,12 +444,15 @@ class Motor:
         if dir.startswith('rev') or dir.startswith('back'):
             ifield = 'tweak_reverse'
             
-        self.put_field(ifield,1,wait=wait)
-        self.check_limits()
-        if wait:
-            put_complete = self.wait_for_put(ifield,timeout=timeout)
-            if not put_complete: return -2
-        return 0
+        stat = self.put_field(drv,val,wait=wait,timeout=timeout)
+        ret = stat
+        if stat == 1:  ret = 0
+        if stat == -2: ret = -1
+        try:
+            self.check_limits()
+        except:
+            ret = -1
+        return ret
 
         
     def set_position(self, position, dial=False, step=False, raw=False):
@@ -510,7 +514,7 @@ class Motor:
         else:
             return "%s.%s" % (self.pvname,self.__motor_params[attr][0])
 
-    def put_field(self,attr,val,wait=False):
+    def put_field(self,attr,val,wait=False,timeout=300):
         """set a Motor attribute (field) to a value
         example:
           >>> motor = Motor('XX:m1')
@@ -529,11 +533,11 @@ class Motor:
         will wait until the motor has moved to drive position 2.
         """
         if not self.store_attr(attr): return None
-        return self._dat[attr].put(val,user_wait=wait)
-
-    def get_field(self,attr,use_char=False):
+        return self._dat[attr].put(val,wait=wait,timeout=timeout)
+    
+    def get_field(self,attr,as_string=False):
         if not self.store_attr(attr): return None
-        return self._dat[attr].get(use_char=use_char)
+        return self._dat[attr].get(as_string=as_string)
 
     def clear_field_callback(self,attr):
         try:
@@ -577,7 +581,7 @@ class Motor:
                   'stop_go', 'set', 'status'):
             j = i
             if (len(j) < 16): j = "%s%s" % (j,' '*(16-len(j)))
-            print "%s = %s" % (j, self.get_field(i,use_char=1))
+            print "%s = %s" % (j, self.get_field(i,as_string=1))
         print "--------------------------------------"
 
     def show_all(self):
@@ -592,9 +596,9 @@ class Motor:
             l = attr 
             if (len(attr)<15): l  = l + ' '*(15-len(l))
             suf = self.__motor_params[attr][0]
-            pv  = "%s.%s" % (self.pvname, suf)
+            pvn  = "%s.%s" % (self.pvname, suf)
             if (len(suf)<5): suf = suf  +' '*(5-len(suf))            
-            val = self.get_field(attr,use_char=1)
+            val = self.get_field(attr,as_string=1)
             if (val):
                 if (len(val)<12): val  = val + ' '*(12-len(val))
             print " %s  %s  %s  %s" % (l,suf,val,

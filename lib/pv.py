@@ -106,12 +106,16 @@ class PV(object):
         if as_string: field = 'char_value'
         return self._args[field]
 
-    def put(self,value,wait=False,timeout=30.0):
+    def put(self,value,wait=False,timeout=30.0,callback=None):
         """set value for PV, optionally waiting until
         the processing is complete.
         """
         if not self.connect():  return None
-        return ca.put(self.chid,value,wait=wait,timeout=timeout)
+        return ca.put(self.chid, value,
+                      wait=wait,
+                      timeout=timeout,
+                      callback=callback)
+
 
     def _set_charval(self,val,ca_calls=True):
         """ set the character representation of the value"""

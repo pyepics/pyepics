@@ -215,8 +215,13 @@ _CB_connect = ctypes.CFUNCTYPE(None, dbr.ca_connection_args)(_onConnectionEvent)
 
 # put events
 def _onPutEvent(args,*varargs):
-    """ set put-is-done for this channel"""
-    _put_done[name(args.chid)] = True
+    """set put-has-completed for this channel, call optional user-supplied callback"""
+    pvname = name(args.chid)
+    userfcn = _put_done[pvname][1]
+    if callable(userfcn):
+        userfcn()
+
+    _put_done[pvname] = (True,None)
 
 # hold global reference to this callback
 _CB_putwait  = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)   
@@ -364,6 +369,9 @@ def _str_to_bytearray(s,maxlen=1):
     
 @withConnectedCHID
 def put(chid,value, wait=False, timeout=20, callback=None):
+    """put,with optional wait and user-defined callback
+    returns 1 on sucess and -1 on timed-out
+    """
     ftype = field_type(chid)
     count = element_count(chid)
     rawdata = (count*dbr.Map[ftype])()    
@@ -376,28 +384,29 @@ def put(chid,value, wait=False, timeout=20, callback=None):
             value = _str_to_bytearray(value,maxlen=count)
         rawdata[:]  = list(value)
       
-    if wait:
+    if wait is not None or callable(callback):
         pvname= name(chid)
-        _put_done[pvname] = False
+        _put_done[pvname] = (False,callback)
         poll()
-        r = libca.ca_array_put_callback(ftype,count,chid,
-                                        rawdata, _CB_putwait, 0)
-
-        t0 = time.time()
-        while time.time()-t0 <timeout:
-            time.sleep(1.e-4)
-            poll()
-            if _put_done[pvname]: break
-        return r
-    
+        ret = libca.ca_array_put_callback(ftype,count,chid,
+                                          rawdata, _CB_putwait, 0)
+        if wait:
+            t0 = time.time()
+            ret = -1
+            while time.time()-t0 <timeout:
+                time.sleep(1.e-4)
+                poll()
+                if _put_done[pvname][0]:
+                    ret = 1
+                    break
     elif callback is not None:
         _cb = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(callback)   
         poll()
-        r = libca.ca_array_put_callback(ftype,count,chid, rawdata, _cb, 0)
+        ret = libca.ca_array_put_callback(ftype,count,chid, rawdata, _cb, 0)
     else:
-        r =  libca.ca_array_put(ftype,count,chid, rawdata)
+        ret =  libca.ca_array_put(ftype,count,chid, rawdata)
     poll()
-    return r
+    return ret
 
 @withConnectedCHID
 def get_ctrlvars(chid):
@@ -440,7 +449,6 @@ def _onGetEvent(args):
     kw = {'ftype':args.type,'count':args.count,
           'chid':args.chid, 'status':args.status}
 
-    print 'onGetEvent' , value
     # add kw arguments for CTRL and TIME variants
     if args.type >= dbr.CTRL_STRING:
         v0 = value[0]
