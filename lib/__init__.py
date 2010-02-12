@@ -24,10 +24,13 @@ import ca
 import dbr
 import pv
 import alarm
+import motor
 
-PV = pv.PV
-Alarm  = alarm.Alarm
-poll = ca.poll
+PV    = pv.PV
+Alarm = alarm.Alarm
+Motor = motor.Motor
+poll  = ca.poll
+
 
 def __createPV(pvname,timeout=5.0):
     "create PV, wait for connection: "
