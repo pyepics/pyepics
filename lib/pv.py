@@ -3,6 +3,7 @@ import dbr
 import time
 import math
 
+
 def fmt_time(t=None):
     if t is None: t = time.time()
     t,frac=divmod(t,1)
@@ -119,7 +120,7 @@ class PV(object):
 
     def _set_charval(self,val,ca_calls=True):
         """ set the character representation of the value"""
-        cval = repr(val)       
+        cval  = repr(val)       
         ftype = self._args['ftype']
         if self._args['count'] > 1:
             if ftype == dbr.CHAR:
@@ -128,15 +129,15 @@ class PV(object):
                 cval = '<array size=%d, type=%s>' % (len(val),
                                                      dbr.Name(ftype))
         elif ftype in (dbr.FLOAT, dbr.DOUBLE):
-            fmt  = "%%.%if"
             if ca_calls and self._args['precision'] is None:
                 self.get_ctrlvars()
             try: 
+                fmt  = "%%.%if"
                 if 4 < abs(int(math.log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
                 cval = (fmt % self._args['precision']) % val                    
             except:
-                cval = repr(val)
+                pass 
         elif ftype == dbr.ENUM:
             if ca_calls and self._args['enum_strs'] in ([], None):
                 self.get_ctrlvars()
@@ -144,7 +145,7 @@ class PV(object):
                 cval = self._args['enum_strs'][val]
             except:
                 pass
-            
+
         self._args['char_value'] =cval
         return cval
 
@@ -166,12 +167,14 @@ class PV(object):
         if self.verbose:
             print '  Event ', self.pvname,self.value, fmt_time(self._args['timestamp'])
         
-        for fcn in self.callbacks:
-            if callable(fcn):  fcn(**self._args)
+        for fcn,kw in self.callbacks:
+            kw.update(self._args)
+            if callable(fcn):  fcn(**kw)
             
-    def add_callback(self,callback=None):
+    def add_callback(self,callback=None,id=0,**kw):
         if callable(callback):
-            self.callbacks.append(callback)
+            kw['id']=id
+            self.callbacks.append((callback,kw))
 
     def _getinfo(self):
         if not self.connect():  return None

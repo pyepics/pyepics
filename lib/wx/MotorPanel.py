@@ -46,7 +46,7 @@ class MotorDetailFrame(wx.Frame):
         panel = wx.Panel(self)# outerpanel)
         sizer = wx.BoxSizer(wx.VERTICAL)
 
-        devtype = motor.get_field('device_type',use_char=True)
+        devtype = motor.get_field('device_type',as_string=True)
         mlabel = "  %s: %s   (%s) units=%s" % (motor.pvname,
                                                   motor.description, devtype, motor.units)
 
@@ -267,7 +267,7 @@ class MotorDetailFrame(wx.Frame):
         if (pv is None): return None
         
         field_val = motor.get_field(field)
-        field_str = motor.get_field(field,use_char=1)
+        field_str = motor.get_field(field,as_string=1)
 
         if field in ('soft_limit', 'high_limit_set', 'low_limit_set'):
             s = 'Limit!'
@@ -464,7 +464,7 @@ class MotorPanel(wx.Panel):
     def onMotorEvent(self,pv=None,field=None,motor=None,**kw):        
         if (pv is None): return None
         field_val = motor.get_field(field)
-        field_str = motor.get_field(field,use_char=1)
+        field_str = motor.get_field(field,as_string=1)
 
         if field == 'low_limit':
             self.drive.SetMin(self.motor.low_limit)
