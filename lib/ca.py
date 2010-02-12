@@ -308,9 +308,10 @@ def _unpack_val(data, count, ftype=dbr.INT,as_numpy=True):
     """ unpack raw data returned from an array get or subscription callback"""
 
     def unpack_simple(data):
-        if count == 1:    return data[0]
+        if count == 1 and ftype != dbr.STRING:    return data[0]
         out = [i for i in data]
-        if ntype == dbr.STRING:
+        if ftype == dbr.STRING:
+            if '\x00' in out:   out = out[:out.index('\x00')]
             out = ''.join(out).rstrip()
         elif has_numpy and as_numpy:
             out = numpy.array(out)
@@ -318,7 +319,9 @@ def _unpack_val(data, count, ftype=dbr.INT,as_numpy=True):
 
     def unpack_ctrltime(data):
         if count == 1 or ntype == dbr.STRING:
-            return data[0].value
+            out = data[0].value
+            if '\x00' in out: out = out[:out.index('\x00')]
+            return out
         out = [i.value for i in data]
         if has_numpy and as_numpy:  out = numpy.array(out)
         return out
@@ -348,7 +351,7 @@ def get(chid,ftype=None,as_string=False, as_numpy=True):
     
     ret = libca.ca_array_get(ftype, count, chid, rawdata)
     poll()
-    v = _unpack_val(rawdata,count,ftype=ftype,as_numpy=as_numpy)
+    v = _unpack_val(rawdata,nelem,ftype=ftype,as_numpy=as_numpy)
     if as_string and ftype==dbr.CHAR:
         v = ''.join([chr(i) for i in s if i>0]).strip().rstrip()
 
@@ -437,6 +440,7 @@ def _onGetEvent(args):
     kw = {'ftype':args.type,'count':args.count,
           'chid':args.chid, 'status':args.status}
 
+    print 'onGetEvent' , value
     # add kw arguments for CTRL and TIME variants
     if args.type >= dbr.CTRL_STRING:
         v0 = value[0]

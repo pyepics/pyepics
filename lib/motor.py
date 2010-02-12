@@ -251,6 +251,7 @@ class Motor:
             if rectype is None:  rectype = p.get() # try again for unconnected PVs
         except:
             rectype = None
+        print ' RECTYPE: ', rectype
             
         if rectype != 'motor':
             raise MotorException, "%s is not an Epics Motor" % name
