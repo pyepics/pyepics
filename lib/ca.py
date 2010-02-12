@@ -360,7 +360,7 @@ def _str_to_bytearray(s,maxlen=1):
     return [ord(i) for i in ("%s%s" % (s,'\x00'*maxlen))[:maxlen] ]
     
 @withConnectedCHID
-def put(chid,value, wait=False, wait_timeout=20, callback=None):
+def put(chid,value, wait=False, timeout=20, callback=None):
     ftype = field_type(chid)
     count = element_count(chid)
     rawdata = (count*dbr.Map[ftype])()    
@@ -381,7 +381,7 @@ def put(chid,value, wait=False, wait_timeout=20, callback=None):
                                         rawdata, _CB_putwait, 0)
 
         t0 = time.time()
-        while time.time()-t0 < wait_timeout:
+        while time.time()-t0 <timeout:
             time.sleep(1.e-4)
             poll()
             if _put_done[pvname]: break

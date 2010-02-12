@@ -1,0 +1,49 @@
+Installation instructions for Py-Epics3
+=======================================
+
+To install the epics module from source, use 
+
+   python setup.py build
+   python setup.py install
+
+
+This assumes that Python 2.5 or higher is installed, and that the shared
+object libraries for Epics Channel Access (libCom.so and libca.so) can be
+found on your system.  For Windows32, these dlls (Com.dll and ca.dll) are
+included with this distribution and installed for you.
+
+I've only tested the installation and use on Linux and Win32.
+
+Locating CA shared libraries
+============================
+
+On Unix systems, the shared libraries for Epics Channel Access (libca.so,
+libCom.so) must be found by Python at runtime.  Since Epics installations
+generally leaves these in an architecture-specific location (and not
+"installed" into normal library directories), you will probably need to set
+this up once per machine.  There are a few ways to do this:
+
+  1. set the environmental variable LD_LIBRARY_PATH (or DYLD_LIBRARY_PATH)
+     to point to the directory with the shared object libraries:
+
+       export LD_LIBRARY_PATH=/usr/local/epics/base/lib/linux-x86 
+
+       setenv LD_LIBRARY_PATH /usr/local/epics/base/lib/linux-x86 
+
+  2. (Linux only?): add the directory with the shared object library as a
+    line in the file /etc/ld.so.conf (or in a file that is included by it) 
+    and run /sbin/ldconfig  (as root):
+
+     sudo echo '/usr/local/epics/base/lib/linux-x86' > /etc/ld.so.conf.d/epics.conf
+     sudo /sbin/ldconfig
+
+
+Option 1. would need to be for user (any shell, really) that wanted to use
+CA, and so should probably be put in a shsll startup script.  
+
+Option 2. only needs to be done once for the whole system.
+
+
+Matt Newville <newville@cars.uchicago.edu>
+Last Update:  6-August-2008
+

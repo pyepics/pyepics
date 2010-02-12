@@ -53,7 +53,7 @@ def caput(pvname, value, wait=False, timeout=60):
     to wait for pv to complete processing, use 'wait=True':
        >>> caput('xx.VAL',3.0,wait=True)
     """ 
-    pv = __createPV(pvname,timeout=10.0)
+    pv = __createPV(pvname,timeout=timeout)
     if pv is not None:
         ret = pv.put(value,wait=wait,timeout=timeout)
         ca.poll()
@@ -85,6 +85,8 @@ def cainfo(pvname,noprint=False):
     """
     pv = __createPV(pvname,timeout=10.0)
     if pv is not None:
+        pv.get()
+        pv.get_ctrlvars()
         info = pv.get_info()
         if noprint: return info
         print info
