@@ -193,7 +193,7 @@ class PV(object):
             fmt = '%i'
             if   xtype in ('float','double'): fmt = '%g'
             elif xtype in ('string','char'):  fmt = '%s'
-            out.append('   value        = %s' % fmt % val)
+            out.append('   value     = %s' % fmt % val)
 
         else:
             aval,ext,fmt = [],'',"%i,"
@@ -201,7 +201,7 @@ class PV(object):
             if xtype in  ('float','double'): fmt = "%g,"
             for i in range(min(5,self._count)):
                 aval.append(fmt % self._val[i])
-            out.append("   value        = array  [%s%s]" % ("".join(aval),ext))
+            out.append("   value     = array  [%s%s]" % ("".join(aval),ext))
 
         for i in ('char_value','count','type','units',
                   'precision','host','access',
@@ -214,8 +214,8 @@ class PV(object):
                 att = getattr(self,i)
                 if i == 'timestamp': att = "%.3f (%s)" % (att,fmt_time(att))
                 if att is not None:
-                    if len(i) < 11:
-                        out.append('   %.10s= %s' % (i+' '*12, str(att)))
+                    if len(i) < 12:
+                        out.append('   %.11s= %s' % (i+' '*12, str(att)))
                     else:
                         out.append('   %.20s= %s' % (i+' '*20, str(att)))
 
