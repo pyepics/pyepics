@@ -34,16 +34,21 @@ libca = None
 PREEMPTIVE_CALLBACK = True
 # PREEMPTIVE_CALLBACK = False
 
-# default timeout for connection
-DEFAULT_CONNECTION_TIMEOUT = 10.0
+## default timeout for connection
+#  This should be kept fairly short --
+#  connection will be tried repeatedly
+DEFAULT_CONNECTION_TIMEOUT = 5.0
 
 ## Cache of existing channel IDs:
-##  pvname: {chid, isConnected, connection_callback)
+##  pvname: {'chid':chid, 'conn': isConnected,
+##           'ts': ts_conn, 'userfcn': user_callback)
+##  isConnected   = True/False: if connected.
+##  ts_conn       = ts of last connection event or failed attempt.
+##  user_callback = user function to be called on change
 _cache  = {}
 
 ## Cache of pvs waiting for put to be done.
 _put_done =  {}
-
         
 class ChannelAccessException(Exception):
     """Channel Access Exception"""
@@ -66,7 +71,6 @@ def initialize_libca():
     load_dll = ctypes.cdll.LoadLibrary
     dllname  = 'libca.so'
     path_sep = ':'
-    os_path  = os.environ['PATH']
     if os.name == 'nt':
         load_dll = ctypes.windll.LoadLibrary
         dllname  = 'ca.dll'
@@ -75,7 +79,6 @@ def initialize_libca():
         for p in (sys.prefix,os.path.join(sys.prefix,'DLLs')):
             path_dirs.insert(0,p)
         os.environ['PATH'] = ';'.join(path_dirs)
-
 
     libca = load_dll(dllname)
     ca_context = {False:0, True:1}[PREEMPTIVE_CALLBACK]
@@ -94,8 +97,7 @@ def finalize_libca(maxtime=10.0):
     flush_io()
     poll()
 
-    for val in _cache.values():
-        clear_channel(val[0])
+    for val in _cache.values():  clear_channel(val['chid'])
     _cache.clear()
 
     for i in range(10):
@@ -104,9 +106,9 @@ def finalize_libca(maxtime=10.0):
         if time.time()-t0 > maxtime: break
 
     context_destroy()
-    _CB_putwait  = _CB_connect = libca = None
+    libca = None
     gc.collect()
-    print 'shutdown in %.3fs' % (time.time()-t0)
+    # print 'shutdown in %.3fs' % (time.time()-t0)
 
 # now register this function to be run on normal exits
 atexit.register(finalize_libca)
@@ -115,9 +117,15 @@ atexit.register(finalize_libca)
 def _onConnectionEvent(args):
     """set flag in cache holding whteher channel is connected.
     if provided, run a user-function"""
-    entry = _cache[name(args.chid)]
-    entry[1] = (args.op == dbr.OP_CONN_UP)
-    if callable(entry[2]):  entry[2](chid=args.chid)
+    pvname = name(args.chid)
+    entry = _cache[pvname]
+    entry['conn'] = (args.op == dbr.OP_CONN_UP)
+    entry['ts']   = time.time()
+    entry['failures'] = 0
+    if callable(entry['userfcn']):
+        entry['userfcn'](pvname=pvname,
+                         chid=entry['chid'],
+                         conn=entry['conn'])
     return 
 
 # hold global reference to this callback
@@ -143,7 +151,9 @@ def show_cache():
     print '  PV name    Is Connected?   Channel ID'
     print '---------------------------------------'
     for name,val in _cache.items():
-        print " %s   %s     %s " % (name, repr(val[1]), val[0])
+        print " %s   %s     %s " % (name,
+                                    repr(val['conn']),
+                                    repr(val['chid']))
 
 ###
 # 3 decorator functions for ca functionality:
@@ -186,7 +196,7 @@ def withConnectedCHID(fcn):
                 raise ChannelAccessException(fcn.func_name, "not a valid chid!")
             if (state(args[0]) != dbr.CS_CONN):
                 t = kw.get('timeout',DEFAULT_CONNECTION_TIMEOUT)
-                connect_channel(args[0],timeout=t)
+                connect_channel(args[0],timeout=t,force=False)
             if (state(args[0]) != dbr.CS_CONN):
                 raise ChannelAccessException(fcn.func_name, "channel cannot connect")
         return fcn(*args,**kw)
@@ -266,7 +276,9 @@ def create_channel(pvname,connect=False,userfcn=None):
     chid = ctypes.c_long()
 
     libca.ca_create_channel(pvname,_CB_connect,0,0,ctypes.byref(chid))
-    _cache[pvname] = [chid,False,userfcn]
+    _cache[pvname] = {'chid':chid, 'conn':False,
+                      'ts':0, 'failures':0,
+                      'userfcn': userfcn}
     if connect: connect_channel(chid)
     return chid
 
@@ -315,38 +327,61 @@ def promote_type(chid,use_time=False,use_ctrl=False,**kw):
 
 
 @withCHID
-def connect_channel(chid,timeout=None,verbose=False):
-    """ wait (up to timeout) until a chid is connected"""
+def connect_channel(chid,timeout=None,verbose=False,force=True):
+    """ wait (up to timeout) until a chid is connected
+
+    Normally, channels will connect very fast, and the
+    connection callback will succeed the first time.
+
+    For un-connected Channels (that are nevertheless queried),
+    the 'ts' (timestamp of last connecion attempt) and
+    'failures' (number of failed connection attempts) from
+    the _cache will be used to prevent spending too much time
+    waiting for a connection that may never happen.
+    
+    """
     conn = (state(chid)==dbr.CS_CONN)
+    if conn: return conn
+
     t0 = time.time()
+    dt = t0 - _cache[name(chid)]['ts']
+    # avoid repeatedly trying to connect to unavailable PV
+    nfail = min(20,  1 + _cache[name(chid)]['failures'])
+    if force: nfail = min(2,nfail)
+    if dt < nfail * DEFAULT_CONNECTION_TIMEOUT: return conn
+
     if timeout is None: timeout=DEFAULT_CONNECTION_TIMEOUT
     while (not conn and (time.time()-t0 <= timeout)):
         poll()
         conn = (state(chid)==dbr.CS_CONN)
     if verbose:
         print 'connected in %.3f s' % ( time.time()-t0 )
+    if not conn:
+        _cache[name(chid)]['ts'] = time.time()
+        _cache[name(chid)]['failures'] += 1
     return conn
 
 def _unpack(data, count, ftype=dbr.INT,as_numpy=True):
-    """ unpack raw data returned from an array get or subscription callback"""
+    """ unpack raw data returned from an array get or
+    subscription callback"""
 
+    ## TODO:  Can these be combined??
     def unpack_simple(data,ntype):
-        if count == 1 and ntype != dbr.STRING:    return data[0]
+        if count == 1 and ntype != dbr.STRING:
+            return data[0]
         out = [i for i in data]
         if ntype == dbr.STRING:
-            if '\x00' in out:   out = out[:out.index('\x00')]
             out = ''.join(out).rstrip()
-        elif has_numpy and as_numpy:
-            out = numpy.array(out)
+            if '\x00' in out:   out = out[:out.index('\x00')]
         return out
 
     def unpack_ctrltime(data,ntype):
-        if count == 1 or ftype == dbr.STRING:
+        if count == 1 or ntype == dbr.STRING:
             out = data[0].value
-            if '\x00' in out: out = out[:out.index('\x00')]
+            if ntype == dbr.STRING and '\x00' in out:
+                out = out[:out.index('\x00')]
             return out
         out = [i.value for i in data]
-        if has_numpy and as_numpy:  out = numpy.array(out)
         return out
 
     ntype = ftype
@@ -357,8 +392,11 @@ def _unpack(data, count, ftype=dbr.INT,as_numpy=True):
     if ftype > dbr.CTRL_STRING:    ntype -= dbr.CTRL_STRING
     elif ftype >= dbr.TIME_STRING: ntype -= dbr.TIME_STRING
 
-    return unpack(data,ntype)
-    
+    out = unpack(data,ntype)
+    if has_numpy and as_numpy and count>1 and ntype !=dbr.STRING:
+        out = numpy.array(out)
+    return out
+
 @withConnectedCHID
 def get(chid,ftype=None,as_string=False, as_numpy=True):
     if ftype is None: ftype = field_type(chid)
@@ -371,16 +409,11 @@ def get(chid,ftype=None,as_string=False, as_numpy=True):
     
     ret = libca.ca_array_get(ftype, count, chid, rawdata)
     poll()
-    v = _unpack(rawdata,nelem,ftype=ftype,as_numpy=as_numpy)
+    val = _unpack(rawdata,nelem,ftype=ftype,as_numpy=as_numpy)
     if as_string and ftype==dbr.CHAR:
-        v = ''.join([chr(i) for i in s if i>0]).strip().rstrip()
+        val = ''.join([chr(i) for i in s if i>0]).strip().rstrip()
 
-    return v
-
-def _str_to_bytearray(s,maxlen=1):
-    # could consider using
-    # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],dtype=numpy.uint8)
-    return [ord(i) for i in ("%s%s" % (s,'\x00'*maxlen))[:maxlen] ]
+    return val
     
 @withConnectedCHID
 def put(chid,value, wait=False, timeout=20, callback=None):
@@ -389,22 +422,26 @@ def put(chid,value, wait=False, timeout=20, callback=None):
     """
     ftype = field_type(chid)
     count = element_count(chid)
-    rawdata = (count*dbr.Map[ftype])()    
+    data  = (count*dbr.Map[ftype])()    
 
     if count == 1:
-        rawdata[0] = value
+        data[0] = value
     else:
-        # automatically convert strings to data arrays for character waveforms
+        # auto-convert strings to data arrays for character waveforms
+        # could consider using???
+        # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],
+        #                  dtype=numpy.uint8)
         if ftype == dbr.CHAR and isinstance(value,(str,unicode)):
-            value = _str_to_bytearray(value,maxlen=count)
-        rawdata[:]  = list(value)
+            pad = '\x00'*(1+count-len(value))
+            value = [ord(i) for i in ("%s%s" % (value,pad)[:count]]            
+        data[:]  = list(value)
       
-    if wait is not None or callable(callback):
+    if wait or callable(callback):
         pvname= name(chid)
         _put_done[pvname] = (False,callback)
         poll()
         ret = libca.ca_array_put_callback(ftype,count,chid,
-                                          rawdata, _CB_putwait, 0)
+                                          data, _CB_putwait, 0)
         if wait:
             t0 = time.time()
             ret = -1
@@ -414,10 +451,6 @@ def put(chid,value, wait=False, timeout=20, callback=None):
                 if _put_done[pvname][0]:
                     ret = 1
                     break
-    elif callback is not None:
-        _cb = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(callback)   
-        poll()
-        ret = libca.ca_array_put_callback(ftype,count,chid, rawdata, _cb, 0)
     else:
         ret =  libca.ca_array_put(ftype,count,chid, rawdata)
     poll()
@@ -519,13 +552,10 @@ def dump_dbr(type,count,data):
 
 def add_exception_event(): return libca.ca_add_exception_event()
 
-
 def add_fd_registration(): return libca.ca_add_fd_registration()
 
 
 def client_status(): return libca.ca_client_status()
-
-    
 
 def replace_access_rights_event(): return libca.ca_replace_access_rights_event()
 def replace_printf_handler(): return libca.ca_replace_printf_handler()

@@ -57,8 +57,8 @@ class PV(object):
                                       userfcn=self._onConnect)
         self._args['chid'] = self.chid
 
-    def _onConnect(self,chid=0):
-        self.connected = ca._cache[self.pvname][1]        
+    def _onConnect(self,chid=0,conn=True,**kw):
+        self.connected = conn
         if self.connected:
             self._args['host']   = ca.host_name(self.chid)
             self._args['count']  = ca.element_count(self.chid)
@@ -71,9 +71,9 @@ class PV(object):
             self._args['type']  = dbr.Name(ftype).lower()
         return
 
-    def connect(self,timeout=5.0):
+    def connect(self,timeout=5.0,force=True):
         if not self.connected:
-            ca.connect_channel(self.chid, timeout=timeout)
+            ca.connect_channel(self.chid, timeout=timeout,force=force)
             self.poll()
         if (self.connected and
             self.auto_monitor and
@@ -97,7 +97,7 @@ class PV(object):
         'Pos'
         
         """
-        if not self.connect():  return None
+        if not self.connect(force=False):  return None
         self._args['value'] = ca.get(self.chid,
                                     ftype=self.ftype)
         self.poll() 
@@ -111,7 +111,7 @@ class PV(object):
         """set value for PV, optionally waiting until
         the processing is complete.
         """
-        if not self.connect():  return None
+        if not self.connect(force=False):  return None
         return ca.put(self.chid, value,
                       wait=wait,
                       timeout=timeout,
@@ -151,7 +151,7 @@ class PV(object):
 
     
     def get_ctrlvars(self):
-        if not self.connect():  return None
+        if not self.connect(force=False):  return None
         kw = ca.get_ctrlvars(self.chid)
         self._args.update(kw)
         return kw
@@ -177,7 +177,7 @@ class PV(object):
             self.callbacks.append((callback,kw))
 
     def _getinfo(self):
-        if not self.connect():  return None
+        if not self.connect(force=False):  return None
         if self._args['precision'] is None: self.get_ctrlvars()
 
         out = []
@@ -312,7 +312,7 @@ class PV(object):
     def info(self): return self._getinfo()
 
     def __repr__(self):
-        if not self.connected:  return "<PV '%s': unconnectd>" % self.pvname
+        if not self.connected:  return "<PV '%s': not connected>" % self.pvname
 
         return "<PV: '%(pvname)s', count=%(count)i, type=%(type)s, access=%(access)s>" % self._args
     
