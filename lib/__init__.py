@@ -56,7 +56,7 @@ def caput(pvname, value, wait=False, timeout=60):
     to wait for pv to complete processing, use 'wait=True':
        >>> caput('xx.VAL',3.0,wait=True)
     """ 
-    pv = __createPV(pvname,timeout=timeout)
+    pv = __createPV(pvname)
     if pv is not None:
         ret = pv.put(value,wait=wait,timeout=timeout)
         ca.poll()
@@ -70,7 +70,7 @@ def caget(pvname, as_string=False):
     to get the character string representation (formatted double, enum string, etc):
        >>> x = caget('xx.VAL', as_string=True)
     """
-    pv = __createPV(pvname,timeout=10.0)
+    pv = __createPV(pvname)
     if pv is not None:
         val = pv.get()
         ca.poll()
@@ -86,7 +86,7 @@ def cainfo(pvname):
     will print out a status report for the pv.  If True, the optional  'noprint' flag
     will NOT print the status report, but return the paragraph as a string.
     """
-    pv = __createPV(pvname,timeout=10.0)
+    pv = __createPV(pvname)
     if pv is not None:
         pv.get()
         pv.get_ctrlvars()

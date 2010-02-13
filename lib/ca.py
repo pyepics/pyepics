@@ -7,10 +7,110 @@
 Overview
 ========
 
-This provides a ctypes-based wrapping of EPICS Channel Access.
+This provides a ctypes-based wrapping of EPICS Channel Access (CA).
 
-The
+The goal for this module is to stay fairly close to the C interface
+to CA while also providing a pleasant Python experience.  To that
+end, this document is mostly confessional, describing the
+differences (sins) with the "pure" C interface:
 
+Name Mangling
+=============
+
+In general, when a CA function is called 'ca_XXX', I renamed that
+function to 'XXX' as the intention is that this module will be
+imported with
+    import ca
+so that function 'ca_XXX' will become 'ca.XXX'
+
+Omissions
+=========
+
+Several parts of the CA library are not implemented (yet?).
+These include:
+
+    ca_dump_dbr()
+    ca_add_exception_event()
+    ca_add_fd_registration()
+    ca_client_status()
+    ca_replace_access_rights_event()
+    ca_puser()
+    ca_set_puser()
+    ca_signal()
+    ca_sg_block()
+    ca_sg_create()
+    ca_sg_delete()
+    ca_sg_array_get()
+    ca_sg_array_put()
+    ca_sg_reset()
+    ca_sg_test()
+    ca_test_event()
+    ca_test_io()
+    ca_dbr_size()
+    ca_dbr_value_size()
+    ca_size_n()
+    ca_channel_state()
+    ca_SEVCHK()
+
+Initialization, Finalization, Lifecycle
+=======================================
+
+Because CA requires a context model set on initialization and 
+because ctypes requires that the shared library be loaded before it
+is used (!) and because ctypes requires references to callback
+functions be kept (else they'll be garbage collected), the
+lifecycle of a CA session is slightly complicated.
+
+The code in this module mostly hides this from you, initializing
+the ca library as soon as it is needed (but not on loading the
+module).  ca.libca keeps the reference to the shared library.
+
+By default this module enables preemptive callbacks.  To disable
+them, set ca.PREEMPTIVE_CALLBACK = False before making any other
+calls to the library.
+
+This module keeps a global cache of PVs (ca._cache) that holds
+connection status.
+
+When shutdown gracefully, This module attempts to clean up after
+itself so that the underlying CA library does not give error
+messages.  On less-than-graceful shutdowns, you may see core dumps
+and error messages from the CA library.
+
+For now, I am assuming that there is one CA context.
+
+Creating and Connecting to Channels
+===================================
+
+To create a channel, use
+
+ chid = ca.create_channel(pvname,connect=False,userfcn=None)
+    pvname   the name of the PV to create.
+    connect  (True/False) whether to (try to) connnect now.
+    userfcn  a Python callback function to be called when the
+             connection state changes.   This function should be
+             prepared to accept keyword arguments 
+                 pvname  name of pv
+                 chid    ctypes chid value
+                 conn    True/False:  whether channel is connected.
+
+    Internally, a connection callback is used so that you should
+    not need to explicitly connect to a channel.
+    
+ stat = connect_channel(chid,timeout=None,verbose=False,force=True):
+    This explicitly tries to connect to a channel, waiting up to
+    timeout for a channel to connect.
+
+    Normally, channels will connect very fast, and the
+    connection callback will succeed the first time.
+
+    For un-connected Channels (that are nevertheless queried),
+    the 'ts' (timestamp of last connecion attempt) and
+    'failures' (number of failed connection attempts) from
+    the _cache will be used to prevent spending too much time
+    waiting for a connection that may never happen.
+    
+   
 """
 import ctypes
 import os
@@ -213,7 +313,9 @@ def raise_on_ca_error(fcn):
         return 
     return wrapper
 
-
+##
+# On with the show: now we're ready to wrap libca functions
+##
 # contexts
 @withCA
 def context_create(context=0): return libca.ca_context_create(context)
@@ -546,38 +648,38 @@ def clear_subscription(evid): return libca.ca_clear_subscription(evid)
 
 ##
 ## several methods are not yet implemented:
-
-def dump_dbr(type,count,data):
-    return libca.ca_dump_dbr(type,count, data)
-
-def add_exception_event(): return libca.ca_add_exception_event()
-
-def add_fd_registration(): return libca.ca_add_fd_registration()
-
-
-def client_status(): return libca.ca_client_status()
-
-def replace_access_rights_event(): return libca.ca_replace_access_rights_event()
-def replace_printf_handler(): return libca.ca_replace_printf_handler()
-
-def puser(): return libca.ca_puser()
-def set_puser(): return libca.ca_set_puser()
-def signal(): return libca.ca_signal()
-def sg_block(): return libca.ca_sg_block()
-def sg_create(): return libca.ca_sg_create()
-def sg_delete(): return libca.ca_sg_delete()
-def sg_array_get(): return libca.ca_sg_array_get()
-def sg_array_put(): return libca.ca_sg_array_put()
-def sg_reset(): return libca.ca_sg_reset()
-def sg_test(): return libca.ca_sg_test()
-
-def test_event(): return libca.ca_test_event()
-def test_io(): return libca.ca_test_io()
-def dbr_size(): return libca.dbr_size()
-def dbr_value_size(): return libca.dbr_value_size()
-
-def size_n(): raise NotImplementedError
-def channel_state(): raise NotImplementedError
-
-def SEVCHK(): raise NotImplementedError
+# 
+# def dump_dbr(type,count,data):
+#     return libca.ca_dump_dbr(type,count, data)
+# 
+# def add_exception_event(): return libca.ca_add_exception_event()
+# 
+# def add_fd_registration(): return libca.ca_add_fd_registration()
+# 
+# 
+# def client_status(): return libca.ca_client_status()
+# 
+# def replace_access_rights_event(): return libca.ca_replace_access_rights_event()
+# def replace_printf_handler(): return libca.ca_replace_printf_handler()
+# 
+# def puser(): return libca.ca_puser()
+# def set_puser(): return libca.ca_set_puser()
+# def signal(): return libca.ca_signal()
+# def sg_block(): return libca.ca_sg_block()
+# def sg_create(): return libca.ca_sg_create()
+# def sg_delete(): return libca.ca_sg_delete()
+# def sg_array_get(): return libca.ca_sg_array_get()
+# def sg_array_put(): return libca.ca_sg_array_put()
+# def sg_reset(): return libca.ca_sg_reset()
+# def sg_test(): return libca.ca_sg_test()
+# 
+# def test_event(): return libca.ca_test_event()
+# def test_io(): return libca.ca_test_io()
+# def dbr_size(): return libca.dbr_size()
+# def dbr_value_size(): return libca.dbr_value_size()
+# 
+# def size_n(): raise NotImplementedError
+# def channel_state(): raise NotImplementedError
+# 
+# def SEVCHK(): raise NotImplementedError
 
