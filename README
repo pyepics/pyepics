@@ -18,7 +18,6 @@ interface.  Using ctypes has several advantages, including no need for
 extension code written in C, better thread-safety, and easier installation
 on multiple platforms. 
 
-
 This package requires python2.5 or higher.  The EPICS (v 3.14.8 or higher,
 I think) Channel Access libraries are also required. Specifically, the
 shared libraries libCom.so and libca.so (or Com.dll and ca.dll on Windows)
@@ -34,33 +33,44 @@ Overview
 ========
 
 Py-Epics3 provides two principle modules: ca, and pv, and functions
-caget(), caput(), and cainfo() for the simplest of interaction with EPICS:
+caget(), caput(), and cainfo() for the simplest of interaction with EPICS.
+In addition, there are modules for Epics Motors and Alarms, and special
+widget classes for using EPICS PVs with wxPython.
 
-    >>> from import epics import caget,caput,cainfo
+
+caget(), caput() and cainfo()
+=============================
+
+The simplest interface to EPICS Channel Access provides functions caget(),
+caput(), and cainfo(), similar to the EZCA interface and to the
+EPICS-supplied command line utilities.  These all take the name of an Epics
+Process Variable as the first argument.
+
+    >>> from import epics import caget, caput, cainfo
     >>> print caget('XXX:m1.VAL')
     1.200
     >>> caput('XXX:m1.VAL',2.30)
     1  
     >>> cainfo('XXX.m1.VAL')
     == XXX:m1.VAL  (double) ==
-       value        = 2.3
-       char_value   = 2.3000
-       count        = 1
-       units        = mm
-       precision    = 4
-       host         = xxx.aps.anl.gov:5064
-       access       = read/write
-       status       = 1
-       severity     = 0
-       timestamp    = 1265996455.417 (2010-Feb-12 11:40:55.417)
-       upper_ctrl_li= 200.0
-       lower_ctrl_li= -200.0
-       upper_disp_li= 200.0
-       lower_disp_li= -200.0
-       upper_alarm_l= 0.0
-       lower_alarm_l= 0.0
-       upper_warning= 0.0
-       lower_warning= 0.0
+       value      = 2.3
+       char_value = 2.3000
+       count      = 1
+       units      = mm
+       precision  = 4
+       host       = xxx.aps.anl.gov:5064
+       access     = read/write
+       status     = 1
+       severity   = 0
+       timestamp  = 1265996455.417 (2010-Feb-12 11:40:55.417)
+       upper_ctrl_limit    = 200.0
+       lower_ctrl_limit    = -200.0
+       upper_disp_limit    = 200.0
+       lower_disp_limit    = -200.0
+       upper_alarm_limit   = 0.0
+       lower_alarm_limit   = 0.0
+       upper_warning_limit = 0.0
+       lower_warning       = 0.0
        PV is monitored internally
        no user callbacks defined.
     =============================

@@ -2,9 +2,12 @@
 #
 # low level support for Epics Channel Access
 import ctypes
-import sys
 import os
+import gc
+import sys
 import time
+import atexit
+
 try:
     import numpy
     has_numpy = True
@@ -39,11 +42,8 @@ def initialize_libca():
  the value of PREEMPTIVE_CALLBACK sets the pre-emptive callback  model:
     False   no preemptive callbacks. pend_io/pend_event must be used.
     True    preemptive callbaks will be done.
- Returns libca
-
- where 
-   libca        = ca library object, used as class for all
-                  subsequent ca calls
+ Returns libca where 
+   libca        = ca library object, used for all subsequent ca calls
 
  Note that this function must be called prior to any real ca calls.
     """
@@ -56,8 +56,7 @@ def initialize_libca():
         dllname  = 'ca.dll'
         path_sep = ';'
         path_dirs = os.environ['PATH'].split(path_sep)
-        for p in (sys.prefix,
-                  os.path.join(sys.prefix,'DLLs')):
+        for p in (sys.prefix,os.path.join(sys.prefix,'DLLs')):
             path_dirs.insert(0,p)
         os.environ['PATH'] = ';'.join(path_dirs)
 
@@ -69,14 +68,14 @@ def initialize_libca():
         raise ChannelAccessException('initialize_libca', 'Cannot create Epics CA Context')
     return libca
 
-#
+###
 # 3 decorator functions for ca functionality:
-#  decorator name     ensures before running decorated function:
-#  --------------     -----------------------------------------------
-#  withCA               libca is initialized 
-#  withCHID             (crudely) that the 1st arg is a chid (c_long)
-#  withConnectedCHID    1st arg is a connected chid.
-#############
+#    decorator name     ensures before running decorated function:
+#    --------------     -----------------------------------------------
+#    withCA               libca is initialized 
+#    withCHID             (crudely) that the 1st arg is a chid (c_long)
+#    withConnectedCHID    1st arg is a connected chid.
+###
 
 def withCA(fcn):
     """decorator to ensure that libca and a context are created prior to
@@ -87,8 +86,7 @@ def withCA(fcn):
     place. """
     def wrapper(*args,**kw):
         global libca
-        if libca is None:
-            libca = initialize_libca()
+        if libca is None:   libca = initialize_libca()
         return fcn(*args,**kw)
     return wrapper
 
@@ -103,7 +101,8 @@ def withCHID(fcn):
 
 
 def withConnectedCHID(fcn):
-    """decorator to ensure that first argument to a function is a chid that is connected"""
+    """decorator to ensure that first argument to a function is a
+    chid that is actually connected"""
     def wrapper(*args,**kw):
         if len(args)>0:
             if not isinstance(args[0],ctypes.c_long):
@@ -129,8 +128,8 @@ def raise_on_ca_error(fcn):
 
 # 
 def shutdown(maxtime=10.0):
-    """ carefully shutdown channel access:
-    run clear_channel(chid) for all chids in _cache
+    """shutdown channel access:
+run clear_channel(chid) for all chids in _cache
     then flush_io() and poll() a few times.
     """
     t0 = time.time()
@@ -140,14 +139,20 @@ def shutdown(maxtime=10.0):
     for val in _cache.values():
         clear_channel(val[0])
     _cache.clear()
-    
+
     for i in range(10):
-        time.sleep(1.e-3)
         flush_io()
         poll(1.e-5,10.0)
         if time.time()-t0 > maxtime: break
-    
-    # print 'shutdown in %.3fs' % (time.time()-t0)
+
+    context_destroy()
+    _CB_putwait  = _CB_connect = libca = None
+    gc.collect()
+    print 'shutdown in %.3fs' % (time.time()-t0)
+
+# 
+atexit.register(shutdown)
+
 
 # contexts
 @withCA
@@ -158,27 +163,30 @@ def context_create(context=0):
 def context_destroy():
     return libca.ca_context_destroy()
 
-@withCA
-def pend_io(t=1.0):
-    f   = libca.ca_pend_io
-    f.argtypes = [ctypes.c_double]
-    return f(t)
-
-@withCA
-def pend_event(t=1.e-5):
-    f   = libca.ca_pend_event
-    f.argtypes = [ctypes.c_double]
-    return f(t)
 
 @withCA
 def flush_io():
     return libca.ca_flush_io()
 
-@withCA
+def pend_io(t=1.0):
+    f   = libca.ca_pend_io
+    f.argtypes = [ctypes.c_double]
+    return f(t)
+
+def pend_event(t=1.e-5):
+    f   = libca.ca_pend_event
+    f.argtypes = [ctypes.c_double]
+    return f(t)
+
 def poll(ev=1.e-4,io=1.0):
+    """polls CA for events and i/o.
+
+    Note that this also does a very short time.sleep()
+    The GIL is thus released several times here.
+    """
     pend_event(ev)
     pend_io(io)    
-    time.sleep(ev)
+    time.sleep(1.e-6)
     
 @withCA
 def current_context():

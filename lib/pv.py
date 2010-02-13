@@ -214,7 +214,10 @@ class PV(object):
                 att = getattr(self,i)
                 if i == 'timestamp': att = "%.3f (%s)" % (att,fmt_time(att))
                 if att is not None:
-                    out.append('   %.13s= %s' % (i+' '*16, str(att)))
+                    if len(i) < 11:
+                        out.append('   %.10s= %s' % (i+' '*12, str(att)))
+                    else:
+                        out.append('   %.20s= %s' % (i+' '*20, str(att)))
 
         if xtype == 'enum':  # list enum strings
             out.append('   enum strings: ')
@@ -227,7 +230,7 @@ class PV(object):
                 out.append("   user-defined callbacks:")
                 for i in cbs:  out.append('      %s' % (i.func_name))
             else:
-                out.append("   no user callbacks defined.")
+                out.append("   no user callbacks are defined.")
         else:
             out.append('   PV is not monitored internally')
         out.append('=============================')
