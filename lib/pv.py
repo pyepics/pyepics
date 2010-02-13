@@ -193,15 +193,15 @@ class PV(object):
             fmt = '%i'
             if   xtype in ('float','double'): fmt = '%g'
             elif xtype in ('string','char'):  fmt = '%s'
-            out.append('   value     = %s' % fmt % val)
+            out.append('   value      = %s' % fmt % val)
 
         else:
             aval,ext,fmt = [],'',"%i,"
-            if self._count>5: ext = '...'
+            if self.count>5: ext = '...'
             if xtype in  ('float','double'): fmt = "%g,"
-            for i in range(min(5,self._count)):
+            for i in range(min(5,self.count)):
                 aval.append(fmt % self._val[i])
-            out.append("   value     = array  [%s%s]" % ("".join(aval),ext))
+            out.append("   value      = array  [%s%s]" % ("".join(aval),ext))
 
         for i in ('char_value','count','type','units',
                   'precision','host','access',
