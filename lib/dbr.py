@@ -198,21 +198,9 @@ def Name(ftype):
 
 def Cast(args):
     """returns pointer to arg type for casting """
-    
     count,ftype = args.count, args.type
     if ftype == STRING: count =MAX_STRING_SIZE
     if ftype not in Map: ftype = double_t
-    
-    # m = Map[ftype]
-#     print 'CAST: ' ,m, dir(m)
-#     if hasattr(m,'_fields_'):
-#         print m._fields_
-#         if m.__class__.__name__=='time_string':
-#             m._fields_.extend([('value', MAX_STRING_SIZE*char_t)])
-#         print m._fields_            
-    # m._fields_.extend([('value', count*double_t)])
-    # print 'CAST: ' ,m._fields_
-
     
     return ctypes.cast(args.raw_dbr, ctypes.POINTER(count*Map[ftype]))
 
