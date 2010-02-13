@@ -200,7 +200,7 @@ class PV(object):
             if self.count>5: ext = '...'
             if xtype in  ('float','double'): fmt = "%g,"
             for i in range(min(5,self.count)):
-                aval.append(fmt % self._arg['value'][i])
+                aval.append(fmt % self._args['value'][i])
             out.append("   value      = array  [%s%s]" % ("".join(aval),ext))
 
         for i in ('char_value','count','type','units',
