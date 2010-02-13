@@ -433,7 +433,7 @@ def put(chid,value, wait=False, timeout=20, callback=None):
         #                  dtype=numpy.uint8)
         if ftype == dbr.CHAR and isinstance(value,(str,unicode)):
             pad = '\x00'*(1+count-len(value))
-            value = [ord(i) for i in ("%s%s" % (value,pad)[:count]]            
+            value = [ord(i) for i in ("%s%s" % (value,pad))[:count]]
         data[:]  = list(value)
       
     if wait or callable(callback):
