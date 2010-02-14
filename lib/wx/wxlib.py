@@ -380,7 +380,7 @@ class pvEnumButtons(wx.Panel,pvCtrlMixin):
         
         sizer = wx.BoxSizer(orientation)
         self.buttons = []
-        for i,label in enumerate(self.pv.enum_strings):
+        for i,label in enumerate(self.pv.enum_strs):
             b = buttons.GenToggleButton(self, -1, label)
             self.buttons.append(b)
             b.Bind(wx.EVT_BUTTON, closure(self._onButton, index=i) )
@@ -397,14 +397,11 @@ class pvEnumButtons(wx.Panel,pvCtrlMixin):
         if self.pv is None: return
         if index is not None:
             self.pv.put(index)
-            # self.buttons[index].up = False
 
-    # def set_pv(self,pvname=None): pass
-    def _pvEvent(self,pv=None,id=None,**kw):
-        if (pv is None): return
-        
+    def _pvEvent(self,pvname=None,value=None,id=None,**kw):
+        if pvname is None or value is None: return
         for i,btn in enumerate(self.buttons):
-            btn.up =  (i != self.pv.value)
+            btn.up =  (i != value)
             btn.Refresh()
 
     def _SetValue(self,value): pass
@@ -421,19 +418,18 @@ class pvEnumChoice(wx.Choice,pvCtrlMixin):
             return
 
         self.Clear()
-        self.AppendItems(self.pv.enum_strings)
-        self.SetSelection(self.pv.get())
+        self.AppendItems(self.pv.enum_strs)
+        self.SetSelection(self.pv.value)
         self.Bind(wx.EVT_CHOICE, self.onChoice)
 
     def onChoice(self,event=None, **kw):
         if self.pv is None: return
-        index = self.pv.enum_strings.index(event.GetString())
+        index = self.pv.enum_strs.index(event.GetString())
         self.pv.put(index)
 
-    # def set_pv(self,pvname=None): pass
-    def _pvEvent(self,pv=None,id=None,**kw):
-        if (pv is None): return
-        self.SetSelection(self.pv.get())
+    def _pvEvent(self,pvname=None,value=None,id=None,**kw):
+        if pvname is None or value is None: return
+        self.SetSelection(value)
 
     def _SetValue(self,value):
         self.SetStringSelection(value)
@@ -468,23 +464,22 @@ class pvFloatCtrl(FloatCtrl,pvCtrlMixin):
     
     def set_pv(self,pvname=None):
         self.pv = epics.PV(pvname)
-        
-        self.pv.get_ctrlvars()
         if self.pv is None: return
-        self.SetValue( self.pv.get() )
+
+        self.pv.connect()
+        if not self.pv.connected: return
+        self.SetValue( self.pv.char_value)
         self.id = self.GetId()
         self.timer.add_callback(self.pv,callback=self._pvEvent,id=self.id )
        
         if self.pv.type in ('string','char'):
             print 'Float Control for string / character data??  '
 
-        if self.pv is not None:
-            self.SetValue(self.pv.get(as_string=True) )
-            self.SetMin(self.pv.lower_ctrl_limit)
-            self.SetMax(self.pv.upper_ctrl_limit)
-            prec = self.pv.precision
-            if prec is None: prec = 0
-            self.SetPrecision(prec)
+        self.SetMin(self.pv.lower_ctrl_limit)
+        self.SetMax(self.pv.upper_ctrl_limit)
+        prec = self.pv.precision
+        if prec is None: prec = 0
+        self.SetPrecision(prec)
 
     def _onEnter(self,value=None,**kw):
         if value in (None,'') or self.pv is None: return 
