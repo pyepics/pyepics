@@ -252,64 +252,64 @@ class PV(object):
     def status(self): return self._getarg('status')
 
     @property
-    def ftype(self): return self._getargs('ftype')
+    def ftype(self): return self._getarg('ftype')
 
     @property
-    def type(self):  return self._getargs('type')
+    def type(self):  return self._getarg('type')
 
     @property
-    def host(self): return self._getargs('host')
+    def host(self): return self._getarg('host')
 
     @property
-    def count(self): return self._getargs('count')
+    def count(self): return self._getarg('count')
 
     @property
-    def access(self): return self._getargs('access')
+    def access(self): return self._getarg('access')
 
     @property
-    def write_access(self): return self._getargs('write_access')
+    def write_access(self): return self._getarg('write_access')
 
     @property
-    def severity(self): return self._getargs('severity')
+    def severity(self): return self._getarg('severity')
 
     @property
-    def timestamp(self): return self._getargs('timestamp')
+    def timestamp(self): return self._getarg('timestamp')
 
     @property
-    def precision(self): return self._getargs('precision')
+    def precision(self): return self._getarg('precision')
 
     @property
-    def units(self): return self._getargs('units')
+    def units(self): return self._getarg('units')
 
     @property
-    def enum_strs(self): return self._getargs('enum_strs')
+    def enum_strs(self): return self._getarg('enum_strs')
 
     @property
-    def no_str(self): return self._getargs('no_str')
+    def no_str(self): return self._getarg('no_str')
 
     @property
-    def upper_disp_limit(self): return self._getargs('upper_disp_limit')
+    def upper_disp_limit(self): return self._getarg('upper_disp_limit')
 
     @property
-    def lower_disp_limit(self): return self._getargs('lower_disp_limit')
+    def lower_disp_limit(self): return self._getarg('lower_disp_limit')
 
     @property
-    def upper_alarm_limit(self): return self._getargs('upper_alarm_limit')
+    def upper_alarm_limit(self): return self._getarg('upper_alarm_limit')
 
     @property
-    def lower_alarm_limit(self): return self._getargs('lower_alarm_limit')
+    def lower_alarm_limit(self): return self._getarg('lower_alarm_limit')
 
     @property
-    def lower_warning_limit(self): return self._getargs('lower_warning_limit')
+    def lower_warning_limit(self): return self._getarg('lower_warning_limit')
 
     @property
-    def upper_warning_limit(self): return self._getargs('upper_warning_limit')
+    def upper_warning_limit(self): return self._getarg('upper_warning_limit')
 
     @property
-    def upper_ctrl_limit(self): return self._getargs('upper_ctrl_limit')
+    def upper_ctrl_limit(self): return self._getarg('upper_ctrl_limit')
 
     @property
-    def lower_ctrl_limit(self): return self._getargs('lower_ctrl_limit')
+    def lower_ctrl_limit(self): return self._getarg('lower_ctrl_limit')
 
     @property
     def info(self): return self._getinfo()
