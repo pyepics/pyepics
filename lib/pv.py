@@ -12,7 +12,7 @@ def fmt_time(t=None):
 class PV(object):
     """== Epics Process Variable
     
-    A PV encapsulates an Epics Process Variable (aka a 'channel').
+    A PV encapsulates an Epics Process Variable.
    
     The primary interface methods for a pv are to get() and put() is value:
       >>>p = PV(pv_name)    # create a pv object given a pv name

@@ -78,13 +78,15 @@ def caget(pvname, as_string=False):
         return val
 
 def cainfo(pvname):
-    """cainfo(pvname,print=False)
+    """cainfo(pvname,print_out=False)
 
     return printable information about pv
        >>>cainfo('xx.VAL')
 
-    will return a status report for the pv.  If print=True,
-    the status report will be printed, and not returned.
+    will return a status report for the pv.
+
+    If print_out=True, the status report will be printed,
+    and not returned.
     """
     pv = __createPV(pvname)
     if pv is not None:

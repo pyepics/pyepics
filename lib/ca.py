@@ -7,80 +7,64 @@
 Overview
 ========
 
-This provides a ctypes-based wrapping of EPICS Channel Access (CA).
+This provides the low-level ctypes-based wrapping of EPICS Channel
+Access (CA).  Most users will not need to be concerned with many of
+the details here, and only use the functional interface (caget, caput)
+or use and create PV objects.
 
-The goal for this module is to stay fairly close to the C interface
-to CA while also providing a pleasant Python experience.  To that
-end, this document is mostly confessional, describing the
-differences (sins) with the "pure" C interface:
+The goal of this module is to stay fairly close to the C interface to
+CA while also providing a pleasant Python experience.  To that end,
+this document mostly describe the differences with the C interface.
 
 Name Mangling
 =============
 
-In general, when a CA function is called 'ca_XXX', I renamed that
-function to 'XXX' as the intention is that this module will be
-imported with
+In general, for a CA function called 'ca_XXX', the function here is
+called 'XXX', as the intention is that importing this module with
     import ca
-so that function 'ca_XXX' will become 'ca.XXX'
 
-Omissions
-=========
+will make the function 'ca_XXX' be mapped to 'ca.XXX'
 
-Several parts of the CA library are not implemented (yet?).
-These include:
-
-    ca_dump_dbr()
-    ca_add_exception_event()
-    ca_add_fd_registration()
-    ca_client_status()
-    ca_replace_access_rights_event()
-    ca_puser()
-    ca_set_puser()
-    ca_signal()
-    ca_sg_block()
-    ca_sg_create()
-    ca_sg_delete()
-    ca_sg_array_get()
-    ca_sg_array_put()
-    ca_sg_reset()
-    ca_sg_test()
-    ca_test_event()
-    ca_test_io()
-    ca_dbr_size()
-    ca_dbr_value_size()
-    ca_size_n()
-    ca_channel_state()
-    ca_SEVCHK()
+Similar name mangling also happens with the DBR in dbr.py, so that,
+for example, DBR_STRING becomes dbr.STRING.
 
 Initialization, Finalization, Lifecycle
 =======================================
 
-Because CA requires a context model set on initialization and 
-because ctypes requires that the shared library be loaded before it
-is used (!) and because ctypes requires references to callback
-functions be kept (else they'll be garbage collected), the
-lifecycle of a CA session is slightly complicated.
+CA requires a context model (preemptive callbacks or non-preemptive
+callbacks) set on initialization, because ctypes requires that the
+shared library be loaded before it is used, and because ctypes
+requires references to the library and callback functions be kept (or
+else they'll be garbage collected), the lifecycle of a CA session is
+slightly complicated.  This module mostly hides this from you,
+initializing the ca library as soon as it is needed (but not on
+loading the module).  ca.libca keeps the reference to the shared
+library.
 
-The code in this module mostly hides this from you, initializing
-the ca library as soon as it is needed (but not on loading the
-module).  ca.libca keeps the reference to the shared library.
+By default this module enables preemptive callbacks, so that EPICS
+will communication will be faster and not requiring the client to
+continually poll for changes.  To disable preemptive callbacks, set
+    ca.PREEMPTIVE_CALLBACK = False
 
-By default this module enables preemptive callbacks.  To disable
-them, set ca.PREEMPTIVE_CALLBACK = False before making any other
-calls to the library.
+*before* making any other calls to the library.
 
-This module keeps a global cache of PVs (ca._cache) that holds
-connection status.
+In addition, this module keeps a global cache of PVs (in ca._cache)
+that holds connection status for all known PVs.  Use the function
+    ca.show_cache()
+
+to print a listing of PV names and connection status, or use
+    ca.show_cache(print_out=False)
+to be returned this listing.
 
 When shutdown gracefully, This module attempts to clean up after
-itself so that the underlying CA library does not give error
-messages.  On less-than-graceful shutdowns, you may see core dumps
-and error messages from the CA library.
+itself so that the CA library does not give error messages.  On
+less-than-graceful shutdowns, you may see core dumps and error
+messages from the CA library.
 
 For now, I am assuming that there is one CA context.
 
-Creating and Connecting to Channels
-===================================
+Using the CA module: Creating and Connecting to Channels
+========================================================
 
 To create a channel, use
 
@@ -110,7 +94,43 @@ To create a channel, use
     the _cache will be used to prevent spending too much time
     waiting for a connection that may never happen.
     
-   
+
+Omissions
+=========
+
+Several parts of the CA library are not implemented (yet?).
+These include the following functions:
+
+    ca_add_exception_event()
+    ca_add_fd_registration()
+    ca_dump_dbr()  * 
+    ca_client_status()
+    ca_puser() *
+    ca_replace_access_rights_event()
+    ca_replace_printf_handler()
+    ca_set_puser() *
+    ca_signal()
+    ca_sg_block()
+    ca_sg_create()
+    ca_sg_delete()
+    ca_sg_array_get()
+    ca_sg_array_put()
+    ca_sg_reset()
+    ca_sg_test()
+    ca_test_event() *
+    ca_test_io() * 
+    ca_SEVCHK() *
+    dbr_size() *
+    dbr_size_n() *
+    dbr_value_size() *
+
+Some of these (marked with *) are probably not necessary.  The others
+should probably be added for completeness.
+
+In addition, not all DBR types are supported.  In addition to the native
+types, the DBR_TIME and DBR_CTRL variants are supported, but the DBR_STS
+and DBR_GR variants are not.
+
 """
 import ctypes
 import os
@@ -127,24 +147,25 @@ except:
 
 import dbr
 
-# holder for DLL
+## holder for DLL
 libca = None
 
-# PREEMPTIVE_CALLBACK determines how
+## PREEMPTIVE_CALLBACK determines the CA context
+
 PREEMPTIVE_CALLBACK = True
 # PREEMPTIVE_CALLBACK = False
 
 ## default timeout for connection
-#  This should be kept fairly short --
-#  connection will be tried repeatedly
+#   This should be kept fairly short --
+#   as connection will be tried repeatedly
 DEFAULT_CONNECTION_TIMEOUT = 5.0
 
 ## Cache of existing channel IDs:
-##  pvname: {'chid':chid, 'conn': isConnected,
-##           'ts': ts_conn, 'userfcn': user_callback)
-##  isConnected   = True/False: if connected.
-##  ts_conn       = ts of last connection event or failed attempt.
-##  user_callback = user function to be called on change
+#  pvname: {'chid':chid, 'conn': isConnected,
+#           'ts': ts_conn, 'userfcn': user_callback)
+#  isConnected   = True/False: if connected.
+#  ts_conn       = ts of last connection event or failed attempt.
+#  user_callback = user function to be called on change
 _cache  = {}
 
 ## Cache of pvs waiting for put to be done.
@@ -159,12 +180,13 @@ class ChannelAccessException(Exception):
         return " %s returned '%s'" % (self.fcn,self.msg)
 
 def initialize_libca():
-    """ load DLL (shared object library) to establish Channel Access Connection.
- the value of PREEMPTIVE_CALLBACK sets the pre-emptive callback  model:
-    False   no preemptive callbacks. pend_io/pend_event must be used.
-    True    preemptive callbaks will be done.
- Returns libca where 
-   libca        = ca library object, used for all subsequent ca calls
+    """ load DLL (shared object library) to establish Channel Access
+    Connection. The value of PREEMPTIVE_CALLBACK sets the pre-emptive
+    callback model: 
+        False   no preemptive callbacks. pend_io/pend_event must be used.
+        True    preemptive callbaks will be done.
+    Returns libca where 
+        libca = ca library object, used for all subsequent ca calls
 
  Note that this function must be called prior to any real ca calls.
     """
@@ -184,10 +206,10 @@ def initialize_libca():
     ca_context = {False:0, True:1}[PREEMPTIVE_CALLBACK]
     ret = libca.ca_context_create(ca_context)
     if ret != dbr.ECA_NORMAL:
-        raise ChannelAccessException('initialize_libca', 'Cannot create Epics CA Context')
+        raise ChannelAccessException('initialize_libca',
+                                     'Cannot create Epics CA Context')
     return libca
 
-# 
 def finalize_libca(maxtime=10.0):
     """shutdown channel access:
     run clear_channel(chid) for all chids in _cache
@@ -196,13 +218,13 @@ def finalize_libca(maxtime=10.0):
     t0 = time.time()
     flush_io()
     poll()
-
-    for val in _cache.values():  clear_channel(val['chid'])
+    for val in _cache.values():
+        clear_channel(val['chid'])
     _cache.clear()
 
     for i in range(10):
         flush_io()
-        poll(1.e-5,10.0)
+        poll()
         if time.time()-t0 > maxtime: break
 
     context_destroy()
@@ -210,15 +232,15 @@ def finalize_libca(maxtime=10.0):
     gc.collect()
     # print 'shutdown in %.3fs' % (time.time()-t0)
 
-# now register this function to be run on normal exits
+## register this function to be run on normal exits
 atexit.register(finalize_libca)
 
-# connection events: 
+## connection event handler: 
 def _onConnectionEvent(args):
-    """set flag in cache holding whteher channel is connected.
-    if provided, run a user-function"""
+    """set flag in cache holding whteher channel is
+    connected. if provided, run a user-function"""
     pvname = name(args.chid)
-    entry = _cache[pvname]
+    entry  = _cache[pvname]
     entry['conn'] = (args.op == dbr.OP_CONN_UP)
     entry['ts']   = time.time()
     entry['failures'] = 0
@@ -231,11 +253,10 @@ def _onConnectionEvent(args):
 # hold global reference to this callback
 _CB_connect = ctypes.CFUNCTYPE(None,dbr.ca_connection_args)(_onConnectionEvent)
 
-# put events
+## put event handler:
 def _onPutEvent(args,*varargs):
     """set put-has-completed for this channel,
-    call optional user-supplied callback
-    """
+    call optional user-supplied callback"""
     pvname = name(args.chid)
     userfcn = _put_done[pvname][1]
     if callable(userfcn): userfcn()
@@ -244,33 +265,38 @@ def _onPutEvent(args,*varargs):
 # hold global reference to this callback
 _CB_putwait  = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)   
 
-
-def show_cache():
-    """Show list of cached PVs
-    """
-    print '  PV name    Is Connected?   Channel ID'
-    print '---------------------------------------'
+def show_cache(print_out=True):
+    """Show list of cached PVs"""
+    o = []
+    o.append('#  PV name    Is Connected?   Channel ID')
+    o.append('#---------------------------------------')
     for name,val in _cache.items():
-        print " %s   %s     %s " % (name,
-                                    repr(val['conn']),
-                                    repr(val['chid']))
+        o.append(" %s   %s     %s " % (name,
+                                       repr(val['conn']),
+                                       repr(val['chid'])))
+    o = '\n'.join(o)
+    if print_out:
+        print o
+    else:
+        return o
 
-###
-# 3 decorator functions for ca functionality:
+## 3 decorator functions for ca functionality:
 #    decorator name     ensures before running decorated function:
 #    --------------     -----------------------------------------------
 #    withCA               libca is initialized 
 #    withCHID             (crudely) that the 1st arg is a chid (c_long)
 #    withConnectedCHID    1st arg is a connected chid.
-###
+##
 
 def withCA(fcn):
-    """decorator to ensure that libca and a context are created prior to
-    any function calls to the channel access library.
+    """decorator to ensure that libca and a context are created
+    prior to function calls to the channel access library. This is
+    intended for functions that at the startup of CA, such as
+        create_channel
 
-    Note that C functions that take a Channel ID (chid) are not wrapped, as
-    the library must have beeni nitialized to produce the chid in the first
-    place. """
+    Note that CA functions that take a Channel ID (chid) as an
+    argument are  NOT wrapped by this: to get a chid, the
+    library must have been initialized already."""
     def wrapper(*args,**kw):
         global libca
         if libca is None:   libca = initialize_libca()
@@ -278,7 +304,14 @@ def withCA(fcn):
     return wrapper
 
 def withCHID(fcn):
-    """decorator to ensure that first argument to a function is a chid"""
+    """decorator to ensure that first argument to a function
+    is a chid. This performs a very weak test, as any ctypes
+    long or python int will pass.
+
+    It may be worth making a chid class (which could hold connection
+    data of _cache) that could be tested here.  For now, that
+    seems slightly 'not low-level' for this module.    
+    """
     def wrapper(*args,**kw):
         if len(args)>0:
             if not isinstance(args[0],(ctypes.c_long,int)):
@@ -289,7 +322,8 @@ def withCHID(fcn):
 
 def withConnectedCHID(fcn):
     """decorator to ensure that first argument to a function is a
-    chid that is actually connected"""
+    chid that is actually connected. This will attempt to connect
+    if needed."""
     def wrapper(*args,**kw):
         if len(args)>0:
             if not isinstance(args[0],ctypes.c_long):
@@ -313,9 +347,10 @@ def raise_on_ca_error(fcn):
         return 
     return wrapper
 
-##
-# On with the show: now we're ready to wrap libca functions
-##
+###
+# Now we're ready to wrap libca functions
+###
+
 # contexts
 @withCA
 def context_create(context=0): return libca.ca_context_create(context)
@@ -356,15 +391,11 @@ def pend_event(t=1.e-5):
     return f(t)
 
 def poll(ev=1.e-4,io=1.0):
-    """polls CA for events and i/o.
-
-    Note that this also does a very short time.sleep()
-    The GIL is thus released several times here.
-    """
+    """polls CA for events and i/o. """
     pend_event(ev)
     pend_io(io)    
-    time.sleep(1.e-6)
 
+## create channel
 
 @withCA
 def create_channel(pvname,connect=False,userfcn=None):
@@ -384,6 +415,7 @@ def create_channel(pvname,connect=False,userfcn=None):
     if connect: connect_channel(chid)
     return chid
 
+# common functions with similar signatures
 @withCHID
 def _chid_f(chid,fcn_name,restype=int,arg=None):
     f = getattr(libca,fcn_name)
@@ -391,8 +423,10 @@ def _chid_f(chid,fcn_name,restype=int,arg=None):
     f.restype = restype
     return f(chid)
 
-def name(chid):          return _chid_f(chid,'ca_name',      restype=ctypes.c_char_p)
-def host_name(chid):     return _chid_f(chid,'ca_host_name', restype=ctypes.c_char_p)
+def name(chid):          return _chid_f(chid,'ca_name',
+                                        restype=ctypes.c_char_p)
+def host_name(chid):     return _chid_f(chid,'ca_host_name',
+                                        restype=ctypes.c_char_p)
 def element_count(chid): return _chid_f(chid,'ca_element_count')
 def read_access(chid):   return _chid_f(chid,'ca_read_access')
 def write_access(chid):  return _chid_f(chid,'ca_write_access')
@@ -529,8 +563,8 @@ def put(chid,value, wait=False, timeout=20, callback=None):
     if count == 1:
         data[0] = value
     else:
-        # auto-convert strings to data arrays for character waveforms
-        # could consider using???
+        # auto-convert strings to arrays for character waveforms
+        # could consider using
         # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],
         #                  dtype=numpy.uint8)
         if ftype == dbr.CHAR and isinstance(value,(str,unicode)):
@@ -538,25 +572,27 @@ def put(chid,value, wait=False, timeout=20, callback=None):
             value = [ord(i) for i in ("%s%s" % (value,pad))[:count]]
         data[:]  = list(value)
       
-    if wait or callable(callback):
-        pvname= name(chid)
-        _put_done[pvname] = (False,callback)
-        poll()
-        ret = libca.ca_array_put_callback(ftype,count,chid,
-                                          data, _CB_putwait, 0)
-        if wait:
-            t0 = time.time()
-            ret = -1
-            while time.time()-t0 <timeout:
-                time.sleep(1.e-4)
-                poll()
-                if _put_done[pvname][0]:
-                    ret = 1
-                    break
-    else:
+    # simple put, without wait or callback
+    if not (wait or callable(callback)):
         ret =  libca.ca_array_put(ftype,count,chid, rawdata)
-    poll()
+        poll()
+        return ret
+    # waith with wait or callback
+    pvname= name(chid)
+    _put_done[pvname] = (False,callback)
+    ret = libca.ca_array_put_callback(ftype,count,chid,
+                                      data, _CB_putwait, 0)
+    if wait:
+        _finished = False
+        t0 = time.time()
+        while time.time()-t0 <timeout:
+            poll()
+            if _put_done[pvname][0]:
+                _finished = True
+                break
+        if not _finished: ret = -ret
     return ret
+
 
 @withConnectedCHID
 def get_ctrlvars(chid):
@@ -564,32 +600,33 @@ def get_ctrlvars(chid):
     ftype = promote_type(chid, use_ctrl=True)
     d = (1*dbr.Map[ftype])()
     ret = libca.ca_array_get(ftype, 1, chid, d)
-    d = d[0]
-    poll(5.e-3,1.0)
+    poll()
     kw = {}
     if ret == dbr.ECA_NORMAL: 
+        d = d[0]
         for attr in ('severity', 'timestamp', 'precision','units', 
                      'upper_disp_limit', 'lower_disp_limit',
                      'upper_alarm_limit', 'upper_warning_limit',
                      'lower_warning_limit','lower_alarm_limit',
                      'upper_ctrl_limit', 'lower_ctrl_limit'):
-            if hasattr(d,attr): kw[attr] = getattr(d,attr)
-        if hasattr(d,'strs') and hasattr(d,'no_str'):
-            if d.no_str > 0:
-                kw['enum_strs'] = [d.strs[i].value for i in range(d.no_str)]
+            if hasattr(d,attr):
+                kw[attr] = getattr(d,attr)
+        if (hasattr(d,'strs') and
+            hasattr(d,'no_str') and d.no_str > 0):
+            kw['enum_strs'] = [d.strs[i].value for i in range(d.no_str)]
     return kw
 
 def get_precision(chid):
+    kw = {}
     if field_type(chid) in (dbr.FLOAT,dbr.DOUBLE):
-        k = get_ctrlvars(chid)
-        return k.get('precision',None)
-    return 0
+        kw = get_ctrlvars(chid)
+    return kw.get('precision',0)
 
 def get_enum_strings(chid):
+    kw = {}
     if field_type(chid) == dbr.ENUM:
         kw = get_ctrlvars(chid)
-        return kw.get('enum_strs',None)
-    return None
+    return kw.get('enum_strs',None)
 
 ##
 ## Event Handlers for get() event callbacks
@@ -622,14 +659,13 @@ def _onGetEvent(args):
         nelem = dbr.MAX_STRING_SIZE
 
     value = _unpack(value, nelem, ftype=args.type)
-
     if callable(args.usr):
         args.usr(value=value, **kw)
 
 @withConnectedCHID
 def create_subscription(chid, use_time=False,use_ctrl=False,
                         callback=None, mask=7, userfcn=None):
-
+    """set a callback function to be called on changes to Channel."""
     ftype = promote_type(chid, use_ctrl=use_ctrl,use_time=use_time)
     count = element_count(chid)
 
