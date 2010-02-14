@@ -77,7 +77,7 @@ def caget(pvname, as_string=False):
         if as_string: return pv.char_value
         return val
 
-def cainfo(pvname):
+def cainfo(pvname,print_out=False):
     """cainfo(pvname,print_out=False)
 
     return printable information about pv
@@ -92,7 +92,7 @@ def cainfo(pvname):
     if pv is not None:
         pv.get()
         pv.get_ctrlvars()
-        if print:
+        if print_out:
             print pv.info
         else:     
             return pv.info
