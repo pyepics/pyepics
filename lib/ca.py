@@ -541,11 +541,11 @@ def get(chid,ftype=None,as_string=False, as_numpy=True):
     nelem = count
     if ftype == dbr.STRING:  nelem = dbr.MAX_STRING_SIZE
        
-    rawdata = (nelem*dbr.Map[ftype])()
+    data = (nelem*dbr.Map[ftype])()
     
-    ret = libca.ca_array_get(ftype, count, chid, rawdata)
+    ret = libca.ca_array_get(ftype, count, chid, data)
     poll()
-    val = _unpack(rawdata,nelem,ftype=ftype,as_numpy=as_numpy)
+    val = _unpack(data,nelem,ftype=ftype,as_numpy=as_numpy)
     if as_string and ftype==dbr.CHAR:
         val = ''.join([chr(i) for i in s if i>0]).strip().rstrip()
 
@@ -574,7 +574,7 @@ def put(chid,value, wait=False, timeout=20, callback=None):
       
     # simple put, without wait or callback
     if not (wait or callable(callback)):
-        ret =  libca.ca_array_put(ftype,count,chid, rawdata)
+        ret =  libca.ca_array_put(ftype,count,chid, data)
         poll()
         return ret
     # waith with wait or callback
