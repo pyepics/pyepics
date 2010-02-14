@@ -56,7 +56,6 @@ class closure:
         return apply(self.func,self.args,self.kw)
 
 
-
 class FloatCtrl(wx.TextCtrl):
     """ Numerical Float Control::
       a wx.TextCtrl that allows only numerical input, can take a precision argument
@@ -267,7 +266,7 @@ class catimer:
 
     def add_callback(self,pv=None,callback=None,id=-1, **kw):
         if pv is None: return
-        pv.add_callback(self._proxy_callback,**kw)
+        pv.add_callback(self._proxy_callback)
         if callback is None: callback = self.__default_callback()
         if pv.pvname not in self.callbacks: self.callbacks[pv.pvname] = {}
         self.callbacks[pv.pvname][id] = (callback,kw)
@@ -279,7 +278,7 @@ class catimer:
             pass
           
     def pend(self,foo=None,**more):
-        epics.poll(1.e-3,1.0)
+        epics.poll()
         for thispv in self.needs_callback:
             print 'need callback: ', thispv
             print self.callbacks[thispv]
@@ -289,7 +288,7 @@ class catimer:
                 try:
                     cb(**kw)
                 except PyDeadObjectError:                    
-                    # print ' removing callback for dead PV object :', pv.pvname
+                    print ' removing callback for dead PV object :', pv.pvname
                     self.remove_callback(thispv.pvname)
 
         self.needs_callback = []
@@ -327,20 +326,21 @@ class pvCtrlMixin:
     def _SetValue(self,value):
         print 'pvCtrlMixin._SetValue must be overwritten for ', self.pv.pvname
         
-    def update(self,value=None):
-        if value is None: value = self.pv.get(as_string=True)
-        self._SetValue(value)
+    def _pvEvent(self,pvname=None,value=None,id=None,char_value=None,**kw):
+        if char_value is not None:
+            self._SetValue(char_value)
+        elif value is not None:
+            self._SetValue(set_float(value)
         
     def set_pv(self,pvname=None):
         self.pv = epics.PV(pvname)
         if self.pv is None: return
-       
-        self._SetValue( self.pv.get(as_string=True) )
+        self.pv.connect()
+        if not self.pv.connected: return
+        self._SetValue(self.pv.char_value)
         self.id = self.GetId()
         self.timer.add_callback(self.pv,callback=self._pvEvent,id=self.id )
 
-    def _pvEvent(self,pvname=None,value=None,id=None,char_value=None,**kw):
-        if value is not None: self.update()
 
 class pvTextCtrl(wx.TextCtrl,pvCtrlMixin):
     """ text control for PV display (as normal string), with callback for automatic updates"""
@@ -468,6 +468,7 @@ class pvFloatCtrl(FloatCtrl,pvCtrlMixin):
     
     def set_pv(self,pvname=None):
         self.pv = epics.PV(pvname)
+        
         self.pv.get_ctrlvars()
         if self.pv is None: return
         self.SetValue( self.pv.get() )

@@ -6,29 +6,23 @@ import operator
    
 class Alarm(object):
     """ alarm class for a PV:
-    run a user-supplied callback when a PV's value goes out of an acceptable range
+    run a user-supplied callback when a PV's value goes out of range
 
     quick synopsis:
-       The supplied _callback_ will be run when a _comparison_ of the pv's value
-       and a _trip point_ is True.  An optional _alert delay_ can be set to limit
-       how frequently the callback is run
+       The supplied callback will be run when a comparison of the PV's
+       value and a trip point is True.  An optional alert delay can be
+       set to limit how frequently the callback is run
 
     arguments:
-       pvname             name of PV for which to set alarm
-       trip_point         value of trip point
-       comparison         a string for the comparison operation: one of
-                              'eq', 'ne', 'le', 'lt', 'ge', 'gt'
-                              '==', '!=', '<=', '<' , '>=', '>'
-       callback           function to run when the comparison(value,trip_point) is True
-       alert_delay        time (in seconds) to stay quiet after executing a callback.
-                          this is a _minimum_ time, as it is checked only when a PVs value
-                          actually changes.  See note below.
-       notify_all_alarms  whether to call alarm callback even for "Alarm to Alarm"
-                          transitions: where the pv was in an alarm state and changed value
-                          to another alarm state.
-                          This is normally False, so that the alarm callback is called only
-                          when going from "No Alarm" to "Alarm" status.
-
+       pvname         name of PV for which to set alarm
+       trip_point     value of trip point
+       comparison     a string for the comparison operation: one of
+                          'eq', 'ne', 'le', 'lt', 'ge', 'gt'
+                          '==', '!=', '<=', '<' , '>=', '>'
+       callback       function to run when comparison(value,trip_point) is True
+       alert_delay    time (in seconds) to stay quiet after executing a callback.
+                      this is a minimum time, as it is checked only when a PVs
+                      value actually changes.  See note below.
        
     example:
        >>> from epics import alarm, poll
@@ -40,39 +34,33 @@ class Alarm(object):
        >>>       trip_point=2.0,
        >>>       alert_delay=600)
        >>> while True:
-       >>>     pend_event()
+       >>>     poll()
 
     when 'XX.VAL' exceeds (is 'gt') 2.0, the alarmHandler will be called.
-   
     
     notes:
-      alarm_delay:  The alarm delay avoids annoying over-notification by specifying a
-                    time to NOT send messages, even when a PV value is changing and
-                    out-of-range.  Since Epics callback are used to process events,
-                    the alarm state will only be checked when a PV's value changes.
-      notify_all_alarms  This sets whether to notify on "Alarm to Alarm" transitions
-                    this is normally false, so that notifications only happen on
-                    transitions from No Alarm to Alarm.
+      alarm_delay:  The alarm delay avoids over-notification by specifying a
+                    time period to NOT send messages after a message has been
+                    sent, even if a value is changing and out-of-range.  Since
+                    Epics callback are used to process events, the alarm state
+                    will only be checked when a PV's value changes.
                     
-                    With "notify_all_alarms" True, the user callback is run when:
-                       The PV value has changed.
-                       The PV value is 'out-of-range' [ comparison(value,trip_point) is True]
-                       It has been at least alarm_delay seconds since the callback was run.
-
-                    With "notify_all_alarms" False (the default), the user callback is run when:
-                       The PV value has changed.
-                       The PV value was 'in-range' [ comparison(value,trip_point) is False]
-                       The PV value is 'out-of-range' [ comparison(value,trip_point) is True]
-                       It has been at least alarm_delay seconds since the callback was run.                    
-
-
-      callback function:  the user-supplied callback function should have the following
-                    keyword argument (using **kw is always recommended!):
-
-                    pv          will hold the EpicsCA pv object for the pv
-                    comparison  will hold the comparison used to define 'out of range'
+      callback function:  the user-supplied callback function should be prepared
+                    for a large number of keyword arguments: use **kw!!!
+                    For further explanation, see notes in pv.py.
+                
+                    These keyword arguments will always be included:
+                    
+                    pvname      name of PV
+                    value       current value of PV
+                    char_value  text string for PV
                     trip_point  will hold the trip point used to define 'out of range'
-    
+                    comparison  string 
+                    self.user_callback(pvname=pvname, value=value,
+                                   char_value=char_value,
+                                   trip_point=self.trip_point,
+                                   comparison=self.cmp.__name__, **kw)
+
     """
     ops= {'eq': operator.__eq__,
           '==': operator.__eq__,
@@ -87,7 +75,7 @@ class Alarm(object):
           'gt': operator.__gt__,
           '>' : operator.__gt__ }
     
-    def __init__(self, pvname, trip_point=None, comparison=None,
+    def __init__(self, pvname, comparison=None, trip_point=None,
                  callback=None,  alert_delay=10, **kw):
 
         if isinstance(pvname, pv.PV):
@@ -96,11 +84,15 @@ class Alarm(object):
             self.pv = pv.PV(pvname)
             self.pv.connect()
         
-        if self.pv is None: return
+        if self.pv is None or comparison is None or trip_point is None:
+            raise UserWarning('alarm requires valid PV, comparison, and trip_point')
+      
+        self.comp_name  = comparison
+        self.trip_point = trip_point
 
-        self.trip_point  = trip_point
         self.last_alert  = 0
         self.alert_delay = alert_delay
+        self.user_callack = callback
 
         self.cmp   = self.ops.get(comparison.replace('_',''),None)
         self.alarm_state = False
@@ -109,10 +101,10 @@ class Alarm(object):
         
     def check_alarm(self,pvname=None,value=None, char_value=None, **kw):
         if (pvname is None or value is None or
-            self.cmp is None or self.trip_point is None):
-            return
+            self.cmp is None or self.trip_point is None): return
 
         val = value
+        if char_value is None: char_value = value
         old_alarm_state  = self.alarm_state
         self.alarm_state =  self.cmp(val,self.trip_point)
 
@@ -121,8 +113,12 @@ class Alarm(object):
 
         if notify:
             self.last_alert = now
-            if char_value is None: char_value = value
             print 'Alarm: ', pvname, char_value, time.ctime()            
-            # self.callback(pv=self.pv, comparison=self.cmp, trip_point=self.trip_point)
-          
+            if callable(self.user_callback):
+                self.user_callback(pvname=pvname, value=value,
+                                   char_value=char_value,
+                                   trip_point=self.trip_point,
+                                   comparison=self.cmp.__name__, **kw)
+                
+            
 

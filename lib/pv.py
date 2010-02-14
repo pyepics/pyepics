@@ -49,7 +49,7 @@ class PV(object):
         if callable(callback): self.callbacks = [callback]
 
         self.connected  = False
-        self._args     = {}.fromkeys(self._fields_)
+        self._args      = {}.fromkeys(self._fields_)
 
         self._args['pvname'] = self.pvname
         self.__mondata = None
@@ -95,7 +95,6 @@ class PV(object):
         0
         >>> p.get('13BMD:m1.DIR',as_string=True)
         'Pos'
-        
         """
         if not self.connect(force=False):  return None
         self._args['value'] = ca.get(self.chid,
@@ -236,77 +235,81 @@ class PV(object):
         out.append('=============================')
         return '\n'.join(out)
         
+    def _getarg(self,arg):
+        if self._args['value'] is None:  self.get()
+        return self._args.get(arg,None)
+        
     @property
-    def value(self):     return self._args['value']
+    def value(self):     return self._getarg('value')
 
     @value.setter
     def value(self,v):   return self.put(v)
 
     @property
-    def char_value(self): return self._args['char_value']
+    def char_value(self): return self._getarg('char_value')
 
     @property
-    def status(self): return self._args['status']
+    def status(self): return self._getarg('status')
 
     @property
-    def ftype(self): return self._args['ftype']
+    def ftype(self): return self._getargs('ftype')
 
     @property
-    def type(self):  return self._args['type']
+    def type(self):  return self._getargs('type')
 
     @property
-    def host(self): return self._args['host']
+    def host(self): return self._getargs('host')
 
     @property
-    def count(self): return self._args['count']
+    def count(self): return self._getargs('count')
 
     @property
-    def access(self): return self._args['access']
+    def access(self): return self._getargs('access')
 
     @property
-    def write_access(self): return self._args['write_access']
+    def write_access(self): return self._getargs('write_access')
 
     @property
-    def severity(self): return self._args['severity']
+    def severity(self): return self._getargs('severity')
 
     @property
-    def timestamp(self): return self._args['timestamp']
+    def timestamp(self): return self._getargs('timestamp')
 
     @property
-    def precision(self): return self._args['precision']
+    def precision(self): return self._getargs('precision')
 
     @property
-    def units(self): return self._args['units']
+    def units(self): return self._getargs('units')
 
     @property
-    def enum_strs(self): return self._args['enum_strs']
+    def enum_strs(self): return self._getargs('enum_strs')
 
     @property
-    def no_str(self): return self._args['no_str']
+    def no_str(self): return self._getargs('no_str')
 
     @property
-    def upper_disp_limit(self): return self._args['upper_disp_limit']
+    def upper_disp_limit(self): return self._getargs('upper_disp_limit')
 
     @property
-    def lower_disp_limit(self): return self._args['lower_disp_limit']
+    def lower_disp_limit(self): return self._getargs('lower_disp_limit')
 
     @property
-    def upper_alarm_limit(self): return self._args['upper_alarm_limit']
+    def upper_alarm_limit(self): return self._getargs('upper_alarm_limit')
 
     @property
-    def lower_alarm_limit(self): return self._args['lower_alarm_limit']
+    def lower_alarm_limit(self): return self._getargs('lower_alarm_limit')
 
     @property
-    def lower_warning_limit(self): return self._args['lower_warning_limit']
+    def lower_warning_limit(self): return self._getargs('lower_warning_limit')
 
     @property
-    def upper_warning_limit(self): return self._args['upper_warning_limit']
+    def upper_warning_limit(self): return self._getargs('upper_warning_limit')
 
     @property
-    def upper_ctrl_limit(self): return self._args['upper_ctrl_limit']
+    def upper_ctrl_limit(self): return self._getargs('upper_ctrl_limit')
 
     @property
-    def lower_ctrl_limit(self): return self._args['lower_ctrl_limit']
+    def lower_ctrl_limit(self): return self._getargs('lower_ctrl_limit')
 
     @property
     def info(self): return self._getinfo()
