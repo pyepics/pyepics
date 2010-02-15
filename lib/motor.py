@@ -505,7 +505,6 @@ class Motor:
         "stop motor right now"
         self.put_field('stop',1)
         ca.poll()
-        
 
     def get_pv(self,attr):
         "return full PV for a field"
@@ -538,14 +537,12 @@ class Motor:
     
     def get_field(self,attr,as_string=False):
         if not attr in self._dat:
-            print '-> store ', attr
             self.store_attr(attr)
             self._dat[attr].get()
         try:
             out = self._dat[attr].get(as_string=as_string)
         except:
             try:
-                print 'OK, try a second time'
                 ca.poll()
                 time.sleep(0.001)
                 out = self._data[attr].get(as_string=as_string)

@@ -327,15 +327,19 @@ class pvCtrlMixin(object):
             pass
         
     def _SetValue(self,value):
+
         print 'pvCtrlMixin._SetValue must be overwritten for ', self.pv.pvname
         
     def update(self,value=None):
         if value is None: value = self.pv.get(as_string=True)
         self._SetValue(value)
 
+    def getValue(self,as_string=True):
+        return self.pv.get(as_string=as_string)
+        
     def _pvEvent(self,pvname=None,value=None,id=None,char_value=None,**kw):
         # if pvname is None or id == 0: return
-        print 'Mixin _pvEvent' , pvname, id, value, char_value
+        # print 'Mixin _pvEvent' , pvname, id, value, char_value
         if pvname is None or value is None or id is None:
             print 'Null Event'
             return
@@ -363,21 +367,27 @@ class pvTextCtrl(wx.TextCtrl,pvCtrlMixin):
         wx.TextCtrl.__init__(self,parent, wx.ID_ANY, value='', **kw)
         pvCtrlMixin.__init__(self,pvname=pvname,timer=timer,
                              font=font,fg=None,bg=None)
-    def _SetValue(self,value): self.SetValue(value)
+    def _SetValue(self,value):
+        self.SetValue(value)
+
 
 class pvText(wx.StaticText,pvCtrlMixin):
     """ static text for PV display, with callback for automatic updates"""
     def __init__(self, parent, pvname=None, timer=None,
+                 as_string=True,
                  font=None, fg=None, bg=None, **kw):
         
+        self.as_string = as_string
         userstyle = kw.get('style',None)
-        kw['style'] = wx.ST_NO_AUTORESIZE       
+        kw['style'] = wx.ST_NO_AUTORESIZE |wx.ALIGN_RIGHT
         if userstyle:         kw['style'] = kw['style'] | userstyle
+        print 'pvText ', kw['style']
         
         wx.StaticText.__init__(self,parent,wx.ID_ANY,label='',**kw)
         pvCtrlMixin.__init__(self,pvname=pvname,timer=timer,
                              font=font,fg=None,bg=None)
-    def _SetValue(self,value): self.SetLabel(str(value).strip())
+    def _SetValue(self,value):
+        self.SetLabel(self.getValue(as_string=self.as_string))
         
 class pvEnumButtons(wx.Panel,pvCtrlMixin):
     """ a panel of buttons for Epics ENUM controls """
@@ -388,9 +398,9 @@ class pvEnumButtons(wx.Panel,pvCtrlMixin):
         pvCtrlMixin.__init__(self,pvname=pvname,timer=timer)
         
         if self.pv.type != 'enum':
-            print 'self.pv: ', self.pv, self.pv.type
             print 'need an enumeration type for pvEnumButtons! '
             return
+        self.pv.get(as_string=True)
         
         sizer = wx.BoxSizer(orientation)
         self.buttons = []
@@ -432,6 +442,8 @@ class pvEnumChoice(wx.Choice,pvCtrlMixin):
             return
 
         self.Clear()
+        self.pv.get(as_string=True)
+        
         self.AppendItems(self.pv.enum_strs)
         self.SetSelection(self.pv.value)
         self.Bind(wx.EVT_CHOICE, self.onChoice)

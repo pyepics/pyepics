@@ -76,7 +76,7 @@ class MotorDetailFrame(wx.Frame):
         ####
         nrow = nrow + 1
         ds.Add(xLabel(dp,"Readback"),                (nrow,0), (1,1), _textstyle,_textpadding)
-        ds.Add(self.motor_text(dp,'readback'),       (nrow,1), (1,1), wx.ALIGN_CENTER|wx.RIGHT,7)
+        ds.Add(self.motor_text(dp,'readback'),       (nrow,1), (1,1), wx.ALIGN_RIGHT,7)
         ds.Add(self.motor_text(dp,'dial_readback'),  (nrow,2), (1,1), wx.ALIGN_CENTER|wx.RIGHT,7)
         ds.Add(self.motor_text(dp,'raw_readback'),   (nrow,3), (1,1), wx.ALIGN_CENTER|wx.RIGHT,7)
 
@@ -263,8 +263,9 @@ class MotorDetailFrame(wx.Frame):
         m.store_attr(attr)
         self.timer.add_callback(m._dat[attr], callback, -5, **kw)
 
-    def onMotorEvent(self,pv=None,field=None,motor=None,**kw):        
-        if (pv is None): return None
+    def onMotorEvent(self,pvname=None,field=None,motor=None,**kw):        
+        print 'Motor event ' , pvname, field, motor
+        if (pvname is None): return None
         
         field_val = motor.get_field(field)
         field_str = motor.get_field(field,as_string=1)
@@ -288,7 +289,8 @@ class MotorDetailFrame(wx.Frame):
 
     def motor_text(self,panel,attr):
         return pvText(panel,  size=(100,-1),style=wx.ALIGN_RIGHT|wx.RIGHT,
-                      timer=self.timer, pvname=self.motor.get_pv(attr))
+                      timer=self.timer, as_string=True,
+                      pvname=self.motor.get_pv(attr))
 
     def pv_ctrl(self,panel,pvname):
         return pvFloatCtrl(panel, size=(100,-1), timer=self.timer,
@@ -327,7 +329,7 @@ class MotorPanel(wx.Panel):
         wx.Panel.__init__(self, parent, style=wx.TAB_TRAVERSAL)
         self.SetFont(wx.Font(13,wx.SWISS,wx.NORMAL,wx.BOLD))
         self.parent = parent
-        wx.Panel.SetBackgroundColour(self,(245,245,225))
+        # wx.Panel.SetBackgroundColour(self,(245,245,225))
         self.timer = timer or catimer(self)
 
         if (callable(messenger)): self.__messenger = messenger
@@ -452,7 +454,8 @@ class MotorPanel(wx.Panel):
 
     def onStopButton(self,event=None):
         if (self.motor is None): return        
-        self.motor.stop = 1
+        self.motor.stop()
+        epics.ca.poll()
 
     def onMoreButton(self,event=None):
         if (self.motor is None): return        
@@ -465,13 +468,13 @@ class MotorPanel(wx.Panel):
         except:
             pass
 
-    def onMotorEvent(self,pv=None,field=None,motor=None,**kw):        
-        if (pv is None): return None
+    def onMotorEvent(self,pvname=None,field=None,motor=None,**kw):        
+        print '(XX) Motor event ' , pvname, field, motor
+        if (pvname is None): return None
         field_val = motor.get_field(field)
         field_str = motor.get_field(field,as_string=1)
-
         if field == 'low_limit':
-            self.drive.SetMin(self.motor.low_limit)
+            self.axdrive.SetMin(self.motor.low_limit)
         elif field == 'high_limit':
             self.drive.SetMax(self.motor.high_limit)
 
@@ -479,7 +482,7 @@ class MotorPanel(wx.Panel):
             s = 'Limit!'
             if (field_val == 0): s = ''
             self.info.SetLabel(s)
-
+            
         elif field == 'set':
             label,color='Set:','Yellow'
             if field_val == 0: label,color='','White'
