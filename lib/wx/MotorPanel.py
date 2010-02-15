@@ -12,7 +12,7 @@
 import wx
 import types
 import epics
-
+import time
 from wxlib import pvText, pvFloatCtrl, pvTextCtrl, pvEnumButtons, pvEnumChoice
 from wxlib import catimer, set_sizer, set_float
 
@@ -132,7 +132,7 @@ class MotorDetailFrame(wx.Frame):
 
         for attr in ('low_limit','high_limit','dial_low_limit','dial_high_limit'):
             pv = epics.PV(self.motor.get_pv(attr))
-            self.timer.add_callback(pv, id=-4, callback=self.onLimitChange,attr=attr)
+            self.timer.add_callback(pv, self.onLimitChange, -4, attr=attr)
         # 
         set_sizer(dp,ds) # ,fit=True)
         sizer.Add(dp, 0)
@@ -261,7 +261,7 @@ class MotorDetailFrame(wx.Frame):
         m = self.motor
         kw = {'field': attr, 'motor': m}
         m.store_attr(attr)
-        self.timer.add_callback(m._dat[attr], callback=callback, id=-5, **kw)
+        self.timer.add_callback(m._dat[attr], callback, -5, **kw)
 
     def onMotorEvent(self,pv=None,field=None,motor=None,**kw):        
         if (pv is None): return None
@@ -327,7 +327,7 @@ class MotorPanel(wx.Panel):
         wx.Panel.__init__(self, parent, style=wx.TAB_TRAVERSAL)
         self.SetFont(wx.Font(13,wx.SWISS,wx.NORMAL,wx.BOLD))
         self.parent = parent
-        # wx.Panel.SetBackgroundColour(self,(245,245,225))
+        wx.Panel.SetBackgroundColour(self,(245,245,225))
         self.timer = timer or catimer(self)
 
         if (callable(messenger)): self.__messenger = messenger
@@ -366,15 +366,16 @@ class MotorPanel(wx.Panel):
         kw = {'field': attr, 'motor': m}
         m.store_attr(attr)
         # print 'set field callback ', attr, callback, id
-        self.timer.add_callback(m._dat[attr], callback=callback, id=-6, **kw)
+        self.timer.add_callback(m._dat[attr], callback, -6, **kw)
 
     def CreatePanel(self,style='normal'):
         " build (but do not fill in) panel components"
-        self.desc = pvText(self, timer= self.timer, size=(135, -1),
+        print 'Create Panel !! '
+        self.desc = pvText(self, timer= self.timer, size=(245, -1),
                            style=wx.ALIGN_CENTER)
         self.rbv  = pvText(self, timer= self.timer, size=(125, -1),
                            fg='Blue',style=wx.ALIGN_CENTER)
-        self.info = wx.StaticText(self, label='', size=(45, 20), style=wx.ALIGN_LEFT)
+        self.info = wx.StaticText(self, label='', size=(55, 20), style=wx.ALIGN_LEFT)
         self.info.SetForegroundColour("Red")
 
         self.drive = pvFloatCtrl(self,  size=(110,-1),
@@ -427,15 +428,18 @@ class MotorPanel(wx.Panel):
         " fill in panel components for motor "
         if self.motor is None: return
 
+        
+
         self.desc.set_pv(self.motor.get_pv('description'))
         self.rbv.set_pv(self.motor.get_pv('readback'))
         self.drive.set_pv(self.motor.get_pv('drive'))
+
 
         self.drive.update()
         self.desc.update()
         self.rbv.update()
 
-        self.twk_list = self.__Init_StepList()
+        self.twk_list = self.Create_StepList()
         self.__Update_StepList()
         
     def onLeftButton(self,event=None):
@@ -494,13 +498,18 @@ class MotorPanel(wx.Panel):
         if val not in self.twk_list:  self.__Update_StepList(value=val)
         self.__twkbox.SetValue(val)
             
-    def __Init_StepList(self):
+    def Create_StepList(self):
         """ create initial list of motor steps, based on motor range
         and precision"""
 
+        print 'Create_StepList: ', self.motor
+
         if self.motor is None: return []
         smax = abs(self.motor.high_limit - self.motor.low_limit)*0.6
+
         p = self.motor.precision
+        print self.motor.high_limit, self.motor.low_limit, smax, p
+
         l = []
         for i in range(6):
             x = 10**(i-p)

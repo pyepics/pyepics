@@ -265,7 +265,9 @@ class Motor:
         self._dat['drive'].get()
 
     def connect_all(self):
-        for p in self._dat.values():  p.get()
+        ca.poll()
+        for p in self._dat.values():
+            if not p.connected: p.get()
 
     def __repr__(self):
         return "<EpicsCA.Motor:  %s '%s'>" % (self.pvname, self.get_field('description'))
@@ -296,8 +298,7 @@ class Motor:
         if not self._dat.has_key(attr) and self.__motor_params.has_key(attr):
             pvname = "%s.%s" % (self.pvname,self.__motor_params[attr][0])
             self._dat[attr] = pv.PV(pvname)
-            self._dat[attr].connect()
-        return self._dat.has_key(attr)
+        return attr in self._dat
     
 
     def check_limits(self):
@@ -536,8 +537,22 @@ class Motor:
         return self._dat[attr].put(val,wait=wait,timeout=timeout)
     
     def get_field(self,attr,as_string=False):
-        if not self.store_attr(attr): return None
-        return self._dat[attr].get(as_string=as_string)
+        if not attr in self._dat:
+            print '-> store ', attr
+            self.store_attr(attr)
+            self._dat[attr].get()
+        try:
+            out = self._dat[attr].get(as_string=as_string)
+        except:
+            try:
+                print 'OK, try a second time'
+                ca.poll()
+                time.sleep(0.001)
+                out = self._data[attr].get(as_string=as_string)
+            except:
+                print 'Get Field Failed: ', attr, self._dat[attr]
+                raise ValueError('Fail.')
+        return out
 
     def clear_field_callback(self,attr):
         try:
@@ -581,7 +596,7 @@ class Motor:
                   'stop_go', 'set', 'status'):
             j = i
             if (len(j) < 16): j = "%s%s" % (j,' '*(16-len(j)))
-            print "%s = %s" % (j, self.get_field(i,as_string=1))
+            print "%s = %s" % (j, self.get_field(i,as_string=True))
         print "--------------------------------------"
 
     def show_all(self):
@@ -593,12 +608,19 @@ class Motor:
         list = self.__motor_params.keys()
         list.sort()
         for attr in list:
+            if not attr in self._dat:
+                self.store_attr(attr)
+
+        self.connect_all()
+        for attr in list:
             l = attr 
             if (len(attr)<15): l  = l + ' '*(15-len(l))
             suf = self.__motor_params[attr][0]
             pvn  = "%s.%s" % (self.pvname, suf)
+
             if (len(suf)<5): suf = suf  +' '*(5-len(suf))            
-            val = self.get_field(attr,as_string=1)
+                
+            val = self.get_field(attr,as_string=True)
             if (val):
                 if (len(val)<12): val  = val + ' '*(12-len(val))
             print " %s  %s  %s  %s" % (l,suf,val,

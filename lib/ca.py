@@ -380,16 +380,19 @@ def client_status(context,level):
 @withCA
 def flush_io():    return libca.ca_flush_io()
 
+@withCA
 def pend_io(t=1.0):
     f   = libca.ca_pend_io
     f.argtypes = [ctypes.c_double]
     return f(t)
 
+@withCA
 def pend_event(t=1.e-5):
     f   = libca.ca_pend_event
     f.argtypes = [ctypes.c_double]
     return f(t)
 
+@withCA
 def poll(ev=1.e-4,io=1.0):
     """polls CA for events and i/o. """
     pend_event(ev)
@@ -541,6 +544,7 @@ def get(chid,ftype=None,as_string=False, as_numpy=True):
     nelem = count
     if ftype == dbr.STRING:  nelem = dbr.MAX_STRING_SIZE
        
+    # print 'CA.get: ',nelem, ftype, dbr.Map[ftype]
     data = (nelem*dbr.Map[ftype])()
     
     ret = libca.ca_array_get(ftype, count, chid, data)

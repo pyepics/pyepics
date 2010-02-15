@@ -254,21 +254,24 @@ class catimer:
         self.parent.Bind(wx.EVT_TIMER, self.pend)
         self._timer.Start(self.time)
 
-    def _proxy_callback(self,pvname=None,**kw):
+    def _proxy_callback(self,pvname=None,id=-1,**kw):
         if pvname not in self.needs_callback:
-            self.needs_callback.append(pvname)
+            self.needs_callback.append((pvname,id,kw))
 
     def __default_callback(self,pvname=None,char_value=None,**kw):
         try:
             print "  %s= %s  at %s " % (pvname, char_value, time.ctime())
         except:
-            pass
+            print " _def callback execption??" , pvname, char_value
 
-    def add_callback(self,pv=None,callback=None,id=-1, **kw):
+    def add_callback(self,pv,callback,id,**kw):
         if pv is None: return
         pv.add_callback(self._proxy_callback)
-        if callback is None: callback = self.__default_callback()
-        if pv.pvname not in self.callbacks: self.callbacks[pv.pvname] = {}
+        if callback is None:
+            callback = self.__default_callback
+
+        if pv.pvname not in self.callbacks:
+            self.callbacks[pv.pvname] = {}
         self.callbacks[pv.pvname][id] = (callback,kw)
         
     def remove_callback(self,pvname,id=-1, **kw):
@@ -279,21 +282,21 @@ class catimer:
           
     def pend(self,foo=None,**more):
         epics.poll()
-        for thispv in self.needs_callback:
-            print 'need callback: ', thispv
-            print self.callbacks[thispv]
-            for id,dat in self.callbacks[thispv].items():
-                cb,kw = dat
-                kw['id']=id
+        for pvname,wid,kw in self.needs_callback:
+            for id,dat in self.callbacks[pvname].items():
+                cb, kw_custom = dat
+                kw.update(kw_custom)
+                if 'id' not in kw: kw['id']=wid
+                if 'pvname' not in kw: kw['pvname']=pvname
+
                 try:
                     cb(**kw)
                 except PyDeadObjectError:                    
-                    print ' removing callback for dead PV object :', pv.pvname
-                    self.remove_callback(thispv.pvname)
+                    print ' no callback for dead PV object?? ', pvname
 
         self.needs_callback = []
 
-class pvCtrlMixin:
+class pvCtrlMixin(object):
     """ mixin for wx Controls with epics PVs:  connects to PV,
     sets a catimer, which manages callback events for the PV
 
@@ -326,12 +329,21 @@ class pvCtrlMixin:
     def _SetValue(self,value):
         print 'pvCtrlMixin._SetValue must be overwritten for ', self.pv.pvname
         
+    def update(self,value=None):
+        if value is None: value = self.pv.get(as_string=True)
+        self._SetValue(value)
+
     def _pvEvent(self,pvname=None,value=None,id=None,char_value=None,**kw):
+        # if pvname is None or id == 0: return
+        print 'Mixin _pvEvent' , pvname, id, value, char_value
+        if pvname is None or value is None or id is None:
+            print 'Null Event'
+            return
         if char_value is not None:
             self._SetValue(char_value)
         elif value is not None:
-            self._SetValue(set_float(value)
-        
+            self._SetValue(set_float(value))
+            
     def set_pv(self,pvname=None):
         self.pv = epics.PV(pvname)
         if self.pv is None: return
@@ -339,7 +351,8 @@ class pvCtrlMixin:
         if not self.pv.connected: return
         self._SetValue(self.pv.char_value)
         self.id = self.GetId()
-        self.timer.add_callback(self.pv,callback=self._pvEvent,id=self.id )
+        
+        self.timer.add_callback(self.pv, self._pvEvent, self.id )
 
 
 class pvTextCtrl(wx.TextCtrl,pvCtrlMixin):
@@ -373,8 +386,9 @@ class pvEnumButtons(wx.Panel,pvCtrlMixin):
 
         wx.Panel.__init__(self, parent, wx.ID_ANY, **kw)
         pvCtrlMixin.__init__(self,pvname=pvname,timer=timer)
-
+        
         if self.pv.type != 'enum':
+            print 'self.pv: ', self.pv, self.pv.type
             print 'need an enumeration type for pvEnumButtons! '
             return
         
@@ -460,26 +474,30 @@ class pvFloatCtrl(FloatCtrl,pvCtrlMixin):
         pvCtrlMixin.__init__(self,pvname=pvname,timer=timer,
                              font=font,fg=None,bg=None)
 
-    def _SetValue(self,value): self.SetValue(value)
+    def _SetValue(self,value):
+        self.SetValue(value)
     
     def set_pv(self,pvname=None):
         self.pv = epics.PV(pvname)
         if self.pv is None: return
+        
+        self.pv.get()
+        self.pv.get_ctrlvars()
+        # be sure to set precision before value!! or PV may be moved!!
+        prec = self.pv.precision
+        if prec is None: prec = 0
+        self.SetPrecision(prec)
 
-        self.pv.connect()
-        if not self.pv.connected: return
         self.SetValue( self.pv.char_value)
         self.id = self.GetId()
-        self.timer.add_callback(self.pv,callback=self._pvEvent,id=self.id )
        
         if self.pv.type in ('string','char'):
             print 'Float Control for string / character data??  '
 
         self.SetMin(self.pv.lower_ctrl_limit)
         self.SetMax(self.pv.upper_ctrl_limit)
-        prec = self.pv.precision
-        if prec is None: prec = 0
-        self.SetPrecision(prec)
+
+        self.timer.add_callback(self.pv, self._pvEvent, self.id )
 
     def _onEnter(self,value=None,**kw):
         if value in (None,'') or self.pv is None: return 

@@ -56,6 +56,10 @@ class PV(object):
         self.chid = ca.create_channel(self.pvname,
                                       userfcn=self._onConnect)
         self._args['chid'] = self.chid
+        try:
+            self._args['type'] = dbr.Name(ca.field_type(self.chid)).lower()
+        except:
+            self._args['type'] = 'unknown'
 
     def _onConnect(self,chid=0,conn=True,**kw):
         self.connected = conn
@@ -64,11 +68,10 @@ class PV(object):
             self._args['count']  = ca.element_count(self.chid)
             self._args['access'] = ca.access(self.chid)
             self._args['write_access'] = ca.write_access(self.chid)
-            ftype  = ca.promote_type(self.chid,
+            self.ftype  = ca.promote_type(self.chid,
                                      use_ctrl=self._form['ctrl'],
                                      use_time=self._form['time'])
-            self._args['ftype'] = ftype
-            self._args['type']  = dbr.Name(ftype).lower()
+            self._args['type'] = dbr.Name(self.ftype).lower()
         return
 
     def connect(self,timeout=5.0,force=True):
@@ -119,8 +122,11 @@ class PV(object):
 
     def _set_charval(self,val,ca_calls=True):
         """ set the character representation of the value"""
-        cval  = repr(val)       
+
         ftype = self._args['ftype']
+        cval  = repr(val)       
+        if ftype == dbr.STRING: cval = val
+        
         if self._args['count'] > 1:
             if ftype == dbr.CHAR:
                 cval = ''.join([chr(i) for i in val]).rstrip()
@@ -174,6 +180,9 @@ class PV(object):
         if callable(callback):
             kw['id']=id
             self.callbacks.append((callback,kw))
+
+    def clear_callbacks(self,**kw):
+        self.callbacks = []
 
     def _getinfo(self):
         if not self.connect(force=False):  return None
@@ -239,6 +248,10 @@ class PV(object):
         if self._args['value'] is None:  self.get()
         return self._args.get(arg,None)
         
+    # note that 
+    @property
+    def type(self): return self._args['type']
+
     @property
     def value(self):     return self._getarg('value')
 
@@ -251,11 +264,6 @@ class PV(object):
     @property
     def status(self): return self._getarg('status')
 
-    @property
-    def ftype(self): return self._getarg('ftype')
-
-    @property
-    def type(self):  return self._getarg('type')
 
     @property
     def host(self): return self._getarg('host')
@@ -317,7 +325,7 @@ class PV(object):
     def __repr__(self):
         if not self.connected:  return "<PV '%s': not connected>" % self.pvname
 
-        return "<PV: '%(pvname)s', count=%(count)i, type=%(type)s, access=%(access)s>" % self._args
+        return "<PV: '%(pvname)s', count=%(count)i, type=%(ftype)s, access=%(access)s>" % self._args
     
     def __str__(self): return self.__repr__()
 

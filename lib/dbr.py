@@ -144,7 +144,7 @@ class ctrl_double(ctypes.Structure):
 # map of Epics DBR types to ctypes types
 Map = {STRING: char_t,
        INT:    short_t,
-       FLOAT:  float,
+       FLOAT:  float_t,
        ENUM:   ushort_t,
        CHAR:   byte_t,
        LONG:   long_t,
