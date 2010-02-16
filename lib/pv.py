@@ -1,13 +1,27 @@
-import ca
-import dbr
+#!/usr/bin/python
+"""Epics Process Variable
+
+"""
 import time
 import math
+import copy
 
+import ca
+import dbr
 
 def fmt_time(t=None):
     if t is None: t = time.time()
     t,frac=divmod(t,1)
     return "%s.%3.3i" %(time.strftime("%Y-%h-%d %H:%M:%S"),1000.0*frac)
+
+_PV_fields_ = ('pvname','value','char_value', 'status','ftype',
+               'chid', 'host','count','access','write_access',
+               'severity', 'timestamp', 'precision',
+               'units', 'enum_strs','no_str',
+               'upper_disp_limit', 'lower_disp_limit',
+               'upper_alarm_limit', 'lower_alarm_limit',
+               'lower_warning_limit','upper_warning_limit',
+               'upper_ctrl_limit', 'lower_ctrl_limit')
 
 class PV(object):
     """== Epics Process Variable
@@ -27,29 +41,19 @@ class PV(object):
       >>>p.type             # EPICS data type: 'string','double','enum','long',....
 """
 
-    _fields_ = ('pvname','value','char_value', 'status','ftype',
-                'chid', 'host','count','access','write_access',
-                'severity', 'timestamp', 'precision',
-                'units', 'enum_strs','no_str',
-                'upper_disp_limit', 'lower_disp_limit',
-                'upper_alarm_limit', 'lower_alarm_limit',
-                'lower_warning_limit','upper_warning_limit',
-                'upper_ctrl_limit', 'lower_ctrl_limit')
-
     def __init__(self,pvname, callback=None, form='native',
                  verbose=False, auto_monitor=True):
-
         self.pvname  = pvname.strip()
         self.verbose = verbose
         self.auto_monitor = auto_monitor
         self._form   = {'ctrl': (form.lower() =='ctrl'),
                         'time': (form.lower() =='time')}
 
-        self.callbacks = []
-        if callable(callback): self.callbacks = [callback]
+        self.callbacks = {}
+        if callable(callback): self.callbacks[0] = (callback,{})
 
         self.connected  = False
-        self._args      = {}.fromkeys(self._fields_)
+        self._args      = {}.fromkeys(_PV_fields_)
 
         self._args['pvname'] = self.pvname
         self.__mondata = None
@@ -170,19 +174,33 @@ class PV(object):
         self._set_charval(self._args['value'],ca_calls=False)
 
         if self.verbose:
-            print '  Event ', self.pvname,self.value, fmt_time(self._args['timestamp'])
+            print '  %s: %s (%s)'% (self.pvname,self._args['char_value'],
+                                    fmt_time(self._args['timestamp'])
         
-        for fcn,kw in self.callbacks:
-            kw.update(self._args)
+        for fcn,kwargs in self.callbacks.values():
+            kw = copy.copy(self._args)
+            kw.update(kwargs)
             if callable(fcn):  fcn(**kw)
             
-    def add_callback(self,callback=None,id=0,**kw):
+    def add_callback(self,callback=None,**kw):
         if callable(callback):
-            kw['id']=id
-            self.callbacks.append((callback,kw))
+            n_cb = len(self.callbacks)                
+            index = n_cb + 1
+            if index > 512 and index > 2*n_cb:
+                nx = None
+                for i in range(index):
+                    if i not in self.callbacks:
+                        nx = i
+                        break
+                if nx is not None: index = i
+            self.callbacks[index] = (callback,kw)
+        return index
+    
+    def remove_callbacks(self,index):
+        if index in self.callbacks: self.callbacks.pop(index)
 
     def clear_callbacks(self,**kw):
-        self.callbacks = []
+        self.callbacks = {}
 
     def _getinfo(self):
         if not self.connect(force=False):  return None
@@ -248,10 +266,6 @@ class PV(object):
         if self._args['value'] is None:  self.get()
         return self._args.get(arg,None)
         
-    # note that 
-    @property
-    def type(self): return self._args['type']
-
     @property
     def value(self):     return self._getarg('value')
 
@@ -264,6 +278,8 @@ class PV(object):
     @property
     def status(self): return self._getarg('status')
 
+    @property
+    def type(self): return self._args['type']
 
     @property
     def host(self): return self._getarg('host')
@@ -334,4 +350,4 @@ class PV(object):
             return (self._chid  == other._chid)
         except:
             return False
-
+        
