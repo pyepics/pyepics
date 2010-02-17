@@ -151,9 +151,11 @@ import dbr
 libca = None
 
 ## PREEMPTIVE_CALLBACK determines the CA context
-
 PREEMPTIVE_CALLBACK = True
 # PREEMPTIVE_CALLBACK = False
+
+AUTO_CLEANUP = True
+
 
 ## default timeout for connection
 #   This should be kept fairly short --
@@ -208,46 +210,55 @@ def initialize_libca():
     if ret != dbr.ECA_NORMAL:
         raise ChannelAccessException('initialize_libca',
                                      'Cannot create Epics CA Context')
+
+    if AUTO_CLEANUP: atexit.register(finalize_libca)
     return libca
 
-def finalize_libca(maxtime=10.0):
+def finalize_libca(maxtime=10.0,gc_collect=True):
     """shutdown channel access:
     run clear_channel(chid) for all chids in _cache
     then flush_io() and poll() a few times.
     """
-    t0 = time.time()
-    flush_io()
-    poll()
-    for val in _cache.values():
-        clear_channel(val['chid'])
-    _cache.clear()
-
-    for i in range(10):
+    print 'Finalize libca'
+    try:
+        t0 = time.time()
         flush_io()
         poll()
-        if time.time()-t0 > maxtime: break
+        for key,val in _cache.items():
+            clear_channel(val['chid'])
+            _cache[key] = {}
+        _cache.clear()
 
-    context_destroy()
-    libca = None
-    gc.collect()
-    # print 'shutdown in %.3fs' % (time.time()-t0)
+        for i in range(10):
+            flush_io()
+            poll()
+            if time.time()-t0 > maxtime: break
 
-## register this function to be run on normal exits
-atexit.register(finalize_libca)
+        context_destroy()
+        libca = None
+    except:
+        pass
+    ## print 'shutdown in %.3fs' % (time.time()-t0)
+
+
 
 ## connection event handler: 
 def _onConnectionEvent(args):
     """set flag in cache holding whteher channel is
     connected. if provided, run a user-function"""
-    pvname = name(args.chid)
-    entry  = _cache[pvname]
-    entry['conn'] = (args.op == dbr.OP_CONN_UP)
-    entry['ts']   = time.time()
-    entry['failures'] = 0
-    if callable(entry['userfcn']):
-        entry['userfcn'](pvname=pvname,
-                         chid=entry['chid'],
-                         conn=entry['conn'])
+    try:
+        pvname = name(args.chid)
+        entry  = _cache[pvname]
+        entry['conn'] = (args.op == dbr.OP_CONN_UP)
+        entry['ts']   = time.time()
+        entry['failures'] = 0
+        if callable(entry['userfcn']):
+            entry['userfcn'](pvname=pvname,
+                             chid=entry['chid'],
+                             conn=entry['conn'])
+    except:
+        pass
+
     return 
 
 # hold global reference to this callback

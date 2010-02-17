@@ -175,7 +175,7 @@ class PV(object):
 
         if self.verbose:
             print '  %s: %s (%s)'% (self.pvname,self._args['char_value'],
-                                    fmt_time(self._args['timestamp'])
+                                    fmt_time(self._args['timestamp']))
         
         for fcn,kwargs in self.callbacks.values():
             kw = copy.copy(self._args)
@@ -196,8 +196,15 @@ class PV(object):
             self.callbacks[index] = (callback,kw)
         return index
     
-    def remove_callbacks(self,index):
-        if index in self.callbacks: self.callbacks.pop(index)
+    def remove_callback(self,index=None):
+        if index is None and len(self.callbacks)==1:
+            index = self.callbacks.keys()[0]
+            
+        if index in self.callbacks:
+            x = self.callbacks.pop(index)
+            print 'pv removed callback ', index, x
+            ca.poll()
+            
 
     def clear_callbacks(self,**kw):
         self.callbacks = {}

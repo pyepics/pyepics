@@ -257,11 +257,10 @@ class Motor:
         self._dat['enable'] = pv.PV("%s_able.VAL" % name)
         isEnabled = (0 == self._dat['enable'].get() )
         if not isEnabled: self._dat['enable'].put(0)        
-        
+        self._callbacks = {}
 
         for attr in self.__init_list:   self.store_attr(attr)
         self.connect_all()
-        
         self._dat['drive'].get()
 
     def connect_all(self):
@@ -553,7 +552,9 @@ class Motor:
 
     def clear_field_callback(self,attr):
         try:
-            self._dat[attr].remove_callback(index=attr)
+            index = self._callbacks.get(attr,None)
+            if index is not None:
+                self._dat[attr].remove_callback(index=index)
         except:
             self._dat[attr].clear_callbacks()
 
@@ -563,7 +564,8 @@ class Motor:
         kw_args['field'] = attr
         kw_args['motor'] = self
         kw_args.update(kw)
-        self._dat[attr].set_callback(callback=callback,index=attr,**kw_args)
+        index = self._dat[attr].add_callback(callback=callback,**kw_args)
+        self._callbacks[attr] = index
 
     def refresh(self):
         """ refresh all motor parameters currently in use:
