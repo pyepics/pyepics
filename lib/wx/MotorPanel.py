@@ -13,9 +13,8 @@ import wx
 import types
 import epics
 import time
-from wxlib import pvText, pvFloatCtrl, pvTextCtrl, pvTimerMixin, pvEnumButtons, pvEnumChoice
-from wxlib import catimer, set_sizer, set_float
-
+from wxlib import pvText, pvFloatCtrl, pvTextCtrl, pvEnumButtons, pvEnumChoice
+from wxlib import catimer, set_sizer, set_float, DelayedEpicsCallback
 
 def xLabel(parent,label):
     return wx.StaticText(parent,label=label,style=wx.ALIGN_BOTTOM)
@@ -27,21 +26,19 @@ def xTitle(parent,label,fontsize=13,color='Blue'):
     return u
 
     
-class MotorDetailFrame(wx.Frame,pvTimerMixin):
+class MotorDetailFrame(wx.Frame):
     """ Detailed Motor Setup Frame"""
     __motor_fields = ('set','low_limit','high_limit','soft_limit','tweak_val',
                       'high_limit_set', 'low_limit_set')
 
-    def __init__(self, motor=None, timer=None):
+    def __init__(self, motor=None):
         
         wx.Frame.__init__(self, None, wx.ID_ANY, style=wx.DEFAULT_FRAME_STYLE,size=(500,750) )
         self.SetFont(wx.Font(11,wx.SWISS,wx.NORMAL,wx.BOLD,False))        
 
-        pvTimerMixin.__init__(self,timer)
-        
         self.motor = motor
         prec = motor.precision
-       
+        
         self.SetTitle("Motor Details: %s  | %s |" % (self.motor.pvname, self.motor.description))
 
         panel = wx.Panel(self)# outerpanel)
@@ -126,7 +123,7 @@ class MotorDetailFrame(wx.Frame,pvTimerMixin):
 
         twk_sizer = wx.BoxSizer(wx.HORIZONTAL)
         twk_panel = wx.Panel(dp)
-        twk_val = pvFloatCtrl(twk_panel, size=(110,-1),precision=prec,timer=self.timer)
+        twk_val = pvFloatCtrl(twk_panel, size=(110,-1),precision=prec)
         twk_val.set_pv(self.motor.get_pv('tweak_val'))                
          
         twk_left = wx.Button(twk_panel, label='<',  size=(30,30))
@@ -145,19 +142,19 @@ class MotorDetailFrame(wx.Frame,pvTimerMixin):
         
         able_btns = pvEnumButtons(dp, pvname=self.motor.pvname+'_able.VAL',
                                   orientation = wx.VERTICAL, 
-                                  size=(110,-1),timer=self.timer)
+                                  size=(110,-1))
 
         ds.Add(able_btns,             (nrow-1,3), (2,1), wx.ALIGN_CENTER)
 
         stop_btns = pvEnumButtons(dp, pvname=self.motor.get_pv('stop_go'),
                                   orientation = wx.VERTICAL, 
-                                  size=(110,-1),timer=self.timer)
+                                  size=(110,-1))
 
         ds.Add(stop_btns,             (2,4), (4,1), wx.ALIGN_RIGHT)
 
         for attr in ('low_limit','high_limit','dial_low_limit','dial_high_limit'):
             pv = epics.PV(self.motor.get_pv(attr))
-            self.add_callback(pv, self.onLimitChange, 1224, attr=attr)
+            pv.add_callback(self.onLimitChange, wid=1224, attr=attr)
         # 
         set_sizer(dp,ds) # ,fit=True)
         sizer.Add(dp, 0)
@@ -176,17 +173,17 @@ class MotorDetailFrame(wx.Frame,pvTimerMixin):
         
         ds.Add(pvEnumButtons(dp, pvname=self.motor.get_pv('set'),
                               orientation = wx.HORIZONTAL, 
-                              size=(110,-1),timer=self.timer), (0,1), (1,1), wx.ALIGN_LEFT)
+                              size=(110,-1)), (0,1), (1,1), wx.ALIGN_LEFT)
 
         ds.Add(xLabel(dp, 'Direction: '), (1,0),(1,1), _textstyle,_textpadding)
         ds.Add(pvEnumButtons(dp, pvname=self.motor.get_pv('direction'),
                               orientation = wx.HORIZONTAL, 
-                              size=(110,-1),timer=self.timer), (1,1), (1,1), wx.ALIGN_LEFT)
+                              size=(110,-1)), (1,1), (1,1), wx.ALIGN_LEFT)
 
 
         ds.Add(xLabel(dp, 'Freeze Offset: '), (0,2),(1,1), _textstyle,_textpadding)
         ds.Add(pvEnumChoice(dp, pvname=self.motor.get_pv('freeze_offset'),
-                            size=(110,-1),timer=self.timer),  (0,3), (1,1), wx.ALIGN_CENTER)
+                            size=(110,-1)),  (0,3), (1,1), wx.ALIGN_CENTER)
         
         ds.Add(xLabel(dp, 'Offset Value: '), (1,2),(1,1), _textstyle,_textpadding)
         ds.Add(self.motor_ctrl(dp,'offset'), (1,3), (1,1), wx.ALIGN_CENTER)
@@ -286,8 +283,9 @@ class MotorDetailFrame(wx.Frame,pvTimerMixin):
         m = self.motor
         kw = {'field': attr, 'motor': m}
         m.store_attr(attr)
-        self.add_callback(m._dat[attr], callback, -5, **kw)
+        m._dat[attr].add_callback(callback, wid=-5, **kw)
 
+    @DelayedEpicsCallback
     def onMotorEvent(self,pvname=None,field=None,motor=None,**kw):        
         print 'Motor event ' , pvname, field, motor
         if (pvname is None): return None
@@ -308,23 +306,22 @@ class MotorDetailFrame(wx.Frame,pvTimerMixin):
                 d.Refresh()
 
     def motor_ctrl(self,panel,attr):
-        return pvFloatCtrl(panel, size=(100,-1), timer=self.timer,
+        return pvFloatCtrl(panel, size=(100,-1), 
                            precision= self.motor.precision,
                            pvname = self.motor.get_pv(attr))
 
     def motor_text(self,panel,attr):
         return pvText(panel,  size=(100,-1), # style=wx.ALIGN_RIGHT,
-                      timer=self.timer, as_string=True,
+                      as_string=True,
                       pvname=self.motor.get_pv(attr))
 
     def motor_textctrl(self,panel,attr,size=(100,-1)):
         return pvTextCtrl(panel,  size=size, # style=wx.ALIGN_RIGHT,
-                          timer=self.timer, 
                           pvname=self.motor.get_pv(attr))        
 
 #     def pv_text(self,panel,pvname):
 #         return pvText(panel,  size=(100,-1), # style=wx.ALIGN_RIGHT,
-#                       timer=self.timer, pvname=pvname)
+#                       pvname=pvname)
 
     
     def onLimitChange(self,pv=None,attr=None,**kw):
@@ -343,13 +340,13 @@ class MotorDetailFrame(wx.Frame,pvTimerMixin):
         if (self.motor is None): return        
         self.motor.tweak_forward = 1
         
-class MotorPanel(wx.Panel,pvTimerMixin):
+class MotorPanel(wx.Panel):
     """ MotorPanel  a simple wx windows panel for controlling an Epics Motor
     """
     __motor_fields = ('set','low_limit','high_limit','soft_limit','tweak_val',
                       'high_limit_set', 'low_limit_set')
 
-    def __init__(self, parent,  motor=None,  timer=None,
+    def __init__(self, parent,  motor=None,  
                  style='normal', messenger=None, *args, **kw):
 
         wx.Panel.__init__(self, parent, style=wx.TAB_TRAVERSAL)
@@ -357,13 +354,13 @@ class MotorPanel(wx.Panel,pvTimerMixin):
         self.parent = parent
         # wx.Panel.SetBackgroundColour(self,(245,245,225))
 
-        pvTimerMixin.__init__(self,timer)
-
         if (callable(messenger)): self.__messenger = messenger
         self.style = style
         self.format = "%.3f" 
         self.motor = None
         self.__sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.catimer = catimer(self)
 
         self.CreatePanel()
         self.SelectMotor(motor)
@@ -380,34 +377,42 @@ class MotorPanel(wx.Panel,pvTimerMixin):
         self.format = "%%.%if" % self.motor.precision
         self.FillPanel()
 
+        print 'Select Motor 4'
+
         self.set_Tweak(self.format % self.motor.tweak_val)
         for i in self.__motor_fields:
             self.set_field_callback(i, self.onMotorEvent)
-
+        print 'Select Motor 5'
+        
         self.info.SetLabel('')
-        if (self.motor.get_field('set') == 1): self.info.SetLabel('Set:')
-        for f in ('high_limit_set', 'low_limit_set', 'soft_limit'):
-            if (self.motor.get_field(f) != 0):
-                self.info.SetLabel('Limit!')
+
+#         print 'Select Motor 6 ', self.motor
+#         # if (self.motor.get_field('set') == 1): self.info.SetLabel('Set:')
+#         print 'Select Motor 7'        
+#         for f in ('high_limit_set', 'low_limit_set', 'soft_limit'):
+#             if (self.motor.get_field(f) != 0):
+#                 print 'Select Motor 8 ', f
+#                 self.info.SetLabel('Limit!')
+#         print 'Select Motor Done'
 
     def set_field_callback(self, attr, callback):
         m = self.motor
         kw = {'field': attr, 'motor': m}
         m.store_attr(attr)
-        self.add_callback(m._dat[attr], callback, -6, **kw)
+        m._dat[attr].add_callback(callback, wid=-6, **kw)
 
     def CreatePanel(self,style='normal'):
         " build (but do not fill in) panel components"
         print 'Create Panel !! '
-        self.desc = pvText(self, timer= self.timer, size=(245, -1),
+        self.desc = pvText(self, size=(245, -1),
                            style=wx.ALIGN_RIGHT)
-        self.rbv  = pvText(self, timer= self.timer, size=(125, -1),
+        self.rbv  = pvText(self, size=(125, -1),
                            fg='Blue',style=wx.ALIGN_CENTER)
         self.info = wx.StaticText(self, label='', size=(55, 20), style=wx.ALIGN_CENTER)
         self.info.SetForegroundColour("Red")
 
         self.drive = pvFloatCtrl(self,  size=(110,-1),
-                                 timer=self.timer, style = wx.TE_RIGHT)
+                                 style = wx.TE_RIGHT)
         
         try:
             self.drive.set_pv(self.motor.get_pv('drive'))
@@ -433,6 +438,7 @@ class MotorPanel(wx.Panel,pvTimerMixin):
         twkbtn2.Bind(wx.EVT_BUTTON, self.onRightButton)
         stopbtn.Bind(wx.EVT_BUTTON, self.onStopButton)
         morebtn.Bind(wx.EVT_BUTTON, self.onMoreButton)
+
         for b in (twkbtn1, twkbtn2):
             b.SetFont(wx.Font(12,wx.SWISS,wx.NORMAL,wx.BOLD,False))
             
@@ -466,8 +472,11 @@ class MotorPanel(wx.Panel,pvTimerMixin):
         self.desc.update()
         self.rbv.update()
 
+        print 'Step List 1'
         self.twk_list = self.Create_StepList()
+        print 'Step List 2'
         self.__Update_StepList()
+        print 'Panel Filled!'        
         
     def onLeftButton(self,event=None):
         if (self.motor is None): return        
@@ -493,10 +502,15 @@ class MotorPanel(wx.Panel,pvTimerMixin):
         except:
             pass
 
+    @DelayedEpicsCallback
     def onMotorEvent(self,pvname=None,field=None,motor=None,**kw):        
+        print 'MOTOR EVENT ', pvname, field
+
         if (pvname is None): return None
         field_val = motor.get_field(field)
         field_str = motor.get_field(field,as_string=1)
+
+
         if field == 'low_limit':
             self.drive.SetMin(self.motor.low_limit)
         elif field == 'high_limit':
@@ -542,7 +556,9 @@ class MotorPanel(wx.Panel,pvTimerMixin):
             x = 10**(i-p)
             for j in (1,2,5):
                 if (j*x < smax):  l.append(j*x)
+        print 'Steps : ', len(l)
         return [self.format%i for i in l]
+    
 
     def __Update_StepList(self,value=None):
         "add a value and re-sort the list of Step values"
