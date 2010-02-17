@@ -14,9 +14,6 @@ def fmt_time(t=None):
     t,frac=divmod(t,1)
     return "%s.%3.3i" %(time.strftime("%Y-%h-%d %H:%M:%S"),1000.0*frac)
 
-# retrieve pv object by name
-PV_cache = {}
-
 _PV_fields_ = ('pvname','value','char_value', 'status','ftype',
                'chid', 'host','count','access','write_access',
                'severity', 'timestamp', 'precision',
@@ -46,7 +43,6 @@ class PV(object):
 
     def __init__(self,pvname, callback=None, form='native',
                  verbose=False, auto_monitor=True):
-
         self.pvname  = pvname.strip()
         self.verbose = verbose
         self.auto_monitor = auto_monitor
@@ -64,15 +60,11 @@ class PV(object):
         self.chid = ca.create_channel(self.pvname,
                                       userfcn=self._onConnect)
         self._args['chid'] = self.chid
-        self._args['pvid'] = id(self)
-        PV_cache[id(self)] = self
-
         try:
             self._args['type'] = dbr.Name(ca.field_type(self.chid)).lower()
         except:
             self._args['type'] = 'unknown'
 
-            
     def _onConnect(self,chid=0,conn=True,**kw):
         self.connected = conn
         if self.connected:
@@ -174,30 +166,56 @@ class PV(object):
         return kw
 
     def _onChanges(self, value=None, **kw):
-        """built-in callback function: this should not be overwritten!!"""
+        """built-in, internal callback function:
+        This should not be overwritten!!
+        
+        To have user-defined code run when the PV value changes,
+        use add_callback()
+        """
         self._args.update(kw)
         self._args['value']  = value
         self._args['timestamp'] = kw.get('timestamp',time.time())
-
         self._set_charval(self._args['value'],ca_calls=False)
 
         if self.verbose:
             print '  %s: %s (%s)'% (self.pvname,self._args['char_value'],
                                     fmt_time(self._args['timestamp']))
+        self.run_callbacks()
         
-        if True:
-            for index in self.callbacks:
-                fcn,kwargs = self.callbacks[index]            
-                kw = copy.copy(self._args)
-                kw.update(kwargs)
-                kw['cb_index'] = index
-                if callable(fcn):  fcn(**kw)
-        # Note: runtime errors can occur if the callback function
-        # is no longer available, as from a GUI toolkit
-        else:
-            pass
+    def run_callbacks(self):
+        """run all user-defined callbacks with the current data
+
+        Normally, this is to be run automatically on event, but
+        it is provided here as a separate function for testing
+        purposes.
+
+        Note that callback functions are called with keyword/val
+        arguments including:
+             self._args  (all PV data available, keys = _PV_fields_)
+             keyword args included in add_callback()
+             keyword 'cb_info' = (index, remove_callback)
+        where the 'cb_info' is provided as a hook so that a callback
+        function  that fails may de-register itself (for example, if
+        a GUI resource is no longer available).
+             
+        """
+        # Note
+        for index in self.callbacks:
+            fcn,kwargs = self.callbacks[index]
+            kw = copy.copy(self._args)
+            kw.update(kwargs)
+            kw['cb_info'] = (index, self.remove_callback)
+            if callable(fcn):
+                fcn(**kw)
             
     def add_callback(self,callback=None,**kw):
+        """add a callback to a PV.  Optional keyword arguments
+        set here will be preserved and passed on to the callback
+        at runtime.
+
+        Note that a PV may have multiple callbacks, so that each
+        has a unique index (small integer) that is returned by
+        add_callback.  This index is needed to remove a callback."""
         if callable(callback):
             n_cb = len(self.callbacks)                
             index = n_cb + 1
@@ -212,12 +230,14 @@ class PV(object):
         return index
     
     def remove_callback(self,index=None):
+        """remove a callback.
+        """
         if index is None and len(self.callbacks)==1:
             index = self.callbacks.keys()[0]
             
         if index in self.callbacks:
             x = self.callbacks.pop(index)
-        ca.poll()
+            self.poll()
 
     def clear_callbacks(self,**kw):
         self.callbacks = {}
