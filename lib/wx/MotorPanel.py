@@ -33,7 +33,7 @@ class MotorDetailFrame(wx.Frame):
 
     def __init__(self, motor=None):
         
-        wx.Frame.__init__(self, None, wx.ID_ANY, style=wx.DEFAULT_FRAME_STYLE,size=(500,750) )
+        wx.Frame.__init__(self, None, wx.ID_ANY, style=wx.DEFAULT_FRAME_STYLE,size=(500,775) )
         self.SetFont(wx.Font(11,wx.SWISS,wx.NORMAL,wx.BOLD,False))        
 
         self.motor = motor
@@ -58,23 +58,16 @@ class MotorDetailFrame(wx.Frame):
 
         sizer.Add((5,5), 0, wx.EXPAND)
 
-#         lu_panel = wx.Panel(panel, -1, size=(500,-1))
-#         lu_sizer = wx.BoxSizer(wx.HORIZONTAL)
-# 
-#         lu_sizer.AddMany([(xLabel(lu_panel,"Label"), 1, wx.ALIGN_LEFT), 
-#                           (self.motor_textctrl(lu_panel,'description',size=(260,-1)),   0, wx.ALIGN_CENTER),
-#                           (xLabel(lu_panel,'      units   '),    1, wx.ALIGN_CENTER),
-#                           (self.motor_textctrl(lu_panel,'units',size=(50,-1)),  0, wx.ALIGN_RIGHT)])
-#          
-#         set_sizer(lu_panel,lu_sizer,fit=True)
-# 
-#         # lu_sizer.Fit(lu_panel)
-#         
-#         sizer.Add(lu_sizer, 0, wx.EXPAND)
-               
-        
-        sizer.Add(wx.StaticLine(panel,size=(100,2)),  0, wx.EXPAND)
+        spanel = wx.Panel(panel, -1, size=(500,50))
+        ssizer = wx.BoxSizer(wx.HORIZONTAL)
+        ssizer.AddMany([(wx.StaticText(spanel,label=' Label ',size=(65,40)), 0, wx.ALIGN_BOTTOM|wx.ALIGN_CENTER|wx.ALIGN_RIGHT), 
+                        (self.motor_textctrl(spanel,'description',size=(200,40)), 0, wx.ALIGN_LEFT),
+                        (wx.StaticText(spanel,label='  units ',size=(75,40)), 0, wx.ALIGN_BOTTOM|wx.ALIGN_RIGHT), 
+                        (self.motor_textctrl(spanel,'units',size=(65,40)), 0, wx.ALIGN_CENTER)
+                        ])
 
+        sizer.Add(ssizer, 0, wx.EXPAND)
+        sizer.Add(wx.StaticLine(panel,size=(100,2)),  0, wx.EXPAND)
 
         ds = wx.GridBagSizer(6, 4)
         dp = wx.Panel(panel)

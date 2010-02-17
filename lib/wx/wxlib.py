@@ -257,7 +257,7 @@ class FloatCtrl(wx.TextCtrl):
 
 class catimer:
     """ Epics Event Timer:
-    combines a wxTimer and ca.poll to manage Epics Events in a wx Application.
+    combines a wxTimer and ca.poll to manage poll for Epics Events in a wx Application.
     """
     def __init__(self,parent=None, period=25, **kw):
         self.parent = parent
@@ -269,10 +269,10 @@ class catimer:
         self._timer.Stop()
         
     def StartTimer(self):
-        self.parent.Bind(wx.EVT_TIMER, self.pend)
+        self.parent.Bind(wx.EVT_TIMER, self.poll)
         self._timer.Start(self.period)
 
-    def pend(self,foo=None,**more):
+    def pend(self,event=None,**kw):
         epics.poll()
     
 class pvCtrlMixin:
