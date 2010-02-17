@@ -395,7 +395,7 @@ class pvCtrlMixin(pvTimerMixin):
     def _pvEvent(self,pvname=None,value=None,wid=None,char_value=None,**kw):
         # if pvname is None or id == 0: return
         print 'Mixin _pvEvent' , pvname, wid, value, char_value
-        if pvname is None or value is None or wid is None:
+        pvname is None or value is None or wid is None:
             print 'Null Event'
             return
         if char_value is not None:
