@@ -433,7 +433,6 @@ class MotorPanel(wx.Panel,pvTimerMixin):
         twkbtn2.Bind(wx.EVT_BUTTON, self.onRightButton)
         stopbtn.Bind(wx.EVT_BUTTON, self.onStopButton)
         morebtn.Bind(wx.EVT_BUTTON, self.onMoreButton)
-
         for b in (twkbtn1, twkbtn2):
             b.SetFont(wx.Font(12,wx.SWISS,wx.NORMAL,wx.BOLD,False))
             

@@ -14,6 +14,9 @@ def fmt_time(t=None):
     t,frac=divmod(t,1)
     return "%s.%3.3i" %(time.strftime("%Y-%h-%d %H:%M:%S"),1000.0*frac)
 
+# retrieve pv object by name
+PV_cache = {}
+
 _PV_fields_ = ('pvname','value','char_value', 'status','ftype',
                'chid', 'host','count','access','write_access',
                'severity', 'timestamp', 'precision',
@@ -43,6 +46,7 @@ class PV(object):
 
     def __init__(self,pvname, callback=None, form='native',
                  verbose=False, auto_monitor=True):
+
         self.pvname  = pvname.strip()
         self.verbose = verbose
         self.auto_monitor = auto_monitor
@@ -60,11 +64,15 @@ class PV(object):
         self.chid = ca.create_channel(self.pvname,
                                       userfcn=self._onConnect)
         self._args['chid'] = self.chid
+        self._args['pvid'] = id(self)
+        PV_cache[id(self)] = self
+
         try:
             self._args['type'] = dbr.Name(ca.field_type(self.chid)).lower()
         except:
             self._args['type'] = 'unknown'
 
+            
     def _onConnect(self,chid=0,conn=True,**kw):
         self.connected = conn
         if self.connected:
@@ -177,10 +185,17 @@ class PV(object):
             print '  %s: %s (%s)'% (self.pvname,self._args['char_value'],
                                     fmt_time(self._args['timestamp']))
         
-        for fcn,kwargs in self.callbacks.values():
-            kw = copy.copy(self._args)
-            kw.update(kwargs)
-            if callable(fcn):  fcn(**kw)
+        if True:
+            for index in self.callbacks:
+                fcn,kwargs = self.callbacks[index]            
+                kw = copy.copy(self._args)
+                kw.update(kwargs)
+                kw['cb_index'] = index
+                if callable(fcn):  fcn(**kw)
+        # Note: runtime errors can occur if the callback function
+        # is no longer available, as from a GUI toolkit
+        else:
+            pass
             
     def add_callback(self,callback=None,**kw):
         if callable(callback):
