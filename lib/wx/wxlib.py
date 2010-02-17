@@ -483,8 +483,6 @@ class pvFloatCtrl(FloatCtrl,pvCtrlMixin):
         self.SetMin(self.pv.lower_ctrl_limit)
         self.SetMax(self.pv.upper_ctrl_limit)
 
-        print 'Float Control ', self.pv, self.GetId()
-
         self.pv.add_callback(self._pvEvent, wid=self.GetId())
 
     def _onEnter(self,value=None,**kw):

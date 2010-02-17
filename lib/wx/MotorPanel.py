@@ -14,7 +14,7 @@ import types
 import epics
 import time
 from wxlib import pvText, pvFloatCtrl, pvTextCtrl, pvEnumButtons, pvEnumChoice
-from wxlib import catimer, set_sizer, set_float, DelayedEpicsCallback
+from wxlib import set_sizer, set_float, DelayedEpicsCallback
 
 def xLabel(parent,label):
     return wx.StaticText(parent,label=label,style=wx.ALIGN_BOTTOM)
@@ -28,7 +28,7 @@ def xTitle(parent,label,fontsize=13,color='Blue'):
     
 class MotorDetailFrame(wx.Frame):
     """ Detailed Motor Setup Frame"""
-    __motor_fields = ('set','low_limit','high_limit','soft_limit','tweak_val',
+    __motor_fields = ('set', 'low_limit','high_limit','soft_limit','tweak_val',
                       'high_limit_set', 'low_limit_set')
 
     def __init__(self, motor=None):
@@ -89,9 +89,13 @@ class MotorDetailFrame(wx.Frame):
 
         ####
         nrow = nrow + 1
+        self.info = wx.StaticText(dp, label='', size=(55, 20), style=wx.ALIGN_CENTER)
+        self.info.SetForegroundColour("Red")
+
         ds.Add(xLabel(dp,"High Limit"),               (nrow,0), (1,1), _textstyle,_textpadding)
         ds.Add(self.motor_ctrl(dp,'high_limit'),      (nrow,1), (1,1), wx.ALIGN_CENTER)
-        ds.Add(self.motor_ctrl(dp,'dial_high_limit'), (nrow,2), (1,1), wx.ALIGN_CENTER)        
+        ds.Add(self.motor_ctrl(dp,'dial_high_limit'), (nrow,2), (1,1), wx.ALIGN_CENTER)
+        ds.Add(self.info,                             (nrow,3), (1,1), wx.ALIGN_CENTER)        
 
         ####
         
@@ -265,6 +269,18 @@ class MotorDetailFrame(wx.Frame):
         for i in self.__motor_fields:
             self.set_field_callback(i, self.onMotorEvent)
 
+
+        self.info.SetLabel('')
+        if self.motor.get_field('set'):
+            wx.CallAfter(self.onMotorEvent,
+                         pvname=self.motor._dat['set'].pvname,
+                         field='set',motor=self.motor)
+        for f in ('high_limit_set', 'low_limit_set', 'soft_limit'):
+            if self.motor.get_field(f):
+                wx.CallAfter(self.onMotorEvent,
+                             pvname=self.motor._dat[f].pvname,
+                             field=f,motor=self.motor)
+
         ############
         set_sizer(panel,sizer,fit=True)
 # 
@@ -296,7 +312,8 @@ class MotorDetailFrame(wx.Frame):
         if field in ('soft_limit', 'high_limit_set', 'low_limit_set'):
             s = 'Limit!'
             if (field_val == 0): s = ''
-
+            self.info.SetLabel(s)
+            
         elif field == 'set':
             label,color='Set:','Yellow'
             if field_val == 0: label,color='','White'
@@ -360,8 +377,6 @@ class MotorPanel(wx.Panel):
         self.motor = None
         self.__sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.catimer = catimer(self)
-
         self.CreatePanel()
         self.SelectMotor(motor)
         
@@ -377,29 +392,29 @@ class MotorPanel(wx.Panel):
         self.format = "%%.%if" % self.motor.precision
         self.FillPanel()
 
-        print 'Select Motor 4'
-
         self.set_Tweak(self.format % self.motor.tweak_val)
         for i in self.__motor_fields:
             self.set_field_callback(i, self.onMotorEvent)
-        print 'Select Motor 5'
         
         self.info.SetLabel('')
+        if self.motor.get_field('set'):
+            wx.CallAfter(self.onMotorEvent,
+                         pvname=self.motor._dat['set'].pvname,
+                         field='set',motor=self.motor)
+        for f in ('high_limit_set', 'low_limit_set', 'soft_limit'):
+            if self.motor.get_field(f):
+                wx.CallAfter(self.onMotorEvent,
+                             pvname=self.motor._dat[f].pvname,
+                             field=f,motor=self.motor)
 
-#         print 'Select Motor 6 ', self.motor
-#         # if (self.motor.get_field('set') == 1): self.info.SetLabel('Set:')
-#         print 'Select Motor 7'        
-#         for f in ('high_limit_set', 'low_limit_set', 'soft_limit'):
-#             if (self.motor.get_field(f) != 0):
-#                 print 'Select Motor 8 ', f
-#                 self.info.SetLabel('Limit!')
-#         print 'Select Motor Done'
 
     def set_field_callback(self, attr, callback):
         m = self.motor
         kw = {'field': attr, 'motor': m}
         m.store_attr(attr)
-        m._dat[attr].add_callback(callback, wid=-6, **kw)
+        pv = m._dat[attr]
+
+        pv.add_callback(callback, wid=-6, **kw)
 
     def CreatePanel(self,style='normal'):
         " build (but do not fill in) panel components"
@@ -425,6 +440,9 @@ class MotorPanel(wx.Panel):
         self.__twkbox = wx.ComboBox(self, value='', size=(120,-1), 
                                     choices=self.twk_list,
                                     style=wx.CB_DROPDOWN|wx.TE_PROCESS_ENTER)
+
+        self.__twkbox.SetFont(wx.Font(13,wx.SWISS,wx.NORMAL,wx.BOLD,False))
+        
 
         self.__twkbox.Bind(wx.EVT_COMBOBOX,    self.OnTweakBoxEvent)
         self.__twkbox.Bind(wx.EVT_TEXT_ENTER,  self.OnTweakBoxEvent)        
@@ -472,11 +490,8 @@ class MotorPanel(wx.Panel):
         self.desc.update()
         self.rbv.update()
 
-        print 'Step List 1'
         self.twk_list = self.Create_StepList()
-        print 'Step List 2'
         self.__Update_StepList()
-        print 'Panel Filled!'        
         
     def onLeftButton(self,event=None):
         if (self.motor is None): return        
@@ -503,13 +518,10 @@ class MotorPanel(wx.Panel):
             pass
 
     @DelayedEpicsCallback
-    def onMotorEvent(self,pvname=None,field=None,motor=None,**kw):        
-        print 'MOTOR EVENT ', pvname, field
-
+    def onMotorEvent(self,pvname=None,field=None,motor=None,**kw):
         if (pvname is None): return None
         field_val = motor.get_field(field)
         field_str = motor.get_field(field,as_string=1)
-
 
         if field == 'low_limit':
             self.drive.SetMin(self.motor.low_limit)
@@ -543,20 +555,18 @@ class MotorPanel(wx.Panel):
         """ create initial list of motor steps, based on motor range
         and precision"""
 
-        print 'Create_StepList: ', self.motor
 
         if self.motor is None: return []
         smax = abs(self.motor.high_limit - self.motor.low_limit)*0.6
 
         p = self.motor.precision
-        print self.motor.high_limit, self.motor.low_limit, smax, p
+        # print self.motor.high_limit, self.motor.low_limit, smax, p
 
         l = []
         for i in range(6):
             x = 10**(i-p)
             for j in (1,2,5):
                 if (j*x < smax):  l.append(j*x)
-        print 'Steps : ', len(l)
         return [self.format%i for i in l]
     
 
