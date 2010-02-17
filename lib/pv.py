@@ -217,9 +217,7 @@ class PV(object):
             
         if index in self.callbacks:
             x = self.callbacks.pop(index)
-            print 'pv removed callback ', index, x
-            ca.poll()
-            
+        ca.poll()
 
     def clear_callbacks(self,**kw):
         self.callbacks = {}
