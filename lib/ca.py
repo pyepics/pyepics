@@ -156,7 +156,6 @@ PREEMPTIVE_CALLBACK = True
 
 AUTO_CLEANUP = True
 
-
 ## default timeout for connection
 #   This should be kept fairly short --
 #   as connection will be tried repeatedly
