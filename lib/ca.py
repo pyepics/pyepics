@@ -218,7 +218,6 @@ def finalize_libca(maxtime=10.0,gc_collect=True):
     run clear_channel(chid) for all chids in _cache
     then flush_io() and poll() a few times.
     """
-    print 'Finalize libca'
     try:
         t0 = time.time()
         flush_io()

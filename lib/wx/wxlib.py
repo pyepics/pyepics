@@ -323,7 +323,6 @@ class pvCtrlMixin:
         self.pv = epics.PV(pvname)
         if self.pv is None: return
         self.pv.get_ctrlvars()
-        print 'PV_Ctrl ', self.pv, self.pv.connected, self.GetId()
         if not self.pv.connected: return
         
         self._SetValue(self.pv.get(as_string=True))

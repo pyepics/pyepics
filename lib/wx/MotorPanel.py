@@ -303,7 +303,6 @@ class MotorDetailFrame(wx.Frame):
 
     @DelayedEpicsCallback
     def onMotorEvent(self,pvname=None,field=None,motor=None,**kw):        
-        print 'Motor event ' , pvname, field, motor
         if (pvname is None): return None
         
         field_val = motor.get_field(field)
@@ -325,7 +324,9 @@ class MotorDetailFrame(wx.Frame):
     def motor_ctrl(self,panel,attr):
         return pvFloatCtrl(panel, size=(100,-1), 
                            precision= self.motor.precision,
-                           pvname = self.motor.get_pv(attr))
+                           pvname = self.motor.get_pv(attr),
+                           style = wx.TE_RIGHT)
+
 
     def motor_text(self,panel,attr):
         return pvText(panel,  size=(100,-1), # style=wx.ALIGN_RIGHT,
@@ -418,7 +419,6 @@ class MotorPanel(wx.Panel):
 
     def CreatePanel(self,style='normal'):
         " build (but do not fill in) panel components"
-        print 'Create Panel !! '
         self.desc = pvText(self, size=(245, -1),
                            style=wx.ALIGN_RIGHT)
         self.rbv  = pvText(self, size=(125, -1),
@@ -478,8 +478,6 @@ class MotorPanel(wx.Panel):
     def FillPanel(self):
         " fill in panel components for motor "
         if self.motor is None: return
-
-        
 
         self.desc.set_pv(self.motor.get_pv('description'))
         self.rbv.set_pv(self.motor.get_pv('readback'))
