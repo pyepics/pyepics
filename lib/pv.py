@@ -306,11 +306,10 @@ class PV(object):
         if self._args['value'] is None:  self.get()
         return self._args.get(arg,None)
         
-    @property
-    def value(self):     return self._getarg('value')
+    def __getval__(self):    return self._getarg('value')
+    def __setval__(self,v):  return self.put(v)
+    value = property(__getval__, __setval__, None, "value property")
 
-    @value.setter
-    def value(self,v):   return self.put(v)
 
     @property
     def char_value(self): return self._getarg('char_value')
