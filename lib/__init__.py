@@ -27,7 +27,6 @@ import alarm
 import motor
 
 PV    = pv.PV
-PV_cache = pv.PV_cache
 Alarm = alarm.Alarm
 Motor = motor.Motor
 poll  = ca.poll
