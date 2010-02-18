@@ -8,7 +8,7 @@ import sys
 import time
 import epics
 
-from lib.wx  import MotorPanel, closure, catimer, pvText, pvFloatCtrl
+from epics.wx  import MotorPanel, closure, pvText, pvFloatCtrl
 
 ID_ABOUT = wx.NewId()
 ID_EXIT  = wx.NewId()
@@ -103,8 +103,11 @@ class MyFrame(wx.Frame):
         self.mainframe.Fit(self)
         self.Refresh()
 
-        wx.CallAfter(self.motor1.SetMotor,
+        wx.CallAfter(self.motor1.SelectMotor,
                      self.motors[motor_choices[0]])
+
+        wx.CallAfter(self.motor2.SelectMotor,
+                     self.motors[motor_choices[3]])
 
     def write_message(self,text,status='normal'):
         self.SetStatusText(text)
