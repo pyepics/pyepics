@@ -4,7 +4,7 @@
    CARS, University of Chicago
 
    version    :  3.0.1 (beta version of epics Py3)
-   last update:  11-Feb-2010
+   last update:  20-Feb-2010
          
 == Overview:
    rewrite of EpicsCA v 2.*, with major goals of:

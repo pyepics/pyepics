@@ -1,6 +1,6 @@
 #!/usr/bin/python
-"""Epics Process Variable
-
+"""
+  Epics Process Variable
 """
 import time
 import math
@@ -118,11 +118,15 @@ class PV(object):
         the processing is complete.
         """
         if not self.connect(force=False):  return None
+        if (self.ftype in (dbr.ENUM,dbr.TIME_ENUM,dbr.CTRL_ENUM) and
+            isinstance(value,str) and
+            value in self._args['enum_strs']):
+            value = self._args['enum_strs'].index(value)
+        
         return ca.put(self.chid, value,
                       wait=wait,
                       timeout=timeout,
                       callback=callback)
-
 
     def _set_charval(self,val,ca_calls=True):
         """ set the character representation of the value"""
