@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!usr/bin/env python
 #
 # low level support for Epics Channel Access
 #
@@ -586,12 +586,13 @@ def put(chid,value, wait=False, timeout=20, callback=None):
             pad = '\x00'*(1+count-len(value))
             value = [ord(i) for i in ("%s%s" % (value,pad))[:count]]
         try:
-            data[:]  = list(value)
+            ndata = len(data)
+            nuser = len(value)
+            if nuser > ndata: value = value[:ndata]
+            data[:len(value)] = list(value)
         except:
             errmsg = "Cannot put array data to PV of type '%s'"            
-            raise ChannelAccessException('put',errmsg % (repr(value),
-                                                         dbr.Name(ftype).lower()))
-
+            raise ChannelAccessException('put',errmsg % (repr(value)))
       
     # simple put, without wait or callback
     if not (wait or callable(callback)):
