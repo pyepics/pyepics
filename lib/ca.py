@@ -610,7 +610,7 @@ def put(chid,value, wait=False, timeout=20, callback=None):
         finished = False
         while not finished:
             poll()
-            finised = _put_done[pvname][0] or (time.time()-t0)>timeout
+            finished = _put_done[pvname][0] or (time.time()-t0)>timeout
         if not _put_done[pvname][0]: ret = -ret
     return ret
 
@@ -743,9 +743,9 @@ def _onPutEvent(args,*varargs):
     """set put-has-completed for this channel,
     call optional user-supplied callback"""
     pvname = name(args.chid)
+
     userfcn = _put_done[pvname][1]
     _put_done[pvname] = (True,None)
-
     if callable(userfcn): userfcn()
 
 # create global reference to these two callbacks
