@@ -40,10 +40,10 @@ CTRL_LONG    = 33
 CTRL_DOUBLE  = 34
 
 
-MAX_STRING_SIZE      = 40        
-MAX_UNITS_SIZE       =  8          
-MAX_ENUM_STRING_SIZE = 26   
-MAX_ENUM_STATES      = 16        
+MAX_STRING_SIZE      = 40
+MAX_UNITS_SIZE       =  8
+MAX_ENUM_STRING_SIZE = 26
+MAX_ENUMS            = 16
 
 EPICS2UNIX_EPOCH = 631173600 - time.timezone
 
@@ -71,7 +71,7 @@ _STAT_SEV_TS = (('status', short_t), ('severity', short_t),
 _UNITS       = ('units', char_t * MAX_UNITS_SIZE)
 
 class time_string(ctypes.Structure):
-    _fields_ = list(_STAT_SEV_TS) + [('value',  MAX_STRING_SIZE*char_t)]
+    _fields_ = list(_STAT_SEV_TS) + [('value', MAX_STRING_SIZE*char_t)]
 
     
 class time_short(ctypes.Structure):
@@ -111,7 +111,7 @@ def _gen_ctrl_lims(t=short_t):
 class ctrl_enum(ctypes.Structure):
     _fields_ = list(_STAT_SEV) 
     _fields_.extend([ ('no_str', short_t),
-                      ('strs', (char_t * MAX_ENUM_STRING_SIZE) * MAX_ENUM_STATES),
+                      ('strs', (char_t * MAX_ENUM_STRING_SIZE) * MAX_ENUMS),
                       ('value',    ushort_t)])
 
 class ctrl_short(ctypes.Structure):
@@ -158,8 +158,8 @@ Map = {STRING: char_t,
        TIME_CHAR:  time_char,
        TIME_LONG:  time_long,
        TIME_DOUBLE: time_double,
-
-       CTRL_STRING:   time_string,  # Note: there is no ctrl string in the C definition!
+       # Note: there is no ctrl string in the C definition
+       CTRL_STRING:   time_string,
        CTRL_SHORT: ctrl_short,
        CTRL_INT:   ctrl_short,
        CTRL_FLOAT: ctrl_float,

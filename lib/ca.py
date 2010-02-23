@@ -284,7 +284,7 @@ def withCHID(fcn):
 
     It may be worth making a chid class (which could hold connection
     data of _cache) that could be tested here.  For now, that
-    seems slightly 'not low-level' for this module.    
+    seems slightly 'not low-level' for this module.
     """
     def wrapper(*args,**kw):
         if len(args)>0:

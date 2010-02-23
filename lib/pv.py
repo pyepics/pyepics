@@ -29,16 +29,16 @@ class PV(object):
     A PV encapsulates an Epics Process Variable.
    
     The primary interface methods for a pv are to get() and put() is value:
-      >>>p = PV(pv_name)    # create a pv object given a pv name
-      >>>p.get()            # get pv value
-      >>>p.put(val)         # set pv to specified value. 
+      >>>p = PV(pv_name)  # create a pv object given a pv name
+      >>>p.get()          # get pv value
+      >>>p.put(val)       # set pv to specified value. 
 
     Additional important attributes include:
-      >>>p.pvname           # name of pv
-      >>>p.value            # pv value (can be set or get)
-      >>>p.char_value       # string representation of pv value
-      >>>p.count            # number of elements in array pvs
-      >>>p.type             # EPICS data type: 'string','double','enum','long',....
+      >>>p.pvname         # name of pv
+      >>>p.value          # pv value (can be set or get)
+      >>>p.char_value     # string representation of pv value
+      >>>p.count          # number of elements in array pvs
+      >>>p.type           # EPICS data type: 'string','double','enum','long',..
 """
 
     def __init__(self,pvname, callback=None, form='native',
@@ -148,7 +148,7 @@ class PV(object):
                 fmt  = "%%.%if"
                 if 4 < abs(int(math.log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
-                cval = (fmt % self._args['precision']) % val                    
+                cval = (fmt % self._args['precision']) % val
             except:
                 pass 
         elif ftype == dbr.ENUM:
@@ -383,8 +383,8 @@ class PV(object):
 
     def __repr__(self):
         if not self.connected:  return "<PV '%s': not connected>" % self.pvname
-
-        return "<PV: '%(pvname)s', count=%(count)i, type=%(ftype)s, access=%(access)s>" % self._args
+        fmt="<PV: '%(pvname)s', count=%(count)i, type=%(type)s, access=%(access)s>"
+        return  fmt % self._args
     
     def __str__(self): return self.__repr__()
 
