@@ -3,14 +3,14 @@
 import epics
 import time
 
-class epicsRecord(object):
+class Record(object):
     """keeps a collection of PVs for an Epics record,
     All PVs share a prefix, and can be retrieved by 'attribute',
 
     the real PV will have a name of prefix+attribute, so that
 
-      >>> a = epicsRecord('13IDC:str:')
-      >>> a.put('EraseStart',1)
+      >>> struck = epics.Record('13IDC:str:')
+      >>> struck.put('EraseStart',1)
       
     will put a 1 to 13IDC:str:EraseStart
 
