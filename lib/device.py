@@ -24,17 +24,27 @@ class Device(object):
     The attribute PVs are built as needed and held in an internal
     buffer (self._pvs).  This class is kept intentionally simple
     so that it may be subclassed.
+
+    To pre-load attribute names on initialization, provide a
+    list or tuple of attributes:
+
+      >>> struck = epics.Device('13IDC:str:',
+      ...                       attrs=('ChannelAdvance','EraseStart','StopAll'))
+      >>> print struck.PV('ChannelAdvance').char_value
+      'External'
+
     """
-    def __init__(self,prefix):
+    def __init__(self,prefix,attrs=None):
         self.prefix=prefix
         self._pvs = {}
+        if attrs is not None:
+            for p in attrs: self.PV(p)
         
     def PV(self,attr):
         """return epics.PV for a device attribute"""
         pvname = "%s%s" % (self.prefix, attr)
-        if pvname not in self._pvs: 
+        if pvname not in self._pvs:
             self._pvs[pvname] = epics.PV(pvname)
-            self._pvs[pvname].get()
         return self._pvs[pvname]
     
     def put(self,attr,value,wait=False,timeout=10.0):
