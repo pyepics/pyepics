@@ -31,6 +31,7 @@ Alarm = alarm.Alarm
 Motor = motor.Motor
 Device = device.Device
 poll  = ca.poll
+sleep = time.sleep
 
 def __createPV(pvname,timeout=5.0):
     "create PV, wait for connection: "
