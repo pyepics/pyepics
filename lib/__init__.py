@@ -25,11 +25,11 @@ import dbr
 import pv
 import alarm
 import motor
-import record
+import device
 PV    = pv.PV
 Alarm = alarm.Alarm
 Motor = motor.Motor
-Record = record.Record
+Device = device.Device
 poll  = ca.poll
 
 def __createPV(pvname,timeout=5.0):
