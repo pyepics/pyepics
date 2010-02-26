@@ -34,15 +34,18 @@ class Device(object):
       'External'
 
     """
-    def __init__(self,prefix,attrs=None):
-        self.prefix=prefix
+    def __init__(self,prefix=None,attrs=None):
+        self.__prefix__=prefix
         self._pvs = {}
         if attrs is not None:
             for p in attrs: self.PV(p)
         
     def PV(self,attr):
         """return epics.PV for a device attribute"""
-        pvname = "%s%s" % (self.prefix, attr)
+        pvname = attr        
+        if prefix is not None: 
+            pvname = "%s%s" % (self.__prefix__, attr)
+
         if pvname not in self._pvs:
             self._pvs[pvname] = epics.PV(pvname)
         return self._pvs[pvname]
