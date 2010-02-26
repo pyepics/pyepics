@@ -35,7 +35,7 @@ class Device(object):
 
     """
     def __init__(self,prefix=None,attrs=None):
-        self.__prefix__=prefix
+        self.__prefix__ = prefix
         self._pvs = {}
         if attrs is not None:
             for p in attrs: self.PV(p)
@@ -43,7 +43,7 @@ class Device(object):
     def PV(self,attr):
         """return epics.PV for a device attribute"""
         pvname = attr        
-        if prefix is not None: 
+        if self.__prefix__ is not None: 
             pvname = "%s%s" % (self.__prefix__, attr)
 
         if pvname not in self._pvs:
