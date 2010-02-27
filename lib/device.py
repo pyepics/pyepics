@@ -29,10 +29,23 @@ class Device(object):
     list or tuple of attributes:
 
       >>> struck = epics.Device('13IDC:str:',
-      ...                       attrs=('ChannelAdvance','EraseStart','StopAll'))
+      ...                       attrs=('ChannelAdvance',
+      ...                              'EraseStart','StopAll'))
       >>> print struck.PV('ChannelAdvance').char_value
       'External'
 
+    The prefix is optional, and when left off, this class can
+    be used as an arbitrary container of PVs, or to turn
+    any subclass into an epics Device:
+
+      >>> class MyClass(epics.Device):
+      ...     def __init__(self,**kw):
+      ...         epics.Device.__init__() # no Prefix!!
+      ...
+      >>> x = MyClass()
+      >>> pv_m1 = x.PV('13IDC:m1.VAL')
+      >>> x.put('13IDC:m3.VAL', 2)
+      >>> print x.PV('13IDC:m3.DIR').get(as_string=True)
     """
     def __init__(self,prefix=None,attrs=None):
         self.__prefix__ = prefix
@@ -45,14 +58,14 @@ class Device(object):
         pvname = attr        
         if self.__prefix__ is not None: 
             pvname = "%s%s" % (self.__prefix__, attr)
-
         if pvname not in self._pvs:
             self._pvs[pvname] = epics.PV(pvname)
         return self._pvs[pvname]
     
     def put(self,attr,value,wait=False,timeout=10.0):
         """put an attribute value, 
-        optionally wait for up to a supplied timeout"""
+        optionally wait for completion or
+        up to a supplied timeout value"""
         return self.PV(attr).put(value,wait=wait,timeout=timeout)
         
     def get(self,attr,as_string=False):
