@@ -5,22 +5,20 @@ of the widget  when the associated PV changes.
 
 """
 from MotorPanel import MotorPanel
-from wxlib      import pvText, pvFloatCtrl, pvTextCtrl, pvEnumButtons, pvEnumChoice, pvAlarm
-from wxlib      import catimer, closure, set_sizer, set_float, FloatCtrl
+import wxlib
 
-pvText        = pvText
-pvAlarm       = pvAlarm
-pvFloatCtrl   = pvFloatCtrl
-pvTextCtrl    = pvTextCtrl
-pvEnumButtons = pvEnumButtons
-pvEnumChoice  = pvEnumChoice
-catimer       = catimer
+pvText        = wxlib.pvText
+pvAlarm       = wxlib.pvAlarm
+pvFloatCtrl   = wxlib.pvFloatCtrl
+pvTextCtrl    = wxlib.pvTextCtrl
+pvEnumButtons = wxlib.pvEnumButtons
+pvEnumChoice  = wxlib.pvEnumChoice
 
-set_sizer = set_sizer
-set_float = set_float
+set_sizer = wxlib.set_sizer
+set_float = wxlib.set_float
 
-closure   = closure
-FloatCtrl = FloatCtrl
+closure   = wxlib.closure
+FloatCtrl = wxlib.FloatCtrl
 
-
+DelayedEpicsCallback = wxlib.DelayedEpicsCallback
 MotorPanel = MotorPanel
