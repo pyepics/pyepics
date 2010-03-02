@@ -298,8 +298,11 @@ class PV(object):
             out.append('   PV is monitored internally')
             if len(self.callbacks) > 0:
                 out.append("   user-defined callbacks:")
-                for i in self.callbacks:
-                    out.append('      %s' % (i.func_name))
+                cblist = self.callbacks.keys()
+                cblist.sort()
+                for i in cblist:
+                    cb = self.callbacks[i]
+                    out.append('      %s' % repr(cb))
             else:
                 out.append("   no user callbacks are defined.")
         else:
