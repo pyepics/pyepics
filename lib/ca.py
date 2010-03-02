@@ -567,8 +567,12 @@ def put(chid,value, wait=False, timeout=20, callback=None):
     ftype = field_type(chid)
     count = element_count(chid)
     data  = (count*dbr.Map[ftype])()    
-
-    if count == 1:
+    
+    if ftype == dbr.STRING:
+        data = (dbr.string_t)()
+        count = 1
+        data.value = value
+    elif count == 1:
         try:
             data[0] = value
         except TypeError:
