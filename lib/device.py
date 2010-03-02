@@ -73,3 +73,24 @@ class Device(object):
         option as_string returns a string representation"""
         return self.PV(attr).get(as_string=as_string)
 
+    def pv_property(attr, as_string=False,wait=False,timeout=10.0):
+        """function to turn a device attribut PV into a property:
+
+        use in your subclass as:
+        
+        >>> class MyDevice(epics.device):
+        >>>     def __init__(self,prefix):
+        >>>         epics.Device.__init__(self)
+        >>>         self.PV('something')
+        >>>     field = pv_property('something', as_string=True)
+
+        then use in code as
+
+        >>> m = MyDevice()
+        >>> print m.field
+        >>> m.field = new_value
+        
+        """
+        return property(lambda self:     self.get(attr,as_string=as_string),
+                        lambda self,val: self.put(attr,val,wait=wait,timeout=timeout),
+                        None, None)

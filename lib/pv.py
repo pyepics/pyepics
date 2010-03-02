@@ -137,7 +137,10 @@ class PV(object):
         
         if self._args['count'] > 1:
             if ftype == dbr.CHAR:
-                cval = ''.join([chr(i) for i in val]).rstrip()
+                val = list(val)
+                n0  = val.index(0)
+                if n0 == -1: n0 = len(val)
+                cval = ''.join([chr(i) for i in val[:n0]]).rstrip()
             else:
                 cval = '<array size=%d, type=%s>' % (len(val),
                                                      dbr.Name(ftype))
@@ -387,7 +390,7 @@ class PV(object):
 
     def __repr__(self):
         if not self.connected:  return "<PV '%s': not connected>" % self.pvname
-        fmt="<PV: '%(pvname)s', count=%(count)i, type=%(type)s, access=%(access)s>"
+        fmt="<PV '%(pvname)s', count=%(count)i, type=%(type)s, access=%(access)s>"
         return  fmt % self._args
     
     def __str__(self): return self.__repr__()
