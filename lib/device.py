@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import epics
+import pv
 
 class Device(object):
     """A simple collection of related PVs, all sharing a prefix,
@@ -59,7 +59,7 @@ class Device(object):
         if self.__prefix__ is not None: 
             pvname = "%s%s" % (self.__prefix__, attr)
         if pvname not in self._pvs:
-            self._pvs[pvname] = epics.PV(pvname)
+            self._pvs[pvname] = pv.PV(pvname)
         return self._pvs[pvname]
     
     def put(self,attr,value,wait=False,timeout=10.0):
