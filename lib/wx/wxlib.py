@@ -10,6 +10,17 @@ import fpformat
 import epics
 import wx.lib.buttons as buttons
 
+def EpicsFunction(f):
+    """decorator to wrap function in a wx.CallAfter() so that
+    Epics calls can be made in a separate thread, and asynchronously.
+
+    This decorator should be used for all code that mix calls to
+    wx and epics    
+    """
+    def wrapper(*args, **kwargs):
+        wx.CallAfter(f, *args, **kwargs)
+    return wrapper
+
 def DelayedEpicsCallback(fcn):
     """decorator to wrap an Epics callback in a wx.CallAfter,
     so that the wx and epics ca threads do not clash

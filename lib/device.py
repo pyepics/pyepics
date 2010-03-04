@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 import pv
 
 class Device(object):
@@ -73,6 +72,13 @@ class Device(object):
         option as_string returns a string representation"""
         return self.PV(attr).get(as_string=as_string)
 
+    def add_callback(self,attr,callback):
+        """add a callback function to an attribute PV,
+        so that the callback function will be run when
+        the attribute's value changes"""
+        self.PV(attr).get()
+        self.PV(attr).add_callback(callback)
+        
     def pv_property(attr, as_string=False,wait=False,timeout=10.0):
         """function to turn a device attribut PV into a property:
 
