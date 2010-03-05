@@ -302,10 +302,18 @@ def withConnectedCHID(fcn):
         if len(args)>0:
             if not isinstance(args[0],ctypes.c_long):
                 raise ChannelAccessException(fcn.func_name, "not a valid chid!")
-            if (state(args[0]) != dbr.CS_CONN):
-                t = kw.get('timeout',DEFAULT_CONNECTION_TIMEOUT)
-                connect_channel(args[0],timeout=t,force=False)
-            if (state(args[0]) != dbr.CS_CONN):
+            try:
+                mystate = state(args[0])
+            except:
+                mystate = None
+            if mystate != dbr.CS_CONN:
+                try:
+                    t = kw.get('timeout',DEFAULT_CONNECTION_TIMEOUT)
+                    connect_channel(args[0],timeout=t,force=False)
+                    mystate = state(args[0])                    
+                except:
+                    mystate = None
+            if mystate != dbr.CS_CONN:
                 raise ChannelAccessException(fcn.func_name, "channel cannot connect")
         return fcn(*args,**kw)
     return wrapper
