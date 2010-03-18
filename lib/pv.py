@@ -51,7 +51,7 @@ class PV(object):
 
         self.callbacks = {}
         if callable(callback): self.callbacks[0] = (callback,{})
-
+        self.ftype = None
         self.connected  = False
         self._args      = {}.fromkeys(_PV_fields_)
 
@@ -89,7 +89,7 @@ class PV(object):
                                           userfcn=self._onChanges,
                                           use_ctrl=self._form['ctrl'],
                                           use_time=self._form['time'])
-        return self.connected
+        return (self.connected and self.ftype is not None)
 
     def poll(self,t1=1.e-3,t2=1.0):    ca.poll(t1,t2)
 
