@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # This module provides support for the EPICS motor record.
+#
+# TODO: convert to using device.py
 # 
 # Author:         Mark Rivers / Matt Newville
 # Created:        Sept. 16, 2002
@@ -629,5 +631,5 @@ class Motor:
 if (__name__ == '__main__'):
     import sys
     for i in sys.argv[1:]:
-        x = EpicsMotor(i)
-        x.show_info()
+        m = Motor(i)
+        m.show_info()
