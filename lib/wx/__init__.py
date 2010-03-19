@@ -22,4 +22,3 @@ FloatCtrl = wxlib.FloatCtrl
 
 DelayedEpicsCallback = wxlib.DelayedEpicsCallback
 EpicsFunction  = wxlib.EpicsFunction
-MotorPanel = MotorPanel

@@ -113,9 +113,10 @@ class PV(object):
         if as_string: field = 'char_value'
         return self._args[field]
 
-    def put(self,value,wait=False,timeout=30.0,callback=None):
-        """set value for PV, optionally waiting until
-        the processing is complete.
+    def  put(self,value,wait=False,timeout=30.0,callback=None,callback_data=None):
+        """set value for PV, optionally waiting until the processing is
+        complete, and optionally specifying a callback function to be run
+        when the processing is complete.        
         """
         if not self.connect(force=False):  return None
         if (self.ftype in (dbr.ENUM,dbr.TIME_ENUM,dbr.CTRL_ENUM) and
@@ -124,12 +125,11 @@ class PV(object):
             value = self._args['enum_strs'].index(value)
         
         return ca.put(self.chid, value,
-                      wait=wait,
-                      timeout=timeout,
-                      callback=callback)
+                      wait=wait,    timeout=timeout,
+                      callback=callback, callback_data=callback_data)
 
     def _set_charval(self,val,ca_calls=True):
-        """ set the character representation of the value"""
+        """ sets the character representation of the value. intended for internal use"""
 
         ftype = self._args['ftype']
         cval  = repr(val)       
@@ -320,7 +320,6 @@ class PV(object):
     def __getval__(self):    return self._getarg('value')
     def __setval__(self,v):  return self.put(v)
     value = property(__getval__, __setval__, None, "value property")
-
 
     @property
     def char_value(self): return self._getarg('char_value')
