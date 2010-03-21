@@ -38,13 +38,12 @@ def __createPV(pvname,timeout=5.0):
     "create PV, wait for connection: "
 
     t0 = time.time()
-    if pvname in __cache: return __cache[pvname]
     thispv = PV(pvname)
     if not thispv.connected:
         thispv.connect()
     while not thispv.connected:
-        time.sleep(0.001)
-        ca.poll()
+        time.sleep(1.e-4)
+	ca.poll()
         if time.time()-t0 > timeout: break
     if not thispv.connected:
         print 'cannot connect to %s' % pvname
@@ -134,3 +133,5 @@ def camonitor(pvname,writer=None, callback=None):
     if thispv is not None:
         thispv.get()
         thispv.add_callback(callback)
+
+

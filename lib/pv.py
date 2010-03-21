@@ -23,8 +23,8 @@ _PV_fields_ = ('pvname','value','char_value', 'status','ftype',
                'lower_warning_limit','upper_warning_limit',
                'upper_ctrl_limit', 'lower_ctrl_limit')
 
-# a cache of pvname:pv object
-PV_cache={}
+# cache of PVs
+PV_cache = {}
 
 class PV(object):
     """== Epics Process Variable
@@ -47,14 +47,9 @@ class PV(object):
     def __init__(self,pvname, callback=None, form='native',
                  verbose=False, auto_monitor=True):
         self.pvname  = pvname.strip()
+        self.form = form.lower()
         self.verbose = verbose
         self.auto_monitor = auto_monitor
-        self.form = form.lower()
-
-        if (pvname,self.form) in PV_cache:
-            return PV_cache[(pvname,self.form)]
-        PV_cache[(pvname,self.form)] = self
-
         self.callbacks = {}
         if callable(callback): self.callbacks[0] = (callback,{})
         self.ftype = None
@@ -63,14 +58,19 @@ class PV(object):
 
         self._args['pvname'] = self.pvname
         self.__mondata = None
-        self.chid = ca.create_channel(self.pvname,
-                                      userfcn=self._onConnect)
+        if self.pvname in ca._cache:
+            self.chid = ca._cache[pvname]['chid']
+        else:
+            self.chid = ca.create_channel(self.pvname,
+                                          userfcn=self._onConnect)
         self._args['chid'] = self.chid
         try:
             self._args['type'] = dbr.Name(ca.field_type(self.chid)).lower()
         except:
             self._args['type'] = 'unknown'
 
+        PV_cache[(pvname,self.form)] = self
+        
     def _onConnect(self,chid=0,conn=True,**kw):
         self.connected = conn
         if self.connected:
@@ -402,7 +402,7 @@ class PV(object):
 
     def __eq__(self,other):
         try:
-            return (self._chid  == other._chid)
+            return (self.chid  == other.chid)
         except:
             return False
         
