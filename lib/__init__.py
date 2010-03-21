@@ -62,9 +62,9 @@ def caput(pvname, value, wait=False, timeout=60):
     to wait for pv to complete processing, use 'wait=True':
        >>> caput('xx.VAL',3.0,wait=True)
     """ 
-    pv = __createPV(pvname)
-    if pv is not None:
-        ret = pv.put(value,wait=wait,timeout=timeout)
+    thispv = __createPV(pvname)
+    if thispv is not None:
+        ret = thispv.put(value,wait=wait,timeout=timeout)
         ca.poll()
         return ret
 
@@ -76,11 +76,11 @@ def caget(pvname, as_string=False):
     to get the character string representation (formatted double, enum string, etc):
        >>> x = caget('xx.VAL', as_string=True)
     """
-    pv = __createPV(pvname)
-    if pv is not None:
-        val = pv.get()
+    thispv = __createPV(pvname)
+    if thispv is not None:
+        val = thispv.get()
         ca.poll()
-        if as_string: return pv.char_value
+        if as_string: return thispv.char_value
         return val
 
 def cainfo(pvname,print_out=False):
@@ -94,14 +94,14 @@ def cainfo(pvname,print_out=False):
     If print_out=True, the status report will be printed,
     and not returned.
     """
-    pv = __createPV(pvname)
-    if pv is not None:
-        pv.get()
-        pv.get_ctrlvars()
+    thispv = __createPV(pvname)
+    if thispv is not None:
+        thispv.get()
+        thispv.get_ctrlvars()
         if print_out:
-            print pv.info
+            print thispv.info
         else:     
-            return pv.info
+            return thispv.info
 
 def camonitor_clear(pvname):
     """clear a monitor on a PV"""
@@ -128,14 +128,14 @@ def camonitor(pvname,writer=None, callback=None):
     if not callable(callback):
         if writer is None:
             writer = sys.stdout.write
-        def callback(pvname=pvname, value=value,
-                     char_value=char_value):
-            writer("%.32s %s %s" % (pvname,pv.fmt_time(),char_value))
+        def callback(pvname=None, value=None,
+                     char_value=None):
+            writer("%.32s %s %s\n" % (pvname,pv.fmt_time(),char_value))
         
-    def __cb(pvname=pvname,value=value,char_value=char_value,**kw):
+    def __cb(pvname=None,value=None,char_value=None,**kw):
         callback(pvname=pvname,value=value,char_value=char_value)
     
-    pv = __createPV(pvname)
-    if pv is not None:
-        pv.get()
-        pv.add_callback(__cb)
+    thispv = __createPV(pvname)
+    if thispv is not None:
+        thispv.get()
+        thispv.add_callback(__cb)
