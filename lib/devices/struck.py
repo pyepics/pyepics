@@ -1,18 +1,17 @@
 #!/usr/bin/python 
 import epics
-import numpy
 
 class Scaler(epics.Device):
     attrs = ('.CNT','.CONT','.TP')
     chan_attrs = ('.NM%i','.S%i','_calc%i.VAL')
     def __init__(self,prefix,nchan=8):
-        epics.Device.__init__(self,prefix,
-                              attrs=self.attrs)
+        attr_list = list(attrs)
+        for i in range(nchan):
+            attr_list.extend([a % (i+1) for a in self.chan_attrs for i])
+
         self.prefix = prefix
         self.nchan  = nchan
-        for i in range(1,nchan+1):
-            for a in self.chan_attrs:
-                self.PV(a % i)
+        epics.Device.__init__(self,prefix, attrs=attr_list)
         
     def AutoCountMode(self):
         self.put('.CONT', 1)

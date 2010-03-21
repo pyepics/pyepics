@@ -6,9 +6,10 @@ Py-EPICS3 is a Python interface to the EPICS Channel Access (CA) library
 for the EPICS control system.
 
 This interface is meant to replace older Epics-Python interfaces, including
-EpicsCA, and is under active development.  The current status is that most
+EpicsCA.  This interface is under active development. Currently, most
 features are working, but more testing, polish, and documentation are
-needed.
+needed. In addition, better compatibility with other existing Epics-Python
+interfaces is desired.
 
 The goals of this module include providing both low-level (C-like) and
 higher-level access (with Pythonic objects) to the EPICS Channnel Access
@@ -113,11 +114,8 @@ not addressed in this implementation are:
   threads : this implementation has not been tested for being 'thread safe'.
  
 
-
-
 For an overview of the CA and EpicsMotor interface, see 
 the included html documentation see the doc directory.
 
-
 Matt Newville <newville@cars.uchicago.edu>
-Last Update:  18-Feb-2010
+Last Update:  20-Mar-2010

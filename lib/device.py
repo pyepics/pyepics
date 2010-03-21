@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import pv
+import ca
 
 class Device(object):
     """A simple collection of related PVs, all sharing a prefix,
@@ -46,11 +47,12 @@ class Device(object):
       >>> x.put('13IDC:m3.VAL', 2)
       >>> print x.PV('13IDC:m3.DIR').get(as_string=True)
     """
-    def __init__(self,prefix=None,attrs=None):
-        self.__prefix__ = prefix
+    def __init__(self,prefix=None,sep='',attrs=None):
+        self.__prefix__ = prefix + sep
         self._pvs = {}
         if attrs is not None:
             for p in attrs: self.PV(p)
+        ca.poll()
         
     def PV(self,attr):
         """return epics.PV for a device attribute"""
@@ -59,6 +61,7 @@ class Device(object):
             pvname = "%s%s" % (self.__prefix__, attr)
         if pvname not in self._pvs:
             self._pvs[pvname] = pv.PV(pvname)
+            ca.poll()
         return self._pvs[pvname]
     
     def put(self,attr,value,wait=False,timeout=10.0):
@@ -80,7 +83,7 @@ class Device(object):
         self.PV(attr).add_callback(callback)
         
     def pv_property(attr, as_string=False,wait=False,timeout=10.0):
-        """function to turn a device attribut PV into a property:
+        """function to turn a device attribute PV into a property:
 
         use in your subclass as:
         
