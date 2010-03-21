@@ -23,6 +23,9 @@ _PV_fields_ = ('pvname','value','char_value', 'status','ftype',
                'lower_warning_limit','upper_warning_limit',
                'upper_ctrl_limit', 'lower_ctrl_limit')
 
+# a cache of pvname:pv object
+PV_cache={}
+
 class PV(object):
     """== Epics Process Variable
     
@@ -46,8 +49,11 @@ class PV(object):
         self.pvname  = pvname.strip()
         self.verbose = verbose
         self.auto_monitor = auto_monitor
-        self._form   = {'ctrl': (form.lower() =='ctrl'),
-                        'time': (form.lower() =='time')}
+        self.form = form.lower()
+
+        if (pvname,self.form) in PV_cache:
+            return PV_cache[(pvname,self.form)]
+        PV_cache[(pvname,self.form)] = self
 
         self.callbacks = {}
         if callable(callback): self.callbacks[0] = (callback,{})
@@ -73,8 +79,8 @@ class PV(object):
             self._args['access'] = ca.access(self.chid)
             self._args['write_access'] = ca.write_access(self.chid)
             self.ftype  = ca.promote_type(self.chid,
-                                     use_ctrl=self._form['ctrl'],
-                                     use_time=self._form['time'])
+                                     use_ctrl= self.form=='ctrl',
+                                     use_time= self.form=='time')
             self._args['type'] = dbr.Name(self.ftype).lower()
         return
 
@@ -87,8 +93,8 @@ class PV(object):
             self.__mondata is None):
             self.__mondata = ca.subscribe(self.chid,
                                           userfcn=self._onChanges,
-                                          use_ctrl=self._form['ctrl'],
-                                          use_time=self._form['time'])
+                                          use_ctrl= self.form=='ctrl',
+                                          use_time= self.form=='time')
         return (self.connected and self.ftype is not None)
 
     def poll(self,t1=1.e-3,t2=1.0):    ca.poll(t1,t2)

@@ -34,8 +34,6 @@ Device = device.Device
 poll  = ca.poll
 sleep = time.sleep
 
-__cache = {}
-
 def __createPV(pvname,timeout=5.0):
     "create PV, wait for connection: "
 
@@ -51,7 +49,6 @@ def __createPV(pvname,timeout=5.0):
     if not thispv.connected:
         print 'cannot connect to %s' % pvname
         return None
-    __cache[pvname] = thispv
     return thispv
 
 def caput(pvname, value, wait=False, timeout=60):
@@ -105,8 +102,8 @@ def cainfo(pvname,print_out=False):
 
 def camonitor_clear(pvname):
     """clear a monitor on a PV"""
-    if pvname in __cache:
-        __cache[pvname].clear_callbacks()
+    if (pvname,'native') in pv.PV_cache:
+        pv.PV_cache[(pvname,'native')].clear_callbacks()
         
 def camonitor(pvname,writer=None, callback=None):
     """ camonitor(pvname, writer=None, callback=None)
@@ -114,28 +111,26 @@ def camonitor(pvname,writer=None, callback=None):
     sets a monitor on a PV.  
        >>>camonitor('xx.VAL')
 
-    This will print out a message with the latest value for that PV
-    each time the value changes and when ca.poll() is called.
+    This will print out a message with the latest value for that PV each
+    time the value changes and when ca.poll() is called.
 
-    To write the result to a file, provide the writer option a write
-    method to an open file or some other method that accepts a string.
+    To write the result to a file, provide the writer option a write method
+    to an open file or some other method that accepts a string.
 
-    To completely control where the output goes, provide a callback
-    method -- this will be sent the pvname, value, and char_value
-    (as keyword arguments!) and you can do whatever you'd like with them.
+    To completely control where the output goes, provide a callback method
+    and you can do whatever you'd like with them.
+
+    Your callback will be sent keyword arguments for pvname, value, and
+    char_value Important: use **kw!!
     """
 
     if not callable(callback):
-        if writer is None:
-            writer = sys.stdout.write
+        if writer is None:  writer = sys.stdout.write
         def callback(pvname=None, value=None,
-                     char_value=None):
+                     char_value=None,**kw):
             writer("%.32s %s %s\n" % (pvname,pv.fmt_time(),char_value))
         
-    def __cb(pvname=None,value=None,char_value=None,**kw):
-        callback(pvname=pvname,value=value,char_value=char_value)
-    
     thispv = __createPV(pvname)
     if thispv is not None:
         thispv.get()
-        thispv.add_callback(__cb)
+        thispv.add_callback(callback)
