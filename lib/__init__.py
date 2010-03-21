@@ -20,6 +20,7 @@
 __version__ = '3.0.1'
 
 import time
+import sys
 import ca
 import dbr
 import pv
@@ -33,10 +34,13 @@ Device = device.Device
 poll  = ca.poll
 sleep = time.sleep
 
+__cache = {}
+
 def __createPV(pvname,timeout=5.0):
     "create PV, wait for connection: "
 
     t0 = time.time()
+    if pvname in __cache: return __cache[pvname]
     thispv = PV(pvname)
     if not thispv.connected:
         thispv.connect()
@@ -47,7 +51,7 @@ def __createPV(pvname,timeout=5.0):
     if not thispv.connected:
         print 'cannot connect to %s' % pvname
         return None
-
+    __cache[pvname] = thispv
     return thispv
 
 def caput(pvname, value, wait=False, timeout=60):
@@ -98,4 +102,40 @@ def cainfo(pvname,print_out=False):
             print pv.info
         else:     
             return pv.info
+
+def camonitor_clear(pvname):
+    """clear a monitor on a PV"""
+    if pvname in __cache:
+        __cache[pvname].clear_callbacks()
+        
+def camonitor(pvname,writer=None, callback=None):
+    """ camonitor(pvname, writer=None, callback=None)
+
+    sets a monitor on a PV.  
+       >>>camonitor('xx.VAL')
+
+    This will print out a message with the latest value for that PV
+    each time the value changes and when ca.poll() is called.
+
+    To write the result to a file, provide the writer option a write
+    method to an open file or some other method that accepts a string.
+
+    To completely control where the output goes, provide a callback
+    method -- this will be sent the pvname, value, and char_value
+    (as keyword arguments!) and you can do whatever you'd like with them.
+    """
+
+    if not callable(callback):
+        if writer is None:
+            writer = sys.stdout.write
+        def callback(pvname=pvname, value=value,
+                     char_value=char_value):
+            writer("%.32s %s %s" % (pvname,pv.fmt_time(),char_value))
+        
+    def __cb(pvname=pvname,value=value,char_value=char_value,**kw):
+        callback(pvname=pvname,value=value,char_value=char_value)
     
+    pv = __createPV(pvname)
+    if pv is not None:
+        pv.get()
+        pv.add_callback(__cb)

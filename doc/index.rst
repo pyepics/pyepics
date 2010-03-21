@@ -3,12 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Documentation for Python epics module
+Documentation for Python Epics module
 =====================================
 
-Py-Epics3 is a Python module for the EPICS Channel Access (CA) library
-for the EPICS control system.
-
+Py-Epics3 is a Python module for the Channel Access (CA) library of the
+EPICS control system.  This provides a simple method for reading and
+writing to Epics Process Variables.  
 
 
 Contents:

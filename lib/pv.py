@@ -12,7 +12,7 @@ import dbr
 def fmt_time(t=None):
     if t is None: t = time.time()
     t,frac=divmod(t,1)
-    return "%s.%3.3i" %(time.strftime("%Y-%h-%d %H:%M:%S"),1000.0*frac)
+    return "%s.%6.6i" %(time.strftime("%Y-%m-%d %H:%M:%S"),1.e6*frac)
 
 _PV_fields_ = ('pvname','value','char_value', 'status','ftype',
                'chid', 'host','count','access','write_access',
