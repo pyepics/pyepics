@@ -394,9 +394,9 @@ _put_done =  {}
         
 class ChannelAccessException(Exception):
     """Channel Access Exception"""
-    def __init__(self, fcn, message):
+    def __init__(self, fcn, msg):
         self.fcn = fcn
-        self.msg = message
+        self.msg = msg
     def __str__(self):
         return " %s returned '%s'" % (self.fcn,self.msg)
 
@@ -427,8 +427,7 @@ def initialize_libca():
     ca_context = {False:0, True:1}[PREEMPTIVE_CALLBACK]
     ret = libca.ca_context_create(ca_context)
     if ret != dbr.ECA_NORMAL:
-        raise ChannelAccessException('initialize_libca',
-                                     'Cannot create Epics CA Context')
+        raise ChannelAccessException('initialize_libca',  'Cannot create Epics CA Context')
 
     if AUTO_CLEANUP: atexit.register(finalize_libca)
     return libca
@@ -538,15 +537,19 @@ def withConnectedCHID(fcn):
         return fcn(*args,**kw)
     return wrapper
 
-def raise_on_ca_error(fcn):
+def PySEVCHK(func_name, status, expected=dbr.ECA_NORMAL):
+    """raise a ChannelAccessException if the wrapped  status != ECA_NORMAL
+    """
+    if status == expected: return status
+    raise ChannelAccessException(func_name,message(status))
+
+def withSEVCHK(fcn):
     """decorator to raise a ChannelAccessException if the wrapped
     ca function does not return status=ECA_NORMAL
     """
     def wrapper(*args,**kw):
         status = fcn(*args,**kw)
-        if status != dbr.ECA_NORMAL:
-            raise ChannelAccessException(fcn.func_name,message(status))
-        return 
+        return PySEVCHK( fcn.func_name, status)
     return wrapper
 
 ###
@@ -557,16 +560,23 @@ def raise_on_ca_error(fcn):
 
 # contexts
 @withCA
-def context_create(context=0): return libca.ca_context_create(context)
+@withSEVCHK
+def context_create(context=0):
+    return libca.ca_context_create(context)
 
 @withCA
-def context_destroy():         return libca.ca_context_destroy()
+@withSEVCHK
+def context_destroy():
+    return libca.ca_context_destroy()
     
 @withCA
-def attach_context(context):   return  libca.ca_attach_context(context)
-
+def attach_context(context):
+    ret = libca.ca_attach_context(context) 
+    return PySEVCHK('attach_context',ret, dbr.ECA_ISATTACHED)
+        
 @withCA
-def detach_context():          return libca.ca_detach_context()
+def detach_context():
+    return libca.ca_detach_context()
 
 @withCA
 def current_context():
@@ -578,7 +588,7 @@ def current_context():
 def client_status(context,level):
     f = libca.ca_client_status
     f.argtypes = (ctypes.c_void_p,ctypes.c_long)
-    return libca.ca_client_status(context,level)
+    return f(context,level)
 
 @withCA
 def flush_io():    return libca.ca_flush_io()
@@ -590,6 +600,7 @@ def message(status):
     return f(status)
 
 @withCA
+@withSEVCHK
 def pend_io(t=1.0):
     f   = libca.ca_pend_io
     f.argtypes = [ctypes.c_double]
@@ -599,7 +610,8 @@ def pend_io(t=1.0):
 def pend_event(t=1.e-5):
     f   = libca.ca_pend_event
     f.argtypes = [ctypes.c_double]
-    return f(t)
+    ret = f(t)
+    return PySEVCHK( 'pend_event', ret,  dbr.ECA_TIMEOUT)
 
 @withCA
 def poll(ev=1.e-4,io=1.0):
@@ -607,6 +619,10 @@ def poll(ev=1.e-4,io=1.0):
     pend_event(ev)
     pend_io(io)    
 
+@withCA
+def test_io():
+    """test if IO is complete: returns True if it is"""
+    return (dbr.ECA_IODONE ==  libca.ca_test_io())
 
 ## create channel
 
@@ -632,7 +648,9 @@ def create_channel(pvname,connect=False,userfcn=None):
     # a reference to _onConnectionEvent:  This is really the connection
     # callback that is run -- the userfcn here is stored in the _cache
     # and called by _onConnectionEvent.
-    libca.ca_create_channel(pvname,_CB_connect,0,0,ctypes.byref(chid))
+    ret = libca.ca_create_channel(pvname,_CB_connect,0,0,ctypes.byref(chid))
+    PySEVCHK('create_channel',ret)
+    
     _cache[pvname] = {'chid':chid, 'conn':False, 'ts':0, 'failures':0,
                       'userfcn': userfcn}
     if connect: connect_channel(chid)
@@ -750,7 +768,7 @@ def _unpack(data, count, ftype=dbr.INT,as_numpy=True):
 
 @withConnectedCHID
 def get(chid,ftype=None,as_string=False, as_numpy=True):
-    """return the current evalue for a Channel.  Options are
+    """return the current value for a Channel.  Options are
        ftype       field type to use (native type is default)
        as_string   flag(True/False) to get a string representation
                    of the value returned.  This is not nearly as
@@ -768,6 +786,7 @@ def get(chid,ftype=None,as_string=False, as_numpy=True):
     data = (nelem*dbr.Map[ftype])()
     
     ret = libca.ca_array_get(ftype, count, chid, data)
+    PySEVCHK('get',ret)
     poll()
     val = _unpack(data,nelem,ftype=ftype,as_numpy=as_numpy)
     if as_string and ftype==dbr.CHAR:
@@ -829,14 +848,16 @@ def put(chid,value, wait=False, timeout=20, callback=None,callback_data=None):
     # simple put, without wait or callback
     if not (wait or callable(callback)):
         ret =  libca.ca_array_put(ftype,count,chid, data)
+        PySEVCHK('put',ret)
         poll()
         return ret
-    # wait with wait or callback
+    # wait with wait or callback    # wait with wait or callback
     pvname = name(chid)
     _put_done[pvname] = (False,callback,callback_data)
 
     ret = libca.ca_array_put_callback(ftype,count,chid,
                                       data, _CB_putwait, 0)
+    PySEVCHK('put',ret)
     if wait:
         t0 = time.time()
         finished = False
@@ -864,6 +885,7 @@ def get_ctrlvars(chid):
     ftype = promote_type(chid, use_ctrl=True)
     d = (1*dbr.Map[ftype])()
     ret = libca.ca_array_get(ftype, 1, chid, d)
+    PySEVCHK('get_ctrlvars',ret)
     poll()
     kw = {}
     if ret == dbr.ECA_NORMAL: 
@@ -910,10 +932,15 @@ def create_subscription(chid, use_time=False,use_ctrl=False,
     poll()
     ret = libca.ca_create_subscription(ftype, count, chid, mask,
                                        cb, uarg, ctypes.byref(evid))
+    PySEVCHK('create_subscription',ret)
+    
     poll()
     return (cb, uarg, evid, ret)
 
 subscribe = create_subscription
+
+@withCA
+@withSEVCHK
 def clear_subscription(evid): return libca.ca_clear_subscription(evid)
 
 ##
@@ -984,40 +1011,119 @@ _CB_connect = ctypes.CFUNCTYPE(None,dbr.ca_connection_args)(_onConnectionEvent)
 _CB_putwait = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)   
 
 
+
+## Synchronous groups
+@withCA
+@withSEVCHK
+def sg_block(gid,t=10.0):
+    f   = libca.ca_sg_block
+    f.argtypes = [ctypes.c_ulong, ctypes.c_double]
+    return f(gid,t)
+
+@withCA
+def sg_create():
+    gid  = ctypes.c_ulong()
+    pgid = ctypes.pointer(gid)
+    ret =  libca.ca_sg_create(pgid)
+    PySEVCHK('sg_create',ret)
+    return gid
+
+@withCA
+@withSEVCHK
+def sg_delete(gid):   return libca.ca_sg_delete(gid)
+
+@withCA
+def sg_test(gid):
+    ret =libca.ca_sg_test(gid)
+    return PySEVCHK('sg_test', ret, dbr.ECA_IODONE)
+
+@withCA
+@withSEVCHK
+def sg_reset(gid):   return libca.ca_sg_reset(gid)
+
+def sg_get(gid, chid, ftype=None,as_string=False,as_numpy=True):
+    """synchronous-group get of the current value for a Channel.
+    same options as get()
+    """
+    if not isinstance(chid,ctypes.c_long):
+        raise ChannelAccessException('sg_get', "not a valid chid!")
+
+    if ftype is None: ftype = field_type(chid)
+    count = element_count(chid)
+
+    nelem = count
+    if ftype == dbr.STRING:  nelem = dbr.MAX_STRING_SIZE
+
+    
+    data = (nelem*dbr.Map[ftype])()
+    
+    ret = libca.ca_sg_array_get(gid, ftype, count, chid, data)
+    PySEVCHK('sg_get',ret)
+
+    poll()
+    val = _unpack(data,nelem,ftype=ftype,as_numpy=as_numpy)
+    if as_string and ftype==dbr.CHAR:
+        val = ''.join([chr(i) for i in s if i>0]).strip().rstrip()
+    return val
+
+def sg_put(gid, chid, value):
+    """synchronous-group put: cannot wait or get callback!"""
+    if not isinstance(chid,ctypes.c_long):
+        raise ChannelAccessException('sg_put', "not a valid chid!")
+
+    ftype = field_type(chid)
+    count = element_count(chid)
+    data  = (count*dbr.Map[ftype])()    
+    if ftype == dbr.STRING:
+        data = (dbr.string_t)()
+        count = 1
+        data.value = value
+    elif count == 1:
+        try:
+            data[0] = value
+        except TypeError:
+            data[0] = type(data[0])(value)
+        except:
+            errmsg = "Cannot put value '%s' to PV of type '%s'"
+            raise ChannelAccessException('put',errmsg % (repr(value),
+                                                         dbr.Name(ftype).lower()))
+    else:
+        # auto-convert strings to arrays for character waveforms
+        # could consider using
+        # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],
+        #                  dtype=numpy.uint8)
+        if ftype == dbr.CHAR and isinstance(value,(str,unicode)):
+            pad = '\x00'*(1+count-len(value))
+            value = [ord(i) for i in ("%s%s" % (value,pad))[:count]]
+        try:
+            ndata = len(data)
+            nuser = len(value)
+            if nuser > ndata: value = value[:ndata]
+            data[:len(value)] = list(value)
+        except:
+            errmsg = "Cannot put array data to PV of type '%s'"            
+            raise ChannelAccessException('put',errmsg % (repr(value)))
+      
+    ret =  libca.ca_sg_put(gid,ftype,count,chid, data)
+    PySEVCHK('sg_put',ret)
+    poll()
+    return ret
+
 ##
-## several methods are not yet implemented:
-# 
-# def dump_dbr(type,count,data):
-#     return libca.ca_dump_dbr(type,count, data)
-# 
+## several methods are not (directly) implemented.
+##
+#
+# def dump_dbr(type,count,data):  return libca.ca_dump_dbr(type,count, data)
 # def add_exception_event(): return libca.ca_add_exception_event()
-# 
 # def add_fd_registration(): return libca.ca_add_fd_registration()
-# 
-# 
 # def client_status(): return libca.ca_client_status()
-# 
 # def replace_access_rights_event(): return libca.ca_replace_access_rights_event()
 # def replace_printf_handler(): return libca.ca_replace_printf_handler()
-# 
+#
 # def puser(): return libca.ca_puser()
 # def set_puser(): return libca.ca_set_puser()
-# def signal(): return libca.ca_signal()
-# def sg_block(): return libca.ca_sg_block()
-# def sg_create(): return libca.ca_sg_create()
-# def sg_delete(): return libca.ca_sg_delete()
-# def sg_array_get(): return libca.ca_sg_array_get()
-# def sg_array_put(): return libca.ca_sg_array_put()
-# def sg_reset(): return libca.ca_sg_reset()
-# def sg_test(): return libca.ca_sg_test()
-# 
 # def test_event(): return libca.ca_test_event()
-# def test_io(): return libca.ca_test_io()
-# def dbr_size(): return libca.dbr_size()
-# def dbr_value_size(): return libca.dbr_value_size()
-# 
-# def size_n(): raise NotImplementedError
-# def channel_state(): raise NotImplementedError
 # 
 # def SEVCHK(): raise NotImplementedError
+# def signal(): return libca.ca_signal()
 

@@ -3,24 +3,31 @@
 EPICS Channel Access in Python 
 ==============================
 
-Py-Epics3 consists of several modules to interact with EPICS. The simplest
-approach uses the functions :func:`caget`, :func:`caput`,
-:func:`camonitor`, :func:`camonitor_clear`, and :func:`cainfo` which are
-similar to the Unix command line utilities and to the EZCA interface.  Most
-users will want to create and use PV objects provided by the pv modules.
+Py-Epics3 contains a Python package `epics` which consists of several
+modules to interact with EPICS.  The simplest approach uses the functions
+`caget()`, `caput()`, `camonitor()`, `camonitor_clear()`, and `cainfo()`
+within the toplevel `epics` module.  These functions are similar to the
+Unix command line utilities and to the EZCA interface, and described in
+more detail below.
+
+Most users will probably want to create and use `PV` objects provided by
+the `pv` module.  The `PV` class provides a pythonic PV object that has
+both methods (including :func:`get` and :func:`put`) and attributes that
+are kept automatically synchronized with the remote PV.
+
+The lowest-level CA functionality is exposed in the `ca` and `dbr` module,
+While  not necessarily intended for general use, this module does provide a
+fairly complete wrapping of the basic EPICS CA library.
+
+In addition, the `epics` package contains modules for Epics motors, alarms,
+and other devices, and a set of wxPython widget classes for using EPICS PVs
+with wxPython.
 
 
-The lowest-level CA functionality is exposed in the *ca* and *dbr* module,
-while a higher-level, more pythonic object-oriented interface is provided
-in the *pv* module.  Py-Epics3 also provides functions caget(), caput(),
-and cainfo() for the simplest of interaction with EPICS similar to EZCA and
-the Unix command-line tools.  In addition, there are modules for Epics
-motors, alarms, and other devices, and special widget classes for using
-EPICS PVs with wxPython.
-
-
-Simple Functional Interface: caget(), caput() and related functions
-===================================================================
+epics module: Simple Functional Interface: caget(), caput() and related functions
+==================================================================================
+.. module:: epics
+   :synopsis: top-level epics module, and container for simplest CA functions
 
 The simplest interface to EPICS Channel Access provides functions
 :func:`caget`, :func:`caput`, as well as functions :func:`camonitor`,

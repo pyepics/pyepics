@@ -7,6 +7,10 @@ import ctypes
 import time
 # EPICS Constants
 ECA_NORMAL = 1
+ECA_TIMEOUT = 80
+ECA_IODONE = 339
+ECA_ISATTACHED = 424
+
 CS_CONN    = 2
 OP_CONN_UP = 6
 OP_CONN_DOWN=7
@@ -51,6 +55,7 @@ short_t  = ctypes.c_short
 ushort_t = ctypes.c_ushort
 int_t    = ctypes.c_int
 long_t   = ctypes.c_long
+ulong_t   = ctypes.c_ulong
 float_t  = ctypes.c_float
 double_t = ctypes.c_double
 byte_t   = ctypes.c_byte
@@ -64,7 +69,7 @@ py_obj   = ctypes.py_object
 # extended DBR types:
 class epicsTimeStamp(ctypes.Structure):
     _fields_ = [('secs', long_t), ('nsec', long_t)]
-        
+       
 _STAT_SEV    = (('status', short_t), ('severity', short_t))
 _STAT_SEV_TS = (('status', short_t), ('severity', short_t),
                 ('stamp',  epicsTimeStamp))
