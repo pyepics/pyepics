@@ -30,7 +30,7 @@ the name of an Epics Process Variable (PV) as the first argument.
 
 ..  function:: caget(pvname[, as_string=False])
 
-    ..index:: caget
+    .. index:: caget
  
 This function retrieves and returns the value of the named PV.
 The optional argument *as_string* tells the function to return the **string
@@ -53,7 +53,7 @@ strings which leads CHAR waveforms to be used as longer strings::
 
 ..  function:: caput(pvname,value[, wait=False[, timeout=60]])
 
-    ..index:: caput
+    .. index:: caput
 
 This function sets the value of the named PV.  The optional argument *wait*
 tells the function to wait until the processing completes.  This can be
@@ -73,7 +73,7 @@ has been exceeded.::
 
 ..  function:: cainfo(pvname[, print_out=True])
 
-    ..index:: cainfo
+    .. index:: cainfo
 
 This function prints out (or returns) an informational paragraph about the
 PV, includin Control Settings.  With *print_out=False*, the paragraph will
@@ -106,9 +106,9 @@ not be printed, but returned.::
 
 ..  function:: camonitor(pvname[, writer=None])
 
-    ..index:: camonitor
+    .. index:: camonitor
 
 
 ..  function:: camonitor_clear(pvname)
 
-    ..index:: camonitor_clear
+    .. index:: camonitor_clear
