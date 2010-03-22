@@ -79,15 +79,15 @@ def caget(pvname, as_string=False):
         if as_string: return thispv.char_value
         return val
 
-def cainfo(pvname,print_out=False):
-    """cainfo(pvname,print_out=False)
+def cainfo(pvname,print_out=True):
+    """cainfo(pvname,print_out=True)
 
     return printable information about pv
        >>>cainfo('xx.VAL')
 
     will return a status report for the pv.
 
-    If print_out=True, the status report will be printed,
+    If print_out=False, the status report will be printed,
     and not returned.
     """
     thispv = __createPV(pvname)

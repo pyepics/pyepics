@@ -119,7 +119,7 @@ class PV(object):
         if as_string: field = 'char_value'
         return self._args[field]
 
-    def  put(self,value,wait=False,timeout=30.0,callback=None,callback_data=None):
+    def put(self,value,wait=False,timeout=30.0,callback=None,callback_data=None):
         """set value for PV, optionally waiting until the processing is
         complete, and optionally specifying a callback function to be run
         when the processing is complete.        
