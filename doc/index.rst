@@ -17,7 +17,6 @@ Contents:
    motivation
    pv
    ca
-   pv
    installation
    getting_started
 
