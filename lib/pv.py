@@ -5,7 +5,6 @@
 import time
 import math
 import copy
-
 import ca
 import dbr
 
@@ -14,14 +13,12 @@ def fmt_time(t=None):
     t,frac=divmod(t,1)
     return "%s.%6.6i" %(time.strftime("%Y-%m-%d %H:%M:%S"),1.e6*frac)
 
-_PV_fields_ = ('pvname','value','char_value', 'status','ftype',
-               'chid', 'host','count','access','write_access',
-               'severity', 'timestamp', 'precision',
-               'units', 'enum_strs','no_str',
-               'upper_disp_limit', 'lower_disp_limit',
-               'upper_alarm_limit', 'lower_alarm_limit',
-               'lower_warning_limit','upper_warning_limit',
-               'upper_ctrl_limit', 'lower_ctrl_limit')
+__fields = ('pvname', 'value', 'char_value', 'status', 'ftype', 'chid',
+            'host', 'count', 'access', 'write_access', 'severity',
+            'timestamp', 'precision', 'units', 'enum_strs', 'no_str',
+            'upper_disp_limit', 'lower_disp_limit', 'upper_alarm_limit',
+            'lower_alarm_limit', 'lower_warning_limit',
+            'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
 # cache of PVs
 PV_cache = {}
@@ -54,7 +51,7 @@ class PV(object):
         if callable(callback): self.callbacks[0] = (callback,{})
         self.ftype = None
         self.connected  = False
-        self._args      = {}.fromkeys(_PV_fields_)
+        self._args      = {}.fromkeys(__fields)
 
         self._args['pvname'] = self.pvname
         self.__mondata = None
@@ -204,7 +201,7 @@ class PV(object):
 
         Note that callback functions are called with keyword/val
         arguments including:
-             self._args  (all PV data available, keys = _PV_fields_)
+             self._args  (all PV data available, keys = __fields)
              keyword args included in add_callback()
              keyword 'cb_info' = (index, remove_callback)
         where the 'cb_info' is provided as a hook so that a callback

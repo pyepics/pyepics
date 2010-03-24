@@ -5,10 +5,6 @@ ca: Low-Level Epics Interface
 Overview
 ========
 
-
-.. module:: ca
-   :synopsis: low-level Channel Access  module.
-
 This module provides a low-level wrapping of the EPICS Channel Access (CA)
 library, using ctypes.  Most users of the `epics` module will not need to
 be concerned with most the details here, and will only use the simple
@@ -24,7 +20,7 @@ documentation.  To that end, this document mostly describe the differences
 with the C interface.
 
 Name Mangling
-=============
+~~~~~~~~~~
 
 In general, for a CA function named 'ca_XXX', the function here is called
 'XXX', as the intention is that importing this module with
@@ -46,18 +42,23 @@ the C constant DBR_STRING becomes dbr.STRING.
 Initialization, Finalization, and Lifecycle
 ===========================================
 
+.. module:: ca
+   :synopsis: low-level Channel Access  module.
+
 The CA library must be initialized before it can be used.  There are 3 main
 reasons for this: 
-   1) CA requires a context model (preemptive callbacks or 
-      non-preemptive callbacks) to be specified before any actual calls are
-      made.
-   2) the ctypes interface requires that the shared library be loaded
-      before it is used, and 
-   3) because ctypes requires references to the library and callback
-      functions be kept for the lifecycle of CA-using part of a program (or
-      else they will be garbage collected).
 
-For these reasone, the handling of the lifecycle here for a CA session can
+  1. CA requires a context model (preemptive callbacks or  non-preemptive
+  callbacks) to be specified before any actual calls are  made. 
+
+  2. the ctypes interface requires that the shared library be loaded
+  before it is used.
+
+  3. because ctypes requires references to the library and callback
+  functions be kept for the lifecycle of CA-using part of a program (or
+  else they will be garbage collected). 
+
+For these reasons, the handling of the lifecycle here for a CA session can
 be slightly complicated.  As far as is possible, this module tries to
 prevent the user from needing to worry about explicitly initializing the CA
 session.  Instead, the library is initialized as soon as it is needed (but
@@ -81,45 +82,16 @@ Here, these tasks are handled by the following constructs:
      a graceful shutdown. If the program crashes (for a non-CA related
      reason, for example), this finalization may not be done.
        
-   * the decorator function :func:`withCA` ensures that the CA library is
-     initialzed before many CA functions are called.  This prevents, for
-     example, one creating a channel ID before CA has been initialized.
-   
-   * the decorator function :func:`withCHID` ensures that CA functions
-     which require a ``chid`` as the first argument actually have a
-     ``chid`` as the first argument.  This is not a highly robust test (it
-     actually checks for a ctypes.c_long or int) but is useful enough to
-     catch most errors before they would cause a crash of the CA library.
 
-   * Additional decorators exist to check that CHIDs have connected, and to
-     check return status codes from `libca` functions.
+.. data:: PREEMPTIVE_CALLBACK 
+
+   sets whether preemptive callbacks will be used.  The default value is
+   ``True``.  This **MUST** be set before any other use of the CA library.
+
+   With preemptive callbacks enabled, EPICS communication will
+   not require client code to continually poll for changes.  
 
 
-.. function::withConnectedCHID 
-
-    which ensures that the first argument of a function is a connected
-    ``chid``.  This test is (intended to be) robust, and will (try to) make
-    sure a ``chid`` is actually connected before calling the decorated
-    function.
-   
-As noted above, this module enables preemptive callbacks by default, so that
-EPICS will communication will be faster and not requiring the client to
-continually poll for changes.  
-
-ca.PREEMPTIVE_CALLBACK = False
-
-To disable preemptive callbacks, set
-
-
-*before* making any other calls to the library.
-
-Tthis module keeps a global cache of PVs (in ca._cache) that holds connection
-status for all known PVs.  Use the function
-    ca.show_cache()
-
-to print a listing of PV names and connection status, or use
-    ca.show_cache(print_out=False)
-to be returned this listing.
 
 Using the CA module
 ====================
@@ -154,11 +126,13 @@ threading contexts are very close to the C library:
          pend_event(ev) 
 	 pend_io_(io)
 
+
+
 Creating and Connecting to Channels
 ===================================
 
 The basic channel object is the "Channel ID" or ``chid``.  With the CA
-library (and ``ca`` module), one creates and acts on ``chid``s, which are
+library (and ``ca`` module), one creates and acts on the ``chid`` values, which are
 :data:`ctypes.c_long`.
 
 To create a channel, use
@@ -201,37 +175,58 @@ will be done when needed), use
     much time waiting for a connection that may never happen.
 
 Other functions that require a valid (but not necessarily connected) Channel areessentially identical to the CA library are:
-    name(chid)
-    host_name(chid)
-    element_count(chid)
-    read_access(chid)
-    write_access(chid)
-    field_type(chid)
-    clear_channel(chid)
-    state(chid)
+.. function::   name(chid)
+
+.. function::     host_name(chid)
+
+.. function::     element_count(chid)
+
+.. function::     read_access(chid)
+
+.. function::     write_access(chid)
+
+.. function::     field_type(chid)
+
+.. function::     clear_channel(chid)
+
+.. function::     state(chid)
 
 Three additional pythonic functions have been added:
-    isConnected(chid)
 
-which returns (dbr.CS_CONN==state(chid)) ie True or False for a connected,
-unconnected channel
+.. function::     isConnected(chid)
 
-   access(chid)
-returns (read_access(chid) + 2 * write_access(chid))
+   returns (dbr.CS_CONN==state(chid)) ie True or False for a connected, 
+   unconnected channel
 
-   promote_type(chid,use_time=False,use_ctrl=False)
-which promotes the native field type of a chid to its TIME or CTRL variant
+.. function:: access(chid)
+
+   returns (read_access(chid) + 2 * write_access(chid))
+
+.. function::    promote_type(chid,use_time=False,use_ctrl=False)
+
+  which promotes the native field type of a chid to its TIME or CTRL variant
+
+
+..  data::  _cache
+
+    The ca module keeps a global cache of Channels that holds connection
+    status and a bit of internal information for all known PVs.  This cache
+    is not intended for general use, .... but ...
+
+.. function:: show_cache(print_out=True)
+
+   this function will print out a listing of PVs in the current session to
+   standard output.  Use the *print_out=False* option to be returned the
+   listing instead of having it printed. 
+
 
 Interacting with Connected Channels
 ===================================
 
-Once a chid is created and connected there are several ways to communicating
-with it.   These are primarily encapsulated in the functions
-   get()
-   put()
-   create_subscription()
-
-with a few additional functions for retrieving specific information.
+Once a chid is created and connected there are several ways to
+communicating with it.  These are primarily encapsulated in the functions
+:func:`get`, :func:`put`, and :func:`create_subscription`, with a few
+additional functions for retrieving specific information.
 
 These functions are where this python module differs the most from the
 underlying CA library, and this is mostly due to the underlying CA function
@@ -240,9 +235,10 @@ space for the data.  In python none of these is needed, and keyword arguments
 can be used to specify such options.
 
 To get a PV's value, use:
-    get(chid, ftype=None, as_string=False, as_numpy=False)
 
-This returns the current value for a Channel.  Options
+.. function::    get(chid, ftype=None, as_string=False, as_numpy=False)
+
+  This returns the current value for a Channel.  Options
 
       ftype         field type to use (native type is default)
       as_string    flag(True/False) to get a string representation
@@ -286,6 +282,7 @@ See note below on user-defined callbacks.
 
 To define a subscription so that a callback is executed every time a PV changes,
 use
+
 .. function::   create_subscription(chid, use_time=False,use_ctrl=False,  mask=7, userfcn=None)
 
    this function returns a tuple of
@@ -330,22 +327,52 @@ the keys in this dictionary may include
         lower_ctrl_limit
         
 enum_strs will be a  list of strings for the names of ENUM states.
-        
+
+Implementation details
+==============================
+
+Several decorator functions are used heavily inside of ca.py
+
+   * the decorator function :func:`withCA` ensures that the CA library is
+     initialzed before many CA functions are called.  This prevents, for
+     example, one creating a channel ID before CA has been initialized.
+   
+   * the decorator function :func:`withCHID` ensures that CA functions
+     which require a ``chid`` as the first argument actually have a
+     ``chid`` as the first argument.  This is not a highly robust test (it
+     actually checks for a ctypes.c_long or int) but is useful enough to
+     catch most errors before they would cause a crash of the CA library.
+
+   * Additional decorators exist to check that CHIDs have connected, and to
+     check return status codes from `libca` functions.
+
+
+..  function:: withConnectedCHID 
+
+    which ensures that the first argument of a function is a connected
+    ``chid``.  This test is (intended to be) robust, and will (try to) make
+    sure a ``chid`` is actually connected before calling the decorated
+    function.
+   
+..  _ca-callbacks-label:
+       
 User-supplied Callback functions
 ================================
 
 User-supplied callback functions can be provided for both put() and create_subscription()
 
 For both cases, it is important to keep two things in mind:
-   how your function will be called
-   what is permissable to do inside your callback function.
+    1)   how your function will be called
+    2)   what is permissable to do inside your callback function.
 
 In both cases, callbacks will be called with keyword arguments.  You should be
 prepared to have them passed to your function.  Use **kw unless you are very
 sure of what will be sent.
 
-For put callbacks, your function will be passed
+For put callbacks, your function will be passed these
+
     pvname=pvname, data=data,
+
 where pvname is the name of the pv, and data is the user-supplied
 callback_data (defaulting to None).
 

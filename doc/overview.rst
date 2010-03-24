@@ -39,34 +39,69 @@ These all take the name of an Epics Process Variable (PV) as the first
 argument.
 
 ..  function:: caget(pvname[, as_string=False])
- 
-This function retrieves and returns the value of the named PV.
-The optional argument *as_string* tells the function to return the **string
-representation** of the value.  The string representation depends on the
-variable type of the PV.  For integer (short or long) and string PVs, the
-string representation is pretty easy.  For float and doubles, the
-internal precision of the PV is used to format the string value.  For enum
-types, the name of the enum state is returned.  
+
+   :param pvname: name of Epics Process Variable
+   :param as_string:  whether to return string representation of the PV value.
+   :type as_string: True or False
+  
+
+retrieves and returns the value of the named PV.
+
+The optional *as_string* argument tells the function to return the **string
+representation** of the value.  The details of the string representation
+depends on the variable type of the PV.  For integer (short or long) and
+string PVs, the string representation is pretty easy: 0 will become '0',
+for example..  For float and doubles, the internal precision of the PV is
+used to format the string value.  For enum types, the name of the enum
+state is returned.
 
 For most array (waveform) records, the string representation will be
-something like `<array size=128, type=int>`, depending on the size and type
-of the waveform.  As an important special case, CHAR waveforms will be
-turned to Python strings when *as_string* is ``True``.  This is to work around
-a painful limitation on the maximum length (40 characters!) of EPICS
-strings which leads CHAR waveforms to be used as longer strings::
+something like::
+
+  <array size=128, type=int>
+
+depending on the size and type of the waveform.  As an important special
+case, CHAR waveforms will be turned to Python strings when *as_string* is
+``True``.  This is to work around a painful limitation on the maximum
+length (40 characters!) of EPICS strings which leads CHAR waveforms to be
+used as longer strings::
 
     >>> from import epics import caget, caput, cainfo
     >>> print caget('XXX:m1.VAL')
     1.200
+   >>> print caget('XXX:dir')                                                                                                          
+   array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 101, 114,  92,  77,
+        97, 114,  99, 104,  50,  48,  49,  48,  92,  70,  97, 115, 116,
+        77,  97, 112,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0])
+   >>> print caget('XXX:dir',as_string=True)
+   'T:\\xas_user\\March2010\\FastMap'
+
 
 ..  function:: caput(pvname,value[, wait=False[, timeout=60]])
 
-This function sets the value of the named PV.  The optional argument *wait*
-tells the function to wait until the processing completes.  This can be
-useful for PVs which take significant time to complete, for example moving
-a physical motor.  The *timeout* argument gives the maximum time to wait,
-in seconds.  The function will return after this (approximate) time even if
-the :func:`put` has not completed.  
+   :param pvname: name of Epics Process Variable
+   :param value:  value to send to  PV
+   :param wait:  whether to wait until the processing has completed.
+   :type wait: True or False
+   :param timeout:  how long to wait (in seconds) for put to complete before giving up.
+   :type timeout: double
+   :rtype: integer
+
+set the value of the named PV.  
+
+The optional *wait* argument tells the function to wait until the
+processing completes.  This can be useful for PVs which take significant
+time to complete, for example moving a physical motor.  The *timeout*
+argument gives the maximum time to wait, in seconds.  The function will
+return after this (approximate) time even if the :func:`put` has not
+completed.
 
 This function returns 1 on success, and a negative number if the timeout
 has been exceeded.
@@ -80,9 +115,13 @@ has been exceeded.
 
 ..  function:: cainfo(pvname[, print_out=True])
 
-This function prints out (or returns as a string) an informational
-paragraph about the PV, including Control Settings.  With *print_out=False*,
-the paragraph will not be printed, but returned.
+   :param pvname: name of Epics Process Variable
+   :param print_out:  whether to write results to standard output (otherwise the string is returned).
+   :type print_out: True or False
+
+prints (or returns as a string) an informational paragraph about the PV,
+including Control Settings.  With *print_out=False*, the paragraph will not
+be printed, but returned.
 
     >>> cainfo('XXX.m1.VAL')
     == XXX:m1.VAL  (double) ==
@@ -111,16 +150,27 @@ the paragraph will not be printed, but returned.
 
 ..  function:: camonitor(pvname[, writer=None[, callback=None]])
 
-This function `sets a monitor` on the named PV, and will print out (by
-default) the PV name, time, and value each time the value changes.  One can
-optionally pass any function that can take a string, for example the
-`write` method of a file open for writing, to *writer*.  If left as ``None``,
-messages of changes will be sent to :func:`sys.stdout.write`. For more complete
+   :param pvname: name of Epics Process Variable
+   :param writer:  whether to write results to standard output (otherwise the string is returned).
+   :type writer: None or a method that can take a string
+   :param callback:  user-supplied function to receive result
+   :type callback: None or callable
+
+
+This `sets a monitor` on the named PV, and will print out (by default) the
+PV name, time, and value each time the value changes.  One can optionally
+pass any function that can take a string, for example the `write` method of
+a file open for writing, to *writer*.  If left as ``None``, messages of
+changes will be sent to :func:`sys.stdout.write`. For more complete
 control, one can specify a *callback* function to be called on each change
 event.  This callback should take keyword arguments for *pvname*, *value*,
-and *char_value*.  See :ref:`pv-callbacks` for information on writing
+and *char_value*.  See :ref:`pv-callbacks-label` for information on writing
 callback functions.
 
 ..  function:: camonitor_clear(pvname)
 
+   :param pvname: name of Epics Process Variable
+
 clears a `monitor` set on the named PV by :func:`camonitor`.
+
+

@@ -700,15 +700,26 @@ def _chid_f(chid,fcn_name,restype=int,arg=None):
     f.restype = restype
     return f(chid)
 
-def name(chid):          return _chid_f(chid,'ca_name',
-                                        restype=ctypes.c_char_p)
-def host_name(chid):     return _chid_f(chid,'ca_host_name',
-                                        restype=ctypes.c_char_p)
-def element_count(chid): return _chid_f(chid,'ca_element_count')
-def read_access(chid):   return _chid_f(chid,'ca_read_access')
-def write_access(chid):  return _chid_f(chid,'ca_write_access')
-def field_type(chid):    return _chid_f(chid,'ca_field_type')
-def clear_channel(chid): return _chid_f(chid,'ca_clear_channel')
+def name(chid):
+    return _chid_f(chid,'ca_name',   restype=ctypes.c_char_p)
+
+def host_name(chid):
+    return _chid_f(chid,'ca_host_name',  restype=ctypes.c_char_p)
+
+def element_count(chid):
+    return _chid_f(chid,'ca_element_count')
+
+def read_access(chid):
+    return _chid_f(chid,'ca_read_access')
+
+def write_access(chid):
+    return _chid_f(chid,'ca_write_access')
+
+def field_type(chid):
+    return _chid_f(chid,'ca_field_type')
+
+def clear_channel(chid):
+    return _chid_f(chid,'ca_clear_channel')
 
 @withCHID
 def state(chid):         return libca.ca_state(chid)
