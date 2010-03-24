@@ -26,7 +26,6 @@ The PV class
    :param verbose:  whether to print out debugging messages
    :type auto_monitor: True or False
    
-
 create a PV object for a named Epics Process Variable.  Once created, a PV
 will (eventually) automatically connect and be ready to use.
 
@@ -41,9 +40,28 @@ methods
 
 .. method:: get([, as_string=False])
 
+   get and return the current value of the PV
+
+   :param as_string:  whether to return the string representation of the  value.  
+   :type as_string:  True/False
+
+
 .. method:: put(value[, wait=False[, timeout=30.0[, callback=None[, callback_data=None]]]])
 
+   set the PV value, optionally waiting to return until processing has completed.
+
+   :param value:  value to set PV to
+   :param wait:  whether to wait for processing to complete (or time-out) before returning.
+   :type  wait:  True/False
+   :param timeout:  maximum time to wait for processing to complete before returning anyway.
+   :type  timeout:  double
+   :param callback: user-supplied function to run when processing has completed.
+   :type callback: None or callable
+   :param callback_data: extra data to pass on to a user-supplied callback function.
+
 .. method:: get_ctrlvars()
+
+   returns a dictionary of the **control values** for the PV.
 
 .. method:: poll()
 
@@ -111,16 +129,33 @@ cannot be assigned to.
 
 .. attribute:: severity
 
+   severity value of PV. Usually 0 for PVs that are not in an alarm
+   condition.
 
 .. attribute:: timestamp
 
+   Unix (not Epics!!) timestamp of the last seen event for this PV.
+
 .. attribute:: precision
+
+   number of decimal places of precision to use for float and double PVs
 
 .. attribute:: units
 
+   string of engineering units for PV
+
 .. attribute:: enum_strs
 
+   a list of strings for the enumeration states  of this PV (for enum PVs)
+
 .. attribute:: no_str
+
+   number of enum states.
+
+.. attribute:: info
+
+   a string paragraph (ie, including newlines) showing much of the
+   information about the PV.
 
 .. attribute:: upper_disp_limit
 
@@ -138,7 +173,7 @@ cannot be assigned to.
 
 .. attribute:: lower_ctrl_limit
 
-.. attribute:: info
+   These are all the various kinds of limits for a PV.
         
 ..  _pv-callbacks-label:
 

@@ -248,7 +248,7 @@ To get a PV's value, use:
 
 .. method::    get(chid[, ftype=None[, as_string=False[, as_numpy=False]]])
 
-   This returns the current value for a Channel. Note that there is not a separate form for array data.
+   return the current value for a Channel. Note that there is not a separate form for array data.
 
    :param chid:  channel ID
    :type  chid:  ctypes.c_long
@@ -261,8 +261,6 @@ To get a PV's value, use:
        for array / waveform data.  This is only applied if numpy can be imported.
    :type as_numpy:  True/False
 
-
-
 The 'as_string' option warrants special attention.  When used, this will
 always return a string representation of the value.  For Enum types, this will
 be the name of the Enum state. For Floats and Doubles, this will be the value
@@ -274,22 +272,27 @@ To set a PV's value, use:
 
 .. function::  put(chid, value, wait=False, timeout=20, callback=None,callback_data=None) 
 
-This puts a value to a Channel, with options to either wait (block) for the
-process to complete, or to execute a supplied callback function when the
-process has completed.  The chid and value are required, with options:
+   set the Channel to a value, with options to either wait (block) for the
+   process to complete, or to execute a supplied callback function when the
+   process has completed.  The chid and value are required.
 
-       wait        flag (True/False) for whether to block here while put
-                     is processing.  Default = False
-       timeout   maximum time to wait for a blocking put.
-       callback  user-defined function to be called when put has
-                     finished processing.
-       callback_data data to pass onto the user-defined callback.
+   :param chid:  channel ID
+   :type  chid:  ctypes.c_long
+   :param wait:  whether to wait for processing to complete (or time-out) before returning.
+   :type  wait:  True/False
+   :param timeout:  maximum time to wait for processing to complete before returning anyway.
+   :type  timeout:  double
+   :param callback: user-supplied function to run when processing has completed.
+   :type callback: None or callable
+   :param callback_data: extra data to pass on to a user-supplied callback function.
 
 put() returns 1 on sucess and -1 on timed-out
 
-Specifying a callback will override setting wait=True.  The callback function
-will be called with keyword arguments
-     pvname=pvname, data=callback_data
+Specifying a callback will override setting wait=True.  The callback
+function will be called with keyword arguments 
+
+       pvname=pvname, data=callback_data
+
 See note below on user-defined callbacks.
 
 To define a subscription so that a callback is executed every time a PV changes,
@@ -382,23 +385,25 @@ User-supplied Callback functions
 User-supplied callback functions can be provided for both put() and create_subscription()
 
 For both cases, it is important to keep two things in mind:
-    1)   how your function will be called
-    2)   what is permissable to do inside your callback function.
+    1)  how your function will be called
+    2)  what is permissable to do inside your callback function.
 
 In both cases, callbacks will be called with keyword arguments.  You should be
-prepared to have them passed to your function.  Use **kw unless you are very
+prepared to have them passed to your function.  Use `**kw` unless you are very
 sure of what will be sent.
 
-For put callbacks, your function will be passed these
+For put callbacks, your function will be passed these::
 
-    pvname=pvname, data=data,
+    pvname=pvname, data=data
 
 where pvname is the name of the pv, and data is the user-supplied
 callback_data (defaulting to None).
 
 For subcription callbacks, your function will be called with keyword/value
-pairs that will include
+pairs that will include::
+
     pvname=pvname,  value=value
+
 and may include several other pairs depending on the data type and whether the
 TIME or CTRL variant was used.
 

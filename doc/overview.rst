@@ -10,6 +10,28 @@ and :func:`cainfo` within the top-level `epics` module.  These functions
 are similar to the Unix command line utilities and to the EZCA library
 interface, and described in more detail below.
 
+
+The :mod:`epics` package consists of several functions, modules and classes
+that are all imported with::
+
+     import epics
+    
+These components includes
+
+    * functions :func:`caget`, :func:`caput`, :func:`camonitor`,
+      :func:`camonitor_clear`, and :func:`cainfo` as described below.
+    * a :mod:`ca` module, providing the low-level Epics Channel Access
+      library as a set of functions.
+    * a :class:`PV` object, giving a higher-level interface to Epics
+      Channel Access.
+    * a :class:`Device` object:  a collection of related PVs
+    * a :class:`Motor` object: a mapping of an Epics Motor
+    * an :class:`Alarm` object, which can be used to set up notifications
+      when a PV's values goes outside an acceptable bounds.
+    * an :mod:`epics.wx` module that provides wxPython classes designed for
+      use with Epics PVs.
+
+
 Most users will probably want to create and use `PV` objects provided by
 the `pv` module.  The `PV` class provides a PV object that has both methods
 (including :func:`get` and :func:`put`) and attributes that are kept
@@ -25,8 +47,11 @@ Epics motors, alarms, a host of other *devices* (collections of PVs), and a
 set of wxPython widget classes for using EPICS PVs with wxPython.
 
 
-:mod:`epics`: caget(), caput() and related functions
-====================================================
+
+
+
+Functions defined in :mod:`epics`: caget(), caput() and related functions
+=========================================================================
 
 .. module:: epics
    :synopsis: top-level epics module, and container for simplest CA functions
@@ -191,14 +216,14 @@ callback functions.
 
   :param pvname: name of Epics Process Variable
 
-    >>> import epics
-    >>> fh = open('PV1.log','w')
-    >>> epics.camonitor('XXX:DMM1Ch2_calc.VAL',writer=fh.write)
-    >>> .... wait for changes ...
-    >>> epics.camonitor_clear('XXX:DMM1Ch2_calc.VAL')
-    >>> fh.close()
-    >>> fh = open('PV1.log','r')
-    >>> for i in fh.readlines(): print i[:-1]
+   >>> import epics
+   >>> fh = open('PV1.log','w')
+   >>> epics.camonitor('XXX:DMM1Ch2_calc.VAL',writer=fh.write)
+   >>> .... wait for changes ...
+   >>> epics.camonitor_clear('XXX:DMM1Ch2_calc.VAL')
+   >>> fh.close()
+   >>> fh = open('PV1.log','r')
+   >>> for i in fh.readlines(): print i[:-1]
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:40.536946 -183.5035
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:41.536757 -183.6716
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:42.535568 -183.5112
@@ -208,3 +233,5 @@ callback functions.
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:46.535813 -183.5085
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:47.536623 -183.5223
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:48.536434 -183.6832
+
+
