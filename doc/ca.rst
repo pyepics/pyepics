@@ -22,22 +22,20 @@ with the C interface.
 Name Mangling
 ~~~~~~~~~~
 
-In general, for a CA function named 'ca_XXX', the function here is called
-'XXX', as the intention is that importing this module with
+In general, for a CA function named `ca_XXX` in the C library, the
+equivalent function is called `XXX` in this module, as the intention is
+that importing `ca` module with
 
-    >>> import ca
+    >>> from epics import ca
 
-or 
-
-   >>> from epics import ca
-
-will mean that the C function 'ca_XXX' be mapped to 'ca.XXX' in Python.
-That is, the Python `ca` namespace is used in place of the name-mangling in
-C due to its lack of namespaces.
+will result in a Python function named :func:`ca.XXX` that correpsonds to
+the C function `ca_XXX`.
+That is, Python namespaces are used in place of the name-mangling done in C
+due to its lack of namespaces.
 
 Similar name *un-mangling* also happens with the DBR prefixes for
-constants, held here in the `dbr` module.  This means, for example, that
-the C constant DBR_STRING becomes dbr.STRING.
+constants, held here in the `dbr` module.  Thus, the C constant DBR_STRING
+becomes dbr.STRING in Python.
 
 Initialization, Finalization, and Lifecycle
 ===========================================
@@ -91,7 +89,7 @@ Here, these tasks are handled by the following constructs:
    With preemptive callbacks enabled, EPICS communication will
    not require client code to continually poll for changes.  
 
-
+   More information on 
 
 Using the CA module
 ====================
@@ -122,10 +120,9 @@ threading contexts are very close to the C library:
 .. function::  poll(ev=1.e-4,io=1.0)
 
      A notable addition the function which is equivalent to::
-     
+    
          pend_event(ev) 
 	 pend_io_(io)
-
 
 
 Creating and Connecting to Channels
@@ -284,42 +281,47 @@ To define a subscription so that a callback is executed every time a PV changes,
 use
 
 .. function::   create_subscription(chid, use_time=False,use_ctrl=False,  mask=7, userfcn=None)
-
-   this function returns a tuple of
-   *(callback_ref, user_arg_ref, event_id, ret_val)*
+    :param use_time:  whether to use the TIME variant for the PV type
+    :type use_time: True/False
+    :param use_ctrl:  whether to use the CTRL variant for the PV type
+    :type use_ctrl: True/False
+    :param  mask:  integer bitmask to control which changes result in a     callback   
+    :type mask:  integer
+    :param userfcn:   user-supplied callback function
+    :type userfcn:  callable or None
+      
+    :rtype: tuple containing *(callback_ref, user_arg_ref, event_id, ret_val)*
    
-   Where *callback_ref* are *user_arg_ref* are references that should be
-   kept for as long as the subscription lives, *event_id* is the id for the
-   event (useful for clearing a subscription), and *ret_val* is the return
-   value of the CA library call :func:`ca_create_subscription`.
+   The returned value contains *callback_ref* are *user_arg_ref* which are
+   references that should be kept for as long as the subscription lives.
+   *event_id* is the id for the event (useful for clearing a subscription),
+   and *ret_val* is the return value of the CA library call
+   :func:`ca_create_subscription`.
 
 Options for create_subscription include:
-      use_time  flag(True/False) to use the TIME variant for the PV type
-      use_ctrl   flag(True/False) to use the CTRL variant for the PV type
-      mask      integer bitmask to control which changes result in a callback
-      userfcn   user-supplied callback function
 
 See not below on callback functions.
 
-A subscription can be cleared with 
-    clear_subscription(event_id)
+.. function: clear_subscription(event_id)
+   
+   clears a subscription given its *event_id*.
 
 Other functions that are provided are
 
-   get_precision(chid)
+.. function:  get_precision(chid)
 
-return the precision of a channel.  For channels with native type other than
-FLOAT or DOUBLE, this will be 0
+   return the precision of a channel.  For channels with native type other
+   than FLOAT or DOUBLE, this will be 0
 
-    get_enum_strings(chid)
+.. function: get_enum_strings(chid)
 
-return the list of names for ENUM states of a Channel.  Returns  None for non-ENUM
-Channels.
+    return the list of names for ENUM states of a Channel.  Returns  None
+    for non-ENUM Channels.
 
-    get_ctrlvars(chid)
+.. function: get_ctrlvars(chid) 
 
-returns a dictionary of CTRL fields for a Channel.  Depending on  the native type,
-the keys in this dictionary may include
+    returns a dictionary of CTRL fields for a Channel.  Depending on  the
+    native type, the keys in this dictionary may include
 
         status severity precision units enum_strs upper_disp_limit
         lower_disp_limit upper_alarm_limit lower_alarm_limit
@@ -327,6 +329,8 @@ the keys in this dictionary may include
         lower_ctrl_limit
         
 enum_strs will be a  list of strings for the names of ENUM states.
+
+..  _ca-implementation-label:
 
 Implementation details
 ==============================
@@ -393,38 +397,50 @@ pend_event() has completed, etc).
 
     
 Omissions
-======
+=========
 
-Several parts of the CA library are not implemented (yet?).
-These include the following functions:
+Several parts of the CA library are not implemented in the Python module.
+These are currently seen as unneeded (with notes where appropriate for
+alternatives), though they could be added on request.  
 
-    ca_add_exception_event()
-    ca_add_fd_registration()
-    ca_dump_dbr()  * 
-    ca_client_status()
-    ca_puser() *
-    ca_replace_access_rights_event()
-    ca_replace_printf_handler()
-    ca_set_puser() *
-    ca_signal()
-    ca_sg_block()
-    ca_sg_create()
-    ca_sg_delete()
-    ca_sg_array_get()
-    ca_sg_array_put()
-    ca_sg_reset()
-    ca_sg_test()
-    ca_test_event() *
-    ca_test_io() * 
-    ca_SEVCHK() *
-    dbr_size() *
-    dbr_size_n() *
-    dbr_value_size() *
+.. function::  ca_add_exception_event
+   
+   *Not implemented*: Python exceptions are raised where appropriate and
+   can be used in user code. 
 
-Some of these (marked with *) are probably not necessary.  The others
-should probably be added for completeness.
+.. function:: ca_add_fd_registration
+   *Not implemented* 
+   
+.. function:: ca_replace_access_rights_event
+   *Not implemented* 
+.. function:: ca_replace_printf_handler
+   *Not implemented* 
+.. function:: ca_client_status
+   *Not implemented* 
+.. function:: ca_set_puser
+   *Not implemented* : it is easy to pass user-defined data to callbacks as needed.
+.. function:: ca_puser
+   *Not implemented*: it is easy to pass user-defined data to callbacks as needed.
 
-In addition, not all DBR types are supported.  In addition to the native
-types, the DBR_TIME and DBR_CTRL variants are supported, but the DBR_STS
-and DBR_GR variants are not.
+.. function::  ca_SEVCHK
+   *Not implemented*: the Python function :func:`Py_SEVCHK` is
+   approximately the same.
+.. function::  ca_signal
+   *Not implemented*: the Python function :func:`Py_SEVCHK` is
+   approximately the same. 
+
+.. function:: ca_test_event
+   *Not implemented*:  this appears to be a function for debugging events.
+   These are easy enough to simulate by directly calling Python callback
+   functions. 
+
+.. function:: ca_dump_dbr
+   *Not implemented*
+
+In addition, not all `DBR` types in the CA C library are supported.   
+
+Only native types and their DBR_TIME and DBR_CTRL variants are supported:
+DBR_STS and DBR_GR variants are not. Several `dbr_XXX` functions are also
+not supported, as they are needed only to dynamically allocate memory.
+
 
