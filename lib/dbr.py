@@ -49,7 +49,7 @@ MAX_UNITS_SIZE       =  8
 MAX_ENUM_STRING_SIZE = 26
 MAX_ENUMS            = 16
 
-EPICS2UNIX_EPOCH = 631173600 - time.timezone
+EPICS2UNIX_EPOCH = 631173600.0 - time.timezone
 
 short_t  = ctypes.c_short
 ushort_t = ctypes.c_ushort
@@ -68,7 +68,7 @@ py_obj   = ctypes.py_object
 
 # extended DBR types:
 class epicsTimeStamp(ctypes.Structure):
-    _fields_ = [('secs', long_t), ('nsec', long_t)]
+    _fields_ = [('secs', ulong_t), ('nsec', ulong_t)]
        
 _STAT_SEV    = (('status', short_t), ('severity', short_t))
 _STAT_SEV_TS = (('status', short_t), ('severity', short_t),

@@ -1,9 +1,9 @@
 =============================
-ca: Low-Level Epics Interface
+:mod:`epics.ca` Low-Level Epics Interface
 =============================
 
-Overview
-========
+Overview, differernce with C library
+====================================
 
 This module provides a low-level wrapping of the EPICS Channel Access (CA)
 library, using ctypes.  Most users of the `epics` module will not need to
@@ -19,10 +19,11 @@ familar with Channel Access and knows where to consult the CA reference
 documentation.  To that end, this document mostly describe the differences
 with the C interface.
 
-Name Mangling
-~~~~~~~~~~
 
-In general, for a CA function named `ca_XXX` in the C library, the
+Name Mangling
+~~~~~~~~~~~~~
+
+As a general rule, a CA function named `ca_XXX` in the C library, the
 equivalent function is called `XXX` in this module, as the intention is
 that importing `ca` module with
 
@@ -36,6 +37,17 @@ due to its lack of namespaces.
 Similar name *un-mangling* also happens with the DBR prefixes for
 constants, held here in the `dbr` module.  Thus, the C constant DBR_STRING
 becomes dbr.STRING in Python.
+
+Initialization
+~~~~~~~~~~~~~~
+
+Most Common Routines
+~~~~~~~~~~~~~~~~~~~~
+
+Changes and Ommissions
+~~~~~~~~~~~~~~~~~~~~~~
+
+
 
 Initialization, Finalization, and Lifecycle
 ===========================================
@@ -136,8 +148,6 @@ To create a channel, use
 
 .. function:: create_channel(pvname,connect=False,userfcn=None)
    
-   This returns a ``chid``.  Here
-
     *pvname*   
       the name of the PV to create.
     *connect* 
@@ -150,6 +160,9 @@ To create a channel, use
          * `pvname`  name of pv
          * `chid`    chid value 
          * `conn`    True/False:  whether channel is connected.
+
+   This returns a ``chid``.  Here
+
 
     Internally, a connection callback is used so that you should
     not need to explicitly connect to a channel.
@@ -233,27 +246,29 @@ can be used to specify such options.
 
 To get a PV's value, use:
 
-.. function::    get(chid, ftype=None, as_string=False, as_numpy=False)
+.. method::    get(chid[, ftype=None[, as_string=False[, as_numpy=False]]])
 
-  This returns the current value for a Channel.  Options
+   This returns the current value for a Channel. Note that there is not a separate form for array data.
 
-      ftype         field type to use (native type is default)
-      as_string    flag(True/False) to get a string representation
-                       of the value returned.  This is not nearly as
-                       featured as for a PV -- see pv.py for more details.
-      as_numpy  flag(True/False) to use numpy array as the
-                       return type for array data.       
+   :param chid:  channel ID
+   :type  chid:  ctypes.c_long
+   :param ftype:  field type to use (native type is default)
+   :type ftype:  integer
+   :param as_string:  whether to return the string representation of the
+       value.  This is not nearly as full-featured as *as_string* for :meth:`PV.get`.
+   :type as_string:  True/False
+   :param as_numpy:  whether to return the Numerical Python representation
+       for array / waveform data.  This is only applied if numpy can be imported.
+   :type as_numpy:  True/False
 
-Note that there is not a separate form for array data.
+
 
 The 'as_string' option warrants special attention.  When used, this will
 always return a string representation of the value.  For Enum types, this will
 be the name of the Enum state. For Floats and Doubles, this will be the value
 formatted according the the precision of the PV.  For waveforms of type CHAR,
-this will be the string representation.
-
-The *as_numpy* option will promote numerical arrays to numpy arrays if numpy
-is available.
+this will be the string representation.  See :meth:`PV.get` for a more
+full-featured version.
 
 To set a PV's value, use:
 
@@ -281,6 +296,7 @@ To define a subscription so that a callback is executed every time a PV changes,
 use
 
 .. function::   create_subscription(chid, use_time=False,use_ctrl=False,  mask=7, userfcn=None)
+
     :param use_time:  whether to use the TIME variant for the PV type
     :type use_time: True/False
     :param use_ctrl:  whether to use the CTRL variant for the PV type
@@ -409,32 +425,46 @@ alternatives), though they could be added on request.
    can be used in user code. 
 
 .. function:: ca_add_fd_registration
+
    *Not implemented* 
    
 .. function:: ca_replace_access_rights_event
+
    *Not implemented* 
+
 .. function:: ca_replace_printf_handler
+
    *Not implemented* 
+
 .. function:: ca_client_status
+
    *Not implemented* 
+
 .. function:: ca_set_puser
+
    *Not implemented* : it is easy to pass user-defined data to callbacks as needed.
+
 .. function:: ca_puser
+
    *Not implemented*: it is easy to pass user-defined data to callbacks as needed.
 
 .. function::  ca_SEVCHK
+
    *Not implemented*: the Python function :func:`Py_SEVCHK` is
    approximately the same.
 .. function::  ca_signal
+
    *Not implemented*: the Python function :func:`Py_SEVCHK` is
    approximately the same. 
 
 .. function:: ca_test_event
+
    *Not implemented*:  this appears to be a function for debugging events.
    These are easy enough to simulate by directly calling Python callback
    functions. 
 
 .. function:: ca_dump_dbr
+
    *Not implemented*
 
 In addition, not all `DBR` types in the CA C library are supported.   

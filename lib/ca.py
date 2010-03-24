@@ -977,9 +977,8 @@ def _onGetEvent(args):
         v0 = value[0]
         kw['status']    = v0.status
         kw['severity']  = v0.severity
-        kw['timestamp'] = (dbr.EPICS2UNIX_EPOCH +
-                           v0.stamp.nsec*1.e-9* +
-                           v0.stamp.secs)
+        kw['timestamp'] = (dbr.EPICS2UNIX_EPOCH + v0.stamp.secs + 
+                           1.e-6*int(v0.stamp.nsec/1000.00))
 
     nelem = args.count
     if args.type in (dbr.STRING,dbr.TIME_STRING,dbr.CTRL_STRING):
@@ -1127,7 +1126,6 @@ def sg_put(gid, chid, value):
 # def dump_dbr(type,count,data):  return libca.ca_dump_dbr(type,count, data)
 # def add_exception_event(): return libca.ca_add_exception_event()
 # def add_fd_registration(): return libca.ca_add_fd_registration()
-# def client_status(): return libca.ca_client_status()
 # def replace_access_rights_event(): return libca.ca_replace_access_rights_event()
 # def replace_printf_handler(): return libca.ca_replace_printf_handler()
 #

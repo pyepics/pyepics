@@ -17,6 +17,8 @@ Contents:
    motivation
    pv
    ca
+   devices
+   wx
    installation
    getting_started
 

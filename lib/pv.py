@@ -11,14 +11,14 @@ import dbr
 def fmt_time(t=None):
     if t is None: t = time.time()
     t,frac=divmod(t,1)
-    return "%s.%6.6i" %(time.strftime("%Y-%m-%d %H:%M:%S"),1.e6*frac)
+    return "%s.%6.6i" %(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(t)),1.e6*frac)
 
-__fields = ('pvname', 'value', 'char_value', 'status', 'ftype', 'chid',
-            'host', 'count', 'access', 'write_access', 'severity',
-            'timestamp', 'precision', 'units', 'enum_strs', 'no_str',
-            'upper_disp_limit', 'lower_disp_limit', 'upper_alarm_limit',
-            'lower_alarm_limit', 'lower_warning_limit',
-            'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
+_fields = ('pvname', 'value', 'char_value', 'status', 'ftype', 'chid',
+           'host', 'count', 'access', 'write_access', 'read_access', 'severity',
+           'timestamp', 'precision', 'units', 'enum_strs', 'no_str',
+           'upper_disp_limit', 'lower_disp_limit', 'upper_alarm_limit',
+           'lower_alarm_limit', 'lower_warning_limit',
+           'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
 # cache of PVs
 PV_cache = {}
@@ -51,7 +51,7 @@ class PV(object):
         if callable(callback): self.callbacks[0] = (callback,{})
         self.ftype = None
         self.connected  = False
-        self._args      = {}.fromkeys(__fields)
+        self._args      = {}.fromkeys(_fields)
 
         self._args['pvname'] = self.pvname
         self.__mondata = None
@@ -70,15 +70,18 @@ class PV(object):
         
     def _onConnect(self,chid=0,conn=True,**kw):
         self.connected = conn
+        # print '_onConnect!!  ', chid, self.pvname, self.form, ' ::'
         if self.connected:
             self._args['host']   = ca.host_name(self.chid)
             self._args['count']  = ca.element_count(self.chid)
             self._args['access'] = ca.access(self.chid)
-            self._args['write_access'] = ca.write_access(self.chid)
+            self._args['read_access'] = 1==ca.read_access(self.chid)
+            self._args['write_access'] = 1==ca.write_access(self.chid)
             self.ftype  = ca.promote_type(self.chid,
                                      use_ctrl= self.form=='ctrl',
                                      use_time= self.form=='time')
             self._args['type'] = dbr.Name(self.ftype).lower()
+            # print 'onConnect ', self.ftype, self._args['type']            
         return
 
     def connect(self,timeout=5.0,force=True):
@@ -185,6 +188,7 @@ class PV(object):
         self._args.update(kw)
         self._args['value']  = value
         self._args['timestamp'] = kw.get('timestamp',time.time())
+
         self._set_charval(self._args['value'],ca_calls=False)
 
         if self.verbose:
@@ -260,7 +264,7 @@ class PV(object):
         # list basic attributes
         mod   = 'native'
         xtype = self._args['type']
-        if '_' in xtype: mod,xtype = ftype.split('_')
+        if '_' in xtype: mod,xtype = xtype.split('_')
 
         out.append("== %s  (%s) ==" % (self.pvname,xtype))
 
@@ -340,10 +344,13 @@ class PV(object):
     def count(self): return self._getarg('count')
 
     @property
-    def access(self): return self._getarg('access')
+    def read_access(self): return self._getarg('read_access')
 
     @property
     def write_access(self): return self._getarg('write_access')
+
+    @property
+    def access(self): return self._getarg('access')
 
     @property
     def severity(self): return self._getarg('severity')
