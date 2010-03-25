@@ -9,7 +9,9 @@ Overview
    :synopsis: PV objects for Epics Channel Access
 
 This module provides a higher-level class :class:`PV`, which creates a `PV`
-object for an EPICS Process Variable.
+object for an EPICS Process Variable.  A `PV` object has both methods and
+attributes for accessing it's properties.
+
 
 
 
@@ -38,6 +40,9 @@ will (eventually) automatically connect and be ready to use.
 methods
 ~~~~~~~
 
+A `PV` has several methods for getting and setting its value and defining
+callbacks to be executed when the PV changes.
+
 .. method:: get([, as_string=False])
 
    get and return the current value of the PV
@@ -45,6 +50,8 @@ methods
    :param as_string:  whether to return the string representation of the  value.  
    :type as_string:  True/False
 
+   see :ref:`pv-as-string-label` for details on how the string representation
+   is determined.
 
 .. method:: put(value[, wait=False[, timeout=30.0[, callback=None[, callback_data=None]]]])
 
@@ -64,6 +71,7 @@ methods
    returns a dictionary of the **control values** for the PV.
 
 .. method:: poll()
+
 
 .. method:: connect()
 
@@ -175,6 +183,11 @@ cannot be assigned to.
 
    These are all the various kinds of limits for a PV.
         
+..  _pv-as-string-label:
+
+String representation for a PV
+================================
+
 ..  _pv-callbacks-label:
 
 User-supplied Callback functions

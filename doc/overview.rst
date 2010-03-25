@@ -31,7 +31,6 @@ These components includes
     * an :mod:`epics.wx` module that provides wxPython classes designed for
       use with Epics PVs.
 
-
 Most users will probably want to create and use `PV` objects provided by
 the `pv` module.  The `PV` class provides a PV object that has both methods
 (including :func:`get` and :func:`put`) and attributes that are kept
@@ -45,9 +44,6 @@ useable, if a little more verbose and C-like than using PV objects.
 In addition, the `epics` package contains more specialized modules for
 Epics motors, alarms, a host of other *devices* (collections of PVs), and a
 set of wxPython widget classes for using EPICS PVs with wxPython.
-
-
-
 
 
 Functions defined in :mod:`epics`: caget(), caput() and related functions
@@ -233,5 +229,75 @@ callback functions.
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:46.535813 -183.5085
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:47.536623 -183.5223
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:48.536434 -183.6832
+
+
+Motivation: Why another Python-Epics Interface?
+================================================
+
+First, Py-Epics3 is intended as an improvement over EpicsCA 2.1, and should
+replace that older Epics-Python interface.  That version has performance
+issues, especially when connecting to a large number of PVs, is not
+thread-aware, and has become difficult to maintain for Windows and Linux.
+
+Second, there are a few other Python modules exposing Epics Channel Access
+available, and having a better and more complete low-level interface to the
+CA library may allow a more common interface to be used.  This desire to
+come to a more universally-acceptable Python-Epics interface has definitely
+influenced the goals for this module, which include:
+
+   1) providing both low-level (C-like) and higher-level access (Pythonic
+      objects) to the EPICS Channel Access protocol.
+   2) supporting as many features of Epics 3.14 as possible, including
+      preemptive callbacks and thread support.
+   3) easy support and distribution for Windows and Unix-like systems.
+   4) being ready for porting to Python3.
+   5) using Python's coup's library.
+
+The main implementation feature here (and difference from EpicsCA) is using
+Python's ctypes library to do handle the connection between Python and the
+CA C library.  Using ctypes has many advantages, including eliminating the
+need to write and maintain a separate wrapper code either with SWIG or
+directly with Python's C API.  Since the module is pure Python, this makes
+installation on multiple platforms much easier as no compilation step is
+needed.  It also provides better thread-safety, as each call to the
+underlying C library is automatically made thread-aware without explicit
+coding.  Migration to Python3 should also be easier, as changes to the C
+API are not an issue.  Finally, since ctypes loads a shared object library
+at runtime,  the underlying Epics library can be upgraded without having to
+re-build the Python wrapper.
+
+
+Status and To-Do List
+=====================
+
+Py-Epics3 is under active development.  The current status is that most
+features are working well, and it is being used in some production code,
+but more testing is needed, and this documentation needs improvement.
+
+There are several desired features are left undone or unfinished:
+ 
+ *  port CaChannel interface to use epics.ca
+
+ *  improve documentation, examples, unit testing.
+
+ *  test threading
+
+ *  investigate retrieving array data for CTRL and TIME variants.
+
+ *  are array_expection events needed???
+
+ *  add more "devices", including low-level epics records,
+
+ *  port the Motor class to be a subclass of epics.Device.
+
+ *  improve wx_motor.py to be a stand-alone app with:
+     - dialog window to select a set of motors for an "instrument"
+     - enable "save/restore" for named positions of all motors
+       in an instrument, with options to prompt-for-restore and
+       prompt-for-restore-per-motor.
+     - config file per instrument to allow loading a saved
+       instrument definition, with saved positions
+     - tabbed/notebook interface for multiple instruments.
+
 
 

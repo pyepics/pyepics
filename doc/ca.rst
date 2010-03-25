@@ -2,8 +2,8 @@
 :mod:`epics.ca` Low-Level Epics Interface
 =============================
 
-Overview, differernce with C library
-====================================
+Overview, difference with C library
+===================================
 
 This module provides a low-level wrapping of the EPICS Channel Access (CA)
 library, using ctypes.  Most users of the `epics` module will not need to
@@ -185,11 +185,12 @@ will be done when needed), use
     much time waiting for a connection that may never happen.
 
 Other functions that require a valid (but not necessarily connected) Channel areessentially identical to the CA library are:
+
 .. function::   name(chid)
 
-.. function::     host_name(chid)
+.. function::   host_name(chid)
 
-.. function::     element_count(chid)
+.. function::   element_count(chid)
 
 .. function::     read_access(chid)
 
@@ -286,7 +287,7 @@ To set a PV's value, use:
    :type callback: None or callable
    :param callback_data: extra data to pass on to a user-supplied callback function.
 
-put() returns 1 on sucess and -1 on timed-out
+put() returns 1 on success and -1 on timed-out
 
 Specifying a callback will override setting wait=True.  The callback
 function will be called with keyword arguments 
@@ -321,23 +322,23 @@ Options for create_subscription include:
 
 See not below on callback functions.
 
-.. function: clear_subscription(event_id)
+.. function:: clear_subscription(event_id)
    
    clears a subscription given its *event_id*.
 
 Other functions that are provided are
 
-.. function:  get_precision(chid)
+.. function::  get_precision(chid)
 
    return the precision of a channel.  For channels with native type other
    than FLOAT or DOUBLE, this will be 0
 
-.. function: get_enum_strings(chid)
+.. function:: get_enum_strings(chid)
 
     return the list of names for ENUM states of a Channel.  Returns  None
     for non-ENUM Channels.
 
-.. function: get_ctrlvars(chid) 
+.. function:: get_ctrlvars(chid) 
 
     returns a dictionary of CTRL fields for a Channel.  Depending on  the
     native type, the keys in this dictionary may include
