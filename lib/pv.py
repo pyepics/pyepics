@@ -97,7 +97,8 @@ class PV(object):
                                           use_time= self.form=='time')
         return (self.connected and self.ftype is not None)
 
-    def poll(self,t1=1.e-3,t2=1.0):    ca.poll(t1,t2)
+    def poll(self,ev=1.e-4, io=1.0):
+        ca.poll(ev=ev, io=io)
 
     def get(self, as_string=False):
         """returns current value of PV
@@ -214,7 +215,7 @@ class PV(object):
              
         """
         # Note
-        for index in self.callbacks:
+        for index in sorted(self.callbacks.keys()):
             fcn,kwargs = self.callbacks[index]
             kw = copy.copy(self._args)
             kw.update(kwargs)
@@ -231,15 +232,9 @@ class PV(object):
         has a unique index (small integer) that is returned by
         add_callback.  This index is needed to remove a callback."""
         if callable(callback):
-            n_cb = len(self.callbacks)                
-            index = n_cb + 1
-            if index > 512 and index > 2*n_cb:
-                nx = None
-                for i in range(index):
-                    if i not in self.callbacks:
-                        nx = i
-                        break
-                if nx is not None: index = i
+            n_cb = len(self.callbacks)
+            index = 1
+            if n_cb > 1:  index = 1 + max(self.callbacks.keys())
             self.callbacks[index] = (callback,kw)
         return index
     
@@ -248,7 +243,6 @@ class PV(object):
         """
         if index is None and len(self.callbacks)==1:
             index = self.callbacks.keys()[0]
-            
         if index in self.callbacks:
             x = self.callbacks.pop(index)
             self.poll()

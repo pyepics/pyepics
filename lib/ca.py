@@ -617,7 +617,7 @@ def pend_event(t=1.e-5):
 def poll(ev=1.e-4,io=1.0):
     """polls CA for events and i/o. """
     pend_event(ev)
-    pend_io(io)    
+    return pend_io(io)    
 
 @withCA
 def test_io():

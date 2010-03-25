@@ -57,7 +57,7 @@ callbacks to be executed when the PV changes.
 
    set the PV value, optionally waiting to return until processing has completed.
 
-   :param value:  value to set PV to
+   :param value:  value to set PV 
    :param wait:  whether to wait for processing to complete (or time-out) before returning.
    :type  wait:  True/False
    :param timeout:  maximum time to wait for processing to complete before returning anyway.
@@ -68,38 +68,98 @@ callbacks to be executed when the PV changes.
 
 .. method:: get_ctrlvars()
 
-   returns a dictionary of the **control values** for the PV.
+   returns a dictionary of the **control values** for the PV.  This 
+   dictionary may have many members, depending on the data type of PV.
 
-.. method:: poll()
+.. method:: poll(ev=1.e-4, io=1.0)
 
+   this simply calls `ca.poll(ev=ev,io=io)` 
 
-.. method:: connect()
+   :param ev:  time to pass to :meth:`ca.pend_event`
+   :type  ev:  double
+   :param io:  time to pass to :meth:`ca.pend_io`
+   :type  io:  double
 
+.. method:: connect(timeout=5.0, force=True)
+ 
+   this explicitly connects a PV, and returns whether or not it has
+   successfully connected.
+
+   :param timeout:  maximum connection time, passed to :meth:`ca.connect_channel`
+   :type  timeout:  double
+   :param force:  whether to (try to) force a connect, passed to :meth:`ca.connect_channel`
+   :type  force:  True/False
+   :rtype:    True/False
+   
 .. method:: add_callback(callback=None[. **kw])
+ 
+   adds a user-defined callback routine to be run on each change event for
+   this PV.  Returns the integer *index*  for the callback.
+
+   :param callback: user-supplied function to run when PV changes.
+   :type callback: None or callable
+   :param kw: additonal keyword/value arguments to pass to each execution of the callback.
+   :rtype:  integer
+
+   Note that multiple callbacks can be defined.  When a PV changes, all callbacks will be
+   executed in the order of their indices.  
+
+   See also: :attr:`callbacks`  attribute, :ref:`pv-callbacks-label`
 
 .. method:: remove_callback(index=None)
 
+   remove a user-defined callback routine.
+
+   :param index: index of user-supplied function, as returned by
+   :meth:`add_callback`, and also to key value for this callback in the
+   :attr:`callbacks` dictionary.
+
+   :type index: None or integer
+   :rtype:  integer
+
+   If only one callback is defined an index=``None``, this will clear the
+   only defined callback.
+
+   See also: :attr:`callbacks`  attribute, :ref:`pv-callbacks-label`
+
 .. method:: clear_callbacks()
 
+   remove all user-defined callback routine.
+
 .. method:: run_callbacks()
+
+   execute all user-defined callbacks right now, even if the PV has not
+   changed.  Useful for debugging!
+
+   See also: :attr:`callbacks`  attribute, :ref:`pv-callbacks-label`
+
 
 attributes
 ~~~~~~~~~~
 
-A PV object has many attributes.  Most of these are actually implemented as
-Python properties, and so except as explicitly noted, these attributes
-cannot be assigned to.
+A PV object has many attributes, each associated with some property of the
+underlying PV: its *value*, *host*, *count*, and so on.  For properties
+that can change, the PV attribute will hold the latest value for the
+corresponding property,  Most attributes are **read-only**, and cannot be
+assigned to.  The exception to this rule is the :attr:`value` attribute.
 
 .. attribute:: value 
 
    The current value of the PV.
 
-   **Important Note**: The :attr:`value` attribute can be assigned to.
+   **Note**: The :attr:`value` attribute can be assigned to.
    When read, the latest value will be returned, even if that means a
    :meth:`get` needs to be called.
 
    Assigning to :attr:`value` is equivalent to setting the value with the
    :meth:`put` method.
+   
+   >>> from epics import PV
+   >>> p1 = PV('xxx.VAL')
+   >>> print p1.value
+   1.00
+   >>> p1.value = 2.00
+  
 
 .. attribute:: char_value
 
@@ -183,20 +243,40 @@ cannot be assigned to.
 
    These are all the various kinds of limits for a PV.
         
+.. attribute:: callbacks
+
+   a dictionary of currently defined callbacks, to be run on changes to the
+   PV.  This dictionary has integer keys (generally in increasing order of
+   when they were defined) which sets which order for executing the
+   callbacks.  The values of this dictionary are tuples of `(callback,
+   keyword_arguments)`.
+
+   **Note**: The :attr:`callbacks` attribute can be assigned to.  It is
+   recommended to use the methods :meth:`add_callback`,
+   :meth:`remove_callback`, and :meth:`clear_callbacks` instead of altering
+   this dictionary directly.
+
 ..  _pv-as-string-label:
 
 String representation for a PV
 ================================
+
+The string representation for a `PV`, as returned either with the
+*as_string* argument to :meth:`ca.get` or from the :attr:`char_value`
+attribute (they are equivalent) needs some further explanation.
+
+
 
 ..  _pv-callbacks-label:
 
 User-supplied Callback functions
 ================================
 
-Much of this information is similar to that in ref:`ca-callbacks-label`.  
+Much of this information is similar to that in :ref:`ca-callbacks-label`
+for the :mod:`ca` module, though there are some important enhancements to
+callbacks on `PV` objects.
 
-User-supplied callback functions can be provided for both :meth:`put` and
-:meth:create_subscription()
+User-supplied callback functions for `PV` objects can be defined
 
 For both cases, it is important to keep two things in mind:
    how your function will be called

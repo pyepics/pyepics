@@ -19,7 +19,6 @@ Contents:
    devices
    wx
    installation
-   getting_started
 
 Indices and tables
 ~~~~~~~~~~~~~~~~~~~~~~
