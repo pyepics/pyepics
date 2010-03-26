@@ -225,8 +225,8 @@ Three additional pythonic functions have been added:
 
 .. function::    promote_type(chid,use_time=False,use_ctrl=False)
 
-  which promotes the native field type of a chid to its TIME or CTRL variant
-
+  which promotes the native field type of a chid to its TIME or CTRL variant.
+  See :ref:`Table of DBR Types <dbr-typetable>`.
 
 ..  data::  _cache
 
@@ -271,6 +271,8 @@ To get a PV's value, use:
    :param as_numpy:  whether to return the Numerical Python representation
        for array / waveform data.  This is only applied if numpy can be imported.
    :type as_numpy:  True/False
+
+For a listing of values of `ftype`, see :ref:`Table of DBR Types <dbr-typetable>`.
 
 The 'as_string' option warrants special attention.  When used, this will
 always return a string representation of the value.  For Enum types, this will
@@ -400,6 +402,50 @@ Synchronous Groups
 Implementation details
 ================================
 
+The details given here should mostly be of interest to those looking at the
+implementation of the `ca` module, those interested in the internals, or
+those looking to translate lower-level C or Python code to this module.
+
+DBR data types
+~~~~~~~~~~~~~~~~~
+
+.. _dbr-typetable: 
+
+   Table of DBR Types
+
+    ============== =================== ========================
+     *CA type*       *integer ftype*     *Python ctypes type*
+    ============== =================== ========================
+     string              0                 string
+     int                 1                 integer 
+     short               1                 integer
+     float               2                 double 
+     enum                3                 integer
+     char                4                 byte
+     long                5                 integer
+     double              6                 double
+                              
+     time_string        14    
+     time_int           15    
+     time_short         15    
+     time_float         16    
+     time_enum          17    
+     time_char          18    
+     time_long          19    
+     time_double        20    
+     ctrl_string        28    
+     ctrl_int           29    
+     ctrl_short         29    
+     ctrl_float         30    
+     ctrl_enum          31    
+     ctrl_char          32    
+     ctrl_long          33    
+     ctrl_double        34    
+    ============== =================== ========================
+
+Function Decorators 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Several decorator functions are used heavily inside of ca.py
 
    * the decorator function :func:`withCA` ensures that the CA library is
@@ -423,44 +469,66 @@ Several decorator functions are used heavily inside of ca.py
     sure a ``chid`` is actually connected before calling the decorated
     function.
    
+:function:`PySEVCHK`: checking CA return codes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
 ..  _ca-callbacks-label:
        
 User-supplied Callback functions
 ================================
 
-User-supplied callback functions can be provided for both put() and create_subscription()
+User-supplied callback functions can be provided for both :meth:`put` and
+:meth:`create_subscription`.  Note that callbacks for `PV` objects are
+slightly different: see :ref:`pv-callbacks-label` in the :mod:`pv` module
+for details.
 
-For both cases, it is important to keep two things in mind:
-    1)  how your function will be called
+When defining a callback function to be run either when a :meth:`put`
+completes or on changes to the Channel, as set from
+:meth:`create_subscription`, it is important to know two things:
+
+    1)  how your function will be called.
     2)  what is permissable to do inside your callback function.
 
 In both cases, callbacks will be called with keyword arguments.  You should be
 prepared to have them passed to your function.  Use `**kw` unless you are very
 sure of what will be sent.
 
-For put callbacks, your function will be passed these::
+For callbacks sent when a :meth:`put` completes, your function will be passed these::
 
-    pvname=pvname, data=data
-
-where pvname is the name of the pv, and data is the user-supplied
-callback_data (defaulting to None).
+    * `pvname` : the name of the pv 
+    * `data`:  the user-supplied callback_data (defaulting to ``None``). 
 
 For subcription callbacks, your function will be called with keyword/value
 pairs that will include::
 
-    pvname=pvname,  value=value
+    * `pvname`: the name of the pv 
+    * `value`: the latest value
+    * `count`: the number of data elements
+    * `ftype`: the numerical CA type indicating the data type
+    * `status`: the status of the PV (1 for OK)
+    * `chid`: the integer address for the channel ID.
 
-and may include several other pairs depending on the data type and whether the
-TIME or CTRL variant was used.
+Depending on the data type, and whether the CTRL or TIME variant was used,
+the callback function may also include some of these as keyword arguments:
 
+    * `enum_strs`: the list of enumeration strings
+    * `no_str`:  number of enumeration strings
+    * `precision`: number of decimal places of precision.
+    * `units`:  string for PV units
+    * `severity`: PV severity
+    * `timestamp`: timestamp from CA server.
+
+      
 A user-supplied callback will be run 'inside' a CA function, and cannot
-reliably make any other CA calls.  It is helpful to think 'this all happens
-inside of a pend_event call', and in an epics thread that may or may not be
-the main thread of your program.  It is advisable to keep the callback
-functions short, not resource-intensive, and to consider strategies which use
-the callback to record that a change has occurred and then act on that change
-outside of the callback (perhaps in a separate thread, perhaps after
-pend_event() has completed, etc).
+reliably make any other CA calls -- this can cause instability..  It is
+helpful to think 'this all happens inside of a pend_event call', and in an
+epics thread that may or may not be the main thread of your program.  It is
+advisable to keep the callback functions short, not resource-intensive, and
+to consider strategies which use the callback to record that a change has
+occurred and then act on that change outside of the callback (perhaps in a
+separate thread, perhaps after pend_event() has completed, etc).
 
     
 ..  _ca-omissions-label:

@@ -157,7 +157,6 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
    1.00
    >>> p1.value = 2.00
   
-
 .. attribute:: char_value
 
    The string representation of the string, as described in :meth:`get`.
@@ -168,12 +167,19 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
 .. attribute:: type
   
-   string describing data type of PV, such as 'double', 'enum', 'string',
-   'long', 'char', 'ctrl_short', and so on.
+   string describing data type of PV, such as `double`, `float`, `enum`, `string`,
+   `int`,  `long`, `char`, or one of the `ctrl` or `time` variants of these, which
+   will be named `ctrl_double`, `time_enum`, and so on.  See the 
+   :ref:`Table of DBR Types <dbr-typetable>`
 
+.. attribute:: ftype
+  
+  The integer value (from the underlying C library) indicating the PV data
+  type according to :ref:`Table of DBR Types <dbr-typetable>`
+    
 .. attribute:: host
-
-   string of host machine provide this PV.
+    
+    string of host machine provide this PV.
 
 .. attribute:: count
 

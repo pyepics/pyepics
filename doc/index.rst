@@ -19,6 +19,7 @@ Contents:
    devices
    wx
    installation
+   doc
 
 Indices and tables
 ~~~~~~~~~~~~~~~~~~~~~~

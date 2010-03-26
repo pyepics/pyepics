@@ -959,9 +959,9 @@ def clear_subscription(evid): return libca.ca_clear_subscription(evid)
 def _onGetEvent(args):
     """Internal Event Handler for get events: not intended for use"""
     value = dbr.Cast(args).contents
-
     kw = {'ftype':args.type,'count':args.count,
-          'chid':args.chid, 'status':args.status}
+          'chid':args.chid, 'pvname': name(args.chid),
+          'status':args.status}
 
     # add kw arguments for CTRL and TIME variants
     if args.type >= dbr.CTRL_STRING:
