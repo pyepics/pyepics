@@ -1,6 +1,6 @@
-=================================
+=========================================
 :mod:`epics.ca` Low-Level Epics Interface
-=================================
+=========================================
 
 Overview, difference with C library
 ===================================
@@ -469,9 +469,29 @@ Several decorator functions are used heavily inside of ca.py
     sure a ``chid`` is actually connected before calling the decorated
     function.
    
-:function:`PySEVCHK`: checking CA return codes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`PySEVCHK` and ChannelAccessExcepction: checking CA return codes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. exception:: ChannelAccessException
+
+   This exception is raised when the :mod:`ca` module experiences
+   unexpected behavior and must raise an exception
+
+..  function:: PySEVCHK(func_name, status[, expected=dbr.ECA_NORMAL])
+
+    This checks the return *status* returned from a `libca.ca_***` and
+    raises a :exc:`ChannelAccessException` if the value does not match the
+    *expected* value.  
+
+    The message from the exception will include the *func_name* (name of
+    the Python function) and the CA message from :mod:`message`.
+
+
+
+..  function:: withSEVCHK
+
+    a decorator to handle the common case of a function whose return value
+    is from a `libca.ca_***` function and whose return value should be ``dbr.ECA_NORMAL``.
 
 
 ..  _ca-callbacks-label:
@@ -495,13 +515,13 @@ In both cases, callbacks will be called with keyword arguments.  You should be
 prepared to have them passed to your function.  Use `**kw` unless you are very
 sure of what will be sent.
 
-For callbacks sent when a :meth:`put` completes, your function will be passed these::
+For callbacks sent when a :meth:`put` completes, your function will be passed these:
 
     * `pvname` : the name of the pv 
     * `data`:  the user-supplied callback_data (defaulting to ``None``). 
 
 For subcription callbacks, your function will be called with keyword/value
-pairs that will include::
+pairs that will include:
 
     * `pvname`: the name of the pv 
     * `value`: the latest value
