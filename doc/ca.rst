@@ -1,6 +1,6 @@
-=============================
+=================================
 :mod:`epics.ca` Low-Level Epics Interface
-=============================
+=================================
 
 Overview, difference with C library
 ===================================
@@ -38,16 +38,26 @@ Similar name *un-mangling* also happens with the DBR prefixes for
 constants, held here in the `dbr` module.  Thus, the C constant DBR_STRING
 becomes dbr.STRING in Python.
 
-Initialization
-~~~~~~~~~~~~~~
 
-Most Common Routines
-~~~~~~~~~~~~~~~~~~~~
+Other Changes and Omissions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Changes and Ommissions
-~~~~~~~~~~~~~~~~~~~~~~
+Several function in the C version of the CA library are not implemented in
+the Python module.  These are currently seen as unnecessary for Python, 
+though some could be added without much trouble.
+
+In addition, while the CA library supports several `DBR` types in C, not
+all of these are supported in Python. Only native types and their DBR_TIME
+and DBR_CTRL variants are supported here.  The DBR_STS and DBR_GR variants
+are not, as they are subsets of the DBR_CTRL type, and space optimization
+is not something you'll be striving for with Python.  In additon, several
+`dbr_XXX` functions are also not supported, as they appear to be needed
+only to dynamically allocate memory.
+
+See :ref:`ca-omissions-label` for further details.
 
 
+..  _ca-init-label:
 
 Initialization, Finalization, and Lifecycle
 ===========================================
@@ -138,7 +148,7 @@ threading contexts are very close to the C library:
 
 
 Creating and Connecting to Channels
-===================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The basic channel object is the "Channel ID" or ``chid``.  With the CA
 library (and ``ca`` module), one creates and acts on the ``chid`` values, which are
@@ -232,7 +242,7 @@ Three additional pythonic functions have been added:
 
 
 Interacting with Connected Channels
-===================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once a chid is created and connected there are several ways to
 communicating with it.  These are primarily encapsulated in the functions
@@ -350,10 +360,45 @@ Other functions that are provided are
         
 enum_strs will be a  list of strings for the names of ENUM states.
 
+..  _ca-sg-label:
+
+Synchronous Groups
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function::  sg_create()
+
+   create synchronous group.  Returns a *group id*, `gid`, which is used to
+   identify this group and is passed to all other synchronous group commands.
+
+.. function::  sg_delete(gid)
+
+   delete a synchronous group
+
+.. function::  sg_block(gid, t=10.0)
+
+   block for a synchronous group to complete processing
+
+.. function::  sg_get(gid,chid[, fype=None[, as_string=False[, as_numpy=True]]])
+
+   perform a `get` within a synchronous group.
+
+.. function::  sg_put(gid,chid, value)
+
+   perform a `put` within a synchronous group.
+
+
+.. function::  sg_test(gid)
+  
+  test whether a synchronous group has completed.
+ 
+.. function::  sg_reset(gid)
+
+   resets a synchronous group
+
 ..  _ca-implementation-label:
 
 Implementation details
-==============================
+================================
 
 Several decorator functions are used heavily inside of ca.py
 
@@ -418,6 +463,8 @@ outside of the callback (perhaps in a separate thread, perhaps after
 pend_event() has completed, etc).
 
     
+..  _ca-omissions-label:
+
 Omissions
 =========
 

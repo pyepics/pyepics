@@ -110,10 +110,7 @@ callbacks to be executed when the PV changes.
 
    remove a user-defined callback routine.
 
-   :param index: index of user-supplied function, as returned by
-   :meth:`add_callback`, and also to key value for this callback in the
-   :attr:`callbacks` dictionary.
-
+   :param index: index of user-supplied function, as returned by  :meth:`add_callback`, and also to key value for this callback in the  :attr:`callbacks` dictionary.
    :type index: None or integer
    :rtype:  integer
 
@@ -266,14 +263,12 @@ The string representation for a `PV`, as returned either with the
 attribute (they are equivalent) needs some further explanation.
 
 
-
 ..  _pv-callbacks-label:
 
 User-supplied Callback functions
 ================================
 
-Much of this information is similar to that in :ref:`ca-callbacks-label`
-for the :mod:`ca` module, though there are some important enhancements to
+Much of this information is similar to that in :ref:`ca-callbacks-label` for the :mod:`ca` module, though there are some important enhancements to
 callbacks on `PV` objects.
 
 User-supplied callback functions for `PV` objects can be defined
