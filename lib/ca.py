@@ -988,7 +988,7 @@ def _onGetEvent(args):
         for attr in dbr.ctrl_limits + ('precision','units'):
             if hasattr(v,attr):        
                 kw[attr] = getattr(v,attr)
-        if hasattr(v,'strs') and hasattr(v,'no_str') and v.no_str > 0):
+        if hasattr(v,'strs') and hasattr(v,'no_str') and v.no_str > 0:
             kw['enum_strs'] = tuple([v.strs[i].value for i in range(v.no_str)])
 
     elif args.type >= dbr.TIME_STRING:

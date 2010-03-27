@@ -143,9 +143,9 @@ class PV(object):
         if self._args['count'] > 1:
             if ftype == dbr.CHAR:
                 val = list(val)
-                n0  = val.index(0)
-                if n0 == -1: n0 = len(val)
-                cval = ''.join([chr(i) for i in val[:n0]]).rstrip()
+                firstnull  = val.index(0)
+                if firstnull < 0: firstnull = len(val)
+                cval = ''.join([chr(i) for i in val[:firstnull]]).rstrip()
             else:
                 cval = '<array size=%d, type=%s>' % (len(val),
                                                      dbr.Name(ftype))
