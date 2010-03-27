@@ -800,10 +800,26 @@ def get(chid,ftype=None,as_string=False, as_numpy=True):
     PySEVCHK('get',ret)
     poll()
     val = _unpack(data,nelem,ftype=ftype,as_numpy=as_numpy)
-    if as_string and ftype==dbr.CHAR:
-        val = ''.join([chr(i) for i in data if i>0]).strip()
+    if as_string:
+        val = _val_as_string(val,chid,nelem,ftype)
     return val
-    
+
+def _val_as_string(val,chid,count,ftype):
+    "primitive conversion of value to a string"
+    try:
+        if ftype==dbr.CHAR:
+            val = ''.join([chr(i) for i in data if i>0]).strip()
+        elif ftype==dbr.ENUM and count==1:
+            val = get_enum_strings(chid)[val]
+        else:
+            if count > 1:
+                val = '<array size=%d, type=%d>' % (count,ftype)
+            else:
+                val = str(val)
+    except:
+        pass
+    return val
+                    
 @withConnectedCHID
 def put(chid,value, wait=False, timeout=20, callback=None,callback_data=None):
     """put value to a Channel, with optional wait and
@@ -1088,8 +1104,8 @@ def sg_get(gid, chid, ftype=None,as_string=False,as_numpy=True):
 
     poll()
     val = _unpack(data,nelem,ftype=ftype,as_numpy=as_numpy)
-    if as_string and ftype==dbr.CHAR:
-        val = ''.join([chr(i) for i in s if i>0]).strip().rstrip()
+    if as_string:
+        val = _val_as_string(val,chid,ftype)
     return val
 
 def sg_put(gid, chid, value):

@@ -266,7 +266,7 @@ To get a PV's value, use:
    :param ftype:  field type to use (native type is default)
    :type ftype:  integer
    :param as_string:  whether to return the string representation of the
-       value.  This is not nearly as full-featured as *as_string* for :meth:`PV.get`.
+       value.  See notes below. 
    :type as_string:  True/False
    :param as_numpy:  whether to return the Numerical Python representation
        for array / waveform data.  This is only applied if numpy can be imported.
