@@ -806,18 +806,19 @@ def get(chid,ftype=None,as_string=False, as_numpy=True):
 
 def _val_as_string(val,chid,count,ftype):
     "primitive conversion of value to a string"
-    try:
-        if ftype==dbr.CHAR:
-            val = ''.join([chr(i) for i in data if i>0]).strip()
-        elif ftype==dbr.ENUM and count==1:
+    if ftype==dbr.CHAR:
+        val = ''.join([chr(i) for i in val if i>0]).strip()
+    elif ftype==dbr.ENUM and count==1:
+        try:
             val = get_enum_strings(chid)[val]
+        except:
+            pass                
+    else:
+        if count > 1:
+            val = '<array size=%d, type=%d>' % (count,ftype)
         else:
-            if count > 1:
-                val = '<array size=%d, type=%d>' % (count,ftype)
-            else:
-                val = str(val)
-    except:
-        pass
+            val = str(val)
+
     return val
                     
 @withConnectedCHID
