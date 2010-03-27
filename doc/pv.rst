@@ -303,12 +303,49 @@ For character waveforms (*char* data with *count* > 1), the
 User-supplied Callback functions
 ================================
 
-Much of this information is similar to that in :ref:`ca-callbacks-label` for the :mod:`ca` module, though there are some important enhancements to
+Much of this information is similar to that in :ref:`ca-callbacks-label`
+for the :mod:`ca` module, though there are some important enhancements to
 callbacks on `PV` objects.
 
-User-supplied callback functions for `PV` objects can be defined
+When defining a callback function to be run on changes to a PV, as set from
+:meth:`add_callback`, it is important to know two things:
 
-For both cases, it is important to keep two things in mind:
-   how your function will be called
-   what is permissable to do inside your callback function.
+    1)  how your function will be called.
+    2)  what is permissable to do inside your callback function.
+
+Callback functions will be called with several keyword arguments.  You should be
+prepared to have them passed to your function, and should always include
+`**kw`  to catch all arguments.  Your callback will be sent the following 
+keyword parameters:
+
+    * `pvname`: the name of the pv 
+    * `value`: the latest value
+    * `char_value`: string representation of value
+    * `count`: the number of data elements
+    * `ftype`: the numerical CA type indicating the data type
+    * `status`: the status of the PV (1 for OK)
+    * `precision`: number of decimal places of precision.
+    * `units`:  string for PV units
+    * `severity`: PV severity
+    * `timestamp`: timestamp from CA server.
+    * `enum_strs`: the list of enumeration strings
+    * `upper_disp_limit`: 
+    * `lower_disp_limit`: 
+    * `upper_alarm_limit`: 
+    * `lower_alarm_limit`: 
+    * `upper_warning_limit`: 
+    * `lower_warning_limit`: 
+    * `upper_ctrl_limit`: 
+    * `lower_ctrl_limit`: 
+
+Some of these may not be directly applicable to all PV data types.
+
+Note that a user-supplied callback will be run 'inside' a CA function, and
+cannot reliably make any other CA calls.  It is helpful to think 'this all
+happens inside of a pend_event call', and in an epics thread that may or
+may not be the main thread of your program.  It is advisable to keep the
+callback functions short, not resource-intensive, and to consider
+strategies which use the callback to record that a change has occurred and
+then act on that change outside of the callback (perhaps in a separate
+thread, perhaps after pend_event() has completed, etc).
 

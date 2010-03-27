@@ -571,13 +571,13 @@ the callback function may also include some of these as keyword arguments:
     * `timestamp`: timestamp from CA server.
 
 A user-supplied callback will be run 'inside' a CA function, and cannot
-reliably make any other CA calls -- this can cause instability..  It is
-helpful to think 'this all happens inside of a pend_event call', and in an
-epics thread that may or may not be the main thread of your program.  It is
-advisable to keep the callback functions short, not resource-intensive, and
-to consider strategies which use the callback to record that a change has
-occurred and then act on that change outside of the callback (perhaps in a
-separate thread, perhaps after pend_event() has completed, etc).
+reliably make any other CA calls.  It is helpful to think 'this all happens
+inside of a pend_event call', and in an epics thread that may or may not be
+the main thread of your program.  It is advisable to keep the callback
+functions short, not resource-intensive, and to consider strategies which
+use the callback to record that a change has occurred and then act on that
+change outside of the callback (perhaps in a separate thread, perhaps after
+pend_event() has completed, etc).
 
     
 ..  _ca-omissions-label:
