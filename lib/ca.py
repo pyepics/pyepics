@@ -801,8 +801,7 @@ def get(chid,ftype=None,as_string=False, as_numpy=True):
     poll()
     val = _unpack(data,nelem,ftype=ftype,as_numpy=as_numpy)
     if as_string and ftype==dbr.CHAR:
-        val = ''.join([chr(i) for i in s if i>0]).strip().rstrip()
-
+        val = ''.join([chr(i) for i in data if i>0]).strip()
     return val
     
 @withConnectedCHID

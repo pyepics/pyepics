@@ -18,6 +18,8 @@ The PV class
 
 .. class:: PV(pvname[, callback=None[, form='native'[, auto_monitor=True[, verbose=False]]]])
 
+   create a PV object for a named Epics Process Variable.  
+
    :param pvname: name of Epics Process Variable
    :param callback:  user-defined callback function on changes to PV value or state.
    :type callback: callable or None
@@ -26,13 +28,12 @@ The PV class
    :param verbose:  whether to print out debugging messages
    :type auto_monitor: True or False
    
-create a PV object for a named Epics Process Variable.  Once created, a PV
-will (eventually) automatically connect and be ready to use.
+Once created, a PV will automatically connect and be ready to use.
 
       >>> from epics import PV
-      >>>p = PV(pv_name)      
-      >>>print p.get()   
-      >>>print p.count, p.type
+      >>> p = PV(pv_name)      
+      >>> print p.get()   
+      >>> print p.count, p.type
 
 methods
 ~~~~~~~~

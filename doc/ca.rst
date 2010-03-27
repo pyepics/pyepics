@@ -257,7 +257,7 @@ can be used to specify such options.
 
 To get a PV's value, use:
 
-.. method::    get(chid[, ftype=None[, as_string=False[, as_numpy=False]]])
+.. method:: get(chid[, ftype=None[, as_string=False[, as_numpy=False]]])
 
    return the current value for a Channel. Note that there is not a separate form for array data.
 
@@ -274,12 +274,12 @@ To get a PV's value, use:
 
 For a listing of values of `ftype`, see :ref:`Table of DBR Types <dbrtype_table>`.
 
-The 'as_string' option warrants special attention.  When used, this will
-always return a string representation of the value.  For Enum types, this will
-be the name of the Enum state. For Floats and Doubles, this will be the value
-formatted according the the precision of the PV.  For waveforms of type CHAR,
-this will be the string representation.  See :meth:`PV.get` for a more
-full-featured version.
+The *as_string* option warrants special attention.  This will always return
+a string representation of the value.  For Enum types, thes will be the
+name of the Enum state. For Floats and Doubles, this will be the value
+formatted according the the precision of the PV.  For waveforms of type
+CHAR, this will be the string representation.  See :meth:`PV.get` for a
+more full-featured version.
 
 To set a PV's value, use:
 
