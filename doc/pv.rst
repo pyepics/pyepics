@@ -265,6 +265,38 @@ The string representation for a `PV`, as returned either with the
 *as_string* argument to :meth:`ca.get` or from the :attr:`char_value`
 attribute (they are equivalent) needs some further explanation.
 
+The value of the string representation (hereafter, the :attr:`char_value`),
+will depend on the native type and count of a `PV`.  
+:ref:`Table of String Representations <charvalue_table>` 
+
+.. _charvalue_table: 
+
+   Table of String Representations:  How raw data :attr:`value` is mapped
+   to :attr:`char_value` for different native data types.
+
+    =============== ========== ==============================
+     *data types*    *count*     *char_value*
+    =============== ========== ==============================
+     string           1         = value   
+     char             1         = value   
+     short            1         = str(value) 
+     long             1         = str(value)
+     enum             1         = enum_str[value]
+     double           1         = ("%%.%if" % (precision)) % value
+     float            1         = ("%%.%if" % (precision)) % value 
+     char             > 1       = long string from bytes in array
+     all others       > 1       = <array size=*count*, type=*type*>
+    =============== ========== ==============================
+
+For double/float values with large exponents, the formatting will be 
+`("%%.%ig" % (precision)) % value`.    
+
+For character waveforms (*char* data with *count* > 1), the
+:attr:char_value will be set from
+
+   >>> firstnull  = val.index(0)
+   >>> if firstnull == -1: firstnull= len(val)
+   >>> char_value = ''.join([chr(i) for i in val[:firstnull]).rstrip()
 
 ..  _pv-callbacks-label:
 

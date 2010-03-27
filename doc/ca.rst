@@ -301,7 +301,7 @@ To set a PV's value, use:
 
    :meth:`put` returns 1 on success and -1 on timed-out
 
-   Specifying a callback will override setting *wait*=``True``.  This
+   Specifying a callback will override setting *wait=True*.  This
    callback function will be called with keyword arguments 
 
        pvname=pvname, data=callback_data
