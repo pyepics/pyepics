@@ -14,8 +14,8 @@ def fmt_time(t=None):
     return "%s.%6.6i" %(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(t)),1.e6*frac)
 
 _fields = ('pvname', 'value', 'char_value', 'status', 'ftype', 'chid',
-           'host', 'count', 'access', 'write_access', 'read_access', 'severity',
-           'timestamp', 'precision', 'units', 'enum_strs', 'no_str',
+           'host', 'count', 'access', 'write_access', 'read_access',
+           'severity', 'timestamp', 'precision', 'units', 'enum_strs',
            'upper_disp_limit', 'lower_disp_limit', 'upper_alarm_limit',
            'lower_alarm_limit', 'lower_warning_limit',
            'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
@@ -54,7 +54,7 @@ class PV(object):
         self._args      = {}.fromkeys(_fields)
 
         self._args['pvname'] = self.pvname
-        self.__mondata = None
+        self._monref = None  # holder of data returned from create_subscription
         if self.pvname in ca._cache:
             self.chid = ca._cache[pvname]['chid']
         else:
@@ -88,13 +88,12 @@ class PV(object):
         if not self.connected:
             ca.connect_channel(self.chid, timeout=timeout,force=force)
             self.poll()
-        if (self.connected and
-            self.auto_monitor and
-            self.__mondata is None):
-            self.__mondata = ca.subscribe(self.chid,
-                                          userfcn=self._onChanges,
-                                          use_ctrl= self.form=='ctrl',
-                                          use_time= self.form=='time')
+        if (self.connected and self.auto_monitor and
+            self._monref is None):
+            self._monref = ca.create_subscription(self.chid,
+                                                  userfcn= self._onChanges,
+                                                  use_ctrl= self.form=='ctrl',
+                                                  use_time= self.form=='time')
         return (self.connected and self.ftype is not None)
 
     def poll(self,ev=1.e-4, io=1.0):
@@ -135,9 +134,8 @@ class PV(object):
                       wait=wait,    timeout=timeout,
                       callback=callback, callback_data=callback_data)
 
-    def _set_charval(self,val,ca_calls=True):
+    def _set_charval(self,val,call_ca=True):
         """ sets the character representation of the value. intended for internal use"""
-
         ftype = self._args['ftype']
         cval  = repr(val)       
         if ftype == dbr.STRING: cval = val
@@ -152,7 +150,7 @@ class PV(object):
                 cval = '<array size=%d, type=%s>' % (len(val),
                                                      dbr.Name(ftype))
         elif ftype in (dbr.FLOAT, dbr.DOUBLE):
-            if ca_calls and self._args['precision'] is None:
+            if call_ca and self._args['precision'] is None:
                 self.get_ctrlvars()
             try: 
                 fmt  = "%%.%if"
@@ -162,16 +160,14 @@ class PV(object):
             except:
                 pass 
         elif ftype == dbr.ENUM:
-            if ca_calls and self._args['enum_strs'] in ([], None):
+            if call_ca and self._args['enum_strs'] in ([], None):
                 self.get_ctrlvars()
             try:
                 cval = self._args['enum_strs'][val]
             except:
                 pass
-
         self._args['char_value'] =cval
         return cval
-
     
     def get_ctrlvars(self):
         if not self.connect(force=False):  return None
@@ -180,17 +176,14 @@ class PV(object):
         return kw
 
     def _onChanges(self, value=None, **kw):
-        """built-in, internal callback function:
-        This should not be overwritten!!
-        
+        """internal callback function: do not overwrite!!
         To have user-defined code run when the PV value changes,
         use add_callback()
         """
         self._args.update(kw)
         self._args['value']  = value
         self._args['timestamp'] = kw.get('timestamp',time.time())
-
-        self._set_charval(self._args['value'],ca_calls=False)
+        self._set_charval(self._args['value'], call_ca=False)
 
         if self.verbose:
             print '  %s: %s (%s)'% (self.pvname,self._args['char_value'],
@@ -220,8 +213,7 @@ class PV(object):
             kw = copy.copy(self._args)
             kw.update(kwargs)
             kw['cb_info'] = (index, self.remove_callback)
-            if callable(fcn):
-                fcn(**kw)
+            if callable(fcn): fcn(**kw)
             
     def add_callback(self,callback=None,**kw):
         """add a callback to a PV.  Optional keyword arguments
@@ -244,7 +236,7 @@ class PV(object):
         if index is None and len(self.callbacks)==1:
             index = self.callbacks.keys()[0]
         if index in self.callbacks:
-            x = self.callbacks.pop(index)
+            self.callbacks.pop(index)
             self.poll()
 
     def clear_callbacks(self,**kw):
@@ -254,21 +246,19 @@ class PV(object):
         if not self.connect(force=False):  return None
         if self._args['precision'] is None: self.get_ctrlvars()
 
-        out = []
         # list basic attributes
-        mod   = 'native'
+        out = []
+        mod = 'native'
         xtype = self._args['type']
         if '_' in xtype: mod,xtype = xtype.split('_')
 
         out.append("== %s  (%s) ==" % (self.pvname,xtype))
-
         if self.count==1:
             val = self._args['value']
             fmt = '%i'
             if   xtype in ('float','double'): fmt = '%g'
             elif xtype in ('string','char'):  fmt = '%s'
             out.append('   value      = %s' % fmt % val)
-
         else:
             aval,ext,fmt = [],'',"%i,"
             if self.count>5: ext = '...'
@@ -298,7 +288,7 @@ class PV(object):
             for i,s in enumerate(self.enum_strs):
                 out.append("       %i = %s " % (i,s))
 
-        if self.__mondata is not None:
+        if self._monref is not None:
             out.append('   PV is monitored internally')
             if len(self.callbacks) > 0:
                 out.append("   user-defined callbacks:")
@@ -360,9 +350,6 @@ class PV(object):
 
     @property
     def enum_strs(self): return self._getarg('enum_strs')
-
-    @property
-    def no_str(self): return self._getarg('no_str')
 
     @property
     def upper_disp_limit(self): return self._getarg('upper_disp_limit')

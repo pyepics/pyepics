@@ -226,7 +226,7 @@ Three additional pythonic functions have been added:
 .. function::    promote_type(chid,use_time=False,use_ctrl=False)
 
   which promotes the native field type of a chid to its TIME or CTRL variant.
-  See :ref:`Table of DBR Types <dbr-typetable>`.
+  See :ref:`Table of DBR Types <dbrtype_table>`.
 
 ..  data::  _cache
 
@@ -272,7 +272,7 @@ To get a PV's value, use:
        for array / waveform data.  This is only applied if numpy can be imported.
    :type as_numpy:  True/False
 
-For a listing of values of `ftype`, see :ref:`Table of DBR Types <dbr-typetable>`.
+For a listing of values of `ftype`, see :ref:`Table of DBR Types <dbrtype_table>`.
 
 The 'as_string' option warrants special attention.  When used, this will
 always return a string representation of the value.  For Enum types, this will
@@ -299,46 +299,52 @@ To set a PV's value, use:
    :type callback: None or callable
    :param callback_data: extra data to pass on to a user-supplied callback function.
 
-put() returns 1 on success and -1 on timed-out
+   :meth:`put` returns 1 on success and -1 on timed-out
 
-Specifying a callback will override setting wait=True.  The callback
-function will be called with keyword arguments 
+   Specifying a callback will override setting *wait*=``True``.  This
+   callback function will be called with keyword arguments 
 
        pvname=pvname, data=callback_data
 
-See note below on user-defined callbacks.
-
-To define a subscription so that a callback is executed every time a PV changes,
-use
+   For more on this *put callback*, see :ref:`ca-callbacks-label` below.
 
 .. function::   create_subscription(chid, use_time=False,use_ctrl=False,  mask=7, userfcn=None)
 
-    :param use_time:  whether to use the TIME variant for the PV type
-    :type use_time: True/False
-    :param use_ctrl:  whether to use the CTRL variant for the PV type
-    :type use_ctrl: True/False
-    :param  mask:  integer bitmask to control which changes result in a     callback   
-    :type mask:  integer
-    :param userfcn:   user-supplied callback function
-    :type userfcn:  callable or None
+   create a *change* subscription, so that the user-supplied callback
+   function is called on changes to the PV.
+
+   :param use_time: whether to use the TIME variant for the PV type
+   :type use_time:  True/False
+   :param use_ctrl: whether to use the CTRL variant for the PV type
+   :type use_ctrl:  True/False
+   :param  mask:    integer bitmask to control which changes result in a     callback   
+   :type mask:      integer
+   :param userfcn:  user-supplied callback function
+   :type userfcn:   callable or None
       
-    :rtype: tuple containing *(callback_ref, user_arg_ref, event_id, ret_val)*
+   :rtype: tuple containing *(callback_ref, user_arg_ref, event_id)*
    
-   The returned value contains *callback_ref* are *user_arg_ref* which are
-   references that should be kept for as long as the subscription lives.
-   *event_id* is the id for the event (useful for clearing a subscription),
-   and *ret_val* is the return value of the CA library call
-   :func:`ca_create_subscription`.
+   The returned tuple contains *callback_ref* an *user_arg_ref* which are
+   references that should be kept for as long as the subscription lives
+   (otherwise they may be garbage collected, causing no end of trouble).
+   *event_id* is the id for the event (useful for clearing a subscription).
 
-Options for create_subscription include:
-
-See not below on callback functions.
+   For more on writing the user-supplied callback, see
+   :ref:`ca-callbacks-label` below. 
 
 .. function:: clear_subscription(event_id)
    
    clears a subscription given its *event_id*.
 
 Other functions that are provided are
+
+.. function::  get_timestamp(chid)
+
+   return the timestamp of a channel -- the time of last update.
+
+.. function::  get_severity(chid)
+
+   return the severity of a channel.
 
 .. function::  get_precision(chid)
 
@@ -352,15 +358,40 @@ Other functions that are provided are
 
 .. function:: get_ctrlvars(chid) 
 
-    returns a dictionary of CTRL fields for a Channel.  Depending on  the
-    native type, the keys in this dictionary may include
+    returns a dictionary of CTRL fields for a Channel.  Depending on the
+    native data type, the keys in this dictionary may include 
+    :ref:`Table of Control Attributes <ctrlvars_table>` 
 
-        status severity precision units enum_strs upper_disp_limit
-        lower_disp_limit upper_alarm_limit lower_alarm_limit
-        upper_warning_limit lower_warning_limit upper_ctrl_limit
-        lower_ctrl_limit
-        
-enum_strs will be a  list of strings for the names of ENUM states.
+.. _ctrlvars_table: 
+
+   Table of Control Attributes
+
+    ==================== ==============================
+     *attribute*             *data types*
+    ==================== ==============================
+     status                 
+     severity               
+     precision             0 for all but double, float
+     units                  
+     enum_strs             enum only
+     upper_disp_limit
+     lower_disp_limit 
+     upper_alarm_limit 
+     lower_alarm_limit
+     upper_warning_limit 
+     lower_warning_limit 
+     upper_ctrl_limit
+     lower_ctrl_limit
+    ==================== ==============================
+
+Note that *enum_strs* will be a tuple of strings for the names of ENUM
+states.
+
+.. function:: get_timevars(chid) 
+
+    returns a dictionary of TIME fields for a Channel.  This will contain a
+    *status*, *severity*, and *timestamp* key.
+
 
 ..  _ca-sg-label:
 
@@ -409,7 +440,7 @@ those looking to translate lower-level C or Python code to this module.
 DBR data types
 ~~~~~~~~~~~~~~~~~
 
-.. _dbr-typetable: 
+.. _dbrtype_table: 
 
    Table of DBR Types
 
@@ -534,13 +565,11 @@ Depending on the data type, and whether the CTRL or TIME variant was used,
 the callback function may also include some of these as keyword arguments:
 
     * `enum_strs`: the list of enumeration strings
-    * `no_str`:  number of enumeration strings
     * `precision`: number of decimal places of precision.
     * `units`:  string for PV units
     * `severity`: PV severity
     * `timestamp`: timestamp from CA server.
 
-      
 A user-supplied callback will be run 'inside' a CA function, and cannot
 reliably make any other CA calls -- this can cause instability..  It is
 helpful to think 'this all happens inside of a pend_event call', and in an

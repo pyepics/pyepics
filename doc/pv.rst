@@ -13,8 +13,6 @@ object for an EPICS Process Variable.  A `PV` object has both methods and
 attributes for accessing it's properties.
 
 
-
-
 The PV class
 ============
 
@@ -23,7 +21,7 @@ The PV class
    :param pvname: name of Epics Process Variable
    :param callback:  user-defined callback function on changes to PV value or state.
    :type callback: callable or None
-   :param form:  which epics *data type* to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant. 
+   :param form:  which epics *data type* to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.  
    :type form: string, one of ('native','ctrl', or 'time')
    :param verbose:  whether to print out debugging messages
    :type auto_monitor: True or False
@@ -36,9 +34,8 @@ will (eventually) automatically connect and be ready to use.
       >>>print p.get()   
       >>>print p.count, p.type
 
-
 methods
-~~~~~~~
+~~~~~~~~
 
 A `PV` has several methods for getting and setting its value and defining
 callbacks to be executed when the PV changes.
@@ -55,21 +52,24 @@ callbacks to be executed when the PV changes.
 
 .. method:: put(value[, wait=False[, timeout=30.0[, callback=None[, callback_data=None]]]])
 
-   set the PV value, optionally waiting to return until processing has completed.
+   set the PV value, optionally waiting to return until processing has
+   completed. 
 
    :param value:  value to set PV 
    :param wait:  whether to wait for processing to complete (or time-out) before returning.
    :type  wait:  True/False
-   :param timeout:  maximum time to wait for processing to complete before returning anyway.
+   :param timeout:  maximum time to wait for processing to complete before returning anyway. 
    :type  timeout:  double
-   :param callback: user-supplied function to run when processing has completed.
+   :param callback: user-supplied function to run when processing has completed. 
    :type callback: None or callable
-   :param callback_data: extra data to pass on to a user-supplied callback function.
+   :param callback_data: extra data to pass on to a user-supplied callback function. 
 
 .. method:: get_ctrlvars()
 
    returns a dictionary of the **control values** for the PV.  This 
-   dictionary may have many members, depending on the data type of PV.
+   dictionary may have many members, depending on the data type of PV.  See
+   the :ref:`Table of Control Attributes <ctrlvars_table>`  for details.
+
 
 .. method:: poll(ev=1.e-4, io=1.0)
 
@@ -170,12 +170,13 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
    string describing data type of PV, such as `double`, `float`, `enum`, `string`,
    `int`,  `long`, `char`, or one of the `ctrl` or `time` variants of these, which
    will be named `ctrl_double`, `time_enum`, and so on.  See the 
-   :ref:`Table of DBR Types <dbr-typetable>`
+   :ref:`Table of DBR Types <dbrtype_table>`
+
 
 .. attribute:: ftype
   
   The integer value (from the underlying C library) indicating the PV data
-  type according to :ref:`Table of DBR Types <dbr-typetable>`
+  type according to :ref:`Table of DBR Types <dbrtype_table>`
     
 .. attribute:: host
     
@@ -218,10 +219,6 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 .. attribute:: enum_strs
 
    a list of strings for the enumeration states  of this PV (for enum PVs)
-
-.. attribute:: no_str
-
-   number of enum states.
 
 .. attribute:: info
 

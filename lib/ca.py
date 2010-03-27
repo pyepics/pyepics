@@ -882,8 +882,7 @@ def put(chid,value, wait=False, timeout=20, callback=None,callback_data=None):
 def get_ctrlvars(chid):
     """return the CTRL fields for a Channel.  Depending on 
     the native type, these fields may include
-        status  severity
-        precision  units  enum_strs
+        status  precision  units  enum_strs
         upper_disp_limit     lower_disp_limit
         upper_alarm_limit    lower_alarm_limit
         upper_warning_limit  lower_warning_limit
@@ -899,35 +898,57 @@ def get_ctrlvars(chid):
     PySEVCHK('get_ctrlvars',ret)
     poll()
     kw = {}
-    if ret == dbr.ECA_NORMAL: 
-        d = d[0]
-        for attr in ('severity', 'timestamp', 'precision','units', 
-                     'upper_disp_limit', 'lower_disp_limit',
-                     'upper_alarm_limit', 'upper_warning_limit',
-                     'lower_warning_limit','lower_alarm_limit',
-                     'upper_ctrl_limit', 'lower_ctrl_limit'):
-            if hasattr(d,attr):
-                kw[attr] = getattr(d,attr)
-        if (hasattr(d,'strs') and
-            hasattr(d,'no_str') and d.no_str > 0):
-            kw['enum_strs'] = [d.strs[i].value for i in range(d.no_str)]
+    v = d[0]
+    for attr in ('precision','units', 
+                 'upper_disp_limit', 'lower_disp_limit',
+                 'upper_alarm_limit', 'upper_warning_limit',
+                 'lower_warning_limit','lower_alarm_limit',
+                 'upper_ctrl_limit', 'lower_ctrl_limit'):
+        if hasattr(v,attr):
+            kw[attr] = getattr(v,attr)
+    if hasattr(v,'strs') and hasattr(v,'no_str') and v.no_str > 0:
+        kw['enum_strs'] = tuple([v.strs[i].value for i in range(v.no_str)])
     return kw
+
+@withConnectedCHID
+def get_timevars(chid):
+    """return the TIME fields for a Channel.  Depending on 
+    the native type, these fields may include
+        status  severity timestamp
+    """
+    ftype = promote_type(chid, use_time=True)
+    d = (1*dbr.Map[ftype])()
+    ret = libca.ca_array_get(ftype, 1, chid, d)
+    PySEVCHK('get_timevars',ret)
+    poll()
+    kw = {}
+    v = d[0]
+    for attr in ('status', 'severity', 'timestamp'):
+        if hasattr(v,attr):
+            kw[attr] = getattr(v,attr)
+    return kw
+
+def get_timestamp(chid):
+    """return the timestamp of a Channel."""
+    return get_timevars(chid).get('timestamp',0)
+
+def get_severity(chid):
+    """return the severity of a Channel."""
+    return get_timevars(chid).get('severity',0)
 
 def get_precision(chid):
     """return the precision of a Channel.  For Channels with
     native type other than FLOAT or DOUBLE, this will be 0"""
-    kw = {}
     if field_type(chid) in (dbr.FLOAT,dbr.DOUBLE):
-        kw = get_ctrlvars(chid)
-    return kw.get('precision',0)
+        return get_ctrlvars(chid).get('precision',0)
+    return 0
 
 def get_enum_strings(chid):
     """return list of names for ENUM states of a Channel.  Returns
     None for non-ENUM Channels"""
-    kw = {}
-    if field_type(chid) == dbr.ENUM: kw = get_ctrlvars(chid)
-    return kw.get('enum_strs',None)
-
+    if field_type(chid) == dbr.ENUM:
+        return get_ctrlvars(chid).get('enum_strs',None)
+    return None
 
 @withConnectedCHID
 def create_subscription(chid, use_time=False,use_ctrl=False,
@@ -946,9 +967,7 @@ def create_subscription(chid, use_time=False,use_ctrl=False,
     PySEVCHK('create_subscription',ret)
     
     poll()
-    return (cb, uarg, evid, ret)
-
-subscribe = create_subscription
+    return (cb, uarg, evid)
 
 @withCA
 @withSEVCHK
@@ -965,20 +984,19 @@ def _onGetEvent(args):
 
     # add kw arguments for CTRL and TIME variants
     if args.type >= dbr.CTRL_STRING:
-        v0 = value[0]
-        for attr in dbr.ctrl_limits + ('no_str','precision','units'):
-            if hasattr(v0,attr):        
-                kw[attr] = getattr(v0,attr)
-        if hasattr(v0,'strs'):
-            s = [v0.strs[i].value for i in range(v0.no_str)]
-            kw['enum_strs'] = tuple(s)
+        v = value[0]
+        for attr in dbr.ctrl_limits + ('precision','units'):
+            if hasattr(v,attr):        
+                kw[attr] = getattr(v,attr)
+        if hasattr(v,'strs') and hasattr(v,'no_str') and v.no_str > 0):
+            kw['enum_strs'] = tuple([v.strs[i].value for i in range(v.no_str)])
 
     elif args.type >= dbr.TIME_STRING:
-        v0 = value[0]
-        kw['status']    = v0.status
-        kw['severity']  = v0.severity
-        kw['timestamp'] = (dbr.EPICS2UNIX_EPOCH + v0.stamp.secs + 
-                           1.e-6*int(v0.stamp.nsec/1000.00))
+        v = value[0]
+        kw['status']    = v.status
+        kw['severity']  = v.severity
+        kw['timestamp'] = (dbr.EPICS2UNIX_EPOCH + v.stamp.secs + 
+                           1.e-6*int(v.stamp.nsec/1000.00))
 
     nelem = args.count
     if args.type in (dbr.STRING,dbr.TIME_STRING,dbr.CTRL_STRING):
@@ -1019,7 +1037,6 @@ def _onPutEvent(args,*varargs):
 # create global reference to these two callbacks
 _CB_connect = ctypes.CFUNCTYPE(None,dbr.ca_connection_args)(_onConnectionEvent)
 _CB_putwait = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)   
-
 
 
 ## Synchronous groups

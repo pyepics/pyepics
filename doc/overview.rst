@@ -3,11 +3,11 @@
 EPICS Channel Access in Python 
 ==============================
 
-Py-Epics3 contains a Python package named `epics` which consists of several
-modules to interact with EPICS.  The simplest approach uses the functions
-:func:`caget`, :func:`caput`, :func:`camonitor`, :func:`camonitor_clear`,
-and :func:`cainfo` within the top-level `epics` module.  These functions
-are similar to the Unix command line utilities and to the EZCA library
+The epics python package consists of several modules to interact with
+EPICS.  The simplest approach uses the functions :func:`caget`,
+:func:`caput`, :func:`camonitor`, :func:`camonitor_clear`, and
+:func:`cainfo` within the top-level `epics` module.  These functions are
+similar to the Unix command line utilities and to the EZCA library
 interface, and described in more detail below.
 
 
@@ -201,7 +201,7 @@ of changes will be sent to :func:`sys.stdout.write`. For more complete
 control, one can specify a *callback* function to be called on each change
 event.  This callback should take keyword arguments for *pvname*, *value*,
 and *char_value*.  See :ref:`pv-callbacks-label` for information on writing
-callback functions.
+callback functions for :func:`camonitor`.
 
 :func:`camonitor_clear`
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -270,9 +270,9 @@ re-build the Python wrapper.
 Status and To-Do List
 =====================
 
-Py-Epics3 is under active development.  The current status is that most
-features are working well, and it is being used in some production code,
-but more testing is needed, and this documentation needs improvement.
+The Epics3 package is under active development.  The current status is that
+most features are working well, and it is being used in some production
+code, but more testing is needed, and this documentation needs improvement.
 
 There are several desired features are left undone or unfinished:
  
@@ -284,9 +284,9 @@ There are several desired features are left undone or unfinished:
 
  *  investigate retrieving array data for CTRL and TIME variants.
 
- *  are array_expection events needed???
+ *  are ca_array_expection events needed???
 
- *  add more "devices", including low-level epics records,
+ *  add more "devices", including low-level epics records.
 
  *  port the Motor class to be a subclass of epics.Device.
 

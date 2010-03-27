@@ -16,7 +16,6 @@
       PV -- Process Variable which will work largely as in EpicsCA 2.*
 """
 
-
 __version__ = '3.0.1'
 
 import time
