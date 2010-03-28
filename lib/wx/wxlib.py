@@ -53,7 +53,7 @@ def set_float(val,default=None):
     if val in (None,''): return default
     try:
         return float(val)
-    except:
+    except ValueError:
         return default
         
 class closure:

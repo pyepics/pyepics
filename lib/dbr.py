@@ -217,7 +217,7 @@ class event_handler_args(ctypes.Structure):
                 ('raw_dbr', void_p),    
                 ('status',  long_t)]
 
-class ca_connection_args(ctypes.Structure):
+class connection_args(ctypes.Structure):
     _fields_ = [('chid', long_t), ('op', long_t)]
 
 class exception_handler_args(ctypes.Structure):

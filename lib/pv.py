@@ -13,13 +13,6 @@ def fmt_time(t=None):
     t,frac=divmod(t,1)
     return "%s.%6.6i" %(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(t)),1.e6*frac)
 
-_fields = ('pvname', 'value', 'char_value', 'status', 'ftype', 'chid',
-           'host', 'count', 'access', 'write_access', 'read_access',
-           'severity', 'timestamp', 'precision', 'units', 'enum_strs',
-           'upper_disp_limit', 'lower_disp_limit', 'upper_alarm_limit',
-           'lower_alarm_limit', 'lower_warning_limit',
-           'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
-
 # cache of PVs
 PV_cache = {}
 
@@ -41,17 +34,25 @@ class PV(object):
       >>>p.type           # EPICS data type: 'string','double','enum','long',..
 """
 
+    _fmt="<PV '%(pvname)s', count=%(count)i, type=%(type)s, access=%(access)s>"
+    _fields = ('pvname', 'value', 'char_value', 'status', 'ftype', 'chid',
+               'host', 'count', 'access', 'write_access', 'read_access',
+               'severity', 'timestamp', 'precision', 'units', 'enum_strs',
+               'upper_disp_limit', 'lower_disp_limit', 'upper_alarm_limit',
+               'lower_alarm_limit', 'lower_warning_limit',
+               'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
+
     def __init__(self,pvname, callback=None, form='native',
                  verbose=False, auto_monitor=True):
-        self.pvname  = pvname.strip()
-        self.form = form.lower()
-        self.verbose = verbose
+        self.pvname     = pvname.strip()
+        self.form       = form.lower()
+        self.verbose    = verbose
         self.auto_monitor = auto_monitor
-        self.callbacks = {}
-        if callable(callback): self.callbacks[0] = (callback,{})
-        self.ftype = None
+        self.ftype      = None
         self.connected  = False
-        self._args      = {}.fromkeys(_fields)
+        self._args      = {}.fromkeys(self._fields)
+        self.callbacks  = {}
+        if callable(callback): self.callbacks[0] = (callback,{})
 
         self._args['pvname'] = self.pvname
         self._monref = None  # holder of data returned from create_subscription
@@ -63,14 +64,14 @@ class PV(object):
         self._args['chid'] = self.chid
         try:
             self._args['type'] = dbr.Name(ca.field_type(self.chid)).lower()
-        except:
+        except epics.ChannelAccessException:
             self._args['type'] = 'unknown'
 
         PV_cache[(pvname,self.form)] = self
         
     def _onConnect(self,chid=0,conn=True,**kw):
         self.connected = conn
-        # print '_onConnect!!  ', chid, self.pvname, self.form, ' ::'
+
         if self.connected:
             self._args['host']   = ca.host_name(self.chid)
             self._args['count']  = ca.element_count(self.chid)
@@ -81,19 +82,21 @@ class PV(object):
                                      use_ctrl= self.form=='ctrl',
                                      use_time= self.form=='time')
             self._args['type'] = dbr.Name(self.ftype).lower()
-            # print 'onConnect ', self.ftype, self._args['type']            
         return
 
     def connect(self,timeout=5.0,force=True):
+        ca_subscribe = ca.create_subscription
+        ca_connect   = ca.connect_channel
         if not self.connected:
-            ca.connect_channel(self.chid, timeout=timeout,force=force)
+            ca_connect(self.chid, timeout=timeout,force=force)
             self.poll()
-        if (self.connected and self.auto_monitor and
-            self._monref is None):
-            self._monref = ca.create_subscription(self.chid,
-                                                  userfcn= self._onChanges,
-                                                  use_ctrl= self.form=='ctrl',
-                                                  use_time= self.form=='time')
+        # should be only be called 1st time, to subscribe
+        # and set self._monref
+        if self._monref is None and self.connected and self.auto_monitor:
+            self._monref = ca_subscribe(self.chid,
+                                        userfcn= self._onChanges,
+                                        use_ctrl= self.form=='ctrl',
+                                        use_time= self.form=='time')
         return (self.connected and self.ftype is not None)
 
     def poll(self,ev=1.e-4, io=1.0):
@@ -101,8 +104,7 @@ class PV(object):
 
     def get(self, as_string=False):
         """returns current value of PV
-        use argument 'as_string=True' to
-        return string representation
+        use argument 'as_string=True' to return string representation
 
         >>> p.get('13BMD:m1.DIR')
         0
@@ -110,8 +112,7 @@ class PV(object):
         'Pos'
         """
         if not self.connect(force=False):  return None
-        self._args['value'] = ca.get(self.chid,
-                                    ftype=self.ftype)
+        self._args['value'] = ca.get(self.chid,ftype=self.ftype)
         self.poll() 
         self._set_charval(self._args['value'])
 
@@ -126,8 +127,7 @@ class PV(object):
         """
         if not self.connect(force=False):  return None
         if (self.ftype in (dbr.ENUM,dbr.TIME_ENUM,dbr.CTRL_ENUM) and
-            isinstance(value,str) and
-            value in self._args['enum_strs']):
+            isinstance(value,str) and value in self._args['enum_strs']):
             value = self._args['enum_strs'].index(value)
         
         return ca.put(self.chid, value,
@@ -135,11 +135,13 @@ class PV(object):
                       callback=callback, callback_data=callback_data)
 
     def _set_charval(self,val,call_ca=True):
-        """ sets the character representation of the value. intended for internal use"""
+        """ sets the character representation of the value.
+        intended only for internal use"""
         ftype = self._args['ftype']
+        if ftype == dbr.STRING:
+            self._args['char_value'] =val
+            return val
         cval  = repr(val)       
-        if ftype == dbr.STRING: cval = val
-        
         if self._args['count'] > 1:
             if ftype == dbr.CHAR:
                 val = list(val)
@@ -157,14 +159,14 @@ class PV(object):
                 if 4 < abs(int(math.log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
                 cval = (fmt % self._args['precision']) % val
-            except:
+            except (IOError, KeyError, ValueError):
                 pass 
         elif ftype == dbr.ENUM:
             if call_ca and self._args['enum_strs'] in ([], None):
                 self.get_ctrlvars()
             try:
                 cval = self._args['enum_strs'][val]
-            except:
+            except (KeyError, IndexError):
                 pass
         self._args['char_value'] =cval
         return cval
@@ -207,7 +209,6 @@ class PV(object):
         a GUI resource is no longer available).
              
         """
-        # Note
         for index in sorted(self.callbacks.keys()):
             fcn,kwargs = self.callbacks[index]
             kw = copy.copy(self._args)
@@ -223,6 +224,7 @@ class PV(object):
         Note that a PV may have multiple callbacks, so that each
         has a unique index (small integer) that is returned by
         add_callback.  This index is needed to remove a callback."""
+        index = None
         if callable(callback):
             n_cb = len(self.callbacks)
             index = 1
@@ -379,9 +381,10 @@ class PV(object):
     def info(self): return self._getinfo()
 
     def __repr__(self):
-        if not self.connected:  return "<PV '%s': not connected>" % self.pvname
-        fmt="<PV '%(pvname)s', count=%(count)i, type=%(type)s, access=%(access)s>"
-        return  fmt % self._args
+        if self.connected:
+            return sel._fmt % self._args
+        else:
+            return "<PV '%s': not connected>" % self.pvname
     
     def __str__(self): return self.__repr__()
 
