@@ -691,7 +691,6 @@ def connect_channel(chid,timeout=None,verbose=False,force=True):
         _cache[name(chid)]['failures'] += 1
     return conn
 
-
 # common functions with similar signatures
 @withCHID
 def _chid_f(chid,fcn_name,restype=int,arg=None):
@@ -801,24 +800,21 @@ def get(chid,ftype=None,as_string=False, as_numpy=True):
     poll()
     val = _unpack(data,nelem,ftype=ftype,as_numpy=as_numpy)
     if as_string:
-        val = _val_as_string(val,chid,nelem,ftype)
+        val = __as_string(val,chid,count,ftype)
     return val
 
-def _val_as_string(val,chid,count,ftype):
+def __as_string(val,chid,count,ftype):
     "primitive conversion of value to a string"
-    if ftype==dbr.CHAR:
-        val = ''.join([chr(i) for i in val if i>0]).strip()
-    elif ftype==dbr.ENUM and count==1:
-        try:
+    try:
+        if ftype==dbr.CHAR:
+            val = ''.join([chr(i) for i in val if i>0]).strip()
+        elif ftype==dbr.ENUM and count==1:
             val = get_enum_strings(chid)[val]
-        except:
-            pass                
-    else:
-        if count > 1:
-            val = '<array size=%d, type=%d>' % (count,ftype)
-        else:
-            val = str(val)
-
+        elif count > 1:
+            val = '<array count=%d, type=%d>' % (count,ftype)
+        val = str(val)
+    except:
+        pass            
     return val
                     
 @withConnectedCHID
@@ -1096,17 +1092,16 @@ def sg_get(gid, chid, ftype=None,as_string=False,as_numpy=True):
 
     nelem = count
     if ftype == dbr.STRING:  nelem = dbr.MAX_STRING_SIZE
-
     
     data = (nelem*dbr.Map[ftype])()
-    
+   
     ret = libca.ca_sg_array_get(gid, ftype, count, chid, data)
     PySEVCHK('sg_get',ret)
 
     poll()
     val = _unpack(data,nelem,ftype=ftype,as_numpy=as_numpy)
     if as_string:
-        val = _val_as_string(val,chid,ftype)
+        val = __as_string(val,chid,count,ftype)
     return val
 
 def sg_put(gid, chid, value):

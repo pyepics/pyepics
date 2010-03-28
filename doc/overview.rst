@@ -39,7 +39,7 @@ automatically synchronized with the remote PV.
 The lowest-level CA functionality is exposed in the `ca` and `dbr` module.
 While  not necessarily intended for general use, this module does provide a
 fairly complete wrapping of the basic EPICS CA library, and is quite
-useable, if a little more verbose and C-like than using PV objects.
+usable, if a little more verbose and C-like than using PV objects.
 
 In addition, the `epics` package contains more specialized modules for
 Epics motors, alarms, a host of other *devices* (collections of PVs), and a
@@ -284,7 +284,7 @@ There are several desired features are left undone or unfinished:
 
  *  investigate retrieving array data for CTRL and TIME variants.
 
- *  are ca_array_expection events needed???
+ *  are ca_array_exception events needed???
 
  *  add more "devices", including low-level epics records.
 

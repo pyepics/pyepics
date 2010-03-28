@@ -15,7 +15,7 @@ devices with :class:`epics.Device`.
 The goal of this module is to stay fairly close to the C interface to the
 CA library while also providing a pleasant Python experience.  It is
 expected that anyone looking into the details of this module is somewhat
-familar with Channel Access and knows where to consult the CA reference
+familiar with Channel Access and knows where to consult the CA reference
 documentation.  To that end, this document mostly describe the differences
 with the C interface.
 
@@ -29,7 +29,7 @@ that importing `ca` module with
 
     >>> from epics import ca
 
-will result in a Python function named :func:`ca.XXX` that correpsonds to
+will result in a Python function named :func:`ca.XXX` that corresponds to
 the C function `ca_XXX`.
 That is, Python namespaces are used in place of the name-mangling done in C
 due to its lack of namespaces.
@@ -50,7 +50,7 @@ In addition, while the CA library supports several `DBR` types in C, not
 all of these are supported in Python. Only native types and their DBR_TIME
 and DBR_CTRL variants are supported here.  The DBR_STS and DBR_GR variants
 are not, as they are subsets of the DBR_CTRL type, and space optimization
-is not something you'll be striving for with Python.  In additon, several
+is not something you'll be striving for with Python.  In addition, several
 `dbr_XXX` functions are also not supported, as they appear to be needed
 only to dynamically allocate memory.
 
@@ -91,10 +91,10 @@ Here, these tasks are handled by the following constructs:
    * :data:`libca` holds a permanent, global reference to the CA shared
      library.
 
-   * the function :func:`initialze_libca` is called to ... initialize
-     libca.  It takes no arguments, but uses the global boolean
+   * the function :func:`initialize_libca` is called to ... initialize
+     libca.  It takes no arguments, but uses the global Boolean
      :data:`PREEMPTIVE_CALLBACK` (default of ``True``) to control whether
-     preemtive callbacks are used.
+     preemptive callbacks are used.
 
    * the function :func:`finalize_libca` is used to finalize libca.
      Normally, this is function is registered to be called when a program
@@ -111,7 +111,11 @@ Here, these tasks are handled by the following constructs:
    With preemptive callbacks enabled, EPICS communication will
    not require client code to continually poll for changes.  
 
-   More information on 
+.. data:: DEFAULT_CONNECTION_TIMEOUT
+
+   sets the default `timeout` value (in seconds) for
+   :func:`connect_channel`.  The default value is `5.0`
+
 
 Using the CA module
 ====================
@@ -150,89 +154,112 @@ threading contexts are very close to the C library:
 Creating and Connecting to Channels
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The basic channel object is the "Channel ID" or ``chid``.  With the CA
-library (and ``ca`` module), one creates and acts on the ``chid`` values, which are
-:data:`ctypes.c_long`.
-
-To create a channel, use
+The basic channel object is the Channel ID or ``chid``.  With the CA
+library (and ``ca`` module), one creates and acts on the ``chid`` values,
+which are :data:`ctypes.c_long`.
 
 .. function:: create_channel(pvname,connect=False,userfcn=None)
    
-    *pvname*   
-      the name of the PV to create.
-    *connect* 
-     (True/False) whether to (try to) connnect now.
-    *userfcn*
-      a Python callback function to be called when the
-      connection state changes.   This function should be
-      prepared to accept keyword arguments of
-      
-         * `pvname`  name of pv
-         * `chid`    chid value 
-         * `conn`    True/False:  whether channel is connected.
+    creates a channel.
 
-   This returns a ``chid``.  Here
+   :param pvname:   the name of the PV to create.
+   :param connect:  whether to (try to) connect to PV as soon as possible.
+   :type  connect:  ``True``/``False``
+   :param userfcn:  user-defined Python function to be called when the connection state changes.
+   :type userfcn:  ``None`` or callable.
+   :rtype: ``chid`` Channel ID 
 
+   The user-defined function should be  prepared to accept keyword arguments of
+         * `pvname`  name of PV
+         * `chid`    ``chid`` Channel ID
+         * `conn`    ``True``/``False``:  whether channel is connected.
 
-    Internally, a connection callback is used so that you should
-    not need to explicitly connect to a channel.
-
-To explicitly connect to a channel (usually not needed as implicit connection
-will be done when needed), use
+   Internally, a connection callback is used so that you should
+   not need to explicitly connect to a channel.
 
 .. function:: connect_channel(chid,timeout=None,verbose=False,force=True)
 
-  
-   This explicitly tries to connect to a channel, waiting up to timeout for a
+   explicitly connect to a channel (usually not needed as implicit
+   connection will be done when needed), waiting up to timeout for a
    channel to connect.  It returns the connection state.
 
-    Normally, channels will connect very fast, and the connection callback
-    will succeed the first time.
+   :param chid:     ``chid`` Channel ID 
+   :param timeout:  maximum time to wait for connection.
+   :type  timeout:  ``None`` or double.
+   :param verbose:  whether to print out debugging information
+   :param force:    whether to (try to) force a connection.
+   :rtype: ``True``/``False``
 
-    For un-connected Channels (that are nevertheless queried), the 'ts'
-    (timestamp of last connecion attempt) and 'failures' (number of failed
-    connection attempts) from the _cache will be used to prevent spending too
-    much time waiting for a connection that may never happen.
+   if *timeout* is ``None``, the value of  :data:`DEFAULT_CONNECTION_TIMEOUT`
+   is used (usually 5.0 seconds).
+   
+   Normally, channels will connect very fast, and the connection callback
+   will succeed the first time.
 
-Other functions that require a valid (but not necessarily connected) Channel areessentially identical to the CA library are:
+   For un-connected Channels (that are nevertheless queried), the 'ts'
+   (timestamp of last connection attempt) and 'failures' (number of failed
+   connection attempts) from the :data:`_cache` will be used to prevent
+   spending too much time waiting for a connection that may never happen.
+
+Many other functions that require a valid (but not necessarily connected)
+Channel are essentially identical to the CA library are:
 
 .. function::   name(chid)
 
+   return PV name for Channel.
+
 .. function::   host_name(chid)
+
+   return host name and port serving Channel.
 
 .. function::   element_count(chid)
 
-.. function::     read_access(chid)
+   return number of elements in Channel's data.
 
-.. function::     write_access(chid)
+.. function::   read_access(chid)
 
-.. function::     field_type(chid)
+   return *read access* for a Channel: 1 for ``True``, 0 for ``False``.
 
-.. function::     clear_channel(chid)
+.. function::   write_access(chid)
 
-.. function::     state(chid)
+   return *write access* for a channel: 1 for ``True``, 0 for ``False``.
+
+.. function::   field_type(chid)
+
+   return the integer DBR field type. See the *ftype* column from
+   :ref:`Table of DBR Types <dbrtype_table>`.
+
+.. function::   clear_channel(chid)
+
+   clear the channel.
+
+.. function::   state(chid)
+
+   return the state of the channel.
 
 Three additional pythonic functions have been added:
 
 .. function::     isConnected(chid)
 
-   returns (dbr.CS_CONN==state(chid)) ie True or False for a connected, 
-   unconnected channel
+   returns `dbr.CS_CONN==state(chid)` ie ``True`` for a connected channel
+   or ``False`` for an unconnected channel.
 
 .. function:: access(chid)
 
-   returns (read_access(chid) + 2 * write_access(chid))
+   returns a string describing read/write access: one of 
+   `no access`, `read-only`, `write-only`, or `read/write`
 
 .. function::    promote_type(chid,use_time=False,use_ctrl=False)
 
-  which promotes the native field type of a chid to its TIME or CTRL variant.
-  See :ref:`Table of DBR Types <dbrtype_table>`.
+  promotes the native field type of a ``chid`` to its TIME or CTRL
+  variant. See :ref:`Table of DBR Types <dbrtype_table>`.  Returns the
+  integer corresponding to the promoted field value.
 
 ..  data::  _cache
 
     The ca module keeps a global cache of Channels that holds connection
     status and a bit of internal information for all known PVs.  This cache
-    is not intended for general use, .... but ...
+    is not intended for general use.
 
 .. function:: show_cache(print_out=True)
 
@@ -240,63 +267,58 @@ Three additional pythonic functions have been added:
    standard output.  Use the *print_out=False* option to be returned the
    listing instead of having it printed. 
 
-
 Interacting with Connected Channels
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once a chid is created and connected there are several ways to
+Once a ``chid`` is created and connected there are several ways to
 communicating with it.  These are primarily encapsulated in the functions
 :func:`get`, :func:`put`, and :func:`create_subscription`, with a few
 additional functions for retrieving specific information.
 
 These functions are where this python module differs the most from the
 underlying CA library, and this is mostly due to the underlying CA function
-requiring the user to supply DBR TYPE and count as well as chid and allocated
-space for the data.  In python none of these is needed, and keyword arguments
-can be used to specify such options.
-
-To get a PV's value, use:
+requiring the user to supply DBR TYPE and count as well as ``chid`` and
+allocated space for the data.  In python none of these is needed, and
+keyword arguments can be used to specify such options.
 
 .. method:: get(chid[, ftype=None[, as_string=False[, as_numpy=False]]])
 
    return the current value for a Channel. Note that there is not a separate form for array data.
 
-   :param chid:  channel ID
+   :param chid:  ``chid`` Channel ID
    :type  chid:  ctypes.c_long
    :param ftype:  field type to use (native type is default)
    :type ftype:  integer
-   :param as_string:  whether to return the string representation of the
-       value.  See notes below. 
-   :type as_string:  True/False
-   :param as_numpy:  whether to return the Numerical Python representation
-       for array / waveform data.  This is only applied if numpy can be imported.
-   :type as_numpy:  True/False
+   :param as_string:  whether to return the string representation of the value.  See notes below. 
+   :type as_string:  ``True``/``False``
+   :param as_numpy:  whether to return the Numerical Python representation for array / waveform data.  This is only applied if numpy can be imported.  
+   :type as_numpy:  ``True``/``False``
 
-For a listing of values of `ftype`, see :ref:`Table of DBR Types <dbrtype_table>`.
 
-The *as_string* option warrants special attention.  This will always return
-a string representation of the value.  For Enum types, thes will be the
-name of the Enum state. For Floats and Doubles, this will be the value
-formatted according the the precision of the PV.  For waveforms of type
-CHAR, this will be the string representation.  See :meth:`PV.get` for a
-more full-featured version.
+For a listing of values of *ftype*, see :ref:`Table of DBR Types <dbrtype_table>`.
 
-To set a PV's value, use:
+The *as_string* option warrants special attention: The feature is not as
+complete as as the *as_string* argument for :meth:`PV.get`.  Here, a string
+representing the value will always be returned. For Enum types, the name of
+the Enum state will be returned.  For waveforms of type CHAR, the string
+representation will be returned.  For other waveforms (with *count* > 1), a
+string like `<array count=3, type=1>` will be returned.  For all other
+types the result will from Python's :func:`str` function.
 
 .. function::  put(chid, value, wait=False, timeout=20, callback=None,callback_data=None) 
 
-   set the Channel to a value, with options to either wait (block) for the
+   sets the Channel to a value, with options to either wait (block) for the
    process to complete, or to execute a supplied callback function when the
    process has completed.  The chid and value are required.
 
-   :param chid:  channel ID
+   :param chid:  ``chid`` Channel ID
    :type  chid:  ctypes.c_long
    :param wait:  whether to wait for processing to complete (or time-out) before returning.
-   :type  wait:  True/False
+   :type  wait:  ``True``/``False``
    :param timeout:  maximum time to wait for processing to complete before returning anyway.
    :type  timeout:  double
    :param callback: user-supplied function to run when processing has completed.
-   :type callback: None or callable
+   :type callback: ``None`` or callable
    :param callback_data: extra data to pass on to a user-supplied callback function.
 
    :meth:`put` returns 1 on success and -1 on timed-out
@@ -310,17 +332,17 @@ To set a PV's value, use:
 
 .. function::   create_subscription(chid, use_time=False,use_ctrl=False,  mask=7, userfcn=None)
 
-   create a *change* subscription, so that the user-supplied callback
+   create a *changed subscription*, so that the user-supplied callback
    function is called on changes to the PV.
 
    :param use_time: whether to use the TIME variant for the PV type
-   :type use_time:  True/False
+   :type use_time:  ``True``/``False``
    :param use_ctrl: whether to use the CTRL variant for the PV type
-   :type use_ctrl:  True/False
+   :type use_ctrl:  ``True``/``False``
    :param  mask:    integer bitmask to control which changes result in a     callback   
    :type mask:      integer
    :param userfcn:  user-supplied callback function
-   :type userfcn:   callable or None
+   :type userfcn:   ``None`` or callable 
       
    :rtype: tuple containing *(callback_ref, user_arg_ref, event_id)*
    
@@ -336,7 +358,7 @@ To set a PV's value, use:
    
    clears a subscription given its *event_id*.
 
-Other functions that are provided are
+Several other functions are provided:
 
 .. function::  get_timestamp(chid)
 
@@ -349,11 +371,11 @@ Other functions that are provided are
 .. function::  get_precision(chid)
 
    return the precision of a channel.  For channels with native type other
-   than FLOAT or DOUBLE, this will be 0
+   than FLOAT or DOUBLE, this will be 0.
 
 .. function:: get_enum_strings(chid)
 
-    return the list of names for ENUM states of a Channel.  Returns  None
+    return the list of names for ENUM states of a Channel.  Returns  ``None``
     for non-ENUM Channels.
 
 .. function:: get_ctrlvars(chid) 
@@ -392,11 +414,23 @@ states.
     returns a dictionary of TIME fields for a Channel.  This will contain a
     *status*, *severity*, and *timestamp* key.
 
-
 ..  _ca-sg-label:
 
 Synchronous Groups
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+According to the CA documentation, Synchronous Groups can be used to ensure
+that a set of Channel Access calls all happen together.
+
+I should warn that these routines have not been well tested.  I believe the
+notion of Synchronous Groups is neither robust nor meaningful in the
+underlying CA library: the actions here are not atomic nor are they
+anything like a *transaction* (there is no rollback). For :func:`sg_get` in
+particular, the correct values here **are actually returned immediately**
+by the CA library, which suggests to me that the concept is broken or the
+documentation wrong.  Consequently, these have not been well-tested (unless
+*trivially shown to be broken* counts).  If you want this functionality,
+please test carefully.
 
 .. function::  sg_create()
 
@@ -418,7 +452,6 @@ Synchronous Groups
 .. function::  sg_put(gid,chid, value)
 
    perform a `put` within a synchronous group.
-
 
 .. function::  sg_test(gid)
   
@@ -474,32 +507,6 @@ DBR data types
      ctrl_double        34    
     ============== =================== ========================
 
-Function Decorators 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Several decorator functions are used heavily inside of ca.py
-
-   * the decorator function :func:`withCA` ensures that the CA library is
-     initialzed before many CA functions are called.  This prevents, for
-     example, one creating a channel ID before CA has been initialized.
-   
-   * the decorator function :func:`withCHID` ensures that CA functions
-     which require a ``chid`` as the first argument actually have a
-     ``chid`` as the first argument.  This is not a highly robust test (it
-     actually checks for a ctypes.c_long or int) but is useful enough to
-     catch most errors before they would cause a crash of the CA library.
-
-   * Additional decorators exist to check that CHIDs have connected, and to
-     check return status codes from `libca` functions.
-
-
-..  function:: withConnectedCHID 
-
-    which ensures that the first argument of a function is a connected
-    ``chid``.  This test is (intended to be) robust, and will (try to) make
-    sure a ``chid`` is actually connected before calling the decorated
-    function.
-   
 `PySEVCHK` and ChannelAccessExcepction: checking CA return codes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -517,13 +524,37 @@ Several decorator functions are used heavily inside of ca.py
     The message from the exception will include the *func_name* (name of
     the Python function) and the CA message from :mod:`message`.
 
-
-
 ..  function:: withSEVCHK
 
-    a decorator to handle the common case of a function whose return value
-    is from a `libca.ca_***` function and whose return value should be ``dbr.ECA_NORMAL``.
+    this decorator handles the common case of running :func:`PySEVCHK` for
+    a function whose return value is from a `libca.ca_***` function and
+    whose return value should be ``dbr.ECA_NORMAL``.
 
+Function Decorators 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In addition to :func:`withSEVCHK`, several other decorator functions are
+used heavily inside of ca.py
+
+.. function:: withCA
+
+   ensures that the CA library is initialized before many CA functions are
+   called.  This prevents, for example, one creating a channel ID before CA
+   has been initialized. 
+   
+.. function:: withCHID
+
+   ensures that CA functions which require a ``chid`` as the first argument
+   actually have a  ``chid`` as the first argument.  This is not a highly
+   robust test (it actually checks for a ctypes.c_long or int) but is
+   useful enough to catch most errors before they would cause a crash of
+   the CA library. 
+
+..  function:: withConnectedCHID 
+
+    ensures that the first argument of a function is a connected ``chid``.
+    This test is (intended to be) robust, and will (try to) make sure a
+    ``chid`` is actually connected before calling the decorated function.
 
 ..  _ca-callbacks-label:
        
@@ -540,7 +571,7 @@ completes or on changes to the Channel, as set from
 :meth:`create_subscription`, it is important to know two things:
 
     1)  how your function will be called.
-    2)  what is permissable to do inside your callback function.
+    2)  what is permissible to do inside your callback function.
 
 In both cases, callbacks will be called with keyword arguments.  You should be
 prepared to have them passed to your function.  Use `**kw` unless you are very
@@ -551,7 +582,7 @@ For callbacks sent when a :meth:`put` completes, your function will be passed th
     * `pvname` : the name of the pv 
     * `data`:  the user-supplied callback_data (defaulting to ``None``). 
 
-For subcription callbacks, your function will be called with keyword/value
+For subscription callbacks, your function will be called with keyword/value
 pairs that will include:
 
     * `pvname`: the name of the pv 
@@ -559,7 +590,7 @@ pairs that will include:
     * `count`: the number of data elements
     * `ftype`: the numerical CA type indicating the data type
     * `status`: the status of the PV (1 for OK)
-    * `chid`: the integer address for the channel ID.
+    * `chid`:   the integer address for the channel ID.
 
 Depending on the data type, and whether the CTRL or TIME variant was used,
 the callback function may also include some of these as keyword arguments:
@@ -570,15 +601,14 @@ the callback function may also include some of these as keyword arguments:
     * `severity`: PV severity
     * `timestamp`: timestamp from CA server.
 
-A user-supplied callback will be run 'inside' a CA function, and cannot
-reliably make any other CA calls.  It is helpful to think 'this all happens
-inside of a pend_event call', and in an epics thread that may or may not be
-the main thread of your program.  It is advisable to keep the callback
-functions short, not resource-intensive, and to consider strategies which
-use the callback to record that a change has occurred and then act on that
-change outside of the callback (perhaps in a separate thread, perhaps after
-pend_event() has completed, etc).
-
+Note that a the user-supplied callback will be run *inside* a CA function,
+and cannot reliably make any other CA calls.  It is helpful to think "this
+all happens inside of a :func:`pend_event` call", and in an epics thread
+that may or may not be the main thread of your program.  It is advisable to
+keep the callback functions short and not resource-intensive.  Consider
+strategies which use the callback only to record that a change has occurred
+and then act on that change later -- perhaps in a separate thread, perhaps
+after :func:`pend_event` has completed.
     
 ..  _ca-omissions-label:
 
@@ -620,11 +650,11 @@ alternatives), though they could be added on request.
 
 .. function::  ca_SEVCHK
 
-   *Not implemented*: the Python function :func:`Py_SEVCHK` is
+   *Not implemented*: the Python function :func:`PySEVCHK` is
    approximately the same.
 .. function::  ca_signal
 
-   *Not implemented*: the Python function :func:`Py_SEVCHK` is
+   *Not implemented*: the Python function :func:`PySEVCHK` is
    approximately the same. 
 
 .. function:: ca_test_event

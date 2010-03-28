@@ -99,7 +99,7 @@ callbacks to be executed when the PV changes.
 
    :param callback: user-supplied function to run when PV changes.
    :type callback: None or callable
-   :param kw: additonal keyword/value arguments to pass to each execution of the callback.
+   :param kw: additional keyword/value arguments to pass to each execution of the callback.
    :rtype:  integer
 
    Note that multiple callbacks can be defined.  When a PV changes, all callbacks will be
@@ -189,11 +189,11 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
 .. attribute:: read_access
 
-   boolean (True/False) for whether PV is readable
+   Boolean (True/False) for whether PV is readable
 
 .. attribute:: write_access
 
-   boolean (True/False) for whether PV is writeable
+   Boolean (True/False) for whether PV is writable
 
 .. attribute:: access
 
@@ -312,7 +312,7 @@ When defining a callback function to be run on changes to a PV, as set from
 :meth:`add_callback`, it is important to know two things:
 
     1)  how your function will be called.
-    2)  what is permissable to do inside your callback function.
+    2)  what is permissible to do inside your callback function.
 
 Callback functions will be called with several keyword arguments.  You should be
 prepared to have them passed to your function, and should always include
@@ -341,12 +341,11 @@ keyword parameters:
 
 Some of these may not be directly applicable to all PV data types.
 
-Note that a user-supplied callback will be run 'inside' a CA function, and
-cannot reliably make any other CA calls.  It is helpful to think 'this all
-happens inside of a pend_event call', and in an epics thread that may or
-may not be the main thread of your program.  It is advisable to keep the
-callback functions short, not resource-intensive, and to consider
-strategies which use the callback to record that a change has occurred and
-then act on that change outside of the callback (perhaps in a separate
-thread, perhaps after pend_event() has completed, etc).
-
+Note that a the user-supplied callback will be run *inside* a CA function,
+and cannot reliably make any other CA calls.  It is helpful to think "this
+all happens inside of a :func:`pend_event` call", and in an epics thread
+that may or may not be the main thread of your program.  It is advisable to
+keep the callback functions short and not resource-intensive.  Consider
+strategies which use the callback only to record that a change has occurred
+and then act on that change later -- perhaps in a separate thread, perhaps
+after :func:`pend_event` has completed.
