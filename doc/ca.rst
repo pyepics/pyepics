@@ -145,10 +145,10 @@ threading contexts are very close to the C library:
 
 .. function::  poll(ev=1.e-4,io=1.0)
 
-     A notable addition the function which is equivalent to::
+   a convenience function which is equivalent to::
     
-         pend_event(ev) 
-	 pend_io_(io)
+       pend_event(ev) 
+       pend_io_(io)
 
 
 Creating and Connecting to Channels
@@ -160,14 +160,14 @@ which are :data:`ctypes.c_long`.
 
 .. function:: create_channel(pvname,connect=False,userfcn=None)
    
-    creates a channel.
+   creates a channel, returning the Channel ID ``chid`` used by other
+   functions to identify this channel.
 
    :param pvname:   the name of the PV to create.
    :param connect:  whether to (try to) connect to PV as soon as possible.
    :type  connect:  ``True``/``False``
    :param userfcn:  user-defined Python function to be called when the connection state changes.
    :type userfcn:  ``None`` or callable.
-   :rtype: ``chid`` Channel ID 
 
    The user-defined function should be  prepared to accept keyword arguments of
          * `pvname`  name of PV
@@ -181,14 +181,15 @@ which are :data:`ctypes.c_long`.
 
    explicitly connect to a channel (usually not needed as implicit
    connection will be done when needed), waiting up to timeout for a
-   channel to connect.  It returns the connection state.
+   channel to connect.  It returns the connection state,
+   ``True`` or ``False``.
+
 
    :param chid:     ``chid`` Channel ID 
    :param timeout:  maximum time to wait for connection.
    :type  timeout:  ``None`` or double.
    :param verbose:  whether to print out debugging information
    :param force:    whether to (try to) force a connection.
-   :rtype: ``True``/``False``
 
    if *timeout* is ``None``, the value of  :data:`DEFAULT_CONNECTION_TIMEOUT`
    is used (usually 5.0 seconds).

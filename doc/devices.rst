@@ -17,14 +17,13 @@ Record is not exact.  On the other hand, the concept of a *device* is more
 flexible than a predefined Epics Record as it can actually hold PVs from
 several different records.::
 
-      mymotor1 = epics.Device('XXX:motor1.', attr=('VAL','RBV','DESC', 'RVAL','LVIO', 'HLS','LLS'))
-      mymotor1.put('VAL',1)
-      print 'Motor %s = %f' % ( mymotor1.get('DESC'),  mymotor1.get('RBV'))
+    motor1 = epics.Device('XXX:motor1.', attr=('VAL', 'RBV', 'DESC', 'RVAL',
+                                               'LVIO', 'HLS', 'LLS'))
+    motor1.put('VAL',1)
+    print 'Motor %s = %f' % ( mymotor1.get('DESC'),  mymotor1.get('RBV'))
 
 While useful on its own like this, the real point of a *device* is as a
 base class, to be inherited and extended.
-
-
 
 .. class:: Device(prefix=None[, attrs=None])
 
@@ -61,19 +60,19 @@ epics Device.
 .. function:: pv_property(attr[, as_string=False[,wait=False[,timeout=10.0]]])
 
    function to turn a device attribute PV into a Python **property**
-   use in your subclass as:
+   use in your subclass as::
         
-   >>> class MyDevice(epics.device):
-   >>>     def __init__(self,prefix):
-   >>>         epics.Device.__init__(self)
-   >>>         self.PV('something')
-   >>>     field = pv_property('something', as_string=True)
+       class MyDevice(epics.device):
+           def __init__(self,prefix):
+               epics.Device.__init__(self)
+               self.PV('something')
+           field = pv_property('something', as_string=True)
 
-   then use in code as
+   then use in code as::
 
-   >>> m = MyDevice()
-   >>> print m.field
-   >>> m.field = new_value
+       m = MyDevice()
+       print m.field
+       m.field = new_value
 
 .. data:: _pvs
   
