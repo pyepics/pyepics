@@ -3,8 +3,7 @@ import epics
 
 class Scaler(epics.Device):
     """ 
-    Simple implementation of Joerger Scaler. Principle methods:
-    
+    Simple implementation of SynApps Scaler Record.   
     """
     attrs = ('.CNT','.CONT','.TP','.T','_calcEnable.VAL')
     chan_attrs = ('.NM%i', '.S%i','_calc%i.VAL', '_calc%i.CALC')
@@ -14,9 +13,9 @@ class Scaler(epics.Device):
                               attrs=self.attrs)
         self.prefix = prefix
         self.nchan  = nchan
-        for i in range(1,nchan+1):
-            for a in self.chan_attrs:
-                self.PV(a % i)
+        self.chans  = range(1,nchan+1)
+        for a in self.chan_attrs:
+            [self.PV(a % i) for i n self.chans]
         
     def AutoCountMode(self):
         self.put('.CONT', 1)
@@ -24,9 +23,11 @@ class Scaler(epics.Device):
     def OneShotMode(self):
         self.put('.CONT', 0)
 
+    def CountTime(self, t):
+        self.put('.TP', t)
+        
     def Count(self, t=None):
-        if t is not None:
-            self.put('.TP', t)
+        if t is not None:  self.CountTime(t)
         self.put('.CNT', 1)
 
     def EnableCalcs(self):
@@ -37,10 +38,9 @@ class Scaler(epics.Device):
         self.put(attr, s)
 
     def getNames(self):
-        return [self.get('.NM%i' %i) for i in range(self.nchan)]
+        return [self.get('.NM%i' % i) for i in self.chans]
 
     def Read(self, use_calc=False):
         attr = '.S%i'
         if use_calc: attr = '_calc%i.VAL'
-        return [self.get(attr %i) for i in range(self.nchan)]
-
+        return [self.get(attr % i) for i in self.chans]
