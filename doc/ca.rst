@@ -284,6 +284,7 @@ keyword arguments can be used to specify such options.
 
 .. method:: get(chid[, ftype=None[, as_string=False[, as_numpy=False]]])
 
+
    return the current value for a Channel. Note that there is not a separate form for array data.
 
    :param chid:  ``chid`` Channel ID
@@ -352,8 +353,24 @@ types the result will from Python's :func:`str` function.
    (otherwise they may be garbage collected, causing no end of trouble).
    *event_id* is the id for the event (useful for clearing a subscription).
 
-   For more on writing the user-supplied callback, see
-   :ref:`ca-callbacks-label` below. 
+   For more on writing the user-supplied callback, see :ref:`ca-callbacks-label` below.  
+
+.. warning:: 
+  
+   *event_id* is the id for the event (useful for clearing a subscription).
+   You **must** keep the returned tuple in active variables, either as a
+   global variable or as data in an encompassing class.   
+   If you do *not* keep this data, the return value will be garbage
+   collected, the C-level reference to the callback will disappear, and you
+   will see coredumps.  
+
+   On linux, a message like::
+   
+       python: Objects/funcobject.c:451: func_dealloc: Assertion 'g->gc.gc_refs != (-2)' failed.
+       Abort (core dumped)
+  
+   is a hint that you have *not* kept this data.
+
 
 .. function:: clear_subscription(event_id)
    

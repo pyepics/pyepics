@@ -199,7 +199,8 @@ def Name(ftype):
          CTRL_LONG: 'CTRL_LONG',
          CTRL_DOUBLE: 'CTRL_DOUBLE',
          }
-    return m[ftype]
+
+    return m.get(ftype,'unknown')
 
 def Cast(args):
     """returns pointer to arg type for casting """

@@ -15,7 +15,7 @@ class Scaler(epics.Device):
         self.nchan  = nchan
         self.chans  = range(1,nchan+1)
         for a in self.chan_attrs:
-            [self.PV(a % i) for i n self.chans]
+            [self.PV(a % i) for i in self.chans]
         
     def AutoCountMode(self):
         self.put('.CONT', 1)

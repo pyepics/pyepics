@@ -23,7 +23,7 @@ setup(
     license = 'Python',
     description = "Epics Channel Access Extensions to Python",
     package_dir = {'epics': 'lib'},
-    packages = ['epics','epics.wx'],
+    packages = ['epics','epics.wx','epics.devices'],
     data_files = data_files,
 )
 

@@ -164,6 +164,7 @@ def withCHID(fcn):
     def wrapper(*args,**kw):
         if len(args)>0:
             if not isinstance(args[0],(ctypes.c_long,int)):
+                print 'withCHID failure: ', args
                 raise ChannelAccessException(fcn.func_name,
                                              "not a valid chid!")
         return fcn(*args,**kw)
@@ -182,6 +183,7 @@ def withConnectedCHID(fcn):
                 mystate = state(args[0])
             except:
                 mystate = None
+
             if mystate != dbr.CS_CONN:
                 try:
                     t = kw.get('timeout',DEFAULT_CONNECTION_TIMEOUT)
@@ -311,6 +313,7 @@ def create_channel(pvname,connect=False,userfcn=None):
     _cache[pvname] = {'chid':chid, 'conn':False, 'ts':0, 'failures':0,
                       'userfcn': userfcn}
     if connect: connect_channel(chid)
+    poll()
     return chid
 
 @withCHID
@@ -507,9 +510,9 @@ def put(chid,value, wait=False, timeout=20, callback=None,
             data[0] = type(data[0])(value)
         except:
             errmsg = "Cannot put value '%s' to PV of type '%s'"
-            name   = dbr.Name(ftype).lower()
+            tname   = dbr.Name(ftype).lower()
             raise ChannelAccessException('put',\
-                                         errmsg % (repr(value),name))
+                                         errmsg % (repr(value),tname))
     else:
         # auto-convert strings to arrays for character waveforms
         # could consider using
@@ -553,7 +556,7 @@ def put(chid,value, wait=False, timeout=20, callback=None,
 def get_ctrlvars(chid):
     """return the CTRL fields for a Channel.  Depending on 
     the native type, these fields may include
-        status  precision  units  enum_strs
+        status  severity precision  units  enum_strs
         upper_disp_limit     lower_disp_limit
         upper_alarm_limit    lower_alarm_limit
         upper_warning_limit  lower_warning_limit
@@ -570,7 +573,7 @@ def get_ctrlvars(chid):
     poll()
     kw = {}
     v = d[0]
-    for attr in ('precision','units', 
+    for attr in ('precision','units', 'severity', 'status',
                  'upper_disp_limit', 'lower_disp_limit',
                  'upper_alarm_limit', 'upper_warning_limit',
                  'lower_warning_limit','lower_alarm_limit',
@@ -624,8 +627,14 @@ def get_enum_strings(chid):
 @withConnectedCHID
 def create_subscription(chid, use_time=False,use_ctrl=False,
                         mask=7, userfcn=None):
-    """setup a callback function to be called when a PVs value
-    or state changes."""
+    """
+    setup a callback function to be called when a PVs value or state changes.
+
+    Important Note:
+        KEEP The returned tuple in named variable: if the return argument
+        gets garbage collected, a coredump will occur.
+    
+    """
     ftype = promote_type(chid, use_ctrl=use_ctrl,use_time=use_time)
     count = element_count(chid)
 

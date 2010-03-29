@@ -96,73 +96,24 @@ Epics ai record as Device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is a slightly more useful example: An Epics ai (analog input record)
-implemented as a Device.:: 
+implemented as a Device. 
 
-    import epics  
-    class ai(epics.Device):
-        "Simple analog input device"
-        _fields = ('VAL','EGU','HOPR','LOPR','PREC','NAME',
-                   'DESC','DTYP','INP','LINR','RVAL','ROFF',
-		   'EGUF','EGUL','AOFF','ASLO','ESLO','EOFF',
-		   'SMOO', 'HIHI','LOLO','HIGH','LOW','HHSV',
-		   'LLSV','HSV','LSV','HYST')
-        def __init__(self,prefix):
-            if not prefix.endswith('.'): prefix = "%s." % prefix
-            epics.Device.__init__(self,prefix,self._fields)
+.. literalinclude:: ../lib/devices/ai.py
 
+which can be used as::
+
+    
     This_ai = ai('XXX.PRES')
     print This_ai.get('VAL')
+
 
 Epics Scaler Record as Device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-And now a more complicated example: an (incomplete but useful) mapping of
+And now a more complicated example: an incomplete (but useful) mapping of
 the Scaler Record from synApps, including methods for changing modes,
-and reading and writing data::
+and reading and writing data. 
 
-    #!/usr/bin/python 
-    import epics
-    
-    class Scaler(epics.Device):
-        """ 
-        Simple implementation of SynApps Scaler Record.   
-        """
-        attrs = ('.CNT','.CONT','.TP','.T','_calcEnable.VAL')
-        chan_attrs = ('.NM%i', '.S%i','_calc%i.VAL', '_calc%i.CALC')
-    
-        def __init__(self,prefix,nchan=8):
-            epics.Device.__init__(self,prefix,
-                                  attrs=self.attrs)
-            self.prefix = prefix
-            self.nchan  = nchan
-            self.chans  = range(1,nchan+1)
-            for a in self.chan_attrs:
-                [self.PV(a % i) for i n self.chans]
-            
-        def AutoCountMode(self):
-            self.put('.CONT', 1)
-    
-        def OneShotMode(self):
-            self.put('.CONT', 0)
-    
-        def CountTime(self, t):
-            self.put('.TP', t)
-            
-        def Count(self, t=None):
-            if t is not None:  self.CountTime(t)
-            self.put('.CNT', 1)
-    
-        def EnableCalcs(self):
-            self.put('_calcEnable.VAL', 1)
-    
-        def setCalc(self,i,s):
-            attr = '_calc%i.CALC'  % i
-            self.put(attr, s)
-    
-        def getNames(self):
-            return [self.get('.NM%i' % i) for i in self.chans]
-    
-        def Read(self, use_calc=False):
-            attr = '.S%i'
-            if use_calc: attr = '_calc%i.VAL'
-            return [self.get(attr % i) for i in self.chans]
+.. literalinclude:: ../lib/devices/scaler.py
+
+

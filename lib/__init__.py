@@ -38,8 +38,7 @@ def __createPV(pvname,timeout=5.0):
 
     t0 = time.time()
     thispv = PV(pvname)
-    if not thispv.connected:
-        thispv.connect()
+    thispv.connect()
     while not thispv.connected:
         time.sleep(1.e-4)
 	ca.poll()
@@ -74,6 +73,7 @@ def caget(pvname, as_string=False):
     thispv = __createPV(pvname)
     if thispv is not None:
         val = thispv.get()
+        thispv.get_ctrlvars()
         ca.poll()
         if as_string: return thispv.char_value
         return val
@@ -98,10 +98,11 @@ def cainfo(pvname,print_out=True):
         else:     
             return thispv.info
 
+_monitor_cache = {}
 def camonitor_clear(pvname):
     """clear a monitor on a PV"""
-    if (pvname,'native') in pv.PV_cache:
-        pv.PV_cache[(pvname,'native')].clear_callbacks()
+    if pvname in _monitor_cache:
+        _monitor_cache[pvname].clear_callbacks()
         
 def camonitor(pvname,writer=None, callback=None):
     """ camonitor(pvname, writer=None, callback=None)
@@ -129,6 +130,7 @@ def camonitor(pvname,writer=None, callback=None):
             writer("%.32s %s %s\n" % (pvname,pv.fmt_time(),char_value))
         
     thispv = __createPV(pvname)
+    _monitor_cache[pvname] = thispv
     if thispv is not None:
         thispv.get()
         thispv.add_callback(callback)

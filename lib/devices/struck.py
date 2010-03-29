@@ -1,27 +1,6 @@
 #!/usr/bin/python 
 import epics
-
-class Scaler(epics.Device):
-    attrs = ('.CNT','.CONT','.TP')
-    chan_attrs = ('.NM%i','.S%i','_calc%i.VAL')
-    def __init__(self,prefix,nchan=8):
-        attr_list = list(attrs)
-        for i in range(nchan):
-            attr_list.extend([a % (i+1) for a in self.chan_attrs for i])
-
-        self.prefix = prefix
-        self.nchan  = nchan
-        epics.Device.__init__(self,prefix, attrs=attr_list)
-        
-    def AutoCountMode(self):
-        self.put('.CONT', 1)
-
-    def OneShotMode(self):
-        self.put('.CONT', 0)
-
-    def Count(self):
-        self.put('.CNT', 1)
-
+import epics.devices 
 
 class Struck(epics.Device):
     """ 
@@ -38,7 +17,7 @@ class Struck(epics.Device):
         self.nchan  = nchan
         self.scaler = None
         if scaler is not None:
-            self.scaler = Scaler(scaler,nchan=nchan)
+            self.scaler = epics.devices.Scaler(scaler,nchan=nchan)
         
     def ExternalMode(self,prescale=None):
         "put Struck in External Mode"

@@ -6,8 +6,11 @@ import os
 import sys
 import time
 import unittest
+
 sys.path.insert(0,'..')
 from lib import ca
+
+import pvnames
 
 def _ca_connect(chid,timeout=5.0):
     n  = 0
@@ -21,75 +24,65 @@ def _ca_connect(chid,timeout=5.0):
 
     
 class CA_BasicTests(unittest.TestCase):
-    pv_host       = 'ioc13ida.cars.aps.anl.gov:50'
-    pvname_double = '13IDA:m1.VAL'
-    pvname_broken = 'non-pv'
-    pvname_enum   = '13IDA:m1.DIR'
-    pvname_string = '13IDA:m1.DESC'
-    
         
     def testA_CreateChid(self):
         print( 'Simple Test: create chid' )
-        chid = ca.create_channel(self.pvname_double)
+        chid = ca.create_channel(pvnames.double_pv)
         self.assertNotEqual(chid,None)
 
     def test_Connect1(self):
-        chid = ca.create_channel(self.pvname_double)
+        chid = ca.create_channel(pvnames.double_pv)
         conn,dt,n = _ca_connect(chid, timeout=2)
-        print( 'CA Connection Test1: connect to existing PV',end='l')
+        print( 'CA Connection Test1: connect to existing PV ')
         print( ' connected in %.4f sec' % (dt))
         self.assertEqual(conn,True)
 
-    def test_Connect2(self):
+
+    def test_Connected(self):
+        pvn = pvnames.double_pv
+        chid = ca.create_channel(pvn,connect=True)
+        isconn = ca.isConnected(chid)
+        print( 'CA test Connected (%s) = %s' % (pvn,isconn))
+        self.assertEqual(isconn,True)
+        state= ca.state(chid)
+        self.assertEqual(state,ca.dbr.CS_CONN)
+        acc = ca.access(chid)
+        self.assertEqual(acc,'read/write')
+
+
+    def test_DoubleVal(self):
+        pvn = pvnames.double_pv
+        chid = ca.create_channel(pvn,connect=True)
+        cdict  = ca.get_ctrlvars(chid)
+        print( 'CA testing CTRL Values for a Double (%s)'   % (pvn))
+        self.failUnless('units' in cdict)
+        self.failUnless('precision' in cdict)
+        self.failUnless('severity' in cdict)
+                  
+        hostname = ca.host_name(chid)
+        self.failUnless(hostname.startswith(pvnames.double_pv_host))
+
+        count = ca.element_count(chid)
+        self.assertEqual(count,1)
+
+        ftype= ca.field_type(chid)
+        self.assertEqual(ftype,ca.dbr.DOUBLE)
+
+        prec = ca.get_precision(chid)
+        self.assertEqual(prec, pvnames.double_pv_prec)
+
+        units= ca.get_ctrlvars(chid)['units']
+        self.assertEqual(units, pvnames.double_pv_units)
+
+    def test_UnConnected(self):
         print( 'CA Connection Test1: connect to non-existing PV (2sec timeout)')
-        chid = ca.create_channel(self.pvname_broken)
+        chid = ca.create_channel('impossible_pvname_certain_to_fail')
         conn,dt,n = _ca_connect(chid, timeout=2)
         self.assertEqual(conn,False)
 
-    def test_GetHost(self):
-        pvn = self.pvname_double
-        chid = ca.create_channel(pvn,connect=True)
-        hostname = ca.host_name(chid)
-        print( 'CA GetHost (%s) = %s' % (pvn,hostname))
-        self.failUnless(hostname.startswith(self.pv_host))
-
-    def test_GetElementCount(self):
-        pvn = self.pvname_double
-        chid = ca.create_channel(pvn,connect=True)
-        count = ca.element_count(chid)
-        print( 'CA GetElementCount (%s) = %s' % (pvn,count))
-        self.assertEqual(count,1)
-
-    def test_GetFieldType(self):
-        pvn = self.pvname_double
-        chid = ca.create_channel(pvn,connect=True)
-        ftype= ca.field_type(chid)
-        print( 'CA GetFieldType (%s) = %s' % (pvn,ftype))
-        self.assertEqual(ftype,ca.dbr.DOUBLE)
-
-    def test_isConnected(self):
-        pvn = self.pvname_double
-        chid = ca.create_channel(pvn,connect=True)
-        isconn = ca.isConnected(chid)
-        print( 'CA isConnected (%s) = %s' % (pvn,isconn))
-        self.assertEqual(isconn,True)
-        
-    def test_state(self):
-        pvn = self.pvname_double
-        chid = ca.create_channel(pvn,connect=True)
-        state= ca.state(chid)
-        print( 'CA state (%s) = %s' % (pvn,state))
-        self.assertEqual(state,ca.dbr.CS_CONN)
-
-    def test_access(self):
-        pvn = self.pvname_double
-        chid = ca.create_channel(pvn,connect=True)
-        acc = ca.access(chid)
-        print( 'CA access (%s) = %s' % (pvn,acc))
-        self.assertEqual(acc,'read/write')
 
     def test_promote_type(self):
-        pvn = self.pvname_double
+        pvn = pvnames.double_pv
         chid = ca.create_channel(pvn,connect=True)
         print( 'CA promote type (%s)' % (pvn))
         f_t  = ca.promote_type(chid,use_time=True)
@@ -97,22 +90,14 @@ class CA_BasicTests(unittest.TestCase):
         self.assertEqual(f_t, ca.dbr.TIME_DOUBLE)
         self.assertEqual(f_c, ca.dbr.CTRL_DOUBLE)
 
-    def test_get_ctrlvars(self):
-        pvn = self.pvname_double
-        chid = ca.create_channel(pvn,connect=True)
-        cdict  = ca.get_ctrlvars(chid)
-        print( 'CA get_ctrlvars (%s)  %i members'   % (pvn,len(cdict)))
-        self.failUnless('units' in cdict)
-        self.failUnless('precision' in cdict)
-        self.failUnless('severity' in cdict)
-        
-    def test_EnumStr(self):
-        pvn  = self.pvname_enum
+    def test_Enum(self):
+        pvn  = pvnames.enum_pv
         chid = ca.create_channel(pvn,connect=True)
         enumstrs = ca.get_enum_strings(chid)
         self.failUnless(len(enumstrs)>1)
         self.failUnless(isinstance(enumstrs[0],str))
         print( 'CA EnumStrings (%s) = %s' % (pvn,repr(enumstrs)))
+        self.failUnless(enumstrs,pvnames.enum_pv_strs)
         
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase( CA_BasicTests)

@@ -13,9 +13,6 @@ def fmt_time(t=None):
     t,frac=divmod(t,1)
     return "%s.%6.6i" %(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(t)),1.e6*frac)
 
-# cache of PVs
-PV_cache = {}
-
 class PV(object):
     """== Epics Process Variable
     
@@ -51,27 +48,25 @@ class PV(object):
         self.ftype      = None
         self.connected  = False
         self._args      = {}.fromkeys(self._fields)
-        self.callbacks  = {}
-        if callable(callback): self.callbacks[0] = (callback,{})
-
         self._args['pvname'] = self.pvname
+
+        self.callbacks  = {}
+        if callable(callback):
+            self.callbacks[0] = (callback,{})
+
         self._monref = None  # holder of data returned from create_subscription
+
         if self.pvname in ca._cache:
             self.chid = ca._cache[pvname]['chid']
+            self._onConnect(chid=self.chid,conn=ca._cache[pvname]['conn'])
         else:
             self.chid = ca.create_channel(self.pvname,
                                           userfcn=self._onConnect)
         self._args['chid'] = self.chid
-        try:
-            self._args['type'] = dbr.Name(ca.field_type(self.chid)).lower()
-        except epics.ChannelAccessException:
-            self._args['type'] = 'unknown'
+        self._args['type'] = dbr.Name(ca.field_type(self.chid)).lower()
 
-        PV_cache[(pvname,self.form)] = self
-        
     def _onConnect(self,chid=0,conn=True,**kw):
         self.connected = conn
-
         if self.connected:
             self._args['host']   = ca.host_name(self.chid)
             self._args['count']  = ca.element_count(self.chid)
@@ -158,15 +153,15 @@ class PV(object):
                 fmt  = "%%.%if"
                 if 4 < abs(int(math.log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
-                cval = (fmt % self._args['precision']) % val
-            except (IOError, KeyError, ValueError):
+                cval = (fmt %  self._args.get('precision',0)) % val
+            except:
                 pass 
         elif ftype == dbr.ENUM:
             if call_ca and self._args['enum_strs'] in ([], None):
                 self.get_ctrlvars()
             try:
                 cval = self._args['enum_strs'][val]
-            except (KeyError, IndexError):
+            except (TypeError, KeyError,  IndexError):
                 pass
         self._args['char_value'] =cval
         return cval
@@ -174,6 +169,7 @@ class PV(object):
     def get_ctrlvars(self):
         if not self.connect(force=False):  return None
         kw = ca.get_ctrlvars(self.chid)
+        ca.poll()
         self._args.update(kw)
         return kw
 
@@ -382,7 +378,7 @@ class PV(object):
 
     def __repr__(self):
         if self.connected:
-            return sel._fmt % self._args
+            return self._fmt % self._args
         else:
             return "<PV '%s': not connected>" % self.pvname
     
@@ -393,4 +389,17 @@ class PV(object):
             return (self.chid  == other.chid)
         except:
             return False
+
+    def disconnect(self):
+        self.connected = False
+        self.callbacks = {}
+        if self._monref is not None:
+            cb,uarg,evid = self._monref
+            ca.clear_subscription(evid)
+            del cb
+            del uarg
+            del evid
+        ca.poll()
         
+    def __del__(self):
+        self.disconnect()
