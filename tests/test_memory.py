@@ -1,5 +1,5 @@
 import time
-import EpicsCA
+import epics
 import gc
 frm = '13XRM:m%i.%s'
 
@@ -22,28 +22,26 @@ def monitor_events(t = 10.0):
     print 'Processing PV requests:'
     nx = 1
     while nx < int(10*t):
-        EpicsCA.pend_event(0.1)
+        epics.ca.pend_event(0.1)
         time.sleep(0.01)
         nx  = nx + 1
-        
 
 def connect_pv(pvname):
-    return  EpicsCA.PV(pvname , connect=False, callback=get_callback)
+    return  epics.PV(pvname , connect=False, callback=get_callback)
     
 def round():
     pvs = []
     for i in range(1,2): # 6):
         for field in ('VAL','DESC','HLM','LLM','SET'):
-            pvs.append( EpicsCA.PV(frm % (i,field), callback=get_callback) )
-    EpicsCA.connect_all()
+            pvs.append( epics.PV(frm % (i,field), callback=get_callback) )
+    epics.ca.poll()
 
     monitor_events(t=1.2)
     
-    EpicsCA.show_pvcache()
+    epics.ca.show_cache()
     print 'Destroying PVs: '
     for i in pvs:  i.disconnect()
-    
-    # EpicsCA.disconnect_all()
+
     monitor_events(t=0.5)
 
         
@@ -52,7 +50,7 @@ for i in range(20):
     round()
     show_memory()
 
-EpicsCA.pend_io(1.0)
+epics.ca.pend_io(1.0)
 
 print 'really done.'
 
