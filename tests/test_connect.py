@@ -1,0 +1,105 @@
+from  EpicsCA import PV, pend_event, pend_io, connect_all
+
+import time
+pvs = [  "13IDC:m1.VAL", "13IDC:m2.VAL", "13IDC:m3.VAL", "13IDC:m4.VAL",
+  "13IDC:m5.VAL", "13IDC:m6.VAL", "13IDC:m7.VAL", "13IDC:m8.VAL",
+  "13IDC:m9.VAL", "13IDC:m10.VAL", "13IDC:m11.VAL", "13IDC:m12.VAL",
+  "13IDC:m13.VAL", "13IDC:m14.VAL", "13IDC:m15.VAL", "13IDC:m16.VAL",
+  "13IDC:m17.VAL", "13IDC:m18.VAL", "13IDC:m19.VAL", "13IDC:m20.VAL",
+  "13IDC:m21.VAL", "13IDC:m22.VAL", "13IDC:m23.VAL", "13IDC:m24.VAL",
+  "13IDC:m25.VAL", "13IDC:m26.VAL", "13IDC:m27.VAL", "13IDC:m28.VAL",
+  "13IDC:m29.VAL", "13IDC:m1.RBV", "13IDC:m2.RBV", "13IDC:m3.RBV",
+  "13IDC:m4.RBV", "13IDC:m5.RBV", "13IDC:m6.RBV", "13IDC:m7.RBV",
+  "13IDC:m8.RBV", "13IDC:m9.RBV", "13IDC:m10.RBV", "13IDC:m11.RBV",
+  "13IDC:m12.RBV", "13IDC:m13.RBV", "13IDC:m14.RBV", "13IDC:m15.RBV",
+  "13IDC:m16.RBV", "13IDC:m17.RBV", "13IDC:m18.RBV", "13IDC:m19.RBV",
+  "13IDC:m20.RBV", "13IDC:m21.RBV", "13IDC:m22.RBV", "13IDC:m23.RBV",
+  "13IDC:m24.RBV", "13IDC:m25.RBV", "13IDC:m26.RBV", "13IDC:m27.RBV",
+  "13IDC:m28.RBV", "13IDC:m29.RBV", "13IDC:m1.DVAL", "13IDC:m2.DVAL",
+  "13IDC:m3.DVAL", "13IDC:m4.DVAL", "13IDC:m5.DVAL", "13IDC:m6.DVAL",
+  "13IDC:m7.DVAL", "13IDC:m8.DVAL", "13IDC:m9.DVAL", "13IDC:m10.DVAL",
+  "13IDC:m11.DVAL", "13IDC:m12.DVAL", "13IDC:m13.DVAL", "13IDC:m14.DVAL",
+  "13IDC:m15.DVAL", "13IDC:m16.DVAL", "13IDC:m17.DVAL", "13IDC:m18.DVAL",
+  "13IDC:m19.DVAL", "13IDC:m20.DVAL", "13IDC:m21.DVAL", "13IDC:m22.DVAL",
+  "13IDC:m23.DVAL", "13IDC:m24.DVAL", "13IDC:m25.DVAL", "13IDC:m26.DVAL",
+  "13IDC:m27.DVAL", "13IDC:m28.DVAL", "13IDC:m29.DVAL", "13IDC:m1.RVAL",
+  "13IDC:m2.RVAL", "13IDC:m3.RVAL", "13IDC:m4.RVAL", "13IDC:m5.RVAL",
+  "13IDC:m6.RVAL", "13IDC:m7.RVAL", "13IDC:m8.RVAL", "13IDC:m9.RVAL",
+  "13IDC:m10.RVAL", "13IDC:m11.RVAL", "13IDC:m12.RVAL", "13IDC:m13.RVAL",
+  "13IDC:m14.RVAL", "13IDC:m15.RVAL", "13IDC:m16.RVAL", "13IDC:m17.RVAL",
+  "13IDC:m18.RVAL", "13IDC:m19.RVAL", "13IDC:m20.RVAL", "13IDC:m21.RVAL",
+  "13IDC:m22.RVAL", "13IDC:m23.RVAL", "13IDC:m24.RVAL", "13IDC:m25.RVAL",
+  "13IDC:m26.RVAL", "13IDC:m27.RVAL", "13IDC:m28.RVAL", "13IDC:m29.RVAL",
+  "13IDC:m1.LLM", "13IDC:m2.LLM", "13IDC:m3.LLM", "13IDC:m4.LLM",
+  "13IDC:m5.LLM", "13IDC:m6.LLM", "13IDC:m7.LLM", "13IDC:m8.LLM",
+  "13IDC:m9.LLM", "13IDC:m10.LLM", "13IDC:m11.LLM", "13IDC:m12.LLM",
+  "13IDC:m13.LLM", "13IDC:m14.LLM", "13IDC:m15.LLM", "13IDC:m16.LLM",
+  "13IDC:m17.LLM", "13IDC:m18.LLM", "13IDC:m19.LLM", "13IDC:m20.LLM",
+  "13IDC:m21.LLM", "13IDC:m22.LLM", "13IDC:m23.LLM", "13IDC:m24.LLM",
+  "13IDC:m25.LLM", "13IDC:m26.LLM", "13IDC:m27.LLM", "13IDC:m28.LLM",
+  "13IDC:m29.LLM", "13IDD:m1.VAL", "13IDD:m2.VAL", "13IDD:m3.VAL",
+  "13IDD:m4.VAL", "13IDD:m5.VAL", "13IDD:m6.VAL", "13IDD:m7.VAL",
+  "13IDD:m8.VAL", "13IDD:m9.VAL", "13IDD:m10.VAL", "13IDD:m11.VAL",
+  "13IDD:m12.VAL", "13IDD:m13.VAL", "13IDD:m14.VAL", "13IDD:m15.VAL",
+  "13IDD:m16.VAL", "13IDD:m17.VAL", "13IDD:m18.VAL", "13IDD:m19.VAL",
+  "13IDD:m20.VAL", "13IDD:m21.VAL", "13IDD:m22.VAL", "13IDD:m23.VAL",
+  "13IDD:m24.VAL", "13IDD:m25.VAL", "13IDD:m26.VAL", "13IDD:m27.VAL",
+  "13IDD:m28.VAL", "13IDD:m29.VAL", "13IDD:m1.RBV", "13IDD:m2.RBV",
+  "13IDD:m3.RBV", "13IDD:m4.RBV", "13IDD:m5.RBV", "13IDD:m6.RBV",
+  "13IDD:m7.RBV", "13IDD:m8.RBV", "13IDD:m9.RBV", "13IDD:m10.RBV",
+  "13IDD:m11.RBV", "13IDD:m12.RBV", "13IDD:m13.RBV", "13IDD:m14.RBV",
+  "13IDD:m15.RBV", "13IDD:m16.RBV", "13IDD:m17.RBV", "13IDD:m18.RBV",
+  "13IDD:m19.RBV", "13IDD:m20.RBV", "13IDD:m21.RBV", "13IDD:m22.RBV",
+  "13IDD:m23.RBV", "13IDD:m24.RBV", "13IDD:m25.RBV", "13IDD:m26.RBV",
+  "13IDD:m27.RBV", "13IDD:m28.RBV", "13IDD:m29.RBV", "13IDD:m1.DVAL",
+  "13IDD:m2.DVAL", "13IDD:m3.DVAL", "13IDD:m4.DVAL", "13IDD:m5.DVAL",
+  "13IDD:m6.DVAL", "13IDD:m7.DVAL", "13IDD:m8.DVAL", "13IDD:m9.DVAL",
+  "13IDD:m10.DVAL", "13IDD:m11.DVAL", "13IDD:m12.DVAL", "13IDD:m13.DVAL",
+  "13IDD:m14.DVAL", "13IDD:m15.DVAL", "13IDD:m16.DVAL", "13IDD:m17.DVAL",
+  "13IDD:m18.DVAL", "13IDD:m19.DVAL", "13IDD:m20.DVAL", "13IDD:m21.DVAL",
+  "13IDD:m22.DVAL", "13IDD:m23.DVAL", "13IDD:m24.DVAL", "13IDD:m25.DVAL",
+  "13IDD:m26.DVAL", "13IDD:m27.DVAL", "13IDD:m28.DVAL", "13IDD:m29.DVAL",
+  "13IDD:m1.RVAL", "13IDD:m2.RVAL", "13IDD:m3.RVAL", "13IDD:m4.RVAL",
+  "13IDD:m5.RVAL", "13IDD:m6.RVAL", "13IDD:m7.RVAL", "13IDD:m8.RVAL",
+  "13IDD:m9.RVAL", "13IDD:m10.RVAL", "13IDD:m11.RVAL", "13IDD:m12.RVAL",
+  "13IDD:m13.RVAL", "13IDD:m14.RVAL", "13IDD:m15.RVAL", "13IDD:m16.RVAL",
+  "13IDD:m17.RVAL", "13IDD:m18.RVAL", "13IDD:m19.RVAL", "13IDD:m20.RVAL",
+  "13IDD:m21.RVAL", "13IDD:m22.RVAL", "13IDD:m23.RVAL", "13IDD:m24.RVAL",
+  "13IDD:m25.RVAL", "13IDD:m26.RVAL", "13IDD:m27.RVAL", "13IDD:m28.RVAL",
+  "13IDD:m29.RVAL", "13IDD:m1.LLM", "13IDD:m2.LLM", "13IDD:m3.LLM",
+  "13IDD:m4.LLM", "13IDD:m5.LLM", "13IDD:m6.LLM", "13IDD:m7.LLM",
+  "13IDD:m8.LLM", "13IDD:m9.LLM", "13IDD:m10.LLM", "13IDD:m11.LLM",
+  "13IDD:m12.LLM", "13IDD:m13.LLM", "13IDD:m14.LLM", "13IDD:m15.LLM",
+  "13IDD:m16.LLM", "13IDD:m17.LLM", "13IDD:m18.LLM", "13IDD:m19.LLM",
+  "13IDD:m20.LLM", "13IDD:m21.LLM", "13IDD:m22.LLM", "13IDD:m23.LLM",
+  "13IDD:m24.LLM", "13IDD:m25.LLM", "13IDD:m26.LLM", "13IDD:m27.LLM",
+  "13IDD:m28.LLM", "13IDD:m29.LLM"]
+
+def testconnect(pvnames,connect=True):
+    t0 = time.time()
+    pvs= []
+    for pvname in pvnames:
+        pvs.append(PV(pvname,connect=connect))
+        
+    connect_all()
+    for p in pvs:  p.get()
+
+
+    dt = time.time()-t0
+    print '===Connect with PV(connect=%s) to %i pvs' % (connect, len(pvs))
+    print '   Total Time = %.4f s, Time per PV = %.1f ms' % ( dt, 1000.*dt/len(pvs))
+
+
+print """
+Demonstration of 30ms connection time, and why 
+  for mypv in pv_list: x = PV(mypv, connect=False)
+  connect_all()
+
+is faster than
+  for mypv in pv_list x = PV(mypv, connect=True)
+
+when creating many PVs:
+"""
+testconnect(pvs, False)
+
+testconnect(pvs, True)
