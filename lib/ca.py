@@ -696,7 +696,12 @@ def _onConnectionEvent(args):
     """set flag in cache holding whteher channel is
     connected. if provided, run a user-function"""
     pvname = name(args.chid)
-    entry  = _cache[pvname]
+    # sys.stdout.write('onConnection Event: %d /  %s\n' % (args.chid, args.op))
+    if args.op != dbr.OP_CONN_UP:  return
+    try:
+        entry  = _cache[pvname]
+    except KeyError:
+        return
     entry['conn'] = (args.op == dbr.OP_CONN_UP)
     entry['ts']   = time.time()
     entry['failures'] = 0

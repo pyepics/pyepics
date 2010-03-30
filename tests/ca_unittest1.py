@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # test expression parsing
 
-from __future__ import print_function
 import os
 import sys
 import time
@@ -26,15 +25,15 @@ def _ca_connect(chid,timeout=5.0):
 class CA_BasicTests(unittest.TestCase):
         
     def testA_CreateChid(self):
-        print( 'Simple Test: create chid' )
+        sys.stdout.write('Simple Test: create chid\n')
         chid = ca.create_channel(pvnames.double_pv)
         self.assertNotEqual(chid,None)
 
     def test_Connect1(self):
         chid = ca.create_channel(pvnames.double_pv)
         conn,dt,n = _ca_connect(chid, timeout=2)
-        print( 'CA Connection Test1: connect to existing PV ')
-        print( ' connected in %.4f sec' % (dt))
+        sys.stdout.write( 'CA Connection Test1: connect to existing PV\n')
+        sys.stdout.write( ' connected in %.4f sec\n' % (dt))
         self.assertEqual(conn,True)
 
 
@@ -42,7 +41,7 @@ class CA_BasicTests(unittest.TestCase):
         pvn = pvnames.double_pv
         chid = ca.create_channel(pvn,connect=True)
         isconn = ca.isConnected(chid)
-        print( 'CA test Connected (%s) = %s' % (pvn,isconn))
+        sys.stdout.write( 'CA test Connected (%s) = %s\n' % (pvn,isconn))
         self.assertEqual(isconn,True)
         state= ca.state(chid)
         self.assertEqual(state,ca.dbr.CS_CONN)
@@ -54,7 +53,7 @@ class CA_BasicTests(unittest.TestCase):
         pvn = pvnames.double_pv
         chid = ca.create_channel(pvn,connect=True)
         cdict  = ca.get_ctrlvars(chid)
-        print( 'CA testing CTRL Values for a Double (%s)'   % (pvn))
+        sys.stdout.write( 'CA testing CTRL Values for a Double (%s)\n'   % (pvn))
         self.failUnless('units' in cdict)
         self.failUnless('precision' in cdict)
         self.failUnless('severity' in cdict)
@@ -75,7 +74,7 @@ class CA_BasicTests(unittest.TestCase):
         self.assertEqual(units, pvnames.double_pv_units)
 
     def test_UnConnected(self):
-        print( 'CA Connection Test1: connect to non-existing PV (2sec timeout)')
+        sys.stdout.write( 'CA Connection Test1: connect to non-existing PV (2sec timeout)\n')
         chid = ca.create_channel('impossible_pvname_certain_to_fail')
         conn,dt,n = _ca_connect(chid, timeout=2)
         self.assertEqual(conn,False)
@@ -84,7 +83,7 @@ class CA_BasicTests(unittest.TestCase):
     def test_promote_type(self):
         pvn = pvnames.double_pv
         chid = ca.create_channel(pvn,connect=True)
-        print( 'CA promote type (%s)' % (pvn))
+        sys.stdout.write( 'CA promote type (%s)\n' % (pvn))
         f_t  = ca.promote_type(chid,use_time=True)
         f_c  = ca.promote_type(chid,use_ctrl=True)        
         self.assertEqual(f_t, ca.dbr.TIME_DOUBLE)
@@ -96,7 +95,7 @@ class CA_BasicTests(unittest.TestCase):
         enumstrs = ca.get_enum_strings(chid)
         self.failUnless(len(enumstrs)>1)
         self.failUnless(isinstance(enumstrs[0],str))
-        print( 'CA EnumStrings (%s) = %s' % (pvn,repr(enumstrs)))
+        sys.stdout.write( 'CA EnumStrings (%s) = %s\n' % (pvn,repr(enumstrs)))
         self.failUnless(enumstrs,pvnames.enum_pv_strs)
         
 if __name__ == '__main__':
