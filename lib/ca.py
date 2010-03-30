@@ -20,7 +20,7 @@ try:
 except ImportError:
     has_numpy = False
 
-import dbr
+from . import dbr
 
 ## holder for shared library
 libca = None
@@ -97,7 +97,7 @@ def finalize_libca(maxtime=10.0,gc_collect=True):
         t0 = time.time()
         flush_io()
         poll()
-        for key,val in _cache.items():
+        for key,val in list(_cache.items()):
             clear_channel(val['chid'])
             _cache[key] = {}
         _cache.clear()
@@ -111,7 +111,6 @@ def finalize_libca(maxtime=10.0,gc_collect=True):
         libca = None
     except:
         pass
-    ## print 'shutdown in %.3fs' % (time.time()-t0)
 
 
 def show_cache(print_out=True):
@@ -119,13 +118,13 @@ def show_cache(print_out=True):
     o = []
     o.append('#  PV name    Is Connected?   Channel ID')
     o.append('#---------------------------------------')
-    for name,val in _cache.items():
+    for name,val in list(_cache.items()):
         o.append(" %s   %s     %s " % (name,
                                        repr(val['conn']),
                                        repr(val['chid'])))
     o = '\n'.join(o)
     if print_out:
-        print o
+        sys.stdout.write("%s\n" % o)
     else:
         return o
 
@@ -164,8 +163,7 @@ def withCHID(fcn):
     def wrapper(*args,**kw):
         if len(args)>0:
             if not isinstance(args[0],(ctypes.c_long,int)):
-                print 'withCHID failure: ', args
-                raise ChannelAccessException(fcn.func_name,
+                raise ChannelAccessException(fcn.__name__,
                                              "not a valid chid!")
         return fcn(*args,**kw)
     return wrapper
@@ -178,7 +176,7 @@ def withConnectedCHID(fcn):
     def wrapper(*args,**kw):
         if len(args)>0:
             if not isinstance(args[0],ctypes.c_long):
-                raise ChannelAccessException(fcn.func_name, "not a valid chid!")
+                raise ChannelAccessException(fcn.__name__, "not a valid chid!")
             try:
                 mystate = state(args[0])
             except:
@@ -192,7 +190,7 @@ def withConnectedCHID(fcn):
                 except:
                     mystate = None
             if mystate != dbr.CS_CONN:
-                raise ChannelAccessException(fcn.func_name, "channel cannot connect")
+                raise ChannelAccessException(fcn.__name__, "channel cannot connect")
         return fcn(*args,**kw)
     return wrapper
 
@@ -208,7 +206,7 @@ def withSEVCHK(fcn):
     """
     def wrapper(*args,**kw):
         status = fcn(*args,**kw)
-        return PySEVCHK( fcn.func_name, status)
+        return PySEVCHK( fcn.__name__, status)
     return wrapper
 
 ###
@@ -345,7 +343,7 @@ def connect_channel(chid,timeout=None,verbose=False,force=True):
         poll()
         conn = (state(chid)==dbr.CS_CONN)
     if verbose:
-        print 'connected in %.3f s' % ( time.time()-t0 )
+        sys.stdout.write('connected in %.3f s\n' % ( time.time()-t0))
     if not conn:
         _cache[name(chid)]['ts'] = time.time()
         _cache[name(chid)]['failures'] += 1
@@ -518,7 +516,7 @@ def put(chid,value, wait=False, timeout=20, callback=None,
         # could consider using
         # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],
         #                  dtype=numpy.uint8)
-        if ftype == dbr.CHAR and isinstance(value,(str,unicode)):
+        if ftype == dbr.CHAR and isinstance(value,str):
             pad = '\x00'*(1+count-len(value))
             value = [ord(i) for i in ("%s%s" % (value,pad))[:count]]
         try:
@@ -531,7 +529,7 @@ def put(chid,value, wait=False, timeout=20, callback=None,
             raise ChannelAccessException('put',errmsg % (repr(value)))
       
     # simple put, without wait or callback
-    if not (wait or callable(callback)):
+    if not (wait or hasattr(callback,'__call__')):
         ret =  libca.ca_array_put(ftype,count,chid, data)
         PySEVCHK('put',ret)
         poll()
@@ -683,7 +681,7 @@ def _onGetEvent(args):
         nelem = dbr.MAX_STRING_SIZE
 
     value = _unpack(value, nelem, ftype=args.type)
-    if callable(args.usr):
+    if hasattr(args.usr,'__call__'):
         args.usr(value=value, **kw)
 
 ## connection event handler: 
@@ -696,7 +694,7 @@ def _onConnectionEvent(args):
         entry['conn'] = (args.op == dbr.OP_CONN_UP)
         entry['ts']   = time.time()
         entry['failures'] = 0
-        if callable(entry['userfcn']):
+        if hasattr(entry['userfcn'],'__call__'):
             entry['userfcn'](pvname=pvname,
                              chid=entry['chid'],
                              conn=entry['conn'])
@@ -712,7 +710,8 @@ def _onPutEvent(args,*varargs):
     userfcn   = _put_done[pvname][1]
     userdata = _put_done[pvname][2]
     _put_done[pvname] = (True,None,None)
-    if callable(userfcn): userfcn(pvname=pvname, data=userdata)
+    if hasattr(userfcn,'__call__'):
+        userfcn(pvname=pvname, data=userdata)
 
 # create global reference to these two callbacks
 _CB_connect = ctypes.CFUNCTYPE(None, dbr.connection_args)(_onConnectionEvent)
@@ -799,7 +798,7 @@ def sg_put(gid, chid, value):
         # could consider using
         # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],
         #                  dtype=numpy.uint8)
-        if ftype == dbr.CHAR and isinstance(value,(str,unicode)):
+        if ftype == dbr.CHAR and isinstance(value,str):
             pad = '\x00'*(1+count-len(value))
             value = [ord(i) for i in ("%s%s" % (value,pad))[:count]]
         try:

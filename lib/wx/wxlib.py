@@ -5,7 +5,7 @@ import wx
 from wx._core import PyDeadObjectError
                    
 import time
-import types
+import sys
 import fpformat
 import epics
 import wx.lib.buttons as buttons
@@ -66,7 +66,7 @@ class closure:
     Many Tkinter 'actions' can use such callbacks.
 
     >>>def my_action(x=None):
-    ...        print 'my action: x = ', x
+    ...    print('my action: x = ', x)
     >>>c = closure(my_action,x=1)
     ..... sometime later ...
     >>>c()
@@ -243,7 +243,6 @@ class FloatCtrl(wx.TextCtrl):
         self.Refresh()
     
     def __CheckValid(self,value):
-        # print ' Check valid ', value
         v = self.__val
         try:
             self.__valid = True
@@ -309,7 +308,7 @@ class pvCtrlMixin:
         if pvname is not None: self.set_pv(pvname)
 
     def _SetValue(self,value):
-        print 'pvCtrlMixin._SetValue must be overwritten for ', self.pv.pvname
+        self._warn("must override _SetValue")
         
     def update(self,value=None):
         if value is None: value = self.pv.get(as_string=True)
@@ -318,6 +317,9 @@ class pvCtrlMixin:
     def getValue(self,as_string=True):
         return self.pv.get(as_string=as_string)
         
+    def _warn(self,msg):
+        sys.stderr.write("%s for pv='%s'\n" % (msg,self.pv.pvname))
+    
     @DelayedEpicsCallback
     def _pvEvent(self,pvname=None,value=None,wid=None,char_value=None,**kw):
         # if pvname is None or id == 0: return
@@ -363,7 +365,6 @@ class pvText(wx.StaticText,pvCtrlMixin):
         kw['style'] = wx.ALIGN_RIGHT | wx.ST_NO_AUTORESIZE
         # if userstyle:         kw['style'] = kw['style'] | userstyle
 
-        # print 'pvText ', kw['style'], wx.ALIGN_RIGHT, userstyle
         
         wx.StaticText.__init__(self,parent,wx.ID_ANY,label='',**kw)
         pvCtrlMixin.__init__(self,pvname=pvname,
@@ -380,8 +381,9 @@ class pvEnumButtons(wx.Panel,pvCtrlMixin):
         pvCtrlMixin.__init__(self,pvname=pvname)
         
         if self.pv.type != 'enum':
-            print 'need an enumeration type for pvEnumButtons! '
+            self._warn('pvEnumButtons needs an enum PV')
             return
+        
         self.pv.get(as_string=True)
         
         sizer = wx.BoxSizer(orientation)
@@ -421,7 +423,7 @@ class pvEnumChoice(wx.Choice,pvCtrlMixin):
         pvCtrlMixin.__init__(self,pvname=pvname)
 
         if self.pv.type != 'enum':
-            print 'need an enumeration type for pvEnumBuattons! '
+            self._warn('pvEnumChoice needs an enum PV')
             return
 
         self.Clear()
@@ -488,8 +490,8 @@ class pvFloatCtrl(FloatCtrl,pvCtrlMixin):
         self.SetValue( self.pv.char_value)
         
         if self.pv.type in ('string','char'):
-            print 'Float Control for string / character data??  '
-
+            self._warn('pvFloatCtrl needs a double or float PV')
+            
         self.SetMin(self.pv.lower_ctrl_limit)
         self.SetMax(self.pv.upper_ctrl_limit)
 

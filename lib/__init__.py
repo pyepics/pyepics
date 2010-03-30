@@ -20,12 +20,12 @@ __version__ = '3.0.1'
 
 import time
 import sys
-import ca
-import dbr
-import pv
-import alarm
-import motor
-import device
+from . import ca
+from . import dbr
+from . import pv
+from . import alarm
+from . import motor
+from . import device
 PV    = pv.PV
 Alarm = alarm.Alarm
 Motor = motor.Motor
@@ -41,10 +41,11 @@ def __createPV(pvname,timeout=5.0):
     thispv.connect()
     while not thispv.connected:
         time.sleep(1.e-4)
-	ca.poll()
-        if time.time()-t0 > timeout: break
+        ca.poll()
+        if time.time()-t0 > timeout:
+            break
     if not thispv.connected:
-        print 'cannot connect to %s' % pvname
+        sys.stdout.write('cannot connect to %s\n' % pvname)
         return None
     return thispv
 
@@ -94,7 +95,7 @@ def cainfo(pvname,print_out=True):
         thispv.get()
         thispv.get_ctrlvars()
         if print_out:
-            print thispv.info
+            sys.stdout.write("%s\n" % thispv.info)
         else:     
             return thispv.info
 
@@ -110,7 +111,7 @@ def camonitor(pvname,writer=None, callback=None):
     sets a monitor on a PV.  
        >>>camonitor('xx.VAL')
 
-    This will print out a message with the latest value for that PV each
+    This will write a message with the latest value for that PV each
     time the value changes and when ca.poll() is called.
 
     To write the result to a file, provide the writer option a write method

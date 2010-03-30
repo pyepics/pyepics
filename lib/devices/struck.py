@@ -98,6 +98,7 @@ class Struck(epics.Device):
 
     
 if __name__ == '__main__':
+    import sys
     s = Struck('13IDC:str:')
     a = 'ChannelAdvance'
-    print "%s = %s " % (a, s.PV(a).char_value)
+    sys.stdout.write("%s = %s\n" % (a, s.PV(a).char_value))

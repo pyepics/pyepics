@@ -32,20 +32,20 @@
 #                    causes the motor to move to 20 (user units).
 #
 
-import pv
-import ca
-
+import sys
 import time
-import exceptions
 
-class MotorLimitException(exceptions.Exception):
+from . import pv
+from . import ca
+
+class MotorLimitException(Exception):
     """ raised to indicate a motor limit has been reached """
     def __init__(self,msg,*args):
         self.msg = msg
     def __str__(self):
         return str(self.msg)
 
-class MotorException(exceptions.Exception):
+class MotorException(Exception):
     """ raised to indicate a problem with a motor"""
     def __init__(self,msg,*args):
         self.msg = msg
@@ -241,7 +241,10 @@ class Motor:
 
     def __init__(self, name=None,timeout=1.):
         self._dat = {}
-        if (not name):  raise MotorException, "must supply motor name"             
+        if (not name):
+            raise MotorException("must supply motor name")
+        
+        
 
         if name.endswith('.VAL'): name = name[:-4]
         self.pvname = name
@@ -254,7 +257,7 @@ class Motor:
             rectype = None
             
         if rectype != 'motor':
-            raise MotorException, "%s is not an Epics Motor" % name
+            raise MotorException("%s is not an Epics Motor" % name)
 
         self._dat['enable'] = pv.PV("%s_able.VAL" % name)
         isEnabled = (0 == self._dat['enable'].get() )
@@ -284,7 +287,7 @@ class Motor:
         elif self.__dict__.has_key(attr):
             return self.__dict__[attr]
         else:
-            raise MotorException, "EpicsMotor has no attribute %s" % attr
+            raise MotorException("EpicsMotor has no attribute %s" % attr)
      
     def __setattr__(self,attr,val):
         if self.__motor_params.has_key(attr):
@@ -310,7 +313,7 @@ class Motor:
                           ('high_limit_set', 'High hard limit violation'),
                           ('low_limit_set',  'Low  hard limit violation')):
             if self.get_field(field)!= 0:
-                raise MotorLimitException, msg
+                raise MotorLimitException(msg)
         return
     
     def within_limits(self,val,lims):
@@ -500,7 +503,7 @@ class Motor:
       
     def wait(self, **kw):
         "deprecated:  use move(val, wait=True)"
-        raise MotorException, 'wait() deprecated: use move(val, wait=True)'
+        raise MotorException('wait() deprecated: use move(val, wait=True)')
 
     def stop(self):
         "stop motor right now"
@@ -548,7 +551,8 @@ class Motor:
                 time.sleep(0.001)
                 out = self._data[attr].get(as_string=as_string)
             except:
-                print 'Get Field Failed: ', attr, self._dat[attr]
+                sys.stderr.write('Get Field Failed: %s %s\n' %
+                                 (attr, self._dat[attr]))
                 raise ValueError('Fail.')
         return out
 
@@ -590,21 +594,25 @@ class Motor:
     def show_info(self):
         " show basic motor settings "
         self.refresh()
-        print self
-        print "--------------------------------------"
+        o = []
+        o.append(repr(self))
+        o.append( "--------------------------------------")
         for i in ('description', 'drive','readback', 'slew_speed',
                   'precision','tweak_val','low_limit', 'high_limit',
                   'stop_go', 'set', 'status'):
             j = i
             if (len(j) < 16): j = "%s%s" % (j,' '*(16-len(j)))
-            print "%s = %s" % (j, self.get_field(i,as_string=True))
-        print "--------------------------------------"
+            o.append("%s = %s" % (j, self.get_field(i,as_string=True)))
+        o.append("--------------------------------------")
+        sys.stdout.write("%s\n" % "\n".join(o))
 
     def show_all(self):
         """ show all motor attributes"""
-        print " Motor %s [%s]\n" % (self.pvname,self.get_field('description'))
-        print "   field      PV Suffix     value            description"
-        print " ------------------------------------------------------------"
+        o = []
+        add = o.append
+        add(" Motor %s [%s]\n" % (self.pvname,self.get_field('description')))
+        add("   field      PV Suffix     value            description")
+        add(" ------------------------------------------------------------")
         self.refresh()
         list = self.__motor_params.keys()
         list.sort()
@@ -624,10 +632,10 @@ class Motor:
             val = self.get_field(attr,as_string=True)
             if (val):
                 if (len(val)<12): val  = val + ' '*(12-len(val))
-            print " %s  %s  %s  %s" % (l,suf,val,
-                                       self.__motor_params[attr][1])
+            add(" %s  %s  %s  %s" % (l,suf,val,
+                                     self.__motor_params[attr][1]))
 
-
+        sys.stdout.write("%s\n" % "\n".join(o))
 if (__name__ == '__main__'):
     import sys
     for i in sys.argv[1:]:

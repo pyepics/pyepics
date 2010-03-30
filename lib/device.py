@@ -1,6 +1,6 @@
 #!/usr/bin/python
-import pv
-import ca
+from . import ca
+from . import pv
 
 class Device(object):
     """A simple collection of related PVs, all sharing a prefix,

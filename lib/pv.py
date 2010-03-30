@@ -5,8 +5,8 @@
 import time
 import math
 import copy
-import ca
-import dbr
+from . import ca
+from . import dbr
 
 def fmt_time(t=None):
     if t is None: t = time.time()
@@ -51,7 +51,7 @@ class PV(object):
         self._args['pvname'] = self.pvname
 
         self.callbacks  = {}
-        if callable(callback):
+        if hasattr(callback,'__call__'):
             self.callbacks[0] = (callback,{})
 
         self._monref = None  # holder of data returned from create_subscription
@@ -65,6 +65,9 @@ class PV(object):
         self._args['chid'] = self.chid
         self._args['type'] = dbr.Name(ca.field_type(self.chid)).lower()
 
+    def _write(self,msg):
+        sys.stdout.write("%s\n" % msg)
+    
     def _onConnect(self,chid=0,conn=True,**kw):
         self.connected = conn
         if self.connected:
@@ -184,8 +187,10 @@ class PV(object):
         self._set_charval(self._args['value'], call_ca=False)
 
         if self.verbose:
-            print '  %s: %s (%s)'% (self.pvname,self._args['char_value'],
-                                    fmt_time(self._args['timestamp']))
+            now = fmt_time(self._args['timestamp'])
+            self.write('%s: %s (%s)'% (self.pvname,
+                                       self._args['char_value'],
+                                       now))
         self.run_callbacks()
         
     def run_callbacks(self):
@@ -210,7 +215,7 @@ class PV(object):
             kw = copy.copy(self._args)
             kw.update(kwargs)
             kw['cb_info'] = (index, self.remove_callback)
-            if callable(fcn): fcn(**kw)
+            if hasattr(fcn,'__call__'): fcn(**kw)
             
     def add_callback(self,callback=None,**kw):
         """add a callback to a PV.  Optional keyword arguments
@@ -221,7 +226,7 @@ class PV(object):
         has a unique index (small integer) that is returned by
         add_callback.  This index is needed to remove a callback."""
         index = None
-        if callable(callback):
+        if hasattr(callback,'__call__'):
             n_cb = len(self.callbacks)
             index = 1
             if n_cb > 1:  index = 1 + max(self.callbacks.keys())

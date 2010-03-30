@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-import ca
-import pv
+import sys
 import time
 import operator
+from . import ca
+from . import pv
    
 class Alarm(object):
     """ alarm class for a PV:
@@ -113,8 +114,9 @@ class Alarm(object):
 
         if notify:
             self.last_alert = now
-            print 'Alarm: ', pvname, char_value, time.ctime()            
-            if callable(self.user_callback):
+            sys.stdout.write('Alarm: %s=%s (%s)\n' % (pvname, char_value,
+                                                      time.ctime()))
+            if hasattr(self.user_callback,'__call__'):
                 self.user_callback(pvname=pvname, value=value,
                                    char_value=char_value,
                                    trip_point=self.trip_point,
