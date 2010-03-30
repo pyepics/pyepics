@@ -57,8 +57,8 @@ class CA_BasicTests(unittest.TestCase):
         self.failUnless('units' in cdict)
         self.failUnless('precision' in cdict)
         self.failUnless('severity' in cdict)
-                  
-        hostname = ca.host_name(chid)
+       
+        hostname = ca.host_name(chid).decode()
         self.failUnless(hostname.startswith(pvnames.double_pv_host))
 
         count = ca.element_count(chid)
@@ -94,7 +94,8 @@ class CA_BasicTests(unittest.TestCase):
         chid = ca.create_channel(pvn,connect=True)
         enumstrs = ca.get_enum_strings(chid)
         self.failUnless(len(enumstrs)>1)
-        self.failUnless(isinstance(enumstrs[0],str))
+
+        self.failUnless(isinstance(enumstrs[0].decode(),str))
         sys.stdout.write( 'CA EnumStrings (%s) = %s\n' % (pvn,repr(enumstrs)))
         self.failUnless(enumstrs,pvnames.enum_pv_strs)
         

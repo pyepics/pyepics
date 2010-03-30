@@ -244,8 +244,6 @@ class Motor:
         if (not name):
             raise MotorException("must supply motor name")
         
-        
-
         if name.endswith('.VAL'): name = name[:-4]
         self.pvname = name
         # make sure motor is enabled:

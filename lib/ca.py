@@ -29,6 +29,9 @@ def get_str2byte():
     return str
 strwrapper = get_str2byte()
 
+def strjoin(sep, seq):
+   return strwrapper(sep).join(seq)
+    
 ## holder for shared library
 libca = None
 
@@ -83,7 +86,7 @@ def initialize_libca():
         path_dirs = os.environ['PATH'].split(path_sep)
         for p in (sys.prefix,os.path.join(sys.prefix,'DLLs')):
             path_dirs.insert(0,p)
-        os.environ['PATH'] = ';'.join(path_dirs)
+        os.environ['PATH'] = ';'.join(path_dirs)  
 
     libca = load_dll(dllname)
     ca_context = {False:0, True:1}[PREEMPTIVE_CALLBACK]
@@ -129,7 +132,7 @@ def show_cache(print_out=True):
         o.append(" %s   %s     %s " % (name,
                                        repr(val['conn']),
                                        repr(val['chid'])))
-    o = '\n'.join(o)
+    o = strjoin('\n', o)
     if print_out:
         sys.stdout.write("%s\n" % o)
     else:
@@ -414,8 +417,11 @@ def _unpack(data, count, ftype=dbr.INT,as_numpy=True):
         if count == 1 and ntype != dbr.STRING:
             return data[0]
         out = [i for i in data]
+        sys.stdout.write(' unpack simple %i %i\n' % (ntype, dbr.STRING))
         if ntype == dbr.STRING:
-            out = ''.join(out).rstrip()
+            print(out)
+            print(str(out))
+            out = strjoin('', out).rstrip()
             if '\x00' in out:   out = out[:out.index('\x00')]
         return out
 
@@ -472,7 +478,7 @@ def __as_string(val,chid,count,ftype):
     "primitive conversion of value to a string"
     try:
         if ftype==dbr.CHAR:
-            val = ''.join([chr(i) for i in val if i>0]).strip()
+            val = strjoin('',   [chr(i) for i in val if i>0]).strip()
         elif ftype==dbr.ENUM and count==1:
             val = get_enum_strings(chid)[val]
         elif count > 1:

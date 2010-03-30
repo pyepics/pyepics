@@ -1,7 +1,10 @@
 import time
+import sys
+
 import epics
 import gc
-frm = '13XRM:m%i.%s'
+
+import pvnames
 
 import os
 def show_memory():
@@ -12,45 +15,37 @@ def show_memory():
     f = open("/proc/%i/statm" % os.getpid())
     mem = f.readline().split()
     f.close()
+    sys.stdout.write('Memory: VmSize = %i kB  /  VmRss = %i kB\n' %( int(mem[0])*4 , int(mem[1])*4))
 
-    print 'Memory: VmSize = %i kB  /  VmRss = %i kB' %( int(mem[0])*4 , int(mem[1])*4)
-
-def get_callback(pv=None):
-    x = 'OnGet %s: %s '  % (pv.pvname, str(pv.value))
+def get_callback(pvname=None, char_value=None,**kw):
+    sys.stdout.write('OnGet %s: %s\n'  % (pvname, char_value))
     
 def monitor_events(t = 10.0):
-    print 'Processing PV requests:'
-    nx = 1
-    while nx < int(10*t):
-        epics.ca.pend_event(0.1)
-        time.sleep(0.01)
-        nx  = nx + 1
-
-def connect_pv(pvname):
-    return  epics.PV(pvname , connect=False, callback=get_callback)
+    sys.stdout.write('Processing PV requests:\n')
+    t0 = time.time()
+    while time.time()-t0 < t :
+        epics.ca.poll()
     
 def round():
+    sys.stdout.write('== Creating some PVs\n ')
     pvs = []
-    for i in range(1,2): # 6):
-        for field in ('VAL','DESC','HLM','LLM','SET'):
-            pvs.append( epics.PV(frm % (i,field), callback=get_callback) )
+    for field in ('VAL','DESC', 'OFF','FOFF', 'HLM','LLM','SET'):
+        pvs.append(epics.PV("%s.%s" % (pvnames.motor1,field), callback=get_callback) )
     epics.ca.poll()
 
-    monitor_events(t=1.2)
+    for p in pvs: p.connect()
+    monitor_events(t=4.)
     
     epics.ca.show_cache()
-    print 'Destroying PVs: '
+    sys.stdout.write('Destroying PVs:\n ')
+    sys.stdout.flush()    
     for i in pvs:  i.disconnect()
 
     monitor_events(t=0.5)
-
         
 for i in range(20):
-    print "================ ", i
     round()
     show_memory()
 
 epics.ca.pend_io(1.0)
-
-print 'really done.'
 

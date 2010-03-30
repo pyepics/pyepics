@@ -23,12 +23,16 @@ enum_pv_strs = ['Neg','Pos']
 str_pv = '13IDA:m1.DESC'
 str_pv_val = 'Hor. slit pos.'
 
+####
+# provide a single motor prefix (to which '.VAL' and '.RBV' etc will be added)
 
-#### 4
+motor1 = '13XRM:m1'
+
+#### 
 #  Here, provide a PV that changes at least once very 10 seconds
 updating_pv1 = '13IDA:DMM1Ch3_calc.VAL'
 
-#### 5
+#### 
 #  Here, provide a list of PVs that  change at least once very 10 seconds
 updating_pvlist = ['13BMA:DMM1Ch2_calc.VAL',
                    '13BMA:DMM1Ch3_calc.VAL',
