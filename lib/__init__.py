@@ -124,7 +124,7 @@ def camonitor(pvname,writer=None, callback=None):
     char_value Important: use **kw!!
     """
 
-    if not callable(callback):
+    if not hasattr(callback,'__call__'):
         if writer is None:  writer = sys.stdout.write
         def callback(pvname=None, value=None,
                      char_value=None,**kw):

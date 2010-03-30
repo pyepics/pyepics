@@ -34,7 +34,7 @@ def DelayedEpicsCallback(fcn):
             except PyDeadObjectError:                    
                 try:
                     cb_index,remove_cb =  kw.get('cb_info',(None,None))
-                    if callable(remove_cb):
+                    if hasattr(remove_cb,'__call__'):
                         remove_cb(index=cb_index)
                 except:
                     pass
@@ -84,7 +84,7 @@ class closure:
         self.kw.update(kw)
         if (self.func == None): return None
         self.args = args
-        return apply(self.func,self.args,self.kw)
+        return self.func(*self.args, **self.kw)
 
 
 class FloatCtrl(wx.TextCtrl):
@@ -112,12 +112,15 @@ class FloatCtrl(wx.TextCtrl):
         
         # set up action 
         self.__action = closure()  
-        if callable(action):  self.__action.func = action
-        if len(action_kw.keys())>0:  self.__action.kw = action_kw
+        if hasattr(action,'__call__'):
+            self.__action.func = action
+        if len(list(action_kw.keys()))>0:
+            self.__action.kw = action_kw
 
         this_sty =  wx.TE_PROCESS_ENTER|wx.TE_RIGHT
         kw = kwargs
-        if kw.has_key('style'): this_sty = this_sty | kw['style']
+        if 'style' in kw:
+            this_sty = this_sty | kw['style']
         kw['style'] = this_sty
             
         wx.TextCtrl.__init__(self, parent, wx.ID_ANY, **kw)        
@@ -136,8 +139,10 @@ class FloatCtrl(wx.TextCtrl):
 
     def SetAction(self,action,action_kw={}):
         self.__action = closure()  
-        if callable(action):         self.__action.func = action
-        if len(action_kw.keys())>0:  self.__action.kw = action_kw
+        if hasattr(action,'__call__'):
+            self.__action.func = action
+        if len(list(action_kw.keys()))>0:
+            self.__action.kw = action_kw
         
     def SetPrecision(self,p):
         if p is None: p = 0
@@ -166,7 +171,8 @@ class FloatCtrl(wx.TextCtrl):
             self.__Text_SetValue(self.__val)
             self.SetForegroundColour(self.fgcol_valid)
             self.SetBackgroundColour(self.bgcol_valid)
-            if  callable(self.__action) and act:  self.__action(value=self.__val)
+            if  hasattr(self.__action,'__call__') and act:
+                self.__action(value=self.__val)
         else:
             self.__val = self.__bound_val
             self.__Text_SetValue(self.__val)

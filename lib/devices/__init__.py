@@ -1,8 +1,15 @@
 """
 simple devices
 """
-from ai import ai
-from ao import ao
-from bi import bi
-from bo import bo
-from scaler import Scaler
+from . import ai
+from . import ao
+from . import bi
+from . import bo
+from . import scaler
+
+ai  = ai.ai
+ao =ao.ao
+bi = bi.bi
+bo = bo.bo
+Scaler = scaler.Scaler
+

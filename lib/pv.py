@@ -237,7 +237,7 @@ class PV(object):
         """remove a callback.
         """
         if index is None and len(self.callbacks)==1:
-            index = self.callbacks.keys()[0]
+            index = list(self.callbacks.keys())[0]
         if index in self.callbacks:
             self.callbacks.pop(index)
             self.poll()
@@ -295,7 +295,7 @@ class PV(object):
             out.append('   PV is monitored internally')
             if len(self.callbacks) > 0:
                 out.append("   user-defined callbacks:")
-                cblist = self.callbacks.keys()
+                cblist = list(self.callbacks.keys())
                 cblist.sort()
                 for i in cblist:
                     cb = self.callbacks[i]

@@ -65,7 +65,8 @@ class Struck(epics.Device):
         sdata = []
         names = []
         addrs = []
-        if mcas is None: mcas = range(1,self.nchan+1)
+        if mcas is None:
+            mcas = list(range(1,self.nchan+1))
         for n in mcas:
             if self.scaler is not None:
                 scaler_name = self.scaler.get('.NM%i' % n)

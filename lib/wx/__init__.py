@@ -4,9 +4,10 @@ All these controls combine a wx widget with one Epics PV, and allow automatic up
 of the widget  when the associated PV changes.
 
 """
-from MotorPanel import MotorPanel
-import wxlib
+from . import MotorPanel
+from . import wxlib
 
+MotorPanel = MotorPanel.MotorPanel
 pvText        = wxlib.pvText
 pvAlarm       = wxlib.pvAlarm
 pvFloatCtrl   = wxlib.pvFloatCtrl

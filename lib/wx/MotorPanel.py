@@ -10,11 +10,19 @@
 #         initial working version.
 #----------------------------------------
 import wx
-import types
-import epics
 import time
-from wxlib import pvText, pvFloatCtrl, pvTextCtrl, pvEnumButtons, pvEnumChoice
-from wxlib import set_sizer, set_float, DelayedEpicsCallback
+
+import epics
+from . import wxlib
+
+pvText = wxlib.pvText
+pvFloatCtrl = wxlib.pvFloatCtrl
+pvTextCtrl = wxlib.pvTextCtrl
+pvEnumButtons = wxlib.pvEnumButtons
+pvEnumChoice = wxlib.pvEnumChoice
+set_sizer = wxlib.set_sizer
+set_float = wxlib.set_float
+DelayedEpicsCallback = wxlib.DelayedEpicsCallback
 
 def xLabel(parent,label):
     return wx.StaticText(parent,label=label,style=wx.ALIGN_BOTTOM)
@@ -365,7 +373,8 @@ class MotorPanel(wx.Panel):
         self.parent = parent
         # wx.Panel.SetBackgroundColour(self,(245,245,225))
 
-        if (callable(messenger)): self.__messenger = messenger
+        if hasattr(messenger,'__call__'):
+            self.__messenger = messenger
         self.style = style
         self.format = "%.3f" 
         self.motor = None
@@ -538,7 +547,8 @@ class MotorPanel(wx.Panel):
             pass
 
     def set_Tweak(self,val):
-        if type(val) is not types.StringType: val = self.format % val
+        if not isinstance(val, str):
+            val = self.format % val
         if val not in self.twk_list:  self.__Update_StepList(value=val)
         self.__twkbox.SetValue(val)
             

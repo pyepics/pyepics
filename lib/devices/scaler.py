@@ -13,7 +13,7 @@ class Scaler(epics.Device):
                               attrs=self.attrs)
         self.prefix = prefix
         self.nchan  = nchan
-        self.chans  = range(1,nchan+1)
+        self.chans  = list(range(1,nchan+1))
         for a in self.chan_attrs:
             [self.PV(a % i) for i in self.chans]
         

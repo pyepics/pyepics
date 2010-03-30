@@ -270,7 +270,7 @@ class Motor:
 
     def connect_all(self):
         ca.poll()
-        for p in self._dat.values():
+        for p in list(self._dat.values()):
             if not p.connected: p.get()
 
     def __repr__(self):
@@ -282,24 +282,25 @@ class Motor:
     
     def __getattr__(self,attr):
         " internal method "
-        if self.__motor_params.has_key(attr):
+        if attr in self.__motor_params:
             return self.get_field(attr)
-        elif self.__dict__.has_key(attr):
+        elif attr in self.__dict__:
             return self.__dict__[attr]
         else:
             raise MotorException("EpicsMotor has no attribute %s" % attr)
      
     def __setattr__(self,attr,val):
-        if self.__motor_params.has_key(attr):
+        if attr in self.__motor_params:
             # print ' Epics Motor SetAttr: ', attr, val
             return self.put_field(attr,val)
         else:
             self.__dict__[attr] = val
 
-    def has_attr(self,attr):  return self._dat.has_key(attr)
+    def has_attr(self,attr):
+        return attr in self._dat
     
     def store_attr(self,attr):
-        if not self._dat.has_key(attr) and self.__motor_params.has_key(attr):
+        if not attr in self._dat and attr in self.__motor_params:
             pvname = "%s.%s" % (self.pvname,self.__motor_params[attr][0])
             self._dat[attr] = pv.PV(pvname)
         return attr in self._dat
@@ -512,8 +513,8 @@ class Motor:
 
     def get_pv(self,attr):
         "return full PV for a field"
-        if (not self._dat.has_key('drive')): return None
-        if not self.__motor_params.has_key(attr):
+        if not 'drive' in self._dat: return None
+        if not attr in self.__motor_params:
             return None
         else:
             return "%s.%s" % (self.pvname,self.__motor_params[attr][0])
@@ -576,8 +577,8 @@ class Motor:
     def refresh(self):
         """ refresh all motor parameters currently in use:
         make sure all used attributes are up-to-date."""
-        for i in self._dat.keys():
-            if self.__motor_params.has_key(i):
+        for i in list(self._dat.keys()):
+            if i in self.__motor_params:
                 self.get_field(i)
 
     def lookup_attribute(self,suffix):
@@ -586,7 +587,7 @@ class Motor:
         """
         suf = suffix.lower()
         if ((suf.find('.') == 0) or (suf.find('_') == 0)): suf =  suf[1:]
-        for (name,ext) in  self.__motor_params.items():
+        for (name,ext) in  list(self.__motor_params.items()):
             if (suf == ext[0].lower()): return name
         return None
 
@@ -614,14 +615,14 @@ class Motor:
         add("   field      PV Suffix     value            description")
         add(" ------------------------------------------------------------")
         self.refresh()
-        list = self.__motor_params.keys()
-        list.sort()
-        for attr in list:
+        klist =list( self.__motor_params.keys())
+        klist.sort()
+        for attr in klist:
             if not attr in self._dat:
                 self.store_attr(attr)
 
         self.connect_all()
-        for attr in list:
+        for attr in klist:
             l = attr 
             if (len(attr)<15): l  = l + ' '*(15-len(l))
             suf = self.__motor_params[attr][0]
