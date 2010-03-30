@@ -275,15 +275,15 @@ In fact, the `epics` package is targeted and tested to work wih Python 2.5,
 Status and To-Do List
 =====================
 
-The Epics3 package is under active development.  The current status is that
+The Epics3 package is under active development.   The current status is that
 most features are working well, and it is being used in some production
-code, but more testing is needed, and this documentation needs improvement.
+code, but more testing and better tests are needed.  
 
 There are several desired features are left undone or unfinished:
  
- *  port CaChannel interface to use epics.ca
-
  *  improve documentation, examples, unit testing.
+
+ *  port CaChannel interface to use epics.ca
 
  *  test threading
 
