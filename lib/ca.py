@@ -22,6 +22,13 @@ except ImportError:
 
 from . import dbr
 
+def get_str2byte():
+    """create wrapping of strings to pass to C functions  for both Python2 and Python3"""
+    if sys.version_info[0] == 3:
+        return lambda x:  bytes(x,'ASCII')
+    return str
+strwrapper = get_str2byte()
+
 ## holder for shared library
 libca = None
 
@@ -299,16 +306,16 @@ def create_channel(pvname,connect=False,userfcn=None):
        conn     connection state (True/False)
     """
     chid = ctypes.c_long()
-
     # 
     # Note that _CB_connect (defined below) is a global variable, holding
     # a reference to _onConnectionEvent:  This is really the connection
     # callback that is run -- the userfcn here is stored in the _cache
     # and called by _onConnectionEvent.
-    ret = libca.ca_create_channel(pvname,_CB_connect,0,0,ctypes.byref(chid))
+    pvn = strwrapper(pvname)    
+    ret = libca.ca_create_channel(pvn, _CB_connect,0,0,ctypes.byref(chid))
     PySEVCHK('create_channel',ret)
     
-    _cache[pvname] = {'chid':chid, 'conn':False, 'ts':0, 'failures':0,
+    _cache[pvn] = {'chid':chid, 'conn':False, 'ts':0, 'failures':0,
                       'userfcn': userfcn}
     if connect: connect_channel(chid)
     poll()
@@ -688,18 +695,19 @@ def _onGetEvent(args):
 def _onConnectionEvent(args):
     """set flag in cache holding whteher channel is
     connected. if provided, run a user-function"""
+    pvname = name(args.chid)
+    entry  = _cache[pvname]
+    entry['conn'] = (args.op == dbr.OP_CONN_UP)
+    entry['ts']   = time.time()
+    entry['failures'] = 0
     try:
-        pvname = name(args.chid)
-        entry  = _cache[pvname]
-        entry['conn'] = (args.op == dbr.OP_CONN_UP)
-        entry['ts']   = time.time()
-        entry['failures'] = 0
         if hasattr(entry['userfcn'],'__call__'):
             entry['userfcn'](pvname=pvname,
                              chid=entry['chid'],
                              conn=entry['conn'])
     except:
-        pass
+        errmsg = "Error Setting User Callback for '%s'"  % pvname
+        raise ChannelAccessException('Connect',errmsg)
     return 
 
 ## put event handler:
@@ -831,4 +839,5 @@ def sg_put(gid, chid, value):
 # 
 # def SEVCHK(): raise NotImplementedError
 # def signal(): return libca.ca_signal()
+
 
