@@ -22,12 +22,12 @@ except ImportError:
 
 from . import dbr
 
-def get_str2byte():
-    """create wrapping of strings to pass to C functions  for both Python2 and Python3"""
+def get_strwrapper():
+    """create string wrapper to pass to C functions  for both Python2 and Python3"""
     if sys.version_info[0] == 3:
         return lambda x:  bytes(x,'ASCII')
     return str
-strwrapper = get_str2byte()
+strwrapper = get_strwrapper()
 
 def strjoin(sep, seq):
    return strwrapper(sep).join(seq)
@@ -417,10 +417,7 @@ def _unpack(data, count, ftype=dbr.INT,as_numpy=True):
         if count == 1 and ntype != dbr.STRING:
             return data[0]
         out = [i for i in data]
-        sys.stdout.write(' unpack simple %i %i\n' % (ntype, dbr.STRING))
         if ntype == dbr.STRING:
-            print(out)
-            print(str(out))
             out = strjoin('', out).rstrip()
             if '\x00' in out:   out = out[:out.index('\x00')]
         return out

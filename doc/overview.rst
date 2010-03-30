@@ -269,7 +269,8 @@ thread-safety available, as each call to the underlying C library is
 automatically made thread-aware without explicit coding.  Finally, by
 avoiding the C API altogether, migration to Python3 is greatly simplified.
 In fact, the `epics` package is targeted and tested to work wih Python 2.5,
-2.6, and 3.1 simultaneously.
+2.6, and 3.1 simultaneously.  Currently, use with Python 3.1 works
+partially, but is not extremely well-tested.
 
 
 Status and To-Do List
@@ -286,6 +287,8 @@ There are several desired features are left undone or unfinished:
  *  port CaChannel interface to use epics.ca
 
  *  test threading
+
+ *  better support for Python 3.1
 
  *  investigate retrieving array data for CTRL and TIME variants.
 
