@@ -45,6 +45,9 @@ In addition, the `epics` package contains more specialized modules for
 Epics motors, alarms, a host of other *devices* (collections of PVs), and a
 set of wxPython widget classes for using EPICS PVs with wxPython.
 
+The `epics` package is targeted for use on Unix-like systems (including
+Linux and Mac OS X) and Windows with Python versions 2.5, 2.6, and 3.1.
+
 
 Functions defined in :mod:`epics`: caget(), caput() and related functions
 =========================================================================
@@ -259,12 +262,14 @@ CA C library.  Using ctypes has many advantages, including eliminating the
 need to write and maintain a separate wrapper code either with SWIG or
 directly with Python's C API.  Since the module is pure Python, this makes
 installation on multiple platforms much easier as no compilation step is
-needed.  It also provides better thread-safety, as each call to the
-underlying C library is automatically made thread-aware without explicit
-coding.  Migration to Python3 should also be easier, as changes to the C
-API are not an issue.  Finally, since ctypes loads a shared object library
-at runtime,  the underlying Epics library can be upgraded without having to
-re-build the Python wrapper.
+needed.  Since ctypes loads a shared object library at runtime, the
+underlying Epics library can be upgraded without having to re-build the
+Python wrapper.  In addition, using ctypes provides the most reliable
+thread-safety available, as each call to the underlying C library is
+automatically made thread-aware without explicit coding.  Finally, by
+avoiding the C API altogether, migration to Python3 is greatly simplified.
+In fact, the `epics` package is targeted and tested to work wih Python 2.5,
+2.6, and 3.1 simultaneously.
 
 
 Status and To-Do List
@@ -298,6 +303,4 @@ There are several desired features are left undone or unfinished:
      - config file per instrument to allow loading a saved
        instrument definition, with saved positions
      - tabbed/notebook interface for multiple instruments.
-
-
 
