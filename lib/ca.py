@@ -40,8 +40,12 @@ def get_strconvertors():
     defined in EPICS_STR_ENCODING (which is 'ASCII' by default). 
     """
     if PY_VERSION >= 3:
-        s2b = lambda x:  bytes(x, EPICS_STR_ENCODING)
-        b2s = lambda x:  str(x, EPICS_STR_ENCODING)
+        def s2b(x):
+            if isinstance(x,bytes): return x
+            return bytes(x, EPICS_STR_ENCODING)
+        def b2s(x):
+            if isinstance(x,str): return x
+            return str(x, EPICS_STR_ENCODING)
         return s2b, b2s
     return str,str
 

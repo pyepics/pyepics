@@ -95,7 +95,7 @@ class CA_BasicTests(unittest.TestCase):
         enumstrs = ca.get_enum_strings(chid)
         self.failUnless(len(enumstrs)>1)
 
-        self.failUnless(isinstance(enumstrs[0].decode(),str))
+        self.failUnless(isinstance(enumstrs[0],str))
         sys.stdout.write( 'CA EnumStrings (%s) = %s\n' % (pvn,repr(enumstrs)))
         self.failUnless(enumstrs,pvnames.enum_pv_strs)
         

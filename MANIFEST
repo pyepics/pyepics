@@ -33,3 +33,15 @@ dlls/win32/Com.dll
 dlls/win32/ca.dll
 scripts/caget.py
 scripts/wx_motor.py
+tests/README
+tests/alarm.py
+tests/ca_test2.py
+tests/ca_test3.py
+tests/ca_unittest1.py
+tests/caget_simple.py
+tests/connect.py
+tests/memleak.py
+tests/memleak_put.py
+tests/memory_motor.py
+tests/pv_01.py
+tests/pvnames.py
