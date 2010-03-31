@@ -6,8 +6,7 @@ import sys
 import time
 import unittest
 
-sys.path.insert(0,'..')
-from lib import ca
+from epics import ca
 
 import pvnames
 
@@ -20,7 +19,6 @@ def _ca_connect(chid,timeout=5.0):
         conn = 2==ca.state(chid)
         n += 1
     return conn, time.time()-t0, n
-
     
 class CA_BasicTests(unittest.TestCase):
         
@@ -35,7 +33,6 @@ class CA_BasicTests(unittest.TestCase):
         sys.stdout.write( 'CA Connection Test1: connect to existing PV\n')
         sys.stdout.write( ' connected in %.4f sec\n' % (dt))
         self.assertEqual(conn,True)
-
 
     def test_Connected(self):
         pvn = pvnames.double_pv
@@ -58,7 +55,7 @@ class CA_BasicTests(unittest.TestCase):
         self.failUnless('precision' in cdict)
         self.failUnless('severity' in cdict)
        
-        hostname = ca.host_name(chid).decode()
+        hostname = ca.host_name(chid)
         self.failUnless(hostname.startswith(pvnames.double_pv_host))
 
         count = ca.element_count(chid)

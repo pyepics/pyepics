@@ -346,8 +346,9 @@ def create_channel(pvname,connect=False,userfcn=None):
     ret = libca.ca_create_channel(pvn, _CB_connect,0,0,ctypes.byref(chid))
     PySEVCHK('create_channel',ret)
     
-    _cache[pvn] = {'chid':chid, 'conn':False, 'ts':0, 'failures':0,
+    _cache[pvname] = {'chid':chid, 'conn':False, 'ts':0, 'failures':0,
                       'userfcn': userfcn}
+
     if connect: connect_channel(chid)
     poll()
     time.sleep(1.e-5)
@@ -371,6 +372,8 @@ def connect_channel(chid,timeout=None,verbose=False,force=True):
     if conn: return conn
 
     t0 = time.time()
+    pvname = name(chid)
+
     dt = t0 - _cache[name(chid)]['ts']
     # avoid repeatedly trying to connect to unavailable PV
     nfail = min(20,  1 + _cache[name(chid)]['failures'])
@@ -732,7 +735,6 @@ def _onConnectionEvent(args):
     """set flag in cache holding whteher channel is
     connected. if provided, run a user-function"""
     pvname = name(args.chid)
-
     if args.op != dbr.OP_CONN_UP:  return
     try:
         entry  = _cache[pvname]
@@ -749,6 +751,7 @@ def _onConnectionEvent(args):
     except:
         errmsg = "Error Setting User Callback for '%s'"  % pvname
         raise ChannelAccessException('Connect',errmsg)
+
     return 
 
 ## put event handler:

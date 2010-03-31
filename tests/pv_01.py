@@ -1,11 +1,13 @@
+import sys
+
 import epics
 import pvnames
 
 p = epics.PV(pvnames.double_pv)
 val = p.get()
 
-print 'PV    = ', p
-print 'Value = ', val
-print 'Info Paragraph:'
-print p.info
+sys.stdout.write( 'PV    =  %s\n' % p)
+sys.stdout.write( 'Value = %s\n' % repr(val))
+sys.stdout.write('Info Paragraph:\n')
+sys.stdout.write('%s\n' %p.info)
 
