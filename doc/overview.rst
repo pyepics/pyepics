@@ -277,7 +277,7 @@ The Epics3 package is under active development.   The current status is that
 most features are working well, and it is starting to be used in production
 code, but more testing and better tests are needed.  
 
-The package is targeted and tested to work wih Python 2.5, 2.6, and 3.1
+The package is targeted and tested to work with Python 2.5, 2.6, and 3.1
 simultaneously (that is, the same code is meant to support all versions). 
 Currently, the package works with Python 3.1, but is not extremely
 well-tested.

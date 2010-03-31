@@ -364,7 +364,7 @@ types the result will from Python's :func:`str` function.
    collected, the C-level reference to the callback will disappear, and you
    will see coredumps.  
 
-   On linux, a message like::
+   On Linux, a message like::
    
        python: Objects/funcobject.c:451: func_dealloc: Assertion 'g->gc.gc_refs != (-2)' failed.
        Abort (core dumped)

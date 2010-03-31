@@ -55,7 +55,7 @@ epics Device.
 .. method:: add_callback(attr,callback)
 
    add a callback function to an attribute PV, so that the callback
-   function will be run when the attribute's value changes
+   function will be run when the at tribute's value changes
         
 .. function:: pv_property(attr[, as_string=False[,wait=False[,timeout=10.0]]])
 
@@ -84,7 +84,7 @@ Examples
 Device without a prefix
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a simple device without a prefix, containing aribitrary PVs::
+Here is a simple device without a prefix, containing arbitrary PVs::
 
     from epics import Device
     dev = Device()
