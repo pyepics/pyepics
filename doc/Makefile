@@ -7,17 +7,28 @@ SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = _build
 
+INSTALLDIR = /home/newville/public_html/Epics/Python/pyepics3
+
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html dirhtml pickle json htmlhelp qthelp latex changes linkcheck doctest 
+.PHONY: help clean html dirhtml pickle json htmlhelp qthelp latex changes linkcheck doctest install
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
+epics.pdf: latex
+	cd $(BUILDDIR)/latex && make all-pdf
+	cp -pr $(BUILDDIR)/latex/epics.pdf .
+
+install: html latex epics.pdf
+	cp -pr epics.pdf $(INSTALLDIR)/epics.pdf
+	mv  $(INSTALLDIR)/doc  $(INSTALLDIR)/doc1
+	cp -pr  $(BUILDDIR)/html $(INSTALLDIR)/doc
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -71,7 +82,6 @@ latex:
 	@echo "Build finished; the LaTeX files are in $(BUILDDIR)/latex."
 	@echo "Run \`make all-pdf' or \`make all-ps' in that directory to" \
 	      "run these through (pdf)latex."
-	cd $(BUILDDIR)/latex && make all-pdf
 
 changes:
 	$(SPHINXBUILD) -b changes $(ALLSPHINXOPTS) $(BUILDDIR)/changes
