@@ -53,13 +53,16 @@ class PV(object):
         self.connected  = False
         self._args      = {}.fromkeys(self._fields)
         self._args['pvname'] = self.pvname
+        self._args['count'] = -1
+        self._args['type'] = 'unknown'
+        self._args['access'] = 'unknown'
 
         self.callbacks  = {}
         if hasattr(callback,'__call__'):
             self.callbacks[0] = (callback,{})
 
         self._monref = None  # holder of data returned from create_subscription
-
+        self.chid = None
         if self.pvname in ca._cache:
             self.chid = ca._cache[pvname]['chid']
             self._onConnect(chid=self.chid,conn=ca._cache[pvname]['conn'])
@@ -73,6 +76,10 @@ class PV(object):
         sys.stdout.write("%s\n" % msg)
     
     def _onConnect(self,chid=0,conn=True,**kw):
+        # occassionally chid is still None (threading issue???)
+        # just return here, and connection will be forced later
+        if self.chid is None: return
+        
         self.connected = conn
         if self.connected:
             self._args['host']   = ca.host_name(self.chid)
@@ -116,10 +123,10 @@ class PV(object):
         if not self.connect(force=False):  return None
         self._args['value'] = ca.get(self.chid,ftype=self.ftype)
         self.poll() 
-        self._set_charval(self._args['value'])
-
         field = 'value'
-        if as_string: field = 'char_value'
+        if as_string:
+            self._set_charval(self._args['value'])
+            field = 'char_value'
         return self._args[field]
 
     def put(self,value,wait=False,timeout=30.0,callback=None,callback_data=None):

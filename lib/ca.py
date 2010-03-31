@@ -346,6 +346,7 @@ def create_channel(pvname,connect=False,userfcn=None):
                       'userfcn': userfcn}
     if connect: connect_channel(chid)
     poll()
+    time.sleep(1.e-5)
     return chid
 
 @withCHID

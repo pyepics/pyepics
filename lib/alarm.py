@@ -97,7 +97,7 @@ class Alarm(object):
 
         self.last_alert  = 0
         self.alert_delay = alert_delay
-        self.user_callack = callback
+        self.user_callback = callback
 
         self.cmp   = self.ops.get(comparison.replace('_',''),None)
         self.alarm_state = False
@@ -113,18 +113,19 @@ class Alarm(object):
         old_alarm_state  = self.alarm_state
         self.alarm_state =  self.cmp(val,self.trip_point)
 
-        now = time.time()
-        notify = self.alarm_state and ((now - self.last_alert) > self.alert_delay) 
+        now = time.time()        
 
-        if notify:
+        if (self.alarm_state and not old_alarm_state and
+            ((now - self.last_alert) > self.alert_delay)) :
             self.last_alert = now
-            sys.stdout.write('Alarm: %s=%s (%s)\n' % (pvname, char_value,
-                                                      time.ctime()))
             if hasattr(self.user_callback,'__call__'):
                 self.user_callback(pvname=pvname, value=value,
                                    char_value=char_value,
                                    trip_point=self.trip_point,
                                    comparison=self.cmp.__name__, **kw)
                 
-            
+            else:
+                sys.stdout.write('Alarm: %s=%s (%s)\n' % (pvname, char_value,
+                                                          time.ctime()))
+
 
