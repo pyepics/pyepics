@@ -254,7 +254,7 @@ influenced the goals for this module, which include:
       preemptive callbacks and thread support.
    3) easy support and distribution for Windows and Unix-like systems.
    4) being ready for porting to Python3.
-   5) using Python's coup's library.
+   5) using Python's ctypes library.
 
 The main implementation feature here (and difference from EpicsCA) is using
 Python's ctypes library to do handle the connection between Python and the
