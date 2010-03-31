@@ -28,6 +28,7 @@ doc/installation.rst
 doc/overview.rst
 doc/pv.rst
 doc/wx.rst
+doc/Makefile
 dlls/win32/Com.dll
 dlls/win32/ca.dll
 scripts/caget.py
