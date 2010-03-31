@@ -30,3 +30,5 @@ doc/pv.rst
 doc/wx.rst
 dlls/win32/Com.dll
 dlls/win32/ca.dll
+scripts/caget.py
+scripts/wx_motor.py
