@@ -268,27 +268,29 @@ Python wrapper.  In addition, using ctypes provides the most reliable
 thread-safety available, as each call to the underlying C library is
 automatically made thread-aware without explicit coding.  Finally, by
 avoiding the C API altogether, migration to Python3 is greatly simplified.
-In fact, the `epics` package is targeted and tested to work wih Python 2.5,
-2.6, and 3.1 simultaneously.  Currently, use with Python 3.1 works
-partially, but is not extremely well-tested.
 
 
 Status and To-Do List
 =====================
 
 The Epics3 package is under active development.   The current status is that
-most features are working well, and it is being used in some production
+most features are working well, and it is starting to be used in production
 code, but more testing and better tests are needed.  
+
+The package is targeted and tested to work wih Python 2.5, 2.6, and 3.1
+simultaneously (that is, the same code is meant to support all versions). 
+Currently, the package works with Python 3.1, but is not extremely
+well-tested.
 
 There are several desired features are left undone or unfinished:
  
  *  improve documentation, examples, unit testing.
 
- *  port CaChannel interface to use epics.ca
+ *  port CaChannel interface (and others??) to use epics.ca
 
- *  test threading
+ *  test threading, and 'contexts'.
 
- *  better support for Python 3.1
+ *  further testing for Python 3.1
 
  *  investigate retrieving array data for CTRL and TIME variants.
 
@@ -306,4 +308,9 @@ There are several desired features are left undone or unfinished:
      - config file per instrument to allow loading a saved
        instrument definition, with saved positions
      - tabbed/notebook interface for multiple instruments.
+
+License
+============
+
+The Epics3 package is distributed under the Epics Open License.
 
