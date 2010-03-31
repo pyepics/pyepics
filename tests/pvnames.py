@@ -49,6 +49,12 @@ other_pvlist = [ '13IDC:scan1.P1PA',
            '13IDA:m2.VAL', '13IDA:m2.DESC',
            '13IDA:m2.FOFF', '13IDA:m2.SET', '13IDA:m2.SPMG' ]
 
+#### alarm test
+
+alarm_pv = '13IDC:m13.VAL'
+alarm_comp='le'
+alarm_trippoint = 1.60
+
 
 #### motor list (for connect.py)
 #  Here, provide a list of Epics Motors
