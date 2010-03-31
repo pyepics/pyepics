@@ -49,3 +49,14 @@ other_pvlist = [ '13IDC:scan1.P1PA',
            '13IDA:m2.VAL', '13IDA:m2.DESC',
            '13IDA:m2.FOFF', '13IDA:m2.SET', '13IDA:m2.SPMG' ]
 
+
+#### motor list (for connect.py)
+#  Here, provide a list of Epics Motors
+motor_list= [  "13IDC:m1", "13IDC:m2", "13IDC:m3", "13IDC:m4",
+               "13IDC:m5", "13IDC:m6", "13IDC:m7", "13IDC:m8",
+               "13IDC:m9", "13IDC:m10", "13IDC:m11", "13IDC:m12",
+               "13IDC:m13", "13IDC:m14", "13IDC:m15", "13IDC:m16",
+               "13IDC:m17", "13IDC:m18", "13IDC:m19", "13IDC:m20",
+               "13IDC:m21", "13IDC:m22", "13IDC:m23", "13IDC:m24",
+               "13IDC:m25", "13IDC:m26", "13IDC:m27", "13IDC:m28"]
+

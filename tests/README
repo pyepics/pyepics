@@ -1,1 +1,6 @@
-customize PV list in pvnames.py
+This directory contains a series of tests for the epics module.
+
+In order to test the module, it must be able to connect to valid PVs
+
+You should customize the PV listed in pvnames.py for the tests to work.
+
