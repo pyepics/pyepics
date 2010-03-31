@@ -1,4 +1,8 @@
 #!/usr/bin/python
+#  M Newville <newville@cars.uchicago.edu>
+#  The University of Chicago, 2010
+#  Epics Open License
+
 """
   Epics Process Variable
 """

@@ -2,10 +2,15 @@
 #
 # low level support for Epics Channel Access
 #
+#  M Newville <newville@cars.uchicago.edu>
+#  The University of Chicago, 2010
+#  Epics Open License
 """
 EPICS Channel Access Interface
 
-See doc/ for documentation
+See doc/  for user documentation.
+
+documentation here is developer documentation.
 """
 import ctypes
 import os
@@ -22,15 +27,34 @@ except ImportError:
 
 from . import dbr
 
-def get_strwrapper():
-    """create string wrapper to pass to C functions  for both Python2 and Python3"""
-    if sys.version_info[0] == 3:
-        return lambda x:  bytes(x,'ASCII')
-    return str
-strwrapper = get_strwrapper()
+EPICS_STR_ENCODING ='ASCII'
+PY_VERSION = sys.version_info[0]
+def get_strconvertors():
+    """create string wrappersto pass to C functions  for both Python2 and Python3
+    EPICS CA library uses char* to represent strings.  In Python3, char* maps to
+    a sequence of bytes which must be explicitly converrted to a Python string
+    specifying the encoding.
+
+    That is, for Python3 one sends and recieves sequences of bytes to libca.
+    This function returns translators (str2bytes, bytes2str), assuming the encoding
+    defined in EPICS_STR_ENCODING (which is 'ASCII' by default). 
+    """
+    if PY_VERSION >= 3:
+        s2b = lambda x:  bytes(x, EPICS_STR_ENCODING)
+        b2s = lambda x:  str(x, EPICS_STR_ENCODING)
+        return s2b, b2s
+    return str,str
+
+str2bytes,bytes2str = get_strconvertors()
 
 def strjoin(sep, seq):
-   return strwrapper(sep).join(seq)
+    if PY_VERSION < 3:
+        return sep.join(seq)
+
+    if isinstance(sep,bytes): sep = bytes2str(sep)
+    if isinstance(seq[0],bytes): 
+        seq = [bytes2str(i) for i in seq]
+    return sep.join(seq)
     
 ## holder for shared library
 libca = None
@@ -264,7 +288,7 @@ def flush_io():    return libca.ca_flush_io()
 def message(status):
     f = libca.ca_message
     f.restype = ctypes.c_char_p
-    return f(status)
+    return bytes2str(f(status))
 
 @withCA
 @withSEVCHK
@@ -314,7 +338,7 @@ def create_channel(pvname,connect=False,userfcn=None):
     # a reference to _onConnectionEvent:  This is really the connection
     # callback that is run -- the userfcn here is stored in the _cache
     # and called by _onConnectionEvent.
-    pvn = strwrapper(pvname)    
+    pvn = str2bytes(pvname)    
     ret = libca.ca_create_channel(pvn, _CB_connect,0,0,ctypes.byref(chid))
     PySEVCHK('create_channel',ret)
     
@@ -368,10 +392,10 @@ def _chid_f(chid,fcn_name,restype=int,arg=None):
     return f(chid)
 
 def name(chid):
-    return _chid_f(chid,'ca_name',   restype=ctypes.c_char_p)
+    return bytes2str(_chid_f(chid,'ca_name',   restype=ctypes.c_char_p))
 
 def host_name(chid):
-    return _chid_f(chid,'ca_host_name',  restype=ctypes.c_char_p)
+    return bytes2str(_chid_f(chid,'ca_host_name',  restype=ctypes.c_char_p))
 
 def element_count(chid):
     return _chid_f(chid,'ca_element_count')
@@ -433,11 +457,15 @@ def _unpack(data, count, ftype=dbr.INT,as_numpy=True):
 
     ntype = ftype
     unpack = unpack_simple
-    if ftype >= dbr.TIME_STRING: unpack = unpack_ctrltime
-    if ftype == dbr.CTRL_STRING: ftype = dbr.TIME_STRING
+    if ftype >= dbr.TIME_STRING:
+        unpack = unpack_ctrltime
+    if ftype == dbr.CTRL_STRING:
+        ftype = dbr.TIME_STRING
 
-    if ftype > dbr.CTRL_STRING:    ntype -= dbr.CTRL_STRING
-    elif ftype >= dbr.TIME_STRING: ntype -= dbr.TIME_STRING
+    if ftype > dbr.CTRL_STRING:
+        ntype -= dbr.CTRL_STRING
+    elif ftype >= dbr.TIME_STRING:
+        ntype -= dbr.TIME_STRING
 
     out = unpack(data,ntype)
     if has_numpy and as_numpy and count>1 and ntype !=dbr.STRING:
@@ -589,7 +617,7 @@ def get_ctrlvars(chid):
         if hasattr(v,attr):
             kw[attr] = getattr(v,attr)
     if hasattr(v,'strs') and hasattr(v,'no_str') and v.no_str > 0:
-        kw['enum_strs'] = tuple([v.strs[i].value for i in range(v.no_str)])
+        kw['enum_strs'] = tuple([bytes2str(v.strs[i].value) for i in range(v.no_str)])
     return kw
 
 @withConnectedCHID

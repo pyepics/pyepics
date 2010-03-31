@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+#  M Newville <newville@cars.uchicago.edu>
+#  The University of Chicago, 2010
+#  Epics Open License
 #
 # Epics Database Records (DBR) Constants and Definitions
 #  most of the code here is copied from db_access.h

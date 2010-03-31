@@ -4,8 +4,12 @@
    CARS, University of Chicago
 
    version    :  3.0.1 (beta version of epics Py3)
-   last update:  20-Feb-2010
-         
+   last update:  31-Mar-2010
+   
+== License:
+   Except where explicitly noted, this file and all files in this distribution are licensed under
+   the Epics Open License (see license.txt in the top-level directory of this distribution)
+   
 == Overview:
    rewrite of EpicsCA v 2.*, with major goals of:
       a) replacing swig interface with ctypes

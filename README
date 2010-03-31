@@ -27,8 +27,13 @@ to be available (and findable by Python at runtime) on the system. For
 Windows, pre-built DLLs are included and installed so that no other Epics
 installation is required.
 
-A binary installer for Windows are available. For installation from source, 
-see the INSTALL file.
+For installation from source, see the INSTALL file. Binary installers for
+Windows are available.  
+
+License
+========
+
+This code is distributed under the  Epics Open License
 
 Overview
 ========
@@ -109,13 +114,7 @@ Features that you won't have to worry about:
      connection management (unless you choose to worry about this)
      PV record types -- this is handled automatically.
 
-not addressed in this implementation are:
-  groups  : the functionality  can be mimiced in python code.
-  threads : this implementation has not been tested for being 'thread safe'.
- 
-
-For an overview of the CA and EpicsMotor interface, see 
-the included html documentation see the doc directory.
 
 Matt Newville <newville@cars.uchicago.edu>
-Last Update:  20-Mar-2010
+Last Update:  30-Mar-2010
+
