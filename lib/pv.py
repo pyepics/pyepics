@@ -94,9 +94,9 @@ class PV(object):
         return
 
     def connect(self,timeout=5.0,force=True):
-        ca_subscribe = ca.create_subscription
-        ca_connect   = ca.connect_channel
         if not self.connected:
+            ca_subscribe = ca.create_subscription
+            ca_connect   = ca.connect_channel
             ca_connect(self.chid, timeout=timeout,force=force)
             self.poll()
         # should be only be called 1st time, to subscribe
@@ -106,6 +106,10 @@ class PV(object):
                                         userfcn= self._onChanges,
                                         use_ctrl= self.form=='ctrl',
                                         use_time= self.form=='time')
+
+        if  self._args['ftype'] is None and self._args['type'] is not None:
+            self._args['ftype'] = dbr.Name(self._args['type'], reverse=True)
+
         return (self.connected and self.ftype is not None)
 
     def poll(self,ev=1.e-4, io=1.0):
@@ -122,6 +126,7 @@ class PV(object):
         """
         if not self.connect(force=False):  return None
         self._args['value'] = ca.get(self.chid,ftype=self.ftype)
+
         self.poll() 
         field = 'value'
         if as_string:
@@ -236,6 +241,7 @@ class PV(object):
         Note that a PV may have multiple callbacks, so that each
         has a unique index (small integer) that is returned by
         add_callback.  This index is needed to remove a callback."""
+        if not self.connected:  self.connect(force=False)
         index = None
         if hasattr(callback,'__call__'):
             n_cb = len(self.callbacks)
@@ -290,8 +296,8 @@ class PV(object):
                   'upper_warning_limit','lower_warning_limit'):
             if hasattr(self,i):
                 att = getattr(self,i)
-                if i == 'timestamp': att = "%.3f (%s)" % (att,fmt_time(att))
                 if att is not None:
+                    if i == 'timestamp': att = "%.3f (%s)" % (att,fmt_time(att))
                     if len(i) < 12:
                         out.append('   %.11s= %s' % (i+' '*12, str(att)))
                     else:
@@ -303,18 +309,17 @@ class PV(object):
                 out.append("       %i = %s " % (i,s))
 
         if self._monref is not None:
-            out.append('   PV is monitored internally')
+            out.append('   PV is internally monitored, with %i user-defined callbacks:' % len(self.callbacks))
             if len(self.callbacks) > 0:
-                out.append("   user-defined callbacks:")
                 cblist = list(self.callbacks.keys())
                 cblist.sort()
                 for i in cblist:
-                    cb = self.callbacks[i]
-                    out.append('      %s' % repr(cb))
-            else:
-                out.append("   no user callbacks are defined.")
+                    cb = self.callbacks[i][0]
+                    cb_name =  cb.func_name
+                    cb_file = cb.func_code.co_filename
+                    out.append('      %s in file %s' % (cb_name, cb_file))
         else:
-            out.append('   PV is not monitored internally')
+            out.append('   PV is NOT internally monitored')
         out.append('=============================')
         return '\n'.join(out)
         

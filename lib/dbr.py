@@ -177,7 +177,9 @@ Map = {STRING: char_t,
        CTRL_DOUBLE: ctrl_double
        }
 
-def Name(ftype):
+def Name(ftype,reverse=False):
+    """ convert integer data type to dbr Name, or optionally reverse that
+    look up (that is, name to integer)"""
     m = {STRING: 'STRING',
          INT: 'INT',
          FLOAT: 'FLOAT',
@@ -202,7 +204,12 @@ def Name(ftype):
          CTRL_LONG: 'CTRL_LONG',
          CTRL_DOUBLE: 'CTRL_DOUBLE',
          }
-
+    if reverse:
+        name = ftype.upper()
+        if name in list(m.values()):
+            for i,v in m.items():
+                if name == v: return i
+                
     return m.get(ftype,'unknown')
 
 def Cast(args):
