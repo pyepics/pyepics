@@ -51,7 +51,7 @@ class Device(object):
       >>> x.put('13IDC:m3.VAL', 2)
       >>> print x.PV('13IDC:m3.DIR').get(as_string=True)
     """
-    def __init__(self,prefix=None,sep='',attrs=None):
+    def __init__(self,prefix=None,attrs=None,sep=''):
         self.__prefix__ = prefix + sep
         self._pvs = {}
         if attrs is not None:
