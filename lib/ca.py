@@ -105,8 +105,7 @@ def initialize_libca():
  Note that this function must be called prior to any real ca calls.
     """
     load_dll = ctypes.cdll.LoadLibrary
-    dllname  = 'libca.so'
-    path_sep = ':'
+    dllname = None
     if os.name == 'nt':
         load_dll = ctypes.windll.LoadLibrary
         dllname  = 'ca.dll'
@@ -114,9 +113,21 @@ def initialize_libca():
         path_dirs = os.environ['PATH'].split(path_sep)
         for p in (sys.prefix,os.path.join(sys.prefix,'DLLs')):
             path_dirs.insert(0,p)
-        os.environ['PATH'] = ';'.join(path_dirs)  
+        os.environ['PATH'] = path_sep.join(path_dirs)  
+    elif os.name == 'posix':
+        dllname  = 'libca.so'
+        try:
+            if os.uname()[0].lower() == 'darwin':
+                dllname = 'libca.dylib'
+        except AttributeError:
+            pass
 
-    libca = load_dll(dllname)
+    try:
+        libca = load_dll(dllname)
+    except:
+        raise ChannelAccessException('initialize_libca',
+                                     'Loading Epics CA DLL failed')
+        
     ca_context = {False:0, True:1}[PREEMPTIVE_CALLBACK]
     ret = libca.ca_context_create(ca_context)
     if ret != dbr.ECA_NORMAL:

@@ -94,9 +94,9 @@ class PV(object):
         return
 
     def connect(self,timeout=5.0,force=True):
+        ca_subscribe = ca.create_subscription
+        ca_connect   = ca.connect_channel
         if not self.connected:
-            ca_subscribe = ca.create_subscription
-            ca_connect   = ca.connect_channel
             ca_connect(self.chid, timeout=timeout,force=force)
             self.poll()
         # should be only be called 1st time, to subscribe

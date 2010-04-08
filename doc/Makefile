@@ -8,6 +8,7 @@ PAPER         =
 BUILDDIR      = _build
 
 INSTALLDIR = /home/newville/public_html/Epics/Python/pyepics3
+INSTALLDIR = /www/apache/htdocs/software/python/pyepics3
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -27,7 +28,7 @@ epics.pdf: latex
 
 install: html latex epics.pdf
 	cp -pr epics.pdf $(INSTALLDIR)/epics.pdf
-	mv  $(INSTALLDIR)/doc  $(INSTALLDIR)/doc1
+	mv  $(INSTALLDIR)/doc  $(INSTALLDIR)/doc_old
 	cp -pr  $(BUILDDIR)/html $(INSTALLDIR)/doc
 
 help:
