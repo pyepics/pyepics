@@ -7,32 +7,31 @@ Overview, difference with C library
 
 This module provides a low-level wrapping of the EPICS Channel Access (CA)
 library, using ctypes.  Most users of the `epics` module will not need to
-be concerned with most the details here, and will only use the simple
+be concerned with most the details here, and will instead use the simple
 functional interface (:func:`epics.caget`, :func:`epics.caput` and so on),
 or create and use epics PV objects with :class:`epics.PV`, or define epics
 devices with :class:`epics.Device`. 
 
-The goal of this module is to stay fairly close to the C interface to the
-CA library while also providing a pleasant Python experience.  It is
+The goal of this `ca` module is to stay fairly close to the C interface to
+the CA library while also providing a pleasant Python experience.  It is
 expected that anyone looking into the details of this module is somewhat
-familiar with Channel Access and knows where to consult the CA reference
-documentation.  To that end, this document mostly describe the differences
+familiar with Channel Access and knows where to consult the `Channel
+Access Reference Documentation <http://www.aps.anl.gov/epics/base/R3-14/11-docs/CAref.html>`_.  This document mostly describe the differences
 with the C interface.
 
 
 Name Mangling
 ~~~~~~~~~~~~~
 
-As a general rule, a CA function named `ca_XXX` in the C library, the
-equivalent function is called `XXX` in this module, as the intention is
-that importing `ca` module with
+As a general rule, a CA function named `ca_XXX` in the C library will have the
+equivalent function called `XXX` in the `ca` module.  This is because the
+intention is that one will import the `ca` module with
 
     >>> from epics import ca
 
-will result in a Python function named :func:`ca.XXX` that corresponds to
-the C function `ca_XXX`.
-That is, Python namespaces are used in place of the name-mangling done in C
-due to its lack of namespaces.
+so that the Python function :func:`ca.XXX` will corresponds to the C
+function `ca_XXX`.  That is, Python namespaces are used in place of the
+name-mangling done in C due to its lack of namespaces.
 
 Similar name *un-mangling* also happens with the DBR prefixes for
 constants, held here in the `dbr` module.  Thus, the C constant DBR_STRING
@@ -43,8 +42,9 @@ Other Changes and Omissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Several function in the C version of the CA library are not implemented in
-the Python module.  These are currently seen as unnecessary for Python, 
-though some could be added without much trouble.
+the Python module.  Most of these unimplemented functions are currently
+seen as unnecessary for Python, though some could be added without much
+trouble.
 
 In addition, while the CA library supports several `DBR` types in C, not
 all of these are supported in Python. Only native types and their DBR_TIME
