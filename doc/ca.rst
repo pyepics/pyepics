@@ -86,7 +86,9 @@ not on loading the module!).  This module also handles finalizing the CA
 session, so that coredumps and warning messages do not happen due to CA
 still being 'alive' as a program ends.
 
-Here, these tasks are handled by the following constructs:
+These initialization and finalization tasks are handled in the following
+way:
+
 
    * :data:`libca` holds a permanent, global reference to the CA shared
      library.
@@ -691,4 +693,30 @@ Only native types and their DBR_TIME and DBR_CTRL variants are supported:
 DBR_STS and DBR_GR variants are not. Several `dbr_XXX` functions are also
 not supported, as they are needed only to dynamically allocate memory.
 
+
+Examples
+=========
+
+Here are some example sessions using the :mod:`ca` module.
+
+Create, Connect, Get Value of Channel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note here that several things have been simplified compare to using CA in C:
+initialization and creating a main-thread context are handled, and connection
+of channels is handled in the background::
+
+    from epics import ca
+    chid  = ca.create_channel('XXX:m1.VAL')
+    count = ca.element_count(chid)
+    ftype = ca.field_type(chid)
+    print "Channel ", chid, count, ftype
+    value = ca.get()
+    print val
+
+Put, waiting for completion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Define callback
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
