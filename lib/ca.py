@@ -134,6 +134,8 @@ def initialize_libca():
         raise ChannelAccessException('initialize_libca',
                                      'Cannot create Epics CA Context')
 
+    # test version here???
+    
     if AUTO_CLEANUP: atexit.register(finalize_libca)
     return libca
 
@@ -304,6 +306,12 @@ def message(status):
     f = libca.ca_message
     f.restype = ctypes.c_char_p
     return bytes2str(f(status))
+
+@withCA
+def version():
+    f = libca.ca_version
+    f.restype = ctypes.c_char_p
+    return bytes2str(f())
 
 @withCA
 @withSEVCHK
