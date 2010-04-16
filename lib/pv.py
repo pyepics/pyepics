@@ -58,8 +58,6 @@ class PV(object):
         self._args['access'] = 'unknown'
 
         self.callbacks  = {}
-        if hasattr(callback,'__call__'):
-            self.callbacks[0] = (callback,{})
 
         self._monref = None  # holder of data returned from create_subscription
         self.chid = None
@@ -71,6 +69,9 @@ class PV(object):
                                           userfcn=self._onConnect)
         self._args['chid'] = self.chid
         self._args['type'] = dbr.Name(ca.field_type(self.chid)).lower()
+        if callback is not None:
+            self.connect()
+            self.add_callback(callback)
 
     def _write(self,msg):
         sys.stdout.write("%s\n" % msg)
@@ -92,6 +93,7 @@ class PV(object):
                                      use_time= self.form=='time')
             self._args['type'] = dbr.Name(self.ftype).lower()
         return
+
 
     def connect(self,timeout=5.0,force=True):
         ca_subscribe = ca.create_subscription

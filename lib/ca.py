@@ -110,9 +110,6 @@ def initialize_libca():
         load_dll = ctypes.windll.LoadLibrary
         dllname  = 'ca.dll'
         path_sep = ';'
-        path_dirs = os.environ['PATH'].split(path_sep)
-        for p in (sys.prefix,os.path.join(sys.prefix,'DLLs')):
-            path_dirs.insert(0,p)
         os.environ['PATH'] = path_sep.join(path_dirs)  
     elif os.name == 'posix':
         dllname  = 'libca.so'
