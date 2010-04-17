@@ -13,6 +13,8 @@ See doc/  for user documentation.
 documentation here is developer documentation.
 """
 import ctypes
+import ctypes.util
+
 import os
 import gc
 import sys
@@ -93,6 +95,48 @@ class ChannelAccessException(Exception):
     def __str__(self):
         return " %s returned '%s'" % (self.fcn,self.msg)
 
+def find_libca():
+    """
+    find location of ca dynamic library
+    """
+    dllpath  = ctypes.util.find_library('ca')
+    if dllpath is not None: return dllpath
+
+    known_hosts = {'Linux':   ('linux-x86', 'linux-x86_64') ,
+                   'Darwin':  ('darwin-ppc','darwin-x86'),
+                   'Win32':   ('win32-x86', 'win32-x86_64'),
+                   'solaris': ('solaris-sparc',) }
+    
+    if os.name == 'posix':
+        libname = 'libca.so'
+        path =os.environ['PATH'].split(':')
+        ldpath=os.environ.get('LD_LIBRARY_PATH','').split(':')
+
+        if sys.platform == 'darwin':
+            ldpath=os.environ.get('DYLD_LIBRARY_PATH','').split(':')
+            libname = 'libca.dylib'
+
+        epics_base =os.environ.get('EPICS_BASE','.')
+        host_arch = os.uname()[0]
+        if host_arch in known_hosts:
+            epicspath = []
+            for d in known_hosts[host_arch]:
+                epicspath.append( os.path.join(epics_base,'lib',d))
+        try:
+            pypath  = epics.__path__
+            pypath.append('.')
+        except:
+            pypath = ['.']
+
+        for d in path + ldpath + epicspath + pypath + sys.path:
+            if os.path.exists(d) and os.path.isdir(d):
+                if libname in os.listdir(d):
+                    return os.path.join(d,libname)
+
+    raise ChannelAccessException('find_libca',
+                                 'Cannot find Epics CA DLL')
+
+        
 def initialize_libca():
     """ load DLL (shared object library) to establish Channel Access
     Connection. The value of PREEMPTIVE_CALLBACK sets the pre-emptive
@@ -104,21 +148,12 @@ def initialize_libca():
 
  Note that this function must be called prior to any real ca calls.
     """
+
+    dllname = find_libca()
+    
     load_dll = ctypes.cdll.LoadLibrary
-    dllname = None
     if os.name == 'nt':
         load_dll = ctypes.windll.LoadLibrary
-        dllname  = 'ca.dll'
-        path_sep = ';'
-        os.environ['PATH'] = path_sep.join(path_dirs)  
-    elif os.name == 'posix':
-        dllname  = 'libca.so'
-        try:
-            if os.uname()[0].lower() == 'darwin':
-                dllname = 'libca.dylib'
-        except AttributeError:
-            pass
-
     try:
         libca = load_dll(dllname)
     except:
