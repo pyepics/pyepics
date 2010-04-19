@@ -270,6 +270,7 @@ automatically made thread-aware without explicit coding.  Finally, by
 avoiding the C API altogether, migration to Python3 is greatly simplified.
 
 
+
 Status and To-Do List
 =====================
 
@@ -284,13 +285,11 @@ well-tested.
 
 There are several desired features are left undone or unfinished:
  
- *  improve documentation, examples, unit testing.
-
  *  port CaChannel interface (and others??) to use epics.ca
 
- *  test threading, and 'contexts'.
-
  *  further testing for Python 3.1
+
+ *  further testing for threading and 'contexts'.
 
  *  investigate retrieving array data for CTRL and TIME variants.
 

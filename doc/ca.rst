@@ -125,7 +125,12 @@ Using the CA module
 Many general-purpose CA functions that deal with general communication and
 threading contexts are very close to the C library:
 
-.. function::  context_create(context=0)
+.. function::  context_create(context=None)
+   
+   here, you can explicitly set context to 1 to enable  preemptive
+   callbacks, 0 to disable them, or leave as ``None`` to use the value of
+   :data:`PREEMPTIVE_CALLBACK` to set the context.
+
 
 .. function::  context_destroy()
 
