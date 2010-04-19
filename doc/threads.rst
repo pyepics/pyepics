@@ -104,12 +104,15 @@ necessary.  The output from this will look like::
     Done
     
     
-Note that while both threads ''A''  and ''B'' are running. a callback for
+Note that while both threads *A*  and *B* are running. a callback for
 the PV `S:SRcurrentAI.VAL` is generated in each thread.
 
 Note also that the callbacks for the PVs created in each thread are
-'''explicitly cleared''' with `for p in pvs: p.clear_callbacks()`.
-Without this, the callbacks for thread ''A'' '''will persist even after the
+**explicitly cleared**  with:
+
+    for p in pvs: p.clear_callbacks()
+
+Without this, the callbacks for thread *A*  will persist even after the
 thread has completed!!!
      
     
