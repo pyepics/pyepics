@@ -4,13 +4,7 @@ Several desired features are left undone or unfinished:
 
  *  improve documentation, examples, unit testing.
 
- *  test threading
-
- *  add ca.sg_*() routines
-
  *  investigate retrieving array data for CTRL and TIME variants.
-
- *  are expection events needed???
 
  *  add more "devices", including low-level epics records,
 
@@ -25,5 +19,5 @@ Several desired features are left undone or unfinished:
        instrument definition, with saved positions
      - tabbed/notebook interface for multiple instruments.
 
-
         
+  * more extensive thread testing

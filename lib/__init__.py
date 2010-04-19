@@ -20,7 +20,7 @@
       PV -- Process Variable which will work largely as in EpicsCA 2.*
 """
 
-__version__ = '3.0.1'
+__version__ = '3.0.2'
 
 import time
 import sys
@@ -30,6 +30,7 @@ from . import pv
 from . import alarm
 from . import motor
 from . import device
+
 PV    = pv.PV
 Alarm = alarm.Alarm
 Motor = motor.Motor

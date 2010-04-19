@@ -315,10 +315,12 @@ def withSEVCHK(fcn):
 # contexts
 @withCA
 @withSEVCHK
-def context_create(context=0):
+def context_create(context=None):
     if not PREEMPTIVE_CALLBACK:
         raise ChannelAccessException('context_create',
                                      'Cannot create new context with PREEMPTIVE_CALLBACK=False')
+    if context is None:
+        context = {False:0, True:1}[PREEMPTIVE_CALLBACK]
     return libca.ca_context_create(context)
 
 @withCA
