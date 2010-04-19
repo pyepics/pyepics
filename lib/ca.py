@@ -99,17 +99,29 @@ def find_libca():
     """
     find location of ca dynamic library
     """
-    dllpath  = ctypes.util.find_library('ca')
-    if dllpath is not None: return dllpath
+    search_path =  [os.path.split( os.path.abspath(__file__))[0] ]
+    search_path.extend(sys.path)
+    path  = os.environ['PATH']
+    path_sep=':'
+    if os.name == 'nt':
+        path_sep=';'
+        search_path.append (os.path.join(sys.prefix,'DLLs') )
+    
+    search_path.extend( os.environ['PATH'].split(path_sep))
 
+    os.environ['PATH'] = path_sep.join(search_path)  
+
+    dllpath  = ctypes.util.find_library('ca')
+    if dllpath is not None:
+        return dllpath
+
+    ## OK, simplest version didn't work, look explicity through path
     known_hosts = {'Linux':   ('linux-x86', 'linux-x86_64') ,
                    'Darwin':  ('darwin-ppc','darwin-x86'),
-                   'Win32':   ('win32-x86', 'win32-x86_64'),
                    'solaris': ('solaris-sparc',) }
     
     if os.name == 'posix':
         libname = 'libca.so'
-        path =os.environ['PATH'].split(':')
         ldpath=os.environ.get('LD_LIBRARY_PATH','').split(':')
 
         if sys.platform == 'darwin':
@@ -128,7 +140,7 @@ def find_libca():
         except:
             pypath = ['.']
 
-        for d in path + ldpath + epicspath + pypath + sys.path:
+        for d in search_path + ldpath + epicspath + pypath + sys.path:
             if os.path.exists(d) and os.path.isdir(d):
                 if libname in os.listdir(d):
                     return os.path.join(d,libname)
@@ -180,9 +192,10 @@ def finalize_libca(maxtime=10.0,gc_collect=True):
         t0 = time.time()
         flush_io()
         poll()
-        for key,val in list(_cache.items()):
-            clear_channel(val['chid'])
-            _cache[key] = {}
+        for context_chids in  list(_cache.values()):
+            for key,val in list(context_chids.items()):
+                clear_channel(val['chid'])
+                context_chids[key] = {}
         _cache.clear()
 
         for i in range(10):
@@ -199,12 +212,13 @@ def finalize_libca(maxtime=10.0,gc_collect=True):
 def show_cache(print_out=True):
     """Show list of cached PVs"""
     o = []
-    o.append('#  PV name    Is Connected?   Channel ID')
+    o.append('#  PV name    Is Connected?   Channel ID  Context')
     o.append('#---------------------------------------')
-    for name,val in list(_cache.items()):
-        o.append(" %s   %s     %s " % (name,
-                                       repr(val['conn']),
-                                       repr(val['chid'])))
+    for context, context_chids in  list(_cache.items()):
+            for name,val in list(context_chids.items()):
+                o.append(" %s   %s     %s  %i" % (name,
+                                                  repr(val['conn']),
+                                                  repr(val['chid']), context))
     o = strjoin('\n', o)
     if print_out:
         sys.stdout.write("%s\n" % o)
@@ -302,12 +316,15 @@ def withSEVCHK(fcn):
 @withCA
 @withSEVCHK
 def context_create(context=0):
+    if not PREEMPTIVE_CALLBACK:
+        raise ChannelAccessException('context_create',
+                                     'Cannot create new context with PREEMPTIVE_CALLBACK=False')
     return libca.ca_context_create(context)
 
 @withCA
-@withSEVCHK
 def context_destroy():
-    return libca.ca_context_destroy()
+    ret = libca.ca_context_destroy()
+    return PySEVCHK('context_destroy',ret, 0)
     
 @withCA
 def attach_context(context):
@@ -396,8 +413,11 @@ def create_channel(pvname,connect=False,userfcn=None):
     pvn = str2bytes(pvname)    
     ret = libca.ca_create_channel(pvn, _CB_connect,0,0,ctypes.byref(chid))
     PySEVCHK('create_channel',ret)
+
+    ctx = current_context()
+    if ctx not in _cache:  _cache[ctx] = {}
     
-    _cache[pvname] = {'chid':chid, 'conn':False, 'ts':0, 'failures':0,
+    _cache[ctx][pvname] = {'chid':chid, 'conn':False, 'ts':0, 'failures':0,
                       'userfcn': userfcn}
 
     if connect: connect_channel(chid)
@@ -424,10 +444,11 @@ def connect_channel(chid,timeout=None,verbose=False,force=True):
 
     t0 = time.time()
     pvname = name(chid)
-
-    dt = t0 - _cache[name(chid)]['ts']
+    ctx = current_context()
+    if ctx not in _cache: _cache[ctx] = {}
+    dt = t0 - _cache[ctx][name(chid)]['ts']
     # avoid repeatedly trying to connect to unavailable PV
-    nfail = min(20,  1 + _cache[name(chid)]['failures'])
+    nfail = min(20,  1 + _cache[ctx][name(chid)]['failures'])
     if force: nfail = min(2,nfail)
     if dt < nfail * DEFAULT_CONNECTION_TIMEOUT: return conn
 
@@ -438,8 +459,8 @@ def connect_channel(chid,timeout=None,verbose=False,force=True):
     if verbose:
         sys.stdout.write('connected in %.3f s\n' % ( time.time()-t0))
     if not conn:
-        _cache[name(chid)]['ts'] = time.time()
-        _cache[name(chid)]['failures'] += 1
+        _cache[ctx][name(chid)]['ts'] = time.time()
+        _cache[ctx][name(chid)]['failures'] += 1
     return conn
 
 # common functions with similar signatures
@@ -788,9 +809,12 @@ def _onConnectionEvent(args):
     pvname = name(args.chid)
     if args.op != dbr.OP_CONN_UP:  return
     try:
-        entry  = _cache[pvname]
+        ctx = current_context()
+        if ctx not in _cache:  _cache[ctx] = {}
+        entry  = _cache[ctx][pvname]
     except KeyError:
         return
+    # print 'Conn Event ', pvname, entry
     entry['conn'] = (args.op == dbr.OP_CONN_UP)
     entry['ts']   = time.time()
     entry['failures'] = 0

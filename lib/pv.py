@@ -61,12 +61,18 @@ class PV(object):
 
         self._monref = None  # holder of data returned from create_subscription
         self.chid = None
-        if self.pvname in ca._cache:
-            self.chid = ca._cache[pvname]['chid']
-            self._onConnect(chid=self.chid,conn=ca._cache[pvname]['conn'])
-        else:
+
+        # get current thread context to use for ca._cache
+        ctx = ca.current_context()
+        if ctx not in ca._cache: ca._cache[ctx] = {}
+        if self.pvname in ca._cache[ctx]:
+            entry = ca._cache[ctx][pvname]
+            self.chid = entry['chid']
+            self._onConnect(chid=self.chid,conn= entry['conn'])
+        if self.chid is None:
             self.chid = ca.create_channel(self.pvname,
                                           userfcn=self._onConnect)
+
         self._args['chid'] = self.chid
         self._args['type'] = dbr.Name(ca.field_type(self.chid)).lower()
         if callback is not None:
