@@ -7,13 +7,14 @@ Based on code from  Friedrich Schotte, NIH, modified by Matt Newville
 import time
 from threading import Thread
 import epics
+import sys
 
 from  pvnames import updating_pvlist
-
+write = sys.stdout.write
 def run_test(runtime=1, pvnames=None,  run_name='thread c'):
-    print ' -> thread  "%s"  will run for %.3f sec ' % ( run_name, runtime)
+    write(' -> thread  "%s"  will run for %.3f sec\n ' % ( run_name, runtime))
     def onChanges(pvname=None, value=None, char_value=None, **kw):
-        print '      %s = %s (%s)' % (pvname, char_value, run_name)
+        write('      %s = %s (%s)\n' % (pvname, char_value, run_name))
         
     epics.ca.context_create()
     t0 = time.time()
@@ -28,12 +29,12 @@ def run_test(runtime=1, pvnames=None,  run_name='thread c'):
         time.sleep(0.01)
 
     for p in pvs: p.clear_callbacks()
-    print 'Done with Thread ', run_name
+    write( 'Done with Thread  %s' % run_name)
     
-print "First, run test in Foreground:"
+write( "First, run test in Foreground:\n")
 run_test(2.0,  updating_pvlist, 'initial')
 
-print "Run 2 Background Threads simultaneously:"
+write("Run 2 Background Threads simultaneously:\n")
 th1 = Thread(target=run_test,args=(5, updating_pvlist,  'A'))
 
 th2 = Thread(target=run_test,args=(10, updating_pvlist, 'B'))
@@ -43,4 +44,4 @@ th2.start()
 th1.join()
 th2.join()
 
-print 'Done'
+write( 'Done\n')
