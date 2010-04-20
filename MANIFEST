@@ -41,6 +41,7 @@ tests/ca_test3.py
 tests/ca_unittest1.py
 tests/caget_simple.py
 tests/connect.py
+tests/no_monitor.py
 tests/thread_test.py
 tests/thread_put.py
 tests/memleak.py
