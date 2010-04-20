@@ -1,0 +1,26 @@
+2010-04-20  Matt Newville  <newville@cars.uchicago.edu>
+
+	* Version 3.0.2:
+
+	- improved method to "locate CA dll" (or .so or .dylib) at run
+	time, using ctypes.util.find_lib().  On Unix (including linux, Mac
+	OSX), if the "usual system approach" of finding a DLL is not
+	successful, the enviroment variables PATH and LD_LIBRARY_PATH (and
+	DYLD_LIBRARY_PATH on Mac OSX) will be searched for the appropriate
+	DLL.
+		
+	- improved functionality for Python Threads.   The _cache data in
+	ca.py now stores Channel IDs with CA "context", so that use of
+	Python threads (as from threading.Thread) work, allowing, gets(),
+	puts(), and callbacks in separately running threads.
+			
+
+2010-04-08  Matt Newville  <newville@cars.uchicago.edu>
+
+	* Version 3.0.1:
+	inital release of version 3.0.1 
+
+	This is a dramatic change from the 2.1 series.  Please consult
+	documentation.
+	
+	

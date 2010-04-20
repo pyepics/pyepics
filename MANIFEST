@@ -1,6 +1,7 @@
 README
 INSTALL
 MANIFEST
+Changelog
 license.txt
 setup.py
 lib/__init__.py
