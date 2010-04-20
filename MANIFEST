@@ -26,6 +26,7 @@ doc/devices.rst
 doc/index.rst
 doc/installation.rst
 doc/overview.rst
+doc/thread.rst
 doc/pv.rst
 doc/wx.rst
 doc/Makefile
@@ -41,6 +42,7 @@ tests/ca_unittest1.py
 tests/caget_simple.py
 tests/connect.py
 tests/thread_test.py
+tests/thread_put.py
 tests/memleak.py
 tests/memleak_put.py
 tests/memory_motor.py
