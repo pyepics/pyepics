@@ -7,15 +7,18 @@
   Epics Process Variable
 """
 import time
+import sys
 import math
 import copy
 from . import ca
 from . import dbr
 
-def fmt_time(t=None):
-    if t is None: t = time.time()
-    t,frac=divmod(t,1)
-    return "%s.%6.6i" %(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(t)),1.e6*frac)
+def fmt_time(ts=None):
+    if ts is None:
+        ts = time.time()
+    ts, frac = divmod(ts, 1)
+    return "%s.%6.6i" % (time.strftime("%Y-%m-%d %H:%M:%S",
+                                       time.localtime(ts)), 1.e6*frac)
 
 class PV(object):
     """== Epics Process Variable
@@ -43,7 +46,7 @@ class PV(object):
                'lower_alarm_limit', 'lower_warning_limit',
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
-    def __init__(self,pvname, callback=None, form='native',
+    def __init__(self, pvname, callback=None, form='native',
                  verbose=False, auto_monitor=True):
         self.pvname     = pvname.strip()
         self.form       = form.lower()
@@ -68,7 +71,7 @@ class PV(object):
         if self.pvname in ca._cache[ctx]:
             entry = ca._cache[ctx][pvname]
             self.chid = entry['chid']
-            self._onConnect(chid=self.chid,conn= entry['conn'])
+            self._onConnect(chid=self.chid, conn=entry['conn'])
         if self.chid is None:
             self.chid = ca.create_channel(self.pvname,
                                           userfcn=self._onConnect)
@@ -79,10 +82,10 @@ class PV(object):
             self.connect()
             self.add_callback(callback)
 
-    def _write(self,msg):
+    def _write(self, msg):
         sys.stdout.write("%s\n" % msg)
     
-    def _onConnect(self,chid=0,conn=True,**kw):
+    def _onConnect(self, chid=0, conn=True, **kw):
         # occassionally chid is still None (threading issue???)
         # just return here, and connection will be forced later
         if self.chid is None: return
@@ -92,36 +95,36 @@ class PV(object):
             self._args['host']   = ca.host_name(self.chid)
             self._args['count']  = ca.element_count(self.chid)
             self._args['access'] = ca.access(self.chid)
-            self._args['read_access'] = 1==ca.read_access(self.chid)
-            self._args['write_access'] = 1==ca.write_access(self.chid)
+            self._args['read_access'] = (1 == ca.read_access(self.chid))
+            self._args['write_access'] = (1 == ca.write_access(self.chid))
             self.ftype  = ca.promote_type(self.chid,
-                                     use_ctrl= self.form=='ctrl',
-                                     use_time= self.form=='time')
+                                     use_ctrl= self.form == 'ctrl',
+                                     use_time= self.form == 'time')
             self._args['type'] = dbr.Name(self.ftype).lower()
         return
 
 
-    def connect(self,timeout=5.0,force=True):
+    def connect(self, timeout=5.0, force=True):
         ca_subscribe = ca.create_subscription
         ca_connect   = ca.connect_channel
         if not self.connected:
-            ca_connect(self.chid, timeout=timeout,force=force)
+            ca_connect(self.chid, timeout=timeout, force=force)
             self.poll()
         # should be only be called 1st time, to subscribe
         # and set self._monref
         if self._monref is None and self.connected and self.auto_monitor:
             self._monref = ca_subscribe(self.chid,
-                                        userfcn= self._onChanges,
-                                        use_ctrl= self.form=='ctrl',
-                                        use_time= self.form=='time')
+                                        userfcn=self._onChanges,
+                                        use_ctrl=self.form == 'ctrl',
+                                        use_time=self.form == 'time')
 
         if  self._args['ftype'] is None and self._args['type'] is not None:
             self._args['ftype'] = dbr.Name(self._args['type'], reverse=True)
 
         return (self.connected and self.ftype is not None)
 
-    def poll(self,ev=1.e-4, io=1.0):
-        ca.poll(ev=ev, io=io)
+    def poll(self, evt=1.e-4, iot=1.0):
+        ca.poll(evt=evt, iot=iot)
 
     def get(self, as_string=False):
         """returns current value of PV
@@ -132,8 +135,9 @@ class PV(object):
         >>> p.get('13BMD:m1.DIR',as_string=True)
         'Pos'
         """
-        if not self.connect(force=False):  return None
-        self._args['value'] = ca.get(self.chid,ftype=self.ftype)
+        if not self.connect(force=False):
+            return None
+        self._args['value'] = ca.get(self.chid, ftype=self.ftype)
 
         self.poll() 
         field = 'value'
@@ -142,26 +146,28 @@ class PV(object):
             field = 'char_value'
         return self._args[field]
 
-    def put(self,value,wait=False,timeout=30.0,callback=None,callback_data=None):
+    def put(self, value, wait=False, timeout=30.0,
+            callback=None, callback_data=None):
         """set value for PV, optionally waiting until the processing is
         complete, and optionally specifying a callback function to be run
         when the processing is complete.        
         """
-        if not self.connect(force=False):  return None
-        if (self.ftype in (dbr.ENUM,dbr.TIME_ENUM,dbr.CTRL_ENUM) and
-            isinstance(value,str) and value in self._args['enum_strs']):
+        if not self.connect(force=False):
+            return None
+        if (self.ftype in (dbr.ENUM, dbr.TIME_ENUM, dbr.CTRL_ENUM) and
+            isinstance(value, str) and value in self._args['enum_strs']):
             value = self._args['enum_strs'].index(value)
         
         return ca.put(self.chid, value,
-                      wait=wait,    timeout=timeout,
+                      wait=wait, timeout=timeout,
                       callback=callback, callback_data=callback_data)
 
-    def _set_charval(self,val,call_ca=True):
+    def _set_charval(self, val, call_ca=True):
         """ sets the character representation of the value.
         intended only for internal use"""
         ftype = self._args['ftype']
         if ftype == dbr.STRING:
-            self._args['char_value'] =val
+            self._args['char_value'] = val
             return val
         cval  = repr(val)       
         if self._args['count'] > 1:
@@ -180,7 +186,7 @@ class PV(object):
                 fmt  = "%%.%if"
                 if 4 < abs(int(math.log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
-                cval = (fmt %  self._args.get('precision',0)) % val
+                cval = (fmt %  self._args.get('precision', 0)) % val
             except:
                 pass 
         elif ftype == dbr.ENUM:
@@ -190,11 +196,13 @@ class PV(object):
                 cval = self._args['enum_strs'][val]
             except (TypeError, KeyError,  IndexError):
                 pass
-        self._args['char_value'] =cval
+        self._args['char_value'] = cval
         return cval
     
     def get_ctrlvars(self):
-        if not self.connect(force=False):  return None
+        ""
+        if not self.connect(force=False):
+            return None
         kw = ca.get_ctrlvars(self.chid)
         ca.poll()
         self._args.update(kw)
@@ -207,14 +215,14 @@ class PV(object):
         """
         self._args.update(kw)
         self._args['value']  = value
-        self._args['timestamp'] = kw.get('timestamp',time.time())
+        self._args['timestamp'] = kw.get('timestamp', time.time())
         self._set_charval(self._args['value'], call_ca=False)
 
         if self.verbose:
             now = fmt_time(self._args['timestamp'])
-            self.write('%s: %s (%s)'% (self.pvname,
-                                       self._args['char_value'],
-                                       now))
+            self._write('%s: %s (%s)'% (self.pvname,
+                                        self._args['char_value'],
+                                        now))
         self.run_callbacks()
         
     def run_callbacks(self):
@@ -235,13 +243,14 @@ class PV(object):
              
         """
         for index in sorted(self.callbacks.keys()):
-            fcn,kwargs = self.callbacks[index]
+            fcn, kwargs = self.callbacks[index]
             kw = copy.copy(self._args)
             kw.update(kwargs)
             kw['cb_info'] = (index, self.remove_callback)
-            if hasattr(fcn,'__call__'): fcn(**kw)
+            if hasattr(fcn, '__call__'):
+                fcn(**kw)
             
-    def add_callback(self,callback=None,**kw):
+    def add_callback(self, callback=None, **kw):
         """add a callback to a PV.  Optional keyword arguments
         set here will be preserved and passed on to the callback
         at runtime.
@@ -249,16 +258,17 @@ class PV(object):
         Note that a PV may have multiple callbacks, so that each
         has a unique index (small integer) that is returned by
         add_callback.  This index is needed to remove a callback."""
-        if not self.connected:  self.connect(force=False)
+        if not self.connected:
+            self.connect(force=False)
         index = None
-        if hasattr(callback,'__call__'):
+        if hasattr(callback, '__call__'):
             n_cb = len(self.callbacks)
             index = 1
             if n_cb > 1:  index = 1 + max(self.callbacks.keys())
-            self.callbacks[index] = (callback,kw)
+            self.callbacks[index] = (callback, kw)
         return index
     
-    def remove_callback(self,index=None):
+    def remove_callback(self, index=None):
         """remove a callback.
         """
         if index is None and len(self.callbacks)==1:
@@ -267,45 +277,51 @@ class PV(object):
             self.callbacks.pop(index)
             self.poll()
 
-    def clear_callbacks(self,**kw):
+    def clear_callbacks(self, **kw):
         self.callbacks = {}
 
     def _getinfo(self):
-        if not self.connect(force=False):  return None
-        if self._args['precision'] is None: self.get_ctrlvars()
+        if not self.connect(force=False):
+            return None
+        if self._args['precision'] is None:
+            self.get_ctrlvars()
 
         # list basic attributes
         out = []
         mod = 'native'
         xtype = self._args['type']
-        if '_' in xtype: mod,xtype = xtype.split('_')
+        if '_' in xtype:
+            mod, xtype = xtype.split('_')
 
-        out.append("== %s  (%s) ==" % (self.pvname,xtype))
-        if self.count==1:
+        out.append("== %s  (%s) ==" % (self.pvname, xtype))
+        if self.count == 1:
             val = self._args['value']
             fmt = '%i'
             if   xtype in ('float','double'): fmt = '%g'
             elif xtype in ('string','char'):  fmt = '%s'
             out.append('   value      = %s' % fmt % val)
         else:
-            aval,ext,fmt = [],'',"%i,"
-            if self.count>5: ext = '...'
+            aval, ext, fmt = [], '', "%i,"
+            if self.count > 5:
+                ext = '...'
             if xtype in  ('float','double'): fmt = "%g,"
-            for i in range(min(5,self.count)):
+            for i in range(min(5, self.count)):
                 aval.append(fmt % self._args['value'][i])
-            out.append("   value      = array  [%s%s]" % ("".join(aval),ext))
+            out.append("   value      = array  [%s%s]" % ("".join(aval),
+                                                          ext))
 
-        for i in ('char_value','count','type','units',
-                  'precision','host','access',
-                  'status','severity','timestamp',
+        for i in ('char_value', 'count', 'type', 'units',
+                  'precision', 'host', 'access',
+                  'status', 'severity', 'timestamp',
                   'upper_ctrl_limit', 'lower_ctrl_limit',
                   'upper_disp_limit', 'lower_disp_limit',
                   'upper_alarm_limit', 'lower_alarm_limit',
-                  'upper_warning_limit','lower_warning_limit'):
-            if hasattr(self,i):
-                att = getattr(self,i)
+                  'upper_warning_limit', 'lower_warning_limit'):
+            if hasattr(self, i):
+                att = getattr(self, i)
                 if att is not None:
-                    if i == 'timestamp': att = "%.3f (%s)" % (att,fmt_time(att))
+                    if i == 'timestamp':
+                        att = "%.3f (%s)" % (att, fmt_time(att))
                     if len(i) < 12:
                         out.append('   %.11s= %s' % (i+' '*12, str(att)))
                     else:
@@ -313,11 +329,14 @@ class PV(object):
 
         if xtype == 'enum':  # list enum strings
             out.append('   enum strings: ')
-            for i,s in enumerate(self.enum_strs):
-                out.append("       %i = %s " % (i,s))
+            for index, estr in enumerate(self.enum_strs):
+                out.append("       %i = %s " % (index, estr))
 
         if self._monref is not None:
-            out.append('   PV is internally monitored, with %i user-defined callbacks:' % len(self.callbacks))
+            msg = 'PV is internally monitored'
+            out.append('   %s, with %i user-defined callbacks:' % (msg,
+                                                         len(self.callbacks)))
+
             if len(self.callbacks) > 0:
                 cblist = list(self.callbacks.keys())
                 cblist.sort()
@@ -331,99 +350,150 @@ class PV(object):
         out.append('=============================')
         return '\n'.join(out)
         
-    def _getarg(self,arg):
+    def _getarg(self, arg):
         if self._args['value'] is None:  self.get()
-        return self._args.get(arg,None)
+        return self._args.get(arg, None)
         
-    def __getval__(self):    return self._getarg('value')
-    def __setval__(self,v):  return self.put(v)
+    def __getval__(self):
+        return self._getarg('value')
+    def __setval__(self, v):
+        return self.put(v)
     value = property(__getval__, __setval__, None, "value property")
 
     @property
-    def char_value(self): return self._getarg('char_value')
+    def char_value(self):
+        "character string representation of value"
+        return self._getarg('char_value')
 
     @property
-    def status(self): return self._getarg('status')
+    def status(self):
+        "pv status"
+        return self._getarg('status')
 
     @property
-    def type(self): return self._args['type']
+    def type(self):
+        "pv type"
+        return self._args['type']
 
     @property
-    def host(self): return self._getarg('host')
+    def host(self):
+        "pv host"
+        return self._getarg('host')
 
     @property
-    def count(self): return self._getarg('count')
+    def count(self):
+        "count (number of elements)"
+        return self._getarg('count')
 
     @property
-    def read_access(self): return self._getarg('read_access')
+    def read_access(self):
+        "read access"
+        return self._getarg('read_access')
 
     @property
-    def write_access(self): return self._getarg('write_access')
+    def write_access(self):
+        "write access"
+        return self._getarg('write_access')
 
     @property
-    def access(self): return self._getarg('access')
+    def access(self):
+        "read/write access as string"
+        return self._getarg('access')
 
     @property
-    def severity(self): return self._getarg('severity')
+    def severity(self):
+        "pv severity"
+        return self._getarg('severity')
 
     @property
-    def timestamp(self): return self._getarg('timestamp')
+    def timestamp(self):
+        "timestamp of last pv action"
+        return self._getarg('timestamp')
 
     @property
-    def precision(self): return self._getarg('precision')
+    def precision(self):
+        "number of digits after decimal point"
+        return self._getarg('precision')
 
     @property
-    def units(self): return self._getarg('units')
+    def units(self):
+        "engineering units for pv"
+        return self._getarg('units')
 
     @property
-    def enum_strs(self): return self._getarg('enum_strs')
+    def enum_strs(self):
+        "list of enumeration strings"
+        return self._getarg('enum_strs')
 
     @property
-    def upper_disp_limit(self): return self._getarg('upper_disp_limit')
+    def upper_disp_limit(self):
+        "limit"
+        return self._getarg('upper_disp_limit')
 
     @property
-    def lower_disp_limit(self): return self._getarg('lower_disp_limit')
+    def lower_disp_limit(self):
+        "limit"
+        return self._getarg('lower_disp_limit')
 
     @property
-    def upper_alarm_limit(self): return self._getarg('upper_alarm_limit')
+    def upper_alarm_limit(self):
+        "limit"
+        return self._getarg('upper_alarm_limit')
 
     @property
-    def lower_alarm_limit(self): return self._getarg('lower_alarm_limit')
+    def lower_alarm_limit(self):
+        "limit"
+        return self._getarg('lower_alarm_limit')
 
     @property
-    def lower_warning_limit(self): return self._getarg('lower_warning_limit')
+    def lower_warning_limit(self):
+        "limit"
+        return self._getarg('lower_warning_limit')
 
     @property
-    def upper_warning_limit(self): return self._getarg('upper_warning_limit')
+    def upper_warning_limit(self):
+        "limit"
+        return self._getarg('upper_warning_limit')
 
     @property
-    def upper_ctrl_limit(self): return self._getarg('upper_ctrl_limit')
+    def upper_ctrl_limit(self):
+        "limit"
+        return self._getarg('upper_ctrl_limit')
 
     @property
-    def lower_ctrl_limit(self): return self._getarg('lower_ctrl_limit')
+    def lower_ctrl_limit(self):
+        "limit"
+        return self._getarg('lower_ctrl_limit')
 
     @property
-    def info(self): return self._getinfo()
+    def info(self):
+        "info string"
+        return self._getinfo()
 
     def __repr__(self):
+        ""
         if self.connected:
             return self._fmt % self._args
         else:
             return "<PV '%s': not connected>" % self.pvname
     
-    def __str__(self): return self.__repr__()
+    def __str__(self):
+        ""
+        return self.__repr__()
 
-    def __eq__(self,other):
+    def __eq__(self, other):
+        ""
         try:
             return (self.chid  == other.chid)
         except:
             return False
 
     def disconnect(self):
+        ""
         self.connected = False
         self.callbacks = {}
         if self._monref is not None:
-            cb,uarg,evid = self._monref
+            cb, uarg, evid = self._monref
             ca.clear_subscription(evid)
             del cb
             del uarg
