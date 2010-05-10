@@ -801,7 +801,7 @@ def _onGetEvent(args):
     # add kw arguments for CTRL and TIME variants
     if args.type >= dbr.CTRL_STRING:
         v = value[0]
-        for attr in dbr.ctrl_limits + ('precision', 'units'):
+        for attr in dbr.ctrl_limits + ('precision', 'units', 'severity'):
             if hasattr(v, attr):        
                 kw[attr] = getattr(v, attr)
         if hasattr(v, 'strs') and hasattr(v, 'no_str') and v.no_str > 0:

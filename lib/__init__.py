@@ -28,8 +28,8 @@ from . import ca
 from . import dbr
 from . import pv
 from . import alarm
-from . import motor
 from . import device
+from . import motor
 
 PV    = pv.PV
 Alarm = alarm.Alarm

@@ -91,7 +91,7 @@ class Device(object):
 
         use in your subclass as:
         
-        >>> class MyDevice(epics.device):
+        >>> class MyDevice(epics.Device):
         >>>     def __init__(self,prefix):
         >>>         epics.Device.__init__(self)
         >>>         self.PV('something')

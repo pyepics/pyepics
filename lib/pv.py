@@ -39,7 +39,7 @@ class PV(object):
 """
 
     _fmt="<PV '%(pvname)s', count=%(count)i, type=%(type)s, access=%(access)s>"
-    _fields = ('pvname', 'value', 'char_value', 'status', 'ftype', 'chid',
+    _fields = ('pvname',  'value',  'char_value',  'status',  'ftype',  'chid',
                'host', 'count', 'access', 'write_access', 'read_access',
                'severity', 'timestamp', 'precision', 'units', 'enum_strs',
                'upper_disp_limit', 'lower_disp_limit', 'upper_alarm_limit',
@@ -115,8 +115,8 @@ class PV(object):
         if self._monref is None and self.connected and self.auto_monitor:
             self._monref = ca_subscribe(self.chid,
                                         userfcn=self._onChanges,
-                                        use_ctrl=self.form == 'ctrl',
-                                        use_time=self.form == 'time')
+                                        use_ctrl=(self.form == 'ctrl'),
+                                        use_time=(self.form == 'time'))
 
         if  self._args['ftype'] is None and self._args['type'] is not None:
             self._args['ftype'] = dbr.Name(self._args['type'], reverse=True)
