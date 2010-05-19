@@ -49,6 +49,16 @@ other_pvlist = [ '13IDC:scan1.P1PA',
            '13IDA:m2.VAL', '13IDA:m2.DESC',
            '13IDA:m2.FOFF', '13IDA:m2.SET', '13IDA:m2.SPMG' ]
 
+string_pvlist = ['13BMA:m1.DESC',
+                 '13BMA:m2.DESC',
+                 '13BMA:m3.DESC',
+                 '13BMA:m4.DESC',
+                 '13IDA:m1.DESC',
+                 '13IDA:m2.DESC',
+                 '13IDA:m3.DESC',
+                 '13IDA:m4.DESC']
+                 
+
 #### alarm test
 
 alarm_pv = '13IDC:m13.VAL'

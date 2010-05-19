@@ -80,6 +80,9 @@ AUTO_CLEANUP = True
 #   as connection will be tried repeatedly
 DEFAULT_CONNECTION_TIMEOUT = 5.0
 
+## maximum element count for auto-monitoring of PVs in epics.pv
+AUTOMONITOR_MAXLENGTH = 100
+
 ## Cache of existing channel IDs:
 #  pvname: {'chid':chid, 'conn': isConnected,
 #           'ts': ts_conn, 'userfcn': user_callback)
@@ -382,7 +385,7 @@ def pend_event(t=1.e-5):
     return PySEVCHK( 'pend_event', ret,  dbr.ECA_TIMEOUT)
 
 @withCA
-def poll(evt=1.e-4, iot=1.0):
+def poll(evt=1.e-4, iot=10.0):
     """polls CA for events and i/o. """
     pend_event(evt)
     return pend_io(iot)    
@@ -535,7 +538,7 @@ def _unpack(data, count, ftype=dbr.INT, as_numpy=True):
     def unpack_simple(data, ntype):
         if count == 1 and ntype != dbr.STRING:
             return data[0]
-        out = [i for i in data]
+        out = data
         if ntype == dbr.STRING:
             out = strjoin('', out).rstrip()
             if '\x00' in out:

@@ -3,8 +3,8 @@
    Matthew Newville <newville@cars.uchicago.edu>
    CARS, University of Chicago
 
-   version    :  3.0.1 (beta version of epics Py3)
-   last update:  31-Mar-2010
+   version    :  3.0.3 (beta version of epics Py3)
+   last update:  10-May-2010
    
 == License:
    Except where explicitly noted, this file and all files in this distribution are licensed under
@@ -20,7 +20,7 @@
       PV -- Process Variable which will work largely as in EpicsCA 2.*
 """
 
-__version__ = '3.0.2'
+__version__ = '3.0.3'
 
 import time
 import sys

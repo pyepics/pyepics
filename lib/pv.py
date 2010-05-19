@@ -105,15 +105,15 @@ class PV(object):
 
 
     def connect(self, timeout=5.0, force=True):
-        ca_subscribe = ca.create_subscription
-        ca_connect   = ca.connect_channel
         if not self.connected:
-            ca_connect(self.chid, timeout=timeout, force=force)
+            ca.connect_channel(self.chid, timeout=timeout, force=force)
             self.poll()
         # should be only be called 1st time, to subscribe
         # and set self._monref
-        if self._monref is None and self.connected and self.auto_monitor:
-            self._monref = ca_subscribe(self.chid,
+        count = ca.element_count(self.chid)
+        if (self._monref is None and self.connected and
+            self.auto_monitor  and count < ca.AUTOMONITOR_MAXLENGTH):
+            self._monref = ca.create_subscription(self.chid,
                                         userfcn=self._onChanges,
                                         use_ctrl=(self.form == 'ctrl'),
                                         use_time=(self.form == 'time'))
@@ -126,7 +126,7 @@ class PV(object):
     def poll(self, evt=1.e-4, iot=1.0):
         ca.poll(evt=evt, iot=iot)
 
-    def get(self, as_string=False):
+    def get(self, as_string=False, as_numpy=True):
         """returns current value of PV
         use argument 'as_string=True' to return string representation
 
@@ -137,8 +137,8 @@ class PV(object):
         """
         if not self.connect(force=False):
             return None
-        self._args['value'] = ca.get(self.chid, ftype=self.ftype)
-
+        
+        self._args['value'] = ca.get(self.chid, ftype=self.ftype, as_numpy=as_numpy)
         self.poll() 
         field = 'value'
         if as_string:
