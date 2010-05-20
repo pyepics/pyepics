@@ -1,0 +1,6 @@
+include README INSTALL MANIFEST.in PKG-INFO Changelog license.txt setup.py use_py3.bat
+recursive-include lib *.py
+recursive-include scripts *
+recursive-include tests *
+recursive-include doc *
+recursive-include dlls *
