@@ -31,14 +31,17 @@ from . import dbr
 EPICS_STR_ENCODING = 'ASCII'
 PY_VERSION = sys.version_info[0]
 def get_strconvertors():
-    """make string wrappersto pass to C functions for both Python2 and Python3
-    EPICS CA library uses char* to represent strings.  In Python3, char* maps to
-    a sequence of bytes which must be explicitly converrted to a Python string
-    specifying the encoding.
+    """create string wrappers to pass to C functions for both
+    Python2 and Python3.  Note that the EPICS CA library uses
+    char* to represent strings.  In Python3, char* maps to a
+    sequence of bytes which must be explicitly converted to a
+    Python string by specifying the encoding.  That is, ASCII
+    encoding is not implicitly assumed.
 
-    That is, for Python3 one sends and recieves sequences of bytes to libca.
-    This function returns translators (str2bytes, bytes2str), assuming the
-    encoding defined in EPICS_STR_ENCODING (which is 'ASCII' by default). 
+    That is, for Python3 one sends and receives sequences of
+    bytes to libca. This function returns the translators
+    (str2bytes, bytes2str), assuming the encoding defined in
+    EPICS_STR_ENCODING (which is 'ASCII' by default).  
     """
     if PY_VERSION >= 3:
         def s2b(st1):
@@ -57,6 +60,7 @@ def get_strconvertors():
 str2bytes, bytes2str = get_strconvertors()
 
 def strjoin(sep, seq):
+    "join string sequence with a separator"
     if PY_VERSION < 3:
         return sep.join(seq)
 
@@ -106,7 +110,7 @@ def find_libca():
     """
     find location of ca dynamic library
     """
-    search_path =  [os.path.split( os.path.abspath(__file__))[0]]
+    search_path = [os.path.split( os.path.abspath(__file__))[0]]
     search_path.extend(sys.path)
     path  = os.environ['PATH']
     path_sep = ':'
@@ -140,8 +144,7 @@ def find_libca():
         if host_arch in known_hosts:
             epicspath = []
             for d in known_hosts[host_arch]:
-                epicspath.append( os.path.join(epics_base, 'lib', d))
-
+                epicspath.append(os.path.join(epics_base, 'lib', d))
         for d in search_path + ldpath + epicspath + sys.path:
             if os.path.exists(d) and os.path.isdir(d):
                 if libname in os.listdir(d):
@@ -185,7 +188,7 @@ def initialize_libca():
     if AUTO_CLEANUP: atexit.register(finalize_libca)
     return libca
 
-def finalize_libca(maxtime=10.0):
+def finalize_libca(maxtime=10.0, gc_collect=True):
     """shutdown channel access:
     run clear_channel(chid) for all chids in _cache
     then flush_io() and poll() a few times.
@@ -283,8 +286,8 @@ def withConnectedCHID(fcn):
 
             if mystate != dbr.CS_CONN:
                 try:
-                    t = kw.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
-                    connect_channel(args[0], timeout=t, force=False)
+                    timeout = kw.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
+                    connect_channel(args[0], timeout=timeout, force=False)
                     mystate = state(args[0])                    
                 except:
                     mystate = None
@@ -295,7 +298,8 @@ def withConnectedCHID(fcn):
     return wrapper
 
 def PySEVCHK(func_name, status, expected=dbr.ECA_NORMAL):
-    """raise a ChannelAccessException if the wrapped  status != ECA_NORMAL
+    """raise a ChannelAccessException if the wrapped
+    status != ECA_NORMAL
     """
     if status == expected:
         return status
@@ -369,19 +373,18 @@ def version():
     fcn = libca.ca_version
     fcn.restype = ctypes.c_char_p
     return bytes2str(fcn())
-
 @withCA
 @withSEVCHK
-def pend_io(t=1.0):
+def pend_io(timeout=1.0):
     fcn   = libca.ca_pend_io
     fcn.argtypes = [ctypes.c_double]
-    return fcn(t)
+    return fcn(timeout)
 
 @withCA
-def pend_event(t=1.e-5):
+def pend_event(timeout=1.e-5):
     fcn = libca.ca_pend_event
     fcn.argtypes = [ctypes.c_double]
-    ret = fcn(t)
+    ret = fcn(timeout)
     return PySEVCHK( 'pend_event', ret,  dbr.ECA_TIMEOUT)
 
 @withCA
@@ -419,14 +422,16 @@ def create_channel(pvname, connect=False, userfcn=None):
     # callback that is run -- the userfcn here is stored in the _cache
     # and called by _onConnectionEvent.
     pvn = str2bytes(pvname)    
-    ret = libca.ca_create_channel(pvn, _CB_connect, 0, 0, ctypes.byref(chid))
+    ret = libca.ca_create_channel(pvn, _CB_connect, 0, 0,
+                                  ctypes.byref(chid))
     PySEVCHK('create_channel', ret)
 
     ctx = current_context()
     if ctx not in _cache:  _cache[ctx] = {}
     
-    _cache[ctx][pvname] = {'chid':chid, 'conn':False, 'ts':0, 'failures':0,
-                      'userfcn': userfcn}
+    _cache[ctx][pvname] = {'chid':chid, 'conn':False,
+                           'ts':0, 'failures':0,
+                           'userfcn': userfcn}
 
     if connect: connect_channel(chid)
     poll()
@@ -489,22 +494,23 @@ def name(chid):
     return bytes2str(_chid_f(chid, 'ca_name', restype=ctypes.c_char_p))
 
 def host_name(chid):
-    return bytes2str(_chid_f(chid, 'ca_host_name', restype=ctypes.c_char_p))
+    return bytes2str(_chid_f(chid, 'ca_host_name',
+                             restype=ctypes.c_char_p))
 
 def element_count(chid):
-    return _chid_f(chid,'ca_element_count')
+    return _chid_f(chid, 'ca_element_count')
 
 def read_access(chid):
-    return _chid_f(chid,'ca_read_access')
+    return _chid_f(chid, 'ca_read_access')
 
 def write_access(chid):
-    return _chid_f(chid,'ca_write_access')
+    return _chid_f(chid, 'ca_write_access')
 
 def field_type(chid):
-    return _chid_f(chid,'ca_field_type')
+    return _chid_f(chid, 'ca_field_type')
 
 def clear_channel(chid):
-    return _chid_f(chid,'ca_clear_channel')
+    return _chid_f(chid, 'ca_clear_channel')
 
 @withCHID
 def state(chid):
@@ -520,7 +526,7 @@ def access(chid):
     return ('no access', 'read-only', 'write-only', 'read/write')[acc]
 
 @withCHID
-def promote_type(chid, use_time=False, use_ctrl=False, **kw):
+def promote_type(chid, use_time=False, use_ctrl=False):
     "promote native field type to TIME or CTRL variant"
     ftype = field_type(chid)
     if   use_ctrl:
@@ -567,7 +573,8 @@ def _unpack(data, count, ftype=dbr.INT, as_numpy=True):
         ntype -= dbr.TIME_STRING
 
     out = unpack(data, ntype)
-    if HAS_NUMPY and as_numpy and count > 1 and ntype != dbr.STRING:
+    if (HAS_NUMPY and as_numpy and
+        count > 1 and ntype != dbr.STRING):
         out = numpy.array(out)
     return out
 
@@ -681,11 +688,12 @@ def put(chid, value, wait=False, timeout=20, callback=None,
                                       data, _CB_putwait, 0)
     PySEVCHK('put', ret)
     if wait:
-        t0 = time.time()
+        time0 = time.time()
         finished = False
         while not finished:
             poll()
-            finished = (_put_done[pvname][0] or (time.time()-t0) > timeout)
+            finished = (_put_done[pvname][0] or
+                        (time.time()-time0) > timeout)
         if not _put_done[pvname][0]:
             ret = -ret
     return ret
@@ -719,8 +727,8 @@ def get_ctrlvars(chid):
         if hasattr(v, attr):
             kw[attr] = getattr(v, attr)
     if hasattr(v, 'strs') and hasattr(v, 'no_str') and v.no_str > 0:
-        kw['enum_strs'] = tuple([bytes2str(v.strs[i].value) for \
-                                 i in range(v.no_str)])
+        kw['enum_strs'] = tuple([bytes2str(v.strs[i].value)
+                                 for i in range(v.no_str)])
     return kw
 
 @withConnectedCHID
@@ -790,7 +798,9 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
 
 @withCA
 @withSEVCHK
-def clear_subscription(evid): return libca.ca_clear_subscription(evid)
+def clear_subscription(evid):
+    "cancel subscription"
+    return libca.ca_clear_subscription(evid)
 
 ##
 ## Event Handlers for get() event callbacks
@@ -830,7 +840,8 @@ def _onConnectionEvent(args):
     """set flag in cache holding whteher channel is
     connected. if provided, run a user-function"""
     pvname = name(args.chid)
-    if args.op != dbr.OP_CONN_UP:  return
+    if args.op != dbr.OP_CONN_UP:
+        return
     try:
         ctx = current_context()
         if ctx not in _cache:
@@ -872,11 +883,11 @@ _CB_putwait = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)
 ## Synchronous groups
 @withCA
 @withSEVCHK
-def sg_block(gid, t=10.0):
+def sg_block(gid, timeout=10.0):
     "sg block"
     fcn   = libca.ca_sg_block
     fcn.argtypes = [ctypes.c_ulong, ctypes.c_double]
-    return fcn(gid, t)
+    return fcn(gid, timeout)
 
 @withCA
 def sg_create():
@@ -901,7 +912,9 @@ def sg_test(gid):
 
 @withCA
 @withSEVCHK
-def sg_reset(gid):   return libca.ca_sg_reset(gid)
+def sg_reset(gid):
+    "sg reset"
+    return libca.ca_sg_reset(gid)
 
 def sg_get(gid, chid, ftype=None, as_string=False, as_numpy=True):
     """synchronous-group get of the current value for a Channel.

@@ -7,8 +7,9 @@
    last update:  19-May-2010
    
 == License:
-   Except where explicitly noted, this file and all files in this distribution are licensed under
-   the Epics Open License (see license.txt in the top-level directory of this distribution)
+   Except where explicitly noted, this file and all files in this
+   distribution are licensed under the Epics Open License
+   See license.txt in the top-level directory of this distribution.
    
 == Overview:
    rewrite of EpicsCA v 2.*, with major goals of:
@@ -38,7 +39,7 @@ Device = device.Device
 poll  = ca.poll
 sleep = time.sleep
 
-def __createPV(pvname,timeout=5.0):
+def __createPV(pvname, timeout=5.0):
     "create PV, wait for connection: "
 
     t0 = time.time()
@@ -64,7 +65,7 @@ def caput(pvname, value, wait=False, timeout=60):
     """ 
     thispv = __createPV(pvname)
     if thispv is not None:
-        ret = thispv.put(value,wait=wait,timeout=timeout)
+        ret = thispv.put(value, wait=wait, timeout=timeout)
         ca.poll()
         return ret
 
@@ -73,7 +74,8 @@ def caget(pvname, as_string=False):
     simple get of a pv's value..
        >>> x = caget('xx.VAL')
 
-    to get the character string representation (formatted double, enum string, etc):
+    to get the character string representation (formatted double,
+    enum string, etc):
        >>> x = caget('xx.VAL', as_string=True)
     """
     thispv = __createPV(pvname)
@@ -81,10 +83,11 @@ def caget(pvname, as_string=False):
         val = thispv.get()
         thispv.get_ctrlvars()
         ca.poll()
-        if as_string: return thispv.char_value
+        if as_string:
+            return thispv.char_value
         return val
 
-def cainfo(pvname,print_out=True):
+def cainfo(pvname, print_out=True):
     """cainfo(pvname,print_out=True)
 
     return printable information about pv
@@ -110,7 +113,7 @@ def camonitor_clear(pvname):
     if pvname in _monitor_cache:
         _monitor_cache[pvname].clear_callbacks()
         
-def camonitor(pvname,writer=None, callback=None):
+def camonitor(pvname, writer=None, callback=None):
     """ camonitor(pvname, writer=None, callback=None)
 
     sets a monitor on a PV.  
@@ -129,11 +132,11 @@ def camonitor(pvname,writer=None, callback=None):
     char_value Important: use **kw!!
     """
 
-    if not hasattr(callback,'__call__'):
-        if writer is None:  writer = sys.stdout.write
-        def callback(pvname=None, value=None,
-                     char_value=None,**kw):
-            writer("%.32s %s %s\n" % (pvname,pv.fmt_time(),char_value))
+    if writer is None:
+        writer = sys.stdout.write
+    if callback is None:
+        def callback(pvname=None, value=None, char_value=None, **kw):
+            writer("%.32s %s %s\n" % (pvname, pv.fmt_time(), char_value))
         
     thispv = __createPV(pvname)
     _monitor_cache[pvname] = thispv
