@@ -76,9 +76,9 @@ class PVImageFrame(ImageFrame):
             # npbuff = 1.0 * npbuff / npbuff.max()
             self.display(npbuff)
             tx.append( (time.time(), 'displayed'))
-            for tf, msg in tx:
-                print "%.4f %s" % (tf - tx[0][0], msg)
-                           
+            # for tf, msg in tx:
+            #  print "%.4f %s" % (tf - tx[0][0], msg)
+
 if __name__ == '__main__':
     import sys
     prefix = '13PS1:image1:'
