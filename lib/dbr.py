@@ -5,7 +5,10 @@
 #
 # Epics Database Records (DBR) Constants and Definitions
 #  most of the code here is copied from db_access.h
-# 
+#
+""" constants and declaration of data types for Epics database records
+This is mostly copied from CA header files
+"""
 import ctypes
 import time
 # EPICS Constants
@@ -16,9 +19,11 @@ ECA_ISATTACHED = 424
 
 CS_CONN    = 2
 OP_CONN_UP = 6
-OP_CONN_DOWN=7
+OP_CONN_DOWN = 7
 
-# Note that DBR_XXXX should be replaced with dbr.XXXX
+#
+# Note that DBR_XXX should be replaced with dbr.XXX
+# 
 STRING = 0
 INT    = 1
 SHORT  = 1
@@ -71,6 +76,7 @@ py_obj   = ctypes.py_object
 
 # extended DBR types:
 class epicsTimeStamp(ctypes.Structure):
+    "emulate epics timestamp"
     _fields_ = [('secs', ulong_t), ('nsec', ulong_t)]
        
 _STAT_SEV    = (('status', short_t), ('severity', short_t))
@@ -108,13 +114,14 @@ class time_double(ctypes.Structure):
    
     
 # DBR types with full control and graphical fields
+# yes, this strange order is as in db_access.h!!!
 ctrl_limits = ('upper_disp_limit',   'lower_disp_limit',
                'upper_alarm_limit',  'upper_warning_limit',
                'lower_warning_limit','lower_alarm_limit',
                'upper_ctrl_limit',   'lower_ctrl_limit')
+
 def _gen_ctrl_lims(t=short_t):
-    # yes, this strange order is as in db_access.h!!!
-    return  [(s,t) for s in  ctrl_limits]
+    return  [(s, t) for s in  ctrl_limits]
 
 class ctrl_enum(ctypes.Structure):
     _fields_ = list(_STAT_SEV) 
@@ -177,7 +184,7 @@ Map = {STRING: char_t,
        CTRL_DOUBLE: ctrl_double
        }
 
-def Name(ftype,reverse=False):
+def Name(ftype, reverse=False):
     """ convert integer data type to dbr Name, or optionally reverse that
     look up (that is, name to integer)"""
     m = {STRING: 'STRING',
@@ -207,16 +214,18 @@ def Name(ftype,reverse=False):
     if reverse:
         name = ftype.upper()
         if name in list(m.values()):
-            for i,v in m.items():
-                if name == v: return i
+            for key, val in m.items():
+                if name == val: return key
                 
     return m.get(ftype,'unknown')
 
 def Cast(args):
     """returns pointer to arg type for casting """
-    count,ftype = args.count, args.type
-    if ftype == STRING: count =MAX_STRING_SIZE
-    if ftype not in Map: ftype = double_t
+    count, ftype = args.count, args.type
+    if ftype == STRING:
+        count = MAX_STRING_SIZE
+    if ftype not in Map:
+        ftype = double_t
     
     return ctypes.cast(args.raw_dbr, ctypes.POINTER(count*Map[ftype]))
 

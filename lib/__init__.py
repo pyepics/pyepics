@@ -42,13 +42,13 @@ sleep = time.sleep
 def __createPV(pvname, timeout=5.0):
     "create PV, wait for connection: "
 
-    t0 = time.time()
+    start_time = time.time()
     thispv = PV(pvname)
     thispv.connect()
     while not thispv.connected:
         time.sleep(1.e-4)
         ca.poll()
-        if time.time()-t0 > timeout:
+        if time.time()-start_time > timeout:
             break
     if not thispv.connected:
         sys.stdout.write('cannot connect to %s\n' % pvname)
@@ -129,13 +129,16 @@ def camonitor(pvname, writer=None, callback=None):
     and you can do whatever you'd like with them.
 
     Your callback will be sent keyword arguments for pvname, value, and
-    char_value Important: use **kw!!
+    char_value Important: use **kwd!!
     """
 
     if writer is None:
         writer = sys.stdout.write
     if callback is None:
-        def callback(pvname=None, value=None, char_value=None, **kw):
+        def callback(pvname=None, value=None, char_value=None, **kwd):
+            "generic monitor callback"
+            if char_value is None:
+                char_value = repr(value)
             writer("%.32s %s %s\n" % (pvname, pv.fmt_time(), char_value))
         
     thispv = __createPV(pvname)

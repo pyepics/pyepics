@@ -13,12 +13,16 @@ import copy
 from . import ca
 from . import dbr
 
-def fmt_time(ts=None):
-    if ts is None:
-        ts = time.time()
-    ts, frac = divmod(ts, 1)
+## maximum element count for auto-monitoring of PVs in epics.pv
+AUTOMONITOR_MAXLENGTH = 100
+
+def fmt_time(tstamp=None):
+    "simple formatter for time values"
+    if tstamp is None:
+        tstamp = time.time()
+    tstamp, frac = divmod(tstamp, 1)
     return "%s.%6.6i" % (time.strftime("%Y-%m-%d %H:%M:%S",
-                                       time.localtime(ts)), 1.e6*frac)
+                                       time.localtime(tstamp)), 1.e6*frac)
 
 class PV(object):
     """== Epics Process Variable
@@ -38,7 +42,7 @@ class PV(object):
       >>>p.type           # EPICS data type: 'string','double','enum','long',..
 """
 
-    _fmt="<PV '%(pvname)s', count=%(count)i, type=%(type)s, access=%(access)s>"
+    _fmt = "<PV '%(pvname)s', count=%(count)i, type=%(type)s, access=%(access)s>"
     _fields = ('pvname',  'value',  'char_value',  'status',  'ftype',  'chid',
                'host', 'count', 'access', 'write_access', 'read_access',
                'severity', 'timestamp', 'precision', 'units', 'enum_strs',
@@ -47,7 +51,7 @@ class PV(object):
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
     def __init__(self, pvname, callback=None, form='native',
-                 verbose=False, auto_monitor=True):
+                 verbose=False, auto_monitor=None):
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
@@ -67,14 +71,15 @@ class PV(object):
 
         # get current thread context to use for ca._cache
         ctx = ca.current_context()
-        if ctx not in ca._cache: ca._cache[ctx] = {}
+        if ctx not in ca._cache:
+            ca._cache[ctx] = {}
         if self.pvname in ca._cache[ctx]:
             entry = ca._cache[ctx][pvname]
             self.chid = entry['chid']
-            self._onConnect(chid=self.chid, conn=entry['conn'])
+            self.on_connect(chid=self.chid, conn=entry['conn'])
         if self.chid is None:
             self.chid = ca.create_channel(self.pvname,
-                                          userfcn=self._onConnect)
+                                          userfcn=self.on_connect)
 
         self._args['chid'] = self.chid
         self._args['type'] = dbr.Name(ca.field_type(self.chid)).lower()
@@ -83,12 +88,15 @@ class PV(object):
             self.add_callback(callback)
 
     def _write(self, msg):
+        "write message"
         sys.stdout.write("%s\n" % msg)
     
-    def _onConnect(self, chid=0, conn=True, **kw):
+    def on_connect(self, chid=None, conn=True, **kwd):
+        "callback for connection events"
         # occassionally chid is still None (threading issue???)
         # just return here, and connection will be forced later
-        if self.chid is None: return
+        if self.chid is None and chid is None:
+            return
         
         self.connected = conn
         if self.connected:
@@ -105,16 +113,18 @@ class PV(object):
 
 
     def connect(self, timeout=5.0, force=True):
+        "check that a PV is connected, forcing a connection if needed"
         if not self.connected:
             ca.connect_channel(self.chid, timeout=timeout, force=force)
             self.poll()
         # should be only be called 1st time, to subscribe
         # and set self._monref
-        count = ca.element_count(self.chid)
-        if (self._monref is None and self.connected and
-            self.auto_monitor  and count < ca.AUTOMONITOR_MAXLENGTH):
+        if self.auto_monitor is None:
+            count = ca.element_count(self.chid)
+            self.auto_monitor = count < AUTOMONITOR_MAXLENGTH
+        if self._monref is None and self.connected and self.auto_monitor:
             self._monref = ca.create_subscription(self.chid,
-                                        userfcn=self._onChanges,
+                                        userfcn=self.on_changes,
                                         use_ctrl=(self.form == 'ctrl'),
                                         use_time=(self.form == 'time'))
 
@@ -124,6 +134,7 @@ class PV(object):
         return (self.connected and self.ftype is not None)
 
     def poll(self, evt=1.e-4, iot=1.0):
+        "poll for changes"
         ca.poll(evt=evt, iot=iot)
 
     def get(self, as_string=False, as_numpy=True):
@@ -138,7 +149,9 @@ class PV(object):
         if not self.connect(force=False):
             return None
         
-        self._args['value'] = ca.get(self.chid, ftype=self.ftype, as_numpy=as_numpy)
+        self._args['value'] = ca.get(self.chid,
+                                     ftype=self.ftype,
+                                     as_numpy=as_numpy)
         self.poll() 
         field = 'value'
         if as_string:
@@ -174,7 +187,8 @@ class PV(object):
             if ftype == dbr.CHAR:
                 val = list(val)
                 firstnull  = val.index(0)
-                if firstnull < 0: firstnull = len(val)
+                if firstnull < 0:
+                    firstnull = len(val)
                 cval = ''.join([chr(i) for i in val[:firstnull]]).rstrip()
             else:
                 cval = '<array size=%d, type=%s>' % (len(val),
@@ -187,7 +201,7 @@ class PV(object):
                 if 4 < abs(int(math.log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
                 cval = (fmt %  self._args.get('precision', 0)) % val
-            except:
+            except (ValueError, TypeError, ArithmeticError):
                 pass 
         elif ftype == dbr.ENUM:
             if call_ca and self._args['enum_strs'] in ([], None):
@@ -200,22 +214,22 @@ class PV(object):
         return cval
     
     def get_ctrlvars(self):
-        ""
+        "get control values for variable"
         if not self.connect(force=False):
             return None
-        kw = ca.get_ctrlvars(self.chid)
+        kwds = ca.get_ctrlvars(self.chid)
         ca.poll()
-        self._args.update(kw)
-        return kw
+        self._args.update(kwds)
+        return kwds
 
-    def _onChanges(self, value=None, **kw):
+    def on_changes(self, value=None, **kwd):
         """internal callback function: do not overwrite!!
         To have user-defined code run when the PV value changes,
         use add_callback()
         """
-        self._args.update(kw)
+        self._args.update(kwd)
         self._args['value']  = value
-        self._args['timestamp'] = kw.get('timestamp', time.time())
+        self._args['timestamp'] = kwd.get('timestamp', time.time())
         self._set_charval(self._args['value'], call_ca=False)
 
         if self.verbose:
@@ -244,11 +258,11 @@ class PV(object):
         """
         for index in sorted(self.callbacks.keys()):
             fcn, kwargs = self.callbacks[index]
-            kw = copy.copy(self._args)
-            kw.update(kwargs)
-            kw['cb_info'] = (index, self.remove_callback)
+            kwd = copy.copy(self._args)
+            kwd.update(kwargs)
+            kwd['cb_info'] = (index, self.remove_callback)
             if hasattr(fcn, '__call__'):
-                fcn(**kw)
+                fcn(**kwd)
             
     def add_callback(self, callback=None, **kw):
         """add a callback to a PV.  Optional keyword arguments
@@ -264,23 +278,25 @@ class PV(object):
         if hasattr(callback, '__call__'):
             n_cb = len(self.callbacks)
             index = 1
-            if n_cb > 1:  index = 1 + max(self.callbacks.keys())
+            if n_cb > 1:
+                index = 1 + max(self.callbacks.keys())
             self.callbacks[index] = (callback, kw)
         return index
     
     def remove_callback(self, index=None):
-        """remove a callback.
-        """
+        """remove a callback by index"""
         if index is None and len(self.callbacks)==1:
             index = list(self.callbacks.keys())[0]
         if index in self.callbacks:
             self.callbacks.pop(index)
             self.poll()
 
-    def clear_callbacks(self, **kw):
+    def clear_callbacks(self):
+        "clear all callbacks"
         self.callbacks = {}
 
     def _getinfo(self):
+        "get information paragraph"
         if not self.connect(force=False):
             return None
         if self._args['precision'] is None:
@@ -293,18 +309,21 @@ class PV(object):
         if '_' in xtype:
             mod, xtype = xtype.split('_')
 
-        out.append("== %s  (%s) ==" % (self.pvname, xtype))
+        out.append("== %s  (%s_%s) ==" % (self.pvname, mod, xtype))
         if self.count == 1:
             val = self._args['value']
             fmt = '%i'
-            if   xtype in ('float','double'): fmt = '%g'
-            elif xtype in ('string','char'):  fmt = '%s'
+            if   xtype in ('float','double'):
+                fmt = '%g'
+            elif xtype in ('string','char'):
+                fmt = '%s'
             out.append('   value      = %s' % fmt % val)
         else:
             aval, ext, fmt = [], '', "%i,"
             if self.count > 5:
                 ext = '...'
-            if xtype in  ('float','double'): fmt = "%g,"
+            if xtype in  ('float','double'):
+                fmt = "%g,"
             for i in range(min(5, self.count)):
                 aval.append(fmt % self._args['value'][i])
             out.append("   value      = array  [%s%s]" % ("".join(aval),
@@ -341,23 +360,28 @@ class PV(object):
                 cblist = list(self.callbacks.keys())
                 cblist.sort()
                 for i in cblist:
-                    cb = self.callbacks[i][0]
-                    cb_name =  cb.func_name
-                    cb_file = cb.func_code.co_filename
-                    out.append('      %s in file %s' % (cb_name, cb_file))
+                    cback = self.callbacks[i][0]
+                    out.append('      %s in file %s' % (cback.func_name,
+                                        cback.func_code.co_filename))
         else:
             out.append('   PV is NOT internally monitored')
         out.append('=============================')
         return '\n'.join(out)
         
     def _getarg(self, arg):
-        if self._args['value'] is None:  self.get()
+        "wrapper for property retrieval"
+        if self._args['value'] is None:
+            self.get()
         return self._args.get(arg, None)
         
     def __getval__(self):
+        "get value"
         return self._getarg('value')
-    def __setval__(self, v):
-        return self.put(v)
+
+    def __setval__(self, val):
+        "put-value"
+        return self.put(val)
+
     value = property(__getval__, __setval__, None, "value property")
 
     @property
@@ -471,31 +495,27 @@ class PV(object):
         return self._getinfo()
 
     def __repr__(self):
-        ""
+        "string representation"
         if self.connected:
             return self._fmt % self._args
         else:
             return "<PV '%s': not connected>" % self.pvname
     
-    def __str__(self):
-        ""
-        return self.__repr__()
-
     def __eq__(self, other):
-        ""
+        "test for equality"
         try:
             return (self.chid  == other.chid)
-        except:
+        except AttributeError:
             return False
 
     def disconnect(self):
-        ""
+        "disconnect PV"
         self.connected = False
         self.callbacks = {}
         if self._monref is not None:
-            cb, uarg, evid = self._monref
+            cback, uarg, evid = self._monref
             ca.clear_subscription(evid)
-            del cb
+            del cback
             del uarg
             del evid
         ca.poll()
