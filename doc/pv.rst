@@ -16,7 +16,7 @@ attributes for accessing it's properties.
 The PV class
 ============
 
-.. class:: PV(pvname[, callback=None[, form='native'[, auto_monitor=True[, verbose=False]]]])
+.. class:: PV(pvname[, callback=None[, form='native'[, auto_monitor=None[, verbose=False]]]])
 
    create a PV object for a named Epics Process Variable.  
 
@@ -25,15 +25,40 @@ The PV class
    :type callback: callable or None
    :param form:  which epics *data type* to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.  
    :type form: string, one of ('native','ctrl', or 'time')
+   :param auto_monitor:  whether to automatically monitor the PV for changes.
+   :type auto_monitor: None, True, or False
    :param verbose:  whether to print out debugging messages
-   :type auto_monitor: True or False
+   :type verbose: True, or False
    
-Once created, a PV will automatically connect and be ready to use.
+Once created, a PV should (barring any network issues) automatically
+connect and be ready to use. 
 
       >>> from epics import PV
-      >>> p = PV(pv_name)      
+      >>> p = PV('XX:m1.VAL')      
       >>> print p.get()   
       >>> print p.count, p.type
+
+
+The *pvname* is required, and is the name of an existing Process Variable.
+
+The *callback* parameter  specifies a python method to be called on changes,
+as discussed in more detail at :ref:`pv-callbacks-label`
+
+The *form* parameter specifies which of the three variants 'native' (the
+default), 'ctrl' (Control) or 'time' to use for the PV.  The control and
+time variants add additional fields to the PV, which can be useful in some
+cases.  Also note that the additional 'ctrl' value fields (see the
+:ref:`Table of Control Attributes <ctrlvars_table>`) can be obtained with
+:ref:`pv-get_ctrlvars-label` even for PVs of 'native' form.
+
+The *auto_monitor* parameter specifies whether the PV should be
+automatically monitored.  See :ref:`pv-automonitor-label` for a detailed
+description of this.
+
+The *verbose* parameter specifies more verbose output on changes, and is
+intended for debugging purposes.
+
+
 
 methods
 ~~~~~~~~
@@ -65,12 +90,13 @@ callbacks to be executed when the PV changes.
    :type callback: None or callable
    :param callback_data: extra data to pass on to a user-supplied callback function. 
 
+..  _pv-get_ctrlvars-label:
+
 .. method:: get_ctrlvars()
 
    returns a dictionary of the **control values** for the PV.  This 
    dictionary may have many members, depending on the data type of PV.  See
    the :ref:`Table of Control Attributes <ctrlvars_table>`  for details.
-
 
 .. method:: poll(ev=1.e-4, io=1.0)
 
@@ -257,6 +283,7 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
    :meth:`remove_callback`, and :meth:`clear_callbacks` instead of altering
    this dictionary directly.
 
+
 ..  _pv-as-string-label:
 
 String representation for a PV
@@ -298,6 +325,25 @@ For character waveforms (*char* data with *count* > 1), the
    >>> firstnull  = val.index(0)
    >>> if firstnull == -1: firstnull= len(val)
    >>> char_value = ''.join([chr(i) for i in val[:firstnull]).rstrip()
+
+.. _pv-automonitor-label:
+
+Automatic Monitoring of a PV
+================================
+
+
+The *auto_monitor* parameter when creating a PV can specify whether that PV
+should be automatically monitored, meaning that an internal callback will
+be registered for changes and any callbacks you define will be called by
+this internal callback.
+
+For most scalar-value PVs, this automatic monitoring is highly desirable as
+the PV will see all changes (and run any defined callbacks) without any
+additional interactrion from the user. The PV's value will always be
+up-to-date.
+
+For some PVs, especially those that auto_monitoring can be 
+
 
 ..  _pv-callbacks-label:
 

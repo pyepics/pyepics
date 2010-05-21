@@ -14,7 +14,7 @@ from . import ca
 from . import dbr
 
 ## maximum element count for auto-monitoring of PVs in epics.pv
-AUTOMONITOR_MAXLENGTH = 100
+AUTOMONITOR_MAXLENGTH = 1024
 
 def fmt_time(tstamp=None):
     "simple formatter for time values"

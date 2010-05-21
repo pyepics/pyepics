@@ -10,16 +10,9 @@ os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = '90000000'
 import epics
 from epics.wx import DelayedEpicsCallback, EpicsFunction
 
-import matplotlib
-matplotlib.use('WXAgg')
-
 import numpy as np
 import Image
 import wx
-
-import matplotlib.cm as cm
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg
 
 
 class PlotFigure(wx.Frame):
@@ -32,28 +25,30 @@ class PlotFigure(wx.Frame):
         self.nx = 1024
         self.ny = 1360
         wx.Frame.__init__(self, None, -1,
-                          title="PV Image Display: %s" % self.prefix)
+                          title="A PV Image Display: %s" % self.prefix)
 
         self.img_pv  = None
         self.frameno = None
-        self.fig = Figure((4,6), 100)
-        self.axes = self.fig.add_axes([0.05, 0.05, 0.9, 0.9])
-        self.axes.set_axis_off()
-        self.canvas = FigureCanvasWxAgg(self, wx.ID_ANY, self.fig)        
-
-
-        txtsizer = wx.BoxSizer(wx.HORIZONTAL)
-        txtsizer.Add(wx.StaticText(self,wx.ID_ANY,'PV Name Prefix'),1,wx.LEFT)
-
-        self.wid_pvname = wx.TextCtrl(self,wx.ID_ANY, self.prefix,
-                                      size=(180,-1),
-                                      style=wx.ALIGN_LEFT|wx.ST_NO_AUTORESIZE|wx.TE_PROCESS_ENTER)
-        self.wid_pvname.Bind(wx.EVT_TEXT_ENTER, self.onPvName)
-        txtsizer.Add(self.wid_pvname,1,wx.LEFT)
-
+        b = Image.open('AreaDetector_Display1.png')
+        self.wximage = wx.EmptyImage(b.size[0], b.size[1])
+        print b.size
+        self.wximage.SetData(b.convert('RGB').tostring())
+        self.bitmap = wx.StaticBitmap(self, -1, wx.BitmapFromImage(self.wximage), (400, 500))
+        print self.bitmap
+        self.tstamp = 0
+        #         txtsizer = wx.BoxSizer(wx.HORIZONTAL)
+        #         txtsizer.Add(wx.StaticText(self,wx.ID_ANY,'PV Name Prefix'),1,wx.LEFT)
+        # 
+        #         self.wid_pvname = wx.TextCtrl(self,wx.ID_ANY, self.prefix,
+        #                                       size=(180,-1),
+        #                                       style=wx.ALIGN_LEFT|wx.ST_NO_AUTORESIZE|wx.TE_PROCESS_ENTER)
+        #         self.wid_pvname.Bind(wx.EVT_TEXT_ENTER, self.onPvName)
+        #         txtsizer.Add(self.wid_pvname,1,wx.LEFT)
+        # 
+        #         sizer.Add(txtsizer, 0, wx.TOP)
+        # ;
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(txtsizer, 0, wx.TOP)
-        sizer.Add(self.canvas, 2, wx.LEFT|wx.TOP|wx.EXPAND, 0)
+        sizer.Add(self.bitmap, 0, wx.LEFT|wx.TOP|wx.EXPAND)
 
         self.SetAutoLayout(True)
         self.SetSizer(sizer)
@@ -95,17 +90,6 @@ class PlotFigure(wx.Frame):
             
         time.sleep(0.01)
 
-    def init_plot_data(self):
-        axes    = self.fig.add_axes([0.075,0.1,0.75,0.85])
-        self.x = np.empty((self.nx, self.ny))
-        self.x.flat = np.arange(self.nx )*2*np.pi/1060.0
-        self.y = np.empty((self.nx, self.ny))
-        self.y.flat = np.arange(self.ny)*2*np.pi/800.0
-
-        z = abs(np.sin(self.x)/2. + np.cos(self.x)/2.)
-
-        self.im = axes.imshow( z, cmap=cm.gray, interpolation='bilinear', origin='lower')
-        axes.set_axis_off()
         
     @DelayedEpicsCallback
     def onNewImage(self, pvname=None, value=None, **kw):
@@ -113,6 +97,7 @@ class PlotFigure(wx.Frame):
 
     @EpicsFunction
     def RefreshImage(self):
+        t0 = time.time()
         if self.img_pv is not None:
             s = self.prefix
             self.size0 = epics.PV("%sArraySize0_RBV" % s).get()
@@ -125,15 +110,28 @@ class PlotFigure(wx.Frame):
             if self.colormode == 2:
                 im_mode = 'RGB'
                 im_size = (self.size1, self.size2)
+            t1 = time.time() - t0
             rawdata = self.img_pv.get(as_numpy=False, as_string=False)
+            t2 = time.time() -t0
 
-            print  '======== ', self.colormode, im_mode, im_size, len(rawdata)
-            imbuff =  Image.frombuffer(im_mode, im_size, rawdata)
-            npbuff = np.array(imbuff)
+            print  '======== ', self.colormode, im_mode, im_size, len(rawdata), time.time()-self.tstamp
+            self.tstamp= time.time()
+            imbuff =  Image.frombuffer(im_mode, im_size, rawdata, 'raw', im_mode, 0, 1)
+            t3 = time.time() -t0
 
-            npbuff = 1.0 * npbuff / npbuff.max()
-            self.im.set_array(npbuff)
-            self.canvas.draw()
+            #             npbuff = np.array(imbuff)
+            # 
+            #             npbuff = 1.0 * npbuff / npbuff.max()
+            # self.im.set_array(npbuff)
+            if self.wximage.GetSize() != imbuff.size:
+                self.wximage = wx.EmptyImage(imbuff.size[0], imbuff.size[1])
+
+            # self.wximage.SetData(imbuff.transpose(Image.FLIP_TOP_BOTTOM).convert('RGB').tostring())
+            self.wximage.SetData(imbuff.convert('RGB').tostring())            
+            self.bitmap.SetBitmap(wx.BitmapFromImage(self.wximage))
+            t4 = time.time() - t0
+            print t1, t2, t3, t4
+            # self.bitmap.SetBitmap(iwx.BitmapFromImage(self.wximage))            
 
 if __name__ == '__main__':
     import sys
@@ -144,8 +142,7 @@ if __name__ == '__main__':
     print sys.argv, prefix
     app = wx.PySimpleApp()
     frame = PlotFigure(prefix=prefix)
-    frame.init_plot_data()
-
+    
     frame.Show()
     app.MainLoop()
 
