@@ -331,19 +331,28 @@ For character waveforms (*char* data with *count* > 1), the
 Automatic Monitoring of a PV
 ================================
 
+When creating a PV, the *auto_monitor* parameter specifies whether the PV
+should be automatically monitored or not.  Automatic monitoring means that
+an internal callback will be registered for changes.  Any callbacks defined
+by the user will be called by this internal callback when changes occur.
 
-The *auto_monitor* parameter when creating a PV can specify whether that PV
-should be automatically monitored, meaning that an internal callback will
-be registered for changes and any callbacks you define will be called by
-this internal callback.
+For most scalar-value PVs, this automatic monitoring is desirable, as the
+PV will see all changes (and run callbacks) without any additional
+interaction from the user. The PV's value will always be up-to-date and no
+unnecessary network traffic is needded.
 
-For most scalar-value PVs, this automatic monitoring is highly desirable as
-the PV will see all changes (and run any defined callbacks) without any
-additional interactrion from the user. The PV's value will always be
-up-to-date.
+For some PVs, especially those that change much more rapidly than you care
+about or those that contain large arrays as values, auto_monitoring can add
+network traffic that you don't need.  For these, you may wish to create
+*your PVs with *auto_monitor=False*.  When you do this, you will need to
+make calls to :meth:`get` to explicitly get the latest value.
 
-For some PVs, especially those that auto_monitoring can be 
-
+The default value for *auto_monitor* is *None*, and is set to True if the
+element count for the PV is smaller than 1024.  To suppress monitoring of
+PVs with fewer array values, you will have to explicitly turn
+*auto_monitor* to `False`. For waveform arrays larger than 1024 items,
+automatic monitoring will be `False` unless you explicitly set it to
+`True`.
 
 ..  _pv-callbacks-label:
 
