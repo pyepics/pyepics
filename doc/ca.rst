@@ -300,7 +300,8 @@ keyword arguments can be used to specify such options.
    :type ftype:  integer
    :param as_string:  whether to return the string representation of the value.  See notes below. 
    :type as_string:  ``True``/``False``
-   :param as_numpy:  whether to return the Numerical Python representation for array / waveform data.  This is only applied if numpy can be imported.  
+   :param as_numpy:  whether to return the Numerical Python representation
+   for array / waveform data.  
    :type as_numpy:  ``True``/``False``
 
 
@@ -313,6 +314,12 @@ the Enum state will be returned.  For waveforms of type CHAR, the string
 representation will be returned.  For other waveforms (with *count* > 1), a
 string like `<array count=3, type=1>` will be returned.  For all other
 types the result will from Python's :func:`str` function.
+
+The *as_numpy* option will cause an array value to be returned as a numpy
+array.  This is only applied if numpy can be imported.  See
+:ref:`advanced-large-arrays-label` for a discussion of strategies for how
+to best deal with very large arrays.
+
 
 .. function::  put(chid, value, wait=False, timeout=20, callback=None,callback_data=None) 
 

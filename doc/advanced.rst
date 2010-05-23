@@ -1,7 +1,32 @@
+===============================================
+Advanced Topic with Python Channel Access
+===============================================
 
-===============================================
-Using Python Threads with EPICS Channel Access
-===============================================
+.. _advanced-large-arrays-label:
+
+
+Strategies for working with large arrays
+============================================
+
+
+EPICS Channels / Process Variables usually have values that can be stored
+with a small number of bytes.  This means that their storage and transfer
+speeds over real networks is not a significant concern.  However, some
+Process Variables can store much larger amounts of data (say, several
+megabytes) which means that some of the assumptions about dealing with
+Channels / PVs may need reconsideration.  
+
+When using PVs with large array sizes, you will need to make sure that the
+environmental variable
+
+The main issue for large arrays
+
+
+.. _advanced-threads-label:
+
+
+Using Python Threads 
+======================
 
 An important feature of the epics python package is that it can be used
 with Python threads.  This section of the document focuses on using Python

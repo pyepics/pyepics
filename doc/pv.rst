@@ -26,9 +26,9 @@ The PV class
    :param form:  which epics *data type* to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.  
    :type form: string, one of ('native','ctrl', or 'time')
    :param auto_monitor:  whether to automatically monitor the PV for changes.
-   :type auto_monitor: None, True, or False
+   :type auto_monitor: ``None``, ``True``, or ``False``
    :param verbose:  whether to print out debugging messages
-   :type verbose: True, or False
+   :type verbose: ``True``/``False``
    
 Once created, a PV should (barring any network issues) automatically
 connect and be ready to use. 
@@ -49,7 +49,7 @@ default), 'ctrl' (Control) or 'time' to use for the PV.  The control and
 time variants add additional fields to the PV, which can be useful in some
 cases.  Also note that the additional 'ctrl' value fields (see the
 :ref:`Table of Control Attributes <ctrlvars_table>`) can be obtained with
-:ref:`pv-get_ctrlvars-label` even for PVs of 'native' form.
+:meth:`get_ctrlvars` even for PVs of 'native' form.
 
 The *auto_monitor* parameter specifies whether the PV should be
 automatically monitored.  See :ref:`pv-automonitor-label` for a detailed
@@ -66,15 +66,22 @@ methods
 A `PV` has several methods for getting and setting its value and defining
 callbacks to be executed when the PV changes.
 
-.. method:: get([, as_string=False])
+.. method:: get([, as_string=False[, as_numpy=True]])
 
    get and return the current value of the PV
 
    :param as_string:  whether to return the string representation of the  value.  
-   :type as_string:  True/False
+   :type as_string: ``True``/``False``
+   :param as_numpy:  whether to try to return a numpy array where appropriate.
+   :type as_string: ``True``/``False``
 
-   see :ref:`pv-as-string-label` for details on how the string representation
-   is determined.
+   see :ref:`pv-as-string-label` for details on how the string
+   representation is determined.
+
+   With the *as_numpy* option, an array PV (that is, a PV whose value has
+   more than one element) will be returned as a numpy array, provided the
+   numpy module is available.  See :ref:`advanced-large-arrays-label` for a
+   discussion of strategies for how to best deal with very large arrays.
 
 .. method:: put(value[, wait=False[, timeout=30.0[, callback=None[, callback_data=None]]]])
 
@@ -83,14 +90,15 @@ callbacks to be executed when the PV changes.
 
    :param value:  value to set PV 
    :param wait:  whether to wait for processing to complete (or time-out) before returning.
-   :type  wait:  True/False
+   :type  wait:  ``True``/``False``
    :param timeout:  maximum time to wait for processing to complete before returning anyway. 
    :type  timeout:  double
    :param callback: user-supplied function to run when processing has completed. 
-   :type callback: None or callable
+   :type callback: ``None`` or a valid python function
    :param callback_data: extra data to pass on to a user-supplied callback function. 
 
-..  _pv-get_ctrlvars-label:
+
+..  _pv-get-ctrlvars-label:  
 
 .. method:: get_ctrlvars()
 
@@ -115,10 +123,10 @@ callbacks to be executed when the PV changes.
    :param timeout:  maximum connection time, passed to :meth:`ca.connect_channel`
    :type  timeout:  double
    :param force:  whether to (try to) force a connect, passed to :meth:`ca.connect_channel`
-   :type  force:  True/False
-   :rtype:    True/False
+   :type  force:  ``True``/``False``
+   :rtype:    ``True``/``False``
    
-.. method:: add_callback(callback=None[. **kw])
+.. method:: add_callback(callback=None[, **kw])
  
    adds a user-defined callback routine to be run on each change event for
    this PV.  Returns the integer *index*  for the callback.
@@ -215,11 +223,11 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
 .. attribute:: read_access
 
-   Boolean (True/False) for whether PV is readable
+   Boolean (``True``/``False``) for whether PV is readable
 
 .. attribute:: write_access
 
-   Boolean (True/False) for whether PV is writable
+   Boolean (``True``/``False``) for whether PV is writable
 
 .. attribute:: access
 
@@ -347,12 +355,12 @@ network traffic that you don't need.  For these, you may wish to create
 *your PVs with *auto_monitor=False*.  When you do this, you will need to
 make calls to :meth:`get` to explicitly get the latest value.
 
-The default value for *auto_monitor* is *None*, and is set to True if the
-element count for the PV is smaller than 1024.  To suppress monitoring of
-PVs with fewer array values, you will have to explicitly turn
-*auto_monitor* to `False`. For waveform arrays larger than 1024 items,
-automatic monitoring will be `False` unless you explicitly set it to
-`True`.
+The default value for *auto_monitor* is ``None``, and is set to ``True`` if
+the element count for the PV is smaller than 1024.  To suppress monitoring
+of PVs with fewer array values, you will have to explicitly turn
+*auto_monitor* to ``False``. For waveform arrays larger than 1024 items,
+automatic monitoring will be ``False`` unless you explicitly set it to
+``True``.
 
 ..  _pv-callbacks-label:
 
@@ -404,3 +412,9 @@ keep the callback functions short and not resource-intensive.  Consider
 strategies which use the callback only to record that a change has occurred
 and then act on that change later -- perhaps in a separate thread, perhaps
 after :func:`pend_event` has completed.
+
+
+..  _pv-examples-label:
+
+Examples
+=========

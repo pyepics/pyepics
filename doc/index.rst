@@ -24,7 +24,7 @@ Contents:
    overview
    pv
    ca
-   threads
+   advanced
    devices
    wx
    installation
