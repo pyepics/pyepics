@@ -79,6 +79,11 @@ PREEMPTIVE_CALLBACK = True
 
 AUTO_CLEANUP = True
 
+##
+# maximum element count for auto-monitoring of PVs in epics.pv
+# and for automatic conversion of numerical array data to numpy arrays
+AUTOMONITOR_MAXLENGTH = 16384
+
 ## default timeout for connection
 #   This should be kept fairly short --
 #   as connection will be tried repeatedly
@@ -150,7 +155,6 @@ def find_libca():
     raise ChannelAccessException('find_libca',
                                  'Cannot find Epics CA DLL')
 
-        
 def initialize_libca():
     """ load DLL (shared object library) to establish Channel Access
     Connection. The value of PREEMPTIVE_CALLBACK sets the pre-emptive
@@ -163,8 +167,10 @@ def initialize_libca():
  Note that this function must be called prior to any real ca calls.
     """
 
+    if os.environ.get('EPICS_MAX_CA_ARRAY_BYTES', None) is None:
+        os.environ['EPICS_MAX_CA_ARRAY_BYTES'] = "%i" %  2**31
+
     dllname = find_libca()
-    
     load_dll = ctypes.cdll.LoadLibrary
     if os.name == 'nt':
         load_dll = ctypes.windll.LoadLibrary
@@ -583,8 +589,8 @@ def _unpack(data, count, ftype=dbr.INT, as_numpy=True):
         ntype -= dbr.TIME_STRING
 
     out = unpack(data, ntype)
-    if (HAS_NUMPY and as_numpy and
-        count > 1 and ntype != dbr.STRING):
+    if (HAS_NUMPY and as_numpy and ntype != dbr.STRING and
+        count > 1 and count < AUTOMONITOR_MAXLENGTH):
         out = numpy.array(out)
     return out
 

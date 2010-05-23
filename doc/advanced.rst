@@ -16,10 +16,64 @@ Process Variables can store much larger amounts of data (say, several
 megabytes) which means that some of the assumptions about dealing with
 Channels / PVs may need reconsideration.  
 
-When using PVs with large array sizes, you will need to make sure that the
-environmental variable
+When using PVs with large array sizes (here, I'll assert that *large* means
+more than 100 or so elements), it is necessary to make sure that the
+environmental variable ``EPICS_CA_MAX_ARRAY_SIZE`` is suitably set.
+Practically, this should not be a significant concern, as this is set (to
+2**31, or 2 Gb) when :mod:`epics.ca` is initialized.  If you do have the 
+environmental variable ``EPICS_CA_MAX_ARRAY_SIZE`` set, that value will be
+used instead.
 
-The main issue for large arrays
+The main issues for large arrays are:
+  * should large arrays automatically be immediately converted to numpy
+    arrays? 
+  * should PVs for large arrays normally be automatically monitored?
+  * should large arrays of character / byte arrays be automatically
+    converted to strings as a way to overcome the very low limit on the
+    length of normal EPICS strings?
+
+For most scalar PVs and for small arrays, the answer to each of these would
+almost certainly be *Yes*.  As arrays get larger (say, to the size of the
+data stream from a typical Area Detector), answering *Yes* is much less
+obvious.  The Python :mod:`epics.ca` module defines a variable
+:data:`AUTOMONITOR_MAXLENGTH` which controls this behavior.  This value, with
+the default value of 16384, controls both behaviors:
+
+ * arrays of size for which PVs are automatically monitored.  That is,
+   arrays with few elements than :data:`AUTOMONITOR_MAXLENGTH` will be
+   automatically monitored.  In any case,  the auto-monitoring of PVs can
+   be explicitly set with  
+
+   >>> pv2 = epics.PV('ScalerPV', auto_monitor=True)
+   >>> pv1 = epics.PV('LargeArrayPV', auto_monitor=False)
+
+ * array size for automatic conversion of data to numpy arrays.  That is,
+   arrays with few elements than :data:`AUTOMONITOR_MAXLENGTH` will be
+   automatically converted to numpy arrays (if appropriate). 
+   In any case,  this conversion can be overridden, with
+
+   >>> chid = epics.ca.create_channel('SimplePV')
+   >>> val1 = epics.ca.get(chid,  as_numpy = False)
+   >>>
+   >>> pv2  = epics.PV('ArrayPV')
+   >>> val2 = pv2.get(as_numpy=False)
+
+   When values for large arrays (that is, with more than
+   :data:`AUTOMONITOR_MAXLENGTH` elements) are returned, this will be a *raw
+   ctype* array.   This data can be iterated over or sent to many other
+   modules, such as the :mod:`Image` module.
+
+Finally, though it is common to use arrays of characters or bytes to
+emulate a long string (EPICS sets a limit of 40 characters for its own
+STRING type), this module resists the temptation to implicitly convert
+byte arrays to strings.   You'll have to be explicit and use either
+
+   >>> chid = epics.ca.create_channel('CharArrayPV')
+   >>> val1 = epics.ca.get(chid,  as_string = True)
+   >>>
+   >>> pv2  = epics.PV('CharArrayPV')
+   >>> val2 = pv2.get(as_string=True)
+
 
 
 .. _advanced-threads-label:
@@ -30,7 +84,7 @@ Using Python Threads
 
 An important feature of the epics python package is that it can be used
 with Python threads.  This section of the document focuses on using Python
-threads both with the `PV` objacte and with the procedural functions in the
+threads both with the `PV` object and with the procedural functions in the
 `ca` module.
 
 Using threads in Python is fairly simple, but Channel Access adds a
@@ -40,10 +94,10 @@ for using Threads with the epics module is to use
 :data:`PREEMPTIVE_CALLBACK` =  ``True``.   This is the default  value, so
 you usually do not need to change anything.
 
-Example
-=======
+Thread Example
+~~~~~~~~~~~~~~~
 
-This is a simplified verstion of test code using Python threads.  It is
+This is a simplified version of test code using Python threads.  It is
 based on code from Friedrich Schotte, NIH, and included as `thread_test.py`
 in the `tests` directory of the source distribution. 
 
@@ -58,7 +112,7 @@ other.::
     import epics
         
     pvlist1 = ('13IDA:DMM1Ch2_raw.VAL', 'S:SRcurrentAI.VAL')
-    pvlist2 = ( '13IDA:DMM1Ch3_raw.VAL', 'S:SRcurrentAI.VAL')
+    pvlist2 = ('13IDA:DMM1Ch3_raw.VAL', 'S:SRcurrentAI.VAL')
        
     def run_test(runtime=1, pvnames=None,  run_name='thread c'):
         print ' |-> thread  "%s"  will run for %.3f sec ' % ( run_name, runtime)

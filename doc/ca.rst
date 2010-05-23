@@ -59,8 +59,8 @@ See :ref:`ca-omissions-label` for further details.
 
 ..  _ca-init-label:
 
-Initialization, Finalization, and Lifecycle
-===========================================
+Initialization, Finalization, and Life-cycle
+==============================================
 
 .. module:: ca
    :synopsis: low-level Channel Access  module.
@@ -75,20 +75,19 @@ reasons for this:
   before it is used.
 
   3. because ctypes requires references to the library and callback
-  functions be kept for the lifecycle of CA-using part of a program (or
+  functions be kept for the life-cycle of CA-using part of a program (or
   else they will be garbage collected). 
 
-For these reasons, the handling of the lifecycle here for a CA session can
+For these reasons, the handling of the life-cycle here for a CA session can
 be slightly complicated.  As far as is possible, this module tries to
 prevent the user from needing to worry about explicitly initializing the CA
 session.  Instead, the library is initialized as soon as it is needed (but
 not on loading the module!).  This module also handles finalizing the CA
-session, so that coredumps and warning messages do not happen due to CA
+session, so that core-dumps and warning messages do not happen due to CA
 still being 'alive' as a program ends.
 
 These initialization and finalization tasks are handled in the following
 way:
-
 
    * :data:`libca` holds a permanent, global reference to the CA shared
      library.
@@ -118,6 +117,12 @@ way:
    sets the default `timeout` value (in seconds) for
    :func:`connect_channel`.  The default value is `5.0`
 
+.. data:: AUTOMONITOR_MAXLENGTH
+
+   sets the default array length (ie, how many elements an array has) above
+   which automatic conversion to numpy arrays *and* automatica monitoring
+   for PV variables is suppressed.  The default value is 16384.  See
+   :ref:`advanced-large-arrays-label` for more details. 
 
 Using the CA module
 ====================
@@ -150,12 +155,12 @@ threading contexts are very close to the C library:
 
 .. function::  pend_event(t=1.e-5)
 
-.. function::  poll(ev=1.e-4,io=1.0)
+.. function::  poll(evt=1.e-4,iot=1.0)
 
    a convenience function which is equivalent to::
     
-       pend_event(ev) 
-       pend_io_(io)
+       pend_event(evt) 
+       pend_io_(iot)
 
 
 Creating and Connecting to Channels

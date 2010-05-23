@@ -106,14 +106,14 @@ callbacks to be executed when the PV changes.
    dictionary may have many members, depending on the data type of PV.  See
    the :ref:`Table of Control Attributes <ctrlvars_table>`  for details.
 
-.. method:: poll(ev=1.e-4, io=1.0)
+.. method:: poll(evt=1.e-4, iot=1.0)
 
-   this simply calls `ca.poll(ev=ev,io=io)` 
+   this simply calls `ca.poll(evt=evt,iot=iot)` 
 
-   :param ev:  time to pass to :meth:`ca.pend_event`
-   :type  ev:  double
-   :param io:  time to pass to :meth:`ca.pend_io`
-   :type  io:  double
+   :param evt:  time to pass to :meth:`ca.pend_event`
+   :type  evt:  double
+   :param iot:  time to pass to :meth:`ca.pend_io`
+   :type  iot:  double
 
 .. method:: connect(timeout=5.0, force=True)
  
@@ -347,7 +347,7 @@ by the user will be called by this internal callback when changes occur.
 For most scalar-value PVs, this automatic monitoring is desirable, as the
 PV will see all changes (and run callbacks) without any additional
 interaction from the user. The PV's value will always be up-to-date and no
-unnecessary network traffic is needded.
+unnecessary network traffic is needed.
 
 For some PVs, especially those that change much more rapidly than you care
 about or those that contain large arrays as values, auto_monitoring can add
@@ -356,11 +356,12 @@ network traffic that you don't need.  For these, you may wish to create
 make calls to :meth:`get` to explicitly get the latest value.
 
 The default value for *auto_monitor* is ``None``, and is set to ``True`` if
-the element count for the PV is smaller than 1024.  To suppress monitoring
-of PVs with fewer array values, you will have to explicitly turn
-*auto_monitor* to ``False``. For waveform arrays larger than 1024 items,
-automatic monitoring will be ``False`` unless you explicitly set it to
-``True``.
+the element count for the PV is smaller than 16384 (The value is set as
+:data:`ca.AUTOMONITOR_MAXLENGTH`).  To suppress monitoring of PVs with
+fewer array values, you will have to explicitly turn *auto_monitor* to
+``False``. For waveform arrays larger than 16384 items, automatic
+monitoring will be ``False`` unless you explicitly set it to ``True``.  See
+:ref:`advanced-large-arrays-label` for more details.
 
 ..  _pv-callbacks-label:
 
@@ -418,3 +419,35 @@ after :func:`pend_event` has completed.
 
 Examples
 =========
+
+Some simple examples using PVs follow.  The simplest approach is to simply
+create a PV and use its :attrib:`value` attribute:
+
+   >>> from epics import PV
+   >>> p1 = PV('xxx.VAL')
+   >>> print p1.value
+   1.00
+   >>> p1.value = 2.00
+ 
+The *print p1.value* line automatically fetches the current PV value.  The
+*p1.value = 2.00* line does a :func:`put` to set the value, causing any
+necessary processing over the network.   
+
+The above example is equivalent to 
+
+   >>> from epics import PV
+   >>> p1 = PV('xxx.VAL')
+   >>> print p1.get()
+   1.00
+   >>> p1.put(value = 2.00)
+
+To get a string representation of the value, you can use either 
+
+   >>> print p1.get(as_string=True)
+   '1.000'
+
+or, equivilently 
+
+   >>> print p1.char_value
+   '1.000'
+

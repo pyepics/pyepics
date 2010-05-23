@@ -13,9 +13,6 @@ import copy
 from . import ca
 from . import dbr
 
-## maximum element count for auto-monitoring of PVs in epics.pv
-AUTOMONITOR_MAXLENGTH = 1024
-
 def fmt_time(tstamp=None):
     "simple formatter for time values"
     if tstamp is None:
@@ -121,7 +118,7 @@ class PV(object):
         # and set self._monref
         if self.auto_monitor is None:
             count = ca.element_count(self.chid)
-            self.auto_monitor = count < AUTOMONITOR_MAXLENGTH
+            self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
         if self._monref is None and self.connected and self.auto_monitor:
             self._monref = ca.create_subscription(self.chid,
                                         userfcn=self.on_changes,
@@ -138,8 +135,9 @@ class PV(object):
         ca.poll(evt=evt, iot=iot)
 
     def get(self, as_string=False, as_numpy=True):
-        """returns current value of PV
-        use argument 'as_string=True' to return string representation
+        """returns current value of PV.  Use the options:
+         as_string to return string representation
+         as_numpy  to (try to) return a numpy array
 
         >>> p.get('13BMD:m1.DIR')
         0
