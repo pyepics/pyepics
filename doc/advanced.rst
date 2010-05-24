@@ -74,6 +74,40 @@ byte arrays to strings.   You'll have to be explicit and use either
    >>> pv2  = epics.PV('CharArrayPV')
    >>> val2 = pv2.get(as_string=True)
 
+Example handling Large Arrays
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is an example reading data from an areaDetector (part of EPICS synApps)
+record, as if it were an image from a digital camera. 
+
+
+
+Example using Character Waveforms as Long Strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As EPICS strings can be only 40 characters long, Character Waveforms are
+sometimes used to allow Long Strings.  Let's say you've created a character
+waveform PV, as with this EPICS database:
+   
+   {{{ grecord....
+   }}}
+  
+You can then use this with:
+
+   >>> import epics
+   >>> pvname = 'CharArrayPV.VAL'
+   >>> pv  = epics.PV(pvname)
+   >>> print pv.info
+   .... 
+   >>> plain_val = pv.get()
+   >>> print plan_val
+   >>> char_val = pv.get(as_string=True)
+   >>> print char_val
+
+
+This example uses PV objects, but the :meth:`get` method of :mod:`ca` is
+essentially equivalent, as its *as_string* parameter works exactly the same
+way.
 
 
 .. _advanced-threads-label:

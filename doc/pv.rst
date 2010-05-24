@@ -420,7 +420,12 @@ after :func:`pend_event` has completed.
 Examples
 =========
 
-Some simple examples using PVs follow.  The simplest approach is to simply
+Some simple examples using PVs follow.  
+
+Basic Use
+~~~~~~~~~~~~
+
+The simplest approach is to simply
 create a PV and use its :attrib:`value` attribute:
 
    >>> from epics import PV
@@ -451,3 +456,16 @@ or, equivilently
    >>> print p1.char_value
    '1.000'
 
+
+Example of using info and properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Example of put
+~~~~~~~~~~~~~~~~
+
+Example of put-with-wait
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Example of simple callback
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Monitoring many PVs
