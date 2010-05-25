@@ -195,14 +195,15 @@ class PV(object):
             if call_ca and self._args['precision'] is None:
                 self.get_ctrlvars()
             try:
-                print("---PRECIsION '", self._args['precision'], val)
+                prec = self._args.get('precision', None)
                 fmt  = "%%.%if"
                 if 4 < abs(int(math.log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
-                cval = (fmt %  self._args.get('precision', 0)) % val
+                cval = (fmt %  prec) % val
             except (ValueError, TypeError, ArithmeticError):
-                
-                pass 
+                self._args['char_value'] = str(val)
+                return self._args['char_value']
+
         elif ftype == dbr.ENUM:
             if call_ca and self._args['enum_strs'] in ([], None):
                 self.get_ctrlvars()
