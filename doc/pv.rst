@@ -457,8 +457,35 @@ or, equivilently
    '1.000'
 
 
-Example of using info and properties
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example of using info and more properties examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A PV
+
+>>> print p.info
+== 13IDA:m3.VAL  (native_double) ==
+   value      = 0.2
+   char_value = 0.200
+   count      = 1
+   type       = double
+   units      = mm
+   precision  = 3
+   host       = ioc13ida.cars.aps.anl.gov:5064
+   access     = read/write
+   status     = 0
+   severity   = 0
+   timestamp  = 1274751883.963 (2010-05-24 20:44:43.963243)
+   upper_ctrl_limit    = 5.49393415451
+   lower_ctrl_limit    = -14.5060658455
+   upper_disp_limit    = 5.49393415451
+   lower_disp_limit    = -14.5060658455
+   upper_alarm_limit   = 0.0
+   lower_alarm_limit   = 0.0
+   upper_warning_limit = 0.0
+   lower_warning_limit = 0.0
+   PV is internally monitored, with 0 user-defined callbacks:
+=============================
+>>> 
 
 Example of put
 ~~~~~~~~~~~~~~~~
