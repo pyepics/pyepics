@@ -195,7 +195,7 @@ class PV(object):
             if call_ca and self._args['precision'] is None:
                 self.get_ctrlvars()
             try:
-                prec = self._args.get('precision', None)
+                prec = getattr(self, 'precision') # self._args.get('precision', None)
                 fmt  = "%%.%if"
                 if 4 < abs(int(math.log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
@@ -300,15 +300,16 @@ class PV(object):
         "get information paragraph"
         if not self.connect(force=False):
             return None
-        if self._args['precision'] is None:
-            self.get_ctrlvars()
 
+        self.get_ctrlvars()
         # list basic attributes
         out = []
         mod = 'native'
         xtype = self._args['type']
         if '_' in xtype:
             mod, xtype = xtype.split('_')
+
+        self._set_charval(self._args['value'], call_ca=False)        
 
         out.append("== %s  (%s_%s) ==" % (self.pvname, mod, xtype))
         if self.count == 1:
@@ -342,6 +343,8 @@ class PV(object):
                 if att is not None:
                     if i == 'timestamp':
                         att = "%.3f (%s)" % (att, fmt_time(att))
+                    elif i == 'char_value':
+                        att = "'%s'" % att
                     if len(i) < 12:
                         out.append('   %.11s= %s' % (i+' '*12, str(att)))
                     else:

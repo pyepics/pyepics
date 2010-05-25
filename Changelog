@@ -1,3 +1,26 @@
+2010-05-25  Matt Newville  <newville@cars.uchicago.edu>
+
+	* Version 3.0.5:
+	- set EPICS_CA_MAX_ARRAY_BYTES to 2**31 prior to loading the
+  	libca DLL, if EPICS_CA_MAX_ARRAY_BYTES is not already set.
+
+	- use ca.AUTOMONITOR_MAXLENGTH (default = 16384) to improve
+	performance for large array / waveform data, in two ways:
+	   1. a PV with an element count > ca.AUTOMONITOR_MAXLENGTH will
+	NOT be automatically monitored, so that explicit get() calls are
+	needed.  To override this,  use  auto_monitor=True when creating
+	the PV.  Smaller arrays will still be automatically monitored
+	(which can be turned off with auto_monitor=False).  This does not
+	have a direct impact on the ca interface.
+
+	  2.  PVs and ca channels with element count >
+	ca.AUTOMONITOR_MAXLENGTH will NOT be implicitly converted to numpy
+	arrays unless explicitly asked for with get(..., as_numpy=True).
+
+	- fixed PV's char_value field in info paragraph, especially for
+	"fresh" PVs where the precision value may not have been correctly
+	fetched when info is called.
+
 2010-05-18  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.4:

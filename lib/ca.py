@@ -166,10 +166,9 @@ def initialize_libca():
 
  Note that this function must be called prior to any real ca calls.
     """
-
-    if os.environ.get('EPICS_MAX_CA_ARRAY_BYTES', None) is None:
-        os.environ['EPICS_MAX_CA_ARRAY_BYTES'] = "%i" %  2**31
-
+    if not 'EPICS_CA_MAX_ARRAY_BYTES' in os.environ:
+        os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = "%i" %  2**31
+        
     dllname = find_libca()
     load_dll = ctypes.cdll.LoadLibrary
     if os.name == 'nt':
