@@ -313,15 +313,15 @@ will depend on the native type and count of a `PV`.
     =============== ========== ==============================
      *data types*    *count*     *char_value*
     =============== ========== ==============================
-     string           1         = value   
-     char             1         = value   
-     short            1         = str(value) 
-     long             1         = str(value)
-     enum             1         = enum_str[value]
-     double           1         = ("%%.%if" % (precision)) % value
-     float            1         = ("%%.%if" % (precision)) % value 
-     char             > 1       = long string from bytes in array
-     all others       > 1       = <array size=*count*, type=*type*>
+     string                1         = value   
+     char                  1         = value   
+     short                 1         = str(value) 
+     long                  1         = str(value)
+     enum                1         = enum_str[value]
+     double              1         = ("%%.%if" % (precision)) % value
+     float                  1         = ("%%.%if" % (precision)) % value 
+     char                > 1       = long string from bytes in array
+     all others        > 1       = <array size=*count*, type=*type*>
     =============== ========== ==============================
 
 For double/float values with large exponents, the formatting will be 
@@ -426,7 +426,7 @@ Basic Use
 ~~~~~~~~~~~~
 
 The simplest approach is to simply
-create a PV and use its :attrib:`value` attribute:
+create a PV and use its :attr:`value` attribute:
 
    >>> from epics import PV
    >>> p1 = PV('xxx.VAL')
@@ -460,12 +460,14 @@ or, equivilently
 Example of using info and more properties examples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A PV
+A PV has many attributes.  This can be seen from its *info* paragraph:
 
->>> print p.info
-== 13IDA:m3.VAL  (native_double) ==
+>>> import epics
+>>> p = epics.PV('13IDA:m3')       
+>>> print p.info    
+== 13IDA:m3  (native_double) ==
    value      = 0.2
-   char_value = 0.200
+   char_value = '0.200'
    count      = 1
    type       = double
    units      = mm
@@ -474,7 +476,7 @@ A PV
    access     = read/write
    status     = 0
    severity   = 0
-   timestamp  = 1274751883.963 (2010-05-24 20:44:43.963243)
+   timestamp  = 1274809682.967 (2010-05-25 12:48:02.967364)
    upper_ctrl_limit    = 5.49393415451
    lower_ctrl_limit    = -14.5060658455
    upper_disp_limit    = 5.49393415451
@@ -485,13 +487,57 @@ A PV
    lower_warning_limit = 0.0
    PV is internally monitored, with 0 user-defined callbacks:
 =============================
->>> 
 
+The individual attributes can also be accessed as below.  Many of these
+(the *control attributes*, see :ref:`Table of Control Attributes
+<ctrlvars_table>`) will not be filled in until either the :attr:`info`
+attribute is accessed or until :meth:`get_ctrlvars` is called.
+
+>>>  print p.type
+double
+>>> print p.units, p.precision, p.lower_disp_limit
+mm 3 -14.5060658455
+
+
+Getting a string value 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is not uncommon to want a string representation of a PVs value, for
+example to show in a display window or to write to some report.  For string
+PVs and integer PVs, this is a simple task.  For floating point values,
+there is ambiguity how many significant digits to show. EPICS PVs all have
+a :attr:`precision` field. which sets how many digits after the decimal
+place should be described.  In addition, for ENUM PVs, it would be
+desireable to get at the name of the ENUM state, not just its integer
+value.
+
+To get the string representation of a PVs value, use either the
+:attr:`char_value` attribute or the *as_string=True* argument to :meth:`get`
+
+ 
 Example of put
 ~~~~~~~~~~~~~~~~
 
+To put a new value to a variable, either of these two approaches can be
+used:
+
+>>> import epics
+>>> p = epics.PV('XXX')
+>>> p.put(1.0)
+
+Or (equivalently):
+
+>>> import epics
+>>> p = epics.PV('XXX')
+>>> p.value = 1.0
+
+The :attr:`value` attribute is the only attribute that can be set.
+
 Example of put-with-wait
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some EPICS records take a significant amount of time to fully process.  And sometimes
+
 
 Example of simple callback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

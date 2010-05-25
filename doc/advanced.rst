@@ -77,8 +77,29 @@ byte arrays to strings.   You'll have to be explicit and use either
 Example handling Large Arrays
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is an example reading data from an areaDetector (part of EPICS synApps)
-record, as if it were an image from a digital camera. 
+Here is an example reading data from an `EPICS areaDetector
+<http://cars9.uchicago.edu/software/epics/areaDetector.html>`_, as if it
+were an image from a digital camera.  This uses the `Python Imaging Library
+<http://www.pythonware.com/products/pil/>`_ for much of the image
+processing:
+
+
+>>> import epics
+>>> import Image
+>>> pvname = '13IDCPS1:image1:ArrayData'
+>>> img_pv  = epics.PV(pvname)
+>>>
+>>> raw_image = img_pv.get(as_numpy=False)
+>>> im_mode = 'RGB'
+>>> im_size = (1360, 1024)
+>>> img = Image.frombuffer(im_mode, im_size, raw_image, 'raw', im_mode, 0, 1)
+>>> img.show()
+
+The result looks like this (taken with a Prosilica GigE camera):
+
+
+.. image:: AreaDetector1.png
+
 
 
 
