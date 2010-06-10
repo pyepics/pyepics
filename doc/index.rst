@@ -16,6 +16,10 @@ to CA similar to EZCA and the Unix command-line tools.  In addition, there
 are classes for an epics :mod:`Device`, epics :mod:`Motor`, :mod:`Alarm`,
 and special code for wxPython widgets.
 
+This documentation is also available in  `PDF Format
+<http://cars9.uchicago.edu/software/python/pyepics3/pyepics3.pdf>`_.
+
+
 Contents:
 
 .. toctree::

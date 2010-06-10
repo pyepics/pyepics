@@ -30,7 +30,7 @@ pdf: latex
 all: html pdf
 
 install: all
-	cp -pr epics.pdf $(INSTALLDIR)/epics.pdf
+	cp -pr epics.pdf $(INSTALLDIR)/pyepics3.pdf
 	mv  $(INSTALLDIR)/doc  $(INSTALLDIR)/doc_old
 	cp -pr  $(BUILDDIR)/html $(INSTALLDIR)/doc
 

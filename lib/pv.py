@@ -48,7 +48,8 @@ class PV(object):
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
     def __init__(self, pvname, callback=None, form='native',
-                 verbose=False, auto_monitor=None):
+                 verbose=False, auto_monitor=None,
+                 connection_callback=None):
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
@@ -60,7 +61,7 @@ class PV(object):
         self._args['count'] = -1
         self._args['type'] = 'unknown'
         self._args['access'] = 'unknown'
-
+        self.connection_callback = connection_callback
         self.callbacks  = {}
 
         self._monref = None  # holder of data returned from create_subscription
@@ -106,6 +107,8 @@ class PV(object):
                                      use_ctrl= self.form == 'ctrl',
                                      use_time= self.form == 'time')
             self._args['type'] = dbr.Name(self.ftype).lower()
+        if hasattr(self.connection_callback, '__call__'):
+            self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
         return
 
 

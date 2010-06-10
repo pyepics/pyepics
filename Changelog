@@ -1,3 +1,9 @@
+2010-06-10  Matt Newville  <newville@cars.uchicago.edu>
+
+	* Version 3.0.6:
+	- added working connection callbacks for PVs: users supply 
+	a function that is called on changes to connection status.
+
 2010-05-25  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.5:

@@ -446,7 +446,8 @@ def create_channel(pvname, connect=False, userfcn=None):
                            'ts':0, 'failures':0,
                            'userfcn': userfcn}
 
-    if connect: connect_channel(chid)
+    if connect:
+        connect_channel(chid)
     poll()
     time.sleep(1.e-5)
     return chid
@@ -855,28 +856,29 @@ def _onConnectionEvent(args):
     """set flag in cache holding whteher channel is
     connected. if provided, run a user-function"""
     pvname = name(args.chid)
-    if args.op != dbr.OP_CONN_UP:
-        return
+    thiscontext = current_context()
+    if thiscontext not in _cache:
+        for context in _cache:
+            if pvname in _cache[context]:
+                thiscontext =context
+                break            
     try:
-        ctx = current_context()
-        if ctx not in _cache:
-            _cache[ctx] = {}
-        entry  = _cache[ctx][pvname]
-    except KeyError:
-        return
+        entry = _cache[thiscontext][pvname]
+    except:
+        entry  = {'chid':args.chid, 'conn':False,
+                  'ts':0, 'failures':0}
+
     # print 'Conn Event ', pvname, entry
     entry['conn'] = (args.op == dbr.OP_CONN_UP)
     entry['ts']   = time.time()
     entry['failures'] = 0
-    try:
-        if hasattr(entry['userfcn'], '__call__'):
-            entry['userfcn'](pvname=pvname,
-                             chid=entry['chid'],
+    if 'userfcn' in entry and hasattr(entry['userfcn'], '__call__'):
+        try:
+            entry['userfcn'](pvname=pvname, chid=entry['chid'],
                              conn=entry['conn'])
-    except:
-        errmsg = "Error Setting User Callback for '%s'"  % pvname
-        raise ChannelAccessException('Connect', errmsg)
-
+        except:
+            errmsg = "Error Calling User Connection Callback for '%s'"  % pvname
+            raise ChannelAccessException('Connect', errmsg)
     return 
 
 ## put event handler:

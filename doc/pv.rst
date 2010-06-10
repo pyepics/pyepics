@@ -16,13 +16,15 @@ attributes for accessing it's properties.
 The PV class
 ============
 
-.. class:: PV(pvname[, callback=None[, form='native'[, auto_monitor=None[, verbose=False]]]])
+.. class:: PV(pvname[, callback=None[, connection_callback=None, [form='native'[, auto_monitor=None[, verbose=False]]]]])
 
    create a PV object for a named Epics Process Variable.  
 
    :param pvname: name of Epics Process Variable
    :param callback:  user-defined callback function on changes to PV value or state.
    :type callback: callable or None
+   :param connection_callback:  user-defined function called on changes to PV connection status.
+   :type connection_callback: callable or None
    :param form:  which epics *data type* to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.  
    :type form: string, one of ('native','ctrl', or 'time')
    :param auto_monitor:  whether to automatically monitor the PV for changes.
@@ -43,6 +45,10 @@ The *pvname* is required, and is the name of an existing Process Variable.
 
 The *callback* parameter  specifies a python method to be called on changes,
 as discussed in more detail at :ref:`pv-callbacks-label`
+
+The *connection_callback* parameter specifies a python method to be called
+on changes to the connection status of the PV (that is, when it connects or
+disconnects).  This is discussed in more detail at :ref:`pv-connection_callbacks-label`
 
 The *form* parameter specifies which of the three variants 'native' (the
 default), 'ctrl' (Control) or 'time' to use for the PV.  The control and
@@ -368,9 +374,12 @@ monitoring will be ``False`` unless you explicitly set it to ``True``.  See
 User-supplied Callback functions
 ================================
 
-Much of this information is similar to that in :ref:`ca-callbacks-label`
-for the :mod:`ca` module, though there are some important enhancements to
-callbacks on `PV` objects.
+This section describes user-defined functions that are called when the
+value of a PV changes.  These callback functions are useful as they allow
+you to be notified of changes without having to continually ask for a PVs
+current value.  Much of this information is similar to that in
+:ref:`ca-callbacks-label` for the :mod:`ca` module, though there are some
+important enhancements to callbacks on `PV` objects.
 
 When defining a callback function to be run on changes to a PV, as set from
 :meth:`add_callback`, it is important to know two things:
@@ -413,6 +422,26 @@ keep the callback functions short and not resource-intensive.  Consider
 strategies which use the callback only to record that a change has occurred
 and then act on that change later -- perhaps in a separate thread, perhaps
 after :func:`pend_event` has completed.
+
+..  _pv-connection_callbacks-label:
+
+User-supplied Connection Callback functions
+====================================
+
+A *connection* callback is a user-defined function that is called when the
+connection status of a PV changes -- that is, when a PV initially
+connects, disconnects or reconnects due to the process serving the PV going
+away, or loss of network connection.  Currently, a connection callback must
+be specified when a PV is created.
+
+Such a connection callback should be prepared to receive the following
+keyword arguments:
+    * `pvname`: the name of the pv 
+    * `conn`: the connection status
+
+where *conn* will be either `True` or `False`, specifying whether the PV is
+now connected.   A simple example is given below.
+
 
 
 ..  _pv-examples-label:
@@ -542,3 +571,12 @@ Some EPICS records take a significant amount of time to fully process.  And some
 Example of simple callback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Monitoring many PVs
+
+Example of connection callback
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A connection callback:
+
+.. literalinclude:: ../tests/pv_connection_callback.py
+
+

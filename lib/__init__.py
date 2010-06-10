@@ -3,8 +3,8 @@
    Matthew Newville <newville@cars.uchicago.edu>
    CARS, University of Chicago
 
-   version    :  3.0.5 
-   last update:  25-May-2010
+   version    :  3.0.6 
+   last update:  10-Jun-2010
    
 == License:
    Except where explicitly noted, this file and all files in this
@@ -21,7 +21,7 @@
       PV -- Process Variable which will work largely as in EpicsCA 2.*
 """
 
-__version__ = '3.0.5'
+__version__ = '3.0.6'
 
 import time
 import sys
@@ -37,11 +37,10 @@ Alarm = alarm.Alarm
 Motor = motor.Motor
 Device = device.Device
 poll  = ca.poll
-sleep = time.sleep
+sleep = time.sleep # should probably remove this!
 
 def __createPV(pvname, timeout=5.0):
     "create PV, wait for connection: "
-
     start_time = time.time()
     thispv = PV(pvname)
     thispv.connect()
