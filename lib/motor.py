@@ -6,6 +6,9 @@
 # Author:         Mark Rivers / Matt Newville
 # Created:        Sept. 16, 2002
 # Modifications:
+#   Jun 14, 2010  MN
+#       migrated more fully to pyepics3, using epics.Device
+# 
 #   Jan 16, 2008  MN
 #       use new EpicsCA.PV put-with-user-wait
 #       wait() method no longer needed
@@ -37,6 +40,7 @@ import time
 
 from . import pv
 from . import ca
+from . import device
 
 class MotorLimitException(Exception):
     """ raised to indicate a motor limit has been reached """
@@ -52,12 +56,12 @@ class MotorException(Exception):
     def __str__(self):
         return str(self.msg)
 
-class Motor:
-    """Epics Motor Class, using EpicsCA, and automatic callbacks
-
+class Motor(device.Device):
+    """Epics Motor Class for pyepics3
+    
    This module provides a class library for the EPICS motor record.
 
-   It uses the EpicsCA.PV class, and emulates 
+   It uses the epics PV class
 
    Virtual attributes:
       These attributes do not appear in the dictionary for this class, but
@@ -89,7 +93,7 @@ class Motor:
       ignore_limits=True keyword set.
 
    Example use:
-      from EpicsCA import Motor
+      from epics import Motor
       m = Motor('13BMD:m38')
       m.move(10)               # Move to position 10 in user coordinates
       m.move(100, dial=True)   # Move to position 100 in dial coordinates
@@ -111,102 +115,103 @@ class Motor:
     """
     # parameter name (short), PV suffix,  longer description
 
-    __motor_params = {
-        'acceleration':    ('ACCL', 'acceleration time'),
-        'back_accel':      ('BACC', 'backlash acceleration time'),
-        'backlash':        ('BDST', 'backlash distance'),
-        'back_speed':      ('BVEL', 'backlash speed'),
-        'card':            ('CARD', 'Card Number '),
-        'dial_high_limit': ('DHLM', 'Dial High Limit '),
-        'direction':       ('DIR',  'User Direction '),
-        'dial_low_limit':  ('DLLM', 'Dial Low Limit '),
-        'settle_time':     ('DLY',  'Readback settle time (s) '),
-        'done_moving':     ('DMOV', 'Done moving to value'),
-        'dial_readback':   ('DRBV', 'Dial Readback Value'),
-        'description':     ('DESC', 'Description'),
-        'dial_drive':      ('DVAL', 'Dial Desired Value'),
-        'units':           ('EGU',  'Engineering Units '),
-        'encoder_step':    ('ERES', 'Encoder Step Size '),
-        'freeze_offset':   ('FOFF', 'Offset-Freeze Switch '),
-        'move_fraction':   ('FRAC', 'Move Fraction'),
-        'hi_severity':     ('HHSV', 'Hihi Severity '),
-        'hi_alarm':        ('HIGH', 'High Alarm Limit '),
-        'hihi_alarm':      ('HIHI', 'Hihi Alarm Limit '),
-        'high_limit':      ('HLM',  'User High Limit  '),
-        'high_limit_set':  ('HLS',  'High Limit Switch  '),
-        'hw_limit':        ('HLSV', 'HW Lim. Violation Svr '),
-        'home_forward':    ('HOMF', 'Home Forward  '),
-        'home_reverse':    ('HOMR', 'Home Reverse  '),
-        'high_op_range':   ('HOPR', 'High Operating Range'),
-        'high_severity':   ('HSV',  'High Severity '),
-        'integral_gain':   ('ICOF', 'Integral Gain '),
-        'jog_accel':       ('JAR',  'Jog Acceleration (EGU/s^2) '),
-        'jog_forward':     ('JOGF', 'Jog motor Forward '),
-        'jog_reverse':     ('JOGR', 'Jog motor Reverse'),
-        'jog_speed':       ('JVEL', 'Jog Velocity '),
-        'last_dial_val':   ('LDVL', 'Last Dial Des Val '),
-        'low_limit':       ('LLM',  'User Low Limit  '),
-        'low_limit_set':   ('LLS',  'At Low Limit Switch'),
-        'lo_severity':     ('LLSV', 'Lolo Severity  '),
-        'lolo_alarm':      ('LOLO', 'Lolo Alarm Limit  '),
-        'low_op_range':    ('LOPR', 'Low Operating Range '),
-        'low_alarm':       ('LOW', ' Low Alarm Limit '),
-        'last_rel_val':    ('LRLV', 'Last Rel Value  '),
-        'last_dial_drive': ('LRVL', 'Last Raw Des Val  '),
-        'last_SPMG':       ('LSPG', 'Last SPMG  '),
-        'low_severity':    ('LSV',  'Low Severity  '),
-        'last_drive':      ('LVAL', 'Last User Des Val'),
-        'soft_limit':      ('LVIO', 'Limit violation  '),
-        'in_progress':     ('MIP',  'Motion In Progress '),
-        'missed':          ('MISS', 'Ran out of retries '),
-        'moving':          ('MOVN', 'Motor is moving  '),
-        'resolution':      ('MRES', 'Motor Step Size (EGU)'),
-        'motor_status':    ('MSTA', 'Motor Status  '),
-        'offset':          ('OFF',  'User Offset (EGU) '),
-        'output_mode':     ('OMSL', 'Output Mode Select  '),
-        'output':          ('OUT',  'Output Specification '),
-        'prop_gain':       ('PCOF', 'Proportional Gain '),
-        'precision':       ('PREC', 'Display Precision '),
-        'readback':        ('RBV',  'User Readback Value '),
-        'retry_max':       ('RTRY', 'Max retry count    '),
-        'retry_count':     ('RCNT', 'Retry count  '),
-        'retry_deadband':  ('RDBD', 'Retry Deadband (EGU)'),
-        'dial_difference': ('RDIF', 'Difference rval-rrbv '),
-        'raw_encoder_pos': ('REP',  'Raw Encoder Position '),
-        'raw_high_limit':  ('RHLS', 'Raw High Limit Switch'),
-        'raw_low_limit':   ('RLLS', 'Raw Low Limit Switch'),
-        'relative_value':  ('RLV',  'Relative Value    '),
-        'raw_motor_pos':   ('RMP',  'Raw Motor Position '),
-        'raw_readback':    ('RRBV', 'Raw Readback Value '),
-        'readback_res':    ('RRES', 'Readback Step Size (EGU)'),
-        'raw_drive':       ('RVAL', 'Raw Desired Value  '),
-        'dial_speed':      ('RVEL', 'Raw Velocity '),
-        's_speed':         ('S',    'Speed (RPS)  '),
-        's_back_speed':    ('SBAK', 'Backlash Speed (RPS)  '),
-        's_base_speed':    ('SBAS', 'Base Speed (RPS)'),
-        's_max_speed':     ('SMAX', 'Max Velocity (RPS)'),
-        'set':             ('SET',  'Set/Use Switch '),
-        'stop_go':         ('SPMG', 'Stop/Pause/Move/Go '),
-        's_revolutions':   ('SREV', 'Steps per Revolution '),
-        'stop':            ('STOP', 'Stop  '),
-        't_direction':     ('TDIR', 'Direction of Travel '),
-        'tweak_forward':   ('TWF',  'Tweak motor Forward '),
-        'tweak_reverse':   ('TWR',  'Tweak motor Reverse '),
-        'tweak_val':       ('TWV',  'Tweak Step Size (EGU) '),
-        'use_encoder':     ('UEIP', 'Use Encoder If Present'),
-        'u_revolutions':   ('UREV', 'EGU per Revolution  '),
-        'use_rdbl':        ('URIP', 'Use RDBL Link If Present'),
-        'drive':           ('VAL',  'User Desired Value'),
-        'base_speed':      ('VBAS', 'Base Velocity (EGU/s)'),
-        'slew_speed':      ('VELO', 'Velocity (EGU/s) '),
-        'version':         ('VERS', 'Code Version '),
-        'max_speed':       ('VMAX', 'Max Velocity (EGU/s)'),
-        'use_home':        ('ATHM', 'uses the Home switch'),
-        'deriv_gain':      ('DCOF', 'Derivative Gain '),
-        'use_torque':      ('CNEN', 'Enable torque control '),
-        'device_type':     ('DTYP', 'Device Type'),
-        'record_type':     ('RTYP', 'Record Type'),
-        'status':          ('STAT', 'Status')}
+    __motor_attrs = {
+        'enabled': '_able.VAL', 
+        'acceleration':    '.ACCL',
+        'back_accel':      '.BACC',
+        'backlash':        '.BDST',
+        'back_speed':      '.BVEL',
+        'card':            '.CARD',
+        'dial_high_limit': '.DHLM',
+        'direction':       '.DIR',
+        'dial_low_limit':  '.DLLM',
+        'settle_time':     '.DLY',
+        'done_moving':     '.DMOV',
+        'dial_readback':   '.DRBV',
+        'description':     '.DESC',
+        'dial_drive':      '.DVAL',
+        'units':           '.EGU',
+        'encoder_step':    '.ERES',
+        'freeze_offset':   '.FOFF',
+        'move_fraction':   '.FRAC',
+        'hi_severity':     '.HHSV',
+        'hi_alarm':        '.HIGH',
+        'hihi_alarm':      '.HIHI',
+        'high_limit':      '.HLM',
+        'high_limit_set':  '.HLS',
+        'hw_limit':        '.HLSV',
+        'home_forward':    '.HOMF',
+        'home_reverse':    '.HOMR',
+        'high_op_range':   '.HOPR',
+        'high_severity':   '.HSV',
+        'integral_gain':   '.ICOF',
+        'jog_accel':       '.JAR',
+        'jog_forward':     '.JOGF',
+        'jog_reverse':     '.JOGR',
+        'jog_speed':       '.JVEL',
+        'last_dial_val':   '.LDVL',
+        'low_limit':       '.LLM',
+        'low_limit_set':   '.LLS',
+        'lo_severity':     '.LLSV',
+        'lolo_alarm':      '.LOLO',
+        'low_op_range':    '.LOPR',
+        'low_alarm':       '.LOW',
+        'last_rel_val':    '.LRLV',
+        'last_dial_drive': '.LRVL',
+        'last_SPMG':       '.LSPG',
+        'low_severity':    '.LSV',
+        'last_drive':      '.LVAL',
+        'soft_limit':      '.LVIO',
+        'in_progress':     '.MIP',
+        'missed':          '.MISS',
+        'moving':          '.MOVN',
+        'resolution':      '.MRES',
+        'motor_status':    '.MSTA',
+        'offset':          '.OFF',
+        'output_mode':     '.OMSL',
+        'output':          '.OUT',
+        'prop_gain':       '.PCOF',
+        'precision':       '.PREC',
+        'readback':        '.RBV',
+        'retry_max':       '.RTRY',
+        'retry_count':     '.RCNT',
+        'retry_deadband':  '.RDBD',
+        'dial_difference': '.RDIF',
+        'raw_encoder_pos': '.REP',
+        'raw_high_limit':  '.RHLS',
+        'raw_low_limit':   '.RLLS',
+        'relative_value':  '.RLV',
+        'raw_motor_pos':   '.RMP',
+        'raw_readback':    '.RRBV',
+        'readback_res':    '.RRES',
+        'raw_drive':       '.RVAL',
+        'dial_speed':      '.RVEL',
+        's_speed':         '.S',
+        's_back_speed':    '.SBAK',
+        's_base_speed':    '.SBAS',
+        's_max_speed':     '.SMAX',
+        'set':             '.SET',
+        'stop_go':         '.SPMG',
+        's_revolutions':   '.SREV',
+        'stop':            '.STOP',
+        't_direction':     '.TDIR',
+        'tweak_forward':   '.TWF',
+        'tweak_reverse':   '.TWR',
+        'tweak_val':       '.TWV',
+        'use_encoder':     '.UEIP',
+        'u_revolutions':   '.UREV',
+        'use_rdbl':        '.URIP',
+        'drive':           '.VAL',
+        'base_speed':      '.VBAS',
+        'slew_speed':      '.VELO',
+        'version':         '.VERS',
+        'max_speed':       '.VMAX',
+        'use_home':        '.ATHM',
+        'deriv_gain':      '.DCOF',
+        'use_torque':      '.CNEN',
+        'device_type':     '.DTYP',
+        'record_type':     '.RTYP',
+        'status':          '.STAT'}
         
 ## fields not implemented:
 ##    
@@ -232,77 +237,90 @@ class Motor:
     __init_list = ('drive','description', 'readback','precision',
                    'tweak_val','tweak_forward','tweak_reverse',
                    'done_moving','set','stop', 'low_limit','high_limit',
-                   'high_limit_set', 'low_limit_set', 'soft_limit','status')
-
+                   'high_limit_set', 'low_limit_set', 'soft_limit','status',
+                   'device_type',  'record_type', 'enabled')
     
     _user_params = ('drive','readback','user')
     _dial_params = ('dial_drive','dial_readback','dial')
     _raw_params  = ('raw_drive','raw_readback','raw')
 
-    def __init__(self, name=None,timeout=1.):
-        self._dat = {}
-        if (not name):
+    def __init__(self, name=None, timeout=3.0):
+        if name is None:
             raise MotorException("must supply motor name")
         
-        if name.endswith('.VAL'): name = name[:-4]
+        if name.endswith('.VAL'):   name = name[:-4]
+        if name.endswith('.'):         name = name[:-1]
+            
+        device.Device.__init__(self, name, [self.__motor_attrs[i] for i in self.__init_list])
+        
         self.pvname = name
         # make sure motor is enabled:
-        try:
-            p = pv.PV("%s.RTYP" % name)
-            rectype = p.get()
-            if rectype is None:  rectype = p.get() # try again for unconnected PVs
-        except:
-            rectype = None
-            
+        t0 = time.time()
+        connected = False
+        while not connected:
+            connected = self.PV('.RTYP').connected
+            time.sleep(0.001)
+            if (time.time()-t0 > timeout):
+                raise MotorException("Cannot connect to %s" % name)                
+            rectype = self.PV('.RTYP').get()
+
+        rectype = self.PV('.RTYP').get()            
         if rectype != 'motor':
             raise MotorException("%s is not an Epics Motor" % name)
 
-        self._dat['enable'] = pv.PV("%s_able.VAL" % name)
-        isEnabled = (0 == self._dat['enable'].get() )
-        if not isEnabled: self._dat['enable'].put(0)        
         self._callbacks = {}
 
-        for attr in self.__init_list:   self.store_attr(attr)
-        self.connect_all()
-        self._dat['drive'].get()
-
-    def connect_all(self):
-        ca.poll()
-        for p in list(self._dat.values()):
-            if not p.connected: p.get()
-
     def __repr__(self):
-        return "<EpicsCA.Motor:  %s '%s'>" % (self.pvname, self.get_field('description'))
+        return "<epics.Motor: %s: '%s'>" % (self.pvname, self.get_field('description'))
 
     def __str__(self):
         return self.__repr__()
 
-    
     def __getattr__(self,attr):
         " internal method "
-        if attr in self.__motor_params:
+        if attr in self.__motor_attrs:
             return self.get_field(attr)
         elif attr in self.__dict__:
             return self.__dict__[attr]
         else:
             raise MotorException("EpicsMotor has no attribute %s" % attr)
-     
+
     def __setattr__(self,attr,val):
-        if attr in self.__motor_params:
-            # print ' Epics Motor SetAttr: ', attr, val
+        if attr in self.__motor_attrs:
             return self.put_field(attr,val)
         else:
             self.__dict__[attr] = val
 
-    def has_attr(self,attr):
-        return attr in self._dat
+    def put_field(self, attr, val, wait=False, timeout=30):
+        """set a Motor attribute (field) to a value
+        example:
+          >>> motor = Motor('XX:m1')
+          >>> motor.put_field('slew_speed', 2)
+
+        which would be equivalent to
+          >>> motor.slew_speed = 2
+
+        setting the optional 'wait' keyword to True will
+        cause this routine to wait to return until the
+        put is complete.  This is most useful when setting
+        the field may take time to complete, as when moving
+        the motor position.  That is,
+          >>> motor.put_field('drive', 2, wait=True)
+
+        will wait until the motor has moved to drive position 2.
+        """
+        x = self.get_field(attr)
+        
+        suffix =self.__motor_attrs[attr]
+        return self.PV(suffix).put(val, wait=wait, timeout=timeout)
     
-    def store_attr(self,attr):
-        if not attr in self._dat and attr in self.__motor_params:
-            pvname = "%s.%s" % (self.pvname,self.__motor_params[attr][0])
-            self._dat[attr] = pv.PV(pvname)
-        return attr in self._dat
-    
+    def get_field(self, attr, as_string=False):
+        "get a motor attribute by name"
+        if attr not in self.__motor_attrs:
+            raise MotorException("EpicsMotor has no attribute %s" % attr)
+        
+        suffix =self.__motor_attrs[attr]
+        return self.PV(suffix).get(as_string=as_string)
 
     def check_limits(self):
         """ check motor limits:
@@ -315,19 +333,18 @@ class Motor:
                 raise MotorLimitException(msg)
         return
     
-    def within_limits(self,val,lims):
+    def within_limits(self, val, limits='user'):
         """ returns whether a value for a motor is within drive limits,"""
-
-        if lims == 'user':
+        
+        if limits == 'user':
             hlim = self.get_field('high_limit')
             llim = self.get_field('low_limit')
-        elif lims == 'dial':
+        elif limits == 'dial':
             hlim = self.get_field('dial_high_limit')
             llim = self.get_field('dial_low_limit')
-        elif lims == 'raw':
+        elif limits == 'raw':
             hlim = self.get_field('raw_high_limit')
             llim = self.get_field('raw_low_limit')
-
         return (val <= hlim and val >= llim)
 
     def move(self,val=None,relative=None,wait=False, timeout=3600.0,
@@ -379,21 +396,6 @@ class Motor:
             ret = -1
         return ret
 
-    def wait_for_put(self,field,timeout=3600.):
-        """ wait for put on a field to complete:
-  
-           returns True  if put completed before timeout
-           returns False if put timed out
-           """
-        t0  = time.time()
-        pvn = self._dat[field]
-        while not pvn.put_complete:
-            ca.poll()
-            time.sleep(0.001)
-            if time.time()-t0 > timeout:  return False
-
-        return True
-    
     def get_position(self, dial=False, readback=False, step=False, raw=False):
         """
         Returns the target or readback motor position in user, dial or step
@@ -510,84 +512,32 @@ class Motor:
         ca.poll()
 
     def get_pv(self,attr):
-        "return full PV for a field"
-        if not 'drive' in self._dat: return None
-        if not attr in self.__motor_params:
-            return None
-        else:
-            return "%s.%s" % (self.pvname,self.__motor_params[attr][0])
+        "return  PV for a field"
+        return self.PV(self.__motor_attrs[attr] )
 
-    def put_field(self,attr,val,wait=False,timeout=300):
-        """set a Motor attribute (field) to a value
-        example:
-          >>> motor = Motor('XX:m1')
-          >>> motor.put_field('slew_speed', 2)
-
-        which would be equivalent to
-          >>> motor.slew_speed = 2
-
-        setting the optional 'wait' keyword to True will
-        cause this routine to wait to return until the
-        put is complete.  This is most useful when setting
-        the field may take time to complete, as when moving
-        the motor position.  That is,
-          >>> motor.put_field('drive', 2, wait=True)
-
-        will wait until the motor has moved to drive position 2.
-        """
-        if not self.store_attr(attr): return None
-        return self._dat[attr].put(val,wait=wait,timeout=timeout)
-    
-    def get_field(self,attr,as_string=False):
-        if not attr in self._dat:
-            self.store_attr(attr)
-            self._dat[attr].get()
-        try:
-            out = self._dat[attr].get(as_string=as_string)
-        except:
-            try:
-                ca.poll()
-                time.sleep(0.001)
-                out = self._data[attr].get(as_string=as_string)
-            except:
-                sys.stderr.write('Get Field Failed: %s %s\n' %
-                                 (attr, self._dat[attr]))
-                raise ValueError('Fail.')
-        return out
-
-    def clear_field_callback(self,attr):
+    def clear_callback(self, attr='drive'):
         try:
             index = self._callbacks.get(attr,None)
             if index is not None:
-                self._dat[attr].remove_callback(index=index)
+                self.get_pv(attr).remove_callback(index=index)
         except:
-            self._dat[attr].clear_callbacks()
+            self.get_pv(attr).clear_callbacks()
 
-    def set_field_callback(self,attr,callback,kw={}):
-        if not self.store_attr(attr): return None
+    def set_callback(self, attr='drive', callback=None, kw=None):
+        self.get_field(attr)
+
         kw_args = {}
-        kw_args['field'] = attr
-        kw_args['motor'] = self
-        kw_args.update(kw)
-        index = self._dat[attr].add_callback(callback=callback,**kw_args)
+        kw_args['motor_field'] = attr
+        if kw is not None:
+            kw_args.update(kw)
+        print 'Hello ', attr, self.get_pv(attr), kw_args
+        index = self.get_pv(attr).add_callback(callback=callback,**kw_args)
         self._callbacks[attr] = index
 
     def refresh(self):
         """ refresh all motor parameters currently in use:
         make sure all used attributes are up-to-date."""
-        for i in list(self._dat.keys()):
-            if i in self.__motor_params:
-                self.get_field(i)
-
-    def lookup_attribute(self,suffix):
-        """
-        Reverse look-up of an attribute name given the PV suffix
-        """
-        suf = suffix.lower()
-        if ((suf.find('.') == 0) or (suf.find('_') == 0)): suf =  suf[1:]
-        for (name,ext) in  list(self.__motor_params.items()):
-            if (suf == ext[0].lower()): return name
-        return None
+        ca.poll()
 
 
     def show_info(self):
@@ -609,32 +559,27 @@ class Motor:
         """ show all motor attributes"""
         o = []
         add = o.append
-        add(" Motor %s [%s]\n" % (self.pvname,self.get_field('description')))
-        add("   field      PV Suffix     value            description")
-        add(" ------------------------------------------------------------")
+        add("#Motor %s" % (self.pvname))
+        add("#  field               value                 PV name")
+        add("#------------------------------------------------------------")
         self.refresh()
-        klist =list( self.__motor_params.keys())
+        klist =list( self.__motor_attrs.keys())
         klist.sort()
+
         for attr in klist:
-            if not attr in self._dat:
-                self.store_attr(attr)
+            label = attr  + ' '*(18-min(18,len(attr)))
 
-        self.connect_all()
-        for attr in klist:
-            l = attr 
-            if (len(attr)<15): l  = l + ' '*(15-len(l))
-            suf = self.__motor_params[attr][0]
-            pvn  = "%s.%s" % (self.pvname, suf)
+            value = self.get_field(attr, as_string=True)
+            pvname  = self.get_pv(attr).pvname
 
-            if (len(suf)<5): suf = suf  +' '*(5-len(suf))            
-                
-            val = self.get_field(attr,as_string=True)
-            if (val):
-                if (len(val)<12): val  = val + ' '*(12-len(val))
-            add(" %s  %s  %s  %s" % (l,suf,val,
-                                     self.__motor_params[attr][1]))
-
+            if value is None: value = 'Not Connected??'
+            value = value + ' '*(18-min(18,len(value)))
+                                 
+            add(" %s  %s  %s" % (label, value, pvname))
+            
         sys.stdout.write("%s\n" % "\n".join(o))
+
+        
 if (__name__ == '__main__'):
     import sys
     for i in sys.argv[1:]:

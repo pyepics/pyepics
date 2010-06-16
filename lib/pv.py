@@ -104,13 +104,12 @@ class PV(object):
             self._args['read_access'] = (1 == ca.read_access(self.chid))
             self._args['write_access'] = (1 == ca.write_access(self.chid))
             self.ftype  = ca.promote_type(self.chid,
-                                     use_ctrl= self.form == 'ctrl',
-                                     use_time= self.form == 'time')
+                                          use_ctrl= self.form == 'ctrl',
+                                          use_time= self.form == 'time')
             self._args['type'] = dbr.Name(self.ftype).lower()
         if hasattr(self.connection_callback, '__call__'):
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
         return
-
 
     def connect(self, timeout=5.0, force=True):
         "check that a PV is connected, forcing a connection if needed"
@@ -130,9 +129,15 @@ class PV(object):
 
         if  self._args['ftype'] is None and self._args['type'] is not None:
             self._args['ftype'] = dbr.Name(self._args['type'], reverse=True)
-
+            
         return (self.connected and self.ftype is not None)
 
+    def reconnect(self):
+        self.automonitor = None
+        self._monref = None
+        self.connected = False
+        return self.connect(force=True)
+    
     def poll(self, evt=1.e-4, iot=1.0):
         "poll for changes"
         ca.poll(evt=evt, iot=iot)

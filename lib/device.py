@@ -65,7 +65,11 @@ class Device(object):
             pvname = "%s%s" % (self.__prefix__, attr)
         if pvname not in self._pvs:
             self._pvs[pvname] = pv.PV(pvname)
-            ca.poll()
+            ca.poll(evt=1.e-3)
+            if not self._pvs[pvname].connected:
+                self._pvs[pvname].connect()
+                ca.poll(evt=1.e-3)
+               
         return self._pvs[pvname]
     
     def put(self,attr,value,wait=False,timeout=10.0):

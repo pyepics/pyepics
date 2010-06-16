@@ -877,7 +877,7 @@ def _onConnectionEvent(args):
             entry['userfcn'](pvname=pvname, chid=entry['chid'],
                              conn=entry['conn'])
         except:
-            errmsg = "Error Calling User Connection Callback for '%s'"  % pvname
+            errmsg = 'Error Calling User Connection Callback for "%s"'  % pvname
             raise ChannelAccessException('Connect', errmsg)
     return 
 
