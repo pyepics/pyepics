@@ -347,8 +347,8 @@ class Motor(device.Device):
             llim = self.get_field('raw_low_limit')
         return (val <= hlim and val >= llim)
 
-    def move(self,val=None,relative=None,wait=False, timeout=3600.0,
-             dial=False,step=False,raw=False, ignore_limits=False):
+    def move(self, val=None, relative=None, wait=False, timeout=3600.0,
+             dial=False, step=False, raw=False, ignore_limits=False):
 
         """ moves motor drive to position
 
@@ -376,20 +376,27 @@ class Motor(device.Device):
             return None
 
         drv,rbv,lims = self._user_params
-        if dial:         drv,rbv,lims = self._dial_params
-        if step or raw:  drv,rbv,lims = self._raw_params
-
-        if (relative):  val = val + self.get_field(rbv)
+        if dial:
+            drv, rbv, lims = self._dial_params
+        if step or raw:
+            drv, rbv, lims = self._raw_params
+            ignore_limits = True
+            
+        if (relative):
+            val = val + self.get_field(rbv)
 
         # Check for limit violations
         if not ignore_limits:
             limits_ok = self.within_limits(val,lims)
-            if not limits_ok: return -1
+            if not limits_ok:
+                return -1
             
         stat = self.put_field(drv,val,wait=wait,timeout=timeout)
         ret = stat
-        if stat == 1:  ret = 0
-        if stat == -2: ret = -1
+        if stat == 1:
+            ret = 0
+        if stat == -2:
+            ret = -1
         try:
             self.check_limits()
         except:
@@ -436,7 +443,7 @@ class Motor(device.Device):
         else:
             return self.get_field(drv)
         
-    def tweak(self,dir='forward',wait=False,timeout=3600.0):
+    def tweak(self, dir='forward', wait=False, timeout=3600.0):
         """ move the motor by the tweak_val
        
         takes optional args:
@@ -450,7 +457,7 @@ class Motor(device.Device):
         if dir.startswith('rev') or dir.startswith('back'):
             ifield = 'tweak_reverse'
             
-        stat = self.put_field(drv,val,wait=wait,timeout=timeout)
+        stat = self.put_field(ifield, 1, wait=wait, timeout=timeout)
         ret = stat
         if stat == 1:  ret = 0
         if stat == -2: ret = -1
