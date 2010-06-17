@@ -97,7 +97,7 @@ class Motor(device.Device):
       m = Motor('13BMD:m38')
       m.move(10)               # Move to position 10 in user coordinates
       m.move(100, dial=True)   # Move to position 100 in dial coordinates
-      m.move(1, raw=True, relative=True) # Move 1 step relative to current position
+      m.move(1, step=True, relative=True) # Move 1 step relative to current position
 
       m.stop()                 # Stop moving immediately
       high = m.high_limit      # Get the high soft limit in user coordinates
@@ -342,25 +342,25 @@ class Motor(device.Device):
         elif limits == 'dial':
             hlim = self.get_field('dial_high_limit')
             llim = self.get_field('dial_low_limit')
-        elif limits == 'raw':
+        elif limits in ('step', 'raw'):
             hlim = self.get_field('raw_high_limit')
             llim = self.get_field('raw_low_limit')
         return (val <= hlim and val >= llim)
 
-    def move(self, val=None, relative=None, wait=False, timeout=3600.0,
+    def move(self, val=None, relative=None, wait=False, timeout=300.0,
              dial=False, step=False, raw=False, ignore_limits=False):
 
         """ moves motor drive to position
 
         arguments:
-         value          value to move to (float) [Must be provided]
+         val            value to move to (float) [Must be provided]
          relative       move relative to current position    (T/F) [F]
          wait           whether to wait for move to complete (T/F) [F]
          dial           use dial coordinates                 (T/F) [F]
          raw            use raw coordinates                  (T/F) [F]
          step           use raw coordinates (backward compat)(T/F) [F]
          ignore_limits  try move without regard to limits    (T/F) [F]
-         timeout        max time for move to complete (in seconds) [3600]
+         timeout        max time for move to complete (in seconds) [300]
         returns:
           None : unable to move, invalid value given
           -1   : target value outside limits -- no move attempted
@@ -443,14 +443,14 @@ class Motor(device.Device):
         else:
             return self.get_field(drv)
         
-    def tweak(self, dir='forward', wait=False, timeout=3600.0):
+    def tweak(self, dir='forward', wait=False, timeout=300.0):
         """ move the motor by the tweak_val
        
         takes optional args:
          dir            direction of motion (forward/reverse)  [forward]
                            must start with 'rev' or 'back' for a reverse tweak.
          wait           wait for move to complete before returning (T/F) [F]
-         timeout        max time for move to complete (in seconds) [3600]           
+         timeout        max time for move to complete (in seconds) [300]           
         """
         
         ifield = 'tweak_forward'
@@ -509,15 +509,6 @@ class Motor(device.Device):
         # Put the motor back in "Use" mode
         self.put_field('set',0)
       
-    def wait(self, **kw):
-        "deprecated:  use move(val, wait=True)"
-        raise MotorException('wait() deprecated: use move(val, wait=True)')
-
-    def stop(self):
-        "stop motor right now"
-        self.put_field('stop',1)
-        ca.poll()
-
     def get_pv(self,attr):
         "return  PV for a field"
         return self.PV(self.__motor_attrs[attr] )

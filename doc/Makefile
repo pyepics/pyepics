@@ -10,6 +10,7 @@ BUILDDIR      = _build
 INSTALLDIR = /home/newville/public_html/Epics/Python/pyepics3
 INSTALLDIR = /www/apache/htdocs/software/python/pyepics3
 
+
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
@@ -23,16 +24,23 @@ html:
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
-pdf: latex
+epics.pdf: latex
 	cd $(BUILDDIR)/latex && make all-pdf
 	cp -pr $(BUILDDIR)/latex/epics.pdf .
 
-all: html pdf
+all: html epics.pdf
 
 install: all
 	cp -pr epics.pdf $(INSTALLDIR)/pyepics3.pdf
+	rm -rf  $(INSTALLDIR)/doc_old
 	mv  $(INSTALLDIR)/doc  $(INSTALLDIR)/doc_old
 	cp -pr  $(BUILDDIR)/html $(INSTALLDIR)/doc
+	cp -pr main_index.html  $(INSTALLDIR)/index.html
+
+test: html
+	rm -rf  $(INSTALLDIR)/doc_test
+	cp -pr  $(BUILDDIR)/html $(INSTALLDIR)/doc_test
+	cp -pr main_index.html  $(INSTALLDIR)/index.html
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"

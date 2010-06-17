@@ -305,8 +305,7 @@ keyword arguments can be used to specify such options.
    :type ftype:  integer
    :param as_string:  whether to return the string representation of the value.  See notes below. 
    :type as_string:  ``True``/``False``
-   :param as_numpy:  whether to return the Numerical Python representation
-   for array / waveform data.  
+   :param as_numpy:  whether to return the Numerical Python representation  for array / waveform data.  
    :type as_numpy:  ``True``/``False``
 
 
@@ -734,6 +733,16 @@ of channels is handled in the background::
 Put, waiting for completion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Here we set a PVs value, waiting for it to complete::
+
+    from epics import ca
+    chid  = ca.create_channel('XXX:m1.VAL')
+    ca.put(chid,  1.0, wait=True)
+
+The  :meth:`put` method will wait to return until the processing is
+complete.
+
 Define callback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 

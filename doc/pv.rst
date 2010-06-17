@@ -13,8 +13,8 @@ object for an EPICS Process Variable.  A `PV` object has both methods and
 attributes for accessing it's properties.
 
 
-The PV class
-============
+The class:`PV` class
+=======================
 
 .. class:: PV(pvname[, callback=None[, connection_callback=None, [form='native'[, auto_monitor=None[, verbose=False]]]]])
 
@@ -426,7 +426,7 @@ after :func:`pend_event` has completed.
 ..  _pv-connection_callbacks-label:
 
 User-supplied Connection Callback functions
-====================================
+=============================================
 
 A *connection* callback is a user-defined function that is called when the
 connection status of a PV changes -- that is, when a PV initially
@@ -436,6 +436,7 @@ be specified when a PV is created.
 
 Such a connection callback should be prepared to receive the following
 keyword arguments:
+
     * `pvname`: the name of the pv 
     * `conn`: the connection status
 
@@ -565,15 +566,57 @@ The :attr:`value` attribute is the only attribute that can be set.
 Example of put-with-wait
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some EPICS records take a significant amount of time to fully process.  And sometimes
+Some EPICS records take a significant amount of time to fully process.  And
+sometimes you want to wait until the processing completes before going on::
+
+    import epics
+    p = epics.PV('XXX')
+    p.put(1.0, wait=True)
+    print 'Done'
+
+This will wait until the processing completes (motor moving, etc) before
+printing 'Done'.   You can also specfy a maximum time to wait -- a
+*timeout* (in seconds)::
+
+    p.put(1.0, wait=True, timeout=30)
+
+which will wait up to 30 seconds.  For the pedantic, this timeout should
+not be used as an accurate clock -- the actual wait time may be slightly
+longer.
 
 
 Example of simple callback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Monitoring many PVs
+
+It is ofen useful to get a notification of when a PV changes.  In general,
+it would be inconvenient (and possibly inefficient) to have to continually
+ask if a PVs value has changed.  Instead, it is better to set a *callback*
+function: a function to be run when the value has changed. 
+
+A simple example of this would be::
+
+    import epics
+    import time
+    def onChanges(pvname=None, value=None, char_value=None, **kw):
+        print 'PV Changed! ', pvname, char_value, time.ctime()
+
+
+    mypv = epics.PV(pvname)
+    mypv.add_callback(onChanges)
+
+    print 'Now wait for changes'
+
+    t0 = time.time()
+    while time.time() - t0 < 60.0: 
+        time.sleep(1.e-4)
+    print 'Done.'
+
+This first defines a *callback function* and then simply waits for
+changes to happen.
+
 
 Example of connection callback
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A connection callback:
 

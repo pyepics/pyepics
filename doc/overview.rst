@@ -311,5 +311,5 @@ There are several desired features are left undone or unfinished:
 License
 ============
 
-The Epics3 package is distributed under the Epics Open License.
-
+The Epics3 package is distributed under a variation of the  `Epics Open License.
+<http://cars9.uchicago.edu/software/python/pyepics3/license.txt>`_.
