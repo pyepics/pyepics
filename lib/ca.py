@@ -874,11 +874,17 @@ def _onConnectionEvent(args):
     entry['failures'] = 0
     if 'userfcn' in entry and hasattr(entry['userfcn'], '__call__'):
         try:
+            time.sleep(1.e-4)
             entry['userfcn'](pvname=pvname, chid=entry['chid'],
                              conn=entry['conn'])
         except:
-            errmsg = 'Error Calling User Connection Callback for "%s"'  % pvname
-            raise ChannelAccessException('Connect', errmsg)
+            time.sleep(1.e-3)
+            try:
+                entry['userfcn'](pvname=pvname, chid=entry['chid'],
+                                 conn=entry['conn'])
+            except:
+                errmsg = 'Error Calling User Connection Callback for "%s"'  % pvname
+                raise ChannelAccessException('Connect', errmsg)
     return 
 
 ## put event handler:
