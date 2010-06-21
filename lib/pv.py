@@ -98,6 +98,7 @@ class PV(object):
         
         self.connected = conn
         if self.connected:
+            time.sleep(1.e-4)
             self._args['host']   = ca.host_name(self.chid)
             self._args['count']  = ca.element_count(self.chid)
             self._args['access'] = ca.access(self.chid)

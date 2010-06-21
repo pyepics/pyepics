@@ -55,20 +55,20 @@ class Device(object):
         self.__prefix__ = prefix 
         self._pvs = {}
         if attrs is not None:
-            for p in attrs: self.PV(p)
+            for p in attrs: self.PV(p, init=True)
         ca.poll()
         
-    def PV(self,attr):
+    def PV(self, attr, init=False):
         """return epics.PV for a device attribute"""
         pvname = attr        
         if self.__prefix__ is not None: 
             pvname = "%s%s" % (self.__prefix__, attr)
         if pvname not in self._pvs:
             self._pvs[pvname] = pv.PV(pvname)
-            ca.poll(evt=1.e-3)
-            if not self._pvs[pvname].connected:
-                self._pvs[pvname].connect()
-                ca.poll(evt=1.e-3)
+            if init:
+                return
+        if not self._pvs[pvname].connected:
+            self._pvs[pvname].connect()
                
         return self._pvs[pvname]
     
