@@ -1,11 +1,38 @@
 import epics
 import time
-m1 = epics.Motor('13XRM:m1')
-m1.drive =  0.0
-m1.tweak_val = 0.10
-m1.move(0.0, wait=True)
 
-for i in range(20):
-    m1.tweak(dir='forward', wait=True)
-    print 'Motor:  ', m1.description , m1.drive, ' Currently at ', m1.readback
-    time.sleep(0.5)
+
+def test1(motorname, start, step, npts):
+    "simple test: stepping with wait"
+    m1 = epics.Motor(motorname)
+    m1.drive =  start
+    m1.tweak_val = step
+    m1.move(start, wait=True)
+
+    for i in range(npts):
+        m1.tweak(dir='forward', wait=True)
+        print 'Motor:  ', m1.description , m1.drive, ' Currently at ', m1.readback
+        time.sleep(0.01)
+
+def testDial(motorname,start, step, npts, offset=1.0):
+    "test using dial coordinates"
+    m1 = epics.Motor(motorname)
+    m1.offset = offset
+    m1.tweak_val = step
+    m1.move(start, wait=True, dial=True)
+    
+    print 'Motor position ', motorname, m1.description
+    user = m1.get_position()
+    dial = m1.get_position(dial=True)
+    raw  = m1.get_position(raw=True)
+
+    print ' User/Dial/Raw = %f / %f / %f' % (user, dial, raw)
+    m1.get_position(raw=True)
+
+
+# test1('13XRM:m1', 0, 0.10, 10)
+# test1('13XRM:m1', 2, -0.05, 20)
+testDial('13XRM:m2', 0.30, 0.01, 10, offset=0.25)
+
+
+
