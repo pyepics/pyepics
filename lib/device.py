@@ -82,6 +82,13 @@ class Device(object):
         """get an attribute value, 
         option as_string returns a string representation"""
         return self.PV(attr).get(as_string=as_string)
+    
+    def get_all(self):
+        """return a dictionary of the values of all current attributes"""
+        out = {}
+        for key in self._pvs:
+            out[key] = self._pvs[key].get()
+        return out
 
     def add_callback(self,attr,callback):
         """add a callback function to an attribute PV,
