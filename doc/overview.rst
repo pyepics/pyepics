@@ -3,16 +3,16 @@
 EPICS Channel Access in Python 
 ==============================
 
-The epics python package consists of several modules to interact with
-EPICS.  The simplest approach uses the functions :func:`caget`,
-:func:`caput`, :func:`camonitor`, :func:`camonitor_clear`, and
-:func:`cainfo` within the top-level `epics` module.  These functions are
-similar to the Unix command line utilities and to the EZCA library
-interface, and described in more detail below.
+The epics python package consists of several modules to interact with EPICS
+Channel Access.  The simplest approach uses the functions :func:`caget`,
+:func:`caput`, :func:`cainfo`, :func:`camonitor`, and
+:func:`camonitor_clear` within the top-level `epics` module.  These
+functions are similar to the Unix command line utilities and to the EZCA
+library interface, and described in more detail below.
 
 
 The :mod:`epics` package consists of several functions, modules and classes
-that are all imported with::
+that are imported with::
 
      import epics
     
@@ -31,15 +31,18 @@ These components includes
     * an :mod:`epics.wx` module that provides wxPython classes designed for
       use with Epics PVs.
 
-Most users will probably want to create and use `PV` objects provided by
-the `pv` module.  The `PV` class provides a PV object that has both methods
-(including :func:`get` and :func:`put`) and attributes that are kept
-automatically synchronized with the remote PV.
+Most beginning users will probably want to create and use :class:`PV`
+objects provided by the :mod:`pv` module.  The :class:`PV` class provides a
+Process Variable object that has both methods (including :meth:`get` and
+:meth:`put`) to read and change the PV, and attributes that are kept
+automatically synchronized with the remote channel.
 
-The lowest-level CA functionality is exposed in the `ca` and `dbr` module.
-While  not necessarily intended for general use, this module does provide a
-fairly complete wrapping of the basic EPICS CA library, and is quite
-usable, if a little more verbose and C-like than using PV objects.
+The lowest-level CA functionality is exposed in the :mod:`ca` and
+:mod:`dbr` module.  While not necessarily intended for general use by
+beginners, this module does provide a fairly complete wrapping of the basic
+EPICS CA library.  For people who have used CA from C or other languages,
+this module will be familiar and quite usable, if a little more verbose and
+C-like than using PV objects.
 
 In addition, the `epics` package contains more specialized modules for
 Epics motors, alarms, a host of other *devices* (collections of PVs), and a
@@ -81,16 +84,16 @@ for example..  For float and doubles, the internal precision of the PV is
 used to format the string value.  For enum types, the name of the enum
 state is returned.
 
-For most array (waveform) records, the string representation will be
-something like::
+For most array data (from Epics waveform records), the string
+representation will be something like::
 
   <array size=128, type=int>
 
 depending on the size and type of the waveform.  As an important special
 case, CHAR waveforms will be turned to Python strings when *as_string* is
-``True``.  This is to work around a painful limitation on the maximum
-length (40 characters!) of EPICS strings which leads CHAR waveforms to be
-used as longer strings::
+``True``.  This is to work around the low limit of the maximum length (40
+characters!) of EPICS strings, and means that it is fairly common to use
+CHAR waveforms when 'long strings' are desired::
 
     >>> from epics import caget, caput, cainfo
     >>> print caget('XXX:m1.VAL')
@@ -113,12 +116,12 @@ used as longer strings::
 :func:`caput`
 ~~~~~~~~~~~~~
 
-..  function:: caput(pvname,value[, wait=False[, timeout=60]])
+..  function:: caput(pvname, value[, wait=False[, timeout=60]])
 
   set the value of the named PV.  
 
   :param pvname: name of Epics Process Variable
-  :param value:  value to send to  PV
+  :param value:  value to send.
   :param wait:  whether to wait until the processing has completed.
   :type wait: True or False
   :param timeout:  how long to wait (in seconds) for put to complete before giving up.
@@ -127,10 +130,11 @@ used as longer strings::
 
 The optional *wait* argument tells the function to wait until the
 processing completes.  This can be useful for PVs which take significant
-time to complete, for example moving a physical motor.  The *timeout*
-argument gives the maximum time to wait, in seconds.  The function will
-return after this (approximate) time even if the :func:`caput` has not
-completed.
+time to complete, either because it causes a physical device (motor, valve,
+etc) to move or because it triggers a complex calculation or data
+processing sequence.  The *timeout* argument gives the maximum time to
+wait, in seconds.  The function will return after this (approximate) time
+even if the :func:`caput` has not completed.
 
 This function returns 1 on success, and a negative number if the timeout
 has been exceeded.
@@ -151,11 +155,9 @@ has been exceeded.
   including Control Settings.
 
   :param pvname: name of Epics Process Variable
-  :param print_out:  whether to write results to standard output (otherwise the string is returned).
+  :param print_out:  whether to write results to standard output 
+                 (otherwise the string is returned).
   :type print_out: True or False
-
-With *print_out=False*, the paragraph will not
-be printed, but returned.
 
     >>> from epics import caget, caput, cainfo
     >>> cainfo('XXX.m1.VAL')
@@ -188,23 +190,34 @@ be printed, but returned.
 
 ..  function:: camonitor(pvname[, writer=None[, callback=None]])
 
-  This `sets a monitor` on the named PV, and will print out (by default)
-  the PV name, time, and value each time the value changes.  
+  This `sets a monitor` on the named PV, which will cause *something* to be
+  done each time the value changes.  By default the PV name, time, and
+  value will be printed out (to standard output) when the value changes,
+  but the action that actually happens can be customized.
+
 
   :param pvname: name of Epics Process Variable
-  :param writer:  whether to write results to standard output (otherwise the string is returned).
-  :type writer: None or a method that can take a string
+  :param writer:  where to write results to standard output .
+  :type writer: None or a method that takes a string argument.
   :param callback:  user-supplied function to receive result
-  :type callback: None or callable
+  :type callback: None or callable function
 
 
-One can any function that can take a string as *writer*, such as the
-`write` method of a file open for writing.  If left as ``None``, messages
-of changes will be sent to :func:`sys.stdout.write`. For more complete
-control, one can specify a *callback* function to be called on each change
-event.  This callback should take keyword arguments for *pvname*, *value*,
-and *char_value*.  See :ref:`pv-callbacks-label` for information on writing
-callback functions for :func:`camonitor`.
+One can specify any function that can take a string as *writer*, such as
+the `write` method of a file that has been open for writing.  If left as
+``None``, messages of changes will be sent to :func:`sys.stdout.write`. For
+more complete control, one can specify a *callback* function to be called
+on each change event.  This callback should take keyword arguments for
+*pvname*, *value*, and *char_value*.  See :ref:`pv-callbacks-label` for
+information on writing callback functions for :func:`camonitor`.
+
+    >>> from epics import camonitor
+    >>> camonitor('XXX.m1.VAL')
+    XXX.m1.VAL 2010-08-01 10:34:15.822452 1.3
+    XXX.m1.VAL 2010-08-01 10:34:16.823233 1.2
+    XXX.m1.VAL 2010-08-01 10:34:17.823233 1.1
+    XXX.m1.VAL 2010-08-01 10:34:18.823233 1.0
+
 
 :func:`camonitor_clear`
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,14 +250,20 @@ callback functions for :func:`camonitor`.
 Motivation: Why another Python-Epics Interface?
 ================================================
 
-First, Py-Epics3 is intended as an improvement over EpicsCA 2.1, and should
-replace that older Epics-Python interface.  That version has performance
+Py-Epics3 is intended as an improvement over EpicsCA 2.1, and should
+replace that older Epics-Python interface.  That version had performance
 issues, especially when connecting to a large number of PVs, is not
 thread-aware, and has become difficult to maintain for Windows and Linux.
 
-Second, there are a few other Python modules exposing Epics Channel Access
-available, and having a better and more complete low-level interface to the
-CA library may allow a more common interface to be used.  This desire to
+There are a few other Python modules exposing Epics Channel Access
+available.  Most of these have a interface to the CA library that was both
+closer to the C library and lower-level than EpicsCA.  Most of these
+interfaces use specialized C-Python 'wrapper' code to provide the
+interface.
+
+Because of this, an additional motivation for this package was to allow a
+more common interface to be used that built higher-level objects (as
+EpicsCA had) on top of a complete lower-level interface.  The desire to
 come to a more universally-acceptable Python-Epics interface has definitely
 influenced the goals for this module, which include:
 
@@ -256,18 +275,20 @@ influenced the goals for this module, which include:
    4) being ready for porting to Python3.
    5) using Python's ctypes library.
 
-The main implementation feature here (and difference from EpicsCA) is using
-Python's ctypes library to do handle the connection between Python and the
-CA C library.  Using ctypes has many advantages, including eliminating the
-need to write and maintain a separate wrapper code either with SWIG or
-directly with Python's C API.  Since the module is pure Python, this makes
-installation on multiple platforms much easier as no compilation step is
-needed.  Since ctypes loads a shared object library at runtime, the
-underlying Epics library can be upgraded without having to re-build the
-Python wrapper.  In addition, using ctypes provides the most reliable
-thread-safety available, as each call to the underlying C library is
-automatically made thread-aware without explicit coding.  Finally, by
+The main implementation feature used here (and difference from EpicsCA) is
+using Python's ctypes library to handle the connection between Python and
+the CA C library.  Using ctypes has many advantages.  Principally, it fully
+eliminates the need to write (and maintain) wrapper code either with SWIG
+or directly with Python's C API.  Since the ctypes module allows access to
+C data and objects in pure Python, no compilation step is needed to build
+the module, making installation and support on multiple platforms much
+easier.  Since ctypes loads a shared object library at runtime, the
+underlying Epics Channel Access library can be upgraded without having to
+re-build the Python wrapper.  In addition, using ctypes provides the most
+reliable thread-safety available, as each call to the underlying C library
+is automatically made thread-aware without explicit code.  Finally, by
 avoiding the C API altogether, migration to Python3 is greatly simplified.
+PyEpics3 does work with both Python 2.* and 3.*.
 
 
 

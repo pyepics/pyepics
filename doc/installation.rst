@@ -2,8 +2,10 @@
 Installation
 ============
 
-This package requires Python version 2.5, 2.6, or 3.1.  Later versions
-(Say, 2.7) may work, but have not been tested.   
+This package requires Python version 2.5, 2.6, or 3.1.  I believe that
+Python 2.7 will work, but this has yet not tested.  It is possible that
+Python 2.4 will work if the ctypes packa is installed, but this has not
+been tested.
 
 Version 3.14 of the EPICS Channel Access library (v 3.14.8 or higher, I
 believe) is required.  More specifically, the shared libraries libCom.so

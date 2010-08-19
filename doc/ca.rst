@@ -12,12 +12,13 @@ functional interface (:func:`epics.caget`, :func:`epics.caput` and so on),
 or create and use epics PV objects with :class:`epics.PV`, or define epics
 devices with :class:`epics.Device`. 
 
-The goal of this `ca` module is to stay fairly close to the C interface to
-the CA library while also providing a pleasant Python experience.  It is
-expected that anyone looking into the details of this module is somewhat
-familiar with Channel Access and knows where to consult the `Channel
-Access Reference Documentation <http://www.aps.anl.gov/epics/base/R3-14/11-docs/CAref.html>`_.  This document mostly describe the differences
-with the C interface.
+The goal of this :mod:`ca` module is to stay fairly close to the C
+interface to the CA library while also providing a pleasant Python
+experience.  It is expected that anyone looking into the details of this
+module is somewhat familiar with Channel Access and knows where to consult
+the `Channel Access Reference Documentation
+<http://www.aps.anl.gov/epics/base/R3-14/11-docs/CAref.html>`_.  This
+document mostly describe the differences with the C interface.
 
 
 Name Mangling
@@ -30,8 +31,9 @@ intention is that one will import the `ca` module with
     >>> from epics import ca
 
 so that the Python function :func:`ca.XXX` will corresponds to the C
-function `ca_XXX`.  That is, Python namespaces are used in place of the
-name-mangling done in C due to its lack of namespaces.
+function `ca_XXX`.  That is, the CA library called its functions `ca_XXX`
+because C does not have namespaces.  Python does have namespaces, and so
+they are used.
 
 Similar name *un-mangling* also happens with the DBR prefixes for
 constants, held here in the `dbr` module.  Thus, the C constant DBR_STRING
@@ -44,7 +46,7 @@ Other Changes and Omissions
 Several function in the C version of the CA library are not implemented in
 the Python module.  Most of these unimplemented functions are currently
 seen as unnecessary for Python, though some could be added without much
-trouble.
+trouble. See :ref:`ca-omissions-label` for further details.
 
 In addition, while the CA library supports several `DBR` types in C, not
 all of these are supported in Python. Only native types and their DBR_TIME
@@ -54,7 +56,6 @@ is not something you'll be striving for with Python.  In addition, several
 `dbr_XXX` functions are also not supported, as they appear to be needed
 only to dynamically allocate memory.
 
-See :ref:`ca-omissions-label` for further details.
 
 
 ..  _ca-init-label:
@@ -74,28 +75,29 @@ reasons for this:
   2. the ctypes interface requires that the shared library be loaded
   before it is used.
 
-  3. because ctypes requires references to the library and callback
+  3. ctypes requires references to the library and callback
   functions be kept for the life-cycle of CA-using part of a program (or
   else they will be garbage collected). 
 
-For these reasons, the handling of the life-cycle here for a CA session can
-be slightly complicated.  As far as is possible, this module tries to
-prevent the user from needing to worry about explicitly initializing the CA
-session.  Instead, the library is initialized as soon as it is needed (but
-not on loading the module!).  This module also handles finalizing the CA
-session, so that core-dumps and warning messages do not happen due to CA
-still being 'alive' as a program ends.
+For these reasons, the handling of the life-cycle for a CA session can be
+slightly complicated.  As far as is possible, the :mod:`ca` module prevents
+the user from needing to worry about explicitly initializing the CA
+session.  Instead, the library is initialized as soon as it is needed.
+This module also handles finalizing the CA session, so that core-dumps and
+warning messages do not happen due to CA still being 'alive' as a program
+ends.
 
-These initialization and finalization tasks are handled in the following
-way:
+Because some users may wish to customize the initialization and
+finalization process, the detailed steps will be described here.  These
+initialization and finalization tasks are handled in the following way:
 
    * :data:`libca` holds a permanent, global reference to the CA shared
      library.
 
-   * the function :func:`initialize_libca` is called to ... initialize
-     libca.  It takes no arguments, but uses the global Boolean
-     :data:`PREEMPTIVE_CALLBACK` (default of ``True``) to control whether
-     preemptive callbacks are used.
+   * the function :func:`initialize_libca` is called to initialize libca.
+     This function takes no arguments, but does use the global Boolean
+     :data:`PREEMPTIVE_CALLBACK` (default value of ``True``) to control
+     whether preemptive callbacks are used.
 
    * the function :func:`finalize_libca` is used to finalize libca.
      Normally, this is function is registered to be called when a program
@@ -107,7 +109,8 @@ way:
 .. data:: PREEMPTIVE_CALLBACK 
 
    sets whether preemptive callbacks will be used.  The default value is
-   ``True``.  This **MUST** be set before any other use of the CA library.
+   ``True``.  If you wish to run without preemptive callbacks this variable
+   **MUST** be set before any other use of the CA library.
 
    With preemptive callbacks enabled, EPICS communication will
    not require client code to continually poll for changes.  
@@ -115,7 +118,7 @@ way:
 .. data:: DEFAULT_CONNECTION_TIMEOUT
 
    sets the default `timeout` value (in seconds) for
-   :func:`connect_channel`.  The default value is `5.0`
+   :func:`connect_channel`.  The default value is `2.0`
 
 .. data:: AUTOMONITOR_MAXLENGTH
 
@@ -170,7 +173,7 @@ The basic channel object is the Channel ID or ``chid``.  With the CA
 library (and ``ca`` module), one creates and acts on the ``chid`` values,
 which are :data:`ctypes.c_long`.
 
-.. function:: create_channel(pvname,connect=False,userfcn=None)
+.. function:: create_channel(pvname, [connect=False, [userfcn=None]])
    
    creates a channel, returning the Channel ID ``chid`` used by other
    functions to identify this channel.
@@ -189,7 +192,7 @@ which are :data:`ctypes.c_long`.
    Internally, a connection callback is used so that you should
    not need to explicitly connect to a channel.
 
-.. function:: connect_channel(chid,timeout=None,verbose=False,force=True)
+.. function:: connect_channel(chid, [timeout=None, [verbose=False, [force=True]]])
 
    explicitly connect to a channel (usually not needed as implicit
    connection will be done when needed), waiting up to timeout for a
@@ -250,7 +253,7 @@ Channel are essentially identical to the CA library are:
 
    return the state of the channel.
 
-Three additional pythonic functions have been added:
+A few additional pythonic functions have been added:
 
 .. function::     isConnected(chid)
 
