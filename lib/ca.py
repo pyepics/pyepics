@@ -101,7 +101,16 @@ _cache  = {}
 _put_done =  {}
         
 class ChannelAccessException(Exception):
-    """Channel Access Exception"""
+    """Channel Access Exception: General Errors"""
+    def __init__(self, fcn, msg):
+        Exception.__init__(self)
+        self.fcn = fcn
+        self.msg = msg
+    def __str__(self):
+        return " %s returned '%s'" % (self.fcn, self.msg)
+
+class CASeverityException(Exception):
+    """Channel Access Severity Check Exception: PySEVCHK got unexpected return value"""
     def __init__(self, fcn, msg):
         Exception.__init__(self)
         self.fcn = fcn
@@ -307,7 +316,7 @@ def PySEVCHK(func_name, status, expected=dbr.ECA_NORMAL):
     """
     if status == expected:
         return status
-    raise ChannelAccessException(func_name, message(status))
+    raise CASeverityException(func_name, message(status))
 
 def withSEVCHK(fcn):
     """decorator to raise a ChannelAccessException if the wrapped
@@ -384,12 +393,15 @@ def version():
     return bytes2str(fcn())
 
 @withCA
-@withSEVCHK
 def pend_io(timeout=1.0):
     """polls CA for i/o. """    
     fcn   = libca.ca_pend_io
     fcn.argtypes = [ctypes.c_double]
     return fcn(timeout)
+    try:
+        return PySEVCHK('pend_io', ret)
+    except CASeverityException:
+        return ret
 
 @withCA
 def pend_event(timeout=1.e-5):
