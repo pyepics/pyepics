@@ -2,15 +2,14 @@
 :mod:`epics.ca` Low-Level Epics Interface
 =========================================
 
-Overview, difference with C library
-===================================
+General description, difference with C library
+=================================================
 
 This module provides a low-level wrapping of the EPICS Channel Access (CA)
 library, using ctypes.  Most users of the `epics` module will not need to
-be concerned with most the details here, and will instead use the simple
+be concerned with most of the details here, and will instead use the simple
 functional interface (:func:`epics.caget`, :func:`epics.caput` and so on),
-or create and use epics PV objects with :class:`epics.PV`, or define epics
-devices with :class:`epics.Device`. 
+or use the :class:`epics.PV` class to create and use epics PV objects.
 
 The goal of this :mod:`ca` module is to stay fairly close to the C
 interface to the CA library while also providing a pleasant Python
@@ -18,7 +17,8 @@ experience.  It is expected that anyone looking into the details of this
 module is somewhat familiar with Channel Access and knows where to consult
 the `Channel Access Reference Documentation
 <http://www.aps.anl.gov/epics/base/R3-14/11-docs/CAref.html>`_.  This
-document mostly describe the differences with the C interface.
+document focuses on the differences with the C interface, assuming a
+general understanding of what the functions are meant to do.
 
 
 Name Mangling
@@ -45,17 +45,16 @@ Other Changes and Omissions
 
 Several function in the C version of the CA library are not implemented in
 the Python module.  Most of these unimplemented functions are currently
-seen as unnecessary for Python, though some could be added without much
-trouble. See :ref:`ca-omissions-label` for further details.
+seen as unnecessary for Python, though some of these could be added without
+much trouble if needed. See :ref:`ca-omissions-label` for further details.
 
 In addition, while the CA library supports several `DBR` types in C, not
 all of these are supported in Python. Only native types and their DBR_TIME
 and DBR_CTRL variants are supported here.  The DBR_STS and DBR_GR variants
 are not, as they are subsets of the DBR_CTRL type, and space optimization
-is not something you'll be striving for with Python.  In addition, several
-`dbr_XXX` functions are also not supported, as they appear to be needed
-only to dynamically allocate memory.
-
+is not something you'll be striving for with Python.  Several `dbr_XXX`
+functions are also not supported, as they appear to be needed only to be
+able to dynamically allocate memory, which is not necessary in Python.
 
 
 ..  _ca-init-label:
@@ -66,33 +65,33 @@ Initialization, Finalization, and Life-cycle
 .. module:: ca
    :synopsis: low-level Channel Access  module.
 
-The CA library must be initialized before it can be used.  There are 3 main
-reasons for this: 
+The Channel Access library must be initialized before it can be used.
+There are 3 main reasons for this need:
 
   1. CA requires a context model (preemptive callbacks or  non-preemptive
-  callbacks) to be specified before any actual calls are  made. 
+  callbacks) to be specified before any actual calls can be made. 
 
   2. the ctypes interface requires that the shared library be loaded
   before it is used.
 
-  3. ctypes requires references to the library and callback
+  3. ctypes also requires that references to the library and callback
   functions be kept for the life-cycle of CA-using part of a program (or
-  else they will be garbage collected). 
+  else they will be garbage collected).
 
-For these reasons, the handling of the life-cycle for a CA session can be
-slightly complicated.  As far as is possible, the :mod:`ca` module prevents
-the user from needing to worry about explicitly initializing the CA
-session.  Instead, the library is initialized as soon as it is needed.
-This module also handles finalizing the CA session, so that core-dumps and
-warning messages do not happen due to CA still being 'alive' as a program
-ends.
+As far as is possible, the :mod:`ca` module hides the details of the CA
+lifecyle from the user, so that it is not necessary to to worry about
+explicitly initializing a Channel Access session.  Instead, the library is
+initialized as soon as it is needed, and intervention is really only
+required to change default settings.  The :mod:`ca` module also handles
+finalizing the CA session, so that core-dumps and warning messages do not
+happen due to CA still being 'alive' as a program ends.
 
 Because some users may wish to customize the initialization and
 finalization process, the detailed steps will be described here.  These
 initialization and finalization tasks are handled in the following way:
 
-   * :data:`libca` holds a permanent, global reference to the CA shared
-     library.
+   * The :data:`libca` variable in the :mod:`ca` module holds a permanent,
+     global reference to the CA shared object library (DLL).
 
    * the function :func:`initialize_libca` is called to initialize libca.
      This function takes no arguments, but does use the global Boolean
@@ -103,17 +102,19 @@ initialization and finalization tasks are handled in the following way:
      Normally, this is function is registered to be called when a program
      ends with :func:`atexit.register`.  Note that this only gets called on
      a graceful shutdown. If the program crashes (for a non-CA related
-     reason, for example), this finalization may not be done.
-       
+     reason, for example), this finalization may not be done, and
+     connections to Epics Variables may not be closed completely on the
+     Channel Access server.       
 
 .. data:: PREEMPTIVE_CALLBACK 
 
    sets whether preemptive callbacks will be used.  The default value is
    ``True``.  If you wish to run without preemptive callbacks this variable
-   **MUST** be set before any other use of the CA library.
-
-   With preemptive callbacks enabled, EPICS communication will
-   not require client code to continually poll for changes.  
+   *MUST* be set before any other use of the CA library.  With preemptive
+   callbacks enabled, EPICS communication will not require client code to
+   continually poll for changes.   With preemptive callback disables,  you
+   will need to frequently poll epics with :func:`pend_io` and
+   func:`pend_event`.
 
 .. data:: DEFAULT_CONNECTION_TIMEOUT
 
@@ -124,7 +125,12 @@ initialization and finalization tasks are handled in the following way:
 
    sets the default array length (ie, how many elements an array has) above
    which automatic conversion to numpy arrays *and* automatica monitoring
-   for PV variables is suppressed.  The default value is 16384.  See
+   for PV variables is suppressed.  The default value is 16384.  To be
+   clear: waveforms with fewer elements than this value will be
+   automatically monitored changes, and will be converted to numpy arrays
+   (if numpy is installed).  Larger waveforms will not be monitored.
+
+
    :ref:`advanced-large-arrays-label` for more details. 
 
 Using the CA module
@@ -133,7 +139,7 @@ Using the CA module
 Many general-purpose CA functions that deal with general communication and
 threading contexts are very close to the C library:
 
-.. function::  context_create(context=None)
+.. function::  context_create([context=None])
    
    here, you can explicitly set context to 1 to enable  preemptive
    callbacks, 0 to disable them, or leave as ``None`` to use the value of
@@ -148,17 +154,17 @@ threading contexts are very close to the C library:
 
 .. function::  current_context()
 
-.. function::  client_status(context,level)
+.. function::  client_status(context, level)
 
 .. function::  message(status)
 
 .. function::  flush_io()
 
-.. function::  pend_io(t=1.0)
+.. function::  pend_io([t=1.0])
 
-.. function::  pend_event(t=1.e-5)
+.. function::  pend_event([t=1.e-5])
 
-.. function::  poll(evt=1.e-4,iot=1.0)
+.. function::  poll([evt=1.e-4, [iot=1.0]])
 
    a convenience function which is equivalent to::
     
@@ -170,8 +176,10 @@ Creating and Connecting to Channels
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The basic channel object is the Channel ID or ``chid``.  With the CA
-library (and ``ca`` module), one creates and acts on the ``chid`` values,
-which are :data:`ctypes.c_long`.
+library (and ``ca`` module), onee creates and acts on the ``chid`` values.
+These are simply :data:`ctypes.c_long` (C long integers) that hold the
+memory address of the C representation of the channel, but it is probably
+a good idea to treat these as object instances.
 
 .. function:: create_channel(pvname, [connect=False, [userfcn=None]])
    
@@ -190,7 +198,8 @@ which are :data:`ctypes.c_long`.
          * `conn`    ``True``/``False``:  whether channel is connected.
 
    Internally, a connection callback is used so that you should
-   not need to explicitly connect to a channel.
+   not need to explicitly connect to a channel, unless you are having
+   difficulty with dropped connections.
 
 .. function:: connect_channel(chid, [timeout=None, [verbose=False, [force=True]]])
 
@@ -199,7 +208,6 @@ which are :data:`ctypes.c_long`.
    channel to connect.  It returns the connection state,
    ``True`` or ``False``.
 
-
    :param chid:     ``chid`` Channel ID 
    :param timeout:  maximum time to wait for connection.
    :type  timeout:  ``None`` or double.
@@ -207,18 +215,19 @@ which are :data:`ctypes.c_long`.
    :param force:    whether to (try to) force a connection.
 
    if *timeout* is ``None``, the value of  :data:`DEFAULT_CONNECTION_TIMEOUT`
-   is used (usually 5.0 seconds).
+   is used (usually 2.0 seconds).
    
-   Normally, channels will connect very fast, and the connection callback
-   will succeed the first time.
+   Normally, channels will connect in milliseconds, and the connection
+   callback will succeed on the first attempt.
 
    For un-connected Channels (that are nevertheless queried), the 'ts'
    (timestamp of last connection attempt) and 'failures' (number of failed
    connection attempts) from the :data:`_cache` will be used to prevent
    spending too much time waiting for a connection that may never happen.
 
-Many other functions that require a valid (but not necessarily connected)
-Channel are essentially identical to the CA library are:
+Many other functions that require a valid Channel ID, but not necessarily a
+connected Channel.  These functions are essentially identical to the CA
+library are:
 
 .. function::   name(chid)
 
@@ -265,7 +274,7 @@ A few additional pythonic functions have been added:
    returns a string describing read/write access: one of 
    `no access`, `read-only`, `write-only`, or `read/write`
 
-.. function::    promote_type(chid,use_time=False,use_ctrl=False)
+.. function::    promote_type(chid,[use_time=False, [use_ctrl=False]])
 
   promotes the native field type of a ``chid`` to its TIME or CTRL
   variant. See :ref:`Table of DBR Types <dbrtype_table>`.  Returns the
@@ -277,7 +286,7 @@ A few additional pythonic functions have been added:
     status and a bit of internal information for all known PVs.  This cache
     is not intended for general use.
 
-.. function:: show_cache(print_out=True)
+.. function:: show_cache([print_out=True])
 
    this function will print out a listing of PVs in the current session to
    standard output.  Use the *print_out=False* option to be returned the
@@ -328,7 +337,8 @@ array.  This is only applied if numpy can be imported.  See
 to best deal with very large arrays.
 
 
-.. function::  put(chid, value, wait=False, timeout=20, callback=None,callback_data=None) 
+.. function::  put(chid, value, [wait=False, [timeout=20, 
+   	           [callback=None, [callback_data=None]]]]) 
 
    sets the Channel to a value, with options to either wait (block) for the
    process to complete, or to execute a supplied callback function when the
@@ -353,10 +363,11 @@ to best deal with very large arrays.
 
    For more on this *put callback*, see :ref:`ca-callbacks-label` below.
 
-.. function::   create_subscription(chid, use_time=False,use_ctrl=False,  mask=7, userfcn=None)
+.. function::   create_subscription(chid, [use_time=False, [use_ctrl=False,
+                                    [mask=7, [userfcn=None]]]])
 
-   create a *changed subscription*, so that the user-supplied callback
-   function is called on changes to the PV.
+   create a *subscription to changes*, The user-supplied callback function
+   will be called on any changes to the PV.
 
    :param use_time: whether to use the TIME variant for the PV type
    :type use_time:  ``True``/``False``
