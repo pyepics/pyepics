@@ -22,8 +22,10 @@ epics.Alarm(pvname = pvnames.alarm_pv,
 
 
 t0 = time.time()
+
 sys.stdout.write('Waiting for pv %s to change! \n' % pvnames.alarm_pv)
-sys.stdout.write('Alarm settings:  comp=%s,  trip_point=%s\n' % (pvnames.alarm_comp, pvnames.alarm_trippoint))
+sys.stdout.write('Alarm settings:  comp=%s,  trip_point=%s\n' % (pvnames.alarm_comp,
+                                                                 pvnames.alarm_trippoint))
 sys.stdout.write('You may have to make this happen!!\n')
 
 while time.time()-t0 < 200:
