@@ -529,58 +529,22 @@ double
 mm 3 -14.5060658455
 
 
-Getting a string value for all PV types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Getting a string value 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It is a common to want or need the string representation of a PVs value,
-for example to show in a display window or to write to some report.
+It is not uncommon to want a string representation of a PVs value, for
+example to show in a display window or to write to some report.  For string
+PVs and integer PVs, this is a simple task.  For floating point values,
+there is ambiguity how many significant digits to show. EPICS PVs all have
+a :attr:`precision` field. which sets how many digits after the decimal
+place should be described.  In addition, for ENUM PVs, it would be
+desireable to get at the name of the ENUM state, not just its integer
+value.
 
+To get the string representation of a PVs value, use either the
+:attr:`char_value` attribute or the *as_string=True* argument to :meth:`get`
 
-For string PVs and integer PVs, this is a simple task.  For floating point
-values, there is ambiguity how many significant digits to show. EPICS PVs
-all have a :attr:`precision` field. which sets how many digits after the
-decimal place should be described.  
-
-
-In addition, for ENUM PVs, it would be desirable to get at the name of the
-ENUM state, not just its integer value.  As above, the :attr:`char_value`
-attribute or the *as_string=True* argument to :meth:`get` can be used to
-get these valuse.   Some further example follow.
-
-Getting the string value (and all enum state names) for an Enum PV
-
->>> import epics
->>> smode = epics.PV('S:ActualMode.VAL')
->>> print smode.value, smode.type
-3 enum
->>> smode.get(as_string=True)
-Stored Beam
->>> print smode.enum_strs
-('State Unknown', 'NO BEAM', 'Injecting', 'Stored Beam', 'Delivered Beam', 'MAINTENANCE')
-
-
-Getting a character waveform PV as a string
-
->>> d = epics.PV('13BMD:edb:dir')
->>> d
-<PV '13BMD:edb:dir', count=128, type=char, access=read/write>
->>> d.type, d.count
-('char', 128)
->>> d.get()
-array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 101, 114,  92,  74,
-       117, 110, 101,  50,  48,  49,  48,  92,  68,  97, 114, 103,  97,
-       117, 100,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0])
->>> d.get(as_string=True)
-'T:\\xas_user\\June2010\\Dargaud'
-
-
+ 
 Example of put
 ~~~~~~~~~~~~~~~~
 
