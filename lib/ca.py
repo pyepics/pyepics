@@ -87,7 +87,7 @@ AUTOMONITOR_MAXLENGTH = 16384
 ## default timeout for connection
 #   This should be kept fairly short --
 #   as connection will be tried repeatedly
-DEFAULT_CONNECTION_TIMEOUT = 5.0
+DEFAULT_CONNECTION_TIMEOUT = 2.0
 
 ## Cache of existing channel IDs:
 #  pvname: {'chid':chid, 'conn': isConnected,
