@@ -1,7 +1,7 @@
 
-==============================
-EPICS Channel Access in Python 
-==============================
+============================================
+Overview of EPICS Channel Access in Python 
+============================================
 
 The epics python package consists of several modules to interact with
 EPICS.  The simplest approach uses the functions :func:`caget`,
@@ -47,6 +47,50 @@ set of wxPython widget classes for using EPICS PVs with wxPython.
 
 The `epics` package is targeted for use on Unix-like systems (including
 Linux and Mac OS X) and Windows with Python versions 2.5, 2.6, and 3.1.
+
+
+Quick Start
+==============
+
+If you're somewhat familiar with Epics Channel Access, you may be able to
+get started right away.
+
+
+Functional Approach: caget, caput
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To get values from PVs, you can simply use the :func:`caget` function:
+
+   >>> from epics import caget, caput
+   >>> m1 = caget('XXX:m1.VAL')
+   >>> print m1
+   1.2001
+
+To set PV values, you can simply use the :func:`caput` function:
+
+   >>> caput('XXX:m1.VAL', 1.90)
+   >>> print caget('XXX:m1.VAL')
+   1.9000
+
+
+
+Object Oriented Approach: PV
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to repeatedly access the same PV, you may find it more
+convenient to ''create a PV'' and use it as a Python object:
+  
+   >>> from epics import PV
+   >>> pv1 = PV('XXX:m1.VAL')
+   >>> print pv1.value
+   1.2001
+   
+To set a PV's value,  you can simply say
+
+   >>> pv1.put(1.9000)
+
+PV objects have several methods and attributes and are more fully 
+documented at :ref:`pv-label`
 
 
 Functions defined in :mod:`epics`: caget(), caput() and related functions
@@ -307,9 +351,3 @@ There are several desired features are left undone or unfinished:
      - config file per instrument to allow loading a saved
        instrument definition, with saved positions
      - tabbed/notebook interface for multiple instruments.
-
-License
-============
-
-The Epics3 package is distributed under a variation of the  `Epics Open License.
-<http://cars9.uchicago.edu/software/python/pyepics3/license.txt>`_.

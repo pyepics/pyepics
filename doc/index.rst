@@ -1,40 +1,38 @@
 .. epics documentation master file, 
 
 
-Documentation for Python Epics module
+Epics Channel Access for Python
 =====================================
 
-Epics is a Python package for the Channel Access (CA) library of the EPICS
-control system.  This package provides simple methods for reading and
-writing to Epics Process Variables via the CA protocol. 
+The Epics Python module is an interface for the Channel Access (CA) library
+of the EPICS control system to the Python Programming language.  
 
-The Epics package consists of a fairly complete and *thin* interface to the
-low-level CA library in the :mod:`ca` module that is base of all other
-functionality.  The :mod:`PV` class provides a high-level `PV` object for
-an object-oriented approach.  There is a very simple, functional approach
-to CA similar to EZCA and the Unix command-line tools.  In addition, there
-are classes for an epics :mod:`Device`, epics :mod:`Motor`, :mod:`Alarm`,
-and special code for wxPython widgets.
+The python epics package provides methods for reading from and writing to
+Epics Process Variables via the CA protocol.  The package includes a
+complete, thin layer over the low-level Channel Access library in the
+:mod:`ca` module, and a few higher-level abstractions built on top of this
+basic functionality.  The :mod:`PV` class provides a `PV` object for an
+object-oriented approach, and there is also a simple functional approach to
+CA similar to EZCA and the Unix command-line tools `caget`, `caput`,
+`cainfo`, and `camonitor`.  In addition, there are classes for an epics
+:mod:`Device`, epics :mod:`Motor`, :mod:`Alarm`, and special code for
+wxPython widgets.
 
-For download, see  `PyEpics3 Home Page
-<http://cars9.uchicago.edu/software/python/pyepics3/>`_.
-
-This documentation is also available in  `PDF Format
-<http://cars9.uchicago.edu/software/python/pyepics3/pyepics3.pdf>`_.
-
+This documentation is also available in  
+`PDF Format <http://cars9.uchicago.edu/software/python/pyepics3/pyepics3.pdf>`_.
 
 Contents:
 
 .. toctree::
    :maxdepth: 3
 
+   installation
    overview
    pv
    ca
    advanced
    devices
    wx
-   installation
    
 Indices and tables
 ~~~~~~~~~~~~~~~~~~~~~~

@@ -256,11 +256,14 @@ def withCA(fcn):
     argument are  NOT wrapped by this: to get a chid, the
     library must have been initialized already."""
     def wrapper(*args, **kw):
-        "withCA wraper"
+        "withCA wrapper"
         global libca
         if libca is None:
             libca = initialize_libca()
         return fcn(*args, **kw)
+    wrapper.__doc__ = fcn.__doc__
+    wrapper.__name__ = fcn.__name__
+    wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
 def withCHID(fcn):
@@ -279,6 +282,9 @@ def withCHID(fcn):
                 raise ChannelAccessException(fcn.__name__,
                                              "not a valid chid!")
         return fcn(*args, **kw)
+    wrapper.__doc__ = fcn.__doc__
+    wrapper.__name__ = fcn.__name__
+    wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
 
@@ -293,7 +299,7 @@ def withConnectedCHID(fcn):
                 raise ChannelAccessException(fcn.__name__,
                                              "not a valid chid!")
             try:
-                mystate = state(args[0])
+                  mystate = state(args[0])
             except:
                 mystate = None
 
@@ -308,6 +314,9 @@ def withConnectedCHID(fcn):
                 raise ChannelAccessException(fcn.__name__,
                                              "channel cannot connect")
         return fcn(*args, **kw)
+    wrapper.__doc__ = fcn.__doc__
+    wrapper.__name__ = fcn.__name__
+    wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
 def PySEVCHK(func_name, status, expected=dbr.ECA_NORMAL):
@@ -326,10 +335,13 @@ def withSEVCHK(fcn):
         "withSEVCHK wrapper"
         status = fcn(*args, **kw)
         return PySEVCHK( fcn.__name__, status)
+    wrapper.__doc__ = fcn.__doc__
+    wrapper.__name__ = fcn.__name__
+    wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
 ###
-#
+# 
 # Now we're ready to wrap libca functions
 #
 ###

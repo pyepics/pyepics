@@ -528,7 +528,7 @@ class Motor(device.Device):
         kw_args['motor_field'] = attr
         if kw is not None:
             kw_args.update(kw)
-        print 'Hello ', attr, self.get_pv(attr), kw_args
+        # print 'Hello ', attr, self.get_pv(attr), kw_args
         index = self.get_pv(attr).add_callback(callback=callback,**kw_args)
         self._callbacks[attr] = index
 
