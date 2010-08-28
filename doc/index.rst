@@ -3,10 +3,10 @@
 Epics Channel Access for Python
 =====================================
 
-The Epics Python module is an interface for the Channel Access (CA) library
-of the EPICS control system to the Python Programming language.  
+The Epics Python package is an interface for the Channel Access (CA) library
+of the Epics control system to the Python Programming language.  
 
-The python epics package provides methods for reading from and writing to
+The epics package provides methods for reading from and writing to
 Epics Process Variables via the CA protocol.  The package includes a
 complete, thin layer over the low-level Channel Access library in the
 :mod:`ca` module, and a few higher-level abstractions built on top of this
