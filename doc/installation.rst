@@ -25,16 +25,18 @@ Downloads
 
 There are a few ways to get the Epics Python Package:
 
-=========================== ===============================================================================================================
-  **Download Option**            Location
---------------------------- ---------------------------------------------------------------------------------------------------------------
-  **Source Kit**             `epics-3.0.7.tar.gz <http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.tar.gz>`_             
---------------------------- ---------------------------------------------------------------------------------------------------------------
-  **Windows Installers**     `epics-3.0.7 for Python 2.6 <http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.win32-py2.6.exe>`_   or  `epics-3.0.7 for Python 3.1 <http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.win32-py3.1.exe>`_ 
---------------------------- ---------------------------------------------------------------------------------------------------------------
-  **Development Version**    http://github.com/newville/pyepics  or use
-                              `git clone https://newville@github.com/newville/pyepics.git`
-=========================== ===============================================================================================================
+
+================================= ======================================
+  **Download Option**                  Location
+--------------------------------- --------------------------------------
+  **Source Kit**                       http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.tar.gz
+--------------------------------- --------------------------------------
+  **Windows Installers**               http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.win32-py2.6.exe 
+                                       http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.win32-py3.1.exe
+--------------------------------- --------------------------------------
+  **Development Version**              http://github.com/newville/pyepics    use             
+                                          `git clone https://newville@github.com/newville/pyepics.git`
+================================= ======================================
 
 All current development is done through the github repository above. For older source kits and Windows Binaries, browse the `Python Epics Source Tree <http://cars9.uchicago.edu/software/python/pyepics3/src/>`_
 
