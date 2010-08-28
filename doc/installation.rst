@@ -23,27 +23,20 @@ LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 Downloads
 ~~~~~~~~~~~~
 
-Source Kits and Windows Binaries for older versions are at the `Python Epics
-Source Tree <http://cars9.uchicago.edu/software/python/pyepics3/src/>`_
+There are a few ways to get the Epics Python Package:
 
-**Windows Installers**
+=========================== ===============================================================================================================
+  **Download Option**            Location
+--------------------------- ---------------------------------------------------------------------------------------------------------------
+  **Source Kit**             `epics-3.0.7.tar.gz <http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.tar.gz>`_             
+--------------------------- ---------------------------------------------------------------------------------------------------------------
+  **Windows Installers**     `epics-3.0.7 for Python 2.6 <http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.win32-py2.6.exe>`_   or  `epics-3.0.7 for Python 3.1 <http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.win32-py3.1.exe>`_ 
+--------------------------- ---------------------------------------------------------------------------------------------------------------
+  **Development Version**    http://github.com/newville/pyepics  or use
+                              `git clone https://newville@github.com/newville/pyepics.git`
+=========================== ===============================================================================================================
 
-Binary installers for Windows are available:
-
-`epics-3.0.7-py2.6.exe
-<http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.win32-py2.6.exe>`_
-for Python 2.6, and 
-`epics-3.0.7-py3.1.exe
-<http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.win32-py3.1.exe>`_
-for Python 3.1.
-
-
-**Source Kit**
-
-The latest source kit is at  `epics-3.0.7.tar.gz
-<http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.tar.gz>`_
-
-
+All current development is done through the github repository above. For older source kits and Windows Binaries, browse the `Python Epics Source Tree <http://cars9.uchicago.edu/software/python/pyepics3/src/>`_
 
 Installation
 ~~~~~~~~~~~~~~
@@ -51,8 +44,6 @@ Installation
 Installation from source on any platform is::
 
    python setup.py install
-
-For Windows, binary installers will be available. 
 
 For more details, especially about how to set paths for LD_LIBRARY_PATH or
 DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.
