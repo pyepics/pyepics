@@ -5,9 +5,11 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-<<<<<<< HEAD
-This package requires Python version 2.5, 2.6, or 3.1.  Later versions
-(Say, 2.7) should work, but have not been tested yet.
+
+This package requires Python version 2.5, 2.6, or 3.1.  I believe that
+Python 2.7 will work, but this has yet not tested.  It is possible that
+Python 2.4 will work if the ctypes package is installed, but this has not
+been tested.
 
 In addtion, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
@@ -19,9 +21,9 @@ use the modules.  For Unix-like systems, these are assumed to be available
 LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 
 Downloads
-~~~~~~~~~
+~~~~~~~~~~~~
 
-Source Kits and Windows Binaries for older versions are at the `Py Epics
+Source Kits and Windows Binaries for older versions are at the `Python Epics
 Source Tree <http://cars9.uchicago.edu/software/python/pyepics3/src/>`_
 
 **Windows Installers**
@@ -37,12 +39,6 @@ for Python 3.1.
 
 
 **Source Kit**
-=======
-This package requires Python version 2.5, 2.6, or 3.1.  I believe that
-Python 2.7 will work, but this has yet not tested.  It is possible that
-Python 2.4 will work if the ctypes packa is installed, but this has not
-been tested.
->>>>>>> ce5dd90d0af58b145f12818eced4857d3f21b908
 
 The latest source kit is at  `epics-3.0.7.tar.gz
 <http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.tar.gz>`_
