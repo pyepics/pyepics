@@ -565,8 +565,8 @@ Or (equivalently):
 
 The :attr:`value` attribute is the only attribute that can be set.
 
-Example of put-with-wait
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Example of put with wait
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some EPICS records take a significant amount of time to fully process.  And
 sometimes you want to wait until the processing completes before going on::
@@ -613,9 +613,10 @@ A simple example of this would be::
         time.sleep(1.e-4)
     print 'Done.'
 
-This first defines a *callback function* and then simply waits for
-changes to happen.
-
+This first defines a *callback function* called `onChanges()` and then
+simply waits for changes to happen.  Note that the callback function should
+take keyword arguments, and generally use `**kw` to catch all arguments.
+See :ref:`pv-callbacks-label` for more details.
 
 Example of connection callback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

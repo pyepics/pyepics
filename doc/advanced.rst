@@ -40,17 +40,17 @@ obvious.  The Python :mod:`epics.ca` module defines a variable
 the default value of 16384, controls both behaviors:
 
  * arrays of size for which PVs are automatically monitored.  That is,
-   arrays with few elements than :data:`AUTOMONITOR_MAXLENGTH` will be
-   automatically monitored.  In any case,  the auto-monitoring of PVs can
+   arrays with fewer elements than :data:`AUTOMONITOR_MAXLENGTH` will be
+   automatically monitored. In any case,  the auto-monitoring of PVs can
    be explicitly set with  
 
    >>> pv2 = epics.PV('ScalerPV', auto_monitor=True)
    >>> pv1 = epics.PV('LargeArrayPV', auto_monitor=False)
 
  * array size for automatic conversion of data to numpy arrays.  That is,
-   arrays with few elements than :data:`AUTOMONITOR_MAXLENGTH` will be
-   automatically converted to numpy arrays (if appropriate). 
-   In any case,  this conversion can be overridden, with
+   arrays with fewer elements than :data:`AUTOMONITOR_MAXLENGTH` will be
+   automatically converted to numpy arrays (if appropriate).  In any case,
+   this conversion can be overridden, with
 
    >>> chid = epics.ca.create_channel('SimplePV')
    >>> val1 = epics.ca.get(chid,  as_numpy = False)
@@ -108,22 +108,37 @@ Example using Character Waveforms as Long Strings
 
 As EPICS strings can be only 40 characters long, Character Waveforms are
 sometimes used to allow Long Strings.  Let's say you've created a character
-waveform PV, as with this EPICS database:
+waveform PV, as with this EPICS database::
    
-   {{{ grecord....
-   }}}
+     grecord(waveform,"$(P):filename")  {
+             field(DTYP,"Soft Channel")
+             field(DESC,"file name")
+             field(NELM,"128")
+             field(FTVL,"CHAR")
+     }
   
 You can then use this with:
 
    >>> import epics
-   >>> pvname = 'CharArrayPV.VAL'
+   >>> pvname = 'PREFIX:filename.VAL'
    >>> pv  = epics.PV(pvname)
    >>> print pv.info
    .... 
    >>> plain_val = pv.get()
-   >>> print plan_val
+   >>> print plain_val
+   array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 101, 114,  92,  77,
+        97, 114,  99, 104,  50,  48,  49,  48,  92,  70,  97, 115, 116,
+        77,  97, 112,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0])
    >>> char_val = pv.get(as_string=True)
    >>> print char_val
+   'T:\\xas_user\\March2010\\FastMap'
 
 
 This example uses PV objects, but the :meth:`get` method of :mod:`ca` is
@@ -237,8 +252,7 @@ necessary.  The output from this will look like::
     Done with Thread  B
     Done
     
-    
-Note that while both threads *A*  and *B* are running. a callback for
+Note that while both threads *A*  and *B* are running, a callback for
 the PV `S:SRcurrentAI.VAL` is generated in each thread.
 
 Note also that the callbacks for the PVs created in each thread are

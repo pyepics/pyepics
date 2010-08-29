@@ -142,7 +142,10 @@ CHAR waveforms when 'long strings' are desired::
     >>> from epics import caget, caput, cainfo
     >>> print caget('XXX:m1.VAL')
     1.200
-   >>> print caget('XXX:dir')                                                                                                          
+    >>> print caget('XXX:m1.DESC')  
+    'Motor 1'                                                                                                        
+  
+    >>> print caget('XXX:dir')  
    array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 101, 114,  92,  77,
         97, 114,  99, 104,  50,  48,  49,  48,  92,  70,  97, 115, 116,
         77,  97, 112,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,

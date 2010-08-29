@@ -83,7 +83,7 @@ def caget(pvname, as_string=False):
         thispv.get_ctrlvars()
         ca.poll()
         if as_string:
-            return thispv.char_value
+            return thispv.get(as_string=True)
         return val
 
 def cainfo(pvname, print_out=True):
