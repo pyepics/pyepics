@@ -80,9 +80,10 @@ def caget(pvname, as_string=False):
     thispv = __createPV(pvname)
     if thispv is not None:
         val = thispv.get()
-        thispv.get_ctrlvars()
         ca.poll()
         if as_string:
+            thispv.get_ctrlvars()
+            ca.poll(evt=1.e-3, iot=1.0)
             return thispv.get(as_string=True)
         return val
 

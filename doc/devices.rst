@@ -84,7 +84,6 @@ epics Device.
 Epics Motor Device
 ===========================
 
-
 .. module:: motor
 
 The Epics Motor record has over 100 fields associated with it.  Of course,
@@ -154,58 +153,98 @@ record is given in :ref:`Table of Motor Attributes <motorattr_table>`.
    Table of Attributes for the epics class:`Motor` class, and the
    corresponding field to the Epics Motor Record.
 
-    -------------------- -------------------------- -------------------- --------------------------
-     *attribute*           *Motor Record field*      *attribute*           *Motor Record field*
-    -------------------- -------------------------- -------------------- --------------------------
-     enabled                 _able.VAL                moving                  .MOVN   
-     acceleration            .ACCL                    resolution              .MRES   
-     back_accel              .BACC                    motor_status            .MSTA   
-     backlash                .BDST                    offset                  .OFF    
-     back_speed              .BVEL                    output_mode             .OMSL   
-     card                    .CARD                    output                  .OUT    
-     dial_high_limit         .DHLM                    prop_gain               .PCOF   
-     direction               .DIR                     precision               .PREC   
-     dial_low_limit          .DLLM                    readback                .RBV    
-     settle_time             .DLY                     retry_max               .RTRY   
-     done_moving             .DMOV                    retry_count             .RCNT   
-     dial_readback           .DRBV                    retry_deadband          .RDBD   
-     description             .DESC                    dial_difference         .RDIF   
-     dial_drive              .DVAL                    raw_encoder_pos         .REP    
-     units                   .EGU                     raw_high_limit          .RHLS   
-     encoder_step            .ERES                    raw_low_limit           .RLLS   
-     freeze_offset           .FOFF                    relative_value          .RLV    
-     move_fraction           .FRAC                    raw_motor_pos           .RMP    
-     hi_severity             .HHSV                    raw_readback            .RRBV   
-     hi_alarm                .HIGH                    readback_res            .RRES   
-     hihi_alarm              .HIHI                    raw_drive               .RVAL   
-     high_limit              .HLM                     dial_speed              .RVEL   
-     high_limit_set          .HLS                     s_speed                 .S      
-     hw_limit                .HLSV                    s_back_speed            .SBAK   
-     home_forward            .HOMF                    s_base_speed            .SBAS   
-     home_reverse            .HOMR                    s_max_speed             .SMAX   
-     high_op_range           .HOPR                    set                     .SET    
-     high_severity           .HSV                     stop_go                 .SPMG   
-     integral_gain           .ICOF                    s_revolutions           .SREV   
-     jog_accel               .JAR                     stop                    .STOP   
-     jog_forward             .JOGF                    t_direction             .TDIR   
-     jog_reverse             .JOGR                    tweak_forward           .TWF    
-     jog_speed               .JVEL                    tweak_reverse           .TWR    
-     last_dial_val           .LDVL                    tweak_val               .TWV    
-     low_limit               .LLM                     use_encoder             .UEIP   
-     low_limit_set           .LLS                     u_revolutions           .UREV   
-     lo_severity             .LLSV                    use_rdbl                .URIP   
-     lolo_alarm              .LOLO                    drive                   .VAL    
-     low_op_range            .LOPR                    base_speed              .VBAS   
-     low_alarm               .LOW                     slew_speed              .VELO   
-     last_rel_val            .LRLV                    version                 .VERS   
-     last_dial_drive         .LRVL                    max_speed               .VMAX   
-     last_SPMG               .LSPG                    use_home                .ATHM   
-     low_severity            .LSV                     deriv_gain              .DCOF   
-     last_drive              .LVAL                    use_torque              .CNEN   
-     soft_limit              .LVIO                    device_type             .DTYP   
-     in_progress             .MIP                     record_type             .RTYP   
-     missed                  .MISS                    status                  .STAT   
-    -------------------- -------------------------- -------------------- --------------------------
+
++--------------------+--------------------------+---+--------------------+--------------------------+
+| **attribute**      |  *Motor Record field*    |   |  **attribute**     | *Motor Record field*     |
++====================+==========================+===+====================+==========================+
+| enabled            |     _able.VAL            |   |   moving           |      .MOVN               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| acceleration       |     .ACCL                |   |   resolution       |      .MRES               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| back_accel         |     .BACC                |   |   motor_status     |      .MSTA               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| backlash           |     .BDST                |   |   offset           |      .OFF                |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| back_speed         |     .BVEL                |   |   output_mode      |      .OMSL               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| card               |     .CARD                |   |   output           |      .OUT                |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| dial_high_limit    |     .DHLM                |   |   prop_gain        |      .PCOF               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| direction          |     .DIR                 |   |   precision        |      .PREC               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| dial_low_limit     |     .DLLM                |   |   readback         |      .RBV                |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| settle_time        |     .DLY                 |   |   retry_max        |      .RTRY               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| done_moving        |     .DMOV                |   |   retry_count      |      .RCNT               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| dial_readback      |     .DRBV                |   |   retry_deadband   |      .RDBD               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| description        |     .DESC                |   |   dial_difference  |      .RDIF               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| dial_drive         |     .DVAL                |   |   raw_encoder_pos  |      .REP                |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| units              |     .EGU                 |   |   raw_high_limit   |      .RHLS               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| encoder_step       |     .ERES                |   |   raw_low_limit    |      .RLLS               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| freeze_offset      |     .FOFF                |   |   relative_value   |      .RLV                |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| move_fraction      |     .FRAC                |   |   raw_motor_pos    |      .RMP                |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| hi_severity        |     .HHSV                |   |   raw_readback     |      .RRBV               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| hi_alarm           |     .HIGH                |   |   readback_res     |      .RRES               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| hihi_alarm         |     .HIHI                |   |   raw_drive        |      .RVAL               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| high_limit         |     .HLM                 |   |   dial_speed       |      .RVEL               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| high_limit_set     |     .HLS                 |   |   s_speed          |      .S                  |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| hw_limit           |     .HLSV                |   |   s_back_speed     |      .SBAK               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| home_forward       |     .HOMF                |   |   s_base_speed     |      .SBAS               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| home_reverse       |     .HOMR                |   |   s_max_speed      |      .SMAX               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| high_op_range      |     .HOPR                |   |   set              |      .SET                |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| high_severity      |     .HSV                 |   |   stop_go          |      .SPMG               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| integral_gain      |     .ICOF                |   |   s_revolutions    |      .SREV               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| jog_accel          |     .JAR                 |   |   stop             |      .STOP               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| jog_forward        |     .JOGF                |   |   t_direction      |      .TDIR               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| jog_reverse        |     .JOGR                |   |   tweak_forward    |      .TWF                |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| jog_speed          |     .JVEL                |   |   tweak_reverse    |      .TWR                |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| last_dial_val      |     .LDVL                |   |   tweak_val        |      .TWV                |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| low_limit          |     .LLM                 |   |   use_encoder      |      .UEIP               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| low_limit_set      |     .LLS                 |   |   u_revolutions    |      .UREV               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| lo_severity        |     .LLSV                |   |   use_rdbl         |      .URIP               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| lolo_alarm         |     .LOLO                |   |   drive            |      .VAL                |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| low_op_range       |     .LOPR                |   |   base_speed       |      .VBAS               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| low_alarm          |     .LOW                 |   |   slew_speed       |      .VELO               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| last_rel_val       |     .LRLV                |   |   version          |      .VERS               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| last_dial_drive    |     .LRVL                |   |   max_speed        |      .VMAX               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| last_SPMG          |     .LSPG                |   |   use_home         |      .ATHM               |
++--------------------+--------------------------+---+--------------------+--------------------------+
+| low_severity       |     .LSV                 |   |   deriv_gain       |      .DCOF               |
++--------------------+--------------------------+---+--------------------+--------------------------+
 
 
 methods for :class:`epics.Motor`
@@ -326,11 +365,16 @@ attribute cannot do so::
 
 .. method:: set_callback(attr='drive'[, callback=None[, kw=None]])
 
+   sets a callback on the `PV` for a particular attribute. 
+
 .. method:: clear_callback(attr='drive')
+
+   clears a callback on the `PV` for a particular attribute.
 
 .. method:: show_info()
 
-
+   prints out a table of attributes and their current values.
+ 
 
 
 Other Device Examples
@@ -391,7 +435,7 @@ prefix, and use methods like :meth:`Count` and :meth:`Read` without
 directly invoking epics calls::
 
    s1 = Scaler('XXX:scaler1')
-   s1.setCalc(2, '(C+B-A/1.e5)')
+   s1.setCalc(2, '(B-2000*A/10000000.)')
    s1.enableCalcs()
    s1.OneShotMode()
    s1.Count(t=5.0)

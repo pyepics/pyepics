@@ -415,8 +415,8 @@ def pend_io(timeout=1.0):
     except CASeverityException:
         return ret
 
-@withCA
-def pend_event(timeout=1.e-5):
+## @withCA
+def pend_event(timeout=1.e-4):
     """polls CA for events """    
     fcn = libca.ca_pend_event
     fcn.argtypes = [ctypes.c_double]
@@ -424,7 +424,7 @@ def pend_event(timeout=1.e-5):
     return PySEVCHK( 'pend_event', ret,  dbr.ECA_TIMEOUT)
 
 @withCA
-def poll(evt=1.e-4, iot=10.0):
+def poll(evt=1.e-4, iot=1.0):
     """polls CA for events and i/o. """
     pend_event(evt)
     return pend_io(iot)    
@@ -473,7 +473,6 @@ def create_channel(pvname, connect=False, userfcn=None):
     if connect:
         connect_channel(chid)
     poll()
-    time.sleep(1.e-5)
     return chid
 
 @withCHID
@@ -794,7 +793,6 @@ def get_timestamp(chid):
 
 def get_severity(chid):
     """return the severity of a Channel."""
-    return get_timevars(chid).get('severity', 0)
 
 def get_precision(chid):
     """return the precision of a Channel.  For Channels with
@@ -892,7 +890,6 @@ def _onConnectionEvent(args):
         entry  = {'chid':args.chid, 'conn':False,
                   'ts':0, 'failures':0}
 
-    # print 'Conn Event ', pvname, entry
     entry['conn'] = (args.op == dbr.OP_CONN_UP)
     entry['ts']   = time.time()
     entry['failures'] = 0
@@ -902,7 +899,7 @@ def _onConnectionEvent(args):
             entry['userfcn'](pvname=pvname, chid=entry['chid'],
                              conn=entry['conn'])
         except:
-            time.sleep(1.e-3)
+            time.sleep(1.e-4)
             try:
                 entry['userfcn'](pvname=pvname, chid=entry['chid'],
                                  conn=entry['conn'])

@@ -63,7 +63,7 @@ class PV(object):
         self._args['access'] = 'unknown'
         self.connection_callback = connection_callback
         self.callbacks  = {}
-
+        self._conn_timeout = 2.0
         self._monref = None  # holder of data returned from create_subscription
         self.chid = None
 
@@ -112,10 +112,13 @@ class PV(object):
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
         return
 
-    def connect(self, timeout=5.0, force=True):
+    def connect(self, timeout=None, force=True):
         "check that a PV is connected, forcing a connection if needed"
         if not self.connected:
-            ca.connect_channel(self.chid, timeout=timeout, force=force)
+            if timeout is not None:
+                self._conn_timeout = timeout            
+            ca.connect_channel(self.chid,
+                               timeout=self._conn_timeout, force=force)
             self.poll()
         # should be only be called 1st time, to subscribe
         # and set self._monref
@@ -159,7 +162,7 @@ class PV(object):
         self._args['value'] = ca.get(self.chid,
                                      ftype=self.ftype,
                                      as_numpy=as_numpy)
-        self.poll() 
+        # self.poll() 
         field = 'value'
         if as_string:
             self._set_charval(self._args['value'])

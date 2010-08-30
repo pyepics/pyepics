@@ -756,7 +756,66 @@ Here we set a PVs value, waiting for it to complete::
 The  :meth:`put` method will wait to return until the processing is
 complete.
 
-Define callback
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Define a callback to Subscribe to Changes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Here, we *subscribe to changes* for a PV, which is to say we define a
+callback function to be called whenever the PV value changes.   In the case
+below, the function to be called will simply write the latest value out to
+standard output::
+
+    from epics import ca
+    import time
+    import sys
+
+    # define a callback function.  Note that this should 
+    # expect certain keyword arguments, including 'pvname' and 'value'
+    def onChanges(pvname=None, value=None, **kw):
+        sys.stdout.write('New Value: %s  value=%s, kw=%s\n' %( pvname, str(value), repr(kw)))
+        sys.stdout.flush()
+    
+    # create the channel 
+    mypv = 'XXX.VAL'
+    chid = ca.create_channel(mypv)
+    
+    # subscribe to events, giving 'userfcn' as the callback function
+    eventID = ca.create_subscription(chid, userfcn=onChanges)
+
+    # now we simply wait for changes
+    t0 = time.time()
+    while time.time()-t0 < 10.0:
+        time.sleep(0.001)
+
+It is **vital** that the return value from :meth:`create_subscription` is
+kept in a variable so that it cannot be garbage collected.  Failure to keep
+this value will cause trouble, inlcuding almost immediate segmentation
+faults (on Windows) or seemingly inexplicable crashes later (on linux).
+
+Define a connection callback 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Here, we define a connection callback -- a function to be called when the
+connection status of the PV changes. Note that this will be called on
+initial connection::
+
+    import epics
+    import time
+
+    def onConnectionChange(pvname=None,  **kw):
+        print 'ca connection status changed:  ', pvname,  kw
+
+    # create channel, provide connection callback
+    motor1 = '13IDC:m1'
+    chid = epics.ca.create_channel(motor1, userfcn=onConnectionChange)
+
+    print 'Now waiting, watching values and connection changes:'
+    t0 = time.time()
+    while time.time()-t0 < 30:
+        time.sleep(0.001)
+
+This will run the supplied callback soon after the channel has been
+created, when a successful connection has been made.  Note that the
+callback should be prepared to accept keyword arguments and that the `**kw`
+form is recommended. 
 

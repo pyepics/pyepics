@@ -33,6 +33,3 @@ def testDial(motorname,start, step, npts, offset=1.0):
 # test1('13XRM:m1', 0, 0.10, 10)
 # test1('13XRM:m1', 2, -0.05, 20)
 testDial('13XRM:m2', 0.30, 0.01, 10, offset=0.25)
-
-
-
