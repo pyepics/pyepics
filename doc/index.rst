@@ -18,10 +18,12 @@ CA similar to EZCA and the Unix command-line tools `caget`, `caput`,
 wxPython widgets.
 
 
+Sections:     installation  ,   overview,   pv,   ca, advanced,    devices,    wx
+
 Contents:
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    installation  
    overview
@@ -30,6 +32,7 @@ Contents:
    advanced
    devices
    wx
+
    
 Indices and tables
 ~~~~~~~~~~~~~~~~~~~~~~

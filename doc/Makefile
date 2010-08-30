@@ -16,7 +16,7 @@ PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html dirhtml pickle json htmlhelp qthelp latex changes linkcheck doctest
+.PHONY: help clean html dirhtml pickle json htmlhelp qthelp latex changes linkcheck doctest latexpdf
 .PHONY: all install
 
 html:
@@ -89,11 +89,17 @@ qthelp:
 	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/epics.qhc"
 
 latex:
-	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
+	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) _build/latex
 	@echo
-	@echo "Build finished; the LaTeX files are in $(BUILDDIR)/latex."
+	@echo "Build finished; the LaTeX files are in _build/latex."
 	@echo "Run \`make all-pdf' or \`make all-ps' in that directory to" \
 	      "run these through (pdf)latex."
+
+latexpdf:
+	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) _build/latex
+	@echo "Running LaTeX files through pdflatex..."
+	make -C _build/latex all-pdf
+	@echo "pdflatex finished; the PDF files are in _build/latex."
 
 changes:
 	$(SPHINXBUILD) -b changes $(ALLSPHINXOPTS) $(BUILDDIR)/changes

@@ -15,7 +15,7 @@ object for an EPICS Process Variable.  A `PV` object has both methods and
 attributes for accessing it's properties.
 
 
-The class:`PV` class
+The :class:`PV` class
 =======================
 
 .. class:: PV(pvname[, callback=None[, connection_callback=None, [form='native'[, auto_monitor=None[, verbose=False]]]]])

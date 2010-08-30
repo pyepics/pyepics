@@ -96,7 +96,7 @@ PV objects have several methods and attributes and are more fully
 documented at :ref:`pv-label`
 
 
-Functions defined in :mod:`epics`: caget(), caput() and related functions
+Functions defined in :mod:`epics`: caget(), caput(), etc.
 =========================================================================
 
 .. module:: epics

@@ -8,7 +8,7 @@ class ai(epics.Device):
                'EGUF','EGUL','AOFF','ASLO','ESLO','EOFF',
                'SMOO', 'HIHI','LOLO','HIGH','LOW','HHSV',
                'LLSV','HSV','LSV','HYST')
-    def __init__(self,prefix):
-        if not prefix.endswith('.'): prefix = "%s." % prefix
-        epics.Device.__init__(self,prefix,self._fields)
-
+    def __init__(self, prefix):
+        if not prefix.endswith('.'):
+            prefix = "%s." % prefix
+        epics.Device.__init__(self, prefix, self._fields)

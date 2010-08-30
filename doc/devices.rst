@@ -19,8 +19,8 @@ several different records.::
 
     motor1 = epics.Device('XXX:motor1.', attr=('VAL', 'RBV', 'DESC', 'RVAL',
                                                'LVIO', 'HLS', 'LLS'))
-    motor1.put('VAL',1)
-    print 'Motor %s = %f' % ( mymotor1.get('DESC'),  mymotor1.get('RBV'))
+    motor1.put('VAL', 1)
+    print 'Motor %s = %f' % ( mymotor1.get('DESC'), mymotor1.get('RBV'))
 
 While useful on its own like this, the real point of a *device* is as a
 base class, to be inherited and extended.  In fact, there is a more
@@ -89,13 +89,15 @@ Epics Motor Device
 
 The Epics Motor record has over 100 fields associated with it.  Of course,
 it is often preferrable to think of 1 Motor with many attributes than 100
-or so separate PVs.  In addition, while there are many interrelated fields
-of the Motor record, the user typically just wants to move the motor by
-setting its drive position.  Of course, there are limits on the range of
-motion that need to be respected and notifications sent when they are
-violated.  Thus, there is a fair amount of functionality for a Motor.
+or so separate PVs.  Many of the fields of the Motor record are
+interrelated and influence other settings, including limits on the range of
+motion which need to be respected, and which may send notifications when
+they are violated.  Thus, there is a fair amount of functionality for a
+Motor.  Typically, the user just wants to move the motor by setting its
+drive position, but a fully enabled Motor should allow the use to change
+and read many of the Motor parameters.
 
-The class:`Motor` class helps you create and use Epics motors.
+The :class:`Motor` class helps the user create and use Epics motors.
 A simple example use would be::
 
     import epics
@@ -114,15 +116,13 @@ A simple example use would be::
 Which will step the motor through a set of positions.    You'll notice a
 few features for Motor:
 
-1.  Motors use english-name attributes for fields of the motor record.  Thus '.VAL' becomes 'drive' and '.DESC' becomes  description. 
+ 1.  Motors use english-name attributes for fields of the motor record.  Thus '.VAL' becomes 'drive' and '.DESC' becomes  description. 
 
-2.  The methods for setting positions can use the User, Dial, or Step coordinate system, and can wait for completion.
+ 2.  The methods for setting positions can use the User, Dial, or Step coordinate system, and can wait for completion.
 
 
-
-The `epics.Motor` class
+The :class:`epics.Motor` class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 .. class:: Motor(pvname[, timeout=30.])
 
@@ -147,118 +147,69 @@ A Motor has very many fields.  Only a few of them are created on
 initialization -- the rest are retrieved as needed.  The motor fields can
 be retrieved either with an attribute or with the :meth:`get_field` method.
 A full list of Motor attributes and their mapping to fields from the motor
-record is given in :ref:`Table of Motorl Attributes <motorattr_table>`.
+record is given in :ref:`Table of Motor Attributes <motorattr_table>`.
 
 .. _motorattr_table: 
 
    Table of Attributes for the epics class:`Motor` class, and the
    corresponding field to the Epics Motor Record.
 
-    ==================== ==============================
-     *attribute*           *Epics Motor Record field*
-    ==================== ==============================
-     enabled                 _able.VAL               
-     acceleration            .ACCL
-     back_accel              .BACC
-     backlash                .BDST
-     back_speed              .BVEL
-     card                    .CARD
-     dial_high_limit         .DHLM
-     direction               .DIR            
-     dial_low_limit          .DLLM
-     settle_time             .DLY
-     done_moving             .DMOV
-     dial_readback           .DRBV
-     description             .DESC
-     dial_drive              .DVAL
-     units                   .EGU
-     encoder_step            .ERES
-     freeze_offset           .FOFF
-     move_fraction           .FRAC
-     hi_severity             .HHSV
-     hi_alarm                .HIGH
-     hihi_alarm              .HIHI
-     high_limit              .HLM
-     high_limit_set          .HLS
-     hw_limit                .HLSV
-     home_forward            .HOMF
-     home_reverse            .HOMR
-     high_op_range           .HOPR
-     high_severity           .HSV
-     integral_gain           .ICOF
-     jog_accel               .JAR
-     jog_forward             .JOGF
-     jog_reverse             .JOGR
-     jog_speed               .JVEL
-     last_dial_val           .LDVL
-     low_limit               .LLM
-     low_limit_set           .LLS
-     lo_severity             .LLSV
-     lolo_alarm              .LOLO
-     low_op_range            .LOPR
-     low_alarm               .LOW
-     last_rel_val            .LRLV
-     last_dial_drive         .LRVL
-     last_SPMG               .LSPG
-     low_severity            .LSV
-     last_drive              .LVAL
-     soft_limit              .LVIO
-     in_progress             .MIP
-     missed                  .MISS
-     moving                  .MOVN
-     resolution              .MRES
-     motor_status            .MSTA
-     offset                  .OFF
-     output_mode             .OMSL
-     output                  .OUT
-     prop_gain               .PCOF
-     precision               .PREC
-     readback                .RBV
-     retry_max               .RTRY
-     retry_count             .RCNT
-     retry_deadband          .RDBD
-     dial_difference         .RDIF
-     raw_encoder_pos         .REP
-     raw_high_limit          .RHLS
-     raw_low_limit           .RLLS
-     relative_value          .RLV
-     raw_motor_pos           .RMP
-     raw_readback            .RRBV
-     readback_res            .RRES
-     raw_drive               .RVAL
-     dial_speed              .RVEL
-     s_speed                 .S
-     s_back_speed            .SBAK
-     s_base_speed            .SBAS
-     s_max_speed             .SMAX
-     set                     .SET
-     stop_go                 .SPMG
-     s_revolutions           .SREV
-     stop                    .STOP
-     t_direction             .TDIR
-     tweak_forward           .TWF
-     tweak_reverse           .TWR
-     tweak_val               .TWV
-     use_encoder             .UEIP
-     u_revolutions           .UREV
-     use_rdbl                .URIP
-     drive                   .VAL   
-     base_speed              .VBAS
-     slew_speed              .VELO
-     version                 .VERS
-     max_speed               .VMAX
-     use_home                .ATHM
-     deriv_gain              .DCOF
-     use_torque              .CNEN
-     device_type             .DTYP
-     record_type             .RTYP
-     status                  .STAT
-    ==================== ==============================
+    -------------------- -------------------------- -------------------- --------------------------
+     *attribute*           *Motor Record field*      *attribute*           *Motor Record field*
+    -------------------- -------------------------- -------------------- --------------------------
+     enabled                 _able.VAL                moving                  .MOVN   
+     acceleration            .ACCL                    resolution              .MRES   
+     back_accel              .BACC                    motor_status            .MSTA   
+     backlash                .BDST                    offset                  .OFF    
+     back_speed              .BVEL                    output_mode             .OMSL   
+     card                    .CARD                    output                  .OUT    
+     dial_high_limit         .DHLM                    prop_gain               .PCOF   
+     direction               .DIR                     precision               .PREC   
+     dial_low_limit          .DLLM                    readback                .RBV    
+     settle_time             .DLY                     retry_max               .RTRY   
+     done_moving             .DMOV                    retry_count             .RCNT   
+     dial_readback           .DRBV                    retry_deadband          .RDBD   
+     description             .DESC                    dial_difference         .RDIF   
+     dial_drive              .DVAL                    raw_encoder_pos         .REP    
+     units                   .EGU                     raw_high_limit          .RHLS   
+     encoder_step            .ERES                    raw_low_limit           .RLLS   
+     freeze_offset           .FOFF                    relative_value          .RLV    
+     move_fraction           .FRAC                    raw_motor_pos           .RMP    
+     hi_severity             .HHSV                    raw_readback            .RRBV   
+     hi_alarm                .HIGH                    readback_res            .RRES   
+     hihi_alarm              .HIHI                    raw_drive               .RVAL   
+     high_limit              .HLM                     dial_speed              .RVEL   
+     high_limit_set          .HLS                     s_speed                 .S      
+     hw_limit                .HLSV                    s_back_speed            .SBAK   
+     home_forward            .HOMF                    s_base_speed            .SBAS   
+     home_reverse            .HOMR                    s_max_speed             .SMAX   
+     high_op_range           .HOPR                    set                     .SET    
+     high_severity           .HSV                     stop_go                 .SPMG   
+     integral_gain           .ICOF                    s_revolutions           .SREV   
+     jog_accel               .JAR                     stop                    .STOP   
+     jog_forward             .JOGF                    t_direction             .TDIR   
+     jog_reverse             .JOGR                    tweak_forward           .TWF    
+     jog_speed               .JVEL                    tweak_reverse           .TWR    
+     last_dial_val           .LDVL                    tweak_val               .TWV    
+     low_limit               .LLM                     use_encoder             .UEIP   
+     low_limit_set           .LLS                     u_revolutions           .UREV   
+     lo_severity             .LLSV                    use_rdbl                .URIP   
+     lolo_alarm              .LOLO                    drive                   .VAL    
+     low_op_range            .LOPR                    base_speed              .VBAS   
+     low_alarm               .LOW                     slew_speed              .VELO   
+     last_rel_val            .LRLV                    version                 .VERS   
+     last_dial_drive         .LRVL                    max_speed               .VMAX   
+     last_SPMG               .LSPG                    use_home                .ATHM   
+     low_severity            .LSV                     deriv_gain              .DCOF   
+     last_drive              .LVAL                    use_torque              .CNEN   
+     soft_limit              .LVIO                    device_type             .DTYP   
+     in_progress             .MIP                     record_type             .RTYP   
+     missed                  .MISS                    status                  .STAT   
+    -------------------- -------------------------- -------------------- --------------------------
 
 
-
-methods for  `epics.Motor`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+methods for :class:`epics.Motor`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: get_field(attr[, as_string=False])
 
@@ -385,16 +336,28 @@ attribute cannot do so::
 Other Device Examples
 ===========================
 
+As defined here, an epics device provides a general way to group together a
+set of PVs.  The examples below show how to build on this generality, and
+may inspire you to build your own device classes.
+
 Device without a prefix
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a simple device without a prefix, containing arbitrary PVs::
+Here is a simple device, that does not even define a prefix.  Thus, all PVs
+in the device must be *fully qualified*, and need not share a prefix.::
+
 
     from epics import Device
     dev = Device()
     p1 = dev.PV('13IDC:m1.VAL')
-    dev.put('13IDC:m1.VAL', 2)
+    p2 = dev.PV('13IDC:m2.VAL')
+    dev.put('13IDC:m1.VAL', 2.8)
+    dev.put('13IDC:m2.VAL', 3.0)
     print dev.PV('13IDC:m3.DIR').get(as_string=True)
+
+This demonstrates that a `Device` is simply a collection of  PVs, which
+can be accessed through :meth:`PV`.
+
 
 Epics ai record as Device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -404,20 +367,38 @@ implemented as a Device.
 
 .. literalinclude:: ../lib/devices/ai.py
 
-which can be used as::
-
+Note that we pre-define the fields that are the *suffixes* of an Epics ai
+input record, and simply subclass :class:`Device` with these fields.  This
+:class:`ai` class can then be used simply and cleanly as::
     
     This_ai = ai('XXX.PRES')
-    print This_ai.get('VAL')
+    print 'Value: ', This_ai.get('VAL')
+    print 'Units: ', This_ai.get('EGU')
 
+Several of the other standard Epics records can easily be exposed as Devices in this way.
 
 Epics Scaler Record as Device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-And now a more complicated example: an incomplete (but useful) mapping of
-the Scaler Record from synApps, including methods for changing modes,
-and reading and writing data. 
+And finally a slightly more complicated example: an incomplete, but very
+useful mapping of the Scaler Record from synApps, including methods for
+changing modes, and reading and writing data.
 
 .. literalinclude:: ../lib/devices/scaler.py
 
+Note that we can then create a :class:`scaler` object from its base PV
+prefix, and use methods like :meth:`Count` and :meth:`Read` without
+directly invoking epics calls::
 
+   s1 = Scaler('XXX:scaler1')
+   s1.setCalc(2, '(C+B-A/1.e5)')
+   s1.enableCalcs()
+   s1.OneShotMode()
+   s1.Count(t=5.0)
+   print 'Names:       ', s1.getNames()
+   print 'Raw  values: ', s1.Read(use_calcs=False) 
+   print 'Calc values: ', s1.Read(use_calcs=True) 
+
+
+
+ 
