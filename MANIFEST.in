@@ -6,3 +6,5 @@ recursive-exclude tests/Misc *
 recursive-include doc *
 recursive-exclude doc/_build *
 recursive-include dlls *
+recursive-exclude junk *
+
