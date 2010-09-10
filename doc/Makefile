@@ -33,7 +33,6 @@ all: html epics.pdf
 install: all
 	cp -pr $(BUILDDIR)/latex/epics.pdf $(INSTALLDIR)/pyepics3.pdf
 	cp -pr $(BUILDDIR)/html/* $(INSTALLDIR)/.
-	cp -pr $(BUILDDIR)/html/* $(INSTALLDIR)/.
 
 test: html
 	rm -rf  $(INSTALLDIR)/doc_test

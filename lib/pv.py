@@ -271,13 +271,14 @@ class PV(object):
         """
         for index in sorted(self.callbacks.keys()):
             fcn, kwargs = self.callbacks[index]
+            # print 'Run Callback %i %s:' % (index, self.pvname)
             kwd = copy.copy(self._args)
             kwd.update(kwargs)
             kwd['cb_info'] = (index, self.remove_callback)
             if hasattr(fcn, '__call__'):
                 fcn(**kwd)
             
-    def add_callback(self, callback=None, **kw):
+    def add_callback(self, callback=None, index=None, **kw):
         """add a callback to a PV.  Optional keyword arguments
         set here will be preserved and passed on to the callback
         at runtime.
@@ -289,10 +290,10 @@ class PV(object):
             self.connect(force=False)
         index = None
         if hasattr(callback, '__call__'):
-            n_cb = len(self.callbacks)
-            index = 1
-            if n_cb > 1:
-                index = 1 + max(self.callbacks.keys())
+            if index is None:
+                index = 1
+                if len(self.callbacks) > 0:
+                    index = 1 + max(self.callbacks.keys())
             self.callbacks[index] = (callback, kw)
         return index
     

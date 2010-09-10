@@ -164,7 +164,8 @@ class FloatCtrl(wx.TextCtrl):
 
     def SetValue(self,value=None,act=True):
         " main method to set value "
-        if value == None: value = wx.TextCtrl.GetValue(self).strip()
+        if value == None:
+            value = wx.TextCtrl.GetValue(self).strip()
         self.__CheckValid(value)
         self.__GetMark()
         if self.__valid:
@@ -300,7 +301,7 @@ class pvCtrlMixin:
     
     """
 
-    def __init__(self,pvname=None, 
+    def __init__(self,pv=None, pvname=None,
                  font=None, fg=None, bg=None):
         if font is None:  font = wx.Font(12,wx.SWISS,wx.NORMAL,wx.BOLD,False)
         
@@ -311,17 +312,24 @@ class pvCtrlMixin:
             if bg   is not None:  self.SetBackgroundColour(fg)
         except:
             pass
-        if pvname is not None: self.set_pv(pvname)
+        if pv is None and pvname is not None:
+            pv = pvname
+        if pv is not None:
+            self.set_pv(pv)
 
     def _SetValue(self,value):
         self._warn("must override _SetValue")
         
+    @EpicsFunction
     def update(self,value=None):
-        if value is None: value = self.pv.get(as_string=True)
+        if value is None and self.pv is not None:
+            value = self.pv.get(as_string=True)
         self._SetValue(value)
 
+    @EpicsFunction
     def getValue(self,as_string=True):
-        return self.pv.get(as_string=as_string)
+        val = self.pv.get(as_string=as_string)
+        return val
         
     def _warn(self,msg):
         sys.stderr.write("%s for pv='%s'\n" % (msg,self.pv.pvname))
@@ -329,6 +337,7 @@ class pvCtrlMixin:
     @DelayedEpicsCallback
     def _pvEvent(self,pvname=None,value=None,wid=None,char_value=None,**kw):
         # if pvname is None or id == 0: return
+
         if pvname is None or value is None or wid is None:  return
         if char_value is None and value is not None:
             prec = kw.get('precision',None)
@@ -337,12 +346,21 @@ class pvCtrlMixin:
             else:
                 char_value = set_float(value)                
         self._SetValue(char_value)
-            
-    def set_pv(self,pvname=None):
-        self.pv = epics.PV(pvname)
-        if self.pv is None: return
+
+    @EpicsFunction
+    def set_pv(self, pv=None):
+        if isinstance(pv, epics.PV):
+            self.pv = pv
+        elif isinstance(pv, (string, unicode)):
+            self.pv = epics.PV(pv)
+            self.pv.connect()
+        if self.pv is None:
+            return
+
+        epics.poll()
         self.pv.get_ctrlvars()
-        if not self.pv.connected: return
+        if not self.pv.connected:
+            return
         
         self._SetValue(self.pv.get(as_string=True))
         self.pv.add_callback(self._pvEvent, wid=self.GetId() )
@@ -350,58 +368,60 @@ class pvCtrlMixin:
 
 class pvTextCtrl(wx.TextCtrl,pvCtrlMixin):
     """ text control for PV display (as normal string), with callback for automatic updates"""
-    def __init__(self, parent,  pvname=None, 
+    def __init__(self, parent,  pv=None, 
                  font=None, fg=None, bg=None, **kw):
 
         wx.TextCtrl.__init__(self,parent, wx.ID_ANY, value='', **kw)
-        pvCtrlMixin.__init__(self,pvname=pvname,
-                             font=font,fg=None,bg=None)
+        pvCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
 
-    def _SetValue(self,value):      self.SetValue(value)
+    def _SetValue(self,value):
+        self.SetValue(value)
 
 class pvText(wx.StaticText,pvCtrlMixin):
     """ static text for PV display, with callback for automatic updates"""
-    def __init__(self, parent, pvname=None, as_string=True,
-                 font=None, fg=None, bg=None, **kw):
+    def __init__(self, parent, pv=None, as_string=True,
+                 font=None, fg=None, bg=None, style=None, **kw):
         
         self.as_string = as_string
-        self.pvname =pvname
+        self.pv = pv
 
-        userstyle = kw.get('style',None)
-        kw['style'] = wx.ALIGN_RIGHT | wx.ST_NO_AUTORESIZE
-        # if userstyle:         kw['style'] = kw['style'] | userstyle
+        wstyle = wx.ALIGN_CENTRE
+        if style is not None:
+            wstyle = style | wstyle
 
-        
-        wx.StaticText.__init__(self,parent,wx.ID_ANY,label='',**kw)
-        pvCtrlMixin.__init__(self,pvname=pvname,
-                             font=font,fg=None,bg=None)
+        wx.StaticText.__init__(self, parent, wx.ID_ANY, label='',
+                               style=wstyle, **kw)
+        pvCtrlMixin.__init__(self, pv=pv, font=font,fg=None, bg=None)
+
     def _SetValue(self,value):
-        self.SetLabel(self.getValue(as_string=self.as_string)+ ' ')
+        if value is not None:
+            self.SetLabel(value) 
         
-class pvEnumButtons(wx.Panel,pvCtrlMixin):
+class pvEnumButtons(wx.Panel, pvCtrlMixin):
     """ a panel of buttons for Epics ENUM controls """
-    def __init__(self, parent, pvname=None, 
+    def __init__(self, parent, pv=None, 
                  orientation=wx.HORIZONTAL,  **kw):
 
         wx.Panel.__init__(self, parent, wx.ID_ANY, **kw)
-        pvCtrlMixin.__init__(self,pvname=pvname)
-        
-        if self.pv.type != 'enum':
+        pvCtrlMixin.__init__(self, pv=pv)
+
+        time.sleep(0.001)
+        if pv.type != 'enum':
             self._warn('pvEnumButtons needs an enum PV')
             return
         
-        self.pv.get(as_string=True)
+        pv.get(as_string=True)
         
         sizer = wx.BoxSizer(orientation)
         self.buttons = []
-        for i,label in enumerate(self.pv.enum_strs):
+        for i,label in enumerate(pv.enum_strs):
             b = buttons.GenToggleButton(self, -1, label)
             self.buttons.append(b)
             b.Bind(wx.EVT_BUTTON, closure(self._onButton, index=i) )
             sizer.Add(b, flag = wx.ALL)
             b.SetToggle(0)
 
-        self.buttons[self.pv.value].SetToggle(1)
+        self.buttons[pv.value].SetToggle(1)
                    
         self.SetAutoLayout(True)
         self.SetSizer(sizer)
@@ -413,30 +433,31 @@ class pvEnumButtons(wx.Panel,pvCtrlMixin):
             self.pv.put(index)
 
     @DelayedEpicsCallback
-    def _pvEvent(self,pvname=None,value=None,wid=None,**kw):
+    def _pvEvent(self, pvname=None, value=None, wid=None, **kw):
         if pvname is None or value is None: return
         for i,btn in enumerate(self.buttons):
             btn.up =  (i != value)
             btn.Refresh()
 
-    def _SetValue(self,value): pass
+    def _SetValue(self,value):
+        pass
 
-class pvEnumChoice(wx.Choice,pvCtrlMixin):
+class pvEnumChoice(wx.Choice, pvCtrlMixin):
     """ a dropdown choice for Epics ENUM controls """
     
-    def __init__(self, parent, pvname=None, **kw):
+    def __init__(self, parent, pv=None, **kw):
         wx.Choice.__init__(self, parent, wx.ID_ANY, **kw)
-        pvCtrlMixin.__init__(self,pvname=pvname)
+        pvCtrlMixin.__init__(self, pv=pv)
 
-        if self.pv.type != 'enum':
+        if pv.type != 'enum':
             self._warn('pvEnumChoice needs an enum PV')
             return
 
         self.Clear()
-        self.pv.get(as_string=True)
+        pv.get(as_string=True)
         
-        self.AppendItems(self.pv.enum_strs)
-        self.SetSelection(self.pv.value)
+        self.AppendItems(pv.enum_strs)
+        self.SetSelection(pv.value)
         self.Bind(wx.EVT_CHOICE, self.onChoice)
 
     def onChoice(self,event=None, **kw):
@@ -445,7 +466,7 @@ class pvEnumChoice(wx.Choice,pvCtrlMixin):
         self.pv.put(index)
 
     @DelayedEpicsCallback
-    def _pvEvent(self,pvname=None,value=None,wid=None,**kw):
+    def _pvEvent(self, pvname=None, value=None, wid=None, **kw):
         if pvname is None or value is None: return
         self.SetSelection(value)
 
@@ -453,15 +474,14 @@ class pvEnumChoice(wx.Choice,pvCtrlMixin):
         self.SetStringSelection(value)
 
 
-class pvAlarm(wx.MessageDialog,pvCtrlMixin):
+class pvAlarm(wx.MessageDialog, pvCtrlMixin):
     """ Alarm Message for a PV: a MessageDialog will pop up when a
     PV trips some alarm level"""
    
-    def __init__(self, parent,  pvname=None, 
+    def __init__(self, parent,  pv=None, 
                  font=None, fg=None, bg=None, trip_point=None, **kw):
 
-        pvCtrlMixin.__init__(self,pvname=pvname,
-                             font=font,fg=None,bg=None)
+        pvCtrlMixin.__init__(self,pv=pv,font=font,fg=None,bg=None)
        
     def _SetValue(self,value): pass
     
@@ -470,22 +490,27 @@ class pvFloatCtrl(FloatCtrl,pvCtrlMixin):
     """ float control for PV display of numerical data,
     with callback for automatic updates, and
     automatic determination of string/float controls """
-    def __init__(self, parent, pvname=None, 
+    def __init__(self, parent, pv=None, 
                  font=None, fg=None, bg=None, precision=None,**kw):
 
         self.pv = None
         FloatCtrl.__init__(self, parent, value=0,
-                           precision=precision,action= self._onEnter)
-        pvCtrlMixin.__init__(self,pvname=pvname,
-                             font=font,fg=None,bg=None)
+                           precision=precision)
+        pvCtrlMixin.__init__(self,pv=pv,
+                             font=font, fg=None, bg=None)
 
     def _SetValue(self,value):
         self.SetValue(value)
     
-    def set_pv(self,pvname=None):
-        self.pv = epics.PV(pvname)
-        if self.pv is None: return
-        
+    @EpicsFunction
+    def set_pv(self, pv=None):
+        # print 'FloatCtrl: SET PV ', pvname, type(pvname), isinstance(pvname, epics.PV)
+        if isinstance(pv, epics.PV):
+            self.pv = pv
+        elif isinstance(pv, (string, unicode)):
+            self.pv = epics.PV(pv)
+        if self.pv is None:
+            return
         self.pv.get()
         self.pv.get_ctrlvars()
         # be sure to set precision before value!! or PV may be moved!!
@@ -493,7 +518,8 @@ class pvFloatCtrl(FloatCtrl,pvCtrlMixin):
         if prec is None: prec = 0
         self.SetPrecision(prec)
 
-        self.SetValue( self.pv.char_value)
+        self.SetValue(self.pv.char_value, act=False)
+
         
         if self.pv.type in ('string','char'):
             self._warn('pvFloatCtrl needs a double or float PV')
@@ -501,12 +527,31 @@ class pvFloatCtrl(FloatCtrl,pvCtrlMixin):
         self.SetMin(self.pv.lower_ctrl_limit)
         self.SetMax(self.pv.upper_ctrl_limit)
 
-        self.pv.add_callback(self._pvEvent, wid=self.GetId())
+        self.pv.add_callback(self._FloatpvEvent, wid=self.GetId())
+        self.SetAction(self._onEnter)
 
+    @DelayedEpicsCallback
+    def _FloatpvEvent(self,pvname=None,value=None,wid=None,char_value=None,**kw):
+        # if pvname is None or id == 0: return
+        # print 'FloatvEvent: ', pvname, value, char_value, wid
+
+        if pvname is None or value is None or wid is None:  return
+        if char_value is None and value is not None:
+            prec = kw.get('precision',None)
+            if prec not in (None,0):
+                char_value = ("%%.%if" % prec) % value
+            else:
+                char_value = set_float(value)                
+
+        self.SetValue(char_value, act=False)
+
+    @EpicsFunction
     def _onEnter(self,value=None,**kw):
         if value in (None,'') or self.pv is None: return 
         try:
             if float(value) != self.pv.get():
+                # print 'FloatPV. onEnter ', self.pv.pvname, value,
+                #              float(value), self.pv.get()
                 self.pv.put(float(value))
         except:
             pass

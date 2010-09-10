@@ -238,7 +238,7 @@ class Motor(device.Device):
                    'tweak_val','tweak_forward','tweak_reverse',
                    'done_moving','set','stop', 'low_limit','high_limit',
                    'high_limit_set', 'low_limit_set', 'soft_limit','status',
-                   'device_type',  'record_type', 'enabled')
+                   'device_type',  'record_type', 'enabled', 'stop_go')
     
     _user_params = ('drive','readback','user')
     _dial_params = ('dial_drive','dial_readback','dial')
@@ -537,19 +537,32 @@ class Motor(device.Device):
         make sure all used attributes are up-to-date."""
         ca.poll()
 
+    def StopNow(self):
+        save_val = self.get_field('stop_go')
+        self.put_field('stop_go', 0)
+        time.sleep(0.10)
+        self.put_field('stop_go', save_val)
+        
+        
+    def get_info(self):
+        out = {}
+        for i in ('description', 'drive','readback', 'slew_speed',
+                  'precision','tweak_val','low_limit', 'high_limit',
+                  'stop_go', 'set', 'status'):
+            out[i] = self.get_field(i, as_string=True)
 
+        return out
+    
     def show_info(self):
         " show basic motor settings "
         self.refresh()
         o = []
         o.append(repr(self))
         o.append( "--------------------------------------")
-        for i in ('description', 'drive','readback', 'slew_speed',
-                  'precision','tweak_val','low_limit', 'high_limit',
-                  'stop_go', 'set', 'status'):
-            j = i
-            if (len(j) < 16): j = "%s%s" % (j,' '*(16-len(j)))
-            o.append("%s = %s" % (j, self.get_field(i,as_string=True)))
+        for nam, val in self.get_info().items():
+            if len(nam) < 16:
+                nam = "%s%s" % (nam,' '*(16-len(nam)))
+            o.append("%s = %s" % (nam, val))
         o.append("--------------------------------------")
         sys.stdout.write("%s\n" % "\n".join(o))
 
