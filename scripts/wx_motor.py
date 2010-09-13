@@ -22,7 +22,7 @@ def my_callback(value=None,**kw):
         print "my callback ", k, v
 
 class SingleMotorFrame(wx.Frame):
-    def __init__(self, parent=None, motor=None, *args,**kwds):
+    def __init__(self, parent=None, motors=None, *args,**kwds):
 
         ## kwds["style"] = wx.CAPTION|wx.MINIMIZE_BOX|wx.MAXIMIZE_BOX| wx.SYSTEM_MENU|wx.RESIZE_BORDER|wx.TAB_TRAVERSAL
         wx.Frame.__init__(self, parent, wx.ID_ANY, '',
@@ -37,23 +37,25 @@ class SingleMotorFrame(wx.Frame):
 
         self.createMenus()
         
-        self.buildFrame(motor=motor)
+        self.buildFrame(motors=motors)
 
-    def buildFrame(self, motor=None):
-        mainsizer = wx.BoxSizer(wx.VERTICAL)
-        mainpanel = wx.Panel(self, -1)
+    def buildFrame(self, motors=None):
+        self.mainsizer = wx.BoxSizer(wx.VERTICAL)
+        self.mainpanel = wx.Panel(self, -1)
 
-        self.motor1 = MotorPanel(self, motor=motor)
-        
-        mainsizer.Add(self.motor1, 1, wx.EXPAND)
+        if motors is not None:
+            self.motors= [MotorPanel(self, motor=m) for m in motors]
+           
+            for mpan in self.motors:
+                self.mainsizer.Add(mpan, 1, wx.EXPAND)
 
-        self.SetSizer(mainsizer)
-        mainsizer.Fit(self)
+        self.mainpanal.SetAutoLayout(1)
+        self.SetSizer(self.mainsizer)
+        self.mainsizer.Fit(self)
         self.Refresh()
 
-        #wx.CallAfter(self.motor1.SelectMotor,
-        #              self.motors[motor_choices[0]])
-
+    def setMotors(self, motors=None):
+        print 'would add motors here....'
 
     def createMenus(self):
         fmenu = wx.Menu()
@@ -98,19 +100,18 @@ class SingleMotorFrame(wx.Frame):
     def onMotorChoice(self,event,motor=None):
         self.motor1.SelectMotor(self.motors[event.GetString()])
 
-
     def onClose(self,event):
         self.Destroy()
 
 if __name__ == '__main__':
 
-    motor ='13XRM:m2.VAL'
+    motor =('13XRM:m2.VAL',)
 
     if len(sys.argv)>1:
-        motor = sys.argv[1]
+        motor = sys.argv[1:]
     
     app = wx.App(redirect=False)
-    SingleMotorFrame(motor=motor).Show()
+    SingleMotorFrame(motors=motors).Show()
     
     app.MainLoop()
 

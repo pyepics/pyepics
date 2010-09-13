@@ -263,7 +263,7 @@ class PV(object):
         arguments including:
              self._args  (all PV data available, keys = __fields)
              keyword args included in add_callback()
-             keyword 'cb_info' = (index, remove_callback)
+             keyword 'cb_info' = (index, self)
         where the 'cb_info' is provided as a hook so that a callback
         function  that fails may de-register itself (for example, if
         a GUI resource is no longer available).
@@ -274,7 +274,7 @@ class PV(object):
             # print 'Run Callback %i %s:' % (index, self.pvname)
             kwd = copy.copy(self._args)
             kwd.update(kwargs)
-            kwd['cb_info'] = (index, self.remove_callback)
+            kwd['cb_info'] = (index, self)
             if hasattr(fcn, '__call__'):
                 fcn(**kwd)
             
@@ -288,7 +288,6 @@ class PV(object):
         add_callback.  This index is needed to remove a callback."""
         if not self.connected:
             self.connect(force=False)
-        index = None
         if hasattr(callback, '__call__'):
             if index is None:
                 index = 1
@@ -299,8 +298,8 @@ class PV(object):
     
     def remove_callback(self, index=None):
         """remove a callback by index"""
-        if index is None and len(self.callbacks)==1:
-            index = list(self.callbacks.keys())[0]
+        if len(self.callbacks)==1:
+            self.callbacks.pop()
         if index in self.callbacks:
             self.callbacks.pop(index)
             self.poll()

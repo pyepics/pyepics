@@ -771,7 +771,8 @@ standard output::
     # define a callback function.  Note that this should 
     # expect certain keyword arguments, including 'pvname' and 'value'
     def onChanges(pvname=None, value=None, **kw):
-        sys.stdout.write('New Value: %s  value=%s, kw=%s\n' %( pvname, str(value), repr(kw)))
+        fmt = 'New Value: %s  value=%s, kw=%s\n'
+        sys.stdout.write(fmt % (pvname, str(value), repr(kw)))
         sys.stdout.flush()
     
     # create the channel 

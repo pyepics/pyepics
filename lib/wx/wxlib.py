@@ -32,12 +32,12 @@ def DelayedEpicsCallback(fcn):
             try:
                 fcn(*args, **kw)
             except PyDeadObjectError:                    
-                try:
-                    cb_index,remove_cb =  kw.get('cb_info',(None,None))
-                    if hasattr(remove_cb,'__call__'):
-                        remove_cb(index=cb_index)
-                except:
-                    pass
+                cb_index, pv =  kw.get('cb_info',(None, None))
+                if hasattr(pv, 'remove_callback'):
+                    try:
+                        pv.remove_callback(index=cb_index)
+                    except:
+                        pass
         return wx.CallAfter(cb)
     return wrapper
 

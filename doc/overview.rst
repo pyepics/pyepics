@@ -31,18 +31,21 @@ These components includes
     * an :mod:`epics.wx` module that provides wxPython classes designed for
       use with Epics PVs.
 
-Most beginning users will probably want to create and use :class:`PV`
-objects provided by the :mod:`pv` module.  The :class:`PV` class provides a
-Process Variable object that has both methods (including :meth:`get` and
-:meth:`put`) to read and change the PV, and attributes that are kept
-automatically synchronized with the remote channel.
+If you're looking to write quick scripts, using the :func:`caget` and
+:func:`caput`  functions is probably how you want to start.
+
+Users looking to build larger-scale solutions recommended to use
+:class:`PV` objects provided by the :mod:`pv` module.  The :class:`PV`
+class provides a Process Variable object that has both methods (including
+:meth:`get` and :meth:`put`) to read and change the PV, and attributes that
+are kept automatically synchronized with the remote channel.
 
 The lowest-level CA functionality is exposed in the :mod:`ca` and
-:mod:`dbr` module.  While not necessarily intended for general use by
-beginners, this module does provide a fairly complete wrapping of the basic
-EPICS CA library.  For people who have used CA from C or other languages,
-this module will be familiar and quite usable, if a little more verbose and
-C-like than using PV objects.
+:mod:`dbr` module.  While not necessary for most use, this module does
+provide a fairly complete wrapping of the basic EPICS CA library.  For
+people who have used CA from C or other languages, this module should be
+familiar and quite usable, if a little more verbose and C-like than using
+PV objects.
 
 In addition, the `epics` package contains more specialized modules for
 Epics motors, alarms, a host of other *devices* (collections of PVs), and a
@@ -56,11 +59,13 @@ Quick Start
 ==============
 
 If you're somewhat familiar with Epics Channel Access, you may be able to
-get started right away.
+get started right away without reading the full documentation, and then use
+Python's introspection tools and  built-in help system, referring to this
+documentation for further details.
 
 
-Functional Approach: caget, caput
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Functional Approach: caget(), caput()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To get values from PVs, you can simply use the :func:`caget` function:
 
@@ -75,25 +80,46 @@ To set PV values, you can simply use the :func:`caput` function:
    >>> print caget('XXX:m1.VAL')
    1.9000
 
-
+For many uses, the simplicity and clarity of this approach is perfect.
 
 Object Oriented Approach: PV
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you want to repeatedly access the same PV, you may find it more
-convenient to ''create a PV'' and use it as a Python object:
+convenient to ''create a PV object'' and use it in a more object-oriented
+manner.
   
    >>> from epics import PV
    >>> pv1 = PV('XXX:m1.VAL')
+   
+PV objects have several methods and attributes.  The most important methods
+are  :meth:`get` and :meth:`put` to receive and send the PV's value, and
+the :attr:`value` attribute which stores the current value.  In analogy to
+the :func:`caget` and :func:`caput` examples above, the value of a PV can
+be fetched either with
+
+   >>> print pv1.get()
+   1.2001
+
+or
+
    >>> print pv1.value
    1.2001
-   
-To set a PV's value,  you can simply say
 
-   >>> pv1.put(1.9000)
+To set a PV's value, you can either use
 
-PV objects have several methods and attributes and are more fully 
-documented at :ref:`pv-label`
+   >>> pv1.put(1.9)
+
+or assign the :attr:`value` attribute
+
+   >>> pv1.value = 1.9
+
+
+PV objects have several more methods, especially related to monitoring
+external changes to the PVs and defining functions to be run automatically
+when the value changes.  There are also several attributes associated with
+a PV reflecting the ``Control Attributes``.  Further details are at
+:ref:`pv-label`
 
 
 Functions defined in :mod:`epics`: caget(), caput(), etc.
@@ -105,9 +131,14 @@ Functions defined in :mod:`epics`: caget(), caput(), etc.
 The simplest interface to EPICS Channel Access provides functions
 :func:`caget`, :func:`caput`, as well as functions :func:`camonitor`,
 :func:`camonitor_clear`, and :func:`cainfo`.  These are similar to the
-EPICS command line utilities and to the functions in the EZCA library.
-These all take the name of an Epics Process Variable (PV) as the first
-argument.
+EPICS command line utilities and to the functions in the EZCA library, in
+that these function all take the name of an Epics Process Variable (PV) as
+the first argument.  As with the EZCA library, the python implementation
+actually keeps a cache of already connected PV (in this case, using
+internally monitored `PV` objects) so that repeated use of a PV name does
+not actually result in a new connection to that PV.  Thus, though the
+functionality is limited, the performance of the functional approach can be
+quite good.
 
 :func:`caget`
 ~~~~~~~~~~~~~
@@ -126,39 +157,56 @@ depends on the variable type of the PV.  For integer (short or long) and
 string PVs, the string representation is pretty easy: 0 will become '0',
 for example..  For float and doubles, the internal precision of the PV is
 used to format the string value.  For enum types, the name of the enum
-state is returned.
-
-For most array data (from Epics waveform records), the string
-representation will be something like::
-
-  <array size=128, type=int>
-
-depending on the size and type of the waveform.  As an important special
-case, CHAR waveforms will be turned to Python strings when *as_string* is
-``True``.  This is to work around the low limit of the maximum length (40
-characters!) of EPICS strings, and means that it is fairly common to use
-CHAR waveforms when 'long strings' are desired::
+state is returned::
 
     >>> from epics import caget, caput, cainfo
-    >>> print caget('XXX:m1.VAL')
-    1.200
-    >>> print caget('XXX:m1.DESC')  
-    'Motor 1'                                                                                                        
-  
-    >>> print caget('XXX:dir')  
-   array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 101, 114,  92,  77,
-        97, 114,  99, 104,  50,  48,  49,  48,  92,  70,  97, 115, 116,
-        77,  97, 112,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0])
-   >>> print caget('XXX:dir',as_string=True)
-   'T:\\xas_user\\March2010\\FastMap'
 
+    >>> print caget('XXX:m1.VAL')     # A double PV
+    0.10000000000000001
+
+    >>> print caget('XXX:m1.DESC')    # A string PV
+    'Motor 1'                                                                                                        
+    >>> print caget('XXX:m1.FOFF')    # An Enum PV  
+    1
+   
+Adding the `as_string=True` argument always results in string being
+returned, with the conversion method depending on the data type::
+
+    >>> print caget('XXX:m1.VAL', as_string=True)
+    '0.10000'
+
+    >>> print caget('XXX:m1.FOFF', as_string=True)
+    'Frozen'
+
+For most array data from Epics waveform records, the regular value will be
+a numpy array (or a python list if numpy is not installed).  The string
+representation will be something like '<array size=128, type=int>'
+depending on the size and type of the waveform.  An array of doubles might
+be::
+
+    >>> print caget('XXX:scan1.P1PA')  # A Double Waveform
+    array([-0.08      , -0.078     , -0.076     , ...,  
+        1.99599814, 1.99799919,  2.     ])
+
+    >>> print caget('XXX:scan1.P1PA', as_string=True)
+    '<array size=2000, type=DOUBLE>'
+
+As an important special case, CHAR waveforms will be turned to Python
+strings when *as_string* is ``True``.  This is to work around the low limit
+of the maximum length (40 characters!) of EPICS strings, and means that it
+is fairly common to use CHAR waveforms when long strings are desired::
+
+    >>> print caget('XXX:dir')      # A CHAR waveform 
+    array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 
+       101, 114,  92,  77,  97, 114,  99, 104,  50,  48,  
+        49,  48,  92,  70,  97, 115, 116,  77,  97, 112,   
+         0,   0, ... 0])
+
+    >>> print caget('XXX:dir',as_string=True)
+    'T:\\xas_user\\March2010\\FastMap'
+
+Of course, some character waveforms are not used for long strings but to
+hold byte array data. 
 
 :func:`caput`
 ~~~~~~~~~~~~~
@@ -241,7 +289,6 @@ has been exceeded.
   done each time the value changes.  By default the PV name, time, and
   value will be printed out (to standard output) when the value changes,
   but the action that actually happens can be customized.
-
 
   :param pvname: name of Epics Process Variable
   :param writer:  where to write results to standard output .

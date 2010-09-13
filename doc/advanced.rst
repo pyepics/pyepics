@@ -19,10 +19,18 @@ Channels / PVs may need reconsideration.
 When using PVs with large array sizes (here, I'll assert that *large* means
 more than 100 or so elements), it is necessary to make sure that the
 environmental variable ``EPICS_CA_MAX_ARRAY_SIZE`` is suitably set.
-Practically, this should not be a significant concern, as this is set (to
-2**31, or 2 Gb) when :mod:`epics.ca` is initialized.  If you do have the 
-environmental variable ``EPICS_CA_MAX_ARRAY_SIZE`` set, that value will be
-used instead.
+Unfortunately, this represents a pretty crude approach to memory management
+within Epics for handling array data as it is used not only sets how large
+an array the client can accept, but how much memory will be allocated on
+the server.  In addition, this value must be set prior to using the CA
+library -- it cannot be altered during the running of a CA program.  
+
+Normally, the default value for ``EPICS_CA_MAX_ARRAY_SIZE`` is only 16384
+(16k, and it turns out that you cannot set it smaller than this value!).
+As Python is used for clients, generally running on workstations or servers
+with sufficient memory, this default value is changed to 2**24, or 16Mb)
+when :mod:`epics.ca` is initialized.  If the environmental variable
+``EPICS_CA_MAX_ARRAY_SIZE`` has not already been set.
 
 The main issues for large arrays are:
   * should large arrays automatically be immediately converted to numpy
@@ -99,7 +107,6 @@ The result looks like this (taken with a Prosilica GigE camera):
 
 
 .. image:: AreaDetector1.png
-
 
 
 
@@ -260,7 +267,6 @@ Note also that the callbacks for the PVs created in each thread are
 
     for p in pvs: 
         p.clear_callbacks()
-
 
 Without this, the callbacks for thread *A*  will persist even after the
 thread has completed!!!

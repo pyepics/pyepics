@@ -13,7 +13,9 @@ derived from wxPython widgets, with special support added for epics PVs,
 especially regarding when to automatically update the widget based on a
 changing value for a PV.
 
-        
+Examples of some wx code is included in the *scripts* folder of the pyepics
+source distribution kit.
+
 ..  _wx-functions-label:
 
 Sub-classed wx Widgets for Epics

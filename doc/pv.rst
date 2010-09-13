@@ -134,26 +134,31 @@ callbacks to be executed when the PV changes.
    :type  force:  ``True``/``False``
    :rtype:    ``True``/``False``
    
-.. method:: add_callback(callback=None[, **kw])
+.. method:: add_callback(callback=None[, index=None , [**kw]])
  
    adds a user-defined callback routine to be run on each change event for
    this PV.  Returns the integer *index*  for the callback.
 
    :param callback: user-supplied function to run when PV changes.
    :type callback: None or callable
+   :param index: identifying key for this callback 
+   :type index:: None (integer will be produced) or immutable
    :param kw: additional keyword/value arguments to pass to each execution of the callback.
    :rtype:  integer
 
-   Note that multiple callbacks can be defined.  When a PV changes, all callbacks will be
-   executed in the order of their indices.  
+   Note that multiple callbacks can be defined, each having its own index
+   (a dictionary key, typically an integer).   When a PV changes, all the
+   defined callbacks will be executed.  They will be called in order (by
+   sorting  the keys of the :attr:`callbacks` dictionary)
 
    See also: :attr:`callbacks`  attribute, :ref:`pv-callbacks-label`
 
 .. method:: remove_callback(index=None)
 
-   remove a user-defined callback routine.
+   remove a user-defined callback routine using supplied
 
-   :param index: index of user-supplied function, as returned by  :meth:`add_callback`, and also to key value for this callback in the  :attr:`callbacks` dictionary.
+   :param index: index of user-supplied function, as returned by :meth:`add_callback`,
+        and also to key for  this callback in the  :attr:`callbacks` dictionary.
    :type index: None or integer
    :rtype:  integer
 
@@ -294,17 +299,16 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
    callbacks.  The values of this dictionary are tuples of `(callback,
    keyword_arguments)`.
 
-   **Note**: The :attr:`callbacks` attribute can be assigned to.  It is
-   recommended to use the methods :meth:`add_callback`,
-   :meth:`remove_callback`, and :meth:`clear_callbacks` instead of altering
-   this dictionary directly.
-
+   **Note**: The :attr:`callbacks` attribute can be assigned to or
+    	  manipulated directly.  This is not recommended. Use the 
+          methods :meth:`add_callback`, :meth:`remove_callback`, and 
+          :meth:`clear_callbacks` instead of altering this dictionary directly.
 
 ..  _pv-as-string-label:
 
 String representation for a PV
 ================================
-
+x
 The string representation for a `PV`, as returned either with the
 *as_string* argument to :meth:`ca.get` or from the :attr:`char_value`
 attribute (they are equivalent) needs some further explanation.
@@ -399,22 +403,32 @@ keyword parameters:
     * `char_value`: string representation of value
     * `count`: the number of data elements
     * `ftype`: the numerical CA type indicating the data type
+    * `type`: the python type for the data
     * `status`: the status of the PV (1 for OK)
-    * `precision`: number of decimal places of precision.
+    * `precision`: number of decimal places of precision for floating point values
     * `units`:  string for PV units
     * `severity`: PV severity
     * `timestamp`: timestamp from CA server.
+    * `read_access`: read access (`True` or `False`)
+    * `write_access`: write access (`True` or `False`)
+    * `access`: string description of  read- and write-access
+    * `host`: host machine and CA port serving PV
     * `enum_strs`: the list of enumeration strings
-    * `upper_disp_limit`: 
-    * `lower_disp_limit`: 
-    * `upper_alarm_limit`: 
-    * `lower_alarm_limit`: 
-    * `upper_warning_limit`: 
-    * `lower_warning_limit`: 
-    * `upper_ctrl_limit`: 
-    * `lower_ctrl_limit`: 
+    * `upper_disp_limit`: upper display limit
+    * `lower_disp_limit`:  lower display limit
+    * `upper_alarm_limit`:  upper alarm limit
+    * `lower_alarm_limit`:  lower alarm limit
+    * `upper_warning_limit`:  upper warning limit
+    * `lower_warning_limit`:  lower warning limit
+    * `upper_ctrl_limit`:  upper control limit
+    * `lower_ctrl_limit`:  lower control limit
+    * `chid`:  integer channel ID 
+    * `cb_info`:  (index, self) tuple containing callback ID 
+                  and the PV object
 
-Some of these may not be directly applicable to all PV data types.
+Some of these may not be directly applicable to all PV data types, and some
+values may be None if the control parameters have not yet been fetched with 
+:meth:`get_ctrlvars`.  
 
 Note that a the user-supplied callback will be run *inside* a CA function,
 and cannot reliably make any other CA calls.  It is helpful to think "this
@@ -424,6 +438,14 @@ keep the callback functions short and not resource-intensive.  Consider
 strategies which use the callback only to record that a change has occurred
 and then act on that change later -- perhaps in a separate thread, perhaps
 after :func:`pend_event` has completed.
+
+The `cb_info` parameter supplied to the callback needs special attention,
+as it is the only non-Epics information passed.   The `cb_info` parameter
+will be a tuple containing (:attr:`index`, :attr:`self`) where 
+:attr:`index` is the key for the :attr:`callbacks` dictionary for the PV 
+and :attr:`self` *is* PV object.  A principle use of this tuple is to 
+**remove the current callback**  if an error happens, as for example in GUI
+code if the widget that the callback is meant to update disappears.
 
 ..  _pv-connection_callbacks-label:
 
@@ -446,7 +468,6 @@ where *conn* will be either `True` or `False`, specifying whether the PV is
 now connected.   A simple example is given below.
 
 
-
 ..  _pv-examples-label:
 
 Examples
@@ -457,8 +478,8 @@ Some simple examples using PVs follow.
 Basic Use
 ~~~~~~~~~~~~
 
-The simplest approach is to simply
-create a PV and use its :attr:`value` attribute:
+The simplest approach is to simply create a PV and use its :attr:`value`
+attribute: 
 
    >>> from epics import PV
    >>> p1 = PV('xxx.VAL')

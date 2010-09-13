@@ -5,7 +5,7 @@ import sys
 
 import time
 
-os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = '90000000'
+os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = '16777216'
 
 import epics
 from epics.wx import DelayedEpicsCallback, EpicsFunction
