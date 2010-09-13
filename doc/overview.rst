@@ -322,6 +322,10 @@ information on writing callback functions for :func:`camonitor`.
 
   :param pvname: name of Epics Process Variable
 
+This simple example monitors a PV with :func:`camonitor` for while, with
+changes being saved to a log file.   After a while, the monitor is cleared
+and the log file is inspected::
+
    >>> import epics
    >>> fh = open('PV1.log','w')
    >>> epics.camonitor('XXX:DMM1Ch2_calc.VAL',writer=fh.write)

@@ -10,23 +10,13 @@
 #         initial working version.
 #----------------------------------------
 import wx
-import time
 import sys
 import epics
-import wxlib
+from epics.wx.wxlib import pvText, pvFloatCtrl, pvTextCtrl, \
+     DelayedEpicsCallback, EpicsFunction, set_float
 
-from MotorDetailFrame import MotorDetailFrame
+from epics.wx.MotorDetailFrame  import MotorDetailFrame
 
-pvText = wxlib.pvText
-pvFloatCtrl = wxlib.pvFloatCtrl
-pvTextCtrl = wxlib.pvTextCtrl
-pvEnumButtons = wxlib.pvEnumButtons
-pvEnumChoice = wxlib.pvEnumChoice
-set_sizer = wxlib.set_sizer
-set_float = wxlib.set_float
-DelayedEpicsCallback = wxlib.DelayedEpicsCallback
-
-        
 class MotorPanel(wx.Panel):
     """ MotorPanel  a simple wx windows panel for controlling an Epics Motor
     """
@@ -53,7 +43,7 @@ class MotorPanel(wx.Panel):
 
         self.SelectMotor(motor)
 
-    @wxlib.EpicsFunction
+    @EpicsFunction
     def SelectMotor(self, motor):
         " set motor to a named motor PV"
         if motor is None:
@@ -75,7 +65,7 @@ class MotorPanel(wx.Panel):
                                                  wid=self.GetId(),
                                                  field=attr)
 
-    @wxlib.EpicsFunction
+    @EpicsFunction
     def fillPanelComponents(self):
         if self.motor is None: return
         try:
@@ -88,7 +78,19 @@ class MotorPanel(wx.Panel):
         epics.poll()
         self.drive.set_pv(self.motor.get_pv('drive'))
         self.rbv.set_pv(self.motor.get_pv('readback') )
-        self.desc.set_pv(self.motor.get_pv('description') )
+
+        descpv = self.motor.get_pv('description')
+        if len(descpv.char_value) > 25:
+            self.desc.Wrap(30)
+            self.desc.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.desc.SetSize( (200, 40))
+        else:
+            self.desc.Wrap(45)
+            self.desc.SetFont(wx.Font(13, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.desc.SetSize( (200, -1))
+            
+        self.desc.set_pv(descpv)
+
 
         self.info.SetLabel('')
         for f in ('set', 'high_limit_set', 'low_limit_set',
@@ -101,26 +103,26 @@ class MotorPanel(wx.Panel):
             
     def CreatePanel(self,style='normal'):
         " build (but do not fill in) panel components"
-        self.desc = pvText(self, size=(250, -1), 
-                           font=wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD),
-                           style=wx.ALIGN_RIGHT)
+        self.desc = pvText(self, size=(200, 25), 
+                           font=wx.Font(13, wx.SWISS, wx.NORMAL, wx.BOLD),
+                           style=  wx.ALIGN_LEFT| wx.ST_NO_AUTORESIZE )
         self.desc.SetForegroundColour("Blue")
-        self.rbv  = pvText(self, size=(125, -1),
-                           fg='Blue',style=wx.ALIGN_CENTER)
-        self.info = wx.StaticText(self, label='', size=(80, 20), style=wx.ALIGN_RIGHT)
+
+        self.rbv  = pvText(self, size=(105, 25),
+                           fg='Blue',style=wx.ALIGN_CENTRE_VERTICAL|wx.ALIGN_RIGHT)
+        self.info = wx.StaticText(self, label='', size=(90, 25), style=wx.ALIGN_CENTRE_VERTICAL|wx.ALIGN_RIGHT)
         self.info.SetForegroundColour("Red")
 
-        self.drive = pvFloatCtrl(self,  size=(110,-1),
-                                 style = wx.TE_RIGHT)
+        self.drive = pvFloatCtrl(self,  size=(120,-1), style = wx.TE_RIGHT)
         
         self.fillPanelComponents()
                 
         self.twk_list = ['','']
-        self.__twkbox = wx.ComboBox(self, value='', size=(120,-1), 
+        self.__twkbox = wx.ComboBox(self, value='', size=(100,-1), 
                                     choices=self.twk_list,
                                     style=wx.CB_DROPDOWN|wx.TE_PROCESS_ENTER)
 
-        self.__twkbox.SetFont(wx.Font(13,wx.SWISS,wx.NORMAL,wx.BOLD,False))
+        self.__twkbox.SetFont(wx.Font(13, wx.SWISS, wx.NORMAL, wx.BOLD))
         
 
         self.__twkbox.Bind(wx.EVT_COMBOBOX,    self.OnTweakBoxEvent)
@@ -141,11 +143,11 @@ class MotorPanel(wx.Panel):
         for b in (twkbtn1, twkbtn2):
             b.SetFont(wx.Font(12,wx.SWISS,wx.NORMAL,wx.BOLD,False))
 
-        spacer = wx.StaticText(self, label=' ', size=(20, 20), style=wx.ALIGN_RIGHT)            
+        spacer = wx.StaticText(self, label=' ', size=(10, 10), style=wx.ALIGN_RIGHT)            
         self.__sizer.AddMany([(spacer,      0, wx.ALIGN_CENTER),
-                              (self.desc,   0, wx.ALIGN_CENTER),
-                              (self.rbv,    0, wx.ALIGN_CENTER),
+                              (self.desc,   0, wx.ALIGN_CENTRE_VERTICAL|wx.ALIGN_LEFT),
                               (self.info,   0, wx.ALIGN_CENTER),
+                              (self.rbv,    0, wx.ALIGN_CENTER),
                               (self.drive,  0, wx.ALIGN_CENTER),
                               (twkbtn1,       0, wx.ALIGN_CENTER),
                               (self.__twkbox, 0, wx.ALIGN_CENTER),
@@ -171,29 +173,29 @@ class MotorPanel(wx.Panel):
         self.twk_list = self.Create_StepList()
         self.__Update_StepList()
         
-    @wxlib.EpicsFunction
+    @EpicsFunction
     def onLeftButton(self,event=None):
         if (self.motor is None): return        
         self.motor.tweak(dir='reverse')
         
-    @wxlib.EpicsFunction
+    @EpicsFunction
     def onRightButton(self,event=None):
         if (self.motor is None): return        
         self.motor.tweak(dir='forward')
 
-    @wxlib.EpicsFunction
+    @EpicsFunction
     def onStopButton(self,event=None):
         curstate = str(self.stopbtn.GetLabel()).lower().strip()
         
         if self.motor is None:
             return
         self.motor.StopNow()
-        epics.ca.poll()
+        epics.poll()
         val = 3
         if curstate == 'stop':   val = 0
         self.motor.put_field('stop_go', val)
 
-    @wxlib.EpicsFunction
+    @EpicsFunction
     def onMoreButton(self,event=None):
         if (self.motor is None): return        
         x = MotorDetailFrame(parent=self, motor=self.motor)

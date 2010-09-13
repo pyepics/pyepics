@@ -26,7 +26,7 @@ str_pv_val = 'Hor. slit pos.'
 ####
 # provide a single motor prefix (to which '.VAL' and '.RBV' etc will be added)
 
-motor1 = '13XRM:m1'
+motor1 = '13XRM:m2'
 
 #### 
 #  Here, provide a PV that changes at least once very 10 seconds

@@ -12,6 +12,7 @@ pvEnumChoice = wxlib.pvEnumChoice
 set_sizer = wxlib.set_sizer
 set_float = wxlib.set_float
 DelayedEpicsCallback = wxlib.DelayedEpicsCallback
+EpicsFunction = wxlib.EpicsFunction
 
 
 def xLabel(parent,label):
@@ -276,23 +277,17 @@ class MotorDetailFrame(wx.Frame):
                              pvname=self.motor.get_pv(f).pvname,
                              field=f,motor=self.motor)
 
-        ############
         set_sizer(panel,sizer,fit=True)
-        #outersizer.Add((34,10),0,wx.ALIGN_LEFT,30)
-
-        #outersizer.Add(panel,1,wx.ALIGN_CENTER,30)
-        #set_sizer(self,outersizer,fit=True)
         self.Show()
         self.Raise()
 
     @DelayedEpicsCallback
-    def onMotorEvent(self,pvname=None,field=None,motor=None,**kw):
+    def onMotorEvent(self, pvname=None, field=None, motor=None, **kw):
         if pvname is None:
             return None
         
         field_val = self.motor.get_field(field)
         field_str = self.motor.get_field(field,as_string=True)
-
         time.sleep(0.01)
         
         if field in ('soft_limit', 'high_limit_set', 'low_limit_set'):
@@ -314,27 +309,29 @@ class MotorDetailFrame(wx.Frame):
                            pv = self.motor.get_pv(attr),
                            style = wx.TE_RIGHT)
 
-
     def motor_text(self,panel,attr):
         return pvText(panel,  size=(100,-1), style=wx.ALIGN_RIGHT|wx.CENTER,
                       as_string=True, pv=self.motor.get_pv(attr))
 
     def motor_textctrl(self,panel,attr,size=(100,-1)):
-        return pvTextCtrl(panel,  size=size, # style=wx.ALIGN_RIGHT,
+        return pvTextCtrl(panel,  size=size, style=wx.ALIGN_LEFT|wx.TE_PROCESS_ENTER,
                           pv=self.motor.get_pv(attr))        
 
-    def onLimitChange(self,pv=None,attr=None,**kw):
-        lim_val  = self.motor.get_field(attr)
-        if   'low_limit' == attr:         self.drives[0].SetMin(lim_val)
-        elif 'high_limit' == attr:        self.drives[0].SetMax(lim_val)
-        elif 'dial_low_limit' == attr:    self.drives[1].SetMin(lim_val)
-        elif 'dial_high_limit' == attr:   self.drives[1].SetMax(lim_val)
+    @DelayedEpicsCallback
+    def onLimitChange(self, pvname=None, attr=None, value=None, **kw):
+        funcs = {'low_limit':       self.drives[0].SetMin,
+                 'high_limit':      self.drives[0].SetMax,
+                 'dial_low_limit':  self.drives[1].SetMin,
+                 'dial_high_limit': self.drives[1].SetMax}
+        if attr in funcs:
+            funcs[attr](value)
             
-
+    @EpicsFunction
     def onLeftButton(self,event=None):
         if (self.motor is None): return
         self.motor.tweak(dir='reverse')
 
+    @EpicsFunction
     def onRightButton(self,event=None):
         if (self.motor is None): return        
         self.motor.tweak(dir='forward')

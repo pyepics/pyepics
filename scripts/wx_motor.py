@@ -7,8 +7,7 @@ import sys
 import time
 import epics
 
-from epics.wx import MotorPanel
-
+from epics.wx import finalize_epics, MotorPanel
 
 ID_ABOUT = wx.NewId()
 ID_EXIT  = wx.NewId()
@@ -24,34 +23,31 @@ def my_callback(value=None,**kw):
 class SingleMotorFrame(wx.Frame):
     def __init__(self, parent=None, motors=None, *args,**kwds):
 
-        ## kwds["style"] = wx.CAPTION|wx.MINIMIZE_BOX|wx.MAXIMIZE_BOX| wx.SYSTEM_MENU|wx.RESIZE_BORDER|wx.TAB_TRAVERSAL
         wx.Frame.__init__(self, parent, wx.ID_ANY, '',
                          wx.DefaultPosition, wx.Size(-1,-1),**kwds)
         self.SetTitle(" Epics Motor Page")
 
         wx.EVT_CLOSE(self, self.onClose)        
-
         self.SetFont(wx.Font(12,wx.SWISS,wx.NORMAL,wx.BOLD,False))
         
         self.createSbar()
-
         self.createMenus()
-        
         self.buildFrame(motors=motors)
 
     def buildFrame(self, motors=None):
         self.mainsizer = wx.BoxSizer(wx.VERTICAL)
-        self.mainpanel = wx.Panel(self, -1)
-
+        #self.mainpanel = wx.Panel(self, -1)
+        
         if motors is not None:
             self.motors= [MotorPanel(self, motor=m) for m in motors]
            
             for mpan in self.motors:
                 self.mainsizer.Add(mpan, 1, wx.EXPAND)
-
-        self.mainpanal.SetAutoLayout(1)
+                self.mainsizer.Add(wx.StaticLine(self, size=(100,3)),  0, wx.EXPAND)
+                 
         self.SetSizer(self.mainsizer)
         self.mainsizer.Fit(self)
+
         self.Refresh()
 
     def setMotors(self, motors=None):
@@ -73,7 +69,7 @@ class SingleMotorFrame(wx.Frame):
         menuBar = wx.MenuBar()
         menuBar.Append(fmenu, "&File");
 
-        menuBar.Append(cmenu, "&Configure");
+        # menuBar.Append(cmenu, "&Configure");
         self.SetMenuBar(menuBar)
 
         wx.EVT_MENU(self, ID_ABOUT, self.onAbout)
@@ -82,11 +78,10 @@ class SingleMotorFrame(wx.Frame):
     def createSbar(self):
         "create status bar"
         self.statusbar = self.CreateStatusBar(2, wx.CAPTION|wx.THICK_FRAME)
-        self.statusbar.SetStatusWidths([-3,-1])
+        self.statusbar.SetStatusWidths([-4,-1])
         for index, name  in enumerate(("Messages", "Status")):
-            self.statusbar.SetStatusText(name, index)
+            self.statusbar.SetStatusText('', index)
             
-
     def write_message(self,text,status='normal'):
         self.SetStatusText(text)
 
@@ -100,15 +95,15 @@ class SingleMotorFrame(wx.Frame):
     def onMotorChoice(self,event,motor=None):
         self.motor1.SelectMotor(self.motors[event.GetString()])
 
-    def onClose(self,event):
+    def onClose(self, event):
+        finalize_epics()
         self.Destroy()
 
 if __name__ == '__main__':
-
-    motor =('13XRM:m2.VAL',)
+    motors =('13XRM:m2.VAL',)
 
     if len(sys.argv)>1:
-        motor = sys.argv[1:]
+        motors = sys.argv[1:]
     
     app = wx.App(redirect=False)
     SingleMotorFrame(motors=motors).Show()

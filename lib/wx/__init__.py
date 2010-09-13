@@ -23,3 +23,4 @@ FloatCtrl = wxlib.FloatCtrl
 
 DelayedEpicsCallback = wxlib.DelayedEpicsCallback
 EpicsFunction  = wxlib.EpicsFunction
+finalize_epics  = wxlib.finalize_epics

@@ -421,7 +421,10 @@ def pend_event(timeout=1.e-4):
     fcn = libca.ca_pend_event
     fcn.argtypes = [ctypes.c_double]
     ret = fcn(timeout)
-    return PySEVCHK( 'pend_event', ret,  dbr.ECA_TIMEOUT)
+    try:
+        return PySEVCHK( 'pend_event', ret,  dbr.ECA_TIMEOUT)
+    except CASeverityException:
+        return ret
 
 @withCA
 def poll(evt=1.e-4, iot=1.0):
@@ -895,11 +898,11 @@ def _onConnectionEvent(args):
     entry['failures'] = 0
     if 'userfcn' in entry and hasattr(entry['userfcn'], '__call__'):
         try:
-            time.sleep(1.e-4)
+            time.sleep(1.e-3)
             entry['userfcn'](pvname=pvname, chid=entry['chid'],
                              conn=entry['conn'])
         except:
-            time.sleep(1.e-4)
+            time.sleep(3.e-3)
             try:
                 entry['userfcn'](pvname=pvname, chid=entry['chid'],
                                  conn=entry['conn'])

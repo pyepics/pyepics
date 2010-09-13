@@ -41,6 +41,14 @@ def DelayedEpicsCallback(fcn):
         return wx.CallAfter(cb)
     return wrapper
 
+@EpicsFunction
+def finalize_epics():
+    """explicitly finalize and cleanup epics so as to prevent core-dumps on exit.
+    """
+    epics.ca.finalize_libca()
+    epics.ca.poll()
+    
+    
 def set_sizer(panel,sizer=None, style=wx.VERTICAL,fit=False):
     """ utility for setting wx Sizer  """
     if sizer is None:  sizer = wx.BoxSizer(style)
@@ -89,11 +97,14 @@ class closure:
 
 class FloatCtrl(wx.TextCtrl):
     """ Numerical Float Control::
-      a wx.TextCtrl that allows only numerical input, can take a precision argument
-      and optional upper / lower bounds
+    a wx.TextCtrl that allows only numerical input, can take a precision argument
+    and optional upper / lower bounds
+    Options:
+      
     """
     def __init__(self, parent, value='', min='', max='', 
-                 action=None,  precision=3, action_kw={}, **kwargs):
+                 precision=3, bell_on_invalid = True,
+                 action=None, action_kw={}, **kwargs):
         
         self.__digits = '0123456789.-'
         self.__prec   = precision
@@ -108,7 +119,7 @@ class FloatCtrl(wx.TextCtrl):
         self.bgcol_valid   ="White"
         self.fgcol_invalid ="Red"
         self.bgcol_invalid =(254,254,80)
-
+        self.bell_on_invalid = bell_on_invalid
         
         # set up action 
         self.__action = closure()  
@@ -180,7 +191,8 @@ class FloatCtrl(wx.TextCtrl):
             self.__CheckValid(self.__val)
             self.SetForegroundColour(self.fgcol_invalid)
             self.SetBackgroundColour(self.bgcol_invalid)
-            wx.Bell()
+            if self.bell_on_invalid:
+                wx.Bell()
         self.__SetMark()
         
     def onKillFocus(self, event):
@@ -272,26 +284,6 @@ class FloatCtrl(wx.TextCtrl):
             self.SetBackgroundColour(self.bgcol_invalid)            
         self.Refresh()
 
-class catimer:
-    """ Epics Event Timer:
-    combines a wxTimer and ca.poll to manage poll for Epics Events in a wx Application.
-    """
-    def __init__(self,parent=None, period=25, **kw):
-        self.parent = parent
-        self.period = period
-        self._timer = wx.Timer(self.parent)
-        self.StartTimer()
-        
-    def StopTimer(self):
-        self._timer.Stop()
-        
-    def StartTimer(self):
-        self.parent.Bind(wx.EVT_TIMER, self.poll)
-        self._timer.Start(self.period)
-
-    def pend(self,event=None,**kw):
-        epics.poll()
-    
 class pvCtrlMixin:
     """ mixin for wx Controls with epics PVs:  connects to PV,
     and manages callback events for the PV
@@ -337,7 +329,7 @@ class pvCtrlMixin:
     @DelayedEpicsCallback
     def _pvEvent(self,pvname=None,value=None,wid=None,char_value=None,**kw):
         # if pvname is None or id == 0: return
-
+        # print 'generic pv event handler ', pvname, value
         if pvname is None or value is None or wid is None:  return
         if char_value is None and value is not None:
             prec = kw.get('precision',None)
@@ -366,15 +358,29 @@ class pvCtrlMixin:
         self.pv.add_callback(self._pvEvent, wid=self.GetId() )
 
 
-class pvTextCtrl(wx.TextCtrl,pvCtrlMixin):
+class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
     """ text control for PV display (as normal string), with callback for automatic updates"""
     def __init__(self, parent,  pv=None, 
                  font=None, fg=None, bg=None, **kw):
 
         wx.TextCtrl.__init__(self,parent, wx.ID_ANY, value='', **kw)
         pvCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
+        self.Bind(wx.EVT_CHAR, self.onChar)
 
-    def _SetValue(self,value):
+    def onChar(self, event):
+        key   = event.GetKeyCode()
+        entry = wx.TextCtrl.GetValue(self).strip()
+        pos   = wx.TextCtrl.GetSelection(self)
+        if (key == wx.WXK_RETURN):
+            self._caput(entry)
+        event.Skip()
+            
+
+    @EpicsFunction
+    def _caput(self, value):
+        self.pv.put(value)
+    
+    def _SetValue(self, value):
         self.SetValue(value)
 
 class pvText(wx.StaticText,pvCtrlMixin):
@@ -385,17 +391,18 @@ class pvText(wx.StaticText,pvCtrlMixin):
         self.as_string = as_string
         self.pv = pv
 
-        wstyle = wx.ALIGN_CENTRE
+        wstyle = wx.ALIGN_LEFT
         if style is not None:
-            wstyle = style | wstyle
-
+            wstyle = style
+            
         wx.StaticText.__init__(self, parent, wx.ID_ANY, label='',
                                style=wstyle, **kw)
         pvCtrlMixin.__init__(self, pv=pv, font=font,fg=None, bg=None)
 
     def _SetValue(self,value):
         if value is not None:
-            self.SetLabel(value) 
+            self.SetLabel(value)
+            # this could test for trunctated text: if self.GetWindowStyle() & wx.ST_NO_AUTORESIZE
         
 class pvEnumButtons(wx.Panel, pvCtrlMixin):
     """ a panel of buttons for Epics ENUM controls """
@@ -426,7 +433,8 @@ class pvEnumButtons(wx.Panel, pvCtrlMixin):
         self.SetAutoLayout(True)
         self.SetSizer(sizer)
         sizer.Fit(self)
-        
+
+    @EpicsFunction
     def _onButton(self,event=None,index=None, **kw):
         if self.pv is None: return
         if index is not None:
@@ -434,8 +442,9 @@ class pvEnumButtons(wx.Panel, pvCtrlMixin):
 
     @DelayedEpicsCallback
     def _pvEvent(self, pvname=None, value=None, wid=None, **kw):
-        if pvname is None or value is None: return
-        for i,btn in enumerate(self.buttons):
+        if pvname is None or value is None:
+            return
+        for i, btn in enumerate(self.buttons):
             btn.up =  (i != value)
             btn.Refresh()
 
@@ -486,16 +495,29 @@ class pvAlarm(wx.MessageDialog, pvCtrlMixin):
     def _SetValue(self,value): pass
     
         
-class pvFloatCtrl(FloatCtrl,pvCtrlMixin):
+class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
     """ float control for PV display of numerical data,
     with callback for automatic updates, and
-    automatic determination of string/float controls """
+    automatic determination of string/float controls
+
+    Options:
+       parent     wx widget of parent
+       pv         epics pv to use for value
+       precision  number of digits past decimal point to display (default to PV's precision)
+       font       wx font
+       fg         wx foreground color
+       bg         wx background color 
+       
+       bell_on_invalid  ring bell when input is out of range
+
+
+    """
     def __init__(self, parent, pv=None, 
-                 font=None, fg=None, bg=None, precision=None,**kw):
+                 font=None, fg=None, bg=None, precision=None, **kw):
 
         self.pv = None
         FloatCtrl.__init__(self, parent, value=0,
-                           precision=precision)
+                           precision=precision, **kw)
         pvCtrlMixin.__init__(self,pv=pv,
                              font=font, fg=None, bg=None)
 
@@ -520,13 +542,11 @@ class pvFloatCtrl(FloatCtrl,pvCtrlMixin):
 
         self.SetValue(self.pv.char_value, act=False)
 
-        
         if self.pv.type in ('string','char'):
             self._warn('pvFloatCtrl needs a double or float PV')
             
         self.SetMin(self.pv.lower_ctrl_limit)
         self.SetMax(self.pv.upper_ctrl_limit)
-
         self.pv.add_callback(self._FloatpvEvent, wid=self.GetId())
         self.SetAction(self._onEnter)
 
@@ -547,11 +567,10 @@ class pvFloatCtrl(FloatCtrl,pvCtrlMixin):
 
     @EpicsFunction
     def _onEnter(self,value=None,**kw):
-        if value in (None,'') or self.pv is None: return 
+        if value in (None,'') or self.pv is None:
+            return 
         try:
             if float(value) != self.pv.get():
-                # print 'FloatPV. onEnter ', self.pv.pvname, value,
-                #              float(value), self.pv.get()
                 self.pv.put(float(value))
         except:
             pass

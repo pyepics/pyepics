@@ -109,7 +109,6 @@ The result looks like this (taken with a Prosilica GigE camera):
 .. image:: AreaDetector1.png
 
 
-
 Example using Character Waveforms as Long Strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
