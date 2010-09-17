@@ -1,18 +1,29 @@
 2010-09-17  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.8:
-	- fixed fetching of ctrl and time variants of array data, due
-	to ptch from Glen Wright (<Glen.Wright@lightsource.ca>)
+ 	- fixed fetching of ctrl and time variants of array data, due
+	to a patch from Glen Wright (<Glen.Wright@lightsource.ca>)!
 
-	- many small improvements for connections on slow networks (say,
-	over a VPN)
+	- improvement for connections on slow networks: 
+	moved setting of monitor reference to pv.on_connect, and
+	postponing setting self.connection until pv.on_connect is
+	complete.  This prevents a main thread from seeing
+	self.connected = True and plowing ahead while the connection
+	callback is still being run.  Connections are now much
+	more reliable over slow networks (say, over a VPN and DSL 
+	line from home -- it works!)
 
+	- set EPICS_CA_MAX_ARRAY_BYTES to 2**24 if not already set.
+	
 	- many fixes to wx.MotorPanel and related GUI components, so 
-	that scripts/wx_motor.py now works.
+	that scripts/wx_motor.py now works much better.
 
 	- small improvements to motor device.
 
-	- doc improvements
+	- added replace_printf_hanlder to ca.py: having difficulty with
+	"fork a daemon process" with ca library.
+
+	- doc improvements and updates
 
 2010-08-31  Matt Newville  <newville@cars.uchicago.edu>
 

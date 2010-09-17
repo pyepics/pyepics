@@ -5,7 +5,6 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-
 This package requires Python version 2.5, 2.6, or 3.1.  I believe that
 Python 2.7 will work, but this has yet not tested.  It is possible that
 Python 2.4 will work if the ctypes package is installed, but this has not
@@ -23,26 +22,24 @@ LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 Downloads
 ~~~~~~~~~~~~
 
-The latest version of the Epics Python Package is 3.0.7.  There are a few ways to get the Epics Python Package:
+The latest version of the Epics Python Package is 3.0.8.  There are a few ways to get the Epics Python Package:
 
-.. _epics-3.0.7.tar.gz:          http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.tar.gz
-.. _epics-3.0.7.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.win32-py2.6.exe
-.. _epics-3.0.7.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.7.win32-py3.1.exe
-.. _pyepics github repository: http://github.com/newville/pyepics
-.. _PyEpics Source Tree: http://cars9.uchicago.edu/software/python/pyepics3/src
-
+.. _epics-3.0.8.tar.gz:          http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.8.tar.gz
+.. _epics-3.0.8.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.8.win32-py2.6.exe
+.. _epics-3.0.8.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.8.win32-py3.1.exe
+.. _pyepics github repository:   http://github.com/newville/pyepics
+.. _PyEpics Source Tree:         http://cars9.uchicago.edu/software/python/pyepics3/src
 
 +---------------------------+----------------------------------------+
 |  Download Option          |  Location                              |
 +===========================+========================================+
-|  Source Kit               |  `epics-3.0.7.tar.gz`_                 |
+|  Source Kit               |  `epics-3.0.8.tar.gz`_                 |
 +---------------------------+----------------------------------------+
-|  Windows Installers       |  `epics-3.0.7.win32-py2.6.exe`_  or    |
-|                           |  `epics-3.0.7.win32-py3.1.exe`_        |
+|  Windows Installers       |  `epics-3.0.8.win32-py2.6.exe`_  or    |
+|                           |  `epics-3.0.8.win32-py3.1.exe`_        |
 +---------------------------+----------------------------------------+
 |  Development Version      |  use `pyepics github repository`_      |
 +---------------------------+----------------------------------------+
-
 
 All development is done through the `pyepics github repository`_.  To get the latest version, use::
 

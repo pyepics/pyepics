@@ -7,9 +7,10 @@
   Epics Process Variable
 """
 import time
-import sys
-import math
 import copy
+from sys import stdout
+from math import log10
+
 from . import ca
 from . import dbr
 
@@ -92,7 +93,7 @@ class PV(object):
 
     def _write(self, msg):
         "write message"
-        sys.stdout.write("%s\n" % msg)
+        stdout.write("%s\n" % msg)
     
     def on_connect(self, chid=None, conn=True, **kwd):
         "callback for connection events"
@@ -115,7 +116,6 @@ class PV(object):
             self._args['typefull'] = _ftype_
             self._args['ftype'] = dbr.Name(_ftype_, reverse=True)
             
-            # set self._monref and 
             if self.auto_monitor is None:
                 self.auto_monitor = self._args['count'] < ca.AUTOMONITOR_MAXLENGTH
             if self._monref is None and self.auto_monitor:
@@ -124,18 +124,24 @@ class PV(object):
                                                       use_ctrl=(self.form == 'ctrl'),
                                                       use_time=(self.form == 'time'))
 
-        self.connected = conn
         if hasattr(self.connection_callback, '__call__'):
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
+        # waiting until the very end until to set self.connected prevents
+        # threads from thinking a connection is complete when it is actually
+        # still in progress.
+        self.connected = conn
         return
 
-    def wait_for_connection(self, force=True):
+    def wait_for_connection(self, force=True, timeout=None):
+        """wait for a connection that started with connect() to finish"""
         if not self._conn_started:
             self.connect(force=force)
         if not self.connected:
+            if timeout is None:
+                timeout = self.connection_timeout
             t0 = time.time()
             while (not self.connected and
-                   time.time()-t0 < self.connection_timeout):
+                   time.time()-t0 < timeout):
                 time.sleep(1.e-3) 
         return self.connected
         
@@ -225,7 +231,7 @@ class PV(object):
             try:
                 prec = getattr(self, 'precision') # self._args.get('precision', None)
                 fmt  = "%%.%if"
-                if 4 < abs(int(math.log10(abs(val + 1.e-9)))):
+                if 4 < abs(int(log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
                 cval = (fmt %  prec) % val
             except (ValueError, TypeError, ArithmeticError):

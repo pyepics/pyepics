@@ -145,7 +145,6 @@ threading contexts are very close to the C library:
    callbacks, 0 to disable them, or leave as ``None`` to use the value of
    :data:`PREEMPTIVE_CALLBACK` to set the context.
 
-
 .. function::  context_destroy()
 
 .. function::  attach_context(context)
@@ -159,6 +158,11 @@ threading contexts are very close to the C library:
 .. function::  message(status)
 
 .. function::  flush_io()
+
+.. function::  replace_printf_handler(fcn)
+    
+   replace the :func:`printf` function with the supplied function (defaults
+   to :func:`sys.stderr.write` )
 
 .. function::  pend_io([t=1.0])
 
@@ -679,10 +683,6 @@ alternatives), though they could be added on request.
    *Not implemented* 
    
 .. function:: ca_replace_access_rights_event
-
-   *Not implemented* 
-
-.. function:: ca_replace_printf_handler
 
    *Not implemented* 
 
