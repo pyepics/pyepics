@@ -73,6 +73,7 @@ char_p   = ctypes.c_char_p
 void_p   = ctypes.c_void_p
 py_obj   = ctypes.py_object
 
+value_offset = None
 
 # extended DBR types:
 class epicsTimeStamp(ctypes.Structure):

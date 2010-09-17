@@ -190,6 +190,8 @@ def initialize_libca():
         
     ca_context = {False:0, True:1}[PREEMPTIVE_CALLBACK]
     ret = libca.ca_context_create(ca_context)
+    # save value offest as array in dbr module
+    dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
     if ret != dbr.ECA_NORMAL:
         raise ChannelAccessException('initialize_libca',
                                      'Cannot create Epics CA Context')
@@ -372,6 +374,13 @@ def detach_context():
     return libca.ca_detach_context()
 
 @withCA
+def replace_printf_handler(fcn=None):
+    if fcn is None:
+        fcn = sys.stderr.write
+    serr = ctypes.CFUNCTYPE(None, ctypes.c_char_p)(fcn)
+    return libca.ca_replace_printf_handler(serr)
+
+@withCA
 def current_context():
     "return this context"
     fcn = libca.ca_current_context
@@ -416,7 +425,7 @@ def pend_io(timeout=1.0):
         return ret
 
 ## @withCA
-def pend_event(timeout=1.e-4):
+def pend_event(timeout=1.e-3):
     """polls CA for events """    
     fcn = libca.ca_pend_event
     fcn.argtypes = [ctypes.c_double]
@@ -427,7 +436,7 @@ def pend_event(timeout=1.e-4):
         return ret
 
 @withCA
-def poll(evt=1.e-4, iot=1.0):
+def poll(evt=1.e-3, iot=1.0):
     """polls CA for events and i/o. """
     pend_event(evt)
     return pend_io(iot)    
@@ -461,8 +470,10 @@ def create_channel(pvname, connect=False, userfcn=None):
     # callback that is run -- the userfcn here is stored in the _cache
     # and called by _onConnectionEvent.
     pvn = str2bytes(pvname)    
+    # sys.stdout.write(' create channel %s \n' % pvn)
     ret = libca.ca_create_channel(pvn, _CB_connect, 0, 0,
                                   ctypes.byref(chid))
+
     PySEVCHK('create_channel', ret)
 
     ctx = current_context()
@@ -492,6 +503,9 @@ def connect_channel(chid, timeout=None, verbose=False, force=True):
     waiting for a connection that may never happen.
     
     """
+    if verbose:
+        sys.stdout.write(' connect channel -> %s %s %s \n' %
+                     (repr(chid), repr(state(chid)), repr(dbr.CS_CONN)))
     conn = (state(chid) == dbr.CS_CONN)
     if conn:
         return conn
@@ -499,7 +513,9 @@ def connect_channel(chid, timeout=None, verbose=False, force=True):
     start_time = time.time()
     pvname = name(chid)
     ctx = current_context()
-    if ctx not in _cache: _cache[ctx] = {}
+
+    if ctx not in _cache:
+        _cache[ctx] = {}
     tdelta = start_time - _cache[ctx][name(chid)]['ts']
     # avoid repeatedly trying to connect to unavailable PV
     nfail = min(20,  1 + _cache[ctx][name(chid)]['failures'])
@@ -510,11 +526,13 @@ def connect_channel(chid, timeout=None, verbose=False, force=True):
 
     if timeout is None:
         timeout = DEFAULT_CONNECTION_TIMEOUT
-    while (not conn and (time.time()-start_time <= timeout)):
+
+    while (not conn and ((time.time()-start_time) < timeout)):
         poll()
         conn = (state(chid) == dbr.CS_CONN)
     if verbose:
         sys.stdout.write('connected in %.3f s\n' % ( time.time()-start_time))
+
     if not conn:
         _cache[ctx][name(chid)]['ts'] = time.time()
         _cache[ctx][name(chid)]['failures'] += 1
@@ -599,7 +617,9 @@ def _unpack(data, count, ftype=dbr.INT, as_numpy=True):
             if ntype == dbr.STRING and '\x00' in out:
                 out = out[:out.index('\x00')]
             return out
-        out = [i.value for i in data]
+        # fix for CTRL / TIME array data:Thanks to Glen Wright !
+        out = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
+                                                  dbr.value_offset[ftype])
         return out
 
     ntype = ftype
@@ -652,7 +672,7 @@ def get(chid, ftype=None, as_string=False, as_numpy=True):
 def __as_string(val, chid, count, ftype):
     "primitive conversion of value to a string"
     try:
-        if ftype == dbr.CHAR:
+        if ftype in (dbr.CHAR, dbr.TIME_CHAR, dbr.CTRL_CHAR):
             val = strjoin('',   [chr(i) for i in val if i>0]).strip()
         elif ftype == dbr.ENUM and count == 1:
             val = get_enum_strings(chid)[val]
@@ -880,8 +900,8 @@ def _onGetEvent(args):
 def _onConnectionEvent(args):
     """set flag in cache holding whteher channel is
     connected. if provided, run a user-function"""
-    pvname = name(args.chid)
     thiscontext = current_context()
+    pvname = name(args.chid)
     if thiscontext not in _cache:
         for context in _cache:
             if pvname in _cache[context]:

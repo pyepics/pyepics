@@ -194,7 +194,7 @@ class PV(object):
             return val
         cval  = repr(val)       
         if self._args['count'] > 1:
-            if ftype == dbr.CHAR:
+            if ftype in (dbr.CHAR, dbr.TIME_CHAR, dbr.CTRL_CHAR):
                 val = list(val)
                 firstnull  = val.index(0)
                 if firstnull < 0:
