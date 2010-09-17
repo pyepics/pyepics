@@ -49,7 +49,8 @@ class PV(object):
 
     def __init__(self, pvname, callback=None, form='native',
                  verbose=False, auto_monitor=None,
-                 connection_callback=None):
+                 connection_callback=None,
+                 connection_timeout=2.0):
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
@@ -63,9 +64,10 @@ class PV(object):
         self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
         self.connection_callback = connection_callback
+        self.connection_timeout = connection_timeout
         self.callbacks  = {}
-        self._conn_timeout = 2.0
         self._monref = None  # holder of data returned from create_subscription
+        self._conn_started = False
         self.chid = None
 
         # get current thread context to use for ca._cache
@@ -86,7 +88,6 @@ class PV(object):
         
         self._args['type'] = dbr.Name(self.ftype).lower()
         if callback is not None:
-            self.connect()
             self.add_callback(callback)
 
     def _write(self, msg):
@@ -99,10 +100,8 @@ class PV(object):
         # just return here, and connection will be forced later
         if self.chid is None and chid is None:
             return
-        
-        self.connected = conn
-        if self.connected:
-            time.sleep(1.e-4)
+        if conn:
+            time.sleep(1.e-3)
             self._args['host']   = ca.host_name(self.chid)
             self._args['count']  = ca.element_count(self.chid)
             self._args['access'] = ca.access(self.chid)
@@ -114,41 +113,52 @@ class PV(object):
             _ftype_ = dbr.Name(self.ftype).lower()
             self._args['type'] = _ftype_
             self._args['typefull'] = _ftype_
+            self._args['ftype'] = dbr.Name(_ftype_, reverse=True)
+            
+            # set self._monref and 
+            if self.auto_monitor is None:
+                self.auto_monitor = self._args['count'] < ca.AUTOMONITOR_MAXLENGTH
+            if self._monref is None and self.auto_monitor:
+                self._monref = ca.create_subscription(self.chid,
+                                                      userfcn=self.on_changes,
+                                                      use_ctrl=(self.form == 'ctrl'),
+                                                      use_time=(self.form == 'time'))
+
+        self.connected = conn
         if hasattr(self.connection_callback, '__call__'):
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
         return
 
+    def wait_for_connection(self, force=True):
+        if not self._conn_started:
+            self.connect(force=force)
+        if not self.connected:
+            t0 = time.time()
+            while (not self.connected and
+                   time.time()-t0 < self.connection_timeout):
+                time.sleep(1.e-3) 
+        return self.connected
+        
     def connect(self, timeout=None, force=True):
         "check that a PV is connected, forcing a connection if needed"
         if not self.connected:
             if timeout is not None:
-                self._conn_timeout = timeout            
+                self.connion_timeout = timeout
             ca.connect_channel(self.chid,
-                               timeout=self._conn_timeout, force=force)
+                               timeout=self.connection_timeout,
+                               force=force)
             self.poll()
-        # should be only be called 1st time, to subscribe
-        # and set self._monref
-        if self.auto_monitor is None:
-            count = ca.element_count(self.chid)
-            self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
-        if self._monref is None and self.connected and self.auto_monitor:
-            self._monref = ca.create_subscription(self.chid,
-                                        userfcn=self.on_changes,
-                                        use_ctrl=(self.form == 'ctrl'),
-                                        use_time=(self.form == 'time'))
-
-        if  self._args['ftype'] is None and self._args['type'] is not None:
-            self._args['ftype'] = dbr.Name(self._args['type'], reverse=True)
-            
-        return (self.connected and self.ftype is not None)
+        self._conn_started = True
+        return self.connected and self.ftype is not None
 
     def reconnect(self):
         self.automonitor = None
         self._monref = None
         self.connected = False
-        return self.connect(force=True)
+        self._conn_started = False
+        return self.wait_for_connection(force=True)
     
-    def poll(self, evt=1.e-4, iot=1.0):
+    def poll(self, evt=1.e-3, iot=1.0):
         "poll for changes"
         ca.poll(evt=evt, iot=iot)
 
@@ -162,7 +172,7 @@ class PV(object):
         >>> p.get('13BMD:m1.DIR',as_string=True)
         'Pos'
         """
-        if not self.connect(force=False):
+        if not self.wait_for_connection():
             return None
         
         self._args['value'] = ca.get(self.chid,
@@ -181,12 +191,12 @@ class PV(object):
         complete, and optionally specifying a callback function to be run
         when the processing is complete.        
         """
-        if not self.connect(force=False):
+        if not self.wait_for_connection():
             return None
         if (self.ftype in (dbr.ENUM, dbr.TIME_ENUM, dbr.CTRL_ENUM) and
             isinstance(value, str) and value in self._args['enum_strs']):
             value = self._args['enum_strs'].index(value)
-        
+
         return ca.put(self.chid, value,
                       wait=wait, timeout=timeout,
                       callback=callback, callback_data=callback_data)
@@ -234,7 +244,7 @@ class PV(object):
     
     def get_ctrlvars(self):
         "get control values for variable"
-        if not self.connect(force=False):
+        if not self.wait_for_connection():
             return None
         kwds = ca.get_ctrlvars(self.chid)
         ca.poll()
@@ -292,8 +302,8 @@ class PV(object):
         Note that a PV may have multiple callbacks, so that each
         has a unique index (small integer) that is returned by
         add_callback.  This index is needed to remove a callback."""
-        if not self.connected:
-            self.connect(force=False)
+        if not self.wait_for_connection():
+            return None
         if hasattr(callback, '__call__'):
             if index is None:
                 index = 1
@@ -316,9 +326,9 @@ class PV(object):
 
     def _getinfo(self):
         "get information paragraph"
-        if not self.connect(force=False):
+        if not self.wait_for_connection():
             return None
-
+        
         self.get_ctrlvars()
         # list basic attributes
         out = []
@@ -523,6 +533,7 @@ class PV(object):
 
     def __repr__(self):
         "string representation"
+
         if self.connected:
             return self._fmt % self._args
         else:

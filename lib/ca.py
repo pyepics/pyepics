@@ -87,7 +87,7 @@ AUTOMONITOR_MAXLENGTH = 16384
 ## default timeout for connection
 #   This should be kept fairly short --
 #   as connection will be tried repeatedly
-DEFAULT_CONNECTION_TIMEOUT = 2.0
+DEFAULT_CONNECTION_TIMEOUT = 5.0
 
 ## Cache of existing channel IDs:
 #  pvname: {'chid':chid, 'conn': isConnected,
@@ -526,7 +526,6 @@ def connect_channel(chid, timeout=None, verbose=False, force=True):
 
     if timeout is None:
         timeout = DEFAULT_CONNECTION_TIMEOUT
-
     while (not conn and ((time.time()-start_time) < timeout)):
         poll()
         conn = (state(chid) == dbr.CS_CONN)
@@ -649,16 +648,16 @@ def get(chid, ftype=None, as_string=False, as_numpy=True):
                    featured as for a PV -- see pv.py for more details.
        as_numpy    flag(True/False) to use numpy array as the
                    return type for array data.       
-    
     """
     if ftype is None:
         ftype = field_type(chid)
+    if ftype in (None, -1):
+        return
     count = element_count(chid)
 
     nelem = count
     if ftype == dbr.STRING:
         nelem = dbr.MAX_STRING_SIZE
-       
     data = (nelem*dbr.Map[ftype])()
     
     ret = libca.ca_array_get(ftype, count, chid, data)
