@@ -1,6 +1,6 @@
 import epics
 import time
-
+epics.ca.DEFAULT_CONNECTION_TIMEOUT=10.
 
 def test1(motorname, start, step, npts):
     "simple test: stepping with wait"
@@ -25,11 +25,9 @@ def testDial(motorname,start, step, npts, offset=1.0):
     user = m1.get_position()
     dial = m1.get_position(dial=True)
     raw  = m1.get_position(raw=True)
-
     print ' User/Dial/Raw = %f / %f / %f' % (user, dial, raw)
-    m1.get_position(raw=True)
 
 
 # test1('13XRM:m1', 0, 0.10, 10)
 # test1('13XRM:m1', 2, -0.05, 20)
-testDial('13XRM:m2', 0.30, 0.01, 10, offset=0.25)
+testDial('13XRM:m2', 0.5, 0.01, 10, offset=0.1)
