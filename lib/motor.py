@@ -261,10 +261,8 @@ class Motor(device.Device):
             connected = self.PV('.RTYP').connected
             time.sleep(0.001)
             if (time.time()-t0 > timeout):
-                raise MotorException("Cannot connect to %s" % name)                
-            rectype = self.PV('.RTYP').get()
-
-        rectype = self.PV('.RTYP').get()            
+                raise MotorException("Cannot connect to %s" % name)
+        rectype = self.PV('.RTYP').get()
         if rectype != 'motor':
             raise MotorException("%s is not an Epics Motor" % name)
 
