@@ -39,7 +39,7 @@ class PV(object):
       >>>p.type           # EPICS data type: 'string','double','enum','long',..
 """
 
-    _fmt = "<PV '%(pvname)s', count=%(count)i, type=%(type)s, access=%(access)s>"
+    _fmt = "<PV '%(pvname)s', count=%(count)i, type=%(typefull)s, access=%(access)s>"
     _fields = ('pvname',  'value',  'char_value',  'status',  'ftype',  'chid',
                'host', 'count', 'access', 'write_access', 'read_access',
                'severity', 'timestamp', 'precision', 'units', 'enum_strs',
@@ -60,6 +60,7 @@ class PV(object):
         self._args['pvname'] = self.pvname
         self._args['count'] = -1
         self._args['type'] = 'unknown'
+        self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
         self.connection_callback = connection_callback
         self.callbacks  = {}
@@ -78,9 +79,12 @@ class PV(object):
         if self.chid is None:
             self.chid = ca.create_channel(self.pvname,
                                           userfcn=self.on_connect)
-
         self._args['chid'] = self.chid
-        self._args['type'] = dbr.Name(ca.field_type(self.chid)).lower()
+        self.ftype  = ca.promote_type(self.chid,
+                                      use_ctrl= self.form == 'ctrl',
+                                      use_time= self.form == 'time')
+        
+        self._args['type'] = dbr.Name(self.ftype).lower()
         if callback is not None:
             self.connect()
             self.add_callback(callback)
@@ -107,7 +111,9 @@ class PV(object):
             self.ftype  = ca.promote_type(self.chid,
                                           use_ctrl= self.form == 'ctrl',
                                           use_time= self.form == 'time')
-            self._args['type'] = dbr.Name(self.ftype).lower()
+            _ftype_ = dbr.Name(self.ftype).lower()
+            self._args['type'] = _ftype_
+            self._args['typefull'] = _ftype_
         if hasattr(self.connection_callback, '__call__'):
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
         return
@@ -317,7 +323,7 @@ class PV(object):
         # list basic attributes
         out = []
         mod = 'native'
-        xtype = self._args['type']
+        xtype = self._args['typefull']
         if '_' in xtype:
             mod, xtype = xtype.split('_')
 
@@ -414,6 +420,11 @@ class PV(object):
     def type(self):
         "pv type"
         return self._args['type']
+
+    @property
+    def typefull(self):
+        "pv type"
+        return self._args['typefull']
 
     @property
     def host(self):
