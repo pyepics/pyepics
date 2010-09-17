@@ -1,3 +1,19 @@
+2010-09-17  Matt Newville  <newville@cars.uchicago.edu>
+
+	* Version 3.0.8:
+	- fixed fetching of ctrl and time variants of array data, due
+	to ptch from Glen Wright (<Glen.Wright@lightsource.ca>)
+
+	- many small improvements for connections on slow networks (say,
+	over a VPN)
+
+	- many fixes to wx.MotorPanel and related GUI components, so 
+	that scripts/wx_motor.py now works.
+
+	- small improvements to motor device.
+
+	- doc improvements
+
 2010-08-31  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.7:

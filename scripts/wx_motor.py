@@ -20,12 +20,12 @@ def my_callback(value=None,**kw):
     for k,v in kw.items():
         print "my callback ", k, v
 
-class SingleMotorFrame(wx.Frame):
+class SimpleMotorFrame(wx.Frame):
     def __init__(self, parent=None, motors=None, *args,**kwds):
 
         wx.Frame.__init__(self, parent, wx.ID_ANY, '',
                          wx.DefaultPosition, wx.Size(-1,-1),**kwds)
-        self.SetTitle(" Epics Motor Page")
+        self.SetTitle(" Epics Motors Page")
 
         wx.EVT_CLOSE(self, self.onClose)        
         self.SetFont(wx.Font(12,wx.SWISS,wx.NORMAL,wx.BOLD,False))
@@ -106,7 +106,7 @@ if __name__ == '__main__':
         motors = sys.argv[1:]
     
     app = wx.App(redirect=False)
-    SingleMotorFrame(motors=motors).Show()
+    SimpleMotorFrame(motors=motors).Show()
     
     app.MainLoop()
 

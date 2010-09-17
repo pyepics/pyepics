@@ -406,17 +406,7 @@ There are several desired features are left undone or unfinished:
  
  *  port CaChannel interface (and others??) to use epics.ca
 
- *  further testing for Python 3.1
-
- *  further testing for threading and 'contexts'.
-
- *  investigate retrieving array data for CTRL and TIME variants.
-
- *  are ca_array_exception events needed???
-
  *  add more "devices", including low-level epics records.
-
- *  port the Motor class to be a subclass of epics.Device.
 
  *  improve wx_motor.py to be a stand-alone app with:
      - dialog window to select a set of motors for an "instrument"
@@ -426,3 +416,7 @@ There are several desired features are left undone or unfinished:
      - config file per instrument to allow loading a saved
        instrument definition, with saved positions
      - tabbed/notebook interface for multiple instruments.
+
+ *  further testing for Python 3.1
+
+ *  further testing for threading and 'contexts'.
