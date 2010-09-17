@@ -11,7 +11,7 @@ no_libca="""*******************************************************
        Could not find CA dynamic library!
 
 A dynamic library (libca.so or libca.dylib) for EPICS CA
-must be found in order for EPCIS calls to work properly.
+must be found in order for EPICS calls to work properly.
 
 Please read the INSTALL inststructions, and fix this
 problem before tyring to use the epics package.
