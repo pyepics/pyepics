@@ -21,7 +21,7 @@ echo '# Publishing PyEpics'
 cp -pr $docbuild/latex/epics.pdf $installdir/pyepics3.pdf
 cp -pr $docbuild/html/*          $installdir/.
 # 
-mv $srcdir/epics* $srcdir/old/.
+mv $srcdir/epics* $srcdir/older/.
 cp -pr Changelog INSTALL README.txt $srcdir/.
 cp -pr dist/*  $srcdir/.
 # 

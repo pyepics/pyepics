@@ -34,11 +34,6 @@ install: all
 	cp -pr $(BUILDDIR)/latex/epics.pdf $(INSTALLDIR)/pyepics3.pdf
 	cp -pr $(BUILDDIR)/html/* $(INSTALLDIR)/.
 
-test: html
-	rm -rf  $(INSTALLDIR)/doc_test
-	cp -pr  $(BUILDDIR)/html $(INSTALLDIR)/doc_test
-	cp -pr main_index.html  $(INSTALLDIR)/index.html
-
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  html      to make standalone HTML files"

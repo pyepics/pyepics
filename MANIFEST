@@ -2,8 +2,10 @@ Changelog
 INSTALL
 MANIFEST.in
 PKG-INFO
-README
+README.txt
 license.txt
+make_wininsts.bat
+publish.sh
 setup.py
 use_py3.bat
 dlls/linux-x86/libCom.so
@@ -23,6 +25,9 @@ doc/main_index.html
 doc/overview.rst
 doc/pv.rst
 doc/wx.rst
+doc/wx_motor.png
+doc/wx_motor_many.png
+doc/wx_motordetail.png
 doc/_static/basic_screenshot.png
 doc/_templates/indexsidebar.html
 lib/__init__.py
@@ -41,11 +46,14 @@ lib/devices/bo.py
 lib/devices/mca.py
 lib/devices/scaler.py
 lib/devices/struck.py
+lib/wx/MotorDetailFrame.py
 lib/wx/MotorPanel.py
 lib/wx/__init__.py
 lib/wx/wxlib.py
 scripts/AreaDetector_Display1.py
 scripts/AreaDetector_Display2.py
+scripts/MotorPanel.py.~1~
+scripts/MotorPanel.pyc
 scripts/caget.py
 scripts/wx_motor.py
 tests/README
@@ -66,7 +74,9 @@ tests/no_monitor.py
 tests/pv_01.py
 tests/pv_callback.py
 tests/pv_connection_callback.py
+tests/pv_multiple_callbacks.py
 tests/pvnames.py
 tests/pvnames.pyc
 tests/thread_put.py
 tests/thread_test.py
+tests/tx.py
