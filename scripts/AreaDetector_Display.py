@@ -10,35 +10,127 @@ os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = '16777216'
 
 import epics
 
-from epics.wx import DelayedEpicsCallback, EpicsFunction
+from epics.wx import DelayedEpicsCallback, EpicsFunction, EpicsTimer
 
 import numpy as np
 import Image
 import wx
 
+class ImageView(wx.Window):
+    def __init__(self, parent, id=-1, pos=wx.DefaultPosition, size=wx.DefaultSize, 
+                 style=wx.BORDER_SUNKEN
+                 ):
+        wx.Window.__init__(self, parent, id, pos, size, style=style)
+        
+        self.image = None
 
-class PlotFigure(wx.Frame, epics.Device):
+        self.SetBackgroundColour('WHITE')
+        # Changed API of wx uses tuples for size and pos now.
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Bind(wx.EVT_SIZE, self.OnSize)
+
+    def SetValue(self, image):
+        self.image = image
+        self.Refresh()
+    
+    def OnSize(self, event):
+        self.DrawImage(size=event.GetSize())
+        event.Skip()
+        self.Refresh()
+
+    def OnPaint(self, event):
+        dc = wx.PaintDC(self)
+        self.DrawImage(dc=None)
+
+
+    def PaintBackground(self, dc, painter, rect=None):
+        if painter is None:
+            return
+        if rect is None:
+            pos = self.GetPosition()
+            sz = self.GetSize()
+        else:
+            pos = rect.Position
+            sz = rect.Size
+
+        if type(painter)==wx.Brush:
+            dc.SetPen(wx.TRANSPARENT_PEN)
+            dc.SetBrush(painter)
+            dc.DrawRectangle(pos.x,pos.y,sz.width,sz.height)
+        else:
+            dc.SetPen(painter)
+            dc.SetBrush(wx.TRANSPARENT_BRUSH)
+            dc.DrawRectangle(pos.x-1,pos.y-1,sz.width+2,sz.height+2)
+
+    def DrawImage(self, dc=None, size=None):
+
+        if not hasattr(self,'image') or self.image is None:
+            return
+        if size is None: size = self.GetSize()
+        wwidth,wheight = size
+        image = self.image
+        bmp = None
+        if image.IsOk():
+            iwidth = image.GetWidth()   # dimensions of image file
+            iheight = image.GetHeight()
+        else:
+            bmp = wx.ArtProvider.GetBitmap(wx.ART_MISSING_IMAGE, wx.ART_MESSAGE_BOX, (64,64))
+            iwidth = bmp.GetWidth()
+            iheight = bmp.GetHeight()
+
+        xfactor = float(wwidth) / iwidth
+        yfactor = float(wheight) / iheight
+
+        if xfactor < 1.0 and xfactor < yfactor:
+            scale = xfactor
+        elif yfactor < 1.0 and yfactor < xfactor:
+            scale = yfactor
+        else:
+            scale = 1.0
+
+        owidth = int(scale*iwidth)
+        oheight = int(scale*iheight)
+        diffx = (wwidth - owidth)/2   # center calc
+        diffy = (wheight - oheight)/2   # center calc
+
+        if bmp is None:
+            if owidth!=iwidth or oheight!=iheight:
+                image = image.Scale(owidth,oheight)
+            bmp = image.ConvertToBitmap()
+
+        if dc is None:
+            dc = wx.PaintDC(self)            
+            
+        dc.DrawBitmap(bmp, diffx, diffy, useMask=True)
+
+
+
+WIDTH  = 1360
+HEIGHT = 1024
+class AD_Display(wx.Frame, epics.Device):
+    """AreaDetector Display """
     attrs = ('ArrayData', 'UniqueId_RBV',
              'ArraySize0_RBV', 'ArraySize1_RBV', 'ArraySize2_RBV',
              'ColorMode_RBV')
     
-
-    def __init__(self, prefix=None, nx=1024, ny=1360):
+    def __init__(self, prefix=None, scale=1.0, approx_height=600):
 
         self.prefix = prefix
-        self.size = [ny, nx, 0]
-        self.ny = ny
-        self.nx = nx
+        self.scale  = scale
+        self.arrsize  = [0,0,0]
+        self.imbuff = None
         self.colormode = 0
         wx.Frame.__init__(self, None, -1)
-        self.SetTitle("PV Image Display")
+        self.SetTitle("Epics Area Detector Display")
+
+        self.img_w = 0
+        self.img_h = 0
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-
-        self.wximage = wx.EmptyImage(self.ny, self.nx)
-        self.bitmap = wx.StaticBitmap(self, -1, wx.BitmapFromImage(self.wximage),
-                                      (self.ny, self.nx))
-
+        self.mainsizer = sizer
+       
+        self.wximage = wx.EmptyImage(approx_height, approx_height)
+        
         txtsizer = wx.BoxSizer(wx.HORIZONTAL)
         txtsizer.Add(wx.StaticText(self,wx.ID_ANY,'PV Name Prefix'),1,wx.LEFT)
         
@@ -50,14 +142,14 @@ class PlotFigure(wx.Frame, epics.Device):
          
         sizer.Add(txtsizer, 0, wx.TOP)
 
-        sizer.Add(self.bitmap, 0, wx.LEFT|wx.TOP|wx.EXPAND)
+        self.image = ImageView(self, size=(100,100))
 
+        sizer.Add(self.image, 1, wx.LEFT|wx.GROW|wx.ALL|wx.ALIGN_CENTER, 0)
+        
         self.SetAutoLayout(True)
         self.SetSizer(sizer)
-        self.connect_pvs()
+        wx.CallAfter( self.connect_pvs )
         self.Fit()
-        self.RefreshImage()
-
 
     def onPvName(self,evt=None, **kw):
         if evt is None:
@@ -65,17 +157,22 @@ class PlotFigure(wx.Frame, epics.Device):
         s = evt.GetString()
         s = str(s).strip()
 
-        if s.endswith(':'):
-            s = s[:-1]
+        if not s.endswith(':'):
+            s = "%s:" % s
         self.prefix = s
         self.connect_pvs()
 
 
     @EpicsFunction
     def connect_pvs(self):
-        print 'Connect PVs ', self.prefix
         epics.Device.__init__(self, self.prefix,
                               attrs=self.attrs)
+
+        if not self.PV('UniqueId_RBV').connected:
+            epics.ca.poll()
+            if not self.PV('UniqueId_RBV').connected:
+                return
+
         self.SetTitle("PV Image Display: %s" % self.prefix)
 
         self.add_callback('UniqueId_RBV',   self.onNewImage)
@@ -84,27 +181,31 @@ class PlotFigure(wx.Frame, epics.Device):
         self.add_callback('ArraySize2_RBV', self.onProperty, dim=2)
         self.add_callback('ColorMode_RBV',  self.onProperty, dim='color')
 
-        self.size = [1,1,1]
-        self.size[0] = self.get('ArraySize0_RBV')
-        self.size[1] = self.get('ArraySize1_RBV')
-        self.size[2] = self.get('ArraySize2_RBV')
+        self.GetImageSize()
+        self.timer = EpicsTimer(self, period=100)
+        epics.poll()
+        self.RefreshImage()
+        
+    @EpicsFunction
+    def GetImageSize(self):
+        self.arrsize = [1,1,1]
+        self.arrsize[0] = self.get('ArraySize0_RBV')
+        self.arrsize[1] = self.get('ArraySize1_RBV')
+        self.arrsize[2] = self.get('ArraySize2_RBV')
         self.colormode = self.get('ColorMode_RBV')
 
-        self.nx = self.size[1]
-        self.ny = self.size[0]
+        self.img_w = self.arrsize[1]
+        self.img_h = self.arrsize[0]
         if self.colormode == 2:
-            self.nx = self.size[2]
-            self.ny = self.size[1]
-            
-        epics.poll()
+            self.img_w = self.arrsize[2]
+            self.img_h = self.arrsize[1]
         
     @DelayedEpicsCallback
     def onProperty(self, pvname=None, value=None, dim=None, **kw):
-        print 'on Property : ' , dim, value
         if dim=='color':
             self.colormode=value
         else:
-            self.size[dim] = value            
+            self.arrsize[dim] = value
 
     @DelayedEpicsCallback
     def onNewImage(self, pvname=None, value=None, **kw):
@@ -115,42 +216,47 @@ class PlotFigure(wx.Frame, epics.Device):
         d = debugtime()
         if self.get('ArrayData') is None:
             return
-        print 'Refresh image'
         im_mode = 'L'
-        im_size = (self.size[0], self.size[1])
+        im_size = (self.arrsize[0], self.arrsize[1])
         if self.colormode == 2:
             im_mode = 'RGB'
-            im_size = [self.size[1], self.size[2]]
+            im_size = [self.arrsize[1], self.arrsize[2]]
         d.add('know image size/type')
         rawdata = self.get('ArrayData') # 
         d.add('have rawdata')
 
+
         imbuff =  Image.frombuffer(im_mode, im_size, rawdata, 'raw', im_mode, 0, 1)
         d.add('data to imbuff')
-        
-        if self.wximage.GetSize() != imbuff.size:
-            print 'reset image??'
-            self.wximage = wx.EmptyImage(imbuff.size[0], imbuff.size[1])
-        d.add('have wximage')
-        
-        # self.wximage.SetData(imbuff.transpose(Image.FLIP_TOP_BOTTOM).convert('RGB').tostring())
-        self.wximage.SetData(imbuff.convert('RGB').tostring())            
-        d.add('wximage.SetData done')
-            
-        self.bitmap.SetBitmap(wx.BitmapFromImage(self.wximage))
-        d.add('wx bitmap set')
-        d.show()
-        # self.bitmap.SetBitmap(iwx.BitmapFromImage(self.wximage))            
+         
+        self.GetImageSize()
+        display_size = (int(self.img_h*self.scale), int(self.img_w*self.scale))
 
+        if self.img_h < 1 or self.img_w < 1:
+            return
+        try:
+            imbuff = imbuff.resize(  display_size )
+        except:
+            pass
+        d.add('imbuff resized')
+        if self.wximage.GetSize() != imbuff.size:
+             self.wximage = wx.EmptyImage(display_size[0], display_size[1])
+        o = imbuff.convert('RGB').tostring()
+        self.wximage.SetData(imbuff.convert('RGB').tostring())
+        self.image.SetValue(self.wximage)
+        # ev  = wx.SizeEvent(display_size)
+        # self.image.OnSize(event=ev)
+        d.add('wx bitmap set')
+        # d.show()
+        
 if __name__ == '__main__':
     import sys
     prefix = '13IDCPS1:image1:'
     if len(sys.argv) > 1:
         prefix = sys.argv[1]
 
-    print sys.argv, prefix
     app = wx.PySimpleApp()
-    frame = PlotFigure(prefix=prefix)
+    frame = AD_Display(prefix=prefix)
     
     frame.Show()
     app.MainLoop()

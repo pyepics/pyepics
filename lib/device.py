@@ -51,11 +51,13 @@ class Device(object):
       >>> x.put('13IDC:m3.VAL', 2)
       >>> print x.PV('13IDC:m3.DIR').get(as_string=True)
     """
-    def __init__(self,prefix=None,attrs=None):
+    def __init__(self, prefix=None, attrs=None, timeout=0.5):
         self.__prefix__ = prefix 
         self._pvs = {}
+        self.connection_timeout = timeout
         if attrs is not None:
-            for p in attrs: self.PV(p, init=True)
+            for p in attrs: self.PV(p, init=True,
+                                    connection_timeout=connection_timeout)
         ca.poll()
         
     def PV(self, attr, init=False):
@@ -64,7 +66,8 @@ class Device(object):
         if self.__prefix__ is not None: 
             pvname = "%s%s" % (self.__prefix__, attr)
         if pvname not in self._pvs:
-            self._pvs[pvname] = pv.PV(pvname)
+            self._pvs[pvname] = pv.PV(pvname,
+                                      connection_timeout=self.connection_timeout)
             if init:
                 return
         if not self._pvs[pvname].connected:
@@ -95,7 +98,11 @@ class Device(object):
         so that the callback function will be run when
         the attribute's value changes"""
         self.PV(attr).get()
-        self.PV(attr).add_callback(callback, **kws)
+        return self.PV(attr).add_callback(callback, **kws)
+        
+    def remove_callbacks(self, attr, index=None):
+        """remove a callback function to an attribute PV"""
+        self.PV(attr).remove_callback(index=index)
         
     def pv_property(attr, as_string=False,wait=False,timeout=10.0):
         """function to turn a device attribute PV into a property:

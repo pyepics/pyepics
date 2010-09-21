@@ -7,7 +7,7 @@ of the widget  when the associated PV changes.
 from . import MotorPanel
 from . import wxlib
 
-MotorPanel = MotorPanel.MotorPanel
+MotorPanel    = MotorPanel.MotorPanel
 pvText        = wxlib.pvText
 pvAlarm       = wxlib.pvAlarm
 pvFloatCtrl   = wxlib.pvFloatCtrl
@@ -24,3 +24,4 @@ FloatCtrl = wxlib.FloatCtrl
 DelayedEpicsCallback = wxlib.DelayedEpicsCallback
 EpicsFunction  = wxlib.EpicsFunction
 finalize_epics  = wxlib.finalize_epics
+EpicsTimer      = wxlib.EpicsTimer

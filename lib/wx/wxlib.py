@@ -94,6 +94,33 @@ class closure:
         self.args = args
         return self.func(*self.args, **self.kw)
 
+class EpicsTimer:
+    """ Epics Event Timer:
+    combines a wxTimer and epics.ca.pend_event to cause Epics Event Processing
+    within a wx Application.
+
+    >>> my_timer = EpicsTimer(parent, period=100)
+    
+    period is in milliseconds.  At each period, epics.ca.poll() will be run.
+    
+    """
+    def __init__(self, parent, period=100, start = True, **kw):
+        self.parent = parent
+        self.period = period
+        self.timer = wx.Timer(parent)
+        self.parent.Bind(wx.EVT_TIMER, self.pend)
+        if start:
+            self.StartTimer()
+        
+    def StopTimer(self):
+        self.timer.Stop()
+
+    def StartTimer(self):
+        self.timer.Start(self.period)
+        
+    def pend(self, event=None):
+        epics.ca.poll()
+
 
 class FloatCtrl(wx.TextCtrl):
     """ Numerical Float Control::
