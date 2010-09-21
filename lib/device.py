@@ -90,12 +90,12 @@ class Device(object):
             out[key] = self._pvs[key].get()
         return out
 
-    def add_callback(self,attr,callback):
+    def add_callback(self, attr, callback, **kws):
         """add a callback function to an attribute PV,
         so that the callback function will be run when
         the attribute's value changes"""
         self.PV(attr).get()
-        self.PV(attr).add_callback(callback)
+        self.PV(attr).add_callback(callback, **kws)
         
     def pv_property(attr, as_string=False,wait=False,timeout=10.0):
         """function to turn a device attribute PV into a property:

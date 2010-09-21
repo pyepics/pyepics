@@ -4,6 +4,7 @@ import os
 import sys
 
 import time
+from debugtime import debugtime
 
 os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = '16777216'
 
@@ -29,13 +30,12 @@ class PlotFigure(wx.Frame):
 
         self.img_pv  = None
         self.frameno = None
-        b = Image.open('AreaDetector_Display1.png')
+        b = Image.open('AreaDetector1.png')
         self.wximage = wx.EmptyImage(b.size[0], b.size[1])
         print b.size
         self.wximage.SetData(b.convert('RGB').tostring())
-        self.bitmap = wx.StaticBitmap(self, -1, wx.BitmapFromImage(self.wximage), (400, 500))
+        self.bitmap = wx.StaticBitmap(self, -1, wx.BitmapFromImage(self.wximage), (self.ny, self.nx))
         print self.bitmap
-        self.tstamp = 0
         #         txtsizer = wx.BoxSizer(wx.HORIZONTAL)
         #         txtsizer.Add(wx.StaticText(self,wx.ID_ANY,'PV Name Prefix'),1,wx.LEFT)
         # 
@@ -76,10 +76,12 @@ class PlotFigure(wx.Frame):
         self.frame_pv = epics.PV("%sUniqueId_RBV" % s)
         
         self.frame_pv.add_callback(self.onNewImage)
+
         self.size0 = epics.PV("%sArraySize0_RBV" % s).get()
         self.size1 = epics.PV("%sArraySize1_RBV" % s).get()
         self.size2 = epics.PV("%sArraySize2_RBV" % s).get()
         self.colormode = epics.PV("%sColorMode_RBV" % s).get()
+
         self.datatype  = epics.PV("%sDataType_RBV" % s).get()                
         self.nx = self.size1
         self.ny = self.size0
@@ -94,48 +96,48 @@ class PlotFigure(wx.Frame):
     @DelayedEpicsCallback
     def onNewImage(self, pvname=None, value=None, **kw):
         self.RefreshImage()
-
+        
     @EpicsFunction
     def RefreshImage(self):
-        t0 = time.time()
+        d = debugtime()
         if self.img_pv is not None:
             s = self.prefix
-            self.size0 = epics.PV("%sArraySize0_RBV" % s).get()
-            self.size1 = epics.PV("%sArraySize1_RBV" % s).get()
-            self.size2 = epics.PV("%sArraySize2_RBV" % s).get()
-            self.colormode = epics.PV("%sColorMode_RBV" % s).get()
+            #self.size0 = epics.PV("%sArraySize0_RBV" % s).get()
+            #self.size1 = epics.PV("%sArraySize1_RBV" % s).get()
+            #self.size2 = epics.PV("%sArraySize2_RBV" % s).get()
+            #self.colormode = epics.PV("%sColorMode_RBV" % s).get()
 
             im_mode = 'L'
             im_size = (self.size0, self.size1)
             if self.colormode == 2:
                 im_mode = 'RGB'
                 im_size = (self.size1, self.size2)
-            t1 = time.time() - t0
-            rawdata = self.img_pv.get(as_numpy=False, as_string=False)
-            t2 = time.time() -t0
+            d.add('know image size/type')
+            rawdata = self.img_pv.get() # as_numpy=True) # False, as_string=False)
+            d.add('have rawdata')
 
-            print  '======== ', self.colormode, im_mode, im_size, len(rawdata), time.time()-self.tstamp
-            self.tstamp= time.time()
+            print  '======== ', self.colormode, im_mode, im_size, len(rawdata)
+            print ' == ', type(rawdata), rawdata[:10]
             imbuff =  Image.frombuffer(im_mode, im_size, rawdata, 'raw', im_mode, 0, 1)
-            t3 = time.time() -t0
+            d.add('data to imbuff')
 
-            #             npbuff = np.array(imbuff)
-            # 
-            #             npbuff = 1.0 * npbuff / npbuff.max()
-            # self.im.set_array(npbuff)
             if self.wximage.GetSize() != imbuff.size:
                 self.wximage = wx.EmptyImage(imbuff.size[0], imbuff.size[1])
-
+            d.add('have wximage')
+            
             # self.wximage.SetData(imbuff.transpose(Image.FLIP_TOP_BOTTOM).convert('RGB').tostring())
+            
             self.wximage.SetData(imbuff.convert('RGB').tostring())            
+            d.add('wximage.SetData done')
+            
             self.bitmap.SetBitmap(wx.BitmapFromImage(self.wximage))
-            t4 = time.time() - t0
-            print t1, t2, t3, t4
+            d.add('wx bitmap set')
+            d.show()
             # self.bitmap.SetBitmap(iwx.BitmapFromImage(self.wximage))            
 
 if __name__ == '__main__':
     import sys
-    prefix = '13PS1:image1:'
+    prefix = '13IDCPS1:image1:'
     if len(sys.argv) > 1:
         prefix = sys.argv[1]
 
