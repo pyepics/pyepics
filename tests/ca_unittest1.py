@@ -89,13 +89,31 @@ class CA_BasicTests(unittest.TestCase):
     def test_Enum(self):
         pvn  = pvnames.enum_pv
         chid = ca.create_channel(pvn,connect=True)
+        sys.stdout.write( 'CA test Enum (%s)\n' % (pvn))
         enumstrs = ca.get_enum_strings(chid)
         self.failUnless(len(enumstrs)>1)
 
         self.failUnless(isinstance(enumstrs[0],str))
         sys.stdout.write( 'CA EnumStrings (%s) = %s\n' % (pvn,repr(enumstrs)))
         self.failUnless(enumstrs,pvnames.enum_pv_strs)
+
+    def test_Values(self):
+        sys.stdout.write( 'CA test Values (compare with caget)\n')
+        os.system('rm ./caget.tst')
+        vals = {}
+        for pvn in (pvnames.double_pv, pvnames.enum_pv,
+                    pvnames.str_pv, pvnames.int_pv, pvnames.long_pv ):
+            os.system('caget  -n %s >> ./caget.tst' % pvn)
+            chid = ca.create_channel(pvn)
+            ca.connect_channel(chid)
+            vals[pvn] = ca.get(chid)
+        rlines = open('./caget.tst', 'r').readlines()
+        for line in rlines:
+            pvn, sval = [i.strip() for i in line[:-1].split(' ', 1)]
+            tval = str(vals[pvn])
+            self.assertEqual(tval, sval)
         
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase( CA_BasicTests)
     unittest.TextTestRunner(verbosity=1).run(suite)

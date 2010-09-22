@@ -19,9 +19,15 @@ enum_pv_strs = ['Neg','Pos']
 
 #### 3
 # this pv should be a STRING. It will NOT be set.
-# provide its value
 str_pv = '13IDA:m1.DESC'
-str_pv_val = 'Hor. slit pos.'
+
+#### 4
+# this pv should be a INT. It will NOT be set.
+int_pv = '13IDA:m1.STOP'
+
+#### 5
+# this pv should be a LONG. It will NOT be set.
+long_pv = '13IDA:m1.RVAL'
 
 ####
 # provide a single motor prefix (to which '.VAL' and '.RBV' etc will be added)
