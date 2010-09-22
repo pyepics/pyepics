@@ -15,11 +15,6 @@ ID_FREAD = wx.NewId()
 ID_FSAVE = wx.NewId()
 ID_CONF  = wx.NewId()
 
-def my_callback(value=None,**kw):
-    print ">> my callback val = ", value
-    for k,v in kw.items():
-        print "my callback ", k, v
-
 class SimpleMotorFrame(wx.Frame):
     def __init__(self, parent=None, motors=None, *args,**kwds):
 
@@ -36,22 +31,18 @@ class SimpleMotorFrame(wx.Frame):
 
     def buildFrame(self, motors=None):
         self.mainsizer = wx.BoxSizer(wx.VERTICAL)
-        #self.mainpanel = wx.Panel(self, -1)
         
         if motors is not None:
             self.motors= [MotorPanel(self, motor=m) for m in motors]
            
             for mpan in self.motors:
                 self.mainsizer.Add(mpan, 1, wx.EXPAND)
-                self.mainsizer.Add(wx.StaticLine(self, size=(100,3)),  0, wx.EXPAND)
+                self.mainsizer.Add(wx.StaticLine(self, size=(100,3)),
+                                   0, wx.EXPAND)
                  
         self.SetSizer(self.mainsizer)
         self.mainsizer.Fit(self)
-
         self.Refresh()
-
-    def setMotors(self, motors=None):
-        print 'would add motors here....'
 
     def createMenus(self):
         fmenu = wx.Menu()

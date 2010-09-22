@@ -1,0 +1,26 @@
+These programs demonstrate some uses of the epics module, especially when 
+coupled with wxWidget displays.
+
+== Motor_Display.py:
+This provides a simple GUI interface to Epics Motors. Multiple motors can
+be specified.  These will be shown as rows in the main page, much like an
+MEDM screen, only nicer.  Each motor will be fully connected to the Epics
+PVs of the Epics Motor Record.  A ``more`` button will bring up a separate
+window with more details of the Motor Record.
+
+   ~> python Motor_Display.py XXX:m1 XXX:m2 XXX:m3
+
+This program requires the wxPython package.
+
+== AreaDetector_Display.py
+This will connect to and display the image from an Epics Area Detector.
+The display will be live, responding to changes in the Epics record.
+
+   ~> python AreaDetector_Display.py XXXAD1:image1:
+
+This program requires the wxPython package and the Python Imaging Library
+
+== caget.py
+This is a simple emulation of the the caget command.
+   
+   ~> python caget.py  XXX.VAL

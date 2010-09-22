@@ -17,15 +17,13 @@ import Image
 import wx
 
 class ImageView(wx.Window):
-    def __init__(self, parent, id=-1, pos=wx.DefaultPosition, size=wx.DefaultSize, 
-                 style=wx.BORDER_SUNKEN
-                 ):
-        wx.Window.__init__(self, parent, id, pos, size, style=style)
+    def __init__(self, parent, id=-1, pos=wx.DefaultPosition,
+                 size=wx.DefaultSize, **kw):
+        wx.Window.__init__(self, parent, id, pos, size, **kw)
         
         self.image = None
-
         self.SetBackgroundColour('WHITE')
-        # Changed API of wx uses tuples for size and pos now.
+
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_SIZE, self.OnSize)
 
@@ -39,54 +37,33 @@ class ImageView(wx.Window):
         self.Refresh()
 
     def OnPaint(self, event):
-        dc = wx.PaintDC(self)
-        self.DrawImage(dc=None)
-
-
-    def PaintBackground(self, dc, painter, rect=None):
-        if painter is None:
-            return
-        if rect is None:
-            pos = self.GetPosition()
-            sz = self.GetSize()
-        else:
-            pos = rect.Position
-            sz = rect.Size
-
-        if type(painter)==wx.Brush:
-            dc.SetPen(wx.TRANSPARENT_PEN)
-            dc.SetBrush(painter)
-            dc.DrawRectangle(pos.x,pos.y,sz.width,sz.height)
-        else:
-            dc.SetPen(painter)
-            dc.SetBrush(wx.TRANSPARENT_BRUSH)
-            dc.DrawRectangle(pos.x-1,pos.y-1,sz.width+2,sz.height+2)
+        self.DrawImage()
 
     def DrawImage(self, dc=None, size=None):
-
         if not hasattr(self,'image') or self.image is None:
             return
-        if size is None: size = self.GetSize()
+        if size is None:
+            size = self.GetSize()
         wwidth,wheight = size
         image = self.image
         bmp = None
         if image.IsOk():
-            iwidth = image.GetWidth()   # dimensions of image file
+            iwidth = image.GetWidth()   
             iheight = image.GetHeight()
         else:
-            bmp = wx.ArtProvider.GetBitmap(wx.ART_MISSING_IMAGE, wx.ART_MESSAGE_BOX, (64,64))
-            iwidth = bmp.GetWidth()
+            bmp = wx.ArtProvider.GetBitmap(wx.ART_MISSING_IMAGE,
+                                           wx.ART_MESSAGE_BOX, (64,64))
+            iwidth  = bmp.GetWidth()
             iheight = bmp.GetHeight()
 
         xfactor = float(wwidth) / iwidth
         yfactor = float(wheight) / iheight
 
+        scale = 1.0
         if xfactor < 1.0 and xfactor < yfactor:
             scale = xfactor
         elif yfactor < 1.0 and yfactor < xfactor:
             scale = yfactor
-        else:
-            scale = 1.0
 
         owidth = int(scale*iwidth)
         oheight = int(scale*iheight)
@@ -100,13 +77,8 @@ class ImageView(wx.Window):
 
         if dc is None:
             dc = wx.PaintDC(self)            
-            
         dc.DrawBitmap(bmp, diffx, diffy, useMask=True)
 
-
-
-WIDTH  = 1360
-HEIGHT = 1024
 class AD_Display(wx.Frame, epics.Device):
     """AreaDetector Display """
     attrs = ('ArrayData', 'UniqueId_RBV',
@@ -222,11 +194,11 @@ class AD_Display(wx.Frame, epics.Device):
             im_mode = 'RGB'
             im_size = [self.arrsize[1], self.arrsize[2]]
         d.add('know image size/type')
-        rawdata = self.get('ArrayData') # 
+        rawdata = self.get('ArrayData')  
         d.add('have rawdata')
 
-
-        imbuff =  Image.frombuffer(im_mode, im_size, rawdata, 'raw', im_mode, 0, 1)
+        imbuff =  Image.frombuffer(im_mode, im_size, rawdata,
+                                   'raw', im_mode, 0, 1)
         d.add('data to imbuff')
          
         self.GetImageSize()
@@ -234,18 +206,16 @@ class AD_Display(wx.Frame, epics.Device):
 
         if self.img_h < 1 or self.img_w < 1:
             return
-        try:
-            imbuff = imbuff.resize(  display_size )
-        except:
-            pass
+
+        imbuff = imbuff.resize(display_size)
+
         d.add('imbuff resized')
         if self.wximage.GetSize() != imbuff.size:
              self.wximage = wx.EmptyImage(display_size[0], display_size[1])
-        o = imbuff.convert('RGB').tostring()
+
         self.wximage.SetData(imbuff.convert('RGB').tostring())
         self.image.SetValue(self.wximage)
-        # ev  = wx.SizeEvent(display_size)
-        # self.image.OnSize(event=ev)
+
         d.add('wx bitmap set')
         # d.show()
         
