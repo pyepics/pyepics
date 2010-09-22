@@ -62,8 +62,9 @@ EPICS2UNIX_EPOCH = 631173600.0 - time.timezone
 short_t  = ctypes.c_short
 ushort_t = ctypes.c_ushort
 int_t    = ctypes.c_int
+uint_t   = ctypes.c_uint
 long_t   = ctypes.c_long
-ulong_t   = ctypes.c_ulong
+ulong_t  = ctypes.c_ulong
 float_t  = ctypes.c_float
 double_t = ctypes.c_double
 byte_t   = ctypes.c_byte
@@ -78,8 +79,7 @@ value_offset = None
 # extended DBR types:
 class epicsTimeStamp(ctypes.Structure):
     "emulate epics timestamp"
-    _fields_ = [('secs', ulong_t), ('nsec', ulong_t)]
-       
+    _fields_ = [('secs', uint_t), ('nsec', uint_t)]
 _STAT_SEV    = (('status', short_t), ('severity', short_t))
 _STAT_SEV_TS = (('status', short_t), ('severity', short_t),
                 ('stamp',  epicsTimeStamp))
@@ -106,11 +106,11 @@ class time_char(ctypes.Structure):
                                      ('value',     byte_t)]
 
 class time_long(ctypes.Structure):
-    _fields_ = list(_STAT_SEV_TS) + [('value',  long_t)]
+    _fields_ = list(_STAT_SEV_TS) + [('value', int_t)]
     
 
 class time_double(ctypes.Structure):
-    _fields_ = list(_STAT_SEV_TS) + [('RISC_pad', long_t),
+    _fields_ = list(_STAT_SEV_TS) + [('RISC_pad', int_t),
                                      ('value',    double_t)]    
    
     
@@ -139,8 +139,8 @@ class ctrl_char(ctypes.Structure):
     _fields_.extend([('RISC_pad', byte_t), ('value', byte_t)])
     
 class ctrl_long(ctypes.Structure):
-    _fields_ = list(_STAT_SEV) +[_UNITS] +  _gen_ctrl_lims(t=long_t)
-    _fields_.extend([('value', long_t)])
+    _fields_ = list(_STAT_SEV) +[_UNITS] +  _gen_ctrl_lims(t=int_t)
+    _fields_.extend([('value', int_t)])
     
 class ctrl_float(ctypes.Structure):
     _fields_ = list(_STAT_SEV)
@@ -163,7 +163,7 @@ Map = {STRING: char_t,
        FLOAT:  float_t,
        ENUM:   ushort_t,
        CHAR:   byte_t,
-       LONG:   long_t,
+       LONG:   int_t,
        DOUBLE: double_t,
 
        TIME_STRING: time_string,
@@ -232,18 +232,18 @@ def Cast(args):
 
 class event_handler_args(ctypes.Structure):
     _fields_ = [('usr',     py_obj),
-                ('chid',    long_t),   
+                ('chid',    int_t),   
                 ('type',    long_t),   
                 ('count',   long_t),      
                 ('raw_dbr', void_p),    
-                ('status',  long_t)]
+                ('status',  int_t)]
 
 class connection_args(ctypes.Structure):
-    _fields_ = [('chid', long_t), ('op', long_t)]
+    _fields_ = [('chid',int_t), ('op', long_t)]
 
 class exception_handler_args(ctypes.Structure):
     _fields_ = [('usr',   void_p),
-                ('chid',  long_t),
+                ('chid',  int_t),
                 ('type',  int_t),
                 ('count', int_t), 
                 ('addr',  void_p),
