@@ -102,7 +102,7 @@ class PV(object):
         if self.chid is None and chid is None:
             return
         if conn:
-            time.sleep(1.e-3)
+            self.poll()
             self._args['host']   = ca.host_name(self.chid)
             self._args['count']  = ca.element_count(self.chid)
             self._args['access'] = ca.access(self.chid)
@@ -142,7 +142,7 @@ class PV(object):
             t0 = time.time()
             while (not self.connected and
                    time.time()-t0 < timeout):
-                time.sleep(1.e-3) 
+                self.poll()
         return self.connected
         
     def connect(self, timeout=None, force=True):
@@ -164,7 +164,7 @@ class PV(object):
         self._conn_started = False
         return self.wait_for_connection(force=True)
     
-    def poll(self, evt=1.e-3, iot=1.0):
+    def poll(self, evt=1.e-4, iot=1.0):
         "poll for changes"
         ca.poll(evt=evt, iot=iot)
 
@@ -184,7 +184,7 @@ class PV(object):
         self._args['value'] = ca.get(self.chid,
                                      ftype=self.ftype,
                                      as_numpy=as_numpy)
-        # self.poll() 
+        self.poll() 
         field = 'value'
         if as_string:
             self._set_charval(self._args['value'])

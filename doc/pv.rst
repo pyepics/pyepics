@@ -114,7 +114,7 @@ callbacks to be executed when the PV changes.
    dictionary may have many members, depending on the data type of PV.  See
    the :ref:`Table of Control Attributes <ctrlvars_table>`  for details.
 
-.. method:: poll(evt=1.e-4, iot=1.0)
+.. method:: poll(evt=1.e-3, iot=1.0)
 
    this simply calls `ca.poll(evt=evt,iot=iot)` 
 
@@ -308,7 +308,7 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
 String representation for a PV
 ================================
-x
+
 The string representation for a `PV`, as returned either with the
 *as_string* argument to :meth:`ca.get` or from the :attr:`char_value`
 attribute (they are equivalent) needs some further explanation.
@@ -336,11 +336,9 @@ will depend on the native type and count of a `PV`.
      all others        > 1       = <array size=*count*, type=*type*>
     =============== ========== ==============================
 
-For double/float values with large exponents, the formatting will be 
-`("%%.%ig" % (precision)) % value`.    
-
-For character waveforms (*char* data with *count* > 1), the
-:attr:char_value will be set from
+For double/float values with large exponents, the formatting will be
+`("%%.%ig" % (precision)) % value`.  For character waveforms (*char* data
+with *count* > 1), the :attr:`char_value` will be set according to::
 
    >>> firstnull  = val.index(0)
    >>> if firstnull == -1: firstnull= len(val)
@@ -631,7 +629,7 @@ A simple example of this would be::
 
     t0 = time.time()
     while time.time() - t0 < 60.0: 
-        time.sleep(1.e-4)
+        time.sleep(1.e-3)
     print 'Done.'
 
 This first defines a *callback function* called `onChanges()` and then

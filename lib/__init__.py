@@ -37,7 +37,7 @@ Alarm = alarm.Alarm
 Motor = motor.Motor
 Device = device.Device 
 poll  = ca.poll
-sleep = time.sleep # should probably remove this!
+# sleep = time.sleep # should probably remove this!
 
 _Cache = {}     # a local cache for PVs used in caget/caput/cainfo/camonitor functions
 _Monitors = {}  # a local cache for Monitored PVs
@@ -51,7 +51,7 @@ def __createPV(pvname, timeout=5.0):
     thispv = PV(pvname)
     thispv.connect()
     while not thispv.connected:
-        time.sleep(1.e-3)
+        poll()
         if time.time()-start_time > timeout:
             break
     if not thispv.connected:
@@ -85,10 +85,10 @@ def caget(pvname, as_string=False):
     thispv = __createPV(pvname)
     if thispv is not None:
         val = thispv.get()
-        time.sleep(1.e-3)
+        poll()
         if as_string:
             thispv.get_ctrlvars()
-            time.sleep(1.e-3)
+            poll()
             return thispv.get(as_string=True)
         return val
 
