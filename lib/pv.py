@@ -149,7 +149,7 @@ class PV(object):
         "check that a PV is connected, forcing a connection if needed"
         if not self.connected:
             if timeout is not None:
-                self.connion_timeout = timeout
+                self.connection_timeout = timeout
             ca.connect_channel(self.chid,
                                timeout=self.connection_timeout,
                                force=force)
