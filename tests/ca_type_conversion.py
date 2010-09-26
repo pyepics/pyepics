@@ -40,25 +40,19 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
 
     for chid in chids:
         print '== ', epics.ca.name(chid), chid
-        time.sleep(1.0)
+        time.sleep(0.1)
         ntype = epics.ca.promote_type(chid, use_ctrl=use_ctrl,
                                       use_time=use_time)
         val  = epics.ca.get(chid, ftype=ntype)
-
         cval = epics.ca.get(chid, as_string=True)    
         if epics.ca.element_count(chid) > 1:
             val = val[:12]
         print ntype, epics.dbr.Name(ntype).lower(), val, cval
-    print '----- finalize'
-    time.sleep(1.0)
-    for k,v in epics.ca._cache.items():
-        for px in v.values():
-            px.pop('chid')
+    print '----- finalizing CA'
     epics.ca.finalize_libca()
-    print '--------------------------------'
     
-for use_preempt in (True,):#  False):
-    for use_numpy in (False,): # True, False):
+for use_preempt in (True, False):
+    for use_numpy in (True, False):
         for use_time, use_ctrl in ((False, False), (True, False), (False, True)):
                 RunTest(pvlist,
                         use_preempt=use_preempt,
