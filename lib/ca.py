@@ -212,11 +212,10 @@ def finalize_libca(maxtime=10.0):
         start_time = time.time()
         flush_io()
         poll()
-        for context_chids in  list(_cache.values()):
-            for key, val in list(context_chids.items()):
-                clear_channel(val['chid'])
+        for contexts in _cache.values():
+            for val in contexts.values():
+                val.pop('chid')
         _cache.clear()
-
         for i in range(10):
             flush_io()
             poll()
