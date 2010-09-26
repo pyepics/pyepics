@@ -205,6 +205,9 @@ def finalize_libca(maxtime=10.0):
     run clear_channel(chid) for all chids in _cache
     then flush_io() and poll() a few times.
     """
+    global libca
+    if libca is None:
+        return
     try:
         start_time = time.time()
         flush_io()
@@ -212,7 +215,6 @@ def finalize_libca(maxtime=10.0):
         for context_chids in  list(_cache.values()):
             for key, val in list(context_chids.items()):
                 clear_channel(val['chid'])
-                context_chids[key] = {}
         _cache.clear()
 
         for i in range(10):
@@ -221,6 +223,7 @@ def finalize_libca(maxtime=10.0):
             if time.time()-start_time > maxtime:
                 break
         context_destroy()
+        libca = None
     except:
         pass
 
@@ -596,48 +599,54 @@ def promote_type(chid, use_time=False, use_ctrl=False):
         ftype = dbr.TIME_STRING
     return ftype
 
-def _unpack(data, count, ftype=dbr.INT, as_numpy=True):
-    """unpack raw data returned from an array get or
-    subscription callback"""
-
-    def unpack_simple(data, ntype):
-        if count == 1 and ntype != dbr.STRING:
-            return data[0]
-        out = data
-        if ntype == dbr.STRING:
-            out = strjoin('', out).rstrip()
-            if '\x00' in out:
-                out = out[:out.index('\x00')]
-        return out
-
-    def unpack_ctrltime(data, ntype):
-        if count == 1 or ntype == dbr.STRING:
-            out = data[0].value
-            if ntype == dbr.STRING and '\x00' in out:
-                out = out[:out.index('\x00')]
-            return out
-        # fix for CTRL / TIME array data:Thanks to Glen Wright !
-        out = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
-                                                  dbr.value_offset[ftype])
-        return out
-
-    ntype = ftype
-    unpack = unpack_simple
-    if ftype >= dbr.TIME_STRING:
-        unpack = unpack_ctrltime
+def native_type(ftype):
+    "return native field type from TIME or CTRL variant"
     if ftype == dbr.CTRL_STRING:
         ftype = dbr.TIME_STRING
-
+    ntype = ftype
     if ftype > dbr.CTRL_STRING:
         ntype -= dbr.CTRL_STRING
     elif ftype >= dbr.TIME_STRING:
         ntype -= dbr.TIME_STRING
+    return ntype
 
-    out = unpack(data, ntype)
-    if (HAS_NUMPY and as_numpy and ntype != dbr.STRING and
-        count > 1 and count < AUTOMONITOR_MAXLENGTH):
-        out = numpy.array(out)
-    return out
+def _unpack(data, count, ftype=dbr.INT, as_numpy=True):
+    """unpack raw data returned from an array get or
+    subscription callback"""
+
+    def unpack_simple(data, count, ntype, use_numpy):
+        if count == 1 and ntype != dbr.STRING:
+            return data[0]
+        if ntype == dbr.STRING:
+            out = strjoin('', data).rstrip()
+            if '\x00' in out:
+                out = out[:out.index('\x00')]
+            return out
+        elif use_numpy:
+            return numpy.array(data)
+        return list(data)
+        
+    def unpack_ctrltime(data, count, ntype, use_numpy):
+        if count == 1 or ntype == dbr.STRING:
+            out = data[0].value
+            if ntype == dbr.STRING and '\x00' in out:
+                out = zout[:out.index('\x00')]
+            return out
+        # fix for CTRL / TIME array data:Thanks to Glen Wright !
+        out = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
+                                                  dbr.value_offset[ftype])
+        if use_numpy:
+            return numpy.array(out)
+        return list(out)
+
+    unpack = unpack_simple
+    if ftype >= dbr.TIME_STRING:
+        unpack = unpack_ctrltime
+
+    ntype = native_type(ftype)
+    use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and
+                 count > 1 and count < AUTOMONITOR_MAXLENGTH)
+    return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID
 def get(chid, ftype=None, as_string=False, as_numpy=True):
@@ -658,11 +667,14 @@ def get(chid, ftype=None, as_string=False, as_numpy=True):
     nelem = count
     if ftype == dbr.STRING:
         nelem = dbr.MAX_STRING_SIZE
+
     data = (nelem*dbr.Map[ftype])()
-    
     ret = libca.ca_array_get(ftype, count, chid, data)
     PySEVCHK('get', ret)
     poll()
+    if count > 2:
+        poll(evt=count*5.e-5, iot=5.0)
+
     val = _unpack(data, nelem, ftype=ftype, as_numpy=as_numpy)
     if as_string:
         val = __as_string(val, chid, count, ftype)
