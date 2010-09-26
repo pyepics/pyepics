@@ -9,7 +9,7 @@
 double_pv = '13XRM:m2.VAL'
 double_pv_host = 'sonata.cars.aps.anl.gov:5064'
 double_pv_units = 'mm'
-double_pv_prec = 4
+double_pv_prec = 5
 
 #### 2
 # this pv should be an ENUM. It will NOT be set.
@@ -23,6 +23,15 @@ long_pv  = '13XRM:m2.RVAL'
 float_pv = '13XRM:m2.VERS'
 enum_pv  = '13XRM:m2.DIR'
 enum_pv_strs = ['Neg','Pos']
+
+## Here are some waveform / array data PVs
+
+long_arr_pv   = '13IDC:str:mca1'
+
+# char / byte array
+char_arr_pv   = '13BMD:edb:dir'
+
+double_arr_pv = '13IDC:scan1.P1PA'
 
 ####
 # provide a single motor prefix (to which '.VAL' and '.RBV' etc will be added)

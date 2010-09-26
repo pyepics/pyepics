@@ -3,10 +3,6 @@ import time
 import epics
 import pvnames
 
-pvnames.long_arr_pv   = '13IDC:str:mca1'
-pvnames.char_arr_pv   = '13BMD:edb:dir'
-pvnames.double_arr_pv = '13IDC:scan1.P1PA'
-
 pvlist = (
     pvnames.str_pv,
     pvnames.int_pv,

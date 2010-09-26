@@ -1,6 +1,39 @@
-This directory contains a series of tests for the epics module.
+This folder contains several tests of the Epics Channel Access Module.
 
-In order to test the module, it must be able to connect to valid PVs
+Almost all of these tests require a working set of Epics Channels to run.
+These are all named in the pvnames.py module, which you will probably need
+to customize to run these tests.
 
-You should customize the PV listed in pvnames.py for the tests to work.
+The tests are not (yet?) very automated, and the results should be
+inspected for correctness.
 
+
+ca_unittest1.py
+ca_type_conversion.py
+ca_connection_callback.py
+ca_simpletest.py
+ca_subscribe.py
+ca_subscribe2.py
+
+caget_simple.py
+connect.py
+connect_many.py
+
+  alarm.py    Tests an alarm
+
+
+memleak.py
+memleak_put.py
+memory_motor.py
+motor_list.py
+motor_simple.py
+no_monitor.py
+pv_callback.py
+pv_connection_callback.py
+pv_multiple_callbacks.py
+pv_simpletest.py
+pv_type_conversion.py
+pvnames.py
+
+thread_put.py
+thread_test.py

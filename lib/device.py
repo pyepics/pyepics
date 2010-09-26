@@ -56,18 +56,18 @@ class Device(object):
         self._pvs = {}
         self.connection_timeout = timeout
         if attrs is not None:
-            for p in attrs: self.PV(p, init=True,
-                                    connection_timeout=connection_timeout)
+            for p in attrs:
+                self.PV(p,init=True,
+                        connection_timeout=self.connection_timeout)
         ca.poll()
         
-    def PV(self, attr, init=False):
+    def PV(self, attr, init=False, **kw):
         """return epics.PV for a device attribute"""
         pvname = attr        
         if self.__prefix__ is not None: 
             pvname = "%s%s" % (self.__prefix__, attr)
         if pvname not in self._pvs:
-            self._pvs[pvname] = pv.PV(pvname,
-                                      connection_timeout=self.connection_timeout)
+            self._pvs[pvname] = pv.PV(pvname, **kw)
             if init:
                 return
         if not self._pvs[pvname].connected:
