@@ -27,14 +27,18 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
     chids= []
     epics.ca.initialize_libca()    
 
+    def onChanges(chid=None, value=None, **kw):
+        print ' on Change ', chid, value
+        
     for pvname in pvlist:
         chid = epics.ca.create_channel(pvname)
         epics.ca.connect_channel(chid)
-        chids.append(chid)
+        eventID = epics.ca.create_subscription(chid, userfcn=onChanges)
+        chids.append((chid, eventID))
         epics.poll(evt=0.025, iot=5.0)
     epics.poll(evt=0.10, iot=10.0)
 
-    for chid in chids:
+    for (chid,eventID) in chids:
         print '== ', epics.ca.name(chid), chid
         time.sleep(0.1)
         ntype = epics.ca.promote_type(chid, use_ctrl=use_ctrl,

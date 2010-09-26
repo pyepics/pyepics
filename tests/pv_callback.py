@@ -3,7 +3,7 @@ import epics
 
 import pvnames
 
-pvname = pvnames.motor1
+pvname = pvnames.updating_pv1 # motor1
 
 mypv = epics.PV(pvname)
 
