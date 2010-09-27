@@ -166,9 +166,9 @@ threading contexts are very close to the C library:
 
 .. function::  pend_io([t=1.0])
 
-.. function::  pend_event([t=1.e-5])
+.. function::  pend_event([t=1.e-3])
 
-.. function::  poll([evt=1.e-4, [iot=1.0]])
+.. function::  poll([evt=1.e-3, [iot=1.0]])
 
    a convenience function which is equivalent to::
     
@@ -341,8 +341,7 @@ array.  This is only applied if numpy can be imported.  See
 to best deal with very large arrays.
 
 
-.. function::  put(chid, value, [wait=False, [timeout=20, 
-   	           [callback=None, [callback_data=None]]]]) 
+.. method::  put(chid, value, [wait=False, [timeout=20, [callback=None, [callback_data=None]]]]) 
 
    sets the Channel to a value, with options to either wait (block) for the
    process to complete, or to execute a supplied callback function when the
@@ -367,8 +366,7 @@ to best deal with very large arrays.
 
    For more on this *put callback*, see :ref:`ca-callbacks-label` below.
 
-.. function::   create_subscription(chid, [use_time=False, [use_ctrl=False,
-                                    [mask=7, [userfcn=None]]]])
+.. method::   create_subscription(chid, [use_time=False, [use_ctrl=False, [mask=7, [userfcn=None]]]])
 
    create a *subscription to changes*, The user-supplied callback function
    will be called on any changes to the PV.
@@ -408,13 +406,13 @@ to best deal with very large arrays.
    is a hint that you have *not* kept this data.
 
 
-.. function:: clear_subscription(event_id)
+.. method:: clear_subscription(event_id)
    
    clears a subscription given its *event_id*.
 
 Several other functions are provided:
 
-.. function::  get_timestamp(chid)
+.. method::  get_timestamp(chid)
 
    return the timestamp of a channel -- the time of last update.
 

@@ -96,7 +96,7 @@ Motor.  Typically, the user just wants to move the motor by setting its
 drive position, but a fully enabled Motor should allow the use to change
 and read many of the Motor parameters.
 
-The :class:`Motor` class helps the user create and use Epics motors.
+The  :class:`Motor` class helps the user create and use Epics motors.
 A simple example use would be::
 
     import epics
@@ -150,7 +150,7 @@ record is given in :ref:`Table of Motor Attributes <motorattr_table>`.
 
 .. _motorattr_table: 
 
-   Table of Attributes for the epics class:`Motor` class, and the
+   Table of Attributes for the epics :class:`Motor` class, and the
    corresponding field to the Epics Motor Record.
 
 

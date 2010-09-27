@@ -98,11 +98,13 @@ class CA_BasicTests(unittest.TestCase):
         self.failUnless(enumstrs,pvnames.enum_pv_strs)
 
     def test_Values(self):
-        sys.stdout.write( 'CA test Values (compare with caget)\n')
+        sys.stdout.write( 'CA test Values (compare 6 values with caget)\n')
         os.system('rm ./caget.tst')
         vals = {}
-        for pvn in (pvnames.double_pv, pvnames.enum_pv,
-                    pvnames.str_pv, pvnames.int_pv, pvnames.long_pv ):
+        for pvn in (pvnames.str_pv,  pvnames.int_pv,
+                    pvnames.float_pv, pvnames.enum_pv,
+                    pvnames.long_pv,  pvnames.double_pv,
+                    ):
             os.system('caget  -n %s >> ./caget.tst' % pvn)
             chid = ca.create_channel(pvn)
             ca.connect_channel(chid)

@@ -1,4 +1,4 @@
-Installation instructions for Py-Epics3
+xInstallation instructions for Py-Epics3
 =======================================
 
 To install the epics module from source, use 
@@ -10,11 +10,30 @@ This assumes that Python 2.5 or higher is installed, and that the shared
 object libraries for Epics Channel Access (libCom.so and libca.so or
 libCom.dylib and libca.dylib on Mac OS X) can be found on your system.
 
-For Windows32, these dlls (Com.dll and ca.dll) are included with this
+For Win32, these dlls (Com.dll and ca.dll) are included with this
 distribution and installed for you.
 
-This code has been tested most extensively on Linux and Win32, with some
-tests done on Mac OS X.
+This code has been tested most extensively with Python2.6 on 32-bit Linux
+and Win32 systems, and versions of Epics base 3.14.10 or 3.14.11.  The
+codes are also tested (though admittedly less regularly)  with other
+combinations of Platform, Python, and Epics base, including:
+
+   Win32 (XP),   Python 2.6,  Epics 3.14.11, win32-x86
+   Win32 (XP),   Python 3.1,  Epics 3.14.11, win32-x86
+   Linux 2.6,    Python 2.6,  Epics 3.14.10, linux-x86
+   Linux 2.6,    Python 3.1,  Epics 3.14.10, linux-x86
+   Linux 2.6,    Python 2.5,  Epics 3.14.8,  linux-x86
+   Linux 2.6,    Python 2.5,  Epics 3.14.11, linux-x86_64
+   MacOS 10.6.5, Python 2.6,  Epics 3.14.11, darwin-x86
+
+At this point, there are no known failures on these systems. More testing
+is definitely needed for Python 3.1, especially once wxPython becomes
+available. More testing is also need on 64 bit machines. Testing on a
+system with 
+
+   MacOS 10.5.8, Python 2.5,  Epics 3.14.11, darwin-ppc
+
+is underway.
 
 Locating CA shared libraries
 ============================
@@ -45,9 +64,11 @@ need to set this up once per machine.  There are a few ways to do this:
   3. set the PATH environmental variable to make sure that the location of 
      libca is in the PATH.
 
-Options 2 and 3 may need to be set for each user (any shell, really) that
-wanted to use CA, and so should probably be put in a shell startup script.
-On the other hand, these approaches also allow "non-root" installations.
+Options 2 and 3 may need to be set for each user shell that uses CA, and so
+should probably be put in a shell startup script.  On the other hand, these
+approaches also allow "non-root" installations.   For testing purposes I
+often install epics base to a folder in my home directory, and set the PATH
+and EPICS environmental variables accordingly.
 
 Testing the Location of CA shared library
 ==========================================
@@ -55,14 +76,17 @@ Testing the Location of CA shared library
 The setup.py script will test where libca might be found and print a
 prominent warning if libca.so cannot be found.
 
-To test this yourself, simply run 
+To test this yourself,  run python from the current directory and 
+type:
     >>> import lib as epics
     >>> epics.ca.find_libca()
 
-If this reports an error, locate libca.so and set PATH or LD_LIBRARY_PATH
-to include the path containing this file.
+This should report the full name of dynamic CA library (libca.so, ca.dll,
+or libca.dylib).   It it does not, or reports an error, you should
+locate libca.so and set PATH or LD_LIBRARY_PATH  to include the path
+containing this file. 
 
 
 Matt Newville <newville@cars.uchicago.edu>
-Last Update:  19-April-2010
+Last Update:  22-September-2010
 

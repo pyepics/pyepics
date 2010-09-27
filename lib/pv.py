@@ -102,7 +102,7 @@ class PV(object):
         if self.chid is None and chid is None:
             return
         if conn:
-            time.sleep(1.e-3)
+            self.poll()
             self._args['host']   = ca.host_name(self.chid)
             self._args['count']  = ca.element_count(self.chid)
             self._args['access'] = ca.access(self.chid)
@@ -142,7 +142,7 @@ class PV(object):
             t0 = time.time()
             while (not self.connected and
                    time.time()-t0 < timeout):
-                time.sleep(1.e-3) 
+                self.poll()
         return self.connected
         
     def connect(self, timeout=None, force=True):
@@ -164,7 +164,7 @@ class PV(object):
         self._conn_started = False
         return self.wait_for_connection(force=True)
     
-    def poll(self, evt=1.e-3, iot=1.0):
+    def poll(self, evt=1.e-4, iot=1.0):
         "poll for changes"
         ca.poll(evt=evt, iot=iot)
 
@@ -180,16 +180,15 @@ class PV(object):
         """
         if not self.wait_for_connection():
             return None
-        
-        self._args['value'] = ca.get(self.chid,
-                                     ftype=self.ftype,
-                                     as_numpy=as_numpy)
-        # self.poll() 
-        field = 'value'
+         
+        if not self.auto_monitor or self._args['value'] is None:
+            self._args['value'] = ca.get(self.chid,
+                                         ftype=self.ftype,
+                                         as_numpy=as_numpy)
         if as_string:
             self._set_charval(self._args['value'])
-            field = 'char_value'
-        return self._args[field]
+            return self._args['char_value']
+        return self._args['value']
 
     def put(self, value, wait=False, timeout=30.0,
             callback=None, callback_data=None):
@@ -211,12 +210,13 @@ class PV(object):
         """ sets the character representation of the value.
         intended only for internal use"""
         ftype = self._args['ftype']
-        if ftype == dbr.STRING:
+        ntype = ca.native_type(ftype)
+        if ntype == dbr.STRING:
             self._args['char_value'] = val
             return val
         cval  = repr(val)       
         if self._args['count'] > 1:
-            if ftype in (dbr.CHAR, dbr.TIME_CHAR, dbr.CTRL_CHAR):
+            if ntype == dbr.CHAR:
                 val = list(val)
                 firstnull  = val.index(0)
                 if firstnull < 0:
@@ -224,8 +224,8 @@ class PV(object):
                 cval = ''.join([chr(i) for i in val[:firstnull]]).rstrip()
             else:
                 cval = '<array size=%d, type=%s>' % (len(val),
-                                                     dbr.Name(ftype))
-        elif ftype in (dbr.FLOAT, dbr.DOUBLE):
+                                                     dbr.Name(ftype).lower())
+        elif ntype in (dbr.FLOAT, dbr.DOUBLE):
             if call_ca and self._args['precision'] is None:
                 self.get_ctrlvars()
             try:
@@ -238,7 +238,7 @@ class PV(object):
                 self._args['char_value'] = str(val)
                 return self._args['char_value']
 
-        elif ftype == dbr.ENUM:
+        elif ntype == dbr.ENUM:
             if call_ca and self._args['enum_strs'] in ([], None):
                 self.get_ctrlvars()
             try:

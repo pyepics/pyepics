@@ -156,7 +156,7 @@ way.
 
 
 Using Python Threads 
-======================
+=========================
 
 An important feature of the epics python package is that it can be used
 with Python threads.  This section of the document focuses on using Python
@@ -271,3 +271,36 @@ Without this, the callbacks for thread *A*  will persist even after the
 thread has completed!!!
      
     
+.. _advanced-sleep-label:
+
+time.sleep() or epics.poll()?
+================================
+
+In order for a program to communicate with Epics devices, it needs to allow
+some time for this communication to happen.   With
+:data:`ca.PREEMPTIVE_CALLBACK` set to  ``True``, this communication  will
+be handled in a thread separate from the main Python thread.  This means
+that CA events can happen at any time, and :meth:`ca.pend_event` does not
+need to be called to explicitly allow for event processing.   
+
+Still, some time must be released from the main Python thread on occasion
+in order for events to be processed.  The simplest way to do this is with 
+:meth:`time.sleep`, so that an event loop can simply be::
+ 
+    >>> while True:
+    >>>     time.sleep(0.001)
+
+Unfortunately, the :meth:`time.sleep` method is not a very high-resolution
+clock, with typical resolutions of 1 to 10 ms, depending on the system.
+Thus, even though events will be asynchronously generated and epics with
+pre-emptive callbacks does not *require* :meth:`ca.pend_event` or
+:meth:`ca.poll` to be run, better performance may be achieved with an event
+loop of::
+
+    >>> while True:
+    >>>     epics.poll(evt=1.e-5, iot=0.1)
+
+as the loop will be run more often than using :meth:`time.sleep`.
+
+
+

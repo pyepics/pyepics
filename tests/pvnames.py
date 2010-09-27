@@ -6,28 +6,32 @@
 # this pv should be a DOUBLE.  It will NOT be set, but
 # you should provide the host_name, units, and precision.  It
 # is assumed to have count=1
-double_pv = '13IDA:m1.VAL'
-double_pv_host = 'ioc13ida.cars.aps.anl.gov:5064'
+double_pv = '13XRM:m2.VAL'
+double_pv_host = 'sonata.cars.aps.anl.gov:5064'
 double_pv_units = 'mm'
-double_pv_prec = 3
+double_pv_prec = 5
 
 #### 2
 # this pv should be an ENUM. It will NOT be set.
 # provide the names of the ENUM states
-enum_pv = '13IDA:m1.DIR'
+
+#### Theae are PVs of the various native types
+###  They will NOT be set.
+str_pv   = '13XRM:m2.DESC'
+int_pv   = '13XRM:m2.STOP'
+long_pv  = '13XRM:m2.RVAL'
+float_pv = '13XRM:m2.VERS'
+enum_pv  = '13XRM:m2.DIR'
 enum_pv_strs = ['Neg','Pos']
 
-#### 3
-# this pv should be a STRING. It will NOT be set.
-str_pv = '13IDA:m1.DESC'
+## Here are some waveform / array data PVs
 
-#### 4
-# this pv should be a INT. It will NOT be set.
-int_pv = '13IDA:m1.STOP'
+long_arr_pv   = '13IDC:str:mca1'
 
-#### 5
-# this pv should be a LONG. It will NOT be set.
-long_pv = '13IDA:m1.RVAL'
+# char / byte array
+char_arr_pv   = '13BMD:edb:dir'
+
+double_arr_pv = '13IDC:scan1.P1PA'
 
 ####
 # provide a single motor prefix (to which '.VAL' and '.RBV' etc will be added)
@@ -59,10 +63,10 @@ string_pvlist = ['13BMA:m1.DESC',
                  '13BMA:m2.DESC',
                  '13BMA:m3.DESC',
                  '13BMA:m4.DESC',
-                 '13IDA:m1.DESC',
-                 '13IDA:m2.DESC',
-                 '13IDA:m3.DESC',
-                 '13IDA:m4.DESC']
+                 '13XRM:m1.DESC',
+                 '13XRM:m2.DESC',
+                 '13XRM:m3.DESC',
+                 '13XRM:m4.DESC']
                  
 
 #### alarm test
