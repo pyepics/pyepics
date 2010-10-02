@@ -98,7 +98,7 @@ class PV(object):
     def on_connect(self, chid=None, conn=True, **kwd):
         "callback for connection events"
         # occassionally chid is still None (threading issue???)
-        # just return here, and connection will be forced later
+        # just return here, and connection will happen later
         if self.chid is None and chid is None:
             return
         if conn:
@@ -132,10 +132,10 @@ class PV(object):
         self.connected = conn
         return
 
-    def wait_for_connection(self, force=True, timeout=None):
+    def wait_for_connection(self, timeout=None):
         """wait for a connection that started with connect() to finish"""
         if not self._conn_started:
-            self.connect(force=force)
+            self.connect()
         if not self.connected:
             if timeout is None:
                 timeout = self.connection_timeout
@@ -145,14 +145,13 @@ class PV(object):
                 self.poll()
         return self.connected
         
-    def connect(self, timeout=None, force=True):
+    def connect(self, timeout=None):
         "check that a PV is connected, forcing a connection if needed"
         if not self.connected:
             if timeout is not None:
                 self.connection_timeout = timeout
             ca.connect_channel(self.chid,
-                               timeout=self.connection_timeout,
-                               force=force)
+                               timeout=self.connection_timeout)
             self.poll()
         self._conn_started = True
         return self.connected and self.ftype is not None
@@ -162,7 +161,7 @@ class PV(object):
         self._monref = None
         self.connected = False
         self._conn_started = False
-        return self.wait_for_connection(force=True)
+        return self.wait_for_connection()
     
     def poll(self, evt=1.e-4, iot=1.0):
         "poll for changes"
@@ -555,14 +554,14 @@ class PV(object):
     def disconnect(self):
         "disconnect PV"
         self.connected = False
-        self.callbacks = {}
         if self._monref is not None:
             cback, uarg, evid = self._monref
             ca.clear_subscription(evid)
             del cback
             del uarg
             del evid
-        ca.poll()
-        
+        ca.poll(evt=1.e-3, iot=1.0)
+        self.callbacks = {}
+
     def __del__(self):
         self.disconnect()

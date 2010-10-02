@@ -29,7 +29,7 @@ def monitor_events(t = 60.0):
     global N_new
     nnotify = 10
     while time.time() < endtime:
-        epics.ca.pend_event(0.05)
+        epics.ca.pend_event(0.01)
         if N_new >= nnotify:
             print "Saw %i changes in %.3f seconds:  %s" % (N_new,  time.time()-t0, show_memory())
             N_new = 0
@@ -45,7 +45,8 @@ def run():
     print 'Destroying PVs: '
     for i in pvs:
         i.disconnect()
-
+    print epics.ca._cache.keys()
+    epics.ca.show_cache()
     epics.ca.poll(0.01, 10.0)
     time.sleep(1.0)
     

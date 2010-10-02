@@ -59,6 +59,8 @@ MAX_ENUMS            = 16
 
 EPICS2UNIX_EPOCH = 631173600.0 - time.timezone
 
+chid_t   = ctypes.c_long
+
 short_t  = ctypes.c_short
 ushort_t = ctypes.c_ushort
 int_t    = ctypes.c_int
@@ -232,18 +234,18 @@ def Cast(args):
 
 class event_handler_args(ctypes.Structure):
     _fields_ = [('usr',     py_obj),
-                ('chid',    int_t),   
+                ('chid',    chid_t),   
                 ('type',    long_t),   
                 ('count',   long_t),      
                 ('raw_dbr', void_p),    
                 ('status',  int_t)]
 
 class connection_args(ctypes.Structure):
-    _fields_ = [('chid',int_t), ('op', long_t)]
+    _fields_ = [('chid', chid_t), ('op', long_t)]
 
 class exception_handler_args(ctypes.Structure):
     _fields_ = [('usr',   void_p),
-                ('chid',  int_t),
+                ('chid',  chid_t),
                 ('type',  int_t),
                 ('count', int_t), 
                 ('addr',  void_p),

@@ -1,3 +1,26 @@
+2010-01-02  Matt Newville  <newville@cars.uchicago.edu>
+
+	* Version 3.0.9:
+ 	- many fixes to ca.py to avoid errors on 64-bit linux (no other 
+	64-bit systems available for testing at this time).  Two separat
+	errors were found:
+	-- incorrect mapping of "DBR_LONG" (should be	ctypes.c_int) 
+	-- use of args.chid as a Channel ID in 'connection' and 'get'
+	callbacks:  The issue is that the Python callback receives
+	args.chid as a Python int, and this must be cast to a
+	dbr.chid_t (a ctypes.c_long) for use by any ca function.
+	Oddly, using the Python int worked on 32 bit systems.
+
+	- simplified approach to reconnection attempts for un-connected
+	channels.  The "force" keyword has been eliminated (it never
+	really forced a connection, just retried).
+
+	- fixed bug that prevented getting array data on systems without
+	numpy installed. 
+	
+	- added tests, tested on more systems with more variations.
+
+
 2010-09-17  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.8:

@@ -166,9 +166,9 @@ threading contexts are very close to the C library:
 
 .. function::  pend_io([t=1.0])
 
-.. function::  pend_event([t=1.e-3])
+.. function::  pend_event([t=1.e-4])
 
-.. function::  poll([evt=1.e-3, [iot=1.0]])
+.. function::  poll([evt=1.e-4, [iot=1.0]])
 
    a convenience function which is equivalent to::
     
@@ -205,9 +205,9 @@ a good idea to treat these as object instances.
    not need to explicitly connect to a channel, unless you are having
    difficulty with dropped connections.
 
-.. function:: connect_channel(chid, [timeout=None, [verbose=False, [force=True]]])
+.. function:: connect_channel(chid, [timeout=None, [verbose=False]])
 
-   explicitly connect to a channel (usually not needed as implicit
+   explicitly connect to a channel (usually not needed, as implicit
    connection will be done when needed), waiting up to timeout for a
    channel to connect.  It returns the connection state,
    ``True`` or ``False``.
@@ -216,7 +216,6 @@ a good idea to treat these as object instances.
    :param timeout:  maximum time to wait for connection.
    :type  timeout:  ``None`` or double.
    :param verbose:  whether to print out debugging information
-   :param force:    whether to (try to) force a connection.
 
    if *timeout* is ``None``, the value of  :data:`DEFAULT_CONNECTION_TIMEOUT`
    is used (usually 2.0 seconds).

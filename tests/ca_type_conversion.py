@@ -27,11 +27,14 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
     chids= []
     epics.ca.initialize_libca()    
 
+    def onConnect(pvname=None,  **kw):
+        print ' on Connect ', pvname, kw
+        
     def onChanges(chid=None, value=None, **kw):
         print ' on Change ', chid, value
         
     for pvname in pvlist:
-        chid = epics.ca.create_channel(pvname)
+        chid = epics.ca.create_channel(pvname, userfcn=onConnect)
         epics.ca.connect_channel(chid)
         eventID = epics.ca.create_subscription(chid, userfcn=onChanges)
         chids.append((chid, eventID))

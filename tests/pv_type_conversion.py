@@ -15,6 +15,12 @@ pvlist = (
     pvnames.double_arr_pv,
     )
 
+def onConnect(pvname=None,  **kw):
+    print ' on Connect ', pvname, kw
+    
+def onChanges(pvname=None, value=None, **kw):
+    print ' on Change ', pvname, value
+        
 
 def RunTest(pvlist, use_preempt=True, maxlen=16384, 
             use_numpy=True, use_time=False, use_ctrl=False):
@@ -24,32 +30,35 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
     epics.ca.HAS_NUMPY = use_numpy
     epics.ca.PREEMPTIVE_CALLBACK = use_preempt
     epics.ca.AUTOMONITOR_MAXLENGTH = maxlen
-    epics.ca.initialize_libca()    
     mypvs= []
     for pvname in pvlist:
-        pv = epics.PV(pvname)
+        pv = epics.PV(pvname, connection_callback=onConnect,
+                      callback=onChanges)
         mypvs.append(pv)
-        epics.poll(evt=0.025, iot=5.0)
     epics.poll(evt=0.10, iot=10.0)
 
     for pv in mypvs:
         print '== ', pv.pvname, pv
-        time.sleep(0.1)
+        # time.sleep(0.1)
+        # epics.poll(evt=0.01, iot=1.0)
         val  = pv.get()
         cval = pv.get(as_string=True)    
         if pv.count > 1:
             val = val[:12]
         print  pv.type, val, cval
-    print '----- finalizing CA'
-    epics.ca.finalize_libca()
-    
+    for pv in mypvs:
+        pv.disconnect()
+    time.sleep(0.01)
+
+
 for use_preempt in (True, False):
     for use_numpy in (True, False):
         for use_time, use_ctrl in ((False, False), (True, False), (False, True)):
-                RunTest(pvlist,
-                        use_preempt=use_preempt,
-                        use_numpy=use_numpy,
-                        use_time=use_time,
-                        use_ctrl=use_ctrl)
+            time.sleep(0.001)
+            RunTest(pvlist,
+                    use_preempt=use_preempt,
+                    use_numpy=use_numpy,
+                    use_time=use_time,
+                    use_ctrl=use_ctrl)
         # sys.exit()
-                
+

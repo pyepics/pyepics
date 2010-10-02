@@ -114,7 +114,7 @@ callbacks to be executed when the PV changes.
    dictionary may have many members, depending on the data type of PV.  See
    the :ref:`Table of Control Attributes <ctrlvars_table>`  for details.
 
-.. method:: poll(evt=1.e-3, iot=1.0)
+.. method:: poll([evt=1.e-4, [iot=1.0]])
 
    this simply calls `ca.poll(evt=evt,iot=iot)` 
 
@@ -123,15 +123,13 @@ callbacks to be executed when the PV changes.
    :param iot:  time to pass to :meth:`ca.pend_io`
    :type  iot:  double
 
-.. method:: connect(timeout=5.0, force=True)
+.. method:: connect([timeout=None])
  
    this explicitly connects a PV, and returns whether or not it has
    successfully connected.
 
    :param timeout:  maximum connection time, passed to :meth:`ca.connect_channel`
    :type  timeout:  double
-   :param force:  whether to (try to) force a connect, passed to :meth:`ca.connect_channel`
-   :type  force:  ``True``/``False``
    :rtype:    ``True``/``False``
    
 .. method:: add_callback(callback=None[, index=None , [**kw]])

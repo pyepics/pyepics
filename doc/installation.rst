@@ -22,21 +22,21 @@ LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 Downloads
 ~~~~~~~~~~~~
 
-The latest version of the Epics Python Package is 3.0.8.  There are a few ways to get the Epics Python Package:
+The latest version of the Epics Python Package is 3.0.9.  There are a few ways to get the Epics Python Package:
 
-.. _epics-3.0.8.tar.gz:          http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.8.tar.gz
-.. _epics-3.0.8.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.8.win32-py2.6.exe
-.. _epics-3.0.8.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.8.win32-py3.1.exe
+.. _epics-3.0.9.tar.gz:          http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.9.tar.gz
+.. _epics-3.0.9.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.9.win32-py2.6.exe
+.. _epics-3.0.9.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.9.win32-py3.1.exe
 .. _pyepics github repository:   http://github.com/newville/pyepics
 .. _PyEpics Source Tree:         http://cars9.uchicago.edu/software/python/pyepics3/src
 
 +---------------------------+----------------------------------------+
 |  Download Option          |  Location                              |
 +===========================+========================================+
-|  Source Kit               |  `epics-3.0.8.tar.gz`_                 |
+|  Source Kit               |  `epics-3.0.9.tar.gz`_                 |
 +---------------------------+----------------------------------------+
-|  Windows Installers       |  `epics-3.0.8.win32-py2.6.exe`_  or    |
-|                           |  `epics-3.0.8.win32-py3.1.exe`_        |
+|  Windows Installers       |  `epics-3.0.9.win32-py2.6.exe`_  or    |
+|                           |  `epics-3.0.9.win32-py3.1.exe`_        |
 +---------------------------+----------------------------------------+
 |  Development Version      |  use `pyepics github repository`_      |
 +---------------------------+----------------------------------------+

@@ -113,6 +113,8 @@ class CA_BasicTests(unittest.TestCase):
         for line in rlines:
             pvn, sval = [i.strip() for i in line[:-1].split(' ', 1)]
             tval = str(vals[pvn])
+            if pvn in (pvnames.float_pv,pvnames.double_pv): # use float precision!
+                tval = "%.7g" % vals[pvn]
             self.assertEqual(tval, sval)
         
 
