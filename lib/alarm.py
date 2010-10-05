@@ -1,12 +1,13 @@
-#!/usr/bin/env python
+ #!/usr/bin/env python
 #  M Newville <newville@cars.uchicago.edu>
 #  The University of Chicago, 2010
 #  Epics Open License
-
+"""
+alarm module -- Alarm class
+"""
 import sys
 import time
 import operator
-from . import ca
 from . import pv
    
 class Alarm(object):
@@ -31,7 +32,7 @@ class Alarm(object):
        
     example:
        >>> from epics import alarm, poll
-       >>> def alarmHandler(pv=None,**kw):
+       >>> def alarmHandler(pv=None, **kw):
        >>>     print 'Alarm!! ', pv.pvname, pv.value
        >>> alarm(pvname = 'XX.VAL',
        >>>       comparison='gt',
@@ -67,21 +68,21 @@ class Alarm(object):
                                    comparison=self.cmp.__name__, **kw)
 
     """
-    ops= {'eq': operator.__eq__,
-          '==': operator.__eq__,
-          'ne': operator.__ne__,
-          '!=': operator.__ne__,
-          'le': operator.__le__,
-          '<=': operator.__le__,
-          'lt': operator.__lt__,
-          '<' : operator.__lt__,
-          'ge': operator.__ge__,
-          '>=': operator.__ge__,
-          'gt': operator.__gt__,
-          '>' : operator.__gt__ }
+    ops = {'eq': operator.__eq__,
+           '==': operator.__eq__,
+           'ne': operator.__ne__,
+           '!=': operator.__ne__,
+           'le': operator.__le__,
+           '<=': operator.__le__,
+           'lt': operator.__lt__,
+           '<' : operator.__lt__,
+           'ge': operator.__ge__,
+           '>=': operator.__ge__,
+           'gt': operator.__gt__,
+           '>' : operator.__gt__ }
     
     def __init__(self, pvname, comparison=None, trip_point=None,
-                 callback=None,  alert_delay=10, **kw):
+                 callback=None, alert_delay=10):
 
         if isinstance(pvname, pv.PV):
             self.pv = pvname
@@ -90,7 +91,8 @@ class Alarm(object):
             self.pv.connect()
         
         if self.pv is None or comparison is None or trip_point is None:
-            raise UserWarning('alarm requires valid PV, comparison, and trip_point')
+            msg = 'alarm requires valid PV, comparison, and trip_point'
+            raise UserWarning(msg)
       
         self.comp_name  = comparison
         self.trip_point = trip_point
@@ -99,26 +101,38 @@ class Alarm(object):
         self.alert_delay = alert_delay
         self.user_callback = callback
 
-        self.cmp   = self.ops.get(comparison.replace('_',''),None)
+        self.cmp   = self.ops.get(comparison.replace('_', ''), None)
         self.alarm_state = False
         self.pv.add_callback(self.check_alarm)
         self.check_alarm()
         
-    def check_alarm(self,pvname=None,value=None, char_value=None, **kw):
+    def __repr__(self):
+        return "<Alarm '%s', comp=%s, trip_point=%s >" % (self.pv.name,
+                                                          self.comp_name,
+                                                          self.trip_point)
+    def reset(self):
+        "resets the alarm state" 
+        self.last_alert = 0
+        self.alarm_state = False
+    
+    def check_alarm(self, pvname=None, value=None, char_value=None, **kw):
+        """checks alarm status, act if needed.
+        """
         if (pvname is None or value is None or
             self.cmp is None or self.trip_point is None): return
 
         val = value
-        if char_value is None: char_value = value
+        if char_value is None:
+            char_value = value
         old_alarm_state  = self.alarm_state
-        self.alarm_state =  self.cmp(val,self.trip_point)
+        self.alarm_state =  self.cmp(val, self.trip_point)
 
         now = time.time()        
 
         if (self.alarm_state and not old_alarm_state and
             ((now - self.last_alert) > self.alert_delay)) :
             self.last_alert = now
-            if hasattr(self.user_callback,'__call__'):
+            if hasattr(self.user_callback, '__call__'):
                 self.user_callback(pvname=pvname, value=value,
                                    char_value=char_value,
                                    trip_point=self.trip_point,

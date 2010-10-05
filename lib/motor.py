@@ -16,9 +16,10 @@
 #       many fixes to use newer python constructs
 # 
 #   Aug 19, 2004  MN
-#                 1. improved setting / checking of monitors on motor attributes
+#                 1. improved setting/checking of monitors on motor attributes
 #                 2. add 'RTYP' and 'DTYP' to motor parameters.
-#                 3. make sure the motor is a motor object, else raise a MotorException.
+#                 3. make sure the motor is a motor object, else
+#                              raise a MotorException.
 #   May 11, 2003  MN
 #                 1. added get_pv(attribute) to return PV for attribute
 #                 2. added __check_attr_stored(attr) method to
@@ -38,20 +39,21 @@
 import sys
 import time
 
-from . import pv
 from . import ca
 from . import device
 
 class MotorLimitException(Exception):
     """ raised to indicate a motor limit has been reached """
-    def __init__(self,msg,*args):
+    def __init__(self, msg, *args):
+        Exception.__init__(self, *args)
         self.msg = msg
     def __str__(self):
         return str(self.msg)
 
 class MotorException(Exception):
     """ raised to indicate a problem with a motor"""
-    def __init__(self,msg,*args):
+    def __init__(self, msg, *args):
+        Exception.__init__(self, *args)
         self.msg = msg
     def __str__(self):
         return str(self.msg)
@@ -234,33 +236,38 @@ class Motor(device.Device):
     # RDBL  Readback Location
     # INIT  Startup commands 
     
-    __init_list = ('drive','description', 'readback','precision',
-                   'tweak_val','tweak_forward','tweak_reverse',
-                   'done_moving','set','stop', 'low_limit','high_limit',
-                   'high_limit_set', 'low_limit_set', 'soft_limit','status',
-                   'device_type',  'record_type', 'enabled', 'stop_go')
+    __init_list = ('drive', 'description', 'readback', 'precision',
+                   'tweak_val', 'tweak_forward', 'tweak_reverse',
+                   'done_moving', 'set', 'stop', 'low_limit', 'high_limit',
+                   'high_limit_set', 'low_limit_set', 'soft_limit',
+                   'status', 'device_type', 'record_type', 'enabled',
+                   'stop_go')
     
-    _user_params = ('drive','readback','user')
-    _dial_params = ('dial_drive','dial_readback','dial')
-    _raw_params  = ('raw_drive','raw_readback','raw')
+    _user_params = ('drive', 'readback', 'user')
+    _dial_params = ('dial_drive', 'dial_readback', 'dial')
+    _raw_params  = ('raw_drive', 'raw_readback', 'raw')
 
     def __init__(self, name=None, timeout=3.0):
         if name is None:
             raise MotorException("must supply motor name")
         
-        if name.endswith('.VAL'):   name = name[:-4]
-        if name.endswith('.'):         name = name[:-1]
+        if name.endswith('.VAL'):
+            name = name[:-4]
+        if name.endswith('.'):
+            name = name[:-1]
             
-        device.Device.__init__(self, name, [self.__motor_attrs[i] for i in self.__init_list])
+        attrs = [self.__motor_attrs[im] for im in self.__init_list]
+        device.Device.__init__(self, name, attrs)
+
         
         self.pvname = name
         # make sure motor is enabled:
-        t0 = time.time()
+        st0 = time.time()
         connected = False
         while not connected:
             connected = self.PV('.RTYP').connected
             time.sleep(0.001)
-            if (time.time()-t0 > timeout):
+            if (time.time()-st0 > timeout):
                 raise MotorException("Cannot connect to %s" % name)
         rectype = self.PV('.RTYP').get()
         if rectype != 'motor':
@@ -269,12 +276,13 @@ class Motor(device.Device):
         self._callbacks = {}
 
     def __repr__(self):
-        return "<epics.Motor: %s: '%s'>" % (self.pvname, self.get_field('description'))
+        return "<epics.Motor: %s: '%s'>" % (self.pvname,
+                                            self.get_field('description'))
 
     def __str__(self):
         return self.__repr__()
 
-    def __getattr__(self,attr):
+    def __getattr__(self, attr):
         " internal method "
         if attr in self.__motor_attrs:
             return self.get_field(attr)
@@ -283,9 +291,9 @@ class Motor(device.Device):
         else:
             raise MotorException("EpicsMotor has no attribute %s" % attr)
 
-    def __setattr__(self,attr,val):
+    def __setattr__(self, attr, val):
         if attr in self.__motor_attrs:
-            return self.put_field(attr,val)
+            return self.put_field(attr, val)
         else:
             self.__dict__[attr] = val
 
@@ -305,11 +313,11 @@ class Motor(device.Device):
         the motor position.  That is,
           >>> motor.put_field('drive', 2, wait=True)
 
-        will wait until the motor has moved to drive position 2.
+          will wait until the motor has moved to drive position 2.
         """
-        x = self.get_field(attr)
+        self.get_field(attr)
         
-        suffix =self.__motor_attrs[attr]
+        suffix = self.__motor_attrs[attr]
         return self.PV(suffix).put(val, wait=wait, timeout=timeout)
     
     def get_field(self, attr, as_string=False):
@@ -317,22 +325,22 @@ class Motor(device.Device):
         if attr not in self.__motor_attrs:
             raise MotorException("EpicsMotor has no attribute %s" % attr)
         
-        suffix =self.__motor_attrs[attr]
+        suffix = self.__motor_attrs[attr]
         return self.PV(suffix).get(as_string=as_string)
 
     def check_limits(self):
         """ check motor limits:
         returns None if no limits are violated
         raises expection if a limit is violated"""
-        for field,msg in (('soft_limit',     'Soft limit violation'),
-                          ('high_limit_set', 'High hard limit violation'),
-                          ('low_limit_set',  'Low  hard limit violation')):
+        for field, msg in (('soft_limit',     'Soft limit violation'),
+                           ('high_limit_set', 'High hard limit violation'),
+                           ('low_limit_set',  'Low  hard limit violation')):
             if self.get_field(field)!= 0:
                 raise MotorLimitException(msg)
         return
     
     def within_limits(self, val, limits='user'):
-        """ returns whether a value for a motor is within drive limits,"""
+        """ returns whether a value for a motor is within drive limits"""
         
         if limits == 'user':
             hlim = self.get_field('high_limit')
@@ -347,7 +355,6 @@ class Motor(device.Device):
 
     def move(self, val=None, relative=None, wait=False, timeout=300.0,
              dial=False, step=False, raw=False, ignore_limits=False):
-
         """ moves motor drive to position
 
         arguments:
@@ -373,7 +380,7 @@ class Motor(device.Device):
         except TypeError:
             return None
 
-        drv,rbv,lims = self._user_params
+        drv, rbv, lims = self._user_params
         if dial:
             drv, rbv, lims = self._dial_params
         if step or raw:
@@ -385,11 +392,11 @@ class Motor(device.Device):
 
         # Check for limit violations
         if not ignore_limits:
-            limits_ok = self.within_limits(val,lims)
+            limits_ok = self.within_limits(val, lims)
             if not limits_ok:
                 return -1
             
-        stat = self.put_field(drv,val,wait=wait,timeout=timeout)
+        stat = self.put_field(drv, val, wait=wait, timeout=timeout)
         ret = stat
         if stat == 1:
             ret = 0
@@ -397,7 +404,7 @@ class Motor(device.Device):
             ret = -1
         try:
             self.check_limits()
-        except:
+        except MotorLimitException:
             ret = -1
         return ret
 
@@ -432,36 +439,40 @@ class Motor(device.Device):
         p=m.get_position(readback=True, step=True) # Read the actual position in steps
         """
         # xx
-        (drv,rbv) = ('drive','readback')
-        if dial:        (drv,rbv) = ('dial_drive','dial_readback')
-        if step or raw: (drv,rbv) = ('raw_drive','raw_readback')        
+        (drv, rbv) = ('drive','readback')
+        if dial:
+            (drv, rbv) = ('dial_drive','dial_readback')
+        if step or raw:
+            (drv, rbv) = ('raw_drive','raw_readback')        
             
         if readback:
             return self.get_field(rbv)
         else:
             return self.get_field(drv)
         
-    def tweak(self, dir='forward', wait=False, timeout=300.0):
+    def tweak(self, direction='foreward', wait=False, timeout=300.0):
         """ move the motor by the tweak_val
        
         takes optional args:
-         dir            direction of motion (forward/reverse)  [forward]
-                           must start with 'rev' or 'back' for a reverse tweak.
-         wait           wait for move to complete before returning (T/F) [F]
-         timeout        max time for move to complete (in seconds) [300]           
+         direction    direction of motion (forward/reverse)  [forward]
+                         must start with 'rev' or 'back' for a reverse tweak.
+         wait         wait for move to complete before returning (T/F) [F]
+         timeout      max time for move to complete (in seconds) [300]
         """
         
         ifield = 'tweak_forward'
-        if dir.startswith('rev') or dir.startswith('back'):
+        if direction.startswith('rev') or direction.startswith('back'):
             ifield = 'tweak_reverse'
             
         stat = self.put_field(ifield, 1, wait=wait, timeout=timeout)
         ret = stat
-        if stat == 1:  ret = 0
-        if stat == -2: ret = -1
+        if stat == 1:
+            ret = 0
+        if stat == -2:
+            ret = -1
         try:
             self.check_limits()
-        except:
+        except MotorLimitException:
             ret = -1
         return ret
 
@@ -494,40 +505,43 @@ class Motor(device.Device):
          """
 
         # Put the motor in "SET" mode
-        self.put_field('set',1)
+        self.put_field('set', 1)
 
       
         # determine which drive value to use
         drv = 'drive'
-        if dial: drv = 'dial_drive'
-        if step or raw: drv = 'raw_drive'
+        if dial:
+            drv = 'dial_drive'
+        if step or raw:
+            drv = 'raw_drive'
 
-        self.put_field(drv,position)
+        self.put_field(drv, position)
         
         # Put the motor back in "Use" mode
-        self.put_field('set',0)
+        self.put_field('set', 0)
       
-    def get_pv(self,attr):
+    def get_pv(self, attr):
         "return  PV for a field"
-        return self.PV(self.__motor_attrs[attr] )
+        return self.PV(self.__motor_attrs[attr])
 
     def clear_callback(self, attr='drive'):
+        "clears callback for attribute"
         try:
-            index = self._callbacks.get(attr,None)
+            index = self._callbacks.get(attr, None)
             if index is not None:
                 self.get_pv(attr).remove_callback(index=index)
         except:
             self.get_pv(attr).clear_callbacks()
 
     def set_callback(self, attr='drive', callback=None, kw=None):
+        "define a callback for an attribute"
         self.get_field(attr)
-
         kw_args = {}
         kw_args['motor_field'] = attr
         if kw is not None:
             kw_args.update(kw)
-        # print 'Hello ', attr, self.get_pv(attr), kw_args
-        index = self.get_pv(attr).add_callback(callback=callback,**kw_args)
+
+        index = self.get_pv(attr).add_callback(callback=callback, **kw_args)
         self._callbacks[attr] = index
 
     def refresh(self):
@@ -536,6 +550,7 @@ class Motor(device.Device):
         ca.poll()
 
     def StopNow(self):
+        "stop motor as soon as possible"
         save_val = self.get_field('stop_go')
         self.put_field('stop_go', 0)
         time.sleep(0.10)
@@ -543,54 +558,52 @@ class Motor(device.Device):
         
         
     def get_info(self):
+        "return information, current field values"
         out = {}
-        for i in ('description', 'drive','readback', 'slew_speed',
+        for attr in ('description', 'drive', 'readback', 'slew_speed',
                   'precision','tweak_val','low_limit', 'high_limit',
                   'stop_go', 'set', 'status'):
-            out[i] = self.get_field(i, as_string=True)
+            out[attr] = self.get_field(attr, as_string=True)
 
         return out
     
     def show_info(self):
         " show basic motor settings "
         self.refresh()
-        o = []
-        o.append(repr(self))
-        o.append( "--------------------------------------")
+        out = []
+        out.append(repr(self))
+        out.append( "--------------------------------------")
         for nam, val in self.get_info().items():
             if len(nam) < 16:
-                nam = "%s%s" % (nam,' '*(16-len(nam)))
-            o.append("%s = %s" % (nam, val))
-        o.append("--------------------------------------")
-        sys.stdout.write("%s\n" % "\n".join(o))
+                nam = "%s%s" % (nam, ' '*(16-len(nam)))
+            out.append("%s = %s" % (nam, val))
+        out.append("--------------------------------------")
+        sys.stdout.write("%s\n" % "\n".join(out))
 
     def show_all(self):
         """ show all motor attributes"""
-        o = []
-        add = o.append
+        out = []
+        add = out.append
         add("#Motor %s" % (self.pvname))
         add("#  field               value                 PV name")
         add("#------------------------------------------------------------")
         self.refresh()
-        klist =list( self.__motor_attrs.keys())
+        klist = list( self.__motor_attrs.keys())
         klist.sort()
 
         for attr in klist:
-            label = attr  + ' '*(18-min(18,len(attr)))
-
+            label = attr  + ' '*(18-min(18, len(attr)))
             value = self.get_field(attr, as_string=True)
             pvname  = self.get_pv(attr).pvname
-
-            if value is None: value = 'Not Connected??'
-            value = value + ' '*(18-min(18,len(value)))
+            if value is None:
+                value = 'Not Connected??'
+            value = value + ' '*(18-min(18, len(value)))
                                  
             add(" %s  %s  %s" % (label, value, pvname))
             
-        sys.stdout.write("%s\n" % "\n".join(o))
+        sys.stdout.write("%s\n" % "\n".join(out))
 
-        
 if (__name__ == '__main__'):
-    import sys
-    for i in sys.argv[1:]:
-        m = Motor(i)
+    for arg in sys.argv[1:]:
+        m = Motor(arg)
         m.show_info()

@@ -39,13 +39,15 @@ Device = device.Device
 poll  = ca.poll
 # sleep = time.sleep # should probably remove this!
 
-_Cache = {}     # a local cache for PVs used in caget/caput/cainfo/camonitor functions
-_Monitors = {}  # a local cache for Monitored PVs
+# a local cache for PVs used in caget/caput/cainfo/camonitor functions
+_CACHE_ = {}
+# a local cache for Monitored PVs
+_MONITORS_ = {}  
 
-def __createPV(pvname, timeout=5.0):
+def __create_pv(pvname, timeout=5.0):
     "create PV, wait for connection: "
-    if pvname in _Cache:
-        return _Cache[pvname]
+    if pvname in _CACHE_:
+        return _CACHE_[pvname]
 
     start_time = time.time()
     thispv = PV(pvname)
@@ -58,7 +60,7 @@ def __createPV(pvname, timeout=5.0):
         sys.stdout.write('cannot connect to %s\n' % pvname)
         return None
     # save this one for next time
-    _Cache[pvname] = thispv
+    _CACHE_[pvname] = thispv
     return thispv
 
 def caput(pvname, value, wait=False, timeout=60):
@@ -69,7 +71,7 @@ def caput(pvname, value, wait=False, timeout=60):
     to wait for pv to complete processing, use 'wait=True':
        >>> caput('xx.VAL',3.0,wait=True)
     """ 
-    thispv = __createPV(pvname)
+    thispv = __create_pv(pvname)
     if thispv is not None:
         return thispv.put(value, wait=wait, timeout=timeout)
 
@@ -82,7 +84,7 @@ def caget(pvname, as_string=False):
     enum string, etc):
        >>> x = caget('xx.VAL', as_string=True)
     """
-    thispv = __createPV(pvname)
+    thispv = __create_pv(pvname)
     if thispv is not None:
         val = thispv.get()
         poll()
@@ -103,7 +105,7 @@ def cainfo(pvname, print_out=True):
     If print_out=False, the status report will be printed,
     and not returned.
     """
-    thispv = __createPV(pvname)
+    thispv = __create_pv(pvname)
     if thispv is not None:
         thispv.get()
         thispv.get_ctrlvars()
@@ -114,8 +116,8 @@ def cainfo(pvname, print_out=True):
 
 def camonitor_clear(pvname):
     """clear a monitor on a PV"""
-    if pvname in _Monitors:
-        _Monitors[pvname].clear_callbacks()
+    if pvname in _MONITORS_:
+        _MONITORS_[pvname].clear_callbacks()
         
 def camonitor(pvname, writer=None, callback=None):
     """ camonitor(pvname, writer=None, callback=None)
@@ -139,14 +141,14 @@ def camonitor(pvname, writer=None, callback=None):
     if writer is None:
         writer = sys.stdout.write
     if callback is None:
-        def callback(pvname=None, value=None, char_value=None, **kwd):
+        def callback(pvname=None, value=None, char_value=None, **kw):
             "generic monitor callback"
             if char_value is None:
                 char_value = repr(value)
             writer("%.32s %s %s\n" % (pvname, pv.fmt_time(), char_value))
         
-    thispv = __createPV(pvname)
-    _Monitors[pvname] = thispv
+    thispv = __create_pv(pvname)
+    _MONITORS_[pvname] = thispv
     if thispv is not None:
         thispv.get()
         thispv.add_callback(callback)

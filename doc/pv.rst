@@ -116,7 +116,7 @@ callbacks to be executed when the PV changes.
 
 .. method:: poll([evt=1.e-4, [iot=1.0]])
 
-   this simply calls `ca.poll(evt=evt,iot=iot)` 
+   poll for changes.  This simply calls `ca.poll(evt=evt,iot=iot)` 
 
    :param evt:  time to pass to :meth:`ca.pend_event`
    :type  evt:  double
@@ -126,9 +126,19 @@ callbacks to be executed when the PV changes.
 .. method:: connect([timeout=None])
  
    this explicitly connects a PV, and returns whether or not it has
-   successfully connected.
+   successfully connected.  It is probably not that useful, as connection
+   should happen automatically. See :meth:`wait_for_connection`.
 
    :param timeout:  maximum connection time, passed to :meth:`ca.connect_channel`
+   :type  timeout:  double
+   :rtype:    ``True``/``False``
+
+.. method:: wait_for_connection([timeout=None])
+ 
+   this waits until a PV is connected, or has timed-out waiting for a
+   connection.  Returns  whether the connection has occured.
+
+   :param timeout:  maximum connection time, default=:data:`ca.DEFAULT_CONNECTION_TIMEOUT`
    :type  timeout:  double
    :rtype:    ``True``/``False``
    
@@ -564,8 +574,8 @@ To get the string representation of a PVs value, use either the
 :attr:`char_value` attribute or the *as_string=True* argument to :meth:`get`
 
  
-Example of put
-~~~~~~~~~~~~~~~~
+Example of :meth:`put`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To put a new value to a variable, either of these two approaches can be
 used:

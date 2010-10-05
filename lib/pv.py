@@ -23,21 +23,23 @@ def fmt_time(tstamp=None):
                                        time.localtime(tstamp)), 1.e6*frac)
 
 class PV(object):
-    """== Epics Process Variable
+    """Epics Process Variable
     
     A PV encapsulates an Epics Process Variable.
    
-    The primary interface methods for a pv are to get() and put() is value:
-      >>>p = PV(pv_name)  # create a pv object given a pv name
-      >>>p.get()          # get pv value
-      >>>p.put(val)       # set pv to specified value. 
+    The primary interface methods for a pv are to get() and put() is value::
 
-    Additional important attributes include:
-      >>>p.pvname         # name of pv
-      >>>p.value          # pv value (can be set or get)
-      >>>p.char_value     # string representation of pv value
-      >>>p.count          # number of elements in array pvs
-      >>>p.type           # EPICS data type: 'string','double','enum','long',..
+      >>> p = PV(pv_name)  # create a pv object given a pv name
+      >>> p.get()          # get pv value
+      >>> p.put(val)       # set pv to specified value. 
+
+    Additional important attributes include::
+
+      >>> p.pvname         # name of pv
+      >>> p.value          # pv value (can be set or get)
+      >>> p.char_value     # string representation of pv value
+      >>> p.count          # number of elements in array pvs
+      >>> p.type           # EPICS data type: 'string','double','enum','long',..
 """
 
     _fmt = "<PV '%(pvname)s', count=%(count)i, type=%(typefull)s, access=%(access)s>"
@@ -50,8 +52,7 @@ class PV(object):
 
     def __init__(self, pvname, callback=None, form='native',
                  verbose=False, auto_monitor=None,
-                 connection_callback=None,
-                 connection_timeout=2.0):
+                 connection_callback=None):
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
@@ -65,7 +66,6 @@ class PV(object):
         self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
         self.connection_callback = connection_callback
-        self.connection_timeout = connection_timeout
         self.callbacks  = {}
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
@@ -78,10 +78,10 @@ class PV(object):
         if self.pvname in ca._cache[ctx]:
             entry = ca._cache[ctx][pvname]
             self.chid = entry['chid']
-            self.on_connect(chid=self.chid, conn=entry['conn'])
+            self.__on_connect(chid=self.chid, conn=entry['conn'])
         if self.chid is None:
             self.chid = ca.create_channel(self.pvname,
-                                          userfcn=self.on_connect)
+                                          userfcn=self.__on_connect)
         self._args['chid'] = self.chid
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
@@ -95,7 +95,7 @@ class PV(object):
         "write message"
         stdout.write("%s\n" % msg)
     
-    def on_connect(self, chid=None, conn=True, **kwd):
+    def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
         # occassionally chid is still None (threading issue???)
         # just return here, and connection will happen later
@@ -103,8 +103,9 @@ class PV(object):
             return
         if conn:
             self.poll()
+            count = ca.element_count(self.chid)
+            self._args['count']  = count
             self._args['host']   = ca.host_name(self.chid)
-            self._args['count']  = ca.element_count(self.chid)
             self._args['access'] = ca.access(self.chid)
             self._args['read_access'] = (1 == ca.read_access(self.chid))
             self._args['write_access'] = (1 == ca.write_access(self.chid))
@@ -117,12 +118,12 @@ class PV(object):
             self._args['ftype'] = dbr.Name(_ftype_, reverse=True)
             
             if self.auto_monitor is None:
-                self.auto_monitor = self._args['count'] < ca.AUTOMONITOR_MAXLENGTH
+                self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
             if self._monref is None and self.auto_monitor:
                 self._monref = ca.create_subscription(self.chid,
-                                                      userfcn=self.on_changes,
-                                                      use_ctrl=(self.form == 'ctrl'),
-                                                      use_time=(self.form == 'time'))
+                                         use_ctrl=(self.form == 'ctrl'),
+                                         use_time=(self.form == 'time'),
+                                         userfcn=self.__on_changes)
 
         if hasattr(self.connection_callback, '__call__'):
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
@@ -138,26 +139,22 @@ class PV(object):
             self.connect()
         if not self.connected:
             if timeout is None:
-                timeout = self.connection_timeout
-            t0 = time.time()
+                timeout = ca.DEFAULT_CONNECTION_TIMEOUT
+            start_time = time.time()
             while (not self.connected and
-                   time.time()-t0 < timeout):
+                   time.time()-start_time < timeout):
                 self.poll()
         return self.connected
         
     def connect(self, timeout=None):
         "check that a PV is connected, forcing a connection if needed"
         if not self.connected:
-            if timeout is not None:
-                self.connection_timeout = timeout
-            ca.connect_channel(self.chid,
-                               timeout=self.connection_timeout)
-            self.poll()
+            ca.connect_channel(self.chid, timeout=timeout)
         self._conn_started = True
         return self.connected and self.ftype is not None
 
     def reconnect(self):
-        self.automonitor = None
+        self.auto_monitor = None
         self._monref = None
         self.connected = False
         self._conn_started = False
@@ -228,7 +225,7 @@ class PV(object):
             if call_ca and self._args['precision'] is None:
                 self.get_ctrlvars()
             try:
-                prec = getattr(self, 'precision') # self._args.get('precision', None)
+                prec = getattr(self, 'precision') 
                 fmt  = "%%.%if"
                 if 4 < abs(int(log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
@@ -256,7 +253,7 @@ class PV(object):
         self._args.update(kwds)
         return kwds
 
-    def on_changes(self, value=None, **kwd):
+    def __on_changes(self, value=None, **kwd):
         """internal callback function: do not overwrite!!
         To have user-defined code run when the PV value changes,
         use add_callback()
@@ -333,71 +330,58 @@ class PV(object):
         "get information paragraph"
         if not self.wait_for_connection():
             return None
-        
         self.get_ctrlvars()
-        # list basic attributes
         out = []
         mod = 'native'
         xtype = self._args['typefull']
         if '_' in xtype:
             mod, xtype = xtype.split('_')
 
+        fmt = '%i'
+        if   xtype in ('float','double'):
+            fmt = '%g'
+        elif xtype in ('string','char'):
+            fmt = '%s'
+            
         self._set_charval(self._args['value'], call_ca=False)        
-
         out.append("== %s  (%s_%s) ==" % (self.pvname, mod, xtype))
         if self.count == 1:
             val = self._args['value']
-            fmt = '%i'
-            if   xtype in ('float','double'):
-                fmt = '%g'
-            elif xtype in ('string','char'):
-                fmt = '%s'
             out.append('   value      = %s' % fmt % val)
         else:
-            aval, ext, fmt = [], '', "%i,"
-            if self.count > 5:
-                ext = '...'
-            if xtype in  ('float','double'):
-                fmt = "%g,"
-            for i in range(min(5, self.count)):
-                aval.append(fmt % self._args['value'][i])
-            out.append("   value      = array  [%s%s]" % ("".join(aval),
-                                                          ext))
-
-        for i in ('char_value', 'count', 'type', 'units',
-                  'precision', 'host', 'access',
-                  'status', 'severity', 'timestamp',
-                  'upper_ctrl_limit', 'lower_ctrl_limit',
-                  'upper_disp_limit', 'lower_disp_limit',
-                  'upper_alarm_limit', 'lower_alarm_limit',
-                  'upper_warning_limit', 'lower_warning_limit'):
-            if hasattr(self, i):
-                att = getattr(self, i)
+            ext  = {True:'...', False:''}[self.count > 5]
+            elems = range(min(5, self.count))
+            aval = [fmt % self._args['value'][i] for i in elems]
+            out.append("   value      = array  [%s%s]" % (",".join(aval), ext))
+        for nam in ('char_value', 'count', 'type', 'units', 'precision',
+                    'host', 'access', 'status', 'severity', 'timestamp',
+                    'upper_ctrl_limit', 'lower_ctrl_limit',
+                    'upper_disp_limit', 'lower_disp_limit',
+                    'upper_alarm_limit', 'lower_alarm_limit',
+                    'upper_warning_limit', 'lower_warning_limit'):
+            if hasattr(self, nam):
+                att = getattr(self, nam)
                 if att is not None:
-                    if i == 'timestamp':
+                    if nam == 'timestamp':
                         att = "%.3f (%s)" % (att, fmt_time(att))
-                    elif i == 'char_value':
+                    elif nam == 'char_value':
                         att = "'%s'" % att
-                    if len(i) < 12:
-                        out.append('   %.11s= %s' % (i+' '*12, str(att)))
+                    if len(nam) < 12:
+                        out.append('   %.11s= %s' % (nam+' '*12, str(att)))
                     else:
-                        out.append('   %.20s= %s' % (i+' '*20, str(att)))
-
+                        out.append('   %.20s= %s' % (nam+' '*20, str(att)))
         if xtype == 'enum':  # list enum strings
             out.append('   enum strings: ')
-            for index, estr in enumerate(self.enum_strs):
-                out.append("       %i = %s " % (index, estr))
+            for index, nam in enumerate(self.enum_strs):
+                out.append("       %i = %s " % (index, nam))
 
         if self._monref is not None:
             msg = 'PV is internally monitored'
             out.append('   %s, with %i user-defined callbacks:' % (msg,
                                                          len(self.callbacks)))
-
             if len(self.callbacks) > 0:
-                cblist = list(self.callbacks.keys())
-                cblist.sort()
-                for i in cblist:
-                    cback = self.callbacks[i][0]
+                for nam in sorted(self.callbacks.keys()):
+                    cback = self.callbacks[nam][0]
                     out.append('      %s in file %s' % (cback.func_name,
                                         cback.func_code.co_filename))
         else:

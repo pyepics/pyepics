@@ -5,14 +5,12 @@
 import epics
 import time
 
-
-motor1 = '13IDC:m1'
+motor1 = '13XRM:m1'
 
 def onConnectionChange(pvname=None,  **kws):
     print 'ca connection status changed:  ', pvname,  kws
     
 chid = epics.ca.create_channel(motor1, userfcn=onConnectionChange)
-
 
 print 'Now waiting, watching values and connection changes:'
 t0 = time.time()

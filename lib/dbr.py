@@ -11,6 +11,7 @@ This is mostly copied from CA header files
 """
 import ctypes
 import time
+
 # EPICS Constants
 ECA_NORMAL = 1
 ECA_TIMEOUT = 80
@@ -51,7 +52,6 @@ CTRL_CHAR    = 32
 CTRL_LONG    = 33
 CTRL_DOUBLE  = 34
 
-
 MAX_STRING_SIZE      = 40
 MAX_UNITS_SIZE       =  8
 MAX_ENUM_STRING_SIZE = 26
@@ -79,39 +79,46 @@ py_obj   = ctypes.py_object
 value_offset = None
 
 # extended DBR types:
-class epicsTimeStamp(ctypes.Structure):
+class TimeStamp(ctypes.Structure):
     "emulate epics timestamp"
     _fields_ = [('secs', uint_t), ('nsec', uint_t)]
 _STAT_SEV    = (('status', short_t), ('severity', short_t))
 _STAT_SEV_TS = (('status', short_t), ('severity', short_t),
-                ('stamp',  epicsTimeStamp))
+                ('stamp', TimeStamp))
 _UNITS       = ('units', char_t * MAX_UNITS_SIZE)
 
 class time_string(ctypes.Structure):
+    "dbr time string"
     _fields_ = list(_STAT_SEV_TS) + [('value', MAX_STRING_SIZE*char_t)]
 
     
 class time_short(ctypes.Structure):
+    "dbr time short"
     _fields_ = list(_STAT_SEV_TS) + [('RISC_pad',  short_t),
                                      ('value',     short_t)]
 
 class time_float(ctypes.Structure):
+    "dbr time float"
     _fields_ = list(_STAT_SEV_TS) + [('value',  float_t)]
 
 class time_enum(ctypes.Structure):
+    "dbr time enum"
     _fields_ = list(_STAT_SEV_TS) + [('RISC_pad',  short_t),
                                      ('value',    ushort_t)]
 
 class time_char(ctypes.Structure):
+    "dbr time char"
     _fields_ = list(_STAT_SEV_TS) + [('RISC_pad0', short_t),
                                      ('RISC_pad1', byte_t),
                                      ('value',     byte_t)]
 
 class time_long(ctypes.Structure):
+    "dbr time long"
     _fields_ = list(_STAT_SEV_TS) + [('value', int_t)]
     
 
 class time_double(ctypes.Structure):
+    "dbr time double"
     _fields_ = list(_STAT_SEV_TS) + [('RISC_pad', int_t),
                                      ('value',    double_t)]    
    
@@ -124,27 +131,33 @@ ctrl_limits = ('upper_disp_limit',   'lower_disp_limit',
                'upper_ctrl_limit',   'lower_ctrl_limit')
 
 def _gen_ctrl_lims(t=short_t):
+    "create types for control limits"
     return  [(s, t) for s in  ctrl_limits]
 
 class ctrl_enum(ctypes.Structure):
+    "dbr ctrl enum"
     _fields_ = list(_STAT_SEV) 
     _fields_.extend([ ('no_str', short_t),
                       ('strs', (char_t * MAX_ENUM_STRING_SIZE) * MAX_ENUMS),
                       ('value',    ushort_t)])
 
 class ctrl_short(ctypes.Structure):
+    "dbr ctrl short"
     _fields_ = list(_STAT_SEV) + [_UNITS] +  _gen_ctrl_lims(t=short_t)
     _fields_.extend([('value', short_t )])
     
 class ctrl_char(ctypes.Structure):
+    "dbr ctrl long"
     _fields_ = list(_STAT_SEV) +[_UNITS] +  _gen_ctrl_lims(t=byte_t)    
     _fields_.extend([('RISC_pad', byte_t), ('value', byte_t)])
     
 class ctrl_long(ctypes.Structure):
+    "dbr ctrl long"
     _fields_ = list(_STAT_SEV) +[_UNITS] +  _gen_ctrl_lims(t=int_t)
     _fields_.extend([('value', int_t)])
     
 class ctrl_float(ctypes.Structure):
+    "dbr ctrl float"    
     _fields_ = list(_STAT_SEV)
     _fields_.extend([('precision',   short_t),
                      ('RISC_pad',    short_t)] + [_UNITS])
@@ -153,6 +166,7 @@ class ctrl_float(ctypes.Structure):
 
 
 class ctrl_double(ctypes.Structure):
+    "dbr ctrl double"
     _fields_ = list(_STAT_SEV)
     _fields_.extend([('precision',   short_t),
                      ('RISC_pad',    short_t)] + [_UNITS])
@@ -233,6 +247,7 @@ def Cast(args):
     return ctypes.cast(args.raw_dbr, ctypes.POINTER(count*Map[ftype]))
 
 class event_handler_args(ctypes.Structure):
+    "event handler arguments"
     _fields_ = [('usr',     py_obj),
                 ('chid',    chid_t),   
                 ('type',    long_t),   
@@ -241,9 +256,11 @@ class event_handler_args(ctypes.Structure):
                 ('status',  int_t)]
 
 class connection_args(ctypes.Structure):
+    "connection arguments"
     _fields_ = [('chid', chid_t), ('op', long_t)]
 
 class exception_handler_args(ctypes.Structure):
+    "exception arguments"
     _fields_ = [('usr',   void_p),
                 ('chid',  chid_t),
                 ('type',  int_t),

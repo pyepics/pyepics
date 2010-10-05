@@ -7,8 +7,8 @@ from . import bi
 from . import bo
 from . import scaler
 
-ai  = ai.ai
-ao =ao.ao
+ai = ai.ai
+ao = ao.ao
 bi = bi.bi
 bo = bo.bo
 Scaler = scaler.Scaler

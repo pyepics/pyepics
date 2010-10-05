@@ -2,7 +2,9 @@
 #  M Newville <newville@cars.uchicago.edu>
 #  The University of Chicago, 2010
 #  Epics Open License
-
+"""
+basic device object defined
+"""
 from . import ca
 from . import pv
 
@@ -56,8 +58,8 @@ class Device(object):
         self._pvs = {}
         self.connection_timeout = timeout
         if attrs is not None:
-            for p in attrs:
-                self.PV(p,init=True,
+            for att in attrs:
+                self.PV(att, init=True,
                         connection_timeout=self.connection_timeout)
         ca.poll()
         
@@ -75,19 +77,20 @@ class Device(object):
                
         return self._pvs[pvname]
     
-    def put(self,attr,value,wait=False,timeout=10.0):
+    def put(self, attr, value, wait=False, timeout=10.0):
         """put an attribute value, 
         optionally wait for completion or
         up to a supplied timeout value"""
-        return self.PV(attr).put(value,wait=wait,timeout=timeout)
+        return self.PV(attr).put(value, wait=wait, timeout=timeout)
         
-    def get(self,attr,as_string=False):
+    def get(self, attr, as_string=False):
         """get an attribute value, 
         option as_string returns a string representation"""
         return self.PV(attr).get(as_string=as_string)
     
     def get_all(self):
-        """return a dictionary of the values of all current attributes"""
+        """return a dictionary of the values of all
+        current attributes"""
         out = {}
         for key in self._pvs:
             out[key] = self._pvs[key].get()
@@ -104,7 +107,7 @@ class Device(object):
         """remove a callback function to an attribute PV"""
         self.PV(attr).remove_callback(index=index)
         
-    def pv_property(attr, as_string=False,wait=False,timeout=10.0):
+    def pv_property(attr, as_string=False, wait=False, timeout=10.0):
         """function to turn a device attribute PV into a property:
 
         use in your subclass as:
@@ -122,6 +125,8 @@ class Device(object):
         >>> m.field = new_value
         
         """
-        return property(lambda self:     self.get(attr,as_string=as_string),
-                        lambda self,val: self.put(attr,val,wait=wait,timeout=timeout),
+        return property(lambda self:     \
+                        self.get(attr, as_string=as_string),
+                        lambda self,val: \
+                        self.put(attr, val, wait=wait, timeout=timeout),
                         None, None)

@@ -27,12 +27,12 @@ def DelayedEpicsCallback(fcn):
     This also checks for dead wxPython objects (say, from a
     closed window), and remove callbacks to them.
     """
-    def wrapper(*args,**kw):
+    def wrapper(*args, **kw):
         def cb():
             try:
                 fcn(*args, **kw)
             except PyDeadObjectError:                    
-                cb_index, pv =  kw.get('cb_info',(None, None))
+                cb_index, pv =  kw.get('cb_info', (None, None))
                 if hasattr(pv, 'remove_callback'):
                     try:
                         pv.remove_callback(index=cb_index)
@@ -43,22 +43,25 @@ def DelayedEpicsCallback(fcn):
 
 @EpicsFunction
 def finalize_epics():
-    """explicitly finalize and cleanup epics so as to prevent core-dumps on exit.
+    """explicitly finalize and cleanup epics so as to
+    prevent core-dumps on exit.
     """
     epics.ca.finalize_libca()
     epics.ca.poll()
     
     
-def set_sizer(panel,sizer=None, style=wx.VERTICAL,fit=False):
+def set_sizer(panel, sizer=None, style=wx.VERTICAL, fit=False):
     """ utility for setting wx Sizer  """
     if sizer is None:  sizer = wx.BoxSizer(style)
     panel.SetAutoLayout(1)
     panel.SetSizer(sizer)
     if fit: sizer.Fit(panel)
 
-def set_float(val,default=None):
-    """ utility to set a floating value, useful for converting from strings """
-    if val in (None,''): return default
+def set_float(val, default=None):
+    """ utility to set a floating value,
+    useful for converting from strings """
+    if val in (None, ''):
+        return default
     try:
         return float(val)
     except ValueError:
@@ -84,13 +87,14 @@ class closure:
 
     based on Command class from J. Grayson's Tkinter book.
     """
-    def __init__(self,func=None,*args, **kw):
+    def __init__(self, func, *args, **kw):
         self.func  = func
         self.kw    = kw
         self.args  = args
     def __call__(self,  *args, **kw):
         self.kw.update(kw)
-        if (self.func == None): return None
+        if self.func is None:
+            return None
         self.args = args
         return self.func(*self.args, **self.kw)
 
@@ -135,7 +139,8 @@ class FloatCtrl(wx.TextCtrl):
         
         self.__digits = '0123456789.-'
         self.__prec   = precision
-        if precision is None: self.__prec = 0
+        if precision is None:
+            self.__prec = 0
         self.format   = '%%.%if' % self.__prec
         
         self.__val = set_float(value)
@@ -145,12 +150,12 @@ class FloatCtrl(wx.TextCtrl):
         self.fgcol_valid   ="Black"
         self.bgcol_valid   ="White"
         self.fgcol_invalid ="Red"
-        self.bgcol_invalid =(254,254,80)
+        self.bgcol_invalid =(254, 254, 80)
         self.bell_on_invalid = bell_on_invalid
         
         # set up action 
         self.__action = closure()  
-        if hasattr(action,'__call__'):
+        if hasattr(action, '__call__'):
             self.__action.func = action
         if len(list(action_kw.keys()))>0:
             self.__action.kw = action_kw
@@ -167,7 +172,6 @@ class FloatCtrl(wx.TextCtrl):
         self.SetValue(self.__val)
               
         self.Bind(wx.EVT_CHAR, self.onChar)
-        # self.Bind(wx.EVT_CHAR, self.CharEvent)        
         self.Bind(wx.EVT_TEXT, self.onText)
 
         self.Bind(wx.EVT_SET_FOCUS,  self.onSetFocus)
@@ -175,17 +179,18 @@ class FloatCtrl(wx.TextCtrl):
         self.Bind(wx.EVT_SIZE, self.onResize)
         self.__GetMark()
 
-    def SetAction(self,action,action_kw={}):
+    def SetAction(self, action, action_kw={}):
         self.__action = closure()  
         if hasattr(action,'__call__'):
             self.__action.func = action
         if len(list(action_kw.keys()))>0:
             self.__action.kw = action_kw
         
-    def SetPrecision(self,p):
-        if p is None: p = 0
-        self.__prec = p
-        self.format = '%%.%if' % p
+    def SetPrecision(self, prec):
+        if prec is None:
+            prec = 0
+        self.__prec = prec
+        self.format = '%%.%if' % prec
         
     def __GetMark(self):
         " keep track of cursor position within text"
@@ -195,12 +200,13 @@ class FloatCtrl(wx.TextCtrl):
         except:
             self.__mark = 0
 
-    def __SetMark(self,m=None):
+    def __SetMark(self, mark=None):
         " "
-        if m==None: m = self.__mark
-        self.SetSelection(m,m)
+        if mark is None:
+            mark = self.__mark
+        self.SetSelection(mark,mark)
 
-    def SetValue(self,value=None,act=True):
+    def SetValue(self, value=None, act=True):
         " main method to set value "
         if value == None:
             value = wx.TextCtrl.GetValue(self).strip()
@@ -210,7 +216,7 @@ class FloatCtrl(wx.TextCtrl):
             self.__Text_SetValue(self.__val)
             self.SetForegroundColour(self.fgcol_valid)
             self.SetBackgroundColour(self.bgcol_valid)
-            if  hasattr(self.__action,'__call__') and act:
+            if  hasattr(self.__action, '__call__') and act:
                 self.__action(value=self.__val)
         else:
             self.__val = self.__bound_val
@@ -231,7 +237,8 @@ class FloatCtrl(wx.TextCtrl):
         
     def onSetFocus(self, event=None):
         self.__SetMark()
-        if event: event.Skip()
+        if event:
+            event.Skip()
       
     def onChar(self, event):
         """ on Character event"""
@@ -240,7 +247,7 @@ class FloatCtrl(wx.TextCtrl):
         pos   = wx.TextCtrl.GetSelection(self)
         # really, the order here is important:
         # 1. return sends to ValidateEntry
-        if (key == wx.WXK_RETURN):
+        if key == wx.WXK_RETURN:
             self.SetValue(entry)
             return
 
@@ -259,7 +266,7 @@ class FloatCtrl(wx.TextCtrl):
             (ckey != '-' and  has_minus and pos[0] == 0)):
             return
         # 4. allow digits, but not other characters
-        if (chr(key) in self.__digits):
+        if chr(key) in self.__digits:
             event.Skip()
             return
         # return without event.Skip() : do not propagate event
@@ -279,16 +286,20 @@ class FloatCtrl(wx.TextCtrl):
         else:
             return int(self.__val)
 
-    def GetMin(self):  return self.__min
-    def GetMax(self):  return self.__max
-    def SetMin(self,min): self.__min = set_float(min)
-    def SetMax(self,max): self.__max = set_float(max)
+    def GetMin(self):
+        return self.__min
+    def GetMax(self):
+        return self.__max
+    def SetMin(self,min):
+        self.__min = set_float(min)
+    def SetMax(self,max):
+        self.__max = set_float(max)
     
-    def __Text_SetValue(self,value):
+    def __Text_SetValue(self, value):
         wx.TextCtrl.SetValue(self, self.format % set_float(value))
         self.Refresh()
     
-    def __CheckValid(self,value):
+    def __CheckValid(self, value):
         v = self.__val
         try:
             self.__valid = True
@@ -320,9 +331,10 @@ class pvCtrlMixin:
     
     """
 
-    def __init__(self,pv=None, pvname=None,
+    def __init__(self, pv=None, pvname=None,
                  font=None, fg=None, bg=None):
-        if font is None:  font = wx.Font(12,wx.SWISS,wx.NORMAL,wx.BOLD,False)
+        if font is None:
+            font = wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,False)
         
         self.pv = None
         try:

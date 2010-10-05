@@ -176,12 +176,12 @@ class MotorPanel(wx.Panel):
     @EpicsFunction
     def onLeftButton(self,event=None):
         if (self.motor is None): return        
-        self.motor.tweak(dir='reverse')
+        self.motor.tweak(direction='reverse')
         
     @EpicsFunction
     def onRightButton(self,event=None):
         if (self.motor is None): return        
-        self.motor.tweak(dir='forward')
+        self.motor.tweak(direction='forward')
 
     @EpicsFunction
     def onStopButton(self,event=None):

@@ -44,7 +44,8 @@ class MotorDetailFrame(wx.Frame):
 
         devtype = motor.get_field('device_type',as_string=True)
         mlabel = "  %s: %s   (%s) units=%s" % (motor.pvname,
-                                                  motor.description, devtype, motor.units)
+                                               motor.description,
+                                               devtype, motor.units)
 
         mlabel = "  %s:  (%s)" % (motor.pvname, devtype)
 
@@ -329,9 +330,9 @@ class MotorDetailFrame(wx.Frame):
     @EpicsFunction
     def onLeftButton(self,event=None):
         if (self.motor is None): return
-        self.motor.tweak(dir='reverse')
+        self.motor.tweak(direction='reverse')
 
     @EpicsFunction
     def onRightButton(self,event=None):
         if (self.motor is None): return        
-        self.motor.tweak(dir='forward')
+        self.motor.tweak(direction='forward')

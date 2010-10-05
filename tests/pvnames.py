@@ -71,10 +71,9 @@ string_pvlist = ['13BMA:m1.DESC',
 
 #### alarm test
 
-alarm_pv = '13IDC:m13.VAL'
-alarm_comp='le'
-alarm_trippoint = 1.60
-
+alarm_pv = '13XRM:m1.VAL'
+alarm_comp='ge'
+alarm_trippoint = 2.5
 
 #### motor list (for connect.py)
 #  Here, provide a list of Epics Motors

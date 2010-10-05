@@ -40,7 +40,7 @@ def get_strconvertors():
 
     That is, for Python3 one sends and receives sequences of
     bytes to libca. This function returns the translators
-    (str2bytes, bytes2str), assuming the encoding defined in
+    (STR2BYTES, BYTES2STR), assuming the encoding defined in
     EPICS_STR_ENCODING (which is 'ASCII' by default).  
     """
     if PY_VERSION >= 3:
@@ -57,7 +57,7 @@ def get_strconvertors():
         return s2b, b2s
     return str, str
 
-str2bytes, bytes2str = get_strconvertors()
+STR2BYTES, BYTES2STR = get_strconvertors()
 
 def strjoin(sep, seq):
     "join string sequence with a separator"
@@ -65,9 +65,9 @@ def strjoin(sep, seq):
         return sep.join(seq)
 
     if isinstance(sep, bytes):
-        sep = bytes2str(sep)
+        sep = BYTES2STR(sep)
     if isinstance(seq[0], bytes): 
-        seq = [bytes2str(i) for i in seq]
+        seq = [BYTES2STR(i) for i in seq]
     return sep.join(seq)
     
 ## holder for shared library
@@ -110,7 +110,8 @@ class ChannelAccessException(Exception):
         return " %s returned '%s'" % (self.fcn, self.msg)
 
 class CASeverityException(Exception):
-    """Channel Access Severity Check Exception: PySEVCHK got unexpected return value"""
+    """Channel Access Severity Check Exception:
+    PySEVCHK got unexpected return value"""
     def __init__(self, fcn, msg):
         Exception.__init__(self)
         self.fcn = fcn
@@ -233,16 +234,17 @@ def finalize_libca(maxtime=10.0):
         poll()
         for ctx in _cache.values():
             for val in ctx.values():
-                val = None 
+                del val
         _cache.clear()
-        for i in range(5):
+        flush_count = 0
+        while (flush_count < 5 and
+               time.time()-start_time < maxtime):
             flush_io()
             poll()
-            if time.time()-start_time > maxtime:
-                break
+            flush_count += 1
         context_destroy()
         libca = None
-    except:
+    except StandardError:
         pass
 
 def show_cache(print_out=True):
@@ -371,6 +373,7 @@ def withSEVCHK(fcn):
 @withCA
 @withSEVCHK
 def context_create(context=None):
+    "create a context -- context=1 for preemptive callbacks"
     if not PREEMPTIVE_CALLBACK:
         raise ChannelAccessException('context_create',
             'Cannot create new context with PREEMPTIVE_CALLBACK=False')
@@ -380,20 +383,24 @@ def context_create(context=None):
 
 @withCA
 def context_destroy():
+    "destroy current context"    
     ret = libca.ca_context_destroy()
     return PySEVCHK('context_destroy', ret, 0)
     
 @withCA
 def attach_context(context):
+    "attach a context"        
     ret = libca.ca_attach_context(context) 
     return PySEVCHK('attach_context', ret, dbr.ECA_ISATTACHED)
         
 @withCA
 def detach_context():
+    "detach a context"
     return libca.ca_detach_context()
 
 @withCA
 def replace_printf_handler(fcn=None):
+    "replace printf output handler -- test???"
     if fcn is None:
         fcn = sys.stderr.write
     serr = ctypes.CFUNCTYPE(None, ctypes.c_char_p)(fcn)
@@ -417,17 +424,17 @@ def flush_io():
 @withCA
 def message(status):
     "write message"
-    return bytes2str(libca.ca_message(status))
+    return BYTES2STR(libca.ca_message(status))
 
 @withCA
 def version():
     """return CA version"""
-    return bytes2str(libca.ca_version())
+    return BYTES2STR(libca.ca_version())
 
 @withCA
 def pend_io(timeout=1.0):
     """polls CA for i/o. """    
-    return libca.ca_pend_io(timeout)
+    ret = libca.ca_pend_io(timeout)
     try:
         return PySEVCHK('pend_io', ret)
     except CASeverityException:
@@ -470,11 +477,11 @@ def create_channel(pvname, connect=False, userfcn=None):
        conn     connection state (True/False)
     """
     # 
-    # Note that _CB_connect (defined below) is a global variable, holding
+    # Note that _CB_CONNECT (defined below) is a global variable, holding
     # a reference to _onConnectionEvent:  This is really the connection
     # callback that is run -- the userfcn here is stored in the _cache
     # and called by _onConnectionEvent.
-    pvn = str2bytes(pvname)    
+    pvn = STR2BYTES(pvname)    
     # sys.stdout.write(' create channel %s \n' % pvn)
     ctx = current_context()
     global _cache
@@ -487,7 +494,7 @@ def create_channel(pvname, connect=False, userfcn=None):
 
     chid = dbr.chid_t()
     # print 'Create Channel ', ctx, chid, pvname
-    ret = libca.ca_create_channel(pvn, _CB_connect, 0, 0, 
+    ret = libca.ca_create_channel(pvn, _CB_CONNECT, 0, 0, 
                                   ctypes.byref(chid))
     PySEVCHK('create_channel', ret)
 
@@ -497,7 +504,7 @@ def create_channel(pvname, connect=False, userfcn=None):
     return chid
 
 @withCHID
-def connect_channel(chid, timeout=None, verbose=False, **kw):
+def connect_channel(chid, timeout=None, verbose=False):
     """ wait (up to timeout) until a chid is connected
 
     Normally, channels will connect very fast, and the
@@ -524,53 +531,55 @@ def connect_channel(chid, timeout=None, verbose=False, **kw):
         if ctx not in _cache:
             _cache[ctx] = {}
 
-        tdelta = start_time - _cache[ctx][pvname]['ts']
-
         if timeout is None:
             timeout = DEFAULT_CONNECTION_TIMEOUT
-        # print 'Connect Channel... ', pvname, timeout
-
         while (not conn and ((time.time()-start_time) < timeout)):
             poll()
             conn = (state(chid) == dbr.CS_CONN)
         if not conn:
             _cache[ctx][pvname]['ts'] = time.time()
             _cache[ctx][pvname]['failures'] += 1
-
     return conn
 
 # functions with very light wrappings:
 @withCHID
 def name(chid):
     "channel name"
-    return bytes2str(libca.ca_name(chid))
+    return BYTES2STR(libca.ca_name(chid))
 
 @withCHID
 def host_name(chid):
-    return bytes2str(libca.ca_host_name(chid))
+    "channel host name"
+    return BYTES2STR(libca.ca_host_name(chid))
 
 @withCHID
 def element_count(chid):
+    "channel data size -- element count"
     return libca.ca_element_count(chid)
 
 @withCHID
 def read_access(chid):
+    "read access for channel"
     return libca.ca_read_access(chid)
 
 @withCHID
 def write_access(chid):
+    "write access for channel"    
     return libca.ca_write_access(chid)
 
 @withCHID
 def field_type(chid):
+    "integer giving data type for channel"
     return libca.ca_field_type(chid)
 
 @withCHID
 def clear_channel(chid):
+    "clear channel"    
     return libca.ca_clear_channel(chid)
 
 @withCHID
 def state(chid):
+    "read attachment state for channel"
     return libca.ca_state(chid)
 
 def isConnected(chid):
@@ -750,14 +759,14 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     pvname = name(chid)
     _put_done[pvname] = (False, callback, callback_data)
     ret = libca.ca_array_put_callback(ftype, count, chid,
-                                      data, _CB_putwait, 0)
+                                      data, _CB_PUTWAIT, 0)
     PySEVCHK('put', ret)
     if wait:
-        time0, finished = time.time(), False
+        start_time, finished = time.time(), False
         while not finished:
             poll()
             finished = (_put_done[pvname][0] or
-                        (time.time()-time0) > timeout)
+                        (time.time()-start_time) > timeout)
         if not _put_done[pvname][0]:
             ret = -ret
     return ret
@@ -792,7 +801,7 @@ def get_ctrlvars(chid):
             out[attr] = getattr(tmpv, attr)
     if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
         tmpv.no_str > 0):
-        out['enum_strs'] = tuple([bytes2str(tmpv.strs[i].value)
+        out['enum_strs'] = tuple([BYTES2STR(tmpv.strs[i].value)
                                   for i in range(tmpv.no_str)])
     return out
 
@@ -803,16 +812,16 @@ def get_timevars(chid):
         status  severity timestamp
     """
     ftype = promote_type(chid, use_time=True)
-    d = (1*dbr.Map[ftype])()
-    ret = libca.ca_array_get(ftype, 1, chid, d)
+    dat = (1*dbr.Map[ftype])()
+    ret = libca.ca_array_get(ftype, 1, chid, dat)
     PySEVCHK('get_timevars', ret)
     poll()
-    kw = {}
-    v = d[0]
+    out = {}
+    val = dat[0]
     for attr in ('status', 'severity', 'timestamp'):
-        if hasattr(v, attr):
-            kw[attr] = getattr(v, attr)
-    return kw
+        if hasattr(val, attr):
+            out[attr] = getattr(val, attr)
+    return out
 
 def get_timestamp(chid):
     """return the timestamp of a Channel."""
@@ -820,6 +829,7 @@ def get_timestamp(chid):
 
 def get_severity(chid):
     """return the severity of a Channel."""
+    return get_timevars(chid).get('severity', 0)
 
 def get_precision(chid):
     """return the precision of a Channel.  For Channels with
@@ -849,16 +859,16 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     ftype = promote_type(chid, use_ctrl=use_ctrl, use_time=use_time)
     count = element_count(chid)
 
-    cb    = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onGetEvent)   
+    cback = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onGetEvent)   
     uarg  = ctypes.py_object(userfcn)
     evid  = ctypes.c_void_p()
     poll()
     ret = libca.ca_create_subscription(ftype, count, chid, mask,
-                                       cb, uarg, ctypes.byref(evid))
+                                       cback, uarg, ctypes.byref(evid))
     PySEVCHK('create_subscription', ret)
     
     poll()
-    return (cb, uarg, evid)
+    return (cback, uarg, evid)
 
 @withCA
 @withSEVCHK
@@ -898,7 +908,7 @@ def _onGetEvent(args):
     nelem = args.count
     if args.type in (dbr.STRING, dbr.TIME_STRING, dbr.CTRL_STRING):
         nelem = dbr.MAX_STRING_SIZE
-
+        
     value = _unpack(value, nelem, ftype=args.type)
     if hasattr(args.usr, '__call__'):
         args.usr(value=value, **kwd)
@@ -909,7 +919,6 @@ def _onConnectionEvent(args):
     connected. if provided, run a user-function"""
     ctx = current_context()
     pvname = name(args.chid)
-    # print 'onConnection Event ', args.chid, args.op==dbr.OP_CONN_UP, pvname, ctx
     global _cache
     if ctx not in _cache:
         _cache[ctx] = {}
@@ -926,8 +935,9 @@ def _onConnectionEvent(args):
     entry['failures'] = 0
     if 'userfcn' in entry and hasattr(entry['userfcn'], '__call__'):
         try:
-            poll(evt=1.e-3,iot=10.0)
-            entry['userfcn'](pvname=pvname, chid=entry['chid'],
+            poll(evt=1.e-3, iot=10.0)
+            entry['userfcn'](pvname=entry['pvname'],
+                             chid=entry['chid'],
                              conn=entry['conn'])
         except:
             errmsg = 'Error Calling User Connection Callback for "%s"'  % pvname
@@ -939,18 +949,17 @@ def _onPutEvent(args, *varargs):
     """set put-has-completed for this channel,
     call optional user-supplied callback"""
     pvname = name(args.chid)
-    userfcn = _put_done[pvname][1]
-    userdata = _put_done[pvname][2]
+    fcn  = _put_done[pvname][1]
+    data = _put_done[pvname][2]
     _put_done[pvname] = (True, None, None)
-    if hasattr(userfcn, '__call__'):
-        userfcn(pvname=pvname, data=userdata)
+    if hasattr(fcn, '__call__'):
+        fcn(pvname=pvname, data=data)
 
 # create global reference to these two callbacks
-_CB_connect = ctypes.CFUNCTYPE(None, dbr.connection_args)(_onConnectionEvent)
-_CB_putwait = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)  
+_CB_CONNECT = ctypes.CFUNCTYPE(None, dbr.connection_args)(_onConnectionEvent)
+_CB_PUTWAIT = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)  
 
 
-## Synchronous groups
 @withCA
 @withSEVCHK
 def sg_block(gid, timeout=10.0):
@@ -1011,7 +1020,7 @@ def sg_get(gid, chid, ftype=None, as_string=False, as_numpy=True):
     return val
 
 def sg_put(gid, chid, value):
-    """synchronous-group put: cannot wait or get callback!"""
+    "synchronous-group put: cannot wait or get callback!"
     if not isinstance(chid, dbr.chid_t):
         raise ChannelAccessException('sg_put', "not a valid chid!")
 
