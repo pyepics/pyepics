@@ -18,19 +18,21 @@ attributes for accessing it's properties.
 The :class:`PV` class
 =======================
 
-.. class:: PV(pvname[, callback=None[, connection_callback=None, [form='native'[, auto_monitor=None[, verbose=False]]]]])
+.. class:: PV(pvname[, callback=None[, form='native'[, auto_monitor=None[, connection_callback=None[,  connection_timeout=None[, verbose=False]]]]]])
 
    create a PV object for a named Epics Process Variable.  
 
    :param pvname: name of Epics Process Variable
    :param callback:  user-defined callback function on changes to PV value or state.
    :type callback: callable or None
-   :param connection_callback:  user-defined function called on changes to PV connection status.
-   :type connection_callback: callable or None
    :param form:  which epics *data type* to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.  
    :type form: string, one of ('native','ctrl', or 'time')
    :param auto_monitor:  whether to automatically monitor the PV for changes.
    :type auto_monitor: ``None``, ``True``, or ``False``
+   :param connection_callback: user-defined function called on changes to PV connection status.
+   :type connection_callback:  callable or None
+   :param connection_timeout:  time (in seconds) to wait for connection before giving up
+   :type connection_callback:  float or None
    :param verbose:  whether to print out debugging messages
    :type verbose: ``True``/``False``
    
@@ -133,15 +135,26 @@ callbacks to be executed when the PV changes.
    :type  timeout:  double
    :rtype:    ``True``/``False``
 
+   if timeout is None, the PVs connection_timeout paramater will be used. If that is also None, 
+   :data:`ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
+
 .. method:: wait_for_connection([timeout=None])
  
    this waits until a PV is connected, or has timed-out waiting for a
    connection.  Returns  whether the connection has occured.
 
-   :param timeout:  maximum connection time, default=:data:`ca.DEFAULT_CONNECTION_TIMEOUT`
+   :param timeout:  maximum connection time.
    :type  timeout:  double
    :rtype:    ``True``/``False``
    
+   if timeout is None, the PVs connection_timeout paramater will be used. If that is also None, 
+   :data:`ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
+
+
+.. method:: disconnect()
+ 
+   disconnect a PV, clearing all callbacks.
+
 .. method:: add_callback(callback=None[, index=None , [**kw]])
  
    adds a user-defined callback routine to be run on each change event for

@@ -11,10 +11,14 @@ import sys
 
 from  pvnames import updating_pvlist
 write = sys.stdout.write
+flush = sys.stdout.flush
+
 def run_test(runtime=1, pvnames=None,  run_name='thread c'):
     write(' -> thread  "%s"  will run for %.3f sec\n ' % ( run_name, runtime))
+    
     def onChanges(pvname=None, value=None, char_value=None, **kw):
         write('      %s = %s (%s)\n' % (pvname, char_value, run_name))
+        flush()
         
     epics.ca.context_create()
     t0 = time.time()
@@ -28,20 +32,24 @@ def run_test(runtime=1, pvnames=None,  run_name='thread c'):
     while time.time()-t0 < runtime:
         time.sleep(0.01)
 
-    for p in pvs: p.clear_callbacks()
-    write( 'Done with Thread  %s' % run_name)
+    for p in pvs:
+        p.clear_callbacks()
+    write( 'Done with Thread  %s\n' % ( run_name))
+    epics.ca.context_destroy()
     
 write( "First, run test in Foreground:\n")
 run_test(2.0,  updating_pvlist, 'initial')
 
 write("Run 2 Background Threads simultaneously:\n")
-th1 = Thread(target=run_test,args=(5, updating_pvlist,  'A'))
+th1 = Thread(target=run_test,args=(3, updating_pvlist,  'A'))
 
-th2 = Thread(target=run_test,args=(10, updating_pvlist, 'B'))
+th2 = Thread(target=run_test,args=(7, updating_pvlist, 'B'))
 th1.start()
 th2.start()
 
 th1.join()
 th2.join()
+time.sleep(0.001)
+write('Done\n')
 
-write( 'Done\n')
+epics.ca.show_cache()

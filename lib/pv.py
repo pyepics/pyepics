@@ -52,13 +52,15 @@ class PV(object):
 
     def __init__(self, pvname, callback=None, form='native',
                  verbose=False, auto_monitor=None,
-                 connection_callback=None):
+                 connection_callback=None,
+                 connection_timeout=None):
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
         self.auto_monitor = auto_monitor
         self.ftype      = None
         self.connected  = False
+        self.connection_timeout = connection_timeout
         self._args      = {}.fromkeys(self._fields)
         self._args['pvname'] = self.pvname
         self._args['count'] = -1
@@ -139,7 +141,9 @@ class PV(object):
             self.connect()
         if not self.connected:
             if timeout is None:
-                timeout = ca.DEFAULT_CONNECTION_TIMEOUT
+                timeout = self.connection_timeout
+                if timeout is None:
+                    timeout = ca.DEFAULT_CONNECTION_TIMEOUT
             start_time = time.time()
             while (not self.connected and
                    time.time()-start_time < timeout):
@@ -149,6 +153,8 @@ class PV(object):
     def connect(self, timeout=None):
         "check that a PV is connected, forcing a connection if needed"
         if not self.connected:
+            if timeout is None:
+                timeout = self.connection_timeout
             ca.connect_channel(self.chid, timeout=timeout)
         self._conn_started = True
         return self.connected and self.ftype is not None
@@ -287,7 +293,7 @@ class PV(object):
         a GUI resource is no longer available).
              
         """
-        for index in sorted(self.callbacks.keys()):
+        for index in sorted(list(self.callbacks.keys())):
             fcn, kwargs = self.callbacks[index]
             # print 'Run Callback %i %s:' % (index, self.pvname)
             kwd = copy.copy(self._args)

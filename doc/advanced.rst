@@ -192,10 +192,11 @@ other.::
        
     def run_test(runtime=1, pvnames=None,  run_name='thread c'):
         print ' |-> thread  "%s"  will run for %.3f sec ' % ( run_name, runtime)
-         
+        
         def onChanges(pvname=None, value=None, char_value=None, **kw):
             print '      %s = %s (%s)' % (pvname, char_value, run_name)
                 
+        # A new CA context must be created per thread
         epics.ca.context_create()
         t0 = time.time()
         pvs = []
@@ -207,8 +208,10 @@ other.::
             
         while time.time()-t0 < runtime:
             time.sleep(0.01)
-        for p in pvs: p.clear_callbacks()
+        for p in pvs: 
+            p.clear_callbacks()
         print 'Done with Thread ', run_name
+	epics.ca.context_destroy()     
             
     print "Run 2 Threads simultaneously:"
     th1 = Thread(target=run_test,args=(3, pvlist1,  'A'))
@@ -221,10 +224,10 @@ other.::
     th2.join()
      
     print 'Done'
-    
-    
-The `epics.ca.context_create()`  here is recommended, but appears to not be
-necessary.  The output from this will look like::
+        
+The calls to `epics.ca.context_create()` and `epics.ca.context_destroy()`
+are required: forgetting them will suppress all callbacks, and is likely to
+to lead in core dumps.  The output from this will look like::
 
     Run 2 Threads simultaneously:
      |-> thread  "A"  will run for 3.000 sec 

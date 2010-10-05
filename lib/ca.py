@@ -20,11 +20,12 @@ import sys
 import time
 import atexit
 
+HAS_NUMPY = False
 try:
     import numpy
     HAS_NUMPY = True
 except ImportError:
-    HAS_NUMPY = False
+    pass
 
 from . import dbr
 
@@ -206,7 +207,7 @@ def initialize_libca():
     libca.ca_client_status.argtypes = [ctypes.c_void_p, ctypes.c_long]
     libca.ca_sg_block.argtypes    = [ctypes.c_ulong, ctypes.c_double]
 
-    libca.ca_current_context.restype = ctypes.c_long
+    libca.ca_current_context.restype = ctypes.c_void_p
     libca.ca_version.restype   = ctypes.c_char_p
     libca.ca_host_name.restype = ctypes.c_char_p
     libca.ca_name.restype      = ctypes.c_char_p
@@ -226,6 +227,7 @@ def finalize_libca(maxtime=10.0):
     then flush_io() and poll() a few times.
     """
     global libca
+    global _cache
     if libca is None:
         return
     try:
@@ -233,8 +235,8 @@ def finalize_libca(maxtime=10.0):
         flush_io()
         poll()
         for ctx in _cache.values():
-            for val in ctx.values():
-                del val
+            for key in list(ctx.keys()):
+                ctx.pop(key)
         _cache.clear()
         flush_count = 0
         while (flush_count < 5 and
@@ -252,6 +254,7 @@ def show_cache(print_out=True):
     out = []
     out.append('#  PV name    Is Connected?   Channel ID  Context')
     out.append('#---------------------------------------')
+    global _cache
     for context, context_chids in  list(_cache.items()):
         for vname, val in list(context_chids.items()):
             out.append(" %s  %s  %i" % (vname,
@@ -307,7 +310,7 @@ def withCHID(fcn):
         if len(args)>0:
             chid = args[0]
             args = list(args)
-            if isinstance(chid, (int, long)):
+            if isinstance(chid, int):
                 args[0] = chid = dbr.chid_t(args[0])
             if not isinstance(chid, dbr.chid_t):
                 raise ChannelAccessException(fcn.__name__,
@@ -328,7 +331,7 @@ def withConnectedCHID(fcn):
         if len(args)>0:
             chid = args[0]
             args = list(args)
-            if isinstance(chid, (int, long)):
+            if isinstance(chid, int):
                 args[0] = chid = dbr.chid_t(chid)
             if not isinstance(chid, dbr.chid_t):
                 raise ChannelAccessException(fcn.__name__,
@@ -383,9 +386,15 @@ def context_create(context=None):
 
 @withCA
 def context_destroy():
-    "destroy current context"    
+    "destroy current context"
+    global _cache
+    ctx = current_context() 
     ret = libca.ca_context_destroy()
-    return PySEVCHK('context_destroy', ret, 0)
+    if ctx in _cache:
+        for key in list(_cache[ctx].keys()):
+            _cache[ctx].pop(key)
+        _cache.pop(ctx)
+    return
     
 @withCA
 def attach_context(context):
@@ -692,7 +701,7 @@ def __as_string(val, chid, count, ftype):
         elif count > 1:
             val = '<array count=%d, type=%d>' % (count, ftype)
         val = str(val)
-    except StandardError:
+    except ValueError:
         pass            
     return val
                     
@@ -936,7 +945,7 @@ def _onConnectionEvent(args):
     if 'userfcn' in entry and hasattr(entry['userfcn'], '__call__'):
         try:
             poll(evt=1.e-3, iot=10.0)
-            entry['userfcn'](pvname=entry['pvname'],
+            entry['userfcn'](pvname=pvname,
                              chid=entry['chid'],
                              conn=entry['conn'])
         except:

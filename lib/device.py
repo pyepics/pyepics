@@ -53,14 +53,13 @@ class Device(object):
       >>> x.put('13IDC:m3.VAL', 2)
       >>> print x.PV('13IDC:m3.DIR').get(as_string=True)
     """
-    def __init__(self, prefix=None, attrs=None, timeout=0.5):
+    def __init__(self, prefix=None, attrs=None, timeout=None):
         self.__prefix__ = prefix 
         self._pvs = {}
-        self.connection_timeout = timeout
         if attrs is not None:
             for att in attrs:
                 self.PV(att, init=True,
-                        connection_timeout=self.connection_timeout)
+                        connection_timeout=timeout)
         ca.poll()
         
     def PV(self, attr, init=False, **kw):

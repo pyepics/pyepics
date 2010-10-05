@@ -4,14 +4,14 @@
 
 import epics
 import time
-
+import sys
 from  pvnames import motor1
-
+write = sys.stdout.write
 def onConnectionChange(pvname=None, conn= None, **kws):
-    print 'PV connection status changed:  ', pvname,  conn
+    write('PV connection status changed: %s %s\n' % (pvname,  repr(conn)))
     
 def onValueChange(pvname=None, value=None, host=None, **kws):
-    print 'PV value changed:  ', pvname, value, host
+    write('PV value changed: %s (%s)  %s ' % ( pvname, host, repr(value)))
     
 mypv = epics.PV(motor1, 
                 connection_callback= onConnectionChange,
@@ -19,7 +19,7 @@ mypv = epics.PV(motor1,
 
 mypv.get()
 
-print 'Now waiting, watching values and connection changes:'
+write('Now waiting, watching values and connection changes:\n')
 t0 = time.time()
 while time.time()-t0 < 300:
     time.sleep(0.001)
