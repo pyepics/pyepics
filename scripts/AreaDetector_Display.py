@@ -5,7 +5,6 @@ import sys
 
 import time
 from debugtime import debugtime
-
 os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = '16777216'
 
 import epics
@@ -76,8 +75,12 @@ class ImageView(wx.Window):
             bmp = image.ConvertToBitmap()
 
         if dc is None:
-            dc = wx.PaintDC(self)            
-        dc.DrawBitmap(bmp, diffx, diffy, useMask=True)
+            try:
+                dc = wx.PaintDC(self)
+            except:
+                pass
+        if dc is not None:
+            dc.DrawBitmap(bmp, diffx, diffy, useMask=True)
 
 class AD_Display(wx.Frame, epics.Device):
     """AreaDetector Display """
@@ -194,9 +197,9 @@ class AD_Display(wx.Frame, epics.Device):
             im_mode = 'RGB'
             im_size = [self.arrsize[1], self.arrsize[2]]
         d.add('know image size/type')
-        rawdata = self.get('ArrayData')  
+        rawdata = self.get('ArrayData')
         d.add('have rawdata')
-
+        
         imbuff =  Image.frombuffer(im_mode, im_size, rawdata,
                                    'raw', im_mode, 0, 1)
         d.add('data to imbuff')
@@ -217,7 +220,7 @@ class AD_Display(wx.Frame, epics.Device):
         self.image.SetValue(self.wximage)
 
         d.add('wx bitmap set')
-        # d.show()
+        d.show()
         
 if __name__ == '__main__':
     import sys
