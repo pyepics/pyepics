@@ -634,6 +634,8 @@ def _unpack(data, count, ftype=dbr.INT, as_numpy=True):
             if '\x00' in out:
                 out = out[:out.index('\x00')]
             return out
+        elif ntype == dbr.CHAR:
+            return data
         elif use_numpy:
             return numpy.array(data)
         return list(data)
@@ -647,7 +649,9 @@ def _unpack(data, count, ftype=dbr.INT, as_numpy=True):
         # fix for CTRL / TIME array data:Thanks to Glen Wright !
         out = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
                                                   dbr.value_offset[ftype])
-        if use_numpy:
+        if ntype == dbr.CHAR:
+            return out
+        elif use_numpy:
             return numpy.array(out)
         return list(out)
 
