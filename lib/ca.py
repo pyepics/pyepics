@@ -684,7 +684,8 @@ def get(chid, ftype=None, as_string=False, as_numpy=True):
     PySEVCHK('get', ret)
     poll()
     if count > 2:
-        poll(evt=count*5.e-5, iot=count*0.01)
+        c = min(count, 1000)
+        poll(evt=c*5.e-5, iot=c*0.01)
 
     val = _unpack(data, nelem, ftype=ftype, as_numpy=as_numpy)
     if as_string:

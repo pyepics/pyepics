@@ -182,7 +182,6 @@ class PV(object):
         """
         if not self.wait_for_connection():
             return None
-         
         if not self.auto_monitor or self._args['value'] is None:
             self._args['value'] = ca.get(self.chid,
                                          ftype=self.ftype,
@@ -216,12 +215,13 @@ class PV(object):
         if ntype == dbr.STRING:
             self._args['char_value'] = val
             return val
-        cval  = repr(val)       
-        if self._args['count'] > 1:
-            if ntype == dbr.CHAR:
+        cval  = repr(val)
+        if self.count > 1:
+            if ntype == dbr.CHAR and self.count < ca.AUTOMONITOR_MAXLENGTH:
                 val = list(val)
-                firstnull  = val.index(0)
-                if firstnull < 0:
+                if 0 in val:
+                    firstnull  = val.index(0)
+                else:
                     firstnull = len(val)
                 cval = ''.join([chr(i) for i in val[:firstnull]]).rstrip()
             else:
@@ -295,7 +295,6 @@ class PV(object):
         """
         for index in sorted(list(self.callbacks.keys())):
             fcn, kwargs = self.callbacks[index]
-            # print 'Run Callback %i %s:' % (index, self.pvname)
             kwd = copy.copy(self._args)
             kwd.update(kwargs)
             kwd['cb_info'] = (index, self)
@@ -355,7 +354,7 @@ class PV(object):
             val = self._args['value']
             out.append('   value      = %s' % fmt % val)
         else:
-            ext  = {True:'...', False:''}[self.count > 5]
+            ext  = {True:'...', False:''}[self.count > 10]
             elems = range(min(5, self.count))
             aval = [fmt % self._args['value'][i] for i in elems]
             out.append("   value      = array  [%s%s]" % (",".join(aval), ext))
@@ -554,4 +553,7 @@ class PV(object):
         self.callbacks = {}
 
     def __del__(self):
-        self.disconnect()
+        try:
+            self.disconnect()
+        except:
+            pass
