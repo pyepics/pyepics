@@ -739,7 +739,7 @@ of channels is handled in the background::
     ftype = ca.field_type(chid)
     print "Channel ", chid, count, ftype
     value = ca.get()
-    print val
+    print value
 
 Put, waiting for completion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

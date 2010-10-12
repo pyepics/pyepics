@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # This module provides support for the EPICS motor record.
 #
-# TODO: convert to using device.py
 # 
 # Author:         Mark Rivers / Matt Newville
 # Created:        Sept. 16, 2002

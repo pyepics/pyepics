@@ -422,7 +422,7 @@ class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
     def _SetValue(self, value):
         self.SetValue(value)
 
-class pvText(wx.StaticText,pvCtrlMixin):
+class pvText(wx.StaticText, pvCtrlMixin):
     """ static text for PV display, with callback for automatic updates"""
     def __init__(self, parent, pv=None, as_string=True,
                  font=None, fg=None, bg=None, style=None, **kw):
@@ -548,7 +548,6 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
        bg         wx background color 
        
        bell_on_invalid  ring bell when input is out of range
-
 
     """
     def __init__(self, parent, pv=None, 
