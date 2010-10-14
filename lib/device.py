@@ -9,23 +9,47 @@ from . import ca
 from . import pv
 
 class Device(object):
-    """A simple collection of related PVs, all sharing a prefix,
-    but having many 'attributes'. This almost describes an
-    Epics Record, but as it is concerned only with PV names,
-    the mapping to an Epics Record is not exact.
+    """A simple collection of related PVs, sharing a common prefix
+    string for their names, but having many 'attributes'.
 
-    Many PVs will have names made up of prefix+attribute, with
-    a common prefix for several related PVs.  This class allows
-    this case to be represented simply such as with:
+    
 
-      >>> struck = epics.Device('13IDC:str:')
-      >>> struck.put('EraseStart',1)
-      >>> time.sleep(1)
-      >>> struck.put('StopAll',1)
-      >>> struck.get('mca1')
+    Many groups of PVs will have names made up of
+         Prefix+Delimeter+Attribute
+    with common Prefix and Delimeter, but a range of Attribute names.
+    Many Epics Records follow this model, but a Device is only about
+    PV names, and so is not exactly a mapping to an Epics Record.
 
-    This will put a 1 to 13IDC:str:EraseStart, wait, put a 1
-    to 13IDC:str:StopAll, then read 13IDC:str:mca1
+    This class allows a collection of PVs to be represented simply.
+
+      >>> dev = epics.Device('XX:m1', delim='.')
+      >>> dev.put('OFF',0 )
+      >>> dev.put('VAL', 0.25)
+      >>> dev.get('RBV')
+      >>> print dev.FOFF
+      >>> print dev.get('FOFF', as_string=True)
+
+    This will put a 0 to XX:m1.OFF, a 0.25 to XX:m1.VAL, and then
+    get XX:m1.RBV and XX.m1.FOFF.
+
+    Note access to the underlying PVs can either be with get()/put()
+    methods or with attributes derived from the Attribute (Suffix) for
+    that PV.  Thus
+      >>> print dev.FOFF
+      >>> print dev.get('FOFF')
+
+    are equivalent, as are:
+      >>> dev.VAL = 1
+      >>> dev.put('VAL', 1)
+    
+    The methods do provide more options.  For example, to get the PV
+    value as a string,
+       Device.get(Attribute, as_string=True)
+    must be used.   To put-with-wait, use
+       Device.put(Attribute, value, wait=True)
+        
+    The list of attributes can be pre-loaded at initialization time.
+
 
     The attribute PVs are built as needed and held in an internal
     buffer (self._pvs).  This class is kept intentionally simple
@@ -52,29 +76,36 @@ class Device(object):
       >>> pv_m1 = x.PV('13IDC:m1.VAL')
       >>> x.put('13IDC:m3.VAL', 2)
       >>> print x.PV('13IDC:m3.DIR').get(as_string=True)
+
+    you can all get
     """
-    def __init__(self, prefix=None, attrs=None, timeout=None):
-        self.__prefix__ = prefix 
+
+    _prefix = None
+    _pvs = {}
+    def __init__(self, prefix=None, attrs=None, delim='',
+                 timeout=None):
+        self._prefix = prefix + delim
+        self._delim = delim
         self._pvs = {}
         if attrs is not None:
-            for att in attrs:
-                self.PV(att, init=True,
+            for attr in attrs:
+                self.PV(attr, init=True, 
                         connection_timeout=timeout)
         ca.poll()
         
     def PV(self, attr, init=False, **kw):
         """return epics.PV for a device attribute"""
         pvname = attr        
-        if self.__prefix__ is not None: 
-            pvname = "%s%s" % (self.__prefix__, attr)
+        if self._prefix is not None: 
+            pvname = "%s%s" % (self._prefix, attr)
         if pvname not in self._pvs:
-            self._pvs[pvname] = pv.PV(pvname, **kw)
+            self._pvs[attr] = pv.PV(pvname, **kw)
             if init:
                 return
-        if not self._pvs[pvname].connected:
-            self._pvs[pvname].connect()
+        if not self._pvs[attr].connected:
+            self._pvs[attr].wait_for_connection()
                
-        return self._pvs[pvname]
+        return self._pvs[attr]
     
     def put(self, attr, value, wait=False, timeout=10.0):
         """put an attribute value, 
@@ -106,24 +137,33 @@ class Device(object):
         """remove a callback function to an attribute PV"""
         self.PV(attr).remove_callback(index=index)
         
+    def __getattr__(self, attr):
+        if attr in self._pvs:
+            return self.get(attr)
+        elif attr in self.__dict__:
+            return self.__dict__[attr]
+        else:
+            try:
+                self.PV(attr)
+                return self.get(attr)
+            except:
+                msg = "Device '%s' has no attribute '%s'"
+                raise AttributeError(msg % (self._prefix, attr))
+ 
+    def __repr__(self):
+        "string representation"
+        return "<Device '%s' %i attributes>" % (self._prefix,
+                                                len(self._pvs))
+    
+
+    def __setattr__(self, attr, val):
+        if attr in ('_prefix', '_pvs'):
+            self.__dict__[attr] = val
+        elif attr in self._pvs:
+            self.put(attr, val)
+
+
     def pv_property(attr, as_string=False, wait=False, timeout=10.0):
-        """function to turn a device attribute PV into a property:
-
-        use in your subclass as:
-        
-        >>> class MyDevice(epics.Device):
-        >>>     def __init__(self,prefix):
-        >>>         epics.Device.__init__(self)
-        >>>         self.PV('something')
-        >>>     field = pv_property('something', as_string=True)
-
-        then use in code as
-
-        >>> m = MyDevice()
-        >>> print m.field
-        >>> m.field = new_value
-        
-        """
         return property(lambda self:     \
                         self.get(attr, as_string=as_string),
                         lambda self,val: \
