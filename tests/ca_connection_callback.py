@@ -15,5 +15,5 @@ chid = epics.ca.create_channel(motor1, userfcn=onConnectionChange)
 
 write('Now waiting, watching values and connection changes:\n')
 t0 = time.time()
-while time.time()-t0 < 300:
+while time.time()-t0 < 15:
     time.sleep(0.001)

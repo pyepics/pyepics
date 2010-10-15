@@ -28,7 +28,7 @@ sys.stdout.write('Alarm settings:  comp=%s,  trip_point=%s\n' % (pvnames.alarm_c
                                                                  pvnames.alarm_trippoint))
 sys.stdout.write('You may have to make this happen!!\n')
 
-while time.time()-t0 < 200:
+while time.time()-t0 < 30:
     try:
         epics.ca.poll()
     except KeyboardInterrupt:

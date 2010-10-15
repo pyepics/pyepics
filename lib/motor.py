@@ -1,10 +1,18 @@
 #!/usr/bin/python
 # This module provides support for the EPICS motor record.
-#
 # 
 # Author:         Mark Rivers / Matt Newville
 # Created:        Sept. 16, 2002
 # Modifications:
+#   Oct 15, 2010  MN
+#       API Change, fuller inttegration with epics.Device, much simpler interface
+#              m = Motor('XXX:m1')
+#              print m.get_field('drive')  # mapped to .VAL
+#       becomes
+#              m = Motor('XXX:m1')
+#              print m.VAL
+#              print m.drive     # now an alias to 'VAL'
+#
 #   Jun 14, 2010  MN
 #       migrated more fully to pyepics3, using epics.Device
 # 
@@ -62,7 +70,7 @@ class Motor(device.Device):
     
    This module provides a class library for the EPICS motor record.
 
-   It uses the epics PV class
+   It uses the epics.Device and epics.PV classese
 
    Virtual attributes:
       These attributes do not appear in the dictionary for this class, but
@@ -116,135 +124,108 @@ class Motor(device.Device):
     """
     # parameter name (short), PV suffix,  longer description
 
-    __motor_attrs = {
-        'enabled': '_able.VAL', 
-        'acceleration':    '.ACCL',
-        'back_accel':      '.BACC',
-        'backlash':        '.BDST',
-        'back_speed':      '.BVEL',
-        'card':            '.CARD',
-        'dial_high_limit': '.DHLM',
-        'direction':       '.DIR',
-        'dial_low_limit':  '.DLLM',
-        'settle_time':     '.DLY',
-        'done_moving':     '.DMOV',
-        'dial_readback':   '.DRBV',
-        'description':     '.DESC',
-        'dial_drive':      '.DVAL',
-        'units':           '.EGU',
-        'encoder_step':    '.ERES',
-        'freeze_offset':   '.FOFF',
-        'move_fraction':   '.FRAC',
-        'hi_severity':     '.HHSV',
-        'hi_alarm':        '.HIGH',
-        'hihi_alarm':      '.HIHI',
-        'high_limit':      '.HLM',
-        'high_limit_set':  '.HLS',
-        'hw_limit':        '.HLSV',
-        'home_forward':    '.HOMF',
-        'home_reverse':    '.HOMR',
-        'high_op_range':   '.HOPR',
-        'high_severity':   '.HSV',
-        'integral_gain':   '.ICOF',
-        'jog_accel':       '.JAR',
-        'jog_forward':     '.JOGF',
-        'jog_reverse':     '.JOGR',
-        'jog_speed':       '.JVEL',
-        'last_dial_val':   '.LDVL',
-        'low_limit':       '.LLM',
-        'low_limit_set':   '.LLS',
-        'lo_severity':     '.LLSV',
-        'lolo_alarm':      '.LOLO',
-        'low_op_range':    '.LOPR',
-        'low_alarm':       '.LOW',
-        'last_rel_val':    '.LRLV',
-        'last_dial_drive': '.LRVL',
-        'last_SPMG':       '.LSPG',
-        'low_severity':    '.LSV',
-        'last_drive':      '.LVAL',
-        'soft_limit':      '.LVIO',
-        'in_progress':     '.MIP',
-        'missed':          '.MISS',
-        'moving':          '.MOVN',
-        'resolution':      '.MRES',
-        'motor_status':    '.MSTA',
-        'offset':          '.OFF',
-        'output_mode':     '.OMSL',
-        'output':          '.OUT',
-        'prop_gain':       '.PCOF',
-        'precision':       '.PREC',
-        'readback':        '.RBV',
-        'retry_max':       '.RTRY',
-        'retry_count':     '.RCNT',
-        'retry_deadband':  '.RDBD',
-        'dial_difference': '.RDIF',
-        'raw_encoder_pos': '.REP',
-        'raw_high_limit':  '.RHLS',
-        'raw_low_limit':   '.RLLS',
-        'relative_value':  '.RLV',
-        'raw_motor_pos':   '.RMP',
-        'raw_readback':    '.RRBV',
-        'readback_res':    '.RRES',
-        'raw_drive':       '.RVAL',
-        'dial_speed':      '.RVEL',
-        's_speed':         '.S',
-        's_back_speed':    '.SBAK',
-        's_base_speed':    '.SBAS',
-        's_max_speed':     '.SMAX',
-        'set':             '.SET',
-        'stop_go':         '.SPMG',
-        's_revolutions':   '.SREV',
-        'stop':            '.STOP',
-        't_direction':     '.TDIR',
-        'tweak_forward':   '.TWF',
-        'tweak_reverse':   '.TWR',
-        'tweak_val':       '.TWV',
-        'use_encoder':     '.UEIP',
-        'u_revolutions':   '.UREV',
-        'use_rdbl':        '.URIP',
-        'drive':           '.VAL',
-        'base_speed':      '.VBAS',
-        'slew_speed':      '.VELO',
-        'version':         '.VERS',
-        'max_speed':       '.VMAX',
-        'use_home':        '.ATHM',
-        'deriv_gain':      '.DCOF',
-        'use_torque':      '.CNEN',
-        'device_type':     '.DTYP',
-        'record_type':     '.RTYP',
-        'status':          '.STAT'}
+    #
+    __extras =  {
+        'disabled':   '_able.VAL', }
+    
+    __alias = {
+        'acceleration':    'ACCL',
+        'back_accel':      'BACC',
+        'backlash':        'BDST',
+        'back_speed':      'BVEL',
+        'card':            'CARD',
+        'dial_high_limit': 'DHLM',
+        'direction':       'DIR',
+        'dial_low_limit':  'DLLM',
+        'settle_time':     'DLY',
+        'done_moving':     'DMOV',
+        'dial_readback':   'DRBV',
+        'description':     'DESC',
+        'dial_drive':      'DVAL',
+        'units':           'EGU',
+        'encoder_step':    'ERES',
+        'freeze_offset':   'FOFF',
+        'move_fraction':   'FRAC',
+        'hi_severity':     'HHSV',
+        'hi_alarm':        'HIGH',
+        'hihi_alarm':      'HIHI',
+        'high_limit':      'HLM',
+        'high_limit_set':  'HLS',
+        'hw_limit':        'HLSV',
+        'home_forward':    'HOMF',
+        'home_reverse':    'HOMR',
+        'high_op_range':   'HOPR',
+        'high_severity':   'HSV',
+        'integral_gain':   'ICOF',
+        'jog_accel':       'JAR',
+        'jog_forward':     'JOGF',
+        'jog_reverse':     'JOGR',
+        'jog_speed':       'JVEL',
+        'last_dial_val':   'LDVL',
+        'low_limit':       'LLM',
+        'low_limit_set':   'LLS',
+        'lo_severity':     'LLSV',
+        'lolo_alarm':      'LOLO',
+        'low_op_range':    'LOPR',
+        'low_alarm':       'LOW',
+        'last_rel_val':    'LRLV',
+        'last_dial_drive': 'LRVL',
+        'last_SPMG':       'LSPG',
+        'low_severity':    'LSV',
+        'last_drive':      'LVAL',
+        'soft_limit':      'LVIO',
+        'in_progress':     'MIP',
+        'missed':          'MISS',
+        'moving':          'MOVN',
+        'resolution':      'MRES',
+        'motor_status':    'MSTA',
+        'offset':          'OFF',
+        'output_mode':     'OMSL',
+        'output':          'OUT',
+        'prop_gain':       'PCOF',
+        'precision':       'PREC',
+        'readback':        'RBV',
+        'retry_max':       'RTRY',
+        'retry_count':     'RCNT',
+        'retry_deadband':  'RDBD',
+        'dial_difference': 'RDIF',
+        'raw_encoder_pos': 'REP',
+        'raw_high_limit':  'RHLS',
+        'raw_low_limit':   'RLLS',
+        'relative_value':  'RLV',
+        'raw_motor_pos':   'RMP',
+        'raw_readback':    'RRBV',
+        'readback_res':    'RRES',
+        'raw_drive':       'RVAL',
+        'dial_speed':      'RVEL',
+        's_speed':         'S',
+        's_back_speed':    'SBAK',
+        's_base_speed':    'SBAS',
+        's_max_speed':     'SMAX',
+        'set':             'SET',
+        'stop_go':         'SPMG',
+        's_revolutions':   'SREV',
+        'stop':            'STOP',
+        't_direction':     'TDIR',
+        'tweak_forward':   'TWF',
+        'tweak_reverse':   'TWR',
+        'tweak_val':       'TWV',
+        'use_encoder':     'UEIP',
+        'u_revolutions':   'UREV',
+        'use_rdbl':        'URIP',
+        'drive':           'VAL',
+        'base_speed':      'VBAS',
+        'slew_speed':      'VELO',
+        'version':         'VERS',
+        'max_speed':       'VMAX',
+        'use_home':        'ATHM',
+        'deriv_gain':      'DCOF',
+        'use_torque':      'CNEN',
+        'device_type':     'DTYP',
+        'record_type':     'RTYP',
+        'status':          'STAT'}
         
-## fields not implemented:
-##    
-    # VOF   Variable Offset
-    # SSET  Set SET Mode 
-    # STOO  STOP OutLink 
-    # SUSE  Set USE Mode  
-    # RLNK  Readback OutLink  
-    # RINP  RMP Input Link 
-    # CDIR  Command direction
-    # DIFF  Difference dval-drbv
-    # DOL   Desired Output Location
-    # FOF   Freeze Offset  
-    # MMAP  Monitor Mask  
-    # NMAP  Monitor Mask  
-    # POST  Post-move commands
-    # PP    Post process command
-    # PREM  Pre-move commands 
-    # PERL  Periodic Limits
-    # RDBL  Readback Location
-    # INIT  Startup commands 
-    
-    __init_list = ('drive', 'description', 'readback', 'precision',
-                   'tweak_val', 'tweak_forward', 'tweak_reverse',
-                   'done_moving', 'set', 'stop', 'low_limit', 'high_limit',
-                   'high_limit_set', 'low_limit_set', 'soft_limit',
-                   'status', 'device_type', 'record_type', 'enabled',
-                   'stop_go')
-    
-    _user_params = ('drive', 'readback', 'user')
-    _dial_params = ('dial_drive', 'dial_readback', 'dial')
-    _raw_params  = ('raw_drive', 'raw_readback', 'raw')
+    _init_list   = ('VAL','DESC', 'RTYP', 'RBV', 'PREC', 'TWV', 'FOFF')
 
     def __init__(self, name=None, timeout=3.0):
         if name is None:
@@ -255,102 +236,79 @@ class Motor(device.Device):
         if name.endswith('.'):
             name = name[:-1]
             
-        attrs = [self.__motor_attrs[im] for im in self.__init_list]
-        device.Device.__init__(self, name, attrs)
+        self.name = name
+        print 'INIT ', name, self._init_list
+        device.Device.__init__(self, name,
+                               attrs=self._init_list,
+                               delim='.')
 
-        
-        self.pvname = name
         # make sure motor is enabled:
-        st0 = time.time()
-        connected = False
-        while not connected:
-            connected = self.PV('.RTYP').connected
-            time.sleep(0.001)
-            if (time.time()-st0 > timeout):
-                raise MotorException("Cannot connect to %s" % name)
-        rectype = self.PV('.RTYP').get()
+        rectype = self.get('RTYP')
         if rectype != 'motor':
             raise MotorException("%s is not an Epics Motor" % name)
 
+        for key, val in self.__extras.items():
+            pvname = "%s%s" % (name, val)
+            self.add_pv(pvname, attr=key)
+        self.get('disabled') == 1
         self._callbacks = {}
 
     def __repr__(self):
-        return "<epics.Motor: %s: '%s'>" % (self.pvname,
-                                            self.get_field('description'))
+        return "<epics.Motor: %s: '%s'>" % (self.name,  self.DESC)
 
     def __str__(self):
         return self.__repr__()
 
     def __getattr__(self, attr):
         " internal method "
-        if attr in self.__motor_attrs:
-            return self.get_field(attr)
+        if attr in self.__alias:
+            attr = self.__alias[attr]
+        if attr in self._pvs:
+            return self.get(attr)
         elif attr in self.__dict__:
             return self.__dict__[attr]
         else:
-            raise MotorException("EpicsMotor has no attribute %s" % attr)
-
+            try:
+                self.PV(attr)
+                return self.get(attr)
+            except:
+                raise MotorException("EpicsMotor has no attribute %s" % attr)
+ 
     def __setattr__(self, attr, val):
-        if attr in self.__motor_attrs:
-            return self.put_field(attr, val)
-        else:
+        if attr in ('name', '_prefix', '_pvs', '_delim', '_callbacks'):
             self.__dict__[attr] = val
-
-    def put_field(self, attr, val, wait=False, timeout=30):
-        """set a Motor attribute (field) to a value
-        example:
-          >>> motor = Motor('XX:m1')
-          >>> motor.put_field('slew_speed', 2)
-
-        which would be equivalent to
-          >>> motor.slew_speed = 2
-
-        setting the optional 'wait' keyword to True will
-        cause this routine to wait to return until the
-        put is complete.  This is most useful when setting
-        the field may take time to complete, as when moving
-        the motor position.  That is,
-          >>> motor.put_field('drive', 2, wait=True)
-
-          will wait until the motor has moved to drive position 2.
-        """
-        self.get_field(attr)
-        
-        suffix = self.__motor_attrs[attr]
-        return self.PV(suffix).put(val, wait=wait, timeout=timeout)
-    
-    def get_field(self, attr, as_string=False):
-        "get a motor attribute by name"
-        if attr not in self.__motor_attrs:
-            raise MotorException("EpicsMotor has no attribute %s" % attr)
-        
-        suffix = self.__motor_attrs[attr]
-        return self.PV(suffix).get(as_string=as_string)
+            return 
+        if attr in self.__alias:
+            attr = self.__alias[attr]
+        if attr in self._pvs:
+            return self.put(attr, val)
+        elif attr in self.__dict__: 
+            self.__dict__[attr] = val           
+        else:
+            try:
+                self.PV(attr)
+                return self.put(attr, val)
+            except:
+                raise MotorException("EpicsMotor has no attribute %s" % attr)
 
     def check_limits(self):
         """ check motor limits:
         returns None if no limits are violated
         raises expection if a limit is violated"""
-        for field, msg in (('soft_limit',     'Soft limit violation'),
-                           ('high_limit_set', 'High hard limit violation'),
-                           ('low_limit_set',  'Low  hard limit violation')):
-            if self.get_field(field)!= 0:
+        for field, msg in (('LVIO', 'Soft limit violation'),
+                           ('HLS',  'High hard limit violation'),
+                           ('LLS',  'Low  hard limit violation')):
+            if self.get(field) != 0:
                 raise MotorLimitException(msg)
         return
     
-    def within_limits(self, val, limits='user'):
-        """ returns whether a value for a motor is within drive limits"""
-        
-        if limits == 'user':
-            hlim = self.get_field('high_limit')
-            llim = self.get_field('low_limit')
-        elif limits == 'dial':
-            hlim = self.get_field('dial_high_limit')
-            llim = self.get_field('dial_low_limit')
-        elif limits in ('step', 'raw'):
-            hlim = self.get_field('raw_high_limit')
-            llim = self.get_field('raw_low_limit')
-        return (val <= hlim and val >= llim)
+    def within_limits(self, val, dial=False):
+        """ returns whether a value for a motor is within drive limits
+        with dial=True   dial limits are used (default is user limits)"""
+        ll_name, hl_name = 'LLM', 'HLM'
+        if dial:
+            ll_name, hl_name = 'DLLM', 'DHLM'
+        return (val <= self.get(hl_name) and val >= self.get(ll_name))
 
     def move(self, val=None, relative=None, wait=False, timeout=300.0,
              dial=False, step=False, raw=False, ignore_limits=False):
@@ -379,23 +337,22 @@ class Motor(device.Device):
         except TypeError:
             return None
 
-        drv, rbv, lims = self._user_params
+        drv, rbv, lims = ('VAL', 'RBV', 'user')
         if dial:
-            drv, rbv, lims = self._dial_params
+            drv, rbv, lims = ('DVAL', 'DRBV', 'dial')
         if step or raw:
-            drv, rbv, lims = self._raw_params
-            ignore_limits = True
-            
-        if (relative):
-            val = val + self.get_field(rbv)
+            drv, rbv, lims = ('RVAL', 'RRBV', None)
+
+        if relative:
+            val += self.get(rbv)
 
         # Check for limit violations
-        if not ignore_limits:
+        if lims is not None and not ignore_limits:
             limits_ok = self.within_limits(val, lims)
             if not limits_ok:
                 return -1
             
-        stat = self.put_field(drv, val, wait=wait, timeout=timeout)
+        stat = self.put(drv, val, wait=wait, timeout=timeout)
         ret = stat
         if stat == 1:
             ret = 0
@@ -437,17 +394,14 @@ class Motor(device.Device):
         p=m.get_position(dial=True)  # Read the target position in dial coordinates
         p=m.get_position(readback=True, step=True) # Read the actual position in steps
         """
-        # xx
-        (drv, rbv) = ('drive','readback')
+        pos, rbv = ('VAL','RBV')
         if dial:
-            (drv, rbv) = ('dial_drive','dial_readback')
-        if step or raw:
-            (drv, rbv) = ('raw_drive','raw_readback')        
-            
+            pos, rbv = ('DVAL', 'DRBV')
+        elif step or raw:
+            pos, rbv = ('RVAL', 'RRBV')
         if readback:
-            return self.get_field(rbv)
-        else:
-            return self.get_field(drv)
+            pos = rbv
+        return self.get(pos)
         
     def tweak(self, direction='foreward', wait=False, timeout=300.0):
         """ move the motor by the tweak_val
@@ -459,11 +413,11 @@ class Motor(device.Device):
          timeout      max time for move to complete (in seconds) [300]
         """
         
-        ifield = 'tweak_forward'
+        ifield = 'TWF'
         if direction.startswith('rev') or direction.startswith('back'):
-            ifield = 'tweak_reverse'
+            ifield = 'TWR'
             
-        stat = self.put_field(ifield, 1, wait=wait, timeout=timeout)
+        stat = self.put(ifield, 1, wait=wait, timeout=timeout)
         ret = stat
         if stat == 1:
             ret = 0
@@ -504,43 +458,42 @@ class Motor(device.Device):
          """
 
         # Put the motor in "SET" mode
-        self.put_field('set', 1)
+        self.put('SET', 1)
 
-      
         # determine which drive value to use
-        drv = 'drive'
+        drv = 'VAL'
         if dial:
-            drv = 'dial_drive'
-        if step or raw:
-            drv = 'raw_drive'
+            drv = 'DVAL'
+        elif step or raw:
+            drv = 'RVAL'
 
-        self.put_field(drv, position)
+        self.put(drv, position)
         
         # Put the motor back in "Use" mode
-        self.put_field('set', 0)
+        self.put('SET', 0)
       
     def get_pv(self, attr):
         "return  PV for a field"
-        return self.PV(self.__motor_attrs[attr])
+        return self.PV(attr)
 
     def clear_callback(self, attr='drive'):
         "clears callback for attribute"
         try:
             index = self._callbacks.get(attr, None)
             if index is not None:
-                self.get_pv(attr).remove_callback(index=index)
+                self.PV(attr).remove_callback(index=index)
         except:
-            self.get_pv(attr).clear_callbacks()
+            self.PV(attr).clear_callbacks()
 
-    def set_callback(self, attr='drive', callback=None, kw=None):
+    def set_callback(self, attr='VAL', callback=None, kw=None):
         "define a callback for an attribute"
-        self.get_field(attr)
+        self.get(attr)
         kw_args = {}
         kw_args['motor_field'] = attr
         if kw is not None:
             kw_args.update(kw)
 
-        index = self.get_pv(attr).add_callback(callback=callback, **kw_args)
+        index = self.PV(attr).add_callback(callback=callback, **kw_args)
         self._callbacks[attr] = index
 
     def refresh(self):
@@ -550,10 +503,10 @@ class Motor(device.Device):
 
     def StopNow(self):
         "stop motor as soon as possible"
-        save_val = self.get_field('stop_go')
-        self.put_field('stop_go', 0)
+        save_val = self.get_field('SPMG')
+        self.put('SPMG', 0)
         time.sleep(0.10)
-        self.put_field('stop_go', save_val)
+        self.put('SPMG', save_val)
         
         
     def get_info(self):
@@ -593,7 +546,7 @@ class Motor(device.Device):
         for attr in klist:
             label = attr  + ' '*(18-min(18, len(attr)))
             value = self.get_field(attr, as_string=True)
-            pvname  = self.get_pv(attr).pvname
+            pvname  = sel.PV(attr).pvname
             if value is None:
                 value = 'Not Connected??'
             value = value + ' '*(18-min(18, len(value)))

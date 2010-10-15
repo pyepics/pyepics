@@ -13,7 +13,7 @@ chid = ca.create_channel(mypv)
 eventID = ca.create_subscription(chid, userfcn=onChanges)
 
 t0 = time.time()
-while time.time()-t0 < 10.0:
+while time.time()-t0 < 15.0:
     time.sleep(0.001)
 
 

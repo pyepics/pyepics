@@ -21,5 +21,5 @@ mypv.get()
 
 write('Now waiting, watching values and connection changes:\n')
 t0 = time.time()
-while time.time()-t0 < 300:
+while time.time()-t0 < 10:
     time.sleep(0.001)

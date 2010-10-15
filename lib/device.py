@@ -89,29 +89,52 @@ class Device(object):
         self._pvs = {}
         if attrs is not None:
             for attr in attrs:
-                self.PV(attr, init=True, 
+                self.PV(attr, connect=False,
                         connection_timeout=timeout)
         ca.poll()
         
-    def PV(self, attr, init=False, **kw):
+    def PV(self, attr, connect=True, **kw):
         """return epics.PV for a device attribute"""
-        pvname = attr        
-        if self._prefix is not None: 
-            pvname = "%s%s" % (self._prefix, attr)
-        if pvname not in self._pvs:
+        if attr not in self._pvs:
+            pvname = attr
+            if self._prefix is not None: 
+                pvname = "%s%s" % (self._prefix, attr)
             self._pvs[attr] = pv.PV(pvname, **kw)
-            if init:
-                return
-        if not self._pvs[attr].connected:
+        if connect and not self._pvs[attr].connected:
             self._pvs[attr].wait_for_connection()
                
+        return self._pvs[attr]
+
+    def add_pv(self, pvname, attr=None, **kw):
+        """add a PV with an optional attribute name that may not exactly
+        correspond to the mapping of Attribute -> Prefix + Delim + Attribute
+        That is, with a device defined as
+        >>> dev = Device('XXX', delim='.')
+
+        getting the VAL attribute
+        >>> dev.get('VAL')   # or dev.VAL
+
+        becomes   'caget(XXX.VAL)'.  With add_pv(), one can add a
+        non-conforming PV to the collection:
+        >>> dev.add_pv('XXX_status.VAL', attr='status')
+
+        and then use as
+        >>> dev.get('status')  # or dev.status
+
+        If attr is not specified, the full pvname will be used.
+        """
+        if attr is None:
+            attr = pvname
+        self._pvs[attr] = pv.PV(pvname, **kw)
         return self._pvs[attr]
     
     def put(self, attr, value, wait=False, timeout=10.0):
         """put an attribute value, 
         optionally wait for completion or
         up to a supplied timeout value"""
-        return self.PV(attr).put(value, wait=wait, timeout=timeout)
+        thispv  =self.PV(attr)
+        thispv.wait_for_connection()
+        return thispv.put(value, wait=wait, timeout=timeout)
         
     def get(self, attr, as_string=False):
         """get an attribute value, 
@@ -150,18 +173,24 @@ class Device(object):
                 msg = "Device '%s' has no attribute '%s'"
                 raise AttributeError(msg % (self._prefix, attr))
  
-    def __repr__(self):
-        "string representation"
-        return "<Device '%s' %i attributes>" % (self._prefix,
-                                                len(self._pvs))
-    
-
     def __setattr__(self, attr, val):
         if attr in ('_prefix', '_pvs'):
             self.__dict__[attr] = val
         elif attr in self._pvs:
             self.put(attr, val)
+        else:
+            try:
+                self.PV(attr)
+                return self.put(attr, val)
+            except:
+                msg = "Device '%s' has no attribute '%s'"
+                raise AttributeError(msg % (self._prefix, attr))
 
+    def __repr__(self):
+        "string representation"
+        return "<Device '%s' %i attributes>" % (self._prefix,
+                                                len(self._pvs))
+    
 
     def pv_property(attr, as_string=False, wait=False, timeout=10.0):
         return property(lambda self:     \

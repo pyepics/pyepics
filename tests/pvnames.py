@@ -40,7 +40,8 @@ motor1 = '13IDC:m2'
 
 #### 
 #  Here, provide a PV that changes at least once very 10 seconds
-updating_pv1 = '13IDA:DMM1Ch3_calc.VAL'
+updating_pv1  = '13IDA:DMM1Ch3_calc.VAL'
+updating_str1 = '13XRM:edb:clientID'
 
 #### 
 #  Here, provide a list of PVs that  change at least once very 10 seconds

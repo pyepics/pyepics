@@ -236,14 +236,13 @@ def Name(ftype, reverse=False):
                 
     return m.get(ftype,'unknown')
 
-def Cast(args):
+def cast_args(args):
     """returns pointer to arg type for casting """
     count, ftype = args.count, args.type
     if ftype == STRING:
         count = MAX_STRING_SIZE
     if ftype not in Map:
         ftype = double_t
-    
     return ctypes.cast(args.raw_dbr, ctypes.POINTER(count*Map[ftype]))
 
 class event_handler_args(ctypes.Structure):

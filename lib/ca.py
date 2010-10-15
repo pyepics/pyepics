@@ -366,6 +366,93 @@ def withSEVCHK(fcn):
     wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
+
+
+##
+## Event Handlers for get() event callbacks
+def _onGetEvent(args):
+    """Internal Event Handler for get events: not intended for use"""
+    value = dbr.cast_args(args).contents
+    # print(" onGet Event: ", args.chid, type(args.chid))
+    # chid = dbr.chid_t(args.chid)
+    pvname = name(args.chid)
+    kwd = {'ftype':args.type, 'count':args.count,
+           'chid':args.chid, 'pvname': pvname,
+           'status':args.status}
+    # add kwd arguments for CTRL and TIME variants
+    if args.type >= dbr.CTRL_STRING:
+        tmpv = value[0]
+        for attr in dbr.ctrl_limits + ('precision', 'units', 'severity'):
+            if hasattr(tmpv, attr):        
+                kwd[attr] = getattr(tmpv, attr)
+        if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
+            tmpv.no_str > 0):
+            kwd['enum_strs'] = tuple([tmpv.strs[i].value for 
+                                      i in range(tmpv.no_str)])
+
+    elif args.type >= dbr.TIME_STRING:
+        tmpv = value[0]
+        kwd['status']    = tmpv.status
+        kwd['severity']  = tmpv.severity
+        kwd['timestamp'] = (dbr.EPICS2UNIX_EPOCH + tmpv.stamp.secs + 
+                            1.e-6*int(tmpv.stamp.nsec/1000.00))
+    nelem = args.count
+    if args.type in (dbr.STRING, dbr.TIME_STRING, dbr.CTRL_STRING):
+        nelem = dbr.MAX_STRING_SIZE
+        
+    value = _unpack(value, nelem, ftype=args.type)
+    if hasattr(args.usr, '__call__'):
+        args.usr(value=value, **kwd)
+
+## connection event handler: 
+def _onConnectionEvent(args):
+    """set flag in cache holding whteher channel is
+    connected. if provided, run a user-function"""
+    ctx = current_context()
+    pvname = name(args.chid)
+    global _cache
+    if ctx not in _cache:
+        _cache[ctx] = {}
+    if pvname not in _cache[ctx]:
+        _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
+                               'ts':0, 'failures':0, 
+                               'userfcn': None}
+
+    conn = (args.op == dbr.OP_CONN_UP)
+    entry = _cache[ctx][pvname]
+    entry['conn'] = conn
+    entry['chid'] = args.chid
+    entry['ts']   = time.time()
+    entry['failures'] = 0
+    if 'userfcn' in entry and hasattr(entry['userfcn'], '__call__'):
+        try:
+            poll(evt=1.e-3, iot=10.0)
+            entry['userfcn'](pvname=pvname,
+                             chid=entry['chid'],
+                             conn=entry['conn'])
+        except ChannelAccessException:
+            pass
+        except:
+            errmsg = 'Error Calling User Connection Callback for "%s"'  % pvname
+            raise ChannelAccessException('Connect', errmsg)
+    return 
+
+## put event handler:
+def _onPutEvent(args, *varargs):
+    """set put-has-completed for this channel,
+    call optional user-supplied callback"""
+    pvname = name(args.chid)
+    fcn  = _put_done[pvname][1]
+    data = _put_done[pvname][2]
+    _put_done[pvname] = (True, None, None)
+    if hasattr(fcn, '__call__'):
+        fcn(pvname=pvname, data=data)
+
+# create global reference to these two callbacks
+_CB_CONNECT = ctypes.CFUNCTYPE(None, dbr.connection_args)(_onConnectionEvent)
+_CB_PUTWAIT = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)  
+_CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onGetEvent)   
+
 ###
 # 
 # Now we're ready to wrap libca functions
@@ -873,209 +960,18 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     ftype = promote_type(chid, use_ctrl=use_ctrl, use_time=use_time)
     count = element_count(chid)
 
-    cback = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onGetEvent)   
     uarg  = ctypes.py_object(userfcn)
     evid  = ctypes.c_void_p()
     poll()
     ret = libca.ca_create_subscription(ftype, count, chid, mask,
-                                       cback, uarg, ctypes.byref(evid))
+                                       _CB_EVENT, uarg, ctypes.byref(evid))
     PySEVCHK('create_subscription', ret)
     
     poll()
-    return (cback, uarg, evid)
+    return (_CB_EVENT, uarg, evid)
 
 @withCA
 @withSEVCHK
 def clear_subscription(evid):
     "cancel subscription"
     return libca.ca_clear_subscription(evid)
-
-##
-
-## Event Handlers for get() event callbacks
-def _onGetEvent(args):
-    """Internal Event Handler for get events: not intended for use"""
-    value = dbr.Cast(args).contents
-    # print "onGet Event: ", args.chid, type(args.chid)
-    # chid = dbr.chid_t(args.chid)
-    pvname = name(args.chid)
-    kwd = {'ftype':args.type, 'count':args.count,
-           'chid':args.chid, 'pvname': pvname,
-           'status':args.status}
-    # add kwd arguments for CTRL and TIME variants
-    if args.type >= dbr.CTRL_STRING:
-        tmpv = value[0]
-        for attr in dbr.ctrl_limits + ('precision', 'units', 'severity'):
-            if hasattr(tmpv, attr):        
-                kwd[attr] = getattr(tmpv, attr)
-        if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
-            tmpv.no_str > 0):
-            kwd['enum_strs'] = tuple([tmpv.strs[i].value for 
-                                      i in range(tmpv.no_str)])
-
-    elif args.type >= dbr.TIME_STRING:
-        tmpv = value[0]
-        kwd['status']    = tmpv.status
-        kwd['severity']  = tmpv.severity
-        kwd['timestamp'] = (dbr.EPICS2UNIX_EPOCH + tmpv.stamp.secs + 
-                            1.e-6*int(tmpv.stamp.nsec/1000.00))
-    nelem = args.count
-    if args.type in (dbr.STRING, dbr.TIME_STRING, dbr.CTRL_STRING):
-        nelem = dbr.MAX_STRING_SIZE
-        
-    value = _unpack(value, nelem, ftype=args.type)
-    if hasattr(args.usr, '__call__'):
-        args.usr(value=value, **kwd)
-
-## connection event handler: 
-def _onConnectionEvent(args):
-    """set flag in cache holding whteher channel is
-    connected. if provided, run a user-function"""
-    ctx = current_context()
-    pvname = name(args.chid)
-    global _cache
-    if ctx not in _cache:
-        _cache[ctx] = {}
-    if pvname not in _cache[ctx]:
-        _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
-                               'ts':0, 'failures':0, 
-                               'userfcn': None}
-
-    conn = (args.op == dbr.OP_CONN_UP)
-    entry = _cache[ctx][pvname]
-    entry['conn'] = conn
-    entry['chid'] = args.chid
-    entry['ts']   = time.time()
-    entry['failures'] = 0
-    if 'userfcn' in entry and hasattr(entry['userfcn'], '__call__'):
-        try:
-            poll(evt=1.e-3, iot=10.0)
-            entry['userfcn'](pvname=pvname,
-                             chid=entry['chid'],
-                             conn=entry['conn'])
-        except ChannelAccessException:
-            pass
-        except:
-            errmsg = 'Error Calling User Connection Callback for "%s"'  % pvname
-            raise ChannelAccessException('Connect', errmsg)
-    return 
-
-## put event handler:
-def _onPutEvent(args, *varargs):
-    """set put-has-completed for this channel,
-    call optional user-supplied callback"""
-    pvname = name(args.chid)
-    fcn  = _put_done[pvname][1]
-    data = _put_done[pvname][2]
-    _put_done[pvname] = (True, None, None)
-    if hasattr(fcn, '__call__'):
-        fcn(pvname=pvname, data=data)
-
-# create global reference to these two callbacks
-_CB_CONNECT = ctypes.CFUNCTYPE(None, dbr.connection_args)(_onConnectionEvent)
-_CB_PUTWAIT = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)  
-
-
-@withCA
-@withSEVCHK
-def sg_block(gid, timeout=10.0):
-    "sg block"
-    return libca.ca_sg_block(gid, timeout)
-
-@withCA
-def sg_create():
-    "sg create"
-    gid  = ctypes.c_ulong()
-    pgid = ctypes.pointer(gid)
-    ret =  libca.ca_sg_create(pgid)
-    PySEVCHK('sg_create', ret)
-    return gid
-
-@withCA
-@withSEVCHK
-def sg_delete(gid):
-    "sg delete"
-    return libca.ca_sg_delete(gid)
-
-@withCA
-def sg_test(gid):
-    "sg test"
-    ret = libca.ca_sg_test(gid)
-    return PySEVCHK('sg_test', ret, dbr.ECA_IODONE)
-
-@withCA
-@withSEVCHK
-def sg_reset(gid):
-    "sg reset"
-    return libca.ca_sg_reset(gid)
-
-def sg_get(gid, chid, ftype=None, as_string=False, as_numpy=True):
-    """synchronous-group get of the current value for a Channel.
-    same options as get()
-    """
-    if not isinstance(chid, dbr.chid_t):
-        raise ChannelAccessException('sg_get', "not a valid chid!")
-
-    if ftype is None:
-        ftype = field_type(chid)
-    count = element_count(chid)
-
-    nelem = count
-    if ftype == dbr.STRING:
-        nelem = dbr.MAX_STRING_SIZE
-    
-    data = (nelem*dbr.Map[ftype])()
-   
-    ret = libca.ca_sg_array_get(gid, ftype, count, chid, data)
-    PySEVCHK('sg_get', ret)
-
-    poll()
-    val = _unpack(data, nelem, ftype=ftype, as_numpy=as_numpy)
-    if as_string:
-        val = __as_string(val, chid, count, ftype)
-    return val
-
-def sg_put(gid, chid, value):
-    "synchronous-group put: cannot wait or get callback!"
-    if not isinstance(chid, dbr.chid_t):
-        raise ChannelAccessException('sg_put', "not a valid chid!")
-
-    ftype = field_type(chid)
-    count = element_count(chid)
-    data  = (count*dbr.Map[ftype])()    
-    if ftype == dbr.STRING:
-        data = (dbr.string_t)()
-        count = 1
-        data.value = value
-    elif count == 1:
-        try:
-            data[0] = value
-        except TypeError:
-            data[0] = type(data[0])(value)
-        except:
-            errmsg = "Cannot put value '%s' to PV of type '%s'"
-            tname   = dbr.Name(ftype).lower()
-            raise ChannelAccessException('put', \
-                                         errmsg % (repr(value),tname))
-    else:
-        # auto-convert strings to arrays for character waveforms
-        # could consider using
-        # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],
-        #                  dtype=numpy.uint8)
-        if ftype == dbr.CHAR and isinstance(value, str):
-            pad = '\x00'*(1+count-len(value))
-            value = [ord(i) for i in ("%s%s" % (value, pad))[:count]]
-        try:
-            ndata = len(data)
-            nuser = len(value)
-            if nuser > ndata:
-                value = value[:ndata]
-            data[:len(value)] = list(value)
-        except:
-            errmsg = "Cannot put array data to PV of type '%s'"            
-            raise ChannelAccessException('put', errmsg % (repr(value)))
-      
-    ret =  libca.ca_sg_put(gid, ftype, count, chid, data)
-    PySEVCHK('sg_put', ret)
-    poll()
-    return ret
