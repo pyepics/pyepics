@@ -309,7 +309,7 @@ requiring the user to supply DBR TYPE and count as well as ``chid`` and
 allocated space for the data.  In python none of these is needed, and
 keyword arguments can be used to specify such options.
 
-.. method:: get(chid[, ftype=None[, as_string=False[, as_numpy=False]]])
+.. method:: get(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=False]]]])
 
 
    return the current value for a Channel. Note that there is not a separate form for array data.
@@ -318,13 +318,17 @@ keyword arguments can be used to specify such options.
    :type  chid:  ctypes.c_long
    :param ftype:  field type to use (native type is default)
    :type ftype:  integer
+   :param count:  naximum element count to return (full data returned by default)
+   :type cont:  integer
    :param as_string:  whether to return the string representation of the value.  See notes below. 
    :type as_string:  ``True``/``False``
    :param as_numpy:  whether to return the Numerical Python representation  for array / waveform data.  
    :type as_numpy:  ``True``/``False``
 
 
-For a listing of values of *ftype*, see :ref:`Table of DBR Types <dbrtype_table>`.
+For a listing of values of *ftype*, see :ref:`Table of DBR Types
+<dbrtype_table>`.    The optional *count* can be used to limit the amount of
+data returned for array data from waveform records.
 
 The *as_string* option warrants special attention: The feature is not as
 complete as as the *as_string* argument for :meth:`PV.get`.  Here, a string
@@ -470,18 +474,16 @@ states.
 Synchronous Groups
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-According to the CA documentation, Synchronous Groups can be used to ensure
-that a set of Channel Access calls all happen together.
+Synchronous Groups can be used to ensure that a set of Channel Access calls
+all happen together, as if in a *transaction*.  Synchronous Groups work in
+PyEpics as of version 3.0.10, but more testing is probably needed.
 
-I should warn that these routines have not been well tested.  I believe the
-notion of Synchronous Groups is neither robust nor meaningful in the
-underlying CA library: the actions here are not atomic nor are they
-anything like a *transaction* (there is no rollback). For :func:`sg_get` in
-particular, the correct values here **are actually returned immediately**
-by the CA library, which suggests to me that the concept is broken or the
-documentation wrong.  Consequently, these have not been well-tested (unless
-*trivially shown to be broken* counts).  If you want this functionality,
-please test carefully.
+The idea is to first create a synchronous group, then add a series of
+:func:`sg_put` and :func:`sg_get` which do not happen immediately, and
+finally block while all the channel access communication is done for the
+group as a unit.  It is important to *not* issue :func:`pend_io` during the
+building of a synchronous group, as this will cause pending :func:`sg_put`
+and :func:`sg_get` to execute.
 
 .. function::  sg_create()
 
@@ -492,17 +494,26 @@ please test carefully.
 
    delete a synchronous group
 
-.. function::  sg_block(gid, t=10.0)
+.. function::  sg_block(gid[, t=10.0])
 
    block for a synchronous group to complete processing
 
-.. function::  sg_get(gid,chid[, fype=None[, as_string=False[, as_numpy=True]]])
+.. function::  sg_get(gid, chid[, fype=None[, as_string=False[, as_numpy=True]]])
 
    perform a `get` within a synchronous group.
 
-.. function::  sg_put(gid,chid, value)
+   This function will not immediately return the value, of course, but the
+   address of the underlying data.
+   
+   After the :func:`sg_block` has completed, you must use :func:`_unpack`
+   to convert this data address to the actual value(s).
 
-   perform a `put` within a synchronous group.
+   See example below.
+
+.. function::  sg_put(gid, chid, value)
+
+   perform a `put` within a synchronous group.  This `put` cannot wait for
+   completion. 
 
 .. function::  sg_test(gid)
   
@@ -511,6 +522,50 @@ please test carefully.
 .. function::  sg_reset(gid)
 
    resets a synchronous group
+
+An example use of a synchronous group::
+
+    from epics import ca
+    import time
+
+    pvs = ('X1.VAL', 'X2.VAL', 'X3.VAL')
+    chids = [ca.create_channel(pvname) for pvname in pvs]
+
+    for chid in chids:
+        ca.connect_channel(chid)
+        ca.put(chid, 0)
+
+    # create synchronous group
+    sg = ca.sg_create()
+
+    # get data pointers from ca.sg_get
+    data = [ca.sg_get(sg, chid) for chid in chids]
+
+    print 'Now change these PVs for the next 10 seconds'
+    time.sleep(10.0)
+
+    print 'will now block for i/o'
+    ca.sg_block(sg)
+    #
+    # CALL ca._unpack with data points and chid to extract data
+    for pvname, dat, chid in zip(pvs, data, chids):
+        val = ca._unpack(dat, chid=chid)
+        print "%s = %s" % (pvname, str(val))
+
+    ca.sg_reset(sg)
+
+    #  Now a SG Put
+    print 'OK, now we will put everything back to 0 synchronously'
+
+    for chid in chids:
+        ca.sg_put(sg, chid, 0)
+
+
+    print 'sg_put done, but not blocked / commited. Sleep for 5 seconds '
+    time.sleep(5.0)
+    ca.sg_block(sg)
+    print 'done.'
+
 
 ..  _ca-implementation-label:
 
@@ -606,6 +661,29 @@ used heavily inside of ca.py
     ensures that the first argument of a function is a connected ``chid``.
     This test is (intended to be) robust, and will (try to) make sure a
     ``chid`` is actually connected before calling the decorated function.
+
+
+Unpacking Data from Callbacks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Throughout the implementation, there are several places where data returned
+by the underlying CA library needs to be be converted to Python data.  This
+is encapsulated in the :func:`_unpack` function.  In general, you will not
+have to run this code, but there is one exception:  when using
+:func:`sg_get`, the values returned will have to be unpacked with this
+function.
+
+..  function:: _unpack(cdata, chid=None[, count=None[, ftype=None[, as_numpy=None]]])
+
+    This takes the ctypes data `cdata` and returns the Python data.
+
+   :param cdata:   cdata as returned by internal libca functions, and :func:`sg_get`.
+   :param chid:    channel ID (optional: used for determining count and ftype)
+   :param count:   number of elements to fetch (defaults to element count of chid  or 1)
+   :param ftype:   data type of channel (defaults to native type of chid)
+   :param as_numpy:  whether to convert to numpy array.
+   :type as_numpy:  ``True`` or ``False``
+
 
 ..  _ca-callbacks-label:
        

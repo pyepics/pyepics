@@ -481,7 +481,7 @@ def context_destroy():
         for key in list(_cache[ctx].keys()):
             _cache[ctx].pop(key)
         _cache.pop(ctx)
-    return
+    return ret
     
 @withCA
 def attach_context(context):
@@ -714,6 +714,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     subscription callback"""
 
     def unpack_simple(data, count, ntype, use_numpy):
+        "simple, native data type"
         if count == 1 and ntype != dbr.STRING:
             return data[0]
         if ntype == dbr.STRING:
@@ -728,6 +729,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         return list(data)
         
     def unpack_ctrltime(data, count, ntype, use_numpy):
+        "ctrl and time data types"
         if count == 1 or ntype == dbr.STRING:
             out = data[0].value
             if ntype == dbr.STRING and '\x00' in out:
@@ -747,9 +749,9 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         unpack = unpack_ctrltime
 
     if count is None and chid is not None:
-            count = element_count(chid)
+        count = element_count(chid)
     if count is None:
-            count = 1
+        count = 1
 
     if ftype is None and chid is not None:
         ftype = field_type(chid)
@@ -788,8 +790,8 @@ def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
     PySEVCHK('get', ret)
     poll()
     if count > 2:
-        c = min(count, 1000)
-        poll(evt=c*5.e-5, iot=c*0.01)
+        tcount = min(count, 1000)
+        poll(evt=tcount*5.e-5, iot=tcount*0.01)
 
     val = _unpack(data, count=nelem, ftype=ftype, as_numpy=as_numpy)
     if as_string:
@@ -1023,7 +1025,7 @@ def sg_reset(gid):
     "sg reset"
     return libca.ca_sg_reset(gid)
 
-def sg_get(gid, chid, ftype=None, as_string=False, as_numpy=True):
+def sg_get(gid, chid, ftype=None):
     """synchronous-group get of the current value for a Channel.
     same options as get()
     
