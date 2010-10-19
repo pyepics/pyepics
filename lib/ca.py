@@ -400,7 +400,7 @@ def _onGetEvent(args):
     if args.type in (dbr.STRING, dbr.TIME_STRING, dbr.CTRL_STRING):
         nelem = dbr.MAX_STRING_SIZE
         
-    value = _unpack(value, nelem, ftype=args.type)
+    value = _unpack(value, count=nelem, ftype=args.type)
     if hasattr(args.usr, '__call__'):
         args.usr(value=value, **kwd)
 
@@ -709,7 +709,7 @@ def native_type(ftype):
         ntype -= dbr.TIME_STRING
     return ntype
 
-def _unpack(data, count, ftype=dbr.INT, as_numpy=True):
+def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     """unpack raw data returned from an array get or
     subscription callback"""
 
@@ -746,13 +746,23 @@ def _unpack(data, count, ftype=dbr.INT, as_numpy=True):
     if ftype >= dbr.TIME_STRING:
         unpack = unpack_ctrltime
 
+    if count is None and chid is not None:
+            count = element_count(chid)
+    if count is None:
+            count = 1
+
+    if ftype is None and chid is not None:
+        ftype = field_type(chid)
+    if ftype is None:
+        ftype = dbr.INT
+
     ntype = native_type(ftype)
     use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and
                  count > 1 and count < AUTOMONITOR_MAXLENGTH)
     return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID
-def get(chid, ftype=None, as_string=False, as_numpy=True):
+def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
     """return the current value for a Channel.  Options are
        ftype       field type to use (native type is default)
        as_string   flag(True/False) to get a string representation
@@ -765,8 +775,11 @@ def get(chid, ftype=None, as_string=False, as_numpy=True):
         ftype = field_type(chid)
     if ftype in (None, -1):
         return
-    count = element_count(chid)
-
+    if count is None:
+        count = element_count(chid)
+    else:
+        count = min(count, element_count(chid))
+        
     nelem = count
     if ftype == dbr.STRING:
         nelem = dbr.MAX_STRING_SIZE
@@ -778,7 +791,7 @@ def get(chid, ftype=None, as_string=False, as_numpy=True):
         c = min(count, 1000)
         poll(evt=c*5.e-5, iot=c*0.01)
 
-    val = _unpack(data, nelem, ftype=ftype, as_numpy=as_numpy)
+    val = _unpack(data, count=nelem, ftype=ftype, as_numpy=as_numpy)
     if as_string:
         val = __as_string(val, chid, count, ftype)
     return val
@@ -975,3 +988,113 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
 def clear_subscription(evid):
     "cancel subscription"
     return libca.ca_clear_subscription(evid)
+
+
+@withCA
+@withSEVCHK
+def sg_block(gid, timeout=10.0):
+    "sg block"
+    return libca.ca_sg_block(gid, timeout)
+
+@withCA
+def sg_create():
+    "sg create"
+    gid  = ctypes.c_ulong()
+    pgid = ctypes.pointer(gid)
+    ret =  libca.ca_sg_create(pgid)
+    PySEVCHK('sg_create', ret)
+    return gid
+
+@withCA
+@withSEVCHK
+def sg_delete(gid):
+    "sg delete"
+    return libca.ca_sg_delete(gid)
+
+@withCA
+def sg_test(gid):
+    "sg test"
+    ret = libca.ca_sg_test(gid)
+    return PySEVCHK('sg_test', ret, dbr.ECA_IODONE)
+
+@withCA
+@withSEVCHK
+def sg_reset(gid):
+    "sg reset"
+    return libca.ca_sg_reset(gid)
+
+def sg_get(gid, chid, ftype=None, as_string=False, as_numpy=True):
+    """synchronous-group get of the current value for a Channel.
+    same options as get()
+    
+    Note that the returned tuple from a sg_get() will have to be
+    unpacked with the '_unpack' method:
+
+    >>> chid = epics.ca.create_channel(PV_Name)
+    >>> epics.ca.connect_channel(chid1)
+    >>> sg = epics.ca.sg_create() 
+    >>> data = epics.ca.sg_get(sg, chid)
+    >>> epics.ca.sg_block(sg)
+    print epics.ca._unpack(data, chid=chid)
+    """
+    if not isinstance(chid, dbr.chid_t):
+        raise ChannelAccessException('sg_get', "not a valid chid!")
+
+    if ftype is None:
+        ftype = field_type(chid)
+    count = element_count(chid)
+
+    nelem = count
+    if ftype == dbr.STRING:
+        nelem = dbr.MAX_STRING_SIZE
+    
+    data = (nelem*dbr.Map[ftype])()
+   
+    ret = libca.ca_sg_array_get(gid, ftype, count, chid, data)
+    PySEVCHK('sg_get', ret)
+    return data
+ 
+def sg_put(gid, chid, value):
+    "synchronous-group put: cannot wait or get callback!"
+    if not isinstance(chid, dbr.chid_t):
+        raise ChannelAccessException('sg_put', "not a valid chid!")
+
+    ftype = field_type(chid)
+    count = element_count(chid)
+    data  = (count*dbr.Map[ftype])()    
+    if ftype == dbr.STRING:
+        data = (dbr.string_t)()
+        count = 1
+        data.value = value
+    elif count == 1:
+        try:
+            data[0] = value
+        except TypeError:
+            data[0] = type(data[0])(value)
+        except:
+            errmsg = "Cannot put value '%s' to PV of type '%s'"
+            tname   = dbr.Name(ftype).lower()
+            raise ChannelAccessException('put', \
+                                         errmsg % (repr(value),tname))
+    else:
+        # auto-convert strings to arrays for character waveforms
+        # could consider using
+        # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],
+        #                  dtype=numpy.uint8)
+        if ftype == dbr.CHAR and isinstance(value, str):
+            pad = '\x00'*(1+count-len(value))
+            value = [ord(i) for i in ("%s%s" % (value, pad))[:count]]
+        try:
+            ndata = len(data)
+            nuser = len(value)
+            if nuser > ndata:
+                value = value[:ndata]
+            data[:len(value)] = list(value)
+        except:
+            errmsg = "Cannot put array data to PV of type '%s'"            
+            raise ChannelAccessException('put', errmsg % (repr(value)))
+      
+    ret =  libca.ca_sg_array_put(gid, ftype, count, chid, data)
+    PySEVCHK('sg_put', ret)
+    # poll()
+    return ret
