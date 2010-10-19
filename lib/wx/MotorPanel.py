@@ -20,9 +20,9 @@ from epics.wx.MotorDetailFrame  import MotorDetailFrame
 class MotorPanel(wx.Panel):
     """ MotorPanel  a simple wx windows panel for controlling an Epics Motor
     """
-    __motor_fields = ('set', 'enabled', 'low_limit','high_limit',
-                      'soft_limit','tweak_val',
-                      'high_limit_set', 'low_limit_set', 'stop_go')
+    __motor_fields = ('SET', 'disabled', 'LLM', 'HLM',  'LVIO', 'TWV',
+                      'HLS', 'LLS', 'SPMG')
+    
 
     def __init__(self, parent,  motor=None,  
                  style='normal', messenger=None, *args, **kw):
@@ -56,10 +56,9 @@ class MotorPanel(wx.Panel):
         self.motor = epics.Motor(motor)
         self.motor.get_info()
 
-        self.format = "%%.%if" % self.motor.precision
+        self.format = "%%.%if" % self.motor.PREC
         self.FillPanel()
-
-        self.set_Tweak(self.format % self.motor.tweak_val)
+        self.set_Tweak(self.format % self.motor.TWV)
         for attr in self.__motor_fields:
             self.motor.get_pv(attr).add_callback(self.onMotorEvent,
                                                  wid=self.GetId(),
@@ -69,17 +68,17 @@ class MotorPanel(wx.Panel):
     def fillPanelComponents(self):
         if self.motor is None: return
         try:
-            odr = self.motor.get_pv('drive')
-            ord = self.motor.get_pv('readback') 
-            ode = self.motor.get_pv('description')
+            odr = self.motor.PV('VAL')
+            ord = self.motor.PV('RBV')
+            ode = self.motor.PV('DESC')
         except:
             pass
 
         epics.poll()
-        self.drive.set_pv(self.motor.get_pv('drive'))
-        self.rbv.set_pv(self.motor.get_pv('readback') )
+        self.drive.set_pv(self.motor.PV('VAL'))
+        self.rbv.set_pv(self.motor.PV('RBV'))
 
-        descpv = self.motor.get_pv('description')
+        descpv = self.motor.PV('DESC')
         if len(descpv.char_value) > 25:
             self.desc.Wrap(30)
             self.desc.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -93,12 +92,10 @@ class MotorPanel(wx.Panel):
 
 
         self.info.SetLabel('')
-        for f in ('set', 'high_limit_set', 'low_limit_set',
-                  'soft_limit', 'stop_go', 'enabled'):
-            if self.motor.get_pv(f):
-                uname = self.motor.get_pv(f).pvname
-                wx.CallAfter(self.onMotorEvent,
-                             pvname=uname, field=f)
+        for f in ('SET', 'LVIO', 'SPMG', 'LLS', 'HLS', 'disabled'):            
+            uname = self.motor.PV(f).pvname
+            wx.CallAfter(self.onMotorEvent,
+                         pvname=uname, field=f)
 
             
     def CreatePanel(self,style='normal'):
@@ -160,6 +157,7 @@ class MotorPanel(wx.Panel):
         self.SetSizer(self.__sizer)
         self.__sizer.Fit(self)
 
+    @EpicsFunction
     def FillPanel(self):
         " fill in panel components for motor "
         if self.motor is None: return
@@ -175,13 +173,13 @@ class MotorPanel(wx.Panel):
         
     @EpicsFunction
     def onLeftButton(self,event=None):
-        if (self.motor is None): return        
+        if self.motor is None: return        
         self.motor.tweak(direction='reverse')
         
     @EpicsFunction
     def onRightButton(self,event=None):
-        if (self.motor is None): return        
-        self.motor.tweak(direction='forward')
+        if self.motor is None: return        
+        self.motor.tweak(direction='foreward')
 
     @EpicsFunction
     def onStopButton(self,event=None):
@@ -192,42 +190,42 @@ class MotorPanel(wx.Panel):
         self.motor.StopNow()
         epics.poll()
         val = 3
-        if curstate == 'stop':   val = 0
-        self.motor.put_field('stop_go', val)
+        if curstate == 'stop':
+            val = 0
+        self.motor.put('SPMG', val)
 
     @EpicsFunction
     def onMoreButton(self,event=None):
-        if (self.motor is None): return        
+        if self.motor is None:
+            return        
         x = MotorDetailFrame(parent=self, motor=self.motor)
             
-    def OnTweakBoxEvent(self,event):
-        if (self.motor is None): return
-        try:
-            self.motor.tweak_val = set_float(event.GetString())
-        except:
-            pass
+    @DelayedEpicsCallback
+    def OnTweakBoxEvent(self, event=None):
+        val = float(self.__twkbox.GetValue())
+        wx.CallAfter(self.motor.PV('TWV').put, val)
 
     @DelayedEpicsCallback
     def onMotorEvent(self, pvname=None, field=None, event=None, **kw):
-        if pvname is None: return None
+        if pvname is None:
+            return None
       
-        field_val = self.motor.get_field(field)
-        field_str = self.motor.get_field(field, as_string=1)
-
-        # print 'onMotor Event: ',  self.motor,  field, field_val, field_str
+        field_val = self.motor.get(field)
+        field_str = self.motor.get(field, as_string=True)
+        
         sys.stdout.flush()
         
-        if field == 'low_limit':
-            self.drive.SetMin(self.motor.low_limit)
-        elif field == 'high_limit':
-            self.drive.SetMax(self.motor.high_limit)
+        if field == 'LLM':
+            self.drive.SetMin(self.motor.LLM)
+        elif field == 'HLM':
+            self.drive.SetMax(self.motor.HLM)
 
-        elif field in ('soft_limit', 'high_limit_set', 'low_limit_set'):
+        elif field in ('LVIO', 'HLS', 'LLS'):
             s = 'Limit!'
             if (field_val == 0): s = ''
             self.info.SetLabel(s)
             
-        elif field == 'set':
+        elif field == 'SET':
             label, color='Set:','Yellow'
             if field_val == 0:
                 label,color='','White'
@@ -236,14 +234,14 @@ class MotorPanel(wx.Panel):
             self.drive.SetBackgroundColour(color)
             self.drive.Refresh()
 
-        elif field == 'enabled':
+        elif field == 'disabled':
             label = ('','Disabled')[field_val]
             self.info.SetLabel(label)
             
-        elif field == 'tweak_val':
+        elif field == 'TWV':
             self.set_Tweak(field_str)
 
-        elif field == 'stop_go':
+        elif field == 'SPMG':
             label, info, color = 'Stop', '', 'White'
             if field_val == 0:
                 label, info, color = ' Go ', 'Stopped', 'Yellow'
@@ -257,28 +255,30 @@ class MotorPanel(wx.Panel):
             self.stopbtn.Refresh()
 
         else:
+            print 'onMotor field = ', field
             pass
 
+    @EpicsFunction
     def set_Tweak(self,val):
         if not isinstance(val, str):
             val = self.format % val
-        if val not in self.twk_list:  self.__Update_StepList(value=val)
+        if val not in self.twk_list:
+            self.__Update_StepList(value=val)
         self.__twkbox.SetValue(val)
             
     def Create_StepList(self):
         """ create initial list of motor steps, based on motor range
         and precision"""
 
+        if self.motor is None:
+            return []
+        smax = 0.6 * abs(self.motor.HLM - self.motor.LLM)
 
-        if self.motor is None: return []
-        smax = abs(self.motor.high_limit - self.motor.low_limit)*0.6
-
-        p = self.motor.precision
-        # print self.motor.high_limit, self.motor.low_limit, smax, p
+        prec = self.motor.PREC
 
         l = []
         for i in range(6):
-            x = 10**(i-p)
+            x = 10**(i-prec)
             for j in (1,2,5):
                 if (j*x < smax):  l.append(j*x)
         return [self.format%i for i in l]
@@ -293,5 +293,6 @@ class MotorPanel(wx.Panel):
         self.twk_list = [self.format % i for i in x]
         # remake list in TweakBox
         self.__twkbox.Clear()
+        # print 'TWK BOX LIST  ', self.twk_list
         self.__twkbox.AppendItems(self.twk_list)
         

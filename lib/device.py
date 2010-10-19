@@ -81,11 +81,12 @@ class Device(object):
     """
 
     _prefix = None
+    _delim = ''
     _pvs = {}
     def __init__(self, prefix=None, attrs=None, delim='',
                  timeout=None):
-        self._prefix = prefix + delim
         self._delim = delim
+        self._prefix = prefix + delim
         self._pvs = {}
         if attrs is not None:
             for attr in attrs:
@@ -102,7 +103,6 @@ class Device(object):
             self._pvs[attr] = pv.PV(pvname, **kw)
         if connect and not self._pvs[attr].connected:
             self._pvs[attr].wait_for_connection()
-               
         return self._pvs[attr]
 
     def add_pv(self, pvname, attr=None, **kw):
@@ -174,7 +174,7 @@ class Device(object):
                 raise AttributeError(msg % (self._prefix, attr))
  
     def __setattr__(self, attr, val):
-        if attr in ('_prefix', '_pvs'):
+        if attr in ('_prefix', '_pvs', '_delim'):
             self.__dict__[attr] = val
         elif attr in self._pvs:
             self.put(attr, val)

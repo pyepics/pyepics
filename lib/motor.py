@@ -125,10 +125,10 @@ class Motor(device.Device):
     # parameter name (short), PV suffix,  longer description
 
     #
-    __extras =  {
+    _extras =  {
         'disabled':   '_able.VAL', }
     
-    __alias = {
+    _alias = {
         'acceleration':    'ACCL',
         'back_accel':      'BACC',
         'backlash':        'BDST',
@@ -230,27 +230,26 @@ class Motor(device.Device):
     def __init__(self, name=None, timeout=3.0):
         if name is None:
             raise MotorException("must supply motor name")
-        
+
         if name.endswith('.VAL'):
             name = name[:-4]
         if name.endswith('.'):
             name = name[:-1]
-            
-        self.name = name
-        print 'INIT ', name, self._init_list
-        device.Device.__init__(self, name,
-                               attrs=self._init_list,
-                               delim='.')
 
-        # make sure motor is enabled:
+        self.name = name
+        device.Device.__init__(self, name, delim='.', 
+                               attrs=self._init_list)
+
+        # make sure this is really a motor!
         rectype = self.get('RTYP')
         if rectype != 'motor':
             raise MotorException("%s is not an Epics Motor" % name)
 
-        for key, val in self.__extras.items():
+        for key, val in self._extras.items():
             pvname = "%s%s" % (name, val)
             self.add_pv(pvname, attr=key)
-        self.get('disabled') == 1
+        
+        # self.put('disabled', 0)
         self._callbacks = {}
 
     def __repr__(self):
@@ -261,21 +260,23 @@ class Motor(device.Device):
 
     def __getattr__(self, attr):
         " internal method "
-        if attr in self.__alias:
-            attr = self.__alias[attr]
+        if attr in self._alias:
+            attr = self._alias[attr]
         if attr in self._pvs:
             return self.get(attr)
         elif attr in self.__dict__:
             return self.__dict__[attr]
         else:
             try:
+                
                 self.PV(attr)
                 return self.get(attr)
             except:
                 raise MotorException("EpicsMotor has no attribute %s" % attr)
  
     def __setattr__(self, attr, val):
-        if attr in ('name', '_prefix', '_pvs', '_delim', '_callbacks'):
+        if attr in ('name', '_prefix', '_pvs', '_delim',
+                    '_alias', '_extra', '_callbacks'):
             self.__dict__[attr] = val
             return 
         if attr in self.__alias:
@@ -351,7 +352,6 @@ class Motor(device.Device):
             limits_ok = self.within_limits(val, lims)
             if not limits_ok:
                 return -1
-            
         stat = self.put(drv, val, wait=wait, timeout=timeout)
         ret = stat
         if stat == 1:
@@ -503,7 +503,7 @@ class Motor(device.Device):
 
     def StopNow(self):
         "stop motor as soon as possible"
-        save_val = self.get_field('SPMG')
+        save_val = self.get('SPMG')
         self.put('SPMG', 0)
         time.sleep(0.10)
         self.put('SPMG', save_val)
@@ -512,10 +512,10 @@ class Motor(device.Device):
     def get_info(self):
         "return information, current field values"
         out = {}
-        for attr in ('description', 'drive', 'readback', 'slew_speed',
-                  'precision','tweak_val','low_limit', 'high_limit',
-                  'stop_go', 'set', 'status'):
-            out[attr] = self.get_field(attr, as_string=True)
+        for attr in ('DESC', 'VAL', 'RBV', 'PREC', 'VELO', 'STAT', 
+                     'SET', 'TWV','LLM', 'HLM', 'SPMG'):
+
+            out[attr] = self.get(attr, as_string=True)
 
         return out
     
@@ -536,21 +536,22 @@ class Motor(device.Device):
         """ show all motor attributes"""
         out = []
         add = out.append
-        add("#Motor %s" % (self.pvname))
+        add("# Motor %s" % (self.name))
         add("#  field               value                 PV name")
         add("#------------------------------------------------------------")
         self.refresh()
-        klist = list( self.__motor_attrs.keys())
+        klist = list( self._alias.keys())
         klist.sort()
-
         for attr in klist:
+            suff = self._alias[attr]
+            # pvn = self._alias[attr]
             label = attr  + ' '*(18-min(18, len(attr)))
-            value = self.get_field(attr, as_string=True)
-            pvname  = sel.PV(attr).pvname
+            value = self.get(suff, as_string=True)
+            pvname  = self.PV(suff).pvname
             if value is None:
                 value = 'Not Connected??'
             value = value + ' '*(18-min(18, len(value)))
-                                 
+            # print " %s  %s  %s" % (label, value, pvname)
             add(" %s  %s  %s" % (label, value, pvname))
             
         sys.stdout.write("%s\n" % "\n".join(out))

@@ -87,7 +87,7 @@ class closure:
 
     based on Command class from J. Grayson's Tkinter book.
     """
-    def __init__(self, func, *args, **kw):
+    def __init__(self, func=None, *args, **kw):
         self.func  = func
         self.kw    = kw
         self.args  = args
