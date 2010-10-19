@@ -3,12 +3,9 @@ Several desired features are left undone or unfinished:
  *  port CaChannel interface to use epics.ca
 
  *  improve documentation, examples, unit testing.
-
- *  investigate retrieving array data for CTRL and TIME variants.
+    - document attributes for devices.
 
  *  add more "devices", including low-level epics records,
-
- *  port the Motor class to be a subclass of epics.Device.
 
  *  improve wx_motor.py to be a stand-alone app with:
      - dialog window to select a set of motors for an "instrument"
@@ -19,5 +16,4 @@ Several desired features are left undone or unfinished:
        instrument definition, with saved positions
      - tabbed/notebook interface for multiple instruments.
 
-        
   * more extensive thread testing
