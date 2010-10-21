@@ -14,7 +14,7 @@ srcdir=$installdir/src
 docbuild='doc/_build'
 
 cd doc
-# make all
+make all
 cd ../
 
 echo '# Publishing PyEpics'
