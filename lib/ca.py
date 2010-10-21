@@ -801,7 +801,8 @@ def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
 def __as_string(val, chid, count, ftype):
     "primitive conversion of value to a string"
     try:
-        if ftype in (dbr.CHAR, dbr.TIME_CHAR, dbr.CTRL_CHAR):
+        if (ftype in (dbr.CHAR, dbr.TIME_CHAR, dbr.CTRL_CHAR) and
+            count < AUTOMONITOR_MAXLENGTH):
             val = strjoin('',   [chr(i) for i in val if i>0]).strip()
         elif ftype == dbr.ENUM and count == 1:
             val = get_enum_strings(chid)[val]

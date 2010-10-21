@@ -18,7 +18,6 @@ class epicsPV(PV):
     """
     This class subclasses PV to provide a compatible API to Mark Rivers
     epicsPV class
-      
     
     - setMonitor() sets a generic callback routine for value change events.
     Subsequent getw(), getValue() or array_get() calls will return the
@@ -118,19 +117,15 @@ class epicsPV(PV):
 
     def getw(self, count=None):
         """ returns PV value"""
-        poll()
-        if count is not None:
-            return self.get()[:count]
-        return self.get()
+        return self.get(count=count)
 
     def getValue(self):
         """  get most recent value for PV   """
-        poll()
         return self.get()
     
-    def putw(self, value):
+    def putw(self, value, wait=False):
         """ set PV value"""
-        self.put(value)
+        self.put(value, wait=wait)
         
     def putWait(self, value):
         """ put PV value, waits for the callback to

@@ -22,6 +22,7 @@ CS_CONN    = 2
 OP_CONN_UP = 6
 OP_CONN_DOWN = 7
 
+CS_NEVER_SEARCH = 4
 #
 # Note that DBR_XXX should be replaced with dbr.XXX
 # 

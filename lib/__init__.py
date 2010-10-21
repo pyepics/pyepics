@@ -32,12 +32,15 @@ from . import alarm
 from . import device
 from . import motor
 
+
 PV    = pv.PV
 Alarm = alarm.Alarm
 Motor = motor.Motor
 Device = device.Device 
 poll  = ca.poll
-# sleep = time.sleep # should probably remove this!
+
+# compatibility with other CA libraries
+from .compat import epicsPV
 
 # a local cache for PVs used in caget/caput/cainfo/camonitor functions
 _CACHE_ = {}

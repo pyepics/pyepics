@@ -122,8 +122,8 @@ class MotorPanel(wx.Panel):
         self.__twkbox.SetFont(wx.Font(13, wx.SWISS, wx.NORMAL, wx.BOLD))
         
 
-        self.__twkbox.Bind(wx.EVT_COMBOBOX,    self.OnTweakBoxEvent)
-        self.__twkbox.Bind(wx.EVT_TEXT_ENTER,  self.OnTweakBoxEvent)        
+        self.__twkbox.Bind(wx.EVT_COMBOBOX,    self.OnTweakBoxComboEvent)
+        self.__twkbox.Bind(wx.EVT_TEXT_ENTER,  self.OnTweakBoxEnterEvent)        
 
         twkbtn1 = wx.Button(self, label='<',  size=(30,30))
         twkbtn2 = wx.Button(self, label='>',  size=(30,30))
@@ -201,9 +201,14 @@ class MotorPanel(wx.Panel):
         x = MotorDetailFrame(parent=self, motor=self.motor)
             
     @DelayedEpicsCallback
-    def OnTweakBoxEvent(self, event=None):
+    def OnTweakBoxEnterEvent(self, event=None):
         val = float(self.__twkbox.GetValue())
         wx.CallAfter(self.motor.PV('TWV').put, val)
+
+    @DelayedEpicsCallback
+    def OnTweakBoxComboEvent(self, event=None):
+        val = float(self.__twkbox.GetValue())
+        wx.CallAfter(self.motor.PV('TWV').put, val)        
 
     @DelayedEpicsCallback
     def onMotorEvent(self, pvname=None, field=None, event=None, **kw):

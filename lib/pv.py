@@ -170,7 +170,7 @@ class PV(object):
         "poll for changes"
         ca.poll(evt=evt, iot=iot)
 
-    def get(self, as_string=False, as_numpy=True):
+    def get(self, count=None, as_string=False, as_numpy=True):
         """returns current value of PV.  Use the options:
          as_string to return string representation
          as_numpy  to (try to) return a numpy array
@@ -184,12 +184,19 @@ class PV(object):
             return None
         if not self.auto_monitor or self._args['value'] is None:
             self._args['value'] = ca.get(self.chid,
+                                         count=count,
                                          ftype=self.ftype,
                                          as_numpy=as_numpy)
         if as_string:
             self._set_charval(self._args['value'])
             return self._args['char_value']
+        if count is not None and self.count > 1:
+            try:
+                return self._args['value'][:count]
+            except:
+                pass
         return self._args['value']
+        
 
     def put(self, value, wait=False, timeout=30.0,
             callback=None, callback_data=None):
