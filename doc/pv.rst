@@ -76,10 +76,12 @@ methods
 A `PV` has several methods for getting and setting its value and defining
 callbacks to be executed when the PV changes.
 
-.. method:: get([, as_string=False[, as_numpy=True]])
+.. method:: get([, count=None[, as_string=False[, as_numpy=True]]])
 
    get and return the current value of the PV
 
+   :param count:  maximum number of array elements to return
+   :type count:  integer or None
    :param as_string:  whether to return the string representation of the  value.  
    :type as_string: ``True``/``False``
    :param as_numpy:  whether to try to return a numpy array where appropriate.
@@ -346,15 +348,15 @@ will depend on the native type and count of a `PV`.
     =============== ========== ==============================
      *data types*    *count*     *char_value*
     =============== ========== ==============================
-     string                1         = value   
-     char                  1         = value   
-     short                 1         = str(value) 
-     long                  1         = str(value)
-     enum                1         = enum_str[value]
-     double              1         = ("%%.%if" % (precision)) % value
-     float                  1         = ("%%.%if" % (precision)) % value 
-     char                > 1       = long string from bytes in array
-     all others        > 1       = <array size=*count*, type=*type*>
+     string               1       = value   
+     char                 1      = value   
+     short                1      = str(value) 
+     long                 1      = str(value)
+     enum                 1      = enum_str[value]
+     double               1      = ("%%.%if" % (precision)) % value
+     float                1      = ("%%.%if" % (precision)) % value 
+     char               > 1      = long string from bytes in array
+     all others         > 1      = <array size=*count*, type=*type*>
     =============== ========== ==============================
 
 For double/float values with large exponents, the formatting will be

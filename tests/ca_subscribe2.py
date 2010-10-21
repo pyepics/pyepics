@@ -11,6 +11,7 @@ def wait(step=0.1, maxtime=30):
     t0 = time.time()
     while time.time()-t0 < maxtime:
         time.sleep(step)
+
     
 def setup_callback(pvname):
     def my_cb(pvname=None, value=None, **kw):
@@ -18,7 +19,7 @@ def setup_callback(pvname):
        sys.stdout.flush()
 
     chid = ca.create_channel(pvname)
-    return ca.create_subscription(chid, userfcn=my_cb)
+    return ca.create_subscription(chid, callback=my_cb)
 
 cb_ref = setup_callback(pvname)
 

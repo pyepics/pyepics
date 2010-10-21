@@ -260,7 +260,6 @@ class MotorPanel(wx.Panel):
             self.stopbtn.Refresh()
 
         else:
-            print 'onMotor field = ', field
             pass
 
     @EpicsFunction

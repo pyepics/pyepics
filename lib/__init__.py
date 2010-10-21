@@ -3,8 +3,8 @@
    Matthew Newville <newville@cars.uchicago.edu>
    CARS, University of Chicago
 
-   version    :  3.0.9
-   last update:  2-Oct-2010
+   version    :  3.0.10
+   last update:  21-Oct-2010
    
 == License:
    Except where explicitly noted, this file and all files in this
@@ -21,7 +21,7 @@
       PV -- Process Variable which will work largely as in EpicsCA 2.*
 """
 
-__version__ = '3.0.9'
+__version__ = '3.0.10'
 
 import time
 import sys
@@ -32,7 +32,6 @@ from . import alarm
 from . import device
 from . import motor
 
-
 PV    = pv.PV
 Alarm = alarm.Alarm
 Motor = motor.Motor
@@ -40,7 +39,7 @@ Device = device.Device
 poll  = ca.poll
 
 # compatibility with other CA libraries
-from .compat import epicsPV
+# from  .compat import epicsPV
 
 # a local cache for PVs used in caget/caput/cainfo/camonitor functions
 _CACHE_ = {}

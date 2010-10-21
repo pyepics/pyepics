@@ -1,3 +1,29 @@
+2010-01-21  Matt Newville  <newville@cars.uchicago.edu>
+
+	* Version 3.0.10:
+
+ 	- improved devices to use attributes in addition to get()/put()
+	methods, so that
+	   a = device('XX:m1', delim='.')
+	   print a.VAL
+	is equivalent to  print a.get('VAL').  Case is preserved, and
+	device.get(attr, as_string=True) is still the only way to get
+	the string representation.
+
+	- several improvements to Motor and MotorPanel to use this new
+	device interface.
+
+	- synchronous groupns now work.
+
+	- epicsPV now works correctly.
+
+	- added a 'count=' argument to ca.get() and PV.get() to limit
+	(really!) the number of array elements fetched for array data.
+
+	- fixed bug in handling very large char waveform for images.
+
+	- better coverage and testing
+
 2010-01-02  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.9:

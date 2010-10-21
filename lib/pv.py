@@ -83,7 +83,7 @@ class PV(object):
             self.__on_connect(chid=self.chid, conn=entry['conn'])
         if self.chid is None:
             self.chid = ca.create_channel(self.pvname,
-                                          userfcn=self.__on_connect)
+                                          callback=self.__on_connect)
         self._args['chid'] = self.chid
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
@@ -125,7 +125,7 @@ class PV(object):
                 self._monref = ca.create_subscription(self.chid,
                                          use_ctrl=(self.form == 'ctrl'),
                                          use_time=(self.form == 'time'),
-                                         userfcn=self.__on_changes)
+                                         callback=self.__on_changes)
 
         if hasattr(self.connection_callback, '__call__'):
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)

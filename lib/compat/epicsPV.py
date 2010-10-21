@@ -12,9 +12,9 @@ Author:         Mark Rivers
 Created:        Sept. 16, 2002.
 Modifications:
 """
-from epics import PV, poll
+import epics
 
-class epicsPV(PV):
+class epicsPV(epics.PV):
     """
     This class subclasses PV to provide a compatible API to Mark Rivers
     epicsPV class
@@ -82,7 +82,7 @@ class epicsPV(PV):
         indicating a new value is available since the last check.
         Returns False if no such callback has occurred.
         """
-        poll()
+        epics.poll()
         out =  self.monitorState
         self.monitorState = False
         return out
@@ -108,7 +108,7 @@ class epicsPV(PV):
         upper_ctrl_limit  :  2.4
         lower_ctrl_limit  :  -2.4
         """
-        poll()
+        epics.poll()
         return self.get_ctrlvars()
       
     def array_get(self, count=None):

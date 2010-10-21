@@ -20,60 +20,62 @@ several different records.::
     motor1 = epics.Device('XXX:motor1.', attr=('VAL', 'RBV', 'DESC', 'RVAL',
                                                'LVIO', 'HLS', 'LLS'))
     motor1.put('VAL', 1)
-    print 'Motor %s = %f' % ( mymotor1.get('DESC'), mymotor1.get('RBV'))
+    print 'Motor %s = %f' % ( motor1.get('DESC'), motor1.get('RBV'))
+
+    motor1.VAL 0 
+    print 'Motor %s = %f' % ( motor1.DESC, motor1.RBV )
 
 While useful on its own like this, the real point of a *device* is as a
 base class, to be inherited and extended.  In fact, there is a more
 sophisticated   Motor device described below at :ref:`device-motor-label`
 
-.. class:: Device(prefix=None[, attrs=None])
+.. class:: Device(prefix=None[, delim=''[, attrs=None]])
 
-The attribute PVs are built as needed and held in an internal
-buffer (self._pvs).  This class is kept intentionally simple
-so that it may be subclassed.
+The attribute PVs are built as needed and held in an internal buffer
+:data:`self._pvs`.  This class is kept intentionally simple so that it may
+be subclassed.
 
-To pre-load attribute names on initialization, provide a list or tuple of attributes.
+To pre-load attribute names on initialization, provide a list or tuple of
+attributes with the `attr` option.
 
 Note that *prefix* is actually optional.  When left off, this class can be
 used as an arbitrary container of PVs, or to turn any subclass into an
 epics Device.
 
+In general, PV names will be mapped as prefix+delim+attr.  See
+:meth:`add_pv` for details of how to override this.
 
-.. method:: PV(attr)
+.. method:: PV(attr[, connect=True[, **kw]]])
 
-   returns the `PV` object for a device attribute
+   returns the `PV` object for a device attribute.  The connect argument
+   and any other keyword wrguments are passed to :meth:`epics.PV`.
 
-.. method::  put(attr,value[,wait=False[,timeout=10.0]])
+.. method::  put(attr, value[, wait=False[, timeout=10.0]])
 
    put an attribute value, optionally wait for completion or up to a
    supplied timeout value
 
-.. method::  get(attr[,as_string=False])
+.. method::  get(attr[, as_string=False])
 
    get an attribute value, option as_string returns a string
    representation
 
-.. method:: add_callback(attr,callback)
+.. method:: add_callback(attr, callback)
 
    add a callback function to an attribute PV, so that the callback
    function will be run when the at tribute's value changes
-        
-.. function:: pv_property(attr[, as_string=False[,wait=False[,timeout=10.0]]])
 
-   function to turn a device attribute PV into a Python **property**
-   use in your subclass as::
-        
-       class MyDevice(epics.device):
-           def __init__(self,prefix):
-               epics.Device.__init__(self)
-               self.PV('something')
-           field = pv_property('something', as_string=True)
+.. method:: add_pv(pvname[, attr=None,[ **kw]])
 
-   then use in code as::
+   adds an expliciltly names :meth:`epics.PV` to the device even though it
+   may violate the normal naming rules (in which `attr` is mapped to
+   `epics.PV(prefix+delim+attr)`.   That is, one can say::
 
-       m = MyDevice()
-       print m.field
-       m.field = new_value
+    import epics
+    m1 = epics.Device('XXX:m1', delim='.')
+    m1.add_pv('XXX:m2.VAL', attr='other')
+    print m1.VAL     # printe value of XXX:m1.VAL
+    print m1.other   # prints value of XXX:m2.VAL
 
 .. data:: _pvs
   
@@ -102,7 +104,7 @@ A simple example use would be::
     import epics
     m1 = epics.Motor('XXX:m1')
 
-    print 'Motor:  ', m1.description , ' Currently at ', m1.readback
+    print 'Motor:  ', m1.DESC , ' Currently at ', m1.RBV
    
     m1.tweak_val = 0.10
     m1.move(0.0, dial=True, wait=True)
@@ -110,12 +112,14 @@ A simple example use would be::
     for i in range(10):
         m1.tweak(dir='forward', wait=True)
 	time.sleep(1.0)
-        print 'Motor:  ', m1.description , ' Currently at ', m1.readback
+        print 'Motor:  ', m1.DESC , ' Currently at ', m1.RBV
 
 Which will step the motor through a set of positions.    You'll notice a
 few features for Motor:
 
- 1.  Motors use english-name attributes for fields of the motor record.  Thus '.VAL' becomes 'drive' and '.DESC' becomes  description. 
+ 1.  Motors can use english-name aliases for attributes for fields of the
+ motor record.  Thus 'VAL' can be spelled 'drive' and 'DESC' can be
+ 'description'.   The Table
 
  2.  The methods for setting positions can use the User, Dial, or Step coordinate system, and can wait for completion.
 
@@ -138,119 +142,119 @@ Once created, a Motor should be ready to use.
       >>> m = Motor('XX:m1')
       >>> print m.drive, m.description, m.slew_speed
       1.030 Fine X 5.0
-      >>> print m.get_field('device_type', as_string=True)
+      >>> print m.get('device_type', as_string=True)
       'asynMotor'
 
 
 A Motor has very many fields.  Only a few of them are created on
 initialization -- the rest are retrieved as needed.  The motor fields can
-be retrieved either with an attribute or with the :meth:`get_field` method.
-A full list of Motor attributes and their mapping to fields from the motor
+be retrieved either with an attribute or with the :meth:`get` method.
+A full list of Motor attributes and their aliases for the motor
 record is given in :ref:`Table of Motor Attributes <motorattr_table>`.
 
 .. _motorattr_table: 
 
-   Table of Attributes for the epics :class:`Motor` class, and the
-   corresponding field to the Epics Motor Record.
+   Table of Aliases for attributes for the epics :class:`Motor` class, and the
+   corresponding attribute name of the Motor Record field.
 
 
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| **attribute**      |  *Motor Record field*    |   |  **attribute**     | *Motor Record field*     |
+|   **alias**        |  *Motor Record field*    |   |    **alias**       | *Motor Record field*     |
 +====================+==========================+===+====================+==========================+
-| enabled            |     _able.VAL            |   |   moving           |      .MOVN               |
+| disabled           |     _able.VAL            |   |   moving           |       MOVN               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| acceleration       |     .ACCL                |   |   resolution       |      .MRES               |
+| acceleration       |      ACCL                |   |   resolution       |       MRES               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| back_accel         |     .BACC                |   |   motor_status     |      .MSTA               |
+| back_accel         |      BACC                |   |   motor_status     |       MSTA               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| backlash           |     .BDST                |   |   offset           |      .OFF                |
+| backlash           |      BDST                |   |   offset           |       OFF                |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| back_speed         |     .BVEL                |   |   output_mode      |      .OMSL               |
+| back_speed         |      BVEL                |   |   output_mode      |       OMSL               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| card               |     .CARD                |   |   output           |      .OUT                |
+| card               |      CARD                |   |   output           |       OUT                |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| dial_high_limit    |     .DHLM                |   |   prop_gain        |      .PCOF               |
+| dial_high_limit    |      DHLM                |   |   prop_gain        |       PCOF               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| direction          |     .DIR                 |   |   precision        |      .PREC               |
+| direction          |      DIR                 |   |   precision        |       PREC               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| dial_low_limit     |     .DLLM                |   |   readback         |      .RBV                |
+| dial_low_limit     |      DLLM                |   |   readback         |       RBV                |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| settle_time        |     .DLY                 |   |   retry_max        |      .RTRY               |
+| settle_time        |      DLY                 |   |   retry_max        |       RTRY               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| done_moving        |     .DMOV                |   |   retry_count      |      .RCNT               |
+| done_moving        |      DMOV                |   |   retry_count      |       RCNT               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| dial_readback      |     .DRBV                |   |   retry_deadband   |      .RDBD               |
+| dial_readback      |      DRBV                |   |   retry_deadband   |       RDBD               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| description        |     .DESC                |   |   dial_difference  |      .RDIF               |
+| description        |      DESC                |   |   dial_difference  |       RDIF               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| dial_drive         |     .DVAL                |   |   raw_encoder_pos  |      .REP                |
+| dial_drive         |      DVAL                |   |   raw_encoder_pos  |       REP                |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| units              |     .EGU                 |   |   raw_high_limit   |      .RHLS               |
+| units              |      EGU                 |   |   raw_high_limit   |       RHLS               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| encoder_step       |     .ERES                |   |   raw_low_limit    |      .RLLS               |
+| encoder_step       |      ERES                |   |   raw_low_limit    |       RLLS               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| freeze_offset      |     .FOFF                |   |   relative_value   |      .RLV                |
+| freeze_offset      |      FOFF                |   |   relative_value   |       RLV                |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| move_fraction      |     .FRAC                |   |   raw_motor_pos    |      .RMP                |
+| move_fraction      |      FRAC                |   |   raw_motor_pos    |       RMP                |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| hi_severity        |     .HHSV                |   |   raw_readback     |      .RRBV               |
+| hi_severity        |      HHSV                |   |   raw_readback     |       RRBV               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| hi_alarm           |     .HIGH                |   |   readback_res     |      .RRES               |
+| hi_alarm           |      HIGH                |   |   readback_res     |       RRES               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| hihi_alarm         |     .HIHI                |   |   raw_drive        |      .RVAL               |
+| hihi_alarm         |      HIHI                |   |   raw_drive        |       RVAL               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| high_limit         |     .HLM                 |   |   dial_speed       |      .RVEL               |
+| high_limit         |      HLM                 |   |   dial_speed       |       RVEL               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| high_limit_set     |     .HLS                 |   |   s_speed          |      .S                  |
+| high_limit_set     |      HLS                 |   |   s_speed          |       S                  |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| hw_limit           |     .HLSV                |   |   s_back_speed     |      .SBAK               |
+| hw_limit           |      HLSV                |   |   s_back_speed     |       SBAK               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| home_forward       |     .HOMF                |   |   s_base_speed     |      .SBAS               |
+| home_forward       |      HOMF                |   |   s_base_speed     |       SBAS               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| home_reverse       |     .HOMR                |   |   s_max_speed      |      .SMAX               |
+| home_reverse       |      HOMR                |   |   s_max_speed      |       SMAX               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| high_op_range      |     .HOPR                |   |   set              |      .SET                |
+| high_op_range      |      HOPR                |   |   set              |       SET                |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| high_severity      |     .HSV                 |   |   stop_go          |      .SPMG               |
+| high_severity      |      HSV                 |   |   stop_go          |       SPMG               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| integral_gain      |     .ICOF                |   |   s_revolutions    |      .SREV               |
+| integral_gain      |      ICOF                |   |   s_revolutions    |       SREV               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| jog_accel          |     .JAR                 |   |   stop             |      .STOP               |
+| jog_accel          |      JAR                 |   |   stop             |       STOP               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| jog_forward        |     .JOGF                |   |   t_direction      |      .TDIR               |
+| jog_forward        |      JOGF                |   |   t_direction      |       TDIR               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| jog_reverse        |     .JOGR                |   |   tweak_forward    |      .TWF                |
+| jog_reverse        |      JOGR                |   |   tweak_forward    |       TWF                |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| jog_speed          |     .JVEL                |   |   tweak_reverse    |      .TWR                |
+| jog_speed          |      JVEL                |   |   tweak_reverse    |       TWR                |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| last_dial_val      |     .LDVL                |   |   tweak_val        |      .TWV                |
+| last_dial_val      |      LDVL                |   |   tweak_val        |       TWV                |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| low_limit          |     .LLM                 |   |   use_encoder      |      .UEIP               |
+| low_limit          |      LLM                 |   |   use_encoder      |       UEIP               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| low_limit_set      |     .LLS                 |   |   u_revolutions    |      .UREV               |
+| low_limit_set      |      LLS                 |   |   u_revolutions    |       UREV               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| lo_severity        |     .LLSV                |   |   use_rdbl         |      .URIP               |
+| lo_severity        |      LLSV                |   |   use_rdbl         |       URIP               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| lolo_alarm         |     .LOLO                |   |   drive            |      .VAL                |
+| lolo_alarm         |      LOLO                |   |   drive            |       VAL                |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| low_op_range       |     .LOPR                |   |   base_speed       |      .VBAS               |
+| low_op_range       |      LOPR                |   |   base_speed       |       VBAS               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| low_alarm          |     .LOW                 |   |   slew_speed       |      .VELO               |
+| low_alarm          |      LOW                 |   |   slew_speed       |       VELO               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| last_rel_val       |     .LRLV                |   |   version          |      .VERS               |
+| last_rel_val       |      LRLV                |   |   version          |       VERS               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| last_dial_drive    |     .LRVL                |   |   max_speed        |      .VMAX               |
+| last_dial_drive    |      LRVL                |   |   max_speed        |       VMAX               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| last_SPMG          |     .LSPG                |   |   use_home         |      .ATHM               |
+| last_SPMG          |      LSPG                |   |   use_home         |       ATHM               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
-| low_severity       |     .LSV                 |   |   deriv_gain       |      .DCOF               |
+| low_severity       |      LSV                 |   |   deriv_gain       |       DCOF               |
 +--------------------+--------------------------+---+--------------------+--------------------------+
 
 
 methods for :class:`epics.Motor`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: get_field(attr[, as_string=False])
+.. method:: get(attr[, as_string=False])
 
    sets a field attribute for the motor.
 
@@ -259,16 +263,16 @@ methods for :class:`epics.Motor`
    :param as_string:  whether to return string value.
    :type as_string: ``True`` or ``False``
 
-Note that :meth:`get_field` can return the string value, while fetching the
+Note that :meth:`get` can return the string value, while fetching the
 attribute cannot do so::
 
     >>> m = epics.Motor('XXX:m1')
     >>> print m.device_type
     0
-    >>> print m.get_field('device_type', as_string=True)
+    >>> print m.get('device_type', as_string=True)
     'asynMotor'
 
-.. method:: put_field(attr, value[, wait=False[, timeout=30]])
+.. method:: put(attr, value[, wait=False[, timeout=30]])
 
    sets a field attribute for the motor.
 
@@ -292,7 +296,7 @@ attribute cannot do so::
 
    checks whether a target value **would be** a limit violation.
  
-   :param value: target valu
+   :param value: target value
    :param limits: one of 'user', 'dial', or 'raw' for which limits to consider
    :type limits: string
    :rtype:    ``True``/``False``
@@ -416,8 +420,8 @@ input record, and simply subclass :class:`Device` with these fields.  This
 :class:`ai` class can then be used simply and cleanly as::
     
     This_ai = ai('XXX.PRES')
-    print 'Value: ', This_ai.get('VAL')
-    print 'Units: ', This_ai.get('EGU')
+    print 'Value: ', This_ai.VAL
+    print 'Units: ', This_ai.EGU
 
 Several of the other standard Epics records can easily be exposed as Devices in this way.
 

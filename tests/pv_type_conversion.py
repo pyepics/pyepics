@@ -3,6 +3,13 @@ import time
 import epics
 import pvnames
 
+HAS_NUMPY = False
+try:
+    import numpy
+    HAS_NUMPY = True
+except ImportError:
+    pass
+   
 pvlist = (
     pvnames.str_pv,
     pvnames.int_pv,
@@ -16,18 +23,18 @@ pvlist = (
     )
 
 def onConnect(pvname=None,  **kw):
-    print ' on Connect ', pvname, kw
+    print(' on Connect %s --  %s' % (pvname, repr(kw)))
     
 def onChanges(pvname=None, value=None, **kw):
-    print ' on Change ', pvname, value
+    print(' on Change %s =  %s' % (pvname, repr(value)))
         
 
 def RunTest(pvlist, use_preempt=True, maxlen=16384, 
             use_numpy=True, use_time=False, use_ctrl=False):
     msg= ">>>Run Test: %i pvs, numpy=%s, time=%s, ctrl=%s, preempt=%s"
-    print msg % (len(pvlist), use_numpy, use_time, use_ctrl, use_preempt)
+    print( msg % (len(pvlist), use_numpy, use_time, use_ctrl, use_preempt))
 
-    epics.ca.HAS_NUMPY = use_numpy
+    epics.ca.HAS_NUMPY = use_numpy and HAS_NUMPY
     epics.ca.PREEMPTIVE_CALLBACK = use_preempt
     epics.ca.AUTOMONITOR_MAXLENGTH = maxlen
     mypvs= []
@@ -38,14 +45,14 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
     epics.poll(evt=0.10, iot=10.0)
 
     for pv in mypvs:
-        print '== ', pv.pvname, pv
+        print('== ', pv.pvname, pv)
         # time.sleep(0.1)
         # epics.poll(evt=0.01, iot=1.0)
         val  = pv.get()
         cval = pv.get(as_string=True)    
         if pv.count > 1:
             val = val[:12]
-        print  pv.type, val, cval
+        print(pv.type, val, cval)
     for pv in mypvs:
         pv.disconnect()
     time.sleep(0.01)

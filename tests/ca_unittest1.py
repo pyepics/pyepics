@@ -47,7 +47,7 @@ class CA_BasicTests(unittest.TestCase):
     def testA_CreateChidWithConn(self):
         write('Simple Test: create chid with conn callback\n')
         chid = ca.create_channel(pvnames.int_pv,
-                                 userfcn=onConnect)
+                                 callback=onConnect)
         val = ca.get(chid)
         
         global CONN_DAT
@@ -142,7 +142,7 @@ class CA_BasicTests(unittest.TestCase):
     def test_subscription_1(self):
         pvn = pvnames.updating_pv1
         chid = ca.create_channel(pvn,connect=True)
-        eventID = ca.create_subscription(chid, userfcn=onChanges)
+        eventID = ca.create_subscription(chid, callback=onChanges)
 
         start_time = time.time()
         global CHANGE_DAT
@@ -157,7 +157,7 @@ class CA_BasicTests(unittest.TestCase):
     def test_subscription_2(self):
         pvn = pvnames.updating_str1
         chid = ca.create_channel(pvn,connect=True)
-        eventID = ca.create_subscription(chid, userfcn=onChanges)
+        eventID = ca.create_subscription(chid, callback=onChanges)
 
         start_time = time.time()
         global CHANGE_DAT
@@ -178,7 +178,7 @@ class CA_BasicTests(unittest.TestCase):
                     pvnames.float_pv, pvnames.enum_pv,
                     pvnames.long_pv,  pvnames.double_pv,
                     ):
-            os.system('caget  -n %s >> ./caget.tst' % pvn)
+            os.system('caget  -n -f5 %s >> ./caget.tst' % pvn)
             chid = ca.create_channel(pvn)
             ca.connect_channel(chid)
             vals[pvn] = ca.get(chid)
@@ -187,7 +187,7 @@ class CA_BasicTests(unittest.TestCase):
             pvn, sval = [i.strip() for i in line[:-1].split(' ', 1)]
             tval = str(vals[pvn])
             if pvn in (pvnames.float_pv,pvnames.double_pv): # use float precision!
-                tval = "%.7g" % vals[pvn]
+                tval = "%.5f" % vals[pvn]
             self.assertEqual(tval, sval)
         
 
@@ -196,7 +196,7 @@ if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=1).run(suite)
 
 #     chid = ca.create_channel(pvnames.int_pv,
-#                              userfcn=onConnect)
+#                              callback=onConnect)
 #     
 #     time.sleep(0.1)
 #     print chid, ca.name(chid)

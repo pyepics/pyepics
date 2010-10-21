@@ -10,7 +10,7 @@ def onChanges(pvname=None, value=None, **kw):
     sys.stdout.flush()
     
 chid = ca.create_channel(mypv)
-eventID = ca.create_subscription(chid, userfcn=onChanges)
+eventID = ca.create_subscription(chid, callback=onChanges)
 
 t0 = time.time()
 while time.time()-t0 < 15.0:

@@ -92,7 +92,7 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 
 ## Cache of existing channel IDs:
 #  pvname: {'chid':chid, 'conn': isConnected,
-#           'ts': ts_conn, 'userfcn': user_callback)
+#           'ts': ts_conn, 'callback': user_callback)
 #  isConnected   = True/False: if connected.
 #  ts_conn       = ts of last connection event or failed attempt.
 #  user_callback = user function to be called on change
@@ -416,7 +416,7 @@ def _onConnectionEvent(args):
     if pvname not in _cache[ctx]:
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
                                'ts':0, 'failures':0, 
-                               'userfcn': None}
+                               'callback': None}
 
     conn = (args.op == dbr.OP_CONN_UP)
     entry = _cache[ctx][pvname]
@@ -424,10 +424,10 @@ def _onConnectionEvent(args):
     entry['chid'] = args.chid
     entry['ts']   = time.time()
     entry['failures'] = 0
-    if 'userfcn' in entry and hasattr(entry['userfcn'], '__call__'):
+    if 'callback' in entry and hasattr(entry['callback'], '__call__'):
         try:
             poll(evt=1.e-3, iot=10.0)
-            entry['userfcn'](pvname=pvname,
+            entry['callback'](pvname=pvname,
                              chid=entry['chid'],
                              conn=entry['conn'])
         except ChannelAccessException:
@@ -558,13 +558,13 @@ def test_io():
 
 ## create channel
 @withCA
-def create_channel(pvname, connect=False, userfcn=None):
+def create_channel(pvname, connect=False, callback=None):
     """ create a Channel for a given pvname
 
     connect=True will try to wait until connection is complete
     before returning
 
-    a user-supplied callback function (userfcn) can be provided
+    a user-supplied callback function (callback) can be provided
     as a connection callback. This function will be called when
     the connection state changes, and will be passed these keyword
     arguments:
@@ -575,7 +575,7 @@ def create_channel(pvname, connect=False, userfcn=None):
     # 
     # Note that _CB_CONNECT (defined below) is a global variable, holding
     # a reference to _onConnectionEvent:  This is really the connection
-    # callback that is run -- the userfcn here is stored in the _cache
+    # callback that is run -- the callack here is stored in the _cache
     # and called by _onConnectionEvent.
     pvn = STR2BYTES(pvname)    
     # sys.stdout.write(' create channel %s \n' % pvn)
@@ -586,7 +586,7 @@ def create_channel(pvname, connect=False, userfcn=None):
     if pvname not in _cache[ctx]:
         _cache[ctx][pvname] = {'conn':False,  'chid': None, 
                                'ts': 0,  'failures':0, 
-                               'userfcn': userfcn}
+                               'callback': callback}
 
     chid = dbr.chid_t()
     # print 'Create Channel ', ctx, chid, pvname
@@ -964,7 +964,7 @@ def get_enum_strings(chid):
 
 @withConnectedCHID
 def create_subscription(chid, use_time=False, use_ctrl=False,
-                        mask=7, userfcn=None):
+                        mask=7, callback=None):
     """
     setup a callback function to be called when a PVs value or state changes.
 
@@ -976,7 +976,7 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     ftype = promote_type(chid, use_ctrl=use_ctrl, use_time=use_time)
     count = element_count(chid)
 
-    uarg  = ctypes.py_object(userfcn)
+    uarg  = ctypes.py_object(callback)
     evid  = ctypes.c_void_p()
     poll()
     ret = libca.ca_create_subscription(ftype, count, chid, mask,

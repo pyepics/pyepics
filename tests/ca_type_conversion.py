@@ -35,9 +35,9 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
         write(' on Change chid=%i value=%s\n' % (int(chid), repr(value)))
         
     for pvname in pvlist:
-        chid = epics.ca.create_channel(pvname, userfcn=onConnect)
+        chid = epics.ca.create_channel(pvname, callback=onConnect)
         epics.ca.connect_channel(chid)
-        eventID = epics.ca.create_subscription(chid, userfcn=onChanges)
+        eventID = epics.ca.create_subscription(chid, callback=onChanges)
         chids.append((chid, eventID))
         epics.poll(evt=0.025, iot=5.0)
     epics.poll(evt=0.05, iot=10.0)
