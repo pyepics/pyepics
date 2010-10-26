@@ -5,15 +5,14 @@ class Mca(epics.Device):
     """ 
     SynApps Mca Record.   
     """
-    _fields = ('CALO', 'CALS', 'CALQ', 'TTH', 'EGU' , 'PRTM', 'PLTM',
-               'PCT', 'PCTL', 'PCTH', 'CHAS', 'DWEL', 'PSCL', 'ERTM', 'ELTM',
-               'ACT' , 'RTIM', 'STIM',  'STRT', 'STOP', 'ERAS', 'ACQG', 'PROC',
-               'ERST', 'NUSE', 'NMAX', 'VAL')
+    attrs = ('CALO', 'CALS', 'CALQ', 'TTH', 'EGU' , 'PRTM', 'PLTM',
+             'PCT', 'PCTL', 'PCTH', 'CHAS', 'DWEL', 'PSCL', 'ERTM', 'ELTM',
+             'ACT' , 'RTIM', 'STIM',  'STRT', 'STOP', 'ERAS', 'ACQG', 'PROC',
+             'ERST', 'NUSE', 'NMAX', 'VAL')
     
-    def __init__(self,prefix):
-        if not prefix.endswith('.'):
-            prefix = "%s." % prefix
-        epics.Device.__init__(self,prefix,self._fields)
+    def __init__(self, prefix):
+        epics.Device.__init__(self, prefix, delim='.',
+                              attrs= self.attrs)
 
     def Read(self):
         attr = 'VAL'

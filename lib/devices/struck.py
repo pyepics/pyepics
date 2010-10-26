@@ -10,16 +10,14 @@ class Struck(epics.Device):
     """
     attrs = ('ChannelAdvance', 'Prescale', 'EraseStart', 'StopAll',
              'PresetReal', 'Dwell')
+
+    _fields = ('_prefix', '_pvs', '_delim', '_nchan', 'scaler')
     
     def __init__(self, prefix, scaler=None, nchan=8):
-        epics.Device.__init__(self, prefix,
-                              attrs=self.attrs)
-        self.put = epics.Device.put
-        self.get = epics.Device.get
-        self.PV  = epics.Device.PV
-        self.prefix = prefix
-        self.nchan  = nchan
+        self._nchan = nchan
         self.scaler = None
+        epics.Device.__init__(self, prefix, delim=':',
+                              attrs=self.attrs)
         if scaler is not None:
             self.scaler = epics.devices.Scaler(scaler, nchan=nchan)
         
@@ -41,11 +39,11 @@ class Struck(epics.Device):
             self.put('Prescale', prescale)
         return out
         
-    def PresetReal(self, val):
+    def setPresetReal(self, val):
         "Set Preset Real Tiem"
         return self.put('PresetReal', val)
 
-    def Dwell(self, val):
+    def setDwell(self, val):
         "Set Dwell Time"
         return self.put('Dwell', val)    
 
@@ -78,14 +76,14 @@ class Struck(epics.Device):
             mcas = list(range(1, self.nchan+1))
         for nmca in mcas:
             if self.scaler is not None:
-                scaler_name = self.scaler.get('.NM%i' % nmca)
+                scaler_name = self.scaler.get('NM%i' % nmca)
                 if len(scaler_name) > 0:
                     if (ignore_prefix is not None and
                         scaler_name.startswith(ignore_prefix)):
                         continue
                     sdata.append(self.readmca(nmca=nmca))
                     names.append(scaler_name.replace(' ', '_'))
-                    addrs.append(self.scaler.prefix + '.S%i' % nmca)
+                    addrs.append(self.scaler.prefix + 'S%i' % nmca)
 
             else:
                 sdata.append(self.readmca(nmca=nmca))

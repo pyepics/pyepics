@@ -83,6 +83,7 @@ class Device(object):
     _prefix = None
     _delim = ''
     _pvs = {}
+    _fields = ('_prefix', '_pvs', '_delim')
     def __init__(self, prefix=None, attrs=None, delim='',
                  timeout=None):
         self._delim = delim
@@ -165,7 +166,7 @@ class Device(object):
             return self.get(attr)
         elif attr in self.__dict__:
             return self.__dict__[attr]
-        else:
+        elif not attr.startswith('__'):
             try:
                 self.PV(attr)
                 return self.get(attr)
@@ -174,7 +175,7 @@ class Device(object):
                 raise AttributeError(msg % (self._prefix, attr))
  
     def __setattr__(self, attr, val):
-        if attr in ('_prefix', '_pvs', '_delim'):
+        if attr in self._fields:
             self.__dict__[attr] = val
         elif attr in self._pvs:
             self.put(attr, val)
