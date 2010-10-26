@@ -1,15 +1,15 @@
 """
 simple devices
 """
-from . import ai
-from . import ao
-from . import bi
-from . import bo
-from . import scaler
+from . import ai, ao, bi, bo
+from . import scaler, struck, mca
 
 ai = ai.ai
 ao = ao.ao
 bi = bi.bi
 bo = bo.bo
 Scaler = scaler.Scaler
+Struck = struck.Struck
+Mca    = mca.Mca
+
 
