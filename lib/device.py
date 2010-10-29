@@ -12,8 +12,6 @@ class Device(object):
     """A simple collection of related PVs, sharing a common prefix
     string for their names, but having many 'attributes'.
 
-    
-
     Many groups of PVs will have names made up of
          Prefix+Delimeter+Attribute
     with common Prefix and Delimeter, but a range of Attribute names.
@@ -83,17 +81,25 @@ class Device(object):
     _prefix = None
     _delim = ''
     _pvs = {}
-    _fields = ('_prefix', '_pvs', '_delim')
-    def __init__(self, prefix=None, attrs=None, delim='',
-                 timeout=None):
+    _init = False
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_init')
+    def __init__(self, prefix=None, attrs=None,
+                 nonpvs=None, delim='', timeout=None):
+        self._nonpvs = list(self._nonpvs)[:]
         self._delim = delim
         self._prefix = prefix + delim
         self._pvs = {}
+        if nonpvs is not None:
+            for npv in nonpvs:
+                if npv not in self._nonpvs:
+                    self._nonpvs.append(npv)
+                
         if attrs is not None:
             for attr in attrs:
                 self.PV(attr, connect=False,
                         connection_timeout=timeout)
         ca.poll()
+        self._init = True
         
     def PV(self, attr, connect=True, **kw):
         """return epics.PV for a device attribute"""
@@ -161,32 +167,36 @@ class Device(object):
         """remove a callback function to an attribute PV"""
         self.PV(attr).remove_callback(index=index)
         
+            
     def __getattr__(self, attr):
         if attr in self._pvs:
             return self.get(attr)
+        elif attr == '_Device__init':
+            return False
         elif attr in self.__dict__:
             return self.__dict__[attr]
-        elif not attr.startswith('__'):
+        elif self._init and not attr.startswith('__'):
             try:
                 self.PV(attr)
                 return self.get(attr)
             except:
                 msg = "Device '%s' has no attribute '%s'"
                 raise AttributeError(msg % (self._prefix, attr))
- 
+    
     def __setattr__(self, attr, val):
-        if attr in self._fields:
+        if attr in self._nonpvs:
             self.__dict__[attr] = val
         elif attr in self._pvs:
             self.put(attr, val)
-        else:
+        elif self.__init:
             try:
                 self.PV(attr)
                 return self.put(attr, val)
             except:
                 msg = "Device '%s' has no attribute '%s'"
                 raise AttributeError(msg % (self._prefix, attr))
-
+        else:
+            self.__dict__[attr] = val            
     def __repr__(self):
         "string representation"
         return "<Device '%s' %i attributes>" % (self._prefix,

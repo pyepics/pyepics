@@ -96,16 +96,22 @@ class PV(object):
     def _write(self, msg):
         "write message"
         stdout.write("%s\n" % msg)
-    
+        stdout.flush()
+        
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
         # occassionally chid is still None (threading issue???)
         # just return here, and connection will happen later
         if self.chid is None and chid is None:
+            time.sleep(0.001)
             return
         if conn:
             self.poll()
-            count = ca.element_count(self.chid)
+            try:
+                count = ca.element_count(self.chid)
+            except ca.ChannelAccessException:
+                time.sleep(0.025)
+                count = ca.element_count(self.chid)                
             self._args['count']  = count
             self._args['host']   = ca.host_name(self.chid)
             self._args['access'] = ca.access(self.chid)
@@ -129,6 +135,9 @@ class PV(object):
 
         if hasattr(self.connection_callback, '__call__'):
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
+        elif not conn:
+            self._write("PV '%s' disconnected." % pvname)
+
         # waiting until the very end until to set self.connected prevents
         # threads from thinking a connection is complete when it is actually
         # still in progress.

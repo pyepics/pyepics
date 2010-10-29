@@ -411,9 +411,13 @@ def _onConnectionEvent(args):
     ctx = current_context()
     pvname = name(args.chid)
     global _cache
+    if ctx is None and len(_cache.keys()) > 0:
+        ctx = _cache.keys()[0]
     if ctx not in _cache:
+        # print 'creating empty context ctx=', ctx
         _cache[ctx] = {}
     if pvname not in _cache[ctx]:
+        # print 'adding pvname to ctx ', pvname, ctx 
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
                                'ts':0, 'failures':0, 
                                'callback': None}
@@ -424,17 +428,13 @@ def _onConnectionEvent(args):
     entry['chid'] = args.chid
     entry['ts']   = time.time()
     entry['failures'] = 0
+
     if 'callback' in entry and hasattr(entry['callback'], '__call__'):
-        try:
-            poll(evt=1.e-3, iot=10.0)
-            entry['callback'](pvname=pvname,
-                             chid=entry['chid'],
-                             conn=entry['conn'])
-        except ChannelAccessException:
-            pass
-        except:
-            errmsg = 'Error Calling User Connection Callback for "%s"'  % pvname
-            raise ChannelAccessException('Connect', errmsg)
+        poll(evt=1.e-3, iot=10.0)
+        entry['callback'](pvname=pvname,
+                          chid=entry['chid'],
+                          conn=entry['conn'])
+
     return 
 
 ## put event handler:

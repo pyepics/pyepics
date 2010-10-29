@@ -9,14 +9,16 @@ class Struck(epics.Device):
     
     """
     attrs = ('ChannelAdvance', 'Prescale', 'EraseStart', 'StopAll',
-             'PresetReal', 'Dwell')
+             'PresetReal', 'Dwell', 'Acquiring')
 
     _fields = ('_prefix', '_pvs', '_delim', '_nchan', 'scaler')
     
     def __init__(self, prefix, scaler=None, nchan=8):
+        if not prefix.endswith(':'):
+            prefix = "%s:" % prefix            
         self._nchan = nchan
         self.scaler = None
-        epics.Device.__init__(self, prefix, delim=':',
+        epics.Device.__init__(self, prefix, delim='',
                               attrs=self.attrs)
         if scaler is not None:
             self.scaler = epics.devices.Scaler(scaler, nchan=nchan)
@@ -73,7 +75,8 @@ class Struck(epics.Device):
         names = []
         addrs = []
         if mcas is None:
-            mcas = list(range(1, self.nchan+1))
+            mcas = list(range(1, self._nchan+1))
+
         for nmca in mcas:
             if self.scaler is not None:
                 scaler_name = self.scaler.get('NM%i' % nmca)
@@ -83,7 +86,7 @@ class Struck(epics.Device):
                         continue
                     sdata.append(self.readmca(nmca=nmca))
                     names.append(scaler_name.replace(' ', '_'))
-                    addrs.append(self.scaler.prefix + 'S%i' % nmca)
+                    addrs.append(self.scaler._prefix + 'S%i' % nmca)
 
             else:
                 sdata.append(self.readmca(nmca=nmca))
@@ -96,13 +99,12 @@ class Struck(epics.Device):
             npts = nelem
         npts = min(nelem, npts)
         fout = open(fname, 'w')
-        fout.write('# Struck MCA data: %s \n' % self.prefix)
+        fout.write('# Struck MCA data: %s \n' % self._prefix)
         fout.write('# Nchannels, Nmca = %i, %i\n' % (npts, nmca))
         fout.write('#----------------------\n')
         fout.write('# %s\n' % (' | '.join(addrs)))
         fout.write('# %s\n' % (' | '.join(names)))
         fmt   =  '%9i ' * nmca + '\n'
-        
         [fout.write(fmt % tuple(sdata[i])) for i in range(npts)]
         fout.close()
     
