@@ -1,0 +1,10 @@
+wget ftp://164.54.160.180/Config/StageDataBase.txt  --user=Administrator --password=Administrator
+wget ftp://164.54.160.180/Config/stages.ini  --user=Administrator --password=Administrator
+wget ftp://164.54.160.180/Config/system.ini  --user=Administrator --password=Administrator
+wget ftp://164.54.160.180/Config/system.ref  --user=Administrator --password=Administrator
+wget ftp://164.54.160.180/Public/Drivers/Python/XPS_C8_drivers.py --user=Administrator --password=Administrator
+wget ftp://164.54.160.180/Public/Scripts/TestVersion.tcl --user=Administrator --password=Administrator
+wget ftp://164.54.160.180/Public/Scripts/History.tcl --user=Administrator --password=Administrator
+wget ftp://164.54.160.180/Firmware/TCL_API_drivers.out --user=Administrator --password=Administrator
+
+

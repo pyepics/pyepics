@@ -1,0 +1,16 @@
+[GENERAL]
+FirmwareName = MainController
+ExternalModuleNames = TCL_API_drivers.out, WatchDog_PEAK715.out, RCModule.out
+CorrectorISRPeriod = 100e-6		; seconds
+IRQDelay = 6e-6     			; seconds
+DACUpdateDelay = 90e-6		; seconds
+ProfileGeneratorISRRatio = 4
+ServitudesISRRatio = 10
+GatheringBufferSize = 1000000
+DelayBeforeStartup = 0			; seconds
+
+[AUTOTUNING]
+VelocityAutoTuningParameters = 20, 10, 15, 0.5, 0.5
+VoltageAutoTuningParameters = 15, 10, 15, 0.5, 0.5
+AccelerationAutoTuningParameters = 10, 10, 15, 0.5, 0.5, 50, 1000, 750
+AccelerationAutoScalingParameters = 10, 15, 5, 5

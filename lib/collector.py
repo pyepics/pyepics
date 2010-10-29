@@ -7,7 +7,7 @@ from threading import Thread
 
 from util import debugtime, new_filename, nativepath, winpath
 
-from struck import Struck
+from epics.devices  import Struck
 from xmap_mca  import QuadVortex
 from xps_trajectory import XPSTrajectory
 from mapper import mapper

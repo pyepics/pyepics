@@ -1,0 +1,22 @@
+#!/usr/bin/python 
+import ftplib
+from cStringIO import StringIO
+
+host = '164.54.160.180'
+user = 'Administrator'
+passwd = 'Administrator'
+
+f = open('system.ini','r')
+data = f.read()
+f.close()
+
+ftpconn = ftplib.FTP()
+        
+ftpconn.connect(host)
+ftpconn.login(user, passwd)
+
+ftpconn.cwd('Config')
+ftpconn.storbinary('STOR system.ini', StringIO(data))
+
+ftpconn.close()
+

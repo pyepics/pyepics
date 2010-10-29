@@ -1,57 +1,72 @@
 #!/usr/bin/python 
-import epics
+import sys
 import time
-from util import debugtime
+import epics
+import numpy
 import ordereddict
 import debugtime
-
-import sys
-def pend(t=0.05):
-    epics.ca.poll()
-    time.sleep(t)
     
+#     _attrs =('PreampGain','MaxEnergy','ADCPercentRule','BaselineCutPercent',
+#              'BaselineThreshold','BaselineFilterLength','BaselineCutEnable',
+#              'CurrentPixel', 'InputCountRate', 'OutputCountRate', 
+#              'GapTime','PeakingTime','EnergyThreshold','MaxWidth',
+#              'PresetMode', 'PresetTriggers', 'PresetEvents',
+#              'Triggers', 'Events', 'TriggerPeakingTime',
+#              'TriggerGapTime','TriggerThreshold')
+# 
+
 class DXP(epics.Device):
     _attrs =('PreampGain','MaxEnergy','ADCPercentRule','BaselineCutPercent',
              'BaselineThreshold','BaselineFilterLength','BaselineCutEnable',
-             'CurrentPixel', 
+             'InputCountRate', 'OutputCountRate', 
              'GapTime','PeakingTime','EnergyThreshold','MaxWidth',
-             'TriggerPeakingTime','TriggerGapTime','TriggerThreshold')
+             'PresetMode', 
+             'TriggerPeakingTime',
+             'TriggerGapTime','TriggerThreshold')
 
     def __init__(self,prefix,mca=1):
-        self.prefix = "%sdxp%i:" % (prefix,mca)
-        # attrs = [ ':%s' % (i) for i in self._attrs]
-        epics.Device.__init__(self, self.prefix, self._attrs)
-        pend()
+        self._prefix = "%sdxp%i" % (prefix, mca)
+        self._maxrois = 16
+
+        epics.Device.__init__(self, self._prefix, delim=':')
+        epics.poll()
             
-class MCA(epics.Device):
-    calib_attrs =('.CALO','.CALS','.CALQ')
-    def __init__(self,prefix,mca=1):
-        self.prefix = "%smca%i" % (prefix,mca)
-        self.maxrois = 16
-        attrs = list(self.calib_attrs)
-        for i in range(self.maxrois):
-            attrs.extend(['.R%iNM' %i,'.R%iLO'%i,'.R%iHI'%i])
+class MCA(epics.Device):  
+    _attrs =('CALO','CALS','CALQ','TTH', 'EGU', 'VAL',
+             'PRTM', 'PLTM', 'ACT', 'RTIM', 'STIM',
+             'ACQG', 'NUSE','PCT', 'PTCL', 
+             'DWEL', 'CHAS', 'PSCL', 'SEQ',
+             'ERTM', 'ELTM', 'IDTIM')
 
-        epics.Device.__init__(self,self.prefix,attrs)
-        pend()
+    def __init__(self,prefix,mca=1):
+        self._prefix = "%smca%i" % (prefix, mca)
+        self._maxrois = 16
+        attrs = list(self._attrs)
+        for i in range(self._maxrois):
+            attrs.extend(['R%i'%i, 'R%iN' %i, 'R%iNM' %i,
+                          'R%iLO'%i,'R%iHI'%i, 'R%iBG'%i])
+
+        epics.Device.__init__(self,self._prefix, delim='.',
+                              attrs= attrs)
+        epics.poll()
         
     def getrois(self):
         rois = ordereddict.OrderedDict()        
-        for i in range(self.maxrois):
-            name = self.get('.R%iNM'%i)
+        for i in range(self._maxrois):
+            name = self.get('R%iNM'%i)
             if name is not None and len(name.strip()) > 0:
-                rois[name] = (self.get('.R%iLO'%i),self.get('.R%iHI'%i))
-        self.rois = rois
+                rois[name] = (self.get('R%iLO'%i),self.get('R%iHI'%i))
         return rois
 
     def get_calib(self):
-        return [self.get(i) for i in self.calib_attrs]
+        return [self.get(i) for i in ('CALO','CALS','CALQ')]
 
-class QuadVortex(epics.Device):
+class MultiXMAP(epics.Device):
     """ 
-    4-Channel XMAP DXP device
+    multi-Channel XMAP DXP device
     """
     attrs = ('PresetReal','Dwell','EraseStart','StopAll',
+             # 'PresetMode',
              'NextPixel', 'PixelsPerRun',
              'CollectMode', 'SyncCount', 'BufferSize_RBV')
 
@@ -60,21 +75,20 @@ class QuadVortex(epics.Device):
                  'Capture',  'NumCapture', 'WriteFile_RBV',
                  'FileTemplate_RBV', 'FileName_RBV', 'AutoIncrement')    
     
+    # _fields = ('_pvs', '_prefix', '_delim',
+    #           'nmca', 'mcas', 'dxps', 'filesaver')
+    
     def __init__(self,prefix,filesaver='netCDF1:',nmca=4):
-
-
         attrs = list(self.attrs)
         attrs.extend(['%s%s' % (filesaver,p) for p in self.pathattrs])
 
-        epics.Device.__init__(self,prefix, attrs=attrs)
         self.filesaver = filesaver
-        self.prefix = prefix
+        self._prefix = prefix
         self.nmca   = nmca
 
-        # print ' Quadvortex init: ', nmca, prefix
-        
         self.dxps   = [DXP(prefix,i+1) for i in range(nmca)]
         self.mcas   = [MCA(prefix,i+1) for i in range(nmca)]
+        epics.Device.__init__(self, prefix, attrs=attrs, delim='')
 
     def get_calib(self):
         return [m.get_calib() for m in self.mcas]
@@ -89,36 +103,32 @@ class QuadVortex(epics.Device):
         d.add('got rois')
         # print 'Write Current Config'
         buff = []
-        def add(s): buff.append(s)
+        def add(s):
+            buff.append(s)
         
         add('#QuadVortex Settings saved: %s' % time.ctime())
         add('[general]')
-        add('prefix= %s' % self.prefix)
+        add('prefix= %s' % self._prefix)
         add('nmcas = %i' % self.nmca)
         add('filesaver= %s' % self.filesaver)
-        d.add('1')
-        add('[roi]')        
+        d.add('starting roi....')
+        add('[roi]')
         for i, k in enumerate(roidata[0].keys()):
             s = [list(roidata[m][k]) for m in range(self.nmca)]
             rd = repr(s).replace('],', '').replace('[', '').replace(']','').replace(',','')
             add("ROI%2.2i = %s | %s" % (i,k,rd))
-        d.add('2')
-
-        cal = [[],[],[]]
-        for i,dat in enumerate(self.get_calib()):
-            off,slope,quad = dat
-            cal[0].append(off)
-            cal[1].append(slope)
-            cal[2].append(quad)
+        d.add('wrote rois')
+        caldat = numpy.array(self.get_calib())
         add('[calibration]')
-        add("OFFSET = %.7g  %.7g %.7g %.7g" % tuple(cal[0]))
-        add("SLOPE  = %.7g  %.7g %.7g %.7g" % tuple(cal[1]))
-        add("QUAD   = %.7g  %.7g %.7g %.7g" % tuple(cal[2]))
-        d.add('3')
-        add('[dxp]\n')
+        add("OFFSET = %s " % (' '.join(["%.7g" % i for i in caldat[:, 0]])))
+        add("SLOPE  = %s " % (' '.join(["%.7g" % i for i in caldat[:, 1]])))
+        add("QUAD   = %s " % (' '.join(["%.7g" % i for i in caldat[:, 2]])))
+        d.add('wrote calib')
+        add('[dxp]')
         dxp_attrs = self.dxps[0]._attrs
+        print len(dxp_attrs), len(self.dxps)
         for  a in dxp_attrs:
-            vals =[dxp.get(a, as_string=True) for dxp in self.dxps]
+            vals = [str(dxp.get(a, as_string=True)) for dxp in self.dxps]
             add("%s = %s" % (a, ' '.join(vals)))
         d.add('wrote dxp params')
         buff = '\n'.join(buff)
@@ -127,32 +137,20 @@ class QuadVortex(epics.Device):
             fh.write(buff)
             fh.close()
         d.add('wrote file')
-        # d.show()
+        d.show()
         return buff
 
     def GetAcquire(self,**kw):
         return self.get('Acquiring',**kw)
-
-    def PresetMode(self,mode=0):
-        return self.put('PresetMode',mode)
-
-    def PresetReal(self,val):
-        "Set Preset Real Tiem"
-        return self.put('PresetReal',val)
-
-    def Dwell(self,val):
-        "Set Dwell Time"
-        return self.put('Dwell',val)    
 
     def start(self):
         "Start Struck"
         ret = self.put('EraseStart',1)
         
         if self.GetAcquire() == 0:
-            pend()
-            ret = self.put('EraseStart',1)
-        return ret
-        
+            epics.poll()
+            self.EraseStart = 1
+        return self.EraseStart
 
     def stop(self):
         "Stop Struck Collection"
@@ -176,23 +174,20 @@ class QuadVortex(epics.Device):
         "Read a Struck MCA"
         return self.get('mca%i' % n)
 
-    def CollectMode(self,mode=0):
-        return self.put('CollectMode',mode)
-
     def SCAMode(self):
         "put XMAP in SCA mapping mode"
-        return self.CollectMode(2)    
+        self.CollectMode = 2    
 
     def SpectraMode(self):
         "put XMAP in MCA spectra mode"
-        self.CollectMode(0)
-        self.PresetMode(0)
+        self.CollectMode = 0
+        self.PresetMode = 0
         # wait until BufferSize is ready
         buffsize = -1
         t0 = time.time()
         while time.time() - t0 < 3:
-            self.CollectMode(0)
-            pend()
+            self.CollectMode = 0
+            epics.poll()
             buffsize = self.get('BufferSize_RBV')
             if buffsize < 16384:
                 break
@@ -206,12 +201,12 @@ class QuadVortex(epics.Device):
 
         print 'Putting XMAP/QuadVortex into MCA mode'
         self.stop()
-        pend()
-        self.CollectMode(1)
-        self.PresetMode(0)
-        self.put('PixelsPerRun', npulses)
-        self.put('SyncCount', 1)
-        pend()
+        epics.poll()
+        self.CollectMode = 1
+        self.PresetMode = 0
+        self.PixelsPerRun =  npulses
+        self.SyncCount =  1
+        epics.poll()
         debug.add(' >> xmap MCAmode: Mode Set: ')
         self.setFileNumber(filenumber)
         if filename is not None:
@@ -226,7 +221,7 @@ class QuadVortex(epics.Device):
         t0 = time.time()
         while time.time() - t0 < 10:
             time.sleep(0.25)
-            pend()
+            epics.poll()
             buffsize = self.get('BufferSize_RBV')
             if buffsize > 16384:
                 break
@@ -242,7 +237,7 @@ class QuadVortex(epics.Device):
         f_buffsize = -1
         t0 = time.time()
         while time.time()- t0 < 3:
-            pend()
+            epics.poll()
             f_buffsize = self.fileGet('ArraySize0_RBV')
             if buffsize == f_buffsize:
                 break            
@@ -255,7 +250,7 @@ class QuadVortex(epics.Device):
         return
 
     def filePut(self,attr,value, **kw):
-        return self.put("%s%s" % (self.filesaver,attr),value, **kw)
+        return self.put("%s%s" % (self.filesaver, attr),value, **kw)
 
     def fileGet(self,attr, **kw):
         return self.get("%s%s" % (self.filesaver,attr),**kw)
@@ -307,10 +302,29 @@ class QuadVortex(epics.Device):
         return self.getFileTemplate() % (self.getFilePath(), self.getFileName(), index)
     
 if __name__ == '__main__':
-    q = QuadVortex('13SDD1:')
-    q.Write_CurrentConfig(filename='QuadVortex.conf')
-    time.sleep(0.5)
-    print 'now do it again:'
-    t0 = time.time()
-    q.Write_CurrentConfig(filename='QuadVortex2.conf')    
-    print time.time()-t0
+
+    qv = MultiXMAP('13SDD1:', nmca=4)
+
+    qv.Write_CurrentConfig(filename='QuadVortex.conf')
+# # print 'Config written.'
+#     
+#     for k, v in q._pvs.items():
+#         print k, v.get()    
+# 
+#     print q.mcas
+# 
+#     t0 = time.time()
+#     print q.nmca
+#     print len(q._pvs) 
+#         
+#     m = MCA('13SDD1:', mca=1)
+#     print 'MCA: ', len(m._pvs), len(m._pvs)*12 
+#     d = DXP('13SDD1:', mca=1)
+#     print 'DXP: ', len(d._pvs), len(d._pvs)*12 
+    
+#     q.Write_CurrentConfig(filename='QuadVortex.conf')
+#     time.sleep(0.5)
+#     print 'now do it again:'
+#     t0 = time.time()
+#     q.Write_CurrentConfig(filename='QuadVortex2.conf')    
+#     print time.time()-t0
