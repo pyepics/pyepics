@@ -1,4 +1,4 @@
-2010-01-21  Matt Newville  <newville@cars.uchicago.edu>
+2010-10-21  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.10:
 
@@ -24,7 +24,7 @@
 
 	- better coverage and testing
 
-2010-01-02  Matt Newville  <newville@cars.uchicago.edu>
+2010-10-02  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.9:
  	- many fixes to ca.py to avoid errors on 64-bit linux (no other 
