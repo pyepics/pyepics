@@ -62,16 +62,16 @@ Line = %f, %f
         self.trajectories = {}
 
         self.ftpconn = ftplib.FTP()
-        # self.ftp_connect()
     
-        for i in range(64):
-            self.xps.EventExtendedRemove(self.ssid,i)
-
         self.nlines_out = 0
 
         self.xps.GroupMotionDisable(self.ssid, self.group_name)
-        time.sleep(0.25)
+        time.sleep(0.1)
         self.xps.GroupMotionEnable(self.ssid, self.group_name)
+
+        for i in range(64):
+            self.xps.EventExtendedRemove(self.ssid,i)
+
         
     def ftp_connect(self):
         self.ftpconn.connect(self.host)
@@ -84,18 +84,10 @@ Line = %f, %f
         self.FTP_connected=False
 
     def upload_trajectoryFile(self,fname, data):
-        #if not self.FTP_connected:    
         self.ftp_connect()
         self.ftpconn.cwd(config.traj_folder)
         self.ftpconn.storbinary('STOR %s' %fname, StringIO(data))
         self.ftp_disconnect()
-        # n = 0 
-        #while n < 16:
-        #    n += 1
-        #    try:
-        #        self.ftpconn.cwd('..')
-        #    except ftplib.all_errors:
-        #        break
  
     def DefineTrajectory(self,name='Traj', **kw):
         traj_file = '%s.trj' % name
@@ -113,17 +105,14 @@ Line = %f, %f
 
         if tdata['ystart'] is not None:            
             yrange = tdata['ystop'] - tdata['ystart']
-
         self.upload_trajectoryFile(traj_file, self.traj_text % (xrange, yrange))
-
 
     def abortScan(self):
         pass
     
     def RunTrajectory(self,name='Traj', verbose=False, save=True, outfile='Gather.dat', debug=False):
-        traj = self.trajectories.get(name,None)
-   
 
+        traj = self.trajectories.get(name,None)
         if traj is None:
             print 'Cannot find trajectory named %s' %  name
             return
@@ -136,9 +125,9 @@ Line = %f, %f
         ystop  = traj['ystop']
         ystep  = traj['ystep']
 
+        ret = xps.GatheringReset(socketID)
         ret = self.xps.XYLineArcVerification(self.ssid, self.group_name, traj_file)
         if debug: print 'XYLineArcVerification:: ', ret
-
 
         if xstep != 0 and xstart is not None:
             npulses = 1  + int( (abs(xstop-xstart) + abs(xstep)/10.0) / abs(xstep))
@@ -163,7 +152,9 @@ Line = %f, %f
         if debug: print 'GatherConfSet: ', o
 
         buffer = ('Always', 'FINE.XYLineArc.TrajectoryPulse',)
-        o = self.xps.EventExtendedConfigurationTriggerSet(self.ssid, buffer,('0','0'), ('',''),('',''),('',''))
+        o = self.xps.EventExtendedConfigurationTriggerSet(self.ssid, buffer,
+                                                          ('0','0'), ('0','0'),
+                                                          ('0','0'), ('0','0'))
         
         if debug: print 'EventExtendedConf TriggerSet: ', o
         o = self.xps.EventExtendedConfigurationActionSet(self.ssid,  ('GatheringOneData',), 
@@ -227,6 +218,29 @@ Line = %f, %f
         
         return nlines
 
+
+def read_long_gather():
+    """ from playing with long trajectories"""
+    
+    ret,  buff = xps.GatheringDataMultipleLinesGet(socketID, 0, npulses_out)
+    if ret < 0:
+        Nchunks = 2
+        nx    = int( (npulses_out-5) / Nchunks)
+        ret = 1
+        while True:
+            ret, xbuff = xps.GatheringDataMultipleLinesGet(socketID, 0, nx)
+            if ret == 0:
+                break
+            Nchunks = Nchunks + 1
+            nx      = int( (npulses_out-5) / Nchunks)            
+        buff = [xbuff]
+        print ' need to read in %i chunks! ' % Nchunks
+        for i in range(1, Nchunks):
+            ret, xbuff = xps.GatheringDataMultipleLinesGet(socketID, i*nx, nx)
+            buff.append(xbuff)
+        ret, xbuff = xps.GatheringDataMultipleLinesGet(socketID, Nchunks*nx, npulses_out-Nchunks*nx)
+        buff.append(xbuff)
+        buff = '# break \n'.join(buff)
 if __name__ == '__main__':
     print 'test:'
     xps = XPSTrajectory()
