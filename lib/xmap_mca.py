@@ -95,35 +95,40 @@ class MultiXMAP(epics.Device):
 
     def get_rois(self):
         return [m.getrois() for m in self.mcas]    
+        
+    def roi_calib_info(self):
+        buff = ['[roi]']
 
+        roidat = self.get_rois()
+        caldat = numpy.array(self.get_calib())
+
+        for i, k in enumerate(roidat[0].keys()):
+            s = [list(roidata[m][k]) for m in range(self.nmca)]
+            rd = repr(s).replace('],', '').replace('[', '').replace(']','').replace(',','')
+            buff.append("ROI%2.2i = %s | %s" % (i,k,rd))
+        buff.append('[calibration]')
+        buff.append("OFFSET = %s " % (' '.join(["%.7g" % i for i in caldat[:, 0]])))
+        buff.append("SLOPE  = %s " % (' '.join(["%.7g" % i for i in caldat[:, 1]])))
+        buff.append("QUAD   = %s " % (' '.join(["%.7g" % i for i in caldat[:, 2]])))
+        return buff
+    
     def Write_CurrentConfig(self, filename=None):
         d = debugtime.debugtime()
 
-        roidata = self.get_rois()
-        d.add('got rois')
         # print 'Write Current Config'
         buff = []
         def add(s):
             buff.append(s)
         
-        add('#QuadVortex Settings saved: %s' % time.ctime())
+        add('#Multi-Element xMAP Settings saved: %s' % time.ctime())
         add('[general]')
         add('prefix= %s' % self._prefix)
         add('nmcas = %i' % self.nmca)
         add('filesaver= %s' % self.filesaver)
         d.add('starting roi....')
-        add('[roi]')
-        for i, k in enumerate(roidata[0].keys()):
-            s = [list(roidata[m][k]) for m in range(self.nmca)]
-            rd = repr(s).replace('],', '').replace('[', '').replace(']','').replace(',','')
-            add("ROI%2.2i = %s | %s" % (i,k,rd))
-        d.add('wrote rois')
-        caldat = numpy.array(self.get_calib())
-        add('[calibration]')
-        add("OFFSET = %s " % (' '.join(["%.7g" % i for i in caldat[:, 0]])))
-        add("SLOPE  = %s " % (' '.join(["%.7g" % i for i in caldat[:, 1]])))
-        add("QUAD   = %s " % (' '.join(["%.7g" % i for i in caldat[:, 2]])))
-        d.add('wrote calib')
+        add.extend( self.roi_calib_info() )
+
+        d.add('wrote roi / calib')
         add('[dxp]')
         dxp_attrs = self.dxps[0]._attrs
         print len(dxp_attrs), len(self.dxps)
@@ -199,7 +204,7 @@ class MultiXMAP(epics.Device):
         "put XMAP in MCA mapping mode"
         debug = debugtime.debugtime()
 
-        print 'Putting XMAP/QuadVortex into MCA mode'
+        print 'Putting xMAP MED into MCA mode'
         self.stop()
         epics.poll()
         self.CollectMode = 1

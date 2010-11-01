@@ -8,12 +8,11 @@ from threading import Thread
 from util import debugtime, new_filename, nativepath, winpath
 
 from epics.devices  import Struck
-from xmap_mca  import QuadVortex
+from xmap_mca  import MultiXMAP
 from xps_trajectory import XPSTrajectory
 from mapper import mapper
 
 from configFile import FastMapConfig
-from mca_rois import Write_MED_header
 from mono_control import mono_control
 
 USE_XMAP = True
@@ -78,7 +77,7 @@ class TrajectoryScan(epics.Device):
             self.struck = Struck(struck, scaler=scaler)
             
         if USE_XMAP:
-            self.xmap = QuadVortex(xmappv,filesaver=fileplugin)
+            self.xmap = MultiXMAP(xmappv, filesaver=fileplugin)
             self.xmap.SpectraMode()
        
         self.positioners = {}
@@ -369,11 +368,13 @@ class TrajectoryScan(epics.Device):
             xmap_prefix = self.mapconf.get('general', 'xmap')
             fout    = os.path.join(self.workdir, 'ROI.dat')
             try:
-                Write_MED_header(prefix=xmap_prefix,nmca=4,filename=fout)
+                fh = open(fout, 'r')
+                fh.write('\n'.join(self.xmap.roi_calib_info()))
+                fh.close()
                 self.ROI_Written = True
                 self.dtime.add('ExecTraj: ROI done')
             except:
-                pass
+                self.dtime.add('ExecTraj: ROI saving failed!!')
         if not self.ENV_Written:
             fout    = os.path.join(self.workdir, 'Environ.dat')
             self.Write_EnvData(filename=fout)
@@ -407,7 +408,8 @@ class TrajectoryScan(epics.Device):
             self.struck.stop()
             self.struck.saveMCAdata(fname=strk_fname, npts=npts, ignore_prefix='_')
         # wait for saving of gathering file to complete
-        # saver_thread.join()            
+        # saver_thread.join()
+        
 
         rowinfo = self.make_rowinfo(xmap_fname, strk_fname, xps_fname, ypos=ypos)
         self.dtime.add('Write Row Data: done')
@@ -525,3 +527,4 @@ class TrajectoryScan(epics.Device):
 if __name__ == '__main__':
     t = TrajectoryScan(configfile='default.scn')
     t.mainloop()
+
