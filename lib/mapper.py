@@ -53,28 +53,41 @@ class mapper(epics.Device):
     def setInfo(self,msg):
         self.put('info',  msg)
         
-    def pv_property(attr, as_string=False,wait=False):
-        return property(lambda self:     self.get(attr,as_string=as_string),
-                        lambda self,val: self.put(attr,val,wait=wait),
+    def __Fget(self, attr):
+        return self.get(attr, as_string=True)
+
+    def __Fput(self, attr, val):
+        return self.put(attr, val)
+    
+    def pv_property(attr):
+        return property(lambda self:     self.__Fget(attr), 
+                        lambda self, val: self.__Fput(attr, val),
                         None, None)
 
-    basedir  = pv_property('basedir',  as_string=True)
-    workdir  = pv_property('workdir',  as_string=True)    
-    filename = pv_property('filename', as_string=True)
-    scanfile = pv_property('scanfile', as_string=True)    
-    info     = pv_property('info',     as_string=True)    
-    message  = pv_property('message',  as_string=True)    
-    
+    basedir  = pv_property('basedir')
+    workdir  = pv_property('workdir')
+    filename = pv_property('filename')
+    scanfile = pv_property('scanfile')
+    info     = pv_property('info')
+    message  = pv_property('message')
+     
 if __name__ == '__main__':
 
     m = mapper('13XRM:map:')
  
+    def as_string(carray):
+        return ''.join([chr(i) for i in carray if i>0])
     
     print m
     print m.basedir
-    print m.info
-    print m.TSTAMP
-    print 'unix ts: ', m.UNIXTS
+    print 'info= ', m.info
+    print 'p_info ', m.info
+
+    # print m.get('info', as_string=True)
+    # print 'info= ', m.info, m.get('info'), m.get('info', as_string=True), as_string(m.info)
+    
+    print 'msg = ', m.message # , m.get('message', as_string=True)
+    print 'unix ts: ', m.UNIXTS, '// ', m.TSTAMP
     
     print m.get('basedir', as_string=True)
 

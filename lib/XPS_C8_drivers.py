@@ -368,7 +368,7 @@ class XPS:
         return self.Send(socketId, command)
 
     # GatheringReset :  Empty the gathered data in memory to start new gathering from scratch
-    def GatheringReset (self, socketId):
+    def GatheringReset(self, socketId):
         return self.Send(socketId, 'GatheringReset()')
 
     # GatheringRun :  Start a new gathering
