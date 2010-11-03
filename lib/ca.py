@@ -19,6 +19,7 @@ import os
 import sys
 import time
 import atexit
+import copy
 
 HAS_NUMPY = False
 try:
@@ -723,7 +724,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
                 out = out[:out.index('\x00')]
             return out
         elif ntype == dbr.CHAR:
-            return data
+            return copy.copy(data)
         elif use_numpy:
             return numpy.array(data)
         return list(data)
@@ -739,7 +740,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         out = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
                                                   dbr.value_offset[ftype])
         if ntype == dbr.CHAR:
-            return out
+            return copy.copy(out)
         elif use_numpy:
             return numpy.array(out)
         return list(out)
@@ -795,10 +796,10 @@ def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
 
     val = _unpack(data, count=nelem, ftype=ftype, as_numpy=as_numpy)
     if as_string:
-        val = __as_string(val, chid, count, ftype)
+        val = _as_string(val, chid, count, ftype)
     return val
 
-def __as_string(val, chid, count, ftype):
+def _as_string(val, chid, count, ftype):
     "primitive conversion of value to a string"
     try:
         if (ftype in (dbr.CHAR, dbr.TIME_CHAR, dbr.CTRL_CHAR) and
