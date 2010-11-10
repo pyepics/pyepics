@@ -38,7 +38,7 @@ class config:
 class XPSTrajectory(object):
     """XPS trajectory....
     """
-    traj_text = """FirstTangent = 0
+    linetraj_text = """FirstTangent = 0
 DiscontinuityAngle = 0.01
 
 Line = %f, %f
@@ -66,7 +66,8 @@ Line = %f, %f
 
         self.xps = XPS()
         self.ssid = self.xps.TCP_ConnectToServer(self.host, config.port, config.timeout)
-        self.xps.Login(self.ssid, self.user, self.passwd)
+        ret = self.xps.Login(self.ssid, self.user, self.passwd)
+        print "XPS Login => ", ret
         self.trajectories = {}
 
         self.ftpconn = ftplib.FTP()
@@ -91,117 +92,158 @@ Line = %f, %f
         self.ftpconn.close()
         self.FTP_connected=False
 
-    def upload_trajectoryFile(self,fname, data):
+    def upload_trajectoryFile(self, fname,  data):
         self.ftp_connect()
         self.ftpconn.cwd(config.traj_folder)
+        print '================'
+        print 'Upload Traj ', fname
+        # print data
+        print '================'
         self.ftpconn.storbinary('STOR %s' %fname, StringIO(data))
         self.ftp_disconnect()
  
-    def DefineTrajectory(self,name='Traj', **kw):
+    def LineTrajectory(self,name='Traj', **kw):
         traj_file = '%s.trj' % name
         tdata = dict(xstart=None, xstop=0, xstep=0.0,
                      ystart=None, ystop=0, ystep=0.0,
-                     scantime=1.0, accel=1.0)
+                     scantime=1.0, accel=1.0, axis=None)
         tdata.update(kw)
         # could check if tdata in self.trajectories.... build up
         # store of used trajectories on the ftp server
         self.trajectories[name] = tdata
         
-        print 'DEFINE TRAJ ', tdata
         xrange = yrange = 0
         if tdata['xstart'] is not None:
             xrange = tdata['xstop'] - tdata['xstart']
+            tdata['axis'] = 'x'
 
         if tdata['ystart'] is not None:            
             yrange = tdata['ystop'] - tdata['ystart']
-        self.upload_trajectoryFile(traj_file, self.traj_text % (xrange, yrange))
+            tdata['axis'] = 'y'
+        self.upload_trajectoryFile(traj_file, self.linetraj_text % (xrange, yrange))
+
+    def DefineLineTrajectories(self, axis='x', start=0, stop=1,
+                               step=0.001, scantime=10.0):
+        """defines 'forward' and 'backward' trajectories for a line scan."""
+        fore_traj = dict(xstart=0, xstop=0, xstep=0.0,
+                         ystart=0, ystop=0, ystep=0.0,
+                         scantime=scantime, accel=1.0, axis=axis)
+
+        back_traj = dict(xstart=0, xstop=0, xstep=0.0,
+                         ystart=0, ystop=0, ystep=0.0,
+                         scantime=scantime, accel=1.0, axis=axis)
+
+        xrange = yrange = 0
+        if axis == 'y':
+            fore_traj.update({'ystart': start, 'ystop': stop,  'ystep': step})
+            back_traj.update({'ystart': stop,  'ystop': start, 'ystep': step})            
+            yrange = stop-start
+        else:
+            fore_traj.update({'xstart': start, 'xstop': stop,  'xstep': step})
+            back_traj.update({'xstart': stop,  'xstop': start, 'xstep': step})            
+            xrange = stop=start
+            
+        self.trajectories['foreward'] = fore_traj
+        self.trajectories['backward'] = back_traj
+
+        self.upload_trajectoryFile('foreward.trj', self.linetraj_text % (xrange, yrange))
+        self.upload_trajectoryFile('backward.trj', self.linetraj_text % (-xrange, -yrange))        
 
     def abortScan(self):
         pass
     
-    def Move_XY(self, xpos=0, ypos=0):
+    def Move_XY(self, xpos=None, ypos=None):
         "move XY positioner to supplied position"
-        print 'Move XY ', xpos, ypos
+        ret = self.xps.GroupPositionCurrentGet(self.ssid, 'FINE', 2)
+        if xpos is None:  xpos = ret[1]
+        if ypos is None:  ypos = ret[2]
         self.xps.GroupMoveAbsolute(self.ssid, 'FINE', (xpos, ypos))
 
-    def RunTrajectory(self,name='Traj', verbose=False, save=True,
-                      outfile='Gather.dat', debug=False):
 
+    def RunLineTrajectory(self,name='foreward', verbose=False, save=True,
+                          outfile='Gather.dat', debug=False):
         traj = self.trajectories.get(name,None)
         if traj is None:
             print 'Cannot find trajectory named %s' %  name
             return
 
         traj_file = '%s.trj'  % name
-        xstart = traj['xstart']
-        xstop  = traj['xstop']
-        xstep  = traj['xstep']
-        ystart = traj['ystart']
-        ystop  = traj['ystop']
-        ystep  = traj['ystep']
-
-        ret = self.xps.GatheringReset(self.ssid)
-
-        ret = self.xps.XYLineArcVerification(self.ssid, self.group_name, traj_file)
-        if debug: print 'XYLineArcVerification:: ', ret
-
-        if xstep != 0 and xstart is not None:
-            npulses = 1  + int( (abs(xstop-xstart) + abs(xstep)/10.0) / abs(xstep))
-            xrange = abs(xstop-xstart)
-            self.xps.XYLineArcPulseOutputSet(self.ssid, self.group_name,  0, xrange, xstep)
-            speed = abs(xstop-xstart)/traj['scantime']
-            if debug: 
-                print 'XPS set pulseOutput to ', xrange, xstart, xstop, xstep, npulses
-        elif ystep != 0 and ystart is not None:
-            npulses = 1 + abs(ystop-ystart + ystep/10.0)/ abs(ystep)
-            yrange = abs(ystop-ystart)            
-            self.xps.XYLineArcPulseOutputSet(self.ssid, self.group_name, 0, yrange, ystep)
-            speed = abs(ystop-ystart)/traj['scantime']            
+        axis   = traj['axis']
+        accel  = traj['accel']
+           
+        if axis == 'x':
+            srange = abs(traj['xstop'] - traj['xstart'])
+            sstep  = traj['xstep']
+        elif axis == 'y':
+            srange = abs(traj['ystop'] - traj['ystart'])
+            sstep  = traj['ystep']
         else:
             print "Cannot figure out number of pulses for trajectory"
             return -1
 
-        o = self.xps.GatheringReset(self.ssid)
-        if debug: print 'Gather reset: ', o
+        npulses = 1 + int( 0.05 + srange/abs(sstep) )
+        speed   = srange/traj['scantime']
 
-        o = self.xps.GatheringConfigurationSet(self.ssid, self.gather_outputs)
-        if debug: print 'GatherConfSet: ', o
+        self.xps.GatheringReset(self.ssid)
+        self.xps.GatheringConfigurationSet(self.ssid, self.gather_outputs)
+        
+        ret = self.xps.XYLineArcVerification(self.ssid, self.group_name, traj_file)
+        if debug: print 'XYLineArcVerification:: ', ret
+
+        self.xps.XYLineArcPulseOutputSet(self.ssid, self.group_name,  0, srange, sstep)
+
+
 
         buffer = ('Always', 'FINE.XYLineArc.TrajectoryPulse',)
         o = self.xps.EventExtendedConfigurationTriggerSet(self.ssid, buffer,
                                                           ('0','0'), ('0','0'),
                                                           ('0','0'), ('0','0'))
-        
-        if debug: print 'EventExtendedConf TriggerSet: ', o
+
         o = self.xps.EventExtendedConfigurationActionSet(self.ssid,  ('GatheringOneData',), 
                                                      ('',), ('',),('',),('',))
-        if debug: print 'EventExtendedConf ActionSet: ', o
+
         eventID, m = self.xps.EventExtendedStart(self.ssid)
-
-        if debug: print 'EventExtendedStart :  ', eventID, m
-        accel   = traj['accel']
-
-        print 'Execute',  traj_file, speed
+        # print 'Execute',  traj_file, speed
         ret = self.xps.XYLineArcExecution(self.ssid, self.group_name, traj_file, speed, accel, 1)
-
-        if debug: print 'XYLineArcExecution :  ', ret
         o = self.xps.EventExtendedRemove(self.ssid, eventID)
-
-        if debug: print 'EventExtendedRemove:  ', o
-
-        time.sleep(0.025)
         o = self.xps.GatheringStop(self.ssid)
-        if debug: print 'GatheringStop:  ', o
-        time.sleep(0.025)
-
-        ret, npulses, nx = self.xps.GatheringCurrentNumberGet(self.ssid)
-        if debug: print 'GatheringCurrentNumberGet ', ret, npulses, nx
-
-        if debug: print 'GatheringMultipleLintGet  ', ret, len(buff) , 'bytes.'
 
         if save:
-            self.SaveResults(outfile, verbose=verbose)
+            npulses = self.SaveResults(outfile, verbose=verbose)
         return npulses
+
+    def RunGenericTrajectory(self,name='foreward',
+                             pulse_range=1, pulse_step=0.01,
+                             speed = 1.0,                              
+                             verbose=False, save=True,
+                             outfile='Gather.dat', debug=False):
+        traj_file = '%s.trj'  % name
+
+
+        self.xps.GatheringReset(self.ssid)
+        self.xps.GatheringConfigurationSet(self.ssid, self.gather_outputs)
+
+        ret = self.xps.XYLineArcVerification(self.ssid, self.group_name, traj_file)
+        self.xps.XYLineArcPulseOutputSet(self.ssid, self.group_name,  0, pulse_range, pulse_step)
+
+        buffer = ('Always', 'FINE.XYLineArc.TrajectoryPulse',)
+        self.xps.EventExtendedConfigurationTriggerSet(self.ssid, buffer,
+                                                      ('0','0'), ('0','0'),
+                                                      ('0','0'), ('0','0'))
+        
+        self.xps.EventExtendedConfigurationActionSet(self.ssid,  ('GatheringOneData',), 
+                                                     ('',), ('',),('',),('',))
+
+        eventID, m = self.xps.EventExtendedStart(self.ssid)
+        print 'Execute',  traj_file, eventID, speed
+        ret = self.xps.XYLineArcExecution(self.ssid, self.group_name, traj_file, speed, 1, 1)
+        o = self.xps.EventExtendedRemove(self.ssid, eventID)
+        o = self.xps.GatheringStop(self.ssid)
+
+        if save:
+            npulses = self.SaveResults(outfile, verbose=verbose)
+        return npulses
+
 
     def SaveResults(self,  fname, verbose=False):
         """read gathering data from XPS
@@ -255,42 +297,21 @@ Line = %f, %f
         if verbose:
             print 'Wrote %i lines, %i bytes to %s' % (nlines, len(buff), fname)
         self.nlines_out = nlines
-        db.show()
-        return nlines
-
-def read_long_gather():
-    """ from playing with long trajectories"""
-    
-    ret,  buff = xps.GatheringDataMultipleLinesGet(socketID, 0, npulses_out)
-    if ret < 0:
-        Nchunks = 2
-        nx    = int( (npulses_out-5) / Nchunks)
-        ret = 1
-        while True:
-            ret, xbuff = xps.GatheringDataMultipleLinesGet(socketID, 0, nx)
-            if ret == 0:
-                break
-            Nchunks = Nchunks + 1
-            nx      = int( (npulses_out-5) / Nchunks)            
-        buff = [xbuff]
-        print ' need to read in %i chunks! ' % Nchunks
-        for i in range(1, Nchunks):
-            ret, xbuff = xps.GatheringDataMultipleLinesGet(socketID, i*nx, nx)
-            buff.append(xbuff)
-        ret, xbuff = xps.GatheringDataMultipleLinesGet(socketID, Nchunks*nx, npulses_out-Nchunks*nx)
-        buff.append(xbuff)
-        buff = '# break \n'.join(buff)
+        # db.show()
+        return npulses
 
 
 if __name__ == '__main__':
     print 'test:'
     xps = XPSTrajectory()
-    xps.DefineTrajectory(name='foreward', scantime=5,
-                         xstart=0, xstop=2.50, xstep=0.001)
-
-    xps.Move_XY(-1.00, 0.1)
+    xps.LineTrajectory(name='foreward', scantime=5,
+                       xstart=-2.0, xstop=2.0, xstep=0.001)
+# 
+    xps.DefineLineTrajectories(axis='x', start=-2., stop=2.0, scantime=5, step=0.02)
+    print xps.trajectories
+    xps.Move_XY(-1.600, 0.1)
     time.sleep(0.02)
-    xps.RunTrajectory(name='foreward', outfile='BigFileOut.txt')
+    # xps.RunTrajectory(name='foreward', outfile='BigFileOut.txt')
 
 # 
 #     for i in range(21):

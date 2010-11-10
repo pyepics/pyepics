@@ -344,12 +344,11 @@ class TrajectoryScan(epics.Device):
             self.xmap.start()
             self.xmap.FileCaptureOn()
 
-            while self.xmap.GetAcquire() != 1:
-                if time.time() - t0 > 5.0 : 
+            while self.xmap.Acquiring != 1:
+                time.sleep(0.05)
+                if time.time() - t0 > 10.0 : 
                     break
-                self.xmap.start()
-                self.xmap.FileCaptureOn()
-            self.dtime.add('exec: xmap armed? %s ' % (repr(1==self.xmap.GetAcquire())))
+            self.dtime.add('exec: xmap armed? %s ' % (repr(1==self.xmap.Acquiring)))
 
         if USE_STRUCK:
             self.struck.start()
