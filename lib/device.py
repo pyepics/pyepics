@@ -83,7 +83,7 @@ class Device(object):
     _pvs = {}
     _init = False
     _nonpvs = ('_prefix', '_pvs', '_delim', '_init')
-    def __init__(self, prefix=None, attrs=None,
+    def __init__(self, prefix='', attrs=None,
                  nonpvs=None, delim='', timeout=None):
         self._nonpvs = list(self._nonpvs)[:]
         self._delim = delim
@@ -93,7 +93,7 @@ class Device(object):
             for npv in nonpvs:
                 if npv not in self._nonpvs:
                     self._nonpvs.append(npv)
-                
+
         if attrs is not None:
             for attr in attrs:
                 self.PV(attr, connect=False,

@@ -226,7 +226,8 @@ class Motor(device.Device):
         'status':          'STAT'}
         
     _init_list   = ('VAL','DESC', 'RTYP', 'RBV', 'PREC', 'TWV', 'FOFF')
-
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_init', '_init_list', '_alias', '_extras')
+        
     def __init__(self, name=None, timeout=3.0):
         if name is None:
             raise MotorException("must supply motor name")
@@ -236,11 +237,11 @@ class Motor(device.Device):
         if name.endswith('.'):
             name = name[:-1]
 
-        self.name = name
+        self._prefix = name
         device.Device.__init__(self, name, delim='.', 
                                attrs=self._init_list)
 
-        # make sure this is really a motor!
+         # make sure this is really a motor!
         rectype = self.get('RTYP')
         if rectype != 'motor':
             raise MotorException("%s is not an Epics Motor" % name)
@@ -248,12 +249,12 @@ class Motor(device.Device):
         for key, val in self._extras.items():
             pvname = "%s%s" % (name, val)
             self.add_pv(pvname, attr=key)
-        
+
         # self.put('disabled', 0)
         self._callbacks = {}
 
     def __repr__(self):
-        return "<epics.Motor: %s: '%s'>" % (self.name,  self.DESC)
+        return "<epics.Motor: %s: '%s'>" % (self._prefix,  self.DESC)
 
     def __str__(self):
         return self.__repr__()
@@ -262,25 +263,24 @@ class Motor(device.Device):
         " internal method "
         if attr in self._alias:
             attr = self._alias[attr]
-        if attr in self._pvs:
+        elif attr in self._pvs:
             return self.get(attr)
         elif attr in self.__dict__:
             return self.__dict__[attr]
         else:
             try:
-                
                 self.PV(attr)
                 return self.get(attr)
             except:
                 raise MotorException("EpicsMotor has no attribute %s" % attr)
  
     def __setattr__(self, attr, val):
-        if attr in ('name', '_prefix', '_pvs', '_delim',
-                    '_alias', '_extra', '_callbacks'):
+        if attr in ('name', '_prefix', '_pvs', '_delim', '_init',
+                    '_alias', '_nonpvs', '_extra', '_callbacks'):
             self.__dict__[attr] = val
             return 
-        if attr in self.__alias:
-            attr = self.__alias[attr]
+        if attr in self._alias:
+            attr = self._alias[attr]
         if attr in self._pvs:
             return self.put(attr, val)
         elif attr in self.__dict__: 
@@ -536,7 +536,7 @@ class Motor(device.Device):
         """ show all motor attributes"""
         out = []
         add = out.append
-        add("# Motor %s" % (self.name))
+        add("# Motor %s" % (self._prefix))
         add("#  field               value                 PV name")
         add("#------------------------------------------------------------")
         self.refresh()
