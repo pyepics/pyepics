@@ -508,15 +508,26 @@ class Motor(device.Device):
         time.sleep(0.10)
         self.put('SPMG', save_val)
         
+            
+    def make_step_list(self, minstep=0.0, maxstep=None, decades=10):
+        """ create a reasonable list of motor steps, as for a dropdown menu
+        The list is based on motor range and precision"""
+
+        if maxstep is None:
+            maxstep = 0.6 * abs(self.HLM - self.LLM)
+        steplist = []
+        for i in range(decades):
+            for step in [j* 10**(i - self.PREC) for j in (1, 2, 5)]:
+                if (step <= maxstep and step > 0.98*minstep):
+                    steplist.append(step)
+        return steplist
         
     def get_info(self):
         "return information, current field values"
         out = {}
         for attr in ('DESC', 'VAL', 'RBV', 'PREC', 'VELO', 'STAT', 
                      'SET', 'TWV','LLM', 'HLM', 'SPMG'):
-
             out[attr] = self.get(attr, as_string=True)
-
         return out
     
     def show_info(self):
