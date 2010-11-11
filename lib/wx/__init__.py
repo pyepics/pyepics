@@ -7,7 +7,9 @@ of the widget  when the associated PV changes.
 from . import MotorPanel
 from . import wxlib
 
+MiniMotorPanel= MotorPanel.MiniMotorPanel
 MotorPanel    = MotorPanel.MotorPanel
+
 pvText        = wxlib.pvText
 pvAlarm       = wxlib.pvAlarm
 pvFloatCtrl   = wxlib.pvFloatCtrl
