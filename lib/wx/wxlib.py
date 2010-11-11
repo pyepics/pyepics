@@ -382,7 +382,7 @@ class pvCtrlMixin:
     def set_pv(self, pv=None):
         if isinstance(pv, epics.PV):
             self.pv = pv
-        elif isinstance(pv, (string, unicode)):
+        elif isinstance(pv, (str, unicode)):
             self.pv = epics.PV(pv)
             self.pv.connect()
         if self.pv is None:
@@ -567,7 +567,7 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
         # print 'FloatCtrl: SET PV ', pvname, type(pvname), isinstance(pvname, epics.PV)
         if isinstance(pv, epics.PV):
             self.pv = pv
-        elif isinstance(pv, (string, unicode)):
+        elif isinstance(pv, (str, unicode)):
             self.pv = epics.PV(pv)
         if self.pv is None:
             return
