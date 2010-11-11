@@ -15,7 +15,7 @@ from mapper import mapper
 from configFile import FastMapConfig
 from mono_control import mono_control
 
-USE_XMAP = False
+USE_XMAP = True
 USE_STRUCK = False
 USE_MONO_CONTROL = False
 
@@ -159,7 +159,7 @@ class TrajectoryScan(epics.Device):
         """ put all pieces (trajectory, struck, xmap) into
         the non-trajectory scan mode"""
         if USE_XMAP:
-            self.Wait_XMAPWrite(i=0)            
+            self.Wait_XMAPWrite(irow=0)
             self.xmap.SpectraMode()
         self.setIdle()
         self.dtime.add('postscan done')
@@ -182,9 +182,9 @@ class TrajectoryScan(epics.Device):
         self.dtime.add('restore_positions done')            
 
 
-    def Wait_XMAPWrite(self,i=0):
+    def Wait_XMAPWrite(self, irow=0):
         """wait for XMAP to finish writing its data"""
-        fnum = i
+        fnum = irow
         if USE_XMAP:
             # wait for previous netcdf file to be written
             t0 = time.time()
@@ -192,7 +192,7 @@ class TrajectoryScan(epics.Device):
             while not self.xmap.FileWriteComplete():
                 self.xmap.finish_pixels()
                 time.sleep(0.05)
-                if time.time()-t0 > 15:
+                if time.time()-t0 > 5:
                     self.mapper.message = 'XMAP File Writing Not Complete!'
                     # self.MasterFile.write('#WARN xmap write failed: row %i\n' % (irow-1))
                     break
@@ -201,7 +201,8 @@ class TrajectoryScan(epics.Device):
             prefix, suffix = os.path.splitext(xmap_fname)
             suffix = suffix.replace('.','')
             fnum = int(suffix)
-            print 'XMAP file %s  / row %i (%3f sec)' % (xmap_fname, i, time.time()-t0)
+            print 'Wrote XMAP file %s  / row %i fnum=%i (%3f sec)' % (xmap_fname, irow,
+                                                                      fnum, time.time()-t0)
             # print "xmap file ", xmap_fname, time.ctime(os.stat(xmap_fname).st_ctime)
         return fnum
 
@@ -282,8 +283,6 @@ class TrajectoryScan(epics.Device):
                 self.PV(pos2).put(start2 + (irow-1)*step2, wait=True)
             self.dtime.add('positioners ready %.5f' % p1_this)
 
-            ## self.Wait_XMAPWrite()
-
             kw['filenumber'] = irow
             kw['scan_pt']    = irow
             if self.state == 'abort':
@@ -304,22 +303,19 @@ class TrajectoryScan(epics.Device):
             if USE_MONO_CONTROL:
                 self.mono_control.CheckMonoPitch()
 
-            xmap_fnum = self.Wait_XMAPWrite(i = irow)
-            # print ' row  ', irow, xmap_fnum
+            # note:
+            #  First WriteRowData will write data from XPS and struck,
+            #  Then we wait for the XMAP to finish writing its data.
+            xps_lines, rowinfo = self.WriteRowData(scan_pt=irow,
+                                                   ypos=ypos, npts=npts1)
+            xmap_fnum = self.Wait_XMAPWrite(irow=irow)
+            print ' row  ', irow, xmap_fnum
             if irow > xmap_fnum:
-                print 'Missing XMAP File'
+                print 'Missing XMAP File!'
                 irow = irow - 1
             else:
-                # note: don't write xps/struck data if xmap file is missing!
-                gather_lines, rowinfo = self.WriteRowData(ypos=ypos, npts=npts1, **kw)
-
-                if gather_lines < npts1: 
-                    print 'Bad XPS data need to redo line?? ', gather_lines, npts1
-                    # self.MasterFile.write('#WARN bad xps data: row %i\n' % (irow))
-                    #irow = irow - 1
-                else:
-                    self.MasterFile.write(rowinfo)
-                    self.MasterFile.flush()
+                self.MasterFile.write(rowinfo)
+                self.MasterFile.flush()
 
             # print 'set mapper.nrow : ', irow
             self.mapper.setNrow(irow)
@@ -389,16 +385,16 @@ class TrajectoryScan(epics.Device):
         time.sleep(0.002)
 
 
-    def WriteRowData(self, filename='TestMap', scan_pt=1, ypos=0, npts=None, **kw):
+    def WriteRowData(self, filename='TestMap', scan_pt=1, ypos=0, npts=None):
         # NOTE:!!  should return here, write files separately.
         strk_fname = self.make_filename('struck', scan_pt)
         xmap_fname = self.make_filename('xmap', scan_pt)
         xps_fname  = self.make_filename('xps', scan_pt)
-        # saver_thread = Thread(target=self.xps.SaveResults, name='saver',
-        # args=(xps_fname,))
-        # saver_thread.start()
-
-        self.xps.SaveResults(xps_fname)
+        print "WriteRowData ", scan_pt, ypos, npts
+        saver_thread = Thread(target=self.xps.SaveResults, name='saver',
+                              args=(xps_fname,))
+        saver_thread.start()
+        # self.xps.SaveResults(xps_fname)
 
         if USE_XMAP:
             self.xmap.stop()
@@ -407,8 +403,9 @@ class TrajectoryScan(epics.Device):
         if USE_STRUCK:
             self.struck.stop()
             self.struck.saveMCAdata(fname=strk_fname, npts=npts, ignore_prefix='_')
+
         # wait for saving of gathering file to complete
-        # saver_thread.join()        
+        saver_thread.join()        
 
         rowinfo = self.make_rowinfo(xmap_fname, strk_fname, xps_fname, ypos=ypos)
         self.dtime.add('Write Row Data: done')
@@ -508,7 +505,7 @@ class TrajectoryScan(epics.Device):
                     self.mapper.AbortScan()
                     self.StartScan()
                 elif self.state  == 'abort':
-                    print 'state abort! '
+                    print 'state is abort'
                     self.mapper.ClearAbort()
                     self.state = 'idle'
                 elif self.state  == 'pending':
