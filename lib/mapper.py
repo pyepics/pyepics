@@ -28,11 +28,13 @@ class mapper(epics.Device):
 
     def AbortScan(self,filename=None):
         self.Abort = 1
+        self.status = 4
 
     def ClearAbort(self):
         self.Abort = 0
         time.sleep(.025)
         self.Start = 0
+        self.status = 0
         
     def setTime(self):
         "Set Time"
@@ -65,6 +67,7 @@ class mapper(epics.Device):
                         None, None)
 
     basedir  = pv_property('basedir')
+    status   = pv_property('status')    
     workdir  = pv_property('workdir')
     filename = pv_property('filename')
     scanfile = pv_property('scanfile')

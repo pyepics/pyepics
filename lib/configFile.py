@@ -5,7 +5,6 @@ from cStringIO import StringIO
 from ordereddict import OrderedDict
 import os
 import time
-import socket
 
 conf_sects = {'general': {},
               'xps':{'bools':('use_ftp',)},

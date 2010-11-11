@@ -55,6 +55,11 @@ def readROIFile(hfile):
     cp =  ConfigParser()
     cp.read(hfile)
     prefix, env, rois = None, [], []
+    try:
+        rois = cp.options('rois')
+    except:
+        return prefix, rois
+            
     for a in cp.options('rois'):
         if a.lower().startswith('roi_'):
             iroi = int(a[4:])

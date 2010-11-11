@@ -19,6 +19,18 @@ MAX_POINTS = 2048
 from EscanWriter import EscanWriter
 DataSaverEvent, EVT_SAVE_DATA = wx.lib.newevent.NewEvent()
 
+SAVE_ESCAN = False
+
+def Connect_Motors():
+    conf = FastMapConfig().config
+    pvs = {}
+    for pvname, label in conf['slow_positioners'].items():
+        pvs[label] = epics.PV(pvname)
+    for  pv in pvs.values():
+        x = pv.get()
+        pv.get_ctrlvars()
+    return pvs
+
 class SetupFrame(wx.Frame):
     def __init__(self, conf=None, **kwds):
         self.config = conf
@@ -60,8 +72,8 @@ class FastMapGUI(wx.Frame):
   """
     _scantypes = ('Line Scan', 'Map')
     _cnf_wildcard = "Scan Definition Files(*.cnf)|*.cnf|All files (*.*)|*.*"
-    
-    def __init__(self, configfile=None, **kwds):
+
+    def __init__(self, configfile=None, motorpvs=None,  **kwds):
 
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, None, -1, **kwds)
@@ -95,7 +107,8 @@ class FastMapGUI(wx.Frame):
         self.m2step.SetAction(self.onM2step)
 
         self.mapconf = None
-        self._pvs = {}
+        self._pvs = motorpvs
+        self.start_time = time.time() - 100.0
         self.configfile = configfile
         self.ReadConfigFile()
         
@@ -339,6 +352,9 @@ class FastMapGUI(wx.Frame):
         cnf = self.config
         dim = cnf['scan']['dimension'] = self.dimchoice.GetSelection() + 1
 
+        cnf['general']['basedir']  = self.mapper.basedir
+        cnf['general']['scandir']  = self.mapper.workdir
+
         cnf['scan']['filename']  = self.filename.GetValue()
         cnf['scan']['comments']  = self.usertitles.GetValue().replace('\n','\\n')
 
@@ -359,7 +375,8 @@ class FastMapGUI(wx.Frame):
             
         self.mapconf.config = cnf
         save = self.mapconf.Save
-        if scan_only: save = self.mapconf.SaveScanParams
+        if scan_only:
+            save = self.mapconf.SaveScanParams
         save(fname)
         
     def ReadConfigFile(self,filename=None):
@@ -422,8 +439,10 @@ class FastMapGUI(wx.Frame):
         self.mapper.add_callback('message',self.onMapMessage)
         self.mapper.add_callback('info',self.onMapInfo)
         self.mapper.add_callback('nrow',self.onMapRow)
-        for pvname,label in self.config['slow_positioners'].items():
-            self._pvs[label] = epics.PV(pvname)
+        if self._pvs is None:
+            self._pvs = {}
+            for pvname,label in self.config['slow_positioners'].items():
+                self._pvs[label] = epics.PV(pvname)
 
         os.chdir(nativepath(self.mapper.basedir))
         self.SetMotorLimits()
@@ -432,6 +451,7 @@ class FastMapGUI(wx.Frame):
     def SaveEscanData(self, **kw):
         """here we run the escan_saver.process() method,
         which looks for new lines to save to the escan data file"""
+        if not SAVE_ESCAN: return
         new_lines = 0
         if (time.time() - self.start_time < 5.0):
             return
@@ -448,7 +468,6 @@ class FastMapGUI(wx.Frame):
             self.escan_saver.clear()
         except:
             pass
-
     
     @DelayedEpicsCallback
     def onMapRow(self,pvname=None,value=0,**kw):
@@ -462,7 +481,7 @@ class FastMapGUI(wx.Frame):
         # SaveEscanData will be called shortly
         # (we don't call it directly here because this
         # is still 'inside' an Epics callback
-        if value > 0:
+        if value > 0 and SAVE_ESCAN:
             self.SaveEscanData()
         
     @DelayedEpicsCallback
@@ -482,7 +501,8 @@ class FastMapGUI(wx.Frame):
             self.usertitles.Enable()
             self.filename.Enable()        
 
-            self.SaveEscanData()
+            if SAVE_ESCAN:
+                self.SaveEscanData()
 
             fname = str(self.filename.GetValue())
 
@@ -525,22 +545,25 @@ class FastMapGUI(wx.Frame):
     @EpicsFunction
     def SetMotorLimits(self):
         m1name = self.m1choice.GetStringSelection()
-        m1 = self.epics_CtrlVars(m1name)
-        if m1 is not None:
-            xmin,xmax =  m1['lower_ctrl_limit'],m1['upper_ctrl_limit']
-            self.m1units.SetLabel( m1['units'])
-            self.m1step.SetMinMax(-abs(xmax-xmin),abs(xmax-xmin))
-            self.m1start.SetMinMax(xmin,xmax)
-            self.m1stop.SetMinMax(xmin,xmax)
+        m1 = self._pvs[m1name]
+        if m1.lower_ctrl_limit is None:
+            m1.get_ctrlvars()
+        xmin,xmax =  m1.lower_ctrl_limit, m1.upper_ctrl_limit
+        self.m1units.SetLabel(m1.units)
+        self.m1step.SetMinMax(-abs(xmax-xmin), abs(xmax-xmin))
+        self.m1start.SetMinMax(xmin, xmax)
+        self.m1stop.SetMinMax(xmin, xmax)
             
         m2name = self.m2choice.GetStringSelection()
-        m2 = self.epics_CtrlVars(m2name)
-        if m2 is not None: 
-            xmin,xmax =  m2['lower_ctrl_limit'],m2['upper_ctrl_limit']
-            self.m2units.SetLabel( m2['units'])
-            self.m2step.SetMinMax(-abs(xmax-xmin),abs(xmax-xmin))
-            self.m2start.SetMinMax(xmin,xmax)
-            self.m2stop.SetMinMax(xmin,xmax)
+        m2 = self._pvs[m2name]
+        if m2.lower_ctrl_limit is None:
+            m2.get_ctrlvars()
+        
+        xmin,xmax =  m2.lower_ctrl_limit, m2.upper_ctrl_limit
+        self.m2units.SetLabel( m2.units)
+        self.m2step.SetMinMax(-abs(xmax-xmin),abs(xmax-xmin))
+        self.m2start.SetMinMax(xmin,xmax)
+        self.m2stop.SetMinMax(xmin,xmax)
            
     def onDimension(self,evt=None):
         cnf = self.config
@@ -640,8 +663,12 @@ class FastMapGUI(wx.Frame):
 
 
 if __name__ == "__main__":
-    app  = wx.PySimpleApp(redirect=False,filename='fastmap.log')
-    frame= FastMapGUI()
+    motorpvs = Connect_Motors()
+
+    app  = wx.PySimpleApp(redirect=False,
+                          filename='fastmap.log')
+                          
+    frame= FastMapGUI(motorpvs=motorpvs)
     app.SetTopWindow(frame)
     frame.Show()        
     app.MainLoop()

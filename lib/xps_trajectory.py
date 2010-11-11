@@ -95,10 +95,6 @@ Line = %f, %f
     def upload_trajectoryFile(self, fname,  data):
         self.ftp_connect()
         self.ftpconn.cwd(config.traj_folder)
-        print '================'
-        print 'Upload Traj ', fname
-        # print data
-        print '================'
         self.ftpconn.storbinary('STOR %s' %fname, StringIO(data))
         self.ftp_disconnect()
  
@@ -122,16 +118,16 @@ Line = %f, %f
             tdata['axis'] = 'y'
         self.upload_trajectoryFile(traj_file, self.linetraj_text % (xrange, yrange))
 
-    def DefineLineTrajectories(self, axis='x', start=0, stop=1,
-                               step=0.001, scantime=10.0):
+    def DefineLineTrajectories(self, axis='x', start=0, stop=1, accel=1.0,
+                               step=0.001, scantime=10.0, **kw):
         """defines 'forward' and 'backward' trajectories for a line scan."""
         fore_traj = dict(xstart=0, xstop=0, xstep=0.0,
                          ystart=0, ystop=0, ystep=0.0,
-                         scantime=scantime, accel=1.0, axis=axis)
+                         scantime=scantime, accel=accel, axis=axis)
 
         back_traj = dict(xstart=0, xstop=0, xstep=0.0,
                          ystart=0, ystop=0, ystep=0.0,
-                         scantime=scantime, accel=1.0, axis=axis)
+                         scantime=scantime, accel=accel, axis=axis)
 
         xrange = yrange = 0
         if axis == 'y':
@@ -141,8 +137,8 @@ Line = %f, %f
         else:
             fore_traj.update({'xstart': start, 'xstop': stop,  'xstep': step})
             back_traj.update({'xstart': stop,  'xstop': start, 'xstep': step})            
-            xrange = stop=start
-            
+            xrange = stop-start
+
         self.trajectories['foreward'] = fore_traj
         self.trajectories['backward'] = back_traj
 
@@ -235,7 +231,7 @@ Line = %f, %f
                                                      ('',), ('',),('',),('',))
 
         eventID, m = self.xps.EventExtendedStart(self.ssid)
-        print 'Execute',  traj_file, eventID, speed
+        # print 'Execute',  traj_file, eventID, speed
         ret = self.xps.XYLineArcExecution(self.ssid, self.group_name, traj_file, speed, 1, 1)
         o = self.xps.EventExtendedRemove(self.ssid, eventID)
         o = self.xps.GatheringStop(self.ssid)
@@ -302,11 +298,10 @@ Line = %f, %f
 
 
 if __name__ == '__main__':
-    print 'test:'
     xps = XPSTrajectory()
-    xps.LineTrajectory(name='foreward', scantime=5,
-                       xstart=-2.0, xstop=2.0, xstep=0.001)
-# 
+#     xps.LineTrajectory(name='foreward', scantime=5,
+#                        xstart=-2.0, xstop=2.0, xstep=0.001)
+# ;# 
     xps.DefineLineTrajectories(axis='x', start=-2., stop=2.0, scantime=5, step=0.02)
     print xps.trajectories
     xps.Move_XY(-1.600, 0.1)
