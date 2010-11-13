@@ -309,7 +309,6 @@ class MiniMotorPanel(wx.Panel):
         self.style = style
         self.label = label
         self.format =  None
-        
         if prec is not None:
             self.format = "%%.%if" % prec
         self.motor = None
@@ -357,8 +356,8 @@ class MiniMotorPanel(wx.Panel):
         self.motor.DESC
         if self.label is None:
             self.label = self.motor.PV('DESC').get()
-            self.desc.SetFont(self.font)
-            self.desc.SetLabel(self.label)
+        self.desc.SetFont(self.font)
+        self.desc.SetLabel(self.label)
             
         self.info.SetLabel('')
         for f in ('SET', 'LVIO', 'SPMG', 'LLS', 'HLS', 'disabled'):            
@@ -369,23 +368,22 @@ class MiniMotorPanel(wx.Panel):
             
     def CreatePanel(self,style='normal'):
         " build (but do not fill in) panel components"
-        self.desc = wx.StaticText(self, size=(40, -1), 
+        self.desc = wx.StaticText(self, size=(40, 10), 
                                   style=  wx.ALIGN_LEFT| wx.ST_NO_AUTORESIZE )
         self.desc.SetForegroundColour("Blue")
 
-        self.info = wx.StaticText(self, label='', size=(40, -1),
+        self.info = wx.StaticText(self, label='', size=(40, 10),
                                   style=wx.ALIGN_CENTRE_VERTICAL|wx.ALIGN_RIGHT)
         self.info.SetForegroundColour("Red")
 
-        self.rbv  = pvText(self, size=(60, -1), font = self.font, 
+        self.rbv  = pvText(self, size=(70, -1), font = self.font, 
                            fg='Blue',style=wx.ALIGN_CENTRE_VERTICAL|wx.ALIGN_CENTER)
 
         self.drive = pvFloatCtrl(self, size=(80, -1),
                                  font=self.font, style = wx.TE_RIGHT)
         
         self.fillPanelComponents()
-                
-        spacer = wx.StaticText(self, label=' ', size=(5, 5), style=wx.ALIGN_RIGHT)            
+        spacer = wx.StaticText(self, label=' ', size=(5, 5), style=wx.ALIGN_RIGHT)           
         self.__sizer.AddMany([(spacer,      0, wx.ALIGN_CENTER),
                               (self.desc,   0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT),
                               (self.info,   0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT),

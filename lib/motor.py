@@ -511,7 +511,7 @@ class Motor(device.Device):
             
     def make_step_list(self, minstep=0.0, maxstep=None, decades=10):
         """ create a reasonable list of motor steps, as for a dropdown menu
-        The list is based on motor range and precision"""
+        The list is based on motor range Mand precision"""
 
         if maxstep is None:
             maxstep = 0.6 * abs(self.HLM - self.LLM)
