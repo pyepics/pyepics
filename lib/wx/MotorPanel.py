@@ -315,7 +315,8 @@ class MiniMotorPanel(wx.Panel):
         self.font = wx.Font(11, wx.SWISS, wx.NORMAL, wx.BOLD)
         self.__sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.CreatePanel()
-        self.SelectMotor(motor)
+        if motor is not None:
+            self.SelectMotor(motor)
 
     @EpicsFunction        
     def make_step_list(self):
@@ -333,8 +334,11 @@ class MiniMotorPanel(wx.Panel):
         if self.motor is not None:
             for i in self.__motor_fields:
                 self.motor.clear_callback(attr=i)
-
-        self.motor = epics.Motor(motor)
+        if isinstance(motor, (str, unicode)):
+            self.motor = epics.Motor(motor)
+        elif isinstance(motor, epics.Motor):
+            self.motor = motor
+            
         self.motor.get_info()
 
         if self.format is None:
@@ -368,7 +372,7 @@ class MiniMotorPanel(wx.Panel):
             
     def CreatePanel(self,style='normal'):
         " build (but do not fill in) panel components"
-        self.desc = wx.StaticText(self, size=(40, 10), 
+        self.desc = wx.StaticText(self, size=(40, -1), 
                                   style=  wx.ALIGN_LEFT| wx.ST_NO_AUTORESIZE )
         self.desc.SetForegroundColour("Blue")
 

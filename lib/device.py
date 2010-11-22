@@ -188,7 +188,7 @@ class Device(object):
             self.__dict__[attr] = val
         elif attr in self._pvs:
             self.put(attr, val)
-        elif self.__init:
+        elif self._init:
             try:
                 self.PV(attr)
                 return self.put(attr, val)

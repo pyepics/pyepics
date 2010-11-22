@@ -261,20 +261,22 @@ class Motor(device.Device):
 
     def __getattr__(self, attr):
         " internal method "
+        # print 'GET ATTR ', attr
         if attr in self._alias:
             attr = self._alias[attr]
         elif attr in self._pvs:
             return self.get(attr)
-        elif attr in self.__dict__:
-            return self.__dict__[attr]
-        else:
+        elif not attr.startswith('__'):
             try:
                 self.PV(attr)
                 return self.get(attr)
             except:
                 raise MotorException("EpicsMotor has no attribute %s" % attr)
- 
+        else:
+            return self.__dict__[attr]
+                
     def __setattr__(self, attr, val):
+        # print 'SET ATTR ', attr, val
         if attr in ('name', '_prefix', '_pvs', '_delim', '_init',
                     '_alias', '_nonpvs', '_extra', '_callbacks'):
             self.__dict__[attr] = val
@@ -285,7 +287,7 @@ class Motor(device.Device):
             return self.put(attr, val)
         elif attr in self.__dict__: 
             self.__dict__[attr] = val           
-        else:
+        elif self._init:
             try:
                 self.PV(attr)
                 return self.put(attr, val)
