@@ -22,7 +22,74 @@ def fmt_time(tstamp=None):
     return "%s.%6.6i" % (time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime(tstamp)), 1.e6*frac)
 
-class PV(object):
+# Common base class for anything that accepts PV & PVTuple callbacks
+# 
+# Uses the _args dictionary (assumed to be defined by the inherited class)
+class _BasePVCallback(object):
+    def __init__(self):
+        self.callbacks  = {}
+
+    def run_callbacks(self):
+        """run all user-defined callbacks with the current data
+
+        Normally, this is to be run automatically on event, but
+        it is provided here as a separate function for testing
+        purposes.
+
+        Note that callback functions are called with keyword/val
+        arguments including:
+             self._args  (all PV data available, keys = __fields)
+             keyword args included in add_callback()
+             keyword 'cb_info' = (index, self)
+        where the 'cb_info' is provided as a hook so that a callback
+        function  that fails may de-register itself (for example, if
+        a GUI resource is no longer available).
+             
+        """
+        for index in sorted(list(self.callbacks.keys())):
+            fcn, kwargs = self.callbacks[index]
+            kwd = copy.copy(self._args)
+            kwd.update(kwargs)
+            kwd['cb_info'] = (index, self)
+            if hasattr(fcn, '__call__'):
+                fcn(**kwd)
+            
+    def add_callback(self, callback=None, index=None, **kw):
+        """add a callback to a PV.  Optional keyword arguments
+        set here will be preserved and passed on to the callback
+        at runtime.
+
+        Note that a PV may have multiple callbacks, so that each
+        has a unique index (small integer) that is returned by
+        add_callback.  This index is needed to remove a callback."""
+        print "%s add_callback" % self
+
+        if not self.wait_for_connection():
+            print "%s add_callback failed (wait_for_connection)" % self
+            return None
+        if hasattr(callback, '__call__'):
+            if index is None:
+                index = 1
+                if len(self.callbacks) > 0:
+                    index = 1 + max(self.callbacks.keys())
+            self.callbacks[index] = (callback, kw)
+            print "%s add_callback attached index %s" % (self, index)
+        return index
+    
+    def remove_callback(self, index=None):
+        """remove a callback by index"""
+        if len(self.callbacks)==1:
+            self.callbacks.pop()
+        if index in self.callbacks:
+            self.callbacks.pop(index)
+            self.poll()
+
+    def clear_callbacks(self):
+        "clear all callbacks"
+        self.callbacks = {}
+
+
+class PV(_BasePVCallback):
     """Epics Process Variable
     
     A PV encapsulates an Epics Process Variable.
@@ -54,6 +121,7 @@ class PV(object):
                  verbose=False, auto_monitor=None,
                  connection_callback=None,
                  connection_timeout=None):
+        _BasePVCallback.__init__(self)
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
@@ -68,7 +136,6 @@ class PV(object):
         self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
         self.connection_callback = connection_callback
-        self.callbacks  = {}
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
         self.chid = None
@@ -290,62 +357,7 @@ class PV(object):
             self._write('%s: %s (%s)'% (self.pvname,
                                         self._args['char_value'],
                                         now))
-        self.run_callbacks()
-        
-    def run_callbacks(self):
-        """run all user-defined callbacks with the current data
-
-        Normally, this is to be run automatically on event, but
-        it is provided here as a separate function for testing
-        purposes.
-
-        Note that callback functions are called with keyword/val
-        arguments including:
-             self._args  (all PV data available, keys = __fields)
-             keyword args included in add_callback()
-             keyword 'cb_info' = (index, self)
-        where the 'cb_info' is provided as a hook so that a callback
-        function  that fails may de-register itself (for example, if
-        a GUI resource is no longer available).
-             
-        """
-        for index in sorted(list(self.callbacks.keys())):
-            fcn, kwargs = self.callbacks[index]
-            kwd = copy.copy(self._args)
-            kwd.update(kwargs)
-            kwd['cb_info'] = (index, self)
-            if hasattr(fcn, '__call__'):
-                fcn(**kwd)
-            
-    def add_callback(self, callback=None, index=None, **kw):
-        """add a callback to a PV.  Optional keyword arguments
-        set here will be preserved and passed on to the callback
-        at runtime.
-
-        Note that a PV may have multiple callbacks, so that each
-        has a unique index (small integer) that is returned by
-        add_callback.  This index is needed to remove a callback."""
-        if not self.wait_for_connection():
-            return None
-        if hasattr(callback, '__call__'):
-            if index is None:
-                index = 1
-                if len(self.callbacks) > 0:
-                    index = 1 + max(self.callbacks.keys())
-            self.callbacks[index] = (callback, kw)
-        return index
-    
-    def remove_callback(self, index=None):
-        """remove a callback by index"""
-        if len(self.callbacks)==1:
-            self.callbacks.pop()
-        if index in self.callbacks:
-            self.callbacks.pop(index)
-            self.poll()
-
-    def clear_callbacks(self):
-        "clear all callbacks"
-        self.callbacks = {}
+        self.run_callbacks()        
 
     def _getinfo(self):
         "get information paragraph"
@@ -573,3 +585,111 @@ class PV(object):
             self.disconnect()
         except:
             pass
+
+
+
+class PVTuple(_BasePVCallback):
+    """Epics Process Variable Tuple
+    
+    A PVTuple encapsulates multiple Epics Process Variables into a single tuple, with a similar/compatible
+    interface to a single PV (callback for the tuple when any PV changes, etc.) Read-only, though.
+   
+    The primary interface methods for a pv are to get() and put() is value::
+
+      >>> p = PV(pv_names...)  # create a pv object given a list or tuple of pv names
+      >>> p.get()          # get value of all PVs as a tuple
+
+    Additional important attributes include::
+
+      >>> p.pvname         # names of all pvs (tuple)
+      >>> p.value          # pv values (can be got only)
+      >>> p.char_value     # string representation of pv values (tuple of strings)
+      >>> p.count          # number of PVs in tuple
+      >>> p.type           # EPICS data types (as tuple): 'string','double','enum','long',..
+      >>> p.pvs            # list of actual PV objects encapsulated
+
+"""
+
+    _fmt = "<PV '%(pvnames)s', count=%(count)i, type=%(typefull)s, access=%(access)s>"
+    _fields = ('pvname',  'value',  'char_value',  'status',  'count', 'type', 'pvs' )
+
+    def __init__(self, pvnames, callback=None):        
+        _BasePVCallback.__init__(self)
+        self.pvs = [ PV(pvname, callback) for pvname in list(pvnames) ]
+        self._args      = {}.fromkeys(self._fields)
+        self._args['pvname'] = tuple(pvnames)
+        self._args['count'] = len(pvnames)
+        self._args['type'] = []
+        self._args['pvs'] = self.pvs
+        for pv in self.pvs:
+            pv.add_callback(self.change_callback)
+
+    def poll(self, evt=1.e-4, iot=1.0):
+        "poll for changes"        
+        ca.poll(evt=evt, iot=iot)
+
+    def get(self, count=None, as_string=False, as_numpy=True):
+        """returns current value of all PVs, as a tuple. Use the options:
+         as_string to return string representations where possible
+         as_numpy  to (try to) return a numpy arrays where possible
+
+        >>> p.get('13BMD:m1.DIR')
+        0
+        >>> p.get('13BMD:m1.DIR',as_string=True)
+        'Pos'
+        """
+        return tuple([ p.get(count,as_string,as_numpy) for p in self.pvs])
+
+    def change_callback(self, **kw):
+        self._args['char_value'] = tuple([ p._args['char_value'] for p in self.pvs ])        
+        self._args['value'] = tuple([ p._args['value'] for p in self.pvs ])
+        print "Callback value %s char_value %s" % (self._args['value'], self._args['char_value'])
+        if None in self._args['value']:
+            return # Don't call a callback until each 'value' has been set
+        self._args['type'] = tuple([ p.type for p in self.pvs ])
+        self.run_callbacks()
+
+    def wait_for_connection(self, timeout=None):
+        for p in self.pvs:
+            if not p._conn_started:
+                p.connect()
+
+        return all([p.wait_for_connection(timeout) for p in self.pvs]) # timeout not quite right here        
+
+    def connect(self, timeout=None):
+        return all([p.connect(timeout) for p in self.pvs])
+
+    def reconnect(self):
+        return all([p.reconnect() for p in self.pvs])
+
+    def get_ctrlvars(self):
+        return [p.get_ctrlvars() for p in self.pvs]
+
+    @property
+    def connected(self):
+        print "%s connected = %s" % (self, [ p.connected for p in self.pvs ] )
+        return all([ p.connected for p in self.pvs ])
+
+    @property
+    def pvname(self):
+        return self._args['pvname']
+
+    @property
+    def value(self):
+        return tuple([ p.value for p in self.pvs ])
+
+    @property
+    def char_value(self):
+        return tuple([ p.char_value for p in self.pvs ])
+
+    @property
+    def count(self):
+        return len(self.pvs)
+
+    @property
+    def type(self):
+        return tuple([ p.type for p in self.pvs ])
+
+
+
+

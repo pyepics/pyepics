@@ -33,6 +33,7 @@ from . import device
 from . import motor
 
 PV    = pv.PV
+PVTuple = pv.PVTuple
 Alarm = alarm.Alarm
 Motor = motor.Motor
 Device = device.Device 
