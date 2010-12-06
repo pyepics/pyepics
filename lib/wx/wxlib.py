@@ -322,6 +322,7 @@ class FloatCtrl(wx.TextCtrl):
             self.SetBackgroundColour(self.bgcol_invalid)            
         self.Refresh()
 
+
 class pvCtrlMixin:
     """ mixin for wx Controls with epics PVs:  connects to PV,
     and manages callback events for the PV
@@ -332,7 +333,13 @@ class pvCtrlMixin:
     """
 
     def __init__(self, pv=None, pvname=None,
-                 font=None, fg=None, bg=None):
+ font=None, fg=None, bg=None):
+        self.translations = {}
+        self.fgColourTranslations = {}
+        self.bgColourTranslations = {}
+        self.fgColourAlarms = {}
+        self.bgColourAlarms = {}
+
         if font is None:
             font = wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,False)
         
@@ -343,6 +350,9 @@ class pvCtrlMixin:
             if bg   is not None:  self.SetBackgroundColour(fg)
         except:
             pass
+        self.defaultFgColour = self.GetForegroundColour()
+        self.defaultBgColour = self.GetBackgroundColour()
+
         if pv is None and pvname is not None:
             pv = pvname
         if pv is not None:
@@ -350,17 +360,58 @@ class pvCtrlMixin:
 
     def _SetValue(self,value):
         self._warn("must override _SetValue")
-        
+
+    def SetControlValue(self, raw_value):        
+        try:
+            wx.Window.SetForegroundColour(self, self.fgColourTranslations.get
+                                          (raw_value, self.defaultFgColour))
+            wx.Window.SetBackgroundColour(self, self.bgColourTranslations.get
+                                          (raw_value, self.defaultBgColour))
+        except TypeError:
+            pass
+        self._SetValue(self.translations.get(raw_value, raw_value))
+
+
+    # Override the standard set color methods so we can record
+    # any explicit user choices that are made, while having the PV 
+    # set colors
+    def SetForegroundColour(color):
+        self.defaultFgColor = color
+        super().SetForegroundColour(color)
+
+    def SetBackgroundColour(color):
+        self.defaultBgColor = color
+        super().SetBackgroundColour(color)
+
+                
+
+    # Setters for dicts to be used for text value or value->color automatic
+    # translations
+
+    def SetTranslations(self, translations):
+        self.translations = translations
+
+    def SetForegroundColourTranslations(self, translations):
+        print "Setting foreground colour translation %s" % translations
+        self.fgColourTranslations = translations
+
+    def SetBackgroundColourTranslations(self, translations):
+        print "Setting background colour translation %s" % translations
+        self.bgColourTranslations = translations
+
     @EpicsFunction
     def update(self,value=None):
+        print "update %s value=%s" % (self, value)
         if value is None and self.pv is not None:
             value = self.pv.get(as_string=True)
-        self._SetValue(value)
+        self.SetControlValue(value)
 
     @EpicsFunction
     def getValue(self,as_string=True):
         val = self.pv.get(as_string=as_string)
-        return val
+        result = self.translations.get(val, val)
+        print "getValue %s value=%s" % (self, result)
+        return result
         
     def _warn(self,msg):
         sys.stderr.write("%s for pv='%s'\n" % (msg,self.pv.pvname))
@@ -375,12 +426,12 @@ class pvCtrlMixin:
             if prec not in (None,0):
                 char_value = ("%%.%if" % prec) % value
             else:
-                char_value = set_float(value)                
-        self._SetValue(char_value)
+                char_value = set_float(value)
+        self.SetControlValue(char_value)
 
     @EpicsFunction
     def set_pv(self, pv=None):
-        if isinstance(pv, epics.PV):
+        if isinstance(pv, epics.PV) or isinstance(pv, epics.PVTuple):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
             self.pv = epics.PV(pv)
@@ -393,7 +444,7 @@ class pvCtrlMixin:
         if not self.pv.connected:
             return
         
-        self._SetValue(self.pv.get(as_string=True))
+        self.SetControlValue(self.pv.get(as_string=True))
         self.pv.add_callback(self._pvEvent, wid=self.GetId() )
 
 
@@ -612,3 +663,23 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
                 self.pv.put(float(value))
         except:
             pass
+
+
+class pvBitmap(wx.StaticBitmap, pvCtrlMixin):
+    """ Static Bitmap where image is based on PV value, with callback for automatic updates"""        
+    def __init__(self, parent,  pv=None, bitmaps={},
+                 defaultBitmap=None, **kw):
+        wx.StaticBitmap.__init__(self,parent, wx.ID_ANY, bitmap=defaultBitmap, **kw)
+        pvCtrlMixin.__init__(self, pv=pv)
+
+        self.defaultBitmap = defaultBitmap
+        self.bitmaps = bitmaps        
+
+    def _SetValue(self, value):        
+        if value in self.bitmaps:
+            nextBitmap = self.bitmaps[value]
+        else:
+            nextBitmap = self.defaultBitmap        
+        if nextBitmap != self.GetBitmap():
+            self.SetBitmap(nextBitmap)
+
