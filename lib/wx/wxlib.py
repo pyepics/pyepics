@@ -335,8 +335,8 @@ class pvCtrlMixin:
     def __init__(self, pv=None, pvname=None,
  font=None, fg=None, bg=None):
         self.translations = {}
-        self.fgColourTranslations = {}
-        self.bgColourTranslations = {}
+        self.fgColourTranslations = None
+        self.bgColourTranslations = None
         self.fgColourAlarms = {}
         self.bgColourAlarms = {}
 
@@ -362,11 +362,13 @@ class pvCtrlMixin:
         self._warn("must override _SetValue")
 
     def SetControlValue(self, raw_value):        
-        try:
-            wx.Window.SetForegroundColour(self, self.fgColourTranslations.get
-                                          (raw_value, self.defaultFgColour))
-            wx.Window.SetBackgroundColour(self, self.bgColourTranslations.get
-                                          (raw_value, self.defaultBgColour))
+        try:            
+            if self.fgColourTranslations is not None:
+                wx.Window.SetForegroundColour(self, self.fgColourTranslations.get
+                                              (raw_value, self.defaultFgColour))
+            if self.bgColourTranslations is not None:
+                wx.Window.SetBackgroundColour(self, self.bgColourTranslations.get
+                                              (raw_value, self.defaultBgColour))
         except TypeError:
             pass
         self._SetValue(self.translations.get(raw_value, raw_value))
@@ -683,3 +685,20 @@ class pvBitmap(wx.StaticBitmap, pvCtrlMixin):
         if nextBitmap != self.GetBitmap():
             self.SetBitmap(nextBitmap)
 
+class pvCheckBox(wx.CheckBox, pvCtrlMixin):
+    """ Checkbox based on a binary PV value, both reads/writes the
+        channel value.
+   
+        If necessary, use the SetTranslations() option to write a
+        dictionary for string value PVs to booleans """
+    def __init__(self, parent, pv=None, **kw):
+        self.pv = None
+        wx.CheckBox.__init__(self, parent, **kw)
+        pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
+        wx.EVT_CHECKBOX(parent, self.GetId(), self._OnClicked)
+
+    def _SetValue(self, value):
+        self.Value = bool(self.pv.get())
+
+    def _OnClicked(self, event):
+        self.pv.put(1 if self.Value else 0 )
