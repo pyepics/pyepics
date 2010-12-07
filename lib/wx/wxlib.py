@@ -9,6 +9,7 @@ import sys
 import fpformat
 import epics
 import wx.lib.buttons as buttons
+import wx.lib.agw.floatspin as floatspin
 
 def EpicsFunction(f):
     """decorator to wrap function in a wx.CallAfter() so that
@@ -687,10 +688,15 @@ class pvBitmap(wx.StaticBitmap, pvCtrlMixin):
 
 class pvCheckBox(wx.CheckBox, pvCtrlMixin):
     """ Checkbox based on a binary PV value, both reads/writes the
-        channel value.
+        PV on changes.
    
         If necessary, use the SetTranslations() option to write a
-        dictionary for string value PVs to booleans """
+        dictionary for string value PVs to booleans
+        
+        If a PVTuple is assigned, the checkbox can act as a "master
+        checkbox" (including with a 3-state value if the right style
+        is set) that sets/clears all the PVs in the tuple as one.
+        """
     def __init__(self, parent, pv=None, **kw):
         self.pv = None
         wx.CheckBox.__init__(self, parent, **kw)
@@ -711,3 +717,41 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
 
     def _OnClicked(self, event):
         self.pv.put(1 if self.Value else 0 )
+
+
+class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin): 
+    """ FloatSpin (floating-point-aware SpinCtrl) linked to a PV
+        value, both reads/writes the PV on changes.
+        
+        Arguments
+        pv = pv to set
+        deadTime = delay between user typing a value into the field, and it being sent
+    """
+    def __init__(self, parent, pv=None, deadTime=500, **kw):
+        floatspin.FloatSpin.__init__(self, parent, **kw)
+        pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
+        floatspin.EVT_FLOATSPIN(parent, self.GetId(), self._OnChanged)
+        
+        self.deadTimer = wx.Timer(self)
+        self.deadTime = deadTime
+        wx.EVT_TIMER(self, self.deadTimer.GetId(), self._OnCharTimeout)
+        
+    def _SetValue(self, value):
+        value = self.pv.get() # get a non-string value
+        self.SetValue(float(value))
+
+    def _OnChanged(self, event):
+        self.pv.put(self.GetValue())
+
+    def _OnCharTimeout(self, event):
+        # save & restore insertion point before syncing control
+        savePoint = self.GetTextCtrl().InsertionPoint
+        self.SyncSpinToText()
+        self.GetTextCtrl().InsertionPoint = savePoint
+        self._OnChanged(event)
+
+    def OnChar(self, event):
+        floatspin.FloatSpin.OnChar(self, event)
+        # Timer will restart if it's already running
+        self.deadTimer.Start(milliseconds=self.deadTime, oneShot=True)
+       
