@@ -592,7 +592,7 @@ class PVTuple(_BasePVCallback):
     """Epics Process Variable Tuple
     
     A PVTuple encapsulates multiple Epics Process Variables into a single tuple, with a similar/compatible
-    interface to a single PV (callback for the tuple when any PV changes, etc.) Read-only, though.
+    interface to a single PV (callback for the tuple when any PV changes, etc.)
    
     The primary interface methods for a pv are to get() and put() is value::
 
@@ -613,12 +613,15 @@ class PVTuple(_BasePVCallback):
     _fmt = "<PV '%(pvnames)s', count=%(count)i, type=%(typefull)s, access=%(access)s>"
     _fields = ('pvname',  'value',  'char_value',  'status',  'count', 'type', 'pvs' )
 
-    def __init__(self, pvnames, callback=None):        
+    def __init__(self, pvnames=None, pvs=[], callback=None):        
         _BasePVCallback.__init__(self)
-        self.pvs = [ PV(pvname, callback) for pvname in list(pvnames) ]
-        self._args      = {}.fromkeys(self._fields)
-        self._args['pvname'] = tuple(pvnames)
-        self._args['count'] = len(pvnames)
+        if pvnames != None:
+            self.pvs = [ PV(pvname, callback) for pvname in list(pvnames) ]
+        else:
+            self.pvs = pvs
+        self._args = {}.fromkeys(self._fields)
+        self._args['pvname'] = tuple([pv.pvname for pv in self.pvs])
+        self._args['count'] = len(self.pvs)
         self._args['type'] = []
         self._args['pvs'] = self.pvs
         for pv in self.pvs:
@@ -639,6 +642,20 @@ class PVTuple(_BasePVCallback):
         'Pos'
         """
         return tuple([ p.get(count,as_string,as_numpy) for p in self.pvs])
+
+    def put(self, value):
+        """ Put either a tuple of values, one per PV. Or a single value, which will be set to all PVs """
+        if not isinstance(value, tuple):
+            value = [ value for x in range(self.count) ] # same for all
+        elif len(value) != self.count:
+            raise ValueError("Wrong number of elements (%d) in tuple argument to PVTuple.put() (need %d) : %s" 
+                             % (len(value), self.count, value))
+        else:
+            value = list(value)
+        
+        for (pv, value) in zip(self.pvs, value):
+            pv.put(value)
+        
 
     def change_callback(self, **kw):
         self._args['char_value'] = tuple([ p._args['char_value'] for p in self.pvs ])        

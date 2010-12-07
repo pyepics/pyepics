@@ -698,7 +698,16 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
         wx.EVT_CHECKBOX(parent, self.GetId(), self._OnClicked)
 
     def _SetValue(self, value):
-        self.Value = bool(self.pv.get())
+        if isinstance(self.pv, epics.PVTuple):
+            rawValue = [ bool(r) for r in list(self.pv.get()) ]
+            if all(rawValue):
+                self.Value = True
+            elif self.Is3State() and any(rawValue):
+                self.ThreeStateValue = wx.CHK_UNDETERMINED
+            else:
+                self.Value = False
+        else:
+            self.Value = bool(self.pv.get())
 
     def _OnClicked(self, event):
         self.pv.put(1 if self.Value else 0 )
