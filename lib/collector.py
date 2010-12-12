@@ -5,9 +5,11 @@ import numpy
 import epics 
 from threading import Thread
 
-from util import debugtime, new_filename, nativepath, winpath
+from util import new_filename, nativepath, winpath
+from debugtime import debugtime
 
-from epics.devices  import Struck
+# from epics.devices  import Struck
+from struck import Struck
 from xmap_mca  import MultiXMAP
 from xps_trajectory import XPSTrajectory
 from mapper import mapper
@@ -16,8 +18,8 @@ from configFile import FastMapConfig
 from mono_control import mono_control
 
 USE_XMAP = True
-USE_STRUCK = False
-USE_MONO_CONTROL = False
+USE_STRUCK = True
+USE_MONO_CONTROL = True
 
 # this should go into the configFile, but then again, 
 # mono_control is highly specialized to a setup.....
@@ -41,12 +43,12 @@ def fix_range(start=0,stop=1,step=0.1, addstep=False):
     stop = start + step * (npts-1)
     return (npts,start,stop,step)
 
-class TrajectoryScan(epics.Device):
+class TrajectoryScan(object):
     subdir_fmt = 'scan%4.4i'
         
     def __init__(self, configfile=None):
-        
-        epics.Device.__init__(self, prefix='')
+        # epics.Device.__init__(self, prefix='')
+        self._pvs = {}
         self.state = 'idle'
         conf = self.mapconf = FastMapConfig(configfile)
         
@@ -56,10 +58,9 @@ class TrajectoryScan(epics.Device):
         basedir     = conf.get('general', 'basedir')
         fileplugin  = conf.get('general', 'fileplugin')
         mapdb       = conf.get('general', 'mapdb')
-
+        # print 'Collector init B'
         self.mapper = mapper(prefix=mapdb)
         self.mono_control = mono_control(MONO_PREFIX)
-
         self.subdir_index = 0
         self.scan_t0  = time.time()
         self.Connect_ENV_PVs()
@@ -67,28 +68,30 @@ class TrajectoryScan(epics.Device):
         self.ROI_Written = False
         self.ENV_Written = False
         self.ROWS_Written = False
-
         self.xps = XPSTrajectory(**conf.get('xps'))
         self.dtime = debugtime()
-
         self.struck = None
         self.xmap = None
         if USE_STRUCK:
             self.struck = Struck(struck, scaler=scaler)
-            
         if USE_XMAP:
             self.xmap = MultiXMAP(xmappv, filesaver=fileplugin)
             self.xmap.SpectraMode()
-       
         self.positioners = {}
         for pname in conf.get('slow_positioners'):
             self.positioners[pname] = self.PV(pname)
-
         self.mapper.add_callback('Start', self.onStart)
         self.mapper.add_callback('Abort', self.onAbort)
         self.mapper.add_callback('basedir', self.onDirectoryChange)
-            
-        # self.mapper.basedir = basedir
+        print 'Collector initialized.'
+
+    def PV(self, pvname):
+        """return epics.PV for a device attribute"""
+        if pvname not in self._pvs:
+            self._pvs[pvname] = epics.PV(pvname)
+        if not self._pvs[pvname].connected:
+            self._pvs[pvname].wait_for_connection()
+        return self._pvs[pvname]
         
     def onStart(self, pvname=None, value=None, **kw):
         if value == 1:
@@ -191,7 +194,7 @@ class TrajectoryScan(epics.Device):
             time.sleep(0.05)
             while not self.xmap.FileWriteComplete():
                 self.xmap.finish_pixels()
-                time.sleep(0.05)
+                time.sleep(0.1)
                 if time.time()-t0 > 5:
                     self.mapper.message = 'XMAP File Writing Not Complete!'
                     # self.MasterFile.write('#WARN xmap write failed: row %i\n' % (irow-1))
@@ -219,7 +222,11 @@ class TrajectoryScan(epics.Device):
         npts1,start1,stop1,step1 = fix_range(start1,stop1,step1, addstep=True)
         npts2,start2,stop2,step2 = fix_range(start2,stop2,step2, addstep=False)
 
-
+        # set offset for whether to start with foreward or backward trajectory
+        dir_offset = 0
+        if start1 > stop1:
+            dir_offset = 1
+            
         print 'map scan: npts1, npts2 = ', npts1, npts2
 
         self.mapper.npts = npts1
@@ -269,32 +276,35 @@ class TrajectoryScan(epics.Device):
         while irow < npts2:
             self.mapper.status = 1
             irow = irow + 1
-            self.dtime.add('map row %i ' % irow)
+            self.dtime.add('======== map row %i ' % irow)
+            dirx = dir_offset + irow % 2
             traj, p1_this, p1_next = [('backward', stop1, start1),
-                                      ('foreward', start1, stop1)][irow%2]
+                                      ('foreward', start1, stop1)][dirx]
             if dimension > 1:
                 self.mapper.info =  'Row %i / %i (%s)' % (irow,npts2,traj)
             else:
                 self.mapper.info =  'Scanning'
             self.mapper.setTime()
-
-            self.PV(pos1).put(p1_this, wait=True)
-            if dimension > 1:
-                self.PV(pos2).put(start2 + (irow-1)*step2, wait=True)
-            self.dtime.add('positioners ready %.5f' % p1_this)
-
             kw['filenumber'] = irow
             kw['scan_pt']    = irow
             if self.state == 'abort':
                 self.mapper.message = 'Map aborted before starting!'
                 break
             ypos = 0
+
+            self.PV(pos1).put(p1_this, wait=True)
+            if dimension > 1:
+                self.PV(pos2).put(start2 + (irow-1)*step2, wait=True)
+            self.dtime.add('positioners ready %.5f' % p1_this)
+
             if dimension > 1:
                 ypos = self.PV(pos2).get()
 
             self.mapper.status = 2
+            self.dtime.add('before exec traj')
             self.ExecuteTrajectory(name=traj, **kw)
             self.mapper.status = 3
+            self.dtime.add('after exec traj')            
 
             if dimension > 1:
                 self.PV(pos2).put(start2 + irow*step2, wait=False)            
@@ -309,7 +319,7 @@ class TrajectoryScan(epics.Device):
             xps_lines, rowinfo = self.WriteRowData(scan_pt=irow,
                                                    ypos=ypos, npts=npts1)
             xmap_fnum = self.Wait_XMAPWrite(irow=irow)
-            print ' row  ', irow, xmap_fnum
+            self.dtime.add('xmap saved')
             if irow > xmap_fnum:
                 print 'Missing XMAP File!'
                 irow = irow - 1
@@ -322,6 +332,8 @@ class TrajectoryScan(epics.Device):
             if self.state == 'abort':
                 self.mapper.message = 'Map aborted!'
                 break
+            self.dtime.add('all done')
+            # self.dtime.show(clear=True)
 
         self.restore_positions()
         self.mapper.info = "Finished"
@@ -333,22 +345,27 @@ class TrajectoryScan(epics.Device):
                           scan_pt=1, scantime=10, dimension=1,
                           npulses=11, wait=False, **kw):
 
+
         if USE_XMAP:
             t0 = time.time()
             self.xmap.setFileNumber(scan_pt)
             self.xmap.start()
             self.xmap.FileCaptureOn()
-
-            while self.xmap.Acquiring != 1:
-                time.sleep(0.05)
-                if time.time() - t0 > 10.0 : 
-                    break
-            self.dtime.add('exec: xmap armed? %s ' % (repr(1==self.xmap.Acquiring)))
+            self.dtime.add('exec: xmap armed A?')
 
         if USE_STRUCK:
             self.struck.start()
 
         self.mapper.PV('Abort').put(0)
+        self.dtime.add('exec: struck started.')
+ 
+        if USE_XMAP:
+            while self.xmap.Acquiring != 1:
+                time.sleep(0.01)
+                if time.time() - t0 > 10.0 : 
+                    break
+            self.dtime.add('exec: xmap armed? %s ' % (repr(1==self.xmap.Acquiring)))
+
         # self.mapper.message = "scanning %s" % name
        
         scan_thread = Thread(target=self.xps.RunLineTrajectory,
@@ -363,13 +380,13 @@ class TrajectoryScan(epics.Device):
         if not self.ROI_Written:
             xmap_prefix = self.mapconf.get('general', 'xmap')
             fout    = os.path.join(self.workdir, 'ROI.dat')
-            try:
-                fh = open(fout, 'r')
+            if True: # try:
+                fh = open(fout, 'w')
                 fh.write('\n'.join(self.xmap.roi_calib_info()))
                 fh.close()
                 self.ROI_Written = True
                 self.dtime.add('ExecTraj: ROI done')
-            except:
+            else: # except:
                 self.dtime.add('ExecTraj: ROI saving failed!!')
         if not self.ENV_Written:
             fout    = os.path.join(self.workdir, 'Environ.dat')
@@ -390,7 +407,8 @@ class TrajectoryScan(epics.Device):
         strk_fname = self.make_filename('struck', scan_pt)
         xmap_fname = self.make_filename('xmap', scan_pt)
         xps_fname  = self.make_filename('xps', scan_pt)
-        print "WriteRowData ", scan_pt, ypos, npts
+        self.dtime.add('Write Row Data: start %i, ypos=%f ' % (scan_pt,  ypos))
+
         saver_thread = Thread(target=self.xps.SaveResults, name='saver',
                               args=(xps_fname,))
         saver_thread.start()
@@ -403,10 +421,11 @@ class TrajectoryScan(epics.Device):
         if USE_STRUCK:
             self.struck.stop()
             self.struck.saveMCAdata(fname=strk_fname, npts=npts, ignore_prefix='_')
+            self.dtime.add('struck saved')
 
         # wait for saving of gathering file to complete
-        saver_thread.join()        
-
+        saver_thread.join()
+        self.dtime.add('xps saved')
         rowinfo = self.make_rowinfo(xmap_fname, strk_fname, xps_fname, ypos=ypos)
         self.dtime.add('Write Row Data: done')
         return (self.xps.nlines_out, rowinfo)
@@ -522,6 +541,6 @@ class TrajectoryScan(epics.Device):
                 break
 
 if __name__ == '__main__':
-    t = TrajectoryScan(configfile='default.scn')
+    t = TrajectoryScan()
     t.mainloop()
 

@@ -19,12 +19,12 @@ params = {'Shutter':        'eps_mbbi4',
           'preslit_diff':   'mono_pid2_incalc.N',
           }
 
+MAX_DIFF = 0.1
+MIN_SUM  = 0.1
+
 class mono_control(epics.Device):
     """  mono control and feedback
     """
-    MAX_DIFF = 0.25
-    MIN_SUM  = 0.1
-
     def __init__(self, prefix):
         self._prefix = prefix
         epics.Device.__init__(self, self._prefix)
@@ -34,19 +34,18 @@ class mono_control(epics.Device):
     def OptimizeMonoRoll(self):
         self.FeedbackOff()
         self.roll_fine = 0
-        print 'July2010: Check Mono Roll: Split Sum / Diff ', self.preslit_sum, self.preslit_diff
-
-        if self.preslit_diff <= self.MIN_SUM:
-            print '   pre-slit intensity too low -- beam lost?? ', self.preslit_sum
+        # print 'July2010: Check Mono Roll: Split Sum / Diff ', self.preslit_sum, self.preslit_diff
+        if self.preslit_sum < MIN_SUM:
+            print '   pre-slit intensity too low -- beam lost?? ', self.preslit_sum, MIN_SUM
             return
-        elif abs(self.preslit_diff) < self.MAX_DIFF:
+        elif abs(self.preslit_diff) < MAX_DIFF:
             return
         rcount = 0
         print 'pre-slit needs roll adjustment'
         self.roll_tweakval = 0.0005
-        while rcount < 20  and (abs(self.preslit_diff) > self.MAX_DIFF/2.0):
+        while rcount < 20  and (abs(self.preslit_diff) > MAX_DIFF/2.0):
             rcount = rcount + 1
-            if split_diff < 0:
+            if self.preslit_diff < 0:
                 self.roll_twr = 1
             else:
                 self.roll_twf = 1                

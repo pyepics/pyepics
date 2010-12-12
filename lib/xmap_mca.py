@@ -90,12 +90,12 @@ class MultiXMAP(epics.Device):
         return [m.getrois() for m in self.mcas]    
         
     def roi_calib_info(self):
-        buff = ['[roi]']
+        buff = ['[rois]']
         roidat = self.get_rois()
         caldat = numpy.array(self.get_calib())
 
         for i, k in enumerate(roidat[0].keys()):
-            s = [list(roidata[m][k]) for m in range(self.nmca)]
+            s = [list(roidat[m][k]) for m in range(self.nmca)]
             rd = repr(s).replace('],', '').replace('[', '').replace(']','').replace(',','')
             buff.append("ROI%2.2i = %s | %s" % (i,k,rd))
         buff.append('[calibration]')
@@ -118,7 +118,7 @@ class MultiXMAP(epics.Device):
         add('nmcas = %i' % self.nmca)
         add('filesaver= %s' % self.filesaver)
         d.add('starting roi....')
-        add.extend( self.roi_calib_info() )
+        buff.extend( self.roi_calib_info() )
 
         d.add('wrote roi / calib')
         add('[dxp]')
@@ -128,6 +128,8 @@ class MultiXMAP(epics.Device):
             vals = [str(dxp.get(a, as_string=True)) for dxp in self.dxps]
             add("%s = %s" % (a, ' '.join(vals)))
         d.add('wrote dxp params')
+        print len(buff)
+        
         buff = '\n'.join(buff)
         if filename is not None:
             fh = open(filename,'w')
@@ -136,7 +138,6 @@ class MultiXMAP(epics.Device):
         d.add('wrote file')
         # d.show()
         return buff
-
 
     def start(self):
         "Start Struck"
@@ -157,14 +158,14 @@ class MultiXMAP(epics.Device):
         self.NextPixel = 1
         return self.NextPixel
 
-
     def finish_pixels(self):
         "Advance to Next Pixel until CurrentPixel == PixelsPerRun"
         pprun = self.PixelsPerRun
         cur   = self.dxps[0].get('CurrentPixel')
+        print 'XMAP : finishing pixels ', cur, ' to ' , pprun
         for i in range(pprun-cur):
             self.next_pixel()
-            time.sleep(0.001)
+            time.sleep(0.005)
         return pprun-cur
 
     def readmca(self,n=1):

@@ -46,28 +46,35 @@ def readEnvironFile(fname):
 def readScanConfig(sfile):
     cp =  ConfigParser()
     cp.read(sfile)
-    s = {}
+    scan = {}
     for a in cp.options('scan'):
-        s[a]  = cp.get('scan',a)
-    return s
+        scan[a]  = cp.get('scan',a)
+    general = {}
+    for a in cp.options('general'):
+        general[a]  = cp.get('general',a)
+    return scan, general
 
 def readROIFile(hfile):
     cp =  ConfigParser()
     cp.read(hfile)
-    prefix, env, rois = None, [], []
+    output = []
     try:
         rois = cp.options('rois')
     except:
-        return prefix, rois
-            
+        print 'rois not found'
+        return []
+
     for a in cp.options('rois'):
-        if a.lower().startswith('roi_'):
-            iroi = int(a[4:])
-            name,dat = cp.get('rois',a).split('||')
-            rois.append((iroi,name.strip(), json.loads(dat)))
-        elif a == 'prefix':
-            prefix = cp.get('rois','prefix')
-    return prefix,sorted(rois)
+        if a.lower().startswith('roi'):
+            iroi = int(a[3:])
+            name, dat = cp.get('rois',a).split('|')
+            xdat = [int(i) for i in dat.split()]
+            dat = [(xdat[0], xdat[1]), (xdat[2], xdat[3]),
+                   (xdat[4], xdat[5]), (xdat[6], xdat[7])] 
+            output.append((iroi, name.strip(), dat))
+    output = sorted(output)
+    print 'Read ROI data: %i ROIS ' % len(output)
+    return output
         
 class EscanWriter(object):
     ScanFile   = 'Scan.cnf'
@@ -92,6 +99,7 @@ class EscanWriter(object):
 
         if self.folder is not None:
             fname = os.path.join(nativepath(self.folder), self.MasterFile)
+            # print  'EscanWriter Read Scan file ', fname
             if os.path.exists(fname):
                 try:
                     header, rows = readMasterFile(fname)
@@ -105,14 +113,17 @@ class EscanWriter(object):
             self.environ = readEnvironFile(os.path.join(self.folder, self.EnvFile))
 
         if self.roidata is None:
-            self.mca_prefix,self.roidata = readROIFile(os.path.join(self.folder,self.ROIFile))
+            # print 'Read ROI data from ', os.path.join(self.folder,self.ROIFile)
+            self.roidata = readROIFile(os.path.join(self.folder,self.ROIFile))
 
         if self.scanconf is None:
             fastmap = FastMapConfig()
             self.slow_positioners = fastmap.config['slow_positioners']
             self.fast_positioners = fastmap.config['fast_positioners']
 
-            scan = self.scanconf = readScanConfig(os.path.join(self.folder,self.ScanFile))
+            self.scanconf, self.generalconf = readScanConfig(os.path.join(self.folder,self.ScanFile))
+            scan = self.scanconf
+            self.mca_prefix = self.generalconf['xmap']
 
             self.dim = self.scanconf['dimension']
             self.comments = self.scanconf['comments']
@@ -157,6 +168,7 @@ class EscanWriter(object):
         self.buff = []
        
     def process(self, maxrow=None):
+        # print '=== Escan Writer: ', self.folder
         self.ReadMaster()
         if self.last_row >= len(self.rowdata):
             return 0
@@ -185,7 +197,9 @@ class EscanWriter(object):
                     atime = time.ctime(os.stat(os.path.join(self.folder,
                                                             xmapfile)).st_ctime)
                     xmapdat     = read_xmap_netcdf(os.path.join(self.folder,xmapfile),verbose=False)
+                    print 'xmap data read!'
                 except:
+                    print 'xmap data failed to read'
                     self.clear()
                     atime = -1
                 time.sleep(0.03)
@@ -193,16 +207,14 @@ class EscanWriter(object):
                 return 0
             # print 'EscanWrite.process Found xmapdata in %.3f sec (%s)' % (time.time()-t0, xmapfile)
 
-            gnpts,ngather  = gdata.shape
-            sdata = sdata[self.off_struck:]
-            snpts,nscalers = sdata.shape
-            off_xmap = self.off_xmap
+            gnpts, ngather  = gdata.shape
+            snpts, nscalers = sdata.shape
 
-            xmdat = xmapdat.data[1+off_xmap:]
-            xmicr = xmapdat.inputCounts[1+off_xmap:]
-            xmocr = xmapdat.outputCounts[1+off_xmap:]
-            xm_tl = xmapdat.liveTime[1+off_xmap:]
-            xm_tr = xmapdat.realTime[1+off_xmap:]
+            xmdat = xmapdat.data[:]
+            xmicr = xmapdat.inputCounts[:]
+            xmocr = xmapdat.outputCounts[:]
+            xm_tl = xmapdat.liveTime[:]
+            xm_tr = xmapdat.realTime[:]
             xnpts = xmdat.shape[0]
             npts = min(snpts,gnpts,xnpts)
 
@@ -226,7 +238,7 @@ class EscanWriter(object):
                     idet = i+1
                 idet = idet+3
                 suf,rnam = ('','.R') # ): #  , ('(raw)','.R1')):
-                mca="%smca1%s" % (self.mca_prefix,rnam)
+                mca="%smca1%s" % (self.mca_prefix, rnam)
                 for iroi,label,roidat in self.roidata:
                     idet  = idet + 1
                     legend.append('D%i' % (idet))
@@ -261,7 +273,8 @@ class EscanWriter(object):
                 # x.extend(["%.2f" % r for r in cor])
                 x.extend(["%i"   % r for r in raw])            
                 add(' '.join(x))
-
+                # print ipt, raw
+                
             self.last_row += 1
         # print "EscanWrite: ", len(self.buff), ' new lines'
         return len(self.buff)

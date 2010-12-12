@@ -20,6 +20,7 @@ from EscanWriter import EscanWriter
 DataSaverEvent, EVT_SAVE_DATA = wx.lib.newevent.NewEvent()
 
 SAVE_ESCAN = False
+SAVE_ESCAN = True
 
 def Connect_Motors():
     conf = FastMapConfig().config
@@ -106,12 +107,15 @@ class FastMapGUI(wx.Frame):
         self.m2stop.SetAction(self.onM2step)        
         self.m2step.SetAction(self.onM2step)
 
+        self.escan_saver = None
+        self.data_fname  = None
+        self.data_mode   = 'w'        
         self.mapconf = None
         self._pvs = motorpvs
         self.start_time = time.time() - 100.0
         self.configfile = configfile
         self.ReadConfigFile()
-        
+
     def buildFrame(self):
         pane = wx.Panel(self, -1)
 
@@ -451,11 +455,22 @@ class FastMapGUI(wx.Frame):
     def SaveEscanData(self, **kw):
         """here we run the escan_saver.process() method,
         which looks for new lines to save to the escan data file"""
-        if not SAVE_ESCAN: return
+        if not SAVE_ESCAN:
+            return
         new_lines = 0
-        if (time.time() - self.start_time < 5.0):
+        if self.data_fname is None:
+            self.data_fname = os.path.abspath(os.path.join(nativepath(self.mapper.basedir),
+                                                           self.mapper.filename))
+            
+        print 'Save Escan Data ', self.data_fname
+        if self.escan_saver is None:
+            self.escan_saver = EscanWriter(folder=self.mapper.workdir)        
+
+        if (time.time() - self.start_time < 2.0):
             return
         
+        self.escan_saver.folder =self.mapper.workdir
+
         new_lines = self.escan_saver.process()
 
         if new_lines > 0:
@@ -555,6 +570,9 @@ class FastMapGUI(wx.Frame):
         self.m1stop.SetMinMax(xmin, xmax)
             
         m2name = self.m2choice.GetStringSelection()
+        if not self.m2choice.IsEnabled() or len(m2name) < 1:
+            return
+        
         m2 = self._pvs[m2name]
         if m2.lower_ctrl_limit is None:
             m2.get_ctrlvars()
@@ -586,7 +604,8 @@ class FastMapGUI(wx.Frame):
 
         sm_labels = self.config['slow_positioners'].values()[:]
         sm_labels.remove(m1name)
-        if m1name == m2name:   m2name = sm_labels[0]
+        if m1name == m2name:
+            m2name = sm_labels[0]
            
         self.m2choice.Clear()
         self.m2choice.AppendItems(sm_labels)
@@ -643,28 +662,26 @@ class FastMapGUI(wx.Frame):
             self.filename.SetValue(fname)
 
         sname = fname + '.cnf'
-        self.SaveConfigFile(sname,scan_only=True)
-        self.mapper.StartScan(fname,sname)            
+        self.SaveConfigFile(sname, scan_only=True)
+        self.mapper.StartScan(fname, sname)            
 
         # setup escan saver 
         self.data_mode   = 'w'
-
         self.data_fname  = os.path.abspath(os.path.join(nativepath(self.mapper.basedir), fname))
 
         self.usertitles.Disable()
         self.filename.Disable()        
         self.abortbutton.Enable()        
         self.start_time = time.time()
-        self.escan_saver = EscanWriter(folder=self.mapper.workdir)
+        if self.escan_saver is None:
+            self.escan_saver = EscanWriter(folder=self.mapper.workdir)
         
     @EpicsFunction
     def onAbortScan(self,evt=None):
         self.mapper.AbortScan()
 
-
 if __name__ == "__main__":
     motorpvs = Connect_Motors()
-
     app  = wx.PySimpleApp(redirect=False,
                           filename='fastmap.log')
                           

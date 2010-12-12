@@ -1,10 +1,11 @@
+import sys
 from EscanWriter import EscanWriter
 
-import sys
 foldername = sys.argv[1]
-
-w = EscanWriter(folder = foldername)
+w = EscanWriter(folder=foldername)
 w.process()
-f = open('testEscan.dat','w')
+fout = w.scanconf['filename']
+# fout = 't1.out'
+f = open(fout, 'w')
 f.write('\n'.join(w.buff))
 f.close()

@@ -214,7 +214,7 @@ Line = %f, %f
                              verbose=False, save=True,
                              outfile='Gather.dat', debug=False):
         traj_file = '%s.trj'  % name
-
+        print 'Run Gen Traj', pulse_range, pulse_step
 
         self.xps.GatheringReset(self.ssid)
         self.xps.GatheringConfigurationSet(self.ssid, self.gather_outputs)
@@ -249,7 +249,7 @@ Line = %f, %f
         ret, npulses, nx = self.xps.GatheringCurrentNumberGet(self.ssid)
         db.add(' Will Save %i pulses , ret=%i ' % (npulses, ret))
         ret, buff = self.xps.GatheringDataMultipleLinesGet(self.ssid, 0, npulses)
-        db.add(' MLGet ret=%i, buff_len = %i ' % (ret, len(buff)))
+        db.add('MLGet ret=%i, buff_len = %i ' % (ret, len(buff)))
         
         if ret < 0:  # gathering too long: need to read in chunks
             print 'Need to read Data in Chunks!!!'  # how many chunks are needed??
@@ -257,19 +257,20 @@ Line = %f, %f
             nx    = int( (npulses-2) / Nchunks)
             ret = 1
             while True:
-                print ' --> ', npulses, Nchunks, nx
+                time.sleep(0.1)
                 ret, xbuff = self.xps.GatheringDataMultipleLinesGet(self.ssid, 0, nx)
-                print nx, ret, len(xbuff)                
                 if ret == 0:
                     break
                 Nchunks = Nchunks + 2
                 nx      = int( (npulses-2) / Nchunks)
-            print  ' -- wil use %i %i Chunks ' % (nx, Nchunks)
+                if nChnks > 10:
+                    print 'looks like something is wrong with the XPS!'                    
+                    break
+            print  ' -- will use %i %i Chunks ' % (nx, Nchunks)
             db.add(' Will use %i chunks ' % (Nchunks))
             buff = [xbuff]
             for i in range(1, Nchunks):
                 ret, xbuff = self.xps.GatheringDataMultipleLinesGet(self.ssid, i*nx, nx)
-                print i*nx, nx, ret, len(xbuff)
                 buff.append(xbuff)
                 db.add('   chunk %i' % (i))
             ret, xbuff = self.xps.GatheringDataMultipleLinesGet(self.ssid, Nchunks*nx,
@@ -279,7 +280,7 @@ Line = %f, %f
             db.add('   chunk last')
 
         obuff = buff[:]
-        for x in (';', '\r', '\t'):
+        for x in ';\r\t':
             obuff = obuff.replace(x,' ')
         db.add('  data fixed')            
         f = open(fname, 'w')
