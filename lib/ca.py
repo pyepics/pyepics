@@ -146,7 +146,8 @@ def find_libca():
     ## OK, simplest version didn't work, look explicity through path
     known_hosts = {'Linux':   ('linux-x86', 'linux-x86_64') ,
                    'Darwin':  ('darwin-ppc', 'darwin-x86'),
-                   'solaris': ('solaris-sparc',) }
+                   'SunOS':   ('solaris-sparc', 'solaris-sparc-gnu') }
+
     
     if os.name == 'posix':
         libname = 'libca.so'
