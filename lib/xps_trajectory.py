@@ -67,7 +67,6 @@ Line = %f, %f
         self.xps = XPS()
         self.ssid = self.xps.TCP_ConnectToServer(self.host, config.port, config.timeout)
         ret = self.xps.Login(self.ssid, self.user, self.passwd)
-        print "XPS Login => ", ret
         self.trajectories = {}
 
         self.ftpconn = ftplib.FTP()

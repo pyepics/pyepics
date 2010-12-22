@@ -24,8 +24,8 @@ __c = (('general', ('mapdb', 'struck', 'scaler', 'xmap',
 
 conf_objs = OrderedDict(__c)
         
-conf_files = ('XXdefault.cnf',
-              '//cars5/Data/xas_user/config/FastMapDefault.cnf')
+conf_files = ('MapDefault.in',
+              '//cars5/Data/xas_user/config/FastMapDefault.ini')
 
 
 default_conf = """# FastMap configuration file (default)
@@ -180,10 +180,10 @@ class FastMapConfig(object):
         
 if __name__ == "__main__":
     a = FastMapConfig()
-    a.Read('default.cnf')
+    a.Read('default.ini')
     for k,v in a.config.items():
            print k,v, type(v) 
-    a.Read('xmap.001.cnf')
+    a.Read('xmap.001.ini')
     print a.config['scan']
-    a.SaveScanParams('xmap.002.cnf')
+    a.SaveScanParams('xmap.002.ini')
 

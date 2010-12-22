@@ -43,7 +43,17 @@ def readEnvironFile(fname):
     h, d = readASCII(fname, nskip=0, isnumeric=False)
     return h
 
-def readScanConfig(sfile):
+def readScanConfig(folder): 
+    sfiles = [os.path.join(folder, 'Scan.ini'),
+              os.path.join(folder, 'Scan.cnf')]
+    found = False
+    for sfile in sfiles:
+        if os.path.exists(sfile):
+            found = True
+            break
+    if not found:
+        raise IOError('No configuration file found')
+    
     cp =  ConfigParser()
     cp.read(sfile)
     scan = {}
@@ -77,7 +87,7 @@ def readROIFile(hfile):
     return output
         
 class EscanWriter(object):
-    ScanFile   = 'Scan.cnf'
+    ScanFile   = 'Scan.ini'
     EnvFile    = 'Environ.dat'
     ROIFile    = 'ROI.dat'
     MasterFile = 'Master.dat'
@@ -121,7 +131,7 @@ class EscanWriter(object):
             self.slow_positioners = fastmap.config['slow_positioners']
             self.fast_positioners = fastmap.config['fast_positioners']
 
-            self.scanconf, self.generalconf = readScanConfig(os.path.join(self.folder,self.ScanFile))
+            self.scanconf, self.generalconf = readScanConfig(self.folder) 
             scan = self.scanconf
             self.mca_prefix = self.generalconf['xmap']
 
@@ -197,7 +207,9 @@ class EscanWriter(object):
                     atime = time.ctime(os.stat(os.path.join(self.folder,
                                                             xmapfile)).st_ctime)
                     xmapdat     = read_xmap_netcdf(os.path.join(self.folder,xmapfile),verbose=False)
-                    print 'xmap data read!'
+                    #print '.',
+                    #if (1+irow) % 20 == 0: print
+                    #sys.stdout.flush()	
                 except:
                     print 'xmap data failed to read'
                     self.clear()

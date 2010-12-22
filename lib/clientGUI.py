@@ -107,15 +107,12 @@ class FastMapGUI(wx.Frame):
         self.m2stop.SetAction(self.onM2step)        
         self.m2step.SetAction(self.onM2step)
 
-        self.escan_saver = None
-        self.data_fname  = None
-        self.data_mode   = 'w'        
         self.mapconf = None
         self._pvs = motorpvs
         self.start_time = time.time() - 100.0
         self.configfile = configfile
         self.ReadConfigFile()
-
+        
     def buildFrame(self):
         pane = wx.Panel(self, -1)
 
@@ -458,19 +455,12 @@ class FastMapGUI(wx.Frame):
         if not SAVE_ESCAN:
             return
         new_lines = 0
-        if self.data_fname is None:
-            self.data_fname = os.path.abspath(os.path.join(nativepath(self.mapper.basedir),
-                                                           self.mapper.filename))
-            
-        print 'Save Escan Data ', self.data_fname
-        if self.escan_saver is None:
-            self.escan_saver = EscanWriter(folder=self.mapper.workdir)        
-
-        if (time.time() - self.start_time < 2.0):
+        # print 'Save Escan Data ', self.data_fname
+        if (time.time() - self.start_time < 5.0):
             return
         
         self.escan_saver.folder =self.mapper.workdir
-
+        
         new_lines = self.escan_saver.process()
 
         if new_lines > 0:
@@ -667,21 +657,23 @@ class FastMapGUI(wx.Frame):
 
         # setup escan saver 
         self.data_mode   = 'w'
-        self.data_fname  = os.path.abspath(os.path.join(nativepath(self.mapper.basedir), fname))
+
+        self.data_fname  = os.path.abspath(os.path.join(nativepath(self.mapper.basedir), self.mapper.filename))
 
         self.usertitles.Disable()
         self.filename.Disable()        
         self.abortbutton.Enable()        
         self.start_time = time.time()
-        if self.escan_saver is None:
-            self.escan_saver = EscanWriter(folder=self.mapper.workdir)
+        self.escan_saver = EscanWriter(folder=self.mapper.workdir)
         
     @EpicsFunction
     def onAbortScan(self,evt=None):
         self.mapper.AbortScan()
 
+
 if __name__ == "__main__":
     motorpvs = Connect_Motors()
+
     app  = wx.PySimpleApp(redirect=False,
                           filename='fastmap.log')
                           

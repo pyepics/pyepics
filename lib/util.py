@@ -1,11 +1,25 @@
 #!/usr/bin/python
 import time
 import os
-from string import printable
+from string import printable, maketrans
 from random import seed, randrange
 
 WIN_BASE = 'T:\\'
 UNIX_BASE = '/cars5/Data/'
+
+BAD_FILECHARS = ';~,`!%$@?*#:"/|\'\\\t\r\n (){}[]<>'
+BAD_FILETABLE = maketrans(BAD_FILECHARS, '_'*len(BAD_FILECHARS))
+
+def fix_filename(s):
+    """fix string to be a 'good' filename.
+    This may be a more restrictive than the OS, but
+    avoids nasty cases."""
+    t = s.translate(BAD_FILETABLE)
+    if t.count('.') > 1:
+        for i in range(t.count('.') - 1):
+            idot = t.find('.')
+            t = "%s_%s" % (t[:idot], t[idot+1:])
+    return t
 
 def unixpath(d):
     if d.startswith(WIN_BASE):
@@ -77,7 +91,8 @@ def random_string(n):
 
 def pathOf(dir,base,ext):
     p = os.path
-    return p.normpath(p.normcase(p.join(dir,"%s.%s" % (base,ext))))
+    #return p.normpath(p.normcase(p.join(dir,"%s.%s" % (base,ext))))
+    return p.normpath(p.join(dir,"%s.%s" % (base,ext)))
 
 def increment_filename(inpfile,ndigits=3):
     """

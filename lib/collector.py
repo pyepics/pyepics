@@ -5,7 +5,7 @@ import numpy
 import epics 
 from threading import Thread
 
-from util import new_filename, nativepath, winpath
+from util import new_filename, nativepath, winpath, fix_filename
 from debugtime import debugtime
 
 # from epics.devices  import Struck
@@ -16,6 +16,7 @@ from mapper import mapper
 
 from configFile import FastMapConfig
 from mono_control import mono_control
+from EscanWriter import EscanWriter
 
 USE_XMAP = True
 USE_STRUCK = True
@@ -116,21 +117,18 @@ class TrajectoryScan(object):
         except:
             print 'Cannot chdir to ', basedir
 
-        subdir_fmt = 'Scan%5.5i'
-        success = False
-        i = self.subdir_index
-        while i < 10000:
-            i  = i + 1
-            f = self.subdir_fmt % i
-            if not os.path.exists(f):
-                try:
-                    os.mkdir(f)
-                except:
-                    print 'Cannot create dir ', f
-                self.subdir_index = i
-                subdir = f
-                success = True
-                break
+        subdir = fix_filename(self.mapper.filename)
+        if '.' in subdir:
+            subdir = subdir.replace('.','_')
+        if len(subdir)>28:
+            subdir = subdir[:28]
+        if os.path.exists(subdir):
+            while i < 1000:
+                subdir = "%s_%3.3i" % ( subdir, i)
+                if not os.path.exists(subdir):
+                    break
+        os.mkdir(subdir)
+
         self.mapper.workdir = subdir
         self.workdir = os.path.abspath(os.path.join(basedir,subdir))
 
@@ -204,8 +202,8 @@ class TrajectoryScan(object):
             prefix, suffix = os.path.splitext(xmap_fname)
             suffix = suffix.replace('.','')
             fnum = int(suffix)
-            print 'Wrote XMAP file %s  / row %i fnum=%i (%3f sec)' % (xmap_fname, irow,
-                                                                      fnum, time.time()-t0)
+            # print 'Wrote XMAP file %s  / row %i fnum=%i (%3f sec)' % (xmap_fname, irow,
+            #                                                          fnum, time.time()-t0)
             # print "xmap file ", xmap_fname, time.ctime(os.stat(xmap_fname).st_ctime)
         return fnum
 
@@ -319,6 +317,7 @@ class TrajectoryScan(object):
             xps_lines, rowinfo = self.WriteRowData(scan_pt=irow,
                                                    ypos=ypos, npts=npts1)
             xmap_fnum = self.Wait_XMAPWrite(irow=irow)
+            print 'Wrote data for row %i' % (irow)
             self.dtime.add('xmap saved')
             if irow > xmap_fnum:
                 print 'Missing XMAP File!'
@@ -393,15 +392,35 @@ class TrajectoryScan(object):
             self.Write_EnvData(filename=fout)
             self.ENV_Written = True
             self.dtime.add('ExecTraj: Env done')
-
+        saver_thread = Thread(target=self.WriteEscanData)
+        saver_thread.start()
+        
         # now wait for scanning thread to complete
         scan_thread.join()  # max(0.1, scantime-5.0))        
+        saver_thread.join()
         while scan_thread.isAlive() and time.time()-t0 < scantime+5.0:
             time.sleep(0.001)
         self.dtime.add('ExecTraj: Scan Thread complete.')        
         time.sleep(0.002)
 
+    def WriteEscanData(self):
+        self.escan_saver.folder =self.workdir
+        new_lines = self.escan_saver.process()
+        
+        self.data_fname  = os.path.abspath(os.path.join(nativepath(self.mapper.basedir),
+                                                        self.mapper.filename))
+        if new_lines > 0:
+            f = open(self.data_fname, self.data_mode)
+            f.write("%s\n" % '\n'.join(self.escan_saver.buff))
+            f.close()
+            self.data_mode  = 'a'
+            print 'Wrote %i lines to %s ' % (new_lines, self.data_fname)
+        try:
+            self.escan_saver.clear()
+        except:
+            pass
 
+        
     def WriteRowData(self, filename='TestMap', scan_pt=1, ypos=0, npts=None):
         # NOTE:!!  should return here, write files separately.
         strk_fname = self.make_filename('struck', scan_pt)
@@ -486,8 +505,10 @@ class TrajectoryScan(object):
 
         self.MasterFile = open(os.path.join(self.workdir, 'Master.dat'), 'w')
 
-        self.mapconf.Save(os.path.join(self.workdir, 'Scan.cnf'))
-
+        self.mapconf.Save(os.path.join(self.workdir, 'Scan.ini'))
+        self.data_mode   = 'w'
+        self.escan_saver = EscanWriter(folder=self.workdir)
+        
         scan = self.mapconf.get('scan')
         scan['scantime'] = scan['time1']
         if scan['dimension'] == 1:

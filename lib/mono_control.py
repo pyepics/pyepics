@@ -85,7 +85,7 @@ class mono_control(epics.Device):
         return  self.pitchFB_Locked == 1
         
     def CheckMonoPitch(self):
-        if abs(self.tilt_fine) < 2.0:
+        if abs(self.tilt_fine) < 3.50:
             print 'Mono tilt fine adjust looks OK'
         else:
             self.OptimizeMonoPitch()

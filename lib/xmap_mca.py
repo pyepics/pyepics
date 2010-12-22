@@ -91,27 +91,32 @@ class MultiXMAP(epics.Device):
         
     def roi_calib_info(self):
         buff = ['[rois]']
+        add = buff.append
         roidat = self.get_rois()
-        caldat = numpy.array(self.get_calib())
 
         for i, k in enumerate(roidat[0].keys()):
             s = [list(roidat[m][k]) for m in range(self.nmca)]
             rd = repr(s).replace('],', '').replace('[', '').replace(']','').replace(',','')
-            buff.append("ROI%2.2i = %s | %s" % (i,k,rd))
-        buff.append('[calibration]')
-        buff.append("OFFSET = %s " % (' '.join(["%.7g" % i for i in caldat[:, 0]])))
-        buff.append("SLOPE  = %s " % (' '.join(["%.7g" % i for i in caldat[:, 1]])))
-        buff.append("QUAD   = %s " % (' '.join(["%.7g" % i for i in caldat[:, 2]])))
+            add("ROI%2.2i = %s | %s" % (i,k,rd))
+            
+        caldat = numpy.array(self.get_calib())
+        add('[calibration]')
+        add("OFFSET = %s " % (' '.join(["%.7g" % i for i in caldat[:, 0]])))
+        add("SLOPE  = %s " % (' '.join(["%.7g" % i for i in caldat[:, 1]])))
+        add("QUAD   = %s " % (' '.join(["%.7g" % i for i in caldat[:, 2]])))
+        
+        add('[dxp]')
+        for a in self.dxps[0]._attrs:
+            vals = [str(dxp.get(a, as_string=True)) for dxp in self.dxps]
+            add("%s = %s" % (a, ' '.join(vals)))
         return buff
     
     def Write_CurrentConfig(self, filename=None):
         d = debugtime.debugtime()
 
-        # print 'Write Current Config'
+        print 'Write Current Config'
         buff = []
-        def add(s):
-            buff.append(s)
-        
+        add = buff.append 
         add('#Multi-Element xMAP Settings saved: %s' % time.ctime())
         add('[general]')
         add('prefix= %s' % self._prefix)
@@ -120,15 +125,7 @@ class MultiXMAP(epics.Device):
         d.add('starting roi....')
         buff.extend( self.roi_calib_info() )
 
-        d.add('wrote roi / calib')
-        add('[dxp]')
-        dxp_attrs = self.dxps[0]._attrs
-        # print len(dxp_attrs), len(self.dxps)
-        for  a in dxp_attrs:
-            vals = [str(dxp.get(a, as_string=True)) for dxp in self.dxps]
-            add("%s = %s" % (a, ' '.join(vals)))
-        d.add('wrote dxp params')
-        print len(buff)
+        d.add('wrote roi / calib / dxp')
         
         buff = '\n'.join(buff)
         if filename is not None:
@@ -136,7 +133,7 @@ class MultiXMAP(epics.Device):
             fh.write(buff)
             fh.close()
         d.add('wrote file')
-        # d.show()
+        d.show()
         return buff
 
     def start(self):
@@ -162,7 +159,7 @@ class MultiXMAP(epics.Device):
         "Advance to Next Pixel until CurrentPixel == PixelsPerRun"
         pprun = self.PixelsPerRun
         cur   = self.dxps[0].get('CurrentPixel')
-        print 'XMAP : finishing pixels ', cur, ' to ' , pprun
+        print 'XMAP finishing pixels ', cur, ' to ' , pprun
         for i in range(pprun-cur):
             self.next_pixel()
             time.sleep(0.005)
@@ -316,4 +313,5 @@ class MultiXMAP(epics.Device):
 if __name__ == '__main__':
     qv = MultiXMAP('13SDD1:', nmca=4)
     qv.Write_CurrentConfig(filename='QuadVortex.conf')
-
+    time.sleep(0.2)
+    qv.Write_CurrentConfig(filename='QuadVortex2.conf')
