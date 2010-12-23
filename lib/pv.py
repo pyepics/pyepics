@@ -146,8 +146,9 @@ class PV(_BasePVCallback):
             ca._cache[ctx] = {}
         if self.pvname in ca._cache[ctx]:
             entry = ca._cache[ctx][pvname]
-            self.chid = entry['chid']
-            self.__on_connect(chid=self.chid, conn=entry['conn'])
+            if entry['chid'] is not None:
+                self.chid = entry['chid']
+                self.__on_connect(chid=self.chid, conn=entry['conn'])
         if self.chid is None:
             self.chid = ca.create_channel(self.pvname,
                                           callback=self.__on_connect)

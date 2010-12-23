@@ -592,12 +592,16 @@ def create_channel(pvname, connect=False, callback=None):
                                'callbacks': [ callback ]}
     else:
         _cache[ctx][pvname]['callbacks'].append(callback)
-
-    chid = dbr.chid_t()
-    # print 'Create Channel ', ctx, chid, pvname
-    ret = libca.ca_create_channel(pvn, _CB_CONNECT, 0, 0, 
-                                  ctypes.byref(chid))
-    PySEVCHK('create_channel', ret)
+    
+    if not 'chid_p' in _cache[ctx][pvname]:
+        chid = dbr.chid_t()
+        # print 'Create Channel ', ctx, chid, pvname
+        ret = libca.ca_create_channel(pvn, _CB_CONNECT, 0, 0, 
+                                  ctypes.byref(chid))    
+        PySEVCHK('create_channel', ret)
+        _cache[ctx][pvname]['chid_p'] = chid
+    else:
+        chid = _cache[ctx][pvname]['chid_p'] # already waiting on a chid
 
     if connect:
         connect_channel(chid)
