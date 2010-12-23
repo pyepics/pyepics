@@ -167,8 +167,9 @@ class PV(_BasePVCallback):
         
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
-        # occassionally chid is still None (threading issue???)
-        # just return here, and connection will happen later
+        # occassionally chid is still None (ie if a second PV is created while 
+        # __on_connect is still pending for the first one.)
+        # Just return here, and connection will happen later
         if self.chid is None and chid is None:
             time.sleep(0.001)
             return
@@ -707,6 +708,7 @@ class PVTuple(_BasePVCallback):
     def type(self):
         return tuple([ p.type for p in self.pvs ])
 
-
+    def __repr__(self):
+        return "<PVTuple %s>" % (self.pvs)
 
 
