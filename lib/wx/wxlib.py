@@ -720,10 +720,10 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
 
 
 class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin): 
-    """ FloatSpin (floating-point-aware SpinCtrl) linked to a PV
-        value, both reads/writes the PV on changes.
+    """ A FloatSpin (floating-point-aware SpinCtrl) linked to a PV,
+        both reads and writes the PV on changes.
         
-        Arguments
+        Additional Arguments:
         pv = pv to set
         deadTime = delay between user typing a value into the field, and it being sent
     """
@@ -751,7 +751,91 @@ class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin):
         self._OnChanged(event)
 
     def OnChar(self, event):
-        floatspin.FloatSpin.OnChar(self, event)
+        super().OnChar(self, event)
         # Timer will restart if it's already running
         self.deadTimer.Start(milliseconds=self.deadTime, oneShot=True)
+
        
+class pvButton(wx.Button, pvCtrlMixin):
+    """ A Button linked to a PV. When the button is pressed, a certain value
+        is written to the PV (useful for momentary PVs with HIGH= set.)
+
+        Additional Arguments:
+        pv = pv to write back to
+        pushValue = value to write when button is pressed
+        disablePV = read this PV in order to disable the button
+        disableValue = disable the button if/when the disablePV has this value
+        
+    """
+    def __init__(self, parent, pv=None, pushValue=1, disablePV=None, disableValue=1, **kw):
+        wx.Button.__init__(self, parent, **kw)
+        pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
+        self.pushValue = pushValue
+        wx.EVT_BUTTON(self, self.GetId(), self.OnPress)
+
+        self.disablePV = disablePV
+        self.disableValue = disableValue            
+        if disablePV is not None:
+            self.disablePV.add_callback(self._disableEvent, wid=self.GetId())     
+        self.maskedEnabled = True
+            
+
+    def Enable(self, value):
+        self.maskedEnabled = value
+        self._UpdateEnabled()
+
+    def _UpdateEnabled(self):
+        enableValue = self.maskedEnabled
+        if self.disablePV is not None and (self.disablePV.get() == self.disableValue):
+            enableValue = False
+        if self.pv is not None and ( self.pv.get() == self.pushValue ):
+            enableValue = False
+        wx.Button.Enable(self, enableValue)
+        
+    @DelayedEpicsCallback
+    def _disableEvent(self, **kw):
+        self._UpdateEnabled()
+
+    def _SetValue(self, event):
+        self._UpdateEnabled()
+
+    def OnPress(self, event):
+        self.pv.put(self.pushValue)
+
+    
+
+class pvRadioButton(wx.RadioButton, pvCtrlMixin):
+    """A pvRadioButton is a radio button associated with a particular PV and one particular value.
+       
+       Suggested for use in a group where all radio buttons are pvRadioButtons, and they all have a
+       discrete value set.
+    """
+    def __init__(self, parent, pv=None, pvValue=None, **kw):
+        wx.RadioButton.__init__(self, parent, **kw)
+        pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
+        self.pvValue = pvValue
+        wx.EVT_RADIOBUTTON(self, self.GetId(), self.OnPress)
+
+    def OnPress(self, event):
+        self.pv.put(self.pvValue)
+        
+    def _SetValue(self, value):
+        if self.pv.get() == self.pvValue: # use raw PV val as is not string-converted
+            self.Value = True
+
+        
+class pvComboBox(wx.ComboBox, pvCtrlMixin):
+    """ A ComboBox linked to a PV. Both reads/writes the combo value on changes
+    """
+    def __init__(self, parent, pv=None, **kw):
+        wx.ComboBox.__init__(self, parent, **kw)
+        pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
+        wx.EVT_TEXT(self, self.GetId(), self.OnText)
+        
+    def _SetValue(self, value):
+        print "pvComboBox %s _SetValue %s" % (self, self.pv.get(as_string=True))
+        if value != self.Value:
+            self.Value = value
+    
+    def OnText(self, event):
+        self.pv.put(self.Value)

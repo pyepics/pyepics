@@ -19,6 +19,9 @@ pvEnumChoice  = wxlib.pvEnumChoice
 pvBitmap      = wxlib.pvBitmap
 pvCheckBox    = wxlib.pvCheckBox
 pvFloatSpin   = wxlib.pvFloatSpin
+pvButton      = wxlib.pvButton
+pvRadioButton = wxlib.pvRadioButton
+pvComboBox    = wxlib.pvComboBox
 
 set_sizer = wxlib.set_sizer
 set_float = wxlib.set_float
