@@ -157,7 +157,7 @@ callbacks to be executed when the PV changes.
  
    disconnect a PV, clearing all callbacks.
 
-.. method:: add_callback(callback=None[, index=None , [**kw]])
+.. method:: add_callback(callback=None[, index=None [, with_ctrlvars=True[, **kw]])
  
    adds a user-defined callback routine to be run on each change event for
    this PV.  Returns the integer *index*  for the callback.
@@ -165,6 +165,8 @@ callbacks to be executed when the PV changes.
    :param callback: user-supplied function to run when PV changes.
    :type callback: None or callable
    :param index: identifying key for this callback 
+   :param with_ctrlvars:  whether to (try to) make sure that accurate
+   ``control values`` will be sent to the callback.
    :type index:: None (integer will be produced) or immutable
    :param kw: additional keyword/value arguments to pass to each execution of the callback.
    :rtype:  integer

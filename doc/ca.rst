@@ -309,7 +309,7 @@ requiring the user to supply DBR TYPE and count as well as ``chid`` and
 allocated space for the data.  In python none of these is needed, and
 keyword arguments can be used to specify such options.
 
-.. method:: get(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=False]]]])
+.. method:: get(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=True]]]])
 
 
    return the current value for a Channel. Note that there is not a separate form for array data.
@@ -318,8 +318,8 @@ keyword arguments can be used to specify such options.
    :type  chid:  ctypes.c_long
    :param ftype:  field type to use (native type is default)
    :type ftype:  integer
-   :param count:  naximum element count to return (full data returned by default)
-   :type cont:  integer
+   :param count:  maximum element count to return (full data returned by default)
+   :type count:  integer
    :param as_string:  whether to return the string representation of the value.  See notes below. 
    :type as_string:  ``True``/``False``
    :param as_numpy:  whether to return the Numerical Python representation  for array / waveform data.  
@@ -378,7 +378,7 @@ to best deal with very large arrays.
    :type use_time:  ``True``/``False``
    :param use_ctrl: whether to use the CTRL variant for the PV type
    :type use_ctrl:  ``True``/``False``
-   :param  mask:    integer bitmask to control which changes result in a     callback   
+   :param  mask:    integer bitmask to control which changes result in a  callback   
    :type mask:      integer
    :param userfcn:  user-supplied callback function
    :type userfcn:   ``None`` or callable 

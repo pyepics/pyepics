@@ -143,15 +143,27 @@ quite good.
 :func:`caget`
 ~~~~~~~~~~~~~
 
-..  function:: caget(pvname[, as_string=False])
+..  function:: caget(pvname[, as_string=False[, count=None[, as_numpy=True])
 
   retrieves and returns the value of the named PV.
 
   :param pvname: name of Epics Process Variable
   :param as_string:  whether to return string representation of the PV value.
-  :type as_string: True or False
+  :type as_string:  ``True``/``False``
  
-The optional *as_string* argument tells the function to return the **string
+  :param count:  number of elements to return for array data.
+  :type count:  integer
+
+   :param as_numpy:  whether to return the Numerical Python representation
+   for array data.  
+   :type as_numpy:  ``True``/``False``
+
+
+The *count* and *as_numpy* options apply only to array or waveform
+data. The default behavior is to return the full data array and convert to
+a numpy array if available.
+
+The *as_string* argument tells the function to return the **string
 representation** of the value.  The details of the string representation
 depends on the variable type of the PV.  For integer (short or long) and
 string PVs, the string representation is pretty easy: 0 will become '0',

@@ -351,7 +351,6 @@ attribute cannot do so::
 
    The "raw" and "dial" keywords are mutually exclusive.
    The "readback" keyword can be used in user, dial or raw coordinates.
-            
 
 .. method:: set_position(position[ dial=False[, raw=False]])
 
