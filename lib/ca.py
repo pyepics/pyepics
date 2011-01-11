@@ -368,8 +368,6 @@ def withSEVCHK(fcn):
     wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
-
-
 ##
 ## Event Handlers for get() event callbacks
 def _onGetEvent(args):
@@ -714,7 +712,6 @@ def native_type(ftype):
 def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     """unpack raw data returned from an array get or
     subscription callback"""
-
     def unpack_simple(data, count, ntype, use_numpy):
         "simple, native data type"
         if count == 1 and ntype != dbr.STRING:
@@ -724,10 +721,8 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
             if '\x00' in out:
                 out = out[:out.index('\x00')]
             return out
-        elif ntype == dbr.CHAR:
-            return copy.copy(data)
         elif use_numpy:
-            return numpy.array(data)
+            return numpy.ctypeslib.as_array(data)
         return list(data)
         
     def unpack_ctrltime(data, count, ntype, use_numpy):
@@ -740,10 +735,8 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         # fix for CTRL / TIME array data:Thanks to Glen Wright !
         out = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
                                                   dbr.value_offset[ftype])
-        if ntype == dbr.CHAR:
-            return copy.copy(out)
-        elif use_numpy:
-            return numpy.array(out)
+        if use_numpy:
+            return numpy.ctypeslib.as_array(out)
         return list(out)
 
     unpack = unpack_simple
@@ -762,7 +755,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
 
     ntype = native_type(ftype)
     use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and
-                 count > 1 and count < AUTOMONITOR_MAXLENGTH)
+                 count > 1)
     return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID
@@ -787,13 +780,13 @@ def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
     nelem = count
     if ftype == dbr.STRING:
         nelem = dbr.MAX_STRING_SIZE
-    data = (nelem*dbr.Map[ftype])()
+    data = (count*dbr.Map[ftype])()
     ret = libca.ca_array_get(ftype, count, chid, data)
     PySEVCHK('get', ret)
     poll()
     if count > 2:
         tcount = min(count, 1000)
-        poll(evt=tcount*5.e-5, iot=tcount*0.01)
+        poll(evt=tcount*1.e-5, iot=tcount*0.01)
 
     val = _unpack(data, count=nelem, ftype=ftype, as_numpy=as_numpy)
     if as_string:

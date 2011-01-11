@@ -196,14 +196,10 @@ class PV(object):
                                          count=count,
                                          ftype=self.ftype,
                                          as_numpy=as_numpy)
+
         if as_string:
             self._set_charval(self._args['value'])
             return self._args['char_value']
-        if count is not None and self.count > 1:
-            try:
-                return self._args['value'][:count]
-            except:
-                pass
         return self._args['value']
         
 
@@ -317,7 +313,8 @@ class PV(object):
             if hasattr(fcn, '__call__'):
                 fcn(**kwd)
             
-    def add_callback(self, callback=None, index=None, **kw):
+    def add_callback(self, callback=None, index=None,
+                     with_ctrlvars=True, **kw):
         """add a callback to a PV.  Optional keyword arguments
         set here will be preserved and passed on to the callback
         at runtime.
@@ -327,6 +324,8 @@ class PV(object):
         add_callback.  This index is needed to remove a callback."""
         if not self.wait_for_connection():
             return None
+        if with_ctrlvars:
+            self.get_ctrlvars()
         if hasattr(callback, '__call__'):
             if index is None:
                 index = 1
