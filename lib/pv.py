@@ -336,8 +336,6 @@ class PV(object):
     
     def remove_callback(self, index=None):
         """remove a callback by index"""
-        if len(self.callbacks)==1:
-            self.callbacks.pop()
         if index in self.callbacks:
             self.callbacks.pop(index)
             self.poll()
