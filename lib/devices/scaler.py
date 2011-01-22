@@ -1,4 +1,5 @@
 #!/usr/bin/python 
+"""Epics Scaler"""
 import epics
 
 class Scaler(epics.Device):

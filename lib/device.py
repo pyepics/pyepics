@@ -139,7 +139,7 @@ class Device(object):
         """put an attribute value, 
         optionally wait for completion or
         up to a supplied timeout value"""
-        thispv  =self.PV(attr)
+        thispv = self.PV(attr)
         thispv.wait_for_connection()
         return thispv.put(value, wait=wait, timeout=timeout)
         

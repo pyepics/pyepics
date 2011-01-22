@@ -1,4 +1,5 @@
 #!/usr/bin/python
+"""Epics analog input record"""
 import epics  
 
 class ai(epics.Device):
