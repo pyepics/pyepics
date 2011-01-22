@@ -19,7 +19,6 @@ import os
 import sys
 import time
 import atexit
-import copy
 
 HAS_NUMPY = False
 try:
@@ -71,6 +70,15 @@ def strjoin(sep, seq):
     if isinstance(seq[0], bytes): 
         seq = [BYTES2STR(i) for i in seq]
     return sep.join(seq)
+    
+## print to stdout
+def write(msg, newline=True, flush=True):
+    """write message to stdout"""
+    sys.stdout.write(msg)
+    if newline:
+        sys.stdout.write("\n")
+    if flush:
+        sys.stdout.flush()
     
 ## holder for shared library
 libca = None
@@ -264,7 +272,7 @@ def show_cache(print_out=True):
                                         context))
     out = strjoin('\n', out)
     if print_out:
-        sys.stdout.write("%s\n" % out)
+        write(out)
     else:
         return out
     
@@ -287,12 +295,12 @@ def withCA(fcn):
     Note that CA functions that take a Channel ID (chid) as an
     argument are  NOT wrapped by this: to get a chid, the
     library must have been initialized already."""
-    def wrapper(*args, **kw):
+    def wrapper(*args, **kwds):
         "withCA wrapper"
         global libca
         if libca is None:
             initialize_libca()
-        return fcn(*args, **kw)
+        return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
     wrapper.__dict__.update(fcn.__dict__)
@@ -307,7 +315,7 @@ def withCHID(fcn):
     data of _cache) that could be tested here.  For now, that
     seems slightly 'not low-level' for this module.
     """
-    def wrapper(*args, **kw):
+    def wrapper(*args, **kwds):
         "withCHID wrapper"
         if len(args)>0:
             chid = args[0]
@@ -317,7 +325,7 @@ def withCHID(fcn):
             if not isinstance(chid, dbr.chid_t):
                 raise ChannelAccessException(fcn.__name__,
                                              "not a valid chid!")
-        return fcn(*args, **kw)
+        return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
     wrapper.__dict__.update(fcn.__dict__)
@@ -328,7 +336,7 @@ def withConnectedCHID(fcn):
     """decorator to ensure that first argument to a function is a
     chid that is actually connected. This will attempt to connect
     if needed."""
-    def wrapper(*args, **kw):
+    def wrapper(*args, **kwds):
         "withConnectedCHID wrapper"
         if len(args)>0:
             chid = args[0]
@@ -339,9 +347,9 @@ def withConnectedCHID(fcn):
                 raise ChannelAccessException(fcn.__name__,
                                              "not a valid chid!")
             if not isConnected(chid):
-                timeout = kw.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
+                timeout = kwds.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
                 connect_channel(chid, timeout=timeout)
-        return fcn(*args, **kw)
+        return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
     wrapper.__dict__.update(fcn.__dict__)
@@ -359,9 +367,9 @@ def withSEVCHK(fcn):
     """decorator to raise a ChannelAccessException if the wrapped
     ca function does not return status=ECA_NORMAL
     """
-    def wrapper(*args, **kw):
+    def wrapper(*args, **kwds):
         "withSEVCHK wrapper"
-        status = fcn(*args, **kw)
+        status = fcn(*args, **kwds)
         return PySEVCHK( fcn.__name__, status)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
@@ -376,25 +384,25 @@ def _onGetEvent(args):
     # print(" onGet Event: ", args.chid, type(args.chid))
     # chid = dbr.chid_t(args.chid)
     pvname = name(args.chid)
-    kwd = {'ftype':args.type, 'count':args.count,
+    kwds = {'ftype':args.type, 'count':args.count,
            'chid':args.chid, 'pvname': pvname,
            'status':args.status}
-    # add kwd arguments for CTRL and TIME variants
+    # add kwds arguments for CTRL and TIME variants
     if args.type >= dbr.CTRL_STRING:
         tmpv = value[0]
         for attr in dbr.ctrl_limits + ('precision', 'units', 'severity'):
             if hasattr(tmpv, attr):        
-                kwd[attr] = getattr(tmpv, attr)
+                kwds[attr] = getattr(tmpv, attr)
         if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
             tmpv.no_str > 0):
-            kwd['enum_strs'] = tuple([tmpv.strs[i].value for 
+            kwds['enum_strs'] = tuple([tmpv.strs[i].value for 
                                       i in range(tmpv.no_str)])
 
     elif args.type >= dbr.TIME_STRING:
         tmpv = value[0]
-        kwd['status']    = tmpv.status
-        kwd['severity']  = tmpv.severity
-        kwd['timestamp'] = (dbr.EPICS2UNIX_EPOCH + tmpv.stamp.secs + 
+        kwds['status']    = tmpv.status
+        kwds['severity']  = tmpv.severity
+        kwds['timestamp'] = (dbr.EPICS2UNIX_EPOCH + tmpv.stamp.secs + 
                             1.e-6*int(tmpv.stamp.nsec/1000.00))
     nelem = args.count
     if args.type in (dbr.STRING, dbr.TIME_STRING, dbr.CTRL_STRING):
@@ -402,7 +410,7 @@ def _onGetEvent(args):
         
     value = _unpack(value, count=nelem, ftype=args.type)
     if hasattr(args.usr, '__call__'):
-        args.usr(value=value, **kwd)
+        args.usr(value=value, **kwds)
 
 ## connection event handler: 
 def _onConnectionEvent(args):
@@ -438,7 +446,7 @@ def _onConnectionEvent(args):
     return 
 
 ## put event handler:
-def _onPutEvent(args, *varargs):
+def _onPutEvent(args, **kwds):
     """set put-has-completed for this channel,
     call optional user-supplied callback"""
     pvname = name(args.chid)
@@ -446,7 +454,7 @@ def _onPutEvent(args, *varargs):
     data = _put_done[pvname][2]
     _put_done[pvname] = (True, None, None)
     if hasattr(fcn, '__call__'):
-        fcn(pvname=pvname, data=data)
+        fcn(pvname=pvname, data=data, **kwds)
 
 # create global reference to these two callbacks
 _CB_CONNECT = ctypes.CFUNCTYPE(None, dbr.connection_args)(_onConnectionEvent)
@@ -578,7 +586,6 @@ def create_channel(pvname, connect=False, callback=None):
     # callback that is run -- the callack here is stored in the _cache
     # and called by _onConnectionEvent.
     pvn = STR2BYTES(pvname)    
-    # sys.stdout.write(' create channel %s \n' % pvn)
     ctx = current_context()
     global _cache
     if ctx not in _cache:
@@ -614,8 +621,8 @@ def connect_channel(chid, timeout=None, verbose=False):
     
     """
     if verbose:
-        sys.stdout.write(' connect channel -> %s %s %s \n' %
-                     (repr(chid), repr(state(chid)), repr(dbr.CS_CONN)))
+        write(' connect channel -> %s %s %s ' %
+               (repr(chid), repr(state(chid)), repr(dbr.CS_CONN)))
     conn = (state(chid) == dbr.CS_CONN)
     if not conn:
         # not connected yet, either indicating a slow network
@@ -754,8 +761,8 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         ftype = dbr.INT
 
     ntype = native_type(ftype)
-    use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and
-                 count > 1)
+    use_numpy = (count > 1 and HAS_NUMPY and as_numpy and
+                 ntype != dbr.STRING)
     return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID

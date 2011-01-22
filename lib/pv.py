@@ -8,7 +8,6 @@
 """
 import time
 import copy
-from sys import stdout
 from math import log10
 
 from . import ca
@@ -93,11 +92,6 @@ class PV(object):
         if callback is not None:
             self.add_callback(callback)
 
-    def _write(self, msg):
-        "write message"
-        stdout.write("%s\n" % msg)
-        stdout.flush()
-        
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
         # occassionally chid is still None (threading issue???)
@@ -135,8 +129,8 @@ class PV(object):
 
         if hasattr(self.connection_callback, '__call__'):
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
-        elif not conn:
-            self._write("PV '%s' disconnected." % pvname)
+        elif not conn and self.verbose:
+            ca.write("PV '%s' disconnected." % pvname)
 
         # waiting until the very end until to set self.connected prevents
         # threads from thinking a connection is complete when it is actually
@@ -283,9 +277,9 @@ class PV(object):
 
         if self.verbose:
             now = fmt_time(self._args['timestamp'])
-            self._write('%s: %s (%s)'% (self.pvname,
-                                        self._args['char_value'],
-                                        now))
+            ca.write('%s: %s (%s)'% (self.pvname,
+                                     self._args['char_value'],
+                                     now))
         self.run_callbacks()
         
     def run_callbacks(self):

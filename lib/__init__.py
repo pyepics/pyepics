@@ -59,7 +59,7 @@ def __create_pv(pvname, timeout=5.0):
         if time.time()-start_time > timeout:
             break
     if not thispv.connected:
-        sys.stdout.write('cannot connect to %s\n' % pvname)
+        ca.write('cannot connect to %s' % pvname)
         return None
     # save this one for next time
     _CACHE_[pvname] = thispv
@@ -116,7 +116,7 @@ def cainfo(pvname, print_out=True):
         thispv.get()
         thispv.get_ctrlvars()
         if print_out:
-            sys.stdout.write("%s\n" % thispv.info)
+            ca.write(thispv.info)
         else:     
             return thispv.info
 
@@ -145,18 +145,16 @@ def camonitor(pvname, writer=None, callback=None):
     """
 
     if writer is None:
-        writer = sys.stdout.write
+        writer = ca.write
     if callback is None:
-        def callback(pvname=None, value=None, char_value=None, **kw):
+        def callback(pvname=None, value=None, char_value=None, **kwds):
             "generic monitor callback"
             if char_value is None:
                 char_value = repr(value)
-            writer("%.32s %s %s\n" % (pvname, pv.fmt_time(), char_value))
+            writer("%.32s %s %s" % (pvname, pv.fmt_time(), char_value))
         
     thispv = __create_pv(pvname)
     _MONITORS_[pvname] = thispv
     if thispv is not None:
         thispv.get()
-        thispv.add_callback(callback)
-
-
+        thispv.add_callback(callback, with_ctrlvars=True)
