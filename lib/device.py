@@ -13,8 +13,8 @@ class Device(object):
     string for their names, but having many 'attributes'.
 
     Many groups of PVs will have names made up of
-         Prefix+Delimeter+Attribute
-    with common Prefix and Delimeter, but a range of Attribute names.
+         Prefix+Delimiter+Attribute
+    with common Prefix and Delimiter, but a range of Attribute names.
     Many Epics Records follow this model, but a Device is only about
     PV names, and so is not exactly a mapping to an Epics Record.
 
