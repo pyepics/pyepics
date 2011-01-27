@@ -721,13 +721,22 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     subscription callback"""
     def unpack_simple(data, count, ntype, use_numpy):
         "simple, native data type"
+        # print 'UNPACK SIMPLE ', data, count, ntype, dbr.STRING
         if count == 1 and ntype != dbr.STRING:
             return data[0]
         if ntype == dbr.STRING:
-            out = strjoin('', data).rstrip()
-            if '\x00' in out:
-                out = out[:out.index('\x00')]
-            return out
+            out = []
+            for elem in range(min(count, len(data))):
+                this = strjoin('', data[elem]).rstrip()
+                if '\x00' in this:
+                    this = this[:this.index('\x00')]
+                out.append(this)
+
+            if len(out) == 1:
+                return out[0]
+            else:
+                return out
+
         elif use_numpy:
             return numpy.ctypeslib.as_array(data)
         return list(data)
@@ -742,6 +751,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         # fix for CTRL / TIME array data:Thanks to Glen Wright !
         out = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
                                                   dbr.value_offset[ftype])
+
         if use_numpy:
             return numpy.ctypeslib.as_array(out)
         return list(out)
@@ -784,10 +794,8 @@ def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
     else:
         count = min(count, element_count(chid))
         
-    nelem = count
-    if ftype == dbr.STRING:
-        nelem = dbr.MAX_STRING_SIZE
     data = (count*dbr.Map[ftype])()
+
     ret = libca.ca_array_get(ftype, count, chid, data)
     PySEVCHK('get', ret)
     poll()
@@ -795,7 +803,7 @@ def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
         tcount = min(count, 1000)
         poll(evt=tcount*1.e-5, iot=tcount*0.01)
 
-    val = _unpack(data, count=nelem, ftype=ftype, as_numpy=as_numpy)
+    val = _unpack(data, count=count, ftype=ftype, as_numpy=as_numpy)
     if as_string:
         val = _as_string(val, chid, count, ftype)
     return val
@@ -836,11 +844,13 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     ftype = field_type(chid)
     count = element_count(chid)
     data  = (count*dbr.Map[ftype])()    
-    
+
     if ftype == dbr.STRING:
-        data = (dbr.string_t)()
-        count = 1
-        data.value = value
+        if count == 1:
+            data[0].value = value
+        else:
+            for elem in range(min(count, len(value))):
+                data[elem].value = value[elem]
     elif count == 1:
         try:
             data[0] = value
@@ -906,6 +916,7 @@ def get_ctrlvars(chid):
     """
     ftype = promote_type(chid, use_ctrl=True)
     dat = (1*dbr.Map[ftype])()
+
     ret = libca.ca_array_get(ftype, 1, chid, dat)
     PySEVCHK('get_ctrlvars', ret)
     poll()
@@ -932,6 +943,7 @@ def get_timevars(chid):
     """
     ftype = promote_type(chid, use_time=True)
     dat = (1*dbr.Map[ftype])()
+
     ret = libca.ca_array_get(ftype, 1, chid, dat)
     PySEVCHK('get_timevars', ret)
     poll()
@@ -1049,15 +1061,15 @@ def sg_get(gid, chid, ftype=None):
         ftype = field_type(chid)
     count = element_count(chid)
 
-    nelem = count
-    if ftype == dbr.STRING:
-        nelem = dbr.MAX_STRING_SIZE
-    
-    data = (nelem*dbr.Map[ftype])()
-   
+    data = (count*dbr.Map[ftype])()
     ret = libca.ca_sg_array_get(gid, ftype, count, chid, data)
     PySEVCHK('sg_get', ret)
-    return data
+    poll()
+
+    val = _unpack(data, count=count, ftype=ftype, as_numpy=as_numpy)
+    if as_string:
+        val = _as_string(val, chid, count, ftype)
+    return val
  
 def sg_put(gid, chid, value):
     "synchronous-group put: cannot wait or get callback!"
@@ -1067,10 +1079,13 @@ def sg_put(gid, chid, value):
     ftype = field_type(chid)
     count = element_count(chid)
     data  = (count*dbr.Map[ftype])()    
+
     if ftype == dbr.STRING:
-        data = (dbr.string_t)()
-        count = 1
-        data.value = value
+        if count == 1:
+            data[0].value = value
+        else:
+            for elem in range(min(count, len(value))):
+                data[elem].value = value[elem]
     elif count == 1:
         try:
             data[0] = value

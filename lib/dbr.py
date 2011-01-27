@@ -175,7 +175,7 @@ class ctrl_double(ctypes.Structure):
     _fields_.extend([('value',       double_t)])
     
 # map of Epics DBR types to ctypes types
-Map = {STRING: char_t,
+Map = {STRING: string_t,
        INT:    short_t,
        FLOAT:  float_t,
        ENUM:   ushort_t,
@@ -240,8 +240,9 @@ def Name(ftype, reverse=False):
 def cast_args(args):
     """returns pointer to arg type for casting """
     count, ftype = args.count, args.type
-    if ftype == STRING:
-        count = MAX_STRING_SIZE
+    #if ftype == STRING:
+    #    print 'THIS IS CAST ARG for STRING '
+    #    count = MAX_STRING_SIZE
     if ftype not in Map:
         ftype = double_t
     return ctypes.cast(args.raw_dbr, ctypes.POINTER(count*Map[ftype]))

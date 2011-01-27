@@ -118,7 +118,8 @@ class PV(object):
             self._args['type'] = _ftype_
             self._args['typefull'] = _ftype_
             self._args['ftype'] = dbr.Name(_ftype_, reverse=True)
-            
+
+
             if self.auto_monitor is None:
                 self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
             if self._monref is None and self.auto_monitor:
@@ -128,6 +129,7 @@ class PV(object):
                                          callback=self.__on_changes)
 
         if hasattr(self.connection_callback, '__call__'):
+            
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
         elif not conn and self.verbose:
             ca.write("PV '%s' disconnected." % pvname)
@@ -185,6 +187,7 @@ class PV(object):
         """
         if not self.wait_for_connection():
             return None
+
         if not self.auto_monitor or self._args['value'] is None:
             self._args['value'] = ca.get(self.chid,
                                          count=count,
