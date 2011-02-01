@@ -18,6 +18,7 @@ import ctypes.util
 import os
 import sys
 import time
+import copy
 import atexit
 
 HAS_NUMPY = False
@@ -736,8 +737,9 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
                 return out[0]
             else:
                 return out
-
-        elif use_numpy:
+        if ntype == dbr.CHAR:
+            data = copy.copy(data)
+        if use_numpy:
             return numpy.ctypeslib.as_array(data)
         return list(data)
         
@@ -752,6 +754,8 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         out = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
                                                   dbr.value_offset[ftype])
 
+        if ntype == dbr.CHAR:
+            out = copy.copy(out)
         if use_numpy:
             return numpy.ctypeslib.as_array(out)
         return list(out)
