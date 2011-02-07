@@ -736,24 +736,41 @@ class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin):
         self.deadTime = deadTime
         wx.EVT_TIMER(self, self.deadTimer.GetId(), self._OnCharTimeout)
         
+    @EpicsFunction
+    def set_pv(self, pv=None):
+        pvCtrlMixin.set_pv(self, pv)
+        self.SetMin(self.pv.lower_ctrl_limit)
+        self.SetMax(self.pv.upper_ctrl_limit)
+
     def _SetValue(self, value):
         value = self.pv.get() # get a non-string value
         self.SetValue(float(value))
 
     def _OnChanged(self, event):
-        self.pv.put(self.GetValue())
+        if self.pv is not None:
+            value = self.GetValue()
+            if self.pv.upper_ctrl_limit <> 0 or self.pv.lower_ctrl_limit <> 0: # both zero -> not set
+                if value > self.pv.upper_ctrl_limit:
+                    value = self.pv.upper_ctrl_limit
+                    self.SetValue(value)
+                if value < self.pv.lower_ctrl_limit:
+                    value = self.pv.lower_ctrl_limit
+                    self.SetValue(value)            
+            self.pv.put(value)
 
     def _OnCharTimeout(self, event):
         # save & restore insertion point before syncing control
         savePoint = self.GetTextCtrl().InsertionPoint
         self.SyncSpinToText()
-        self.GetTextCtrl().InsertionPoint = savePoint
+        self.GetTextCtrl().InsertionPoint = savePoint  
         self._OnChanged(event)
 
     def OnChar(self, event):
-        super().OnChar(self, event)
+        floatspin.FloatSpin.OnChar(self, event)
         # Timer will restart if it's already running
         self.deadTimer.Start(milliseconds=self.deadTime, oneShot=True)
+
+
 
        
 class pvButton(wx.Button, pvCtrlMixin):
