@@ -1,0 +1,92 @@
+xInstallation instructions for Py-Epics3
+=======================================
+
+To install the epics module from source, use 
+
+   python setup.py build
+   python setup.py install
+
+This assumes that Python 2.5 or higher is installed, and that the shared
+object libraries for Epics Channel Access (libCom.so and libca.so or
+libCom.dylib and libca.dylib on Mac OS X) can be found on your system.
+
+For Win32, these dlls (Com.dll and ca.dll) are included with this
+distribution and installed for you.
+
+This code has been tested most extensively with Python2.6 on 32-bit Linux
+and Win32 systems, and versions of Epics base 3.14.10 or 3.14.11.  The
+codes are also tested (though admittedly less regularly)  with other
+combinations of Platform, Python, and Epics base, including:
+
+   Win32 (XP),   Python 2.6,  Epics 3.14.11, win32-x86
+   Win32 (XP),   Python 3.1,  Epics 3.14.11, win32-x86
+   Linux 2.6,    Python 2.6,  Epics 3.14.10, linux-x86
+   Linux 2.6,    Python 3.1,  Epics 3.14.10, linux-x86
+   Linux 2.6,    Python 2.5,  Epics 3.14.8,  linux-x86
+   Linux 2.6,    Python 2.5,  Epics 3.14.11, linux-x86_64
+   MacOS 10.6.5, Python 2.6,  Epics 3.14.11, darwin-x86
+
+At this point, there are no known failures on these systems. More testing
+is definitely needed for Python 3.1, especially once wxPython becomes
+available. More testing is also need on 64 bit machines. Testing on a
+system with 
+
+   MacOS 10.5.8, Python 2.5,  Epics 3.14.11, darwin-ppc
+
+is underway.
+
+Locating CA shared libraries
+============================
+
+On Unix systems, the shared libraries for Epics Channel Access (libca.so,
+libCom.so) must be found by Python at runtime.  Since Epics installations
+generally leaves these in an architecture-specific location (and not
+"installed" into normal system-wide library directories), you will probably
+need to set this up once per machine.  There are a few ways to do this:
+
+  1. (Linux only?): add the directory with the shared object library as a
+    line in the file /etc/ld.so.conf (or in a file that is included by it) 
+    and run /sbin/ldconfig  (as root):
+
+      sudo echo '/usr/local/epics/base/lib/linux-x86' > /etc/ld.so.conf.d/epics.conf
+      sudo /sbin/ldconfig
+
+    This approach has the advantage that it applies system-wide and
+    persists. It is also the fastest option at run-time.
+
+  2. set the environmental variable LD_LIBRARY_PATH (or DYLD_LIBRARY_PATH)
+     to point to the directory with the shared object libraries:
+
+       export LD_LIBRARY_PATH=/usr/local/epics/base/lib/linux-x86 
+
+       setenv LD_LIBRARY_PATH /usr/local/epics/base/lib/linux-x86 
+
+  3. set the PATH environmental variable to make sure that the location of 
+     libca is in the PATH.
+
+Options 2 and 3 may need to be set for each user shell that uses CA, and so
+should probably be put in a shell startup script.  On the other hand, these
+approaches also allow "non-root" installations.   For testing purposes I
+often install epics base to a folder in my home directory, and set the PATH
+and EPICS environmental variables accordingly.
+
+Testing the Location of CA shared library
+==========================================
+
+The setup.py script will test where libca might be found and print a
+prominent warning if libca.so cannot be found.
+
+To test this yourself,  run python from the current directory and 
+type:
+    >>> import lib as epics
+    >>> epics.ca.find_libca()
+
+This should report the full name of dynamic CA library (libca.so, ca.dll,
+or libca.dylib).   It it does not, or reports an error, you should
+locate libca.so and set PATH or LD_LIBRARY_PATH  to include the path
+containing this file. 
+
+
+Matt Newville <newville@cars.uchicago.edu>
+Last Update:  22-September-2010
+
