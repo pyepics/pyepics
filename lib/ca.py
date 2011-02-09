@@ -740,7 +740,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         if ntype == dbr.CHAR:
             data = copy.copy(data)
         if use_numpy:
-            return numpy.ctypeslib.as_array(data)
+            return copy.copy(numpy.ctypeslib.as_array(data))
         return list(data)
         
     def unpack_ctrltime(data, count, ntype, use_numpy):
@@ -757,7 +757,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         if ntype == dbr.CHAR:
             out = copy.copy(out)
         if use_numpy:
-            return numpy.ctypeslib.as_array(out)
+            return copy.copy(numpy.ctypeslib.as_array(out))
         return list(out)
 
     unpack = unpack_simple
