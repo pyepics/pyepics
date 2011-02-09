@@ -62,7 +62,7 @@ class _BasePVCallback(object):
         Note that a PV may have multiple callbacks, so that each
         has a unique index (small integer) that is returned by
         add_callback.  This index is needed to remove a callback."""
-        print "%s add_callback" % self
+        #print "%s add_callback" % self
 
         if not self.wait_for_connection():
             print "%s add_callback failed (wait_for_connection)" % self
@@ -73,7 +73,7 @@ class _BasePVCallback(object):
                 if len(self.callbacks) > 0:
                     index = 1 + max(self.callbacks.keys())
             self.callbacks[index] = (callback, kw)
-            print "%s add_callback attached index %s" % (self, index)
+            #print "%s add_callback attached index %s" % (self, index)
         return index
     
     def remove_callback(self, index=None):
@@ -662,7 +662,7 @@ class PVTuple(_BasePVCallback):
     def change_callback(self, **kw):
         self._args['char_value'] = tuple([ p._args['char_value'] for p in self.pvs ])        
         self._args['value'] = tuple([ p._args['value'] for p in self.pvs ])
-        print "Callback value %s char_value %s" % (self._args['value'], self._args['char_value'])
+        #print "Callback value %s char_value %s" % (self._args['value'], self._args['char_value'])
         if None in self._args['value']:
             return # Don't call a callback until each 'value' has been set
         self._args['type'] = tuple([ p.type for p in self.pvs ])
@@ -686,7 +686,7 @@ class PVTuple(_BasePVCallback):
 
     @property
     def connected(self):
-        print "%s connected = %s" % (self, [ p.connected for p in self.pvs ] )
+        #print "%s connected = %s" % (self, [ p.connected for p in self.pvs ] )
         return all([ p.connected for p in self.pvs ])
 
     @property
@@ -708,6 +708,10 @@ class PVTuple(_BasePVCallback):
     @property
     def type(self):
         return tuple([ p.type for p in self.pvs ])
+
+    @property
+    def severity(self):
+        return max([ p.severity for p in self.pvs ])
 
     def __repr__(self):
         return "<PVTuple %s>" % (self.pvs)
