@@ -351,8 +351,8 @@ class pvCtrlMixin:
             if bg   is not None:  self.SetBackgroundColour(fg)
         except:
             pass
-        self.defaultFgColour = self.GetForegroundColour()
-        self.defaultBgColour = self.GetBackgroundColour()
+        self.defaultFgColour = None
+        self.defaultBgColour = None
 
         if pv is None and pvname is not None:
             pv = pvname
@@ -363,30 +363,71 @@ class pvCtrlMixin:
         self._warn("must override _SetValue")
 
     def SetControlValue(self, raw_value):        
-        try:            
-            if self.fgColourTranslations is not None:
-                wx.Window.SetForegroundColour(self, self.fgColourTranslations.get
-                                              (raw_value, self.defaultFgColour))
-            if self.bgColourTranslations is not None:
-                wx.Window.SetBackgroundColour(self, self.bgColourTranslations.get
-                                              (raw_value, self.defaultBgColour))
-        except TypeError:
-            pass
+        if len(self.fgColourAlarms) > 0 or len(self.bgColourAlarms) > 0:
+            self.pv.get_ctrlvars() # load severity if we care about it <-- NB: this may be a performance problem
+
+        colour = None
+        if self.fgColourTranslations is not None and raw_value in self.fgColourTranslations:
+            colour = self.fgColourTranslations[raw_value]
+        elif self.pv.severity in self.fgColourAlarms:
+            colour = self.fgColourAlarms[self.pv.severity]        
+        self.OverrideForegroundColour(colour)
+            
+        colour=None
+        if self.bgColourTranslations is not None and raw_value in self.bgColourTranslations:
+            colour = self.bgColourTranslations[raw_value]
+        elif self.pv.severity in self.bgColourAlarms:
+            colour = self.bgColourAlarms[self.pv.severity]
+        self.OverrideBackgroundColour(colour)
+            
         self._SetValue(self.translations.get(raw_value, raw_value))
 
 
-    # Override the standard set color methods so we can record
-    # any explicit user choices that are made, while having the PV 
-    # set colors
-    def SetForegroundColour(color):
-        self.defaultFgColor = color
-        super().SetForegroundColour(color)
+    # Call this method to override the control's default foreground colour,
+    # Call with color=None to disable overriding
+    def OverrideForegroundColour(self, colour):
+        if colour is None:
+            if self.defaultFgColour is not None:
+                wx.Window.SetForegroundColour(self, self.defaultFgColour)
+                self.defaultFgColour = None
+        else:
+            if self.defaultFgColour is None:
+                self.defaultFgColour = wx.Window.GetForegroundColour(self)
+            wx.Window.SetForegroundColour(self, colour)      
 
-    def SetBackgroundColour(color):
-        self.defaultBgColor = color
-        super().SetBackgroundColour(color)
+    # Call this method to override the control's default background colour,
+    # Call with color=None to disable overriding
+    def OverrideBackgroundColour(self, color):
+        if color is None and self.defaultBgColour is not None:
+            wx.Window.SetBackgroundColour(self, self.defaultBgColour)
+        else:
+            if self.defaultBgColour is None:
+                self.defaultBgColour = wx.Window.GetBackgroundColour(self)
+            wx.Window.SetBackgroundColour(self, color)
 
-                
+
+    # Override the standard set color methods so we can avoid
+    # changing colour if it's currently being overriden
+
+    def SetForegroundColour(self, color):
+        if self.defaultFgColor is None:
+            wx.Window.SetForegroundColour(self, color)
+        else:
+            self.defaultFgColor = color
+
+    def GetForegroundColour(self):
+        return self.defaultFgColor if self.defaultFgColor is not None else wx.Window.GetForegroundColour(self)
+        
+    def SetBackgroundColour(self, color):
+        if self.defaultBgColour is None:
+            wx.Window.SetBackgroundColour(self, color)
+        else:
+            self.defaultBgColor = color
+
+    def GetBackgroundColour(self):
+        return self.defaultBgColor if self.defaultBgColor is not None else wx.Window.GetBackgroundColour(self)
+
+
 
     # Setters for dicts to be used for text value or value->color automatic
     # translations
@@ -395,16 +436,13 @@ class pvCtrlMixin:
         self.translations = translations
 
     def SetForegroundColourTranslations(self, translations):
-        print "Setting foreground colour translation %s" % translations
         self.fgColourTranslations = translations
 
     def SetBackgroundColourTranslations(self, translations):
-        print "Setting background colour translation %s" % translations
         self.bgColourTranslations = translations
 
     @EpicsFunction
     def update(self,value=None):
-        print "update %s value=%s" % (self, value)
         if value is None and self.pv is not None:
             value = self.pv.get(as_string=True)
         self.SetControlValue(value)
@@ -413,7 +451,6 @@ class pvCtrlMixin:
     def getValue(self,as_string=True):
         val = self.pv.get(as_string=as_string)
         result = self.translations.get(val, val)
-        print "getValue %s value=%s" % (self, result)
         return result
         
     def _warn(self,msg):
@@ -479,23 +516,31 @@ class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
 class pvText(wx.StaticText, pvCtrlMixin):
     """ static text for PV display, with callback for automatic updates"""
     def __init__(self, parent, pv=None, as_string=True,
-                 font=None, fg=None, bg=None, style=None, **kw):
-        
-        self.as_string = as_string
-        self.pv = pv
-
+                 font=None, fg=None, bg=None, style=None, 
+                 minor_alarm="DARKRED", major_alarm="RED",
+                 invalid_alarm="ORANGERED", units="", **kw):
         wstyle = wx.ALIGN_LEFT
         if style is not None:
             wstyle = style
-            
+
         wx.StaticText.__init__(self, parent, wx.ID_ANY, label='',
                                style=wstyle, **kw)
         pvCtrlMixin.__init__(self, pv=pv, font=font,fg=None, bg=None)
+        
+        self.as_string = as_string
+        self.units = units
+
+        self.fgColourAlarms = {
+            1 : minor_alarm,
+            2 : major_alarm,
+            3 : invalid_alarm } # alarm severities do not have an enum in pyepics
+ 
+            
 
     def _SetValue(self,value):
         if value is not None:
-            self.SetLabel(value)
-            # this could test for trunctated text: if self.GetWindowStyle() & wx.ST_NO_AUTORESIZE
+            self.SetLabel("%s%s" % (value, self.units))
+
         
 class pvEnumButtons(wx.Panel, pvCtrlMixin):
     """ a panel of buttons for Epics ENUM controls """
@@ -736,12 +781,6 @@ class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin):
         self.deadTime = deadTime
         wx.EVT_TIMER(self, self.deadTimer.GetId(), self._OnCharTimeout)
         
-    @EpicsFunction
-    def set_pv(self, pv=None):
-        pvCtrlMixin.set_pv(self, pv)
-        self.SetMin(self.pv.lower_ctrl_limit)
-        self.SetMax(self.pv.upper_ctrl_limit)
-
     def _SetValue(self, value):
         value = self.pv.get() # get a non-string value
         self.SetValue(float(value))
@@ -850,7 +889,7 @@ class pvComboBox(wx.ComboBox, pvCtrlMixin):
         wx.EVT_TEXT(self, self.GetId(), self.OnText)
         
     def _SetValue(self, value):
-        print "pvComboBox %s _SetValue %s" % (self, self.pv.get(as_string=True))
+        # print "pvComboBox %s _SetValue %s" % (self, self.pv.get(as_string=True))
         if value != self.Value:
             self.Value = value
     
