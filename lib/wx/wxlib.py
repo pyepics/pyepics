@@ -398,8 +398,9 @@ class pvCtrlMixin:
     # Call this method to override the control's default background colour,
     # Call with color=None to disable overriding
     def OverrideBackgroundColour(self, color):
-        if color is None and self.defaultBgColour is not None:
-            wx.Window.SetBackgroundColour(self, self.defaultBgColour)
+        if color is None:
+            if self.defaultBgColour is not None:
+                wx.Window.SetBackgroundColour(self, self.defaultBgColour)
         else:
             if self.defaultBgColour is None:
                 self.defaultBgColour = wx.Window.GetBackgroundColour(self)
@@ -752,11 +753,11 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
         if isinstance(self.pv, epics.PVTuple):
             rawValue = [ bool(r) for r in list(self.pv.get()) ]
             if all(rawValue):
-                self.Value = True
+                self.ThreeStateValue = wx.CHK_CHECKED
             elif self.Is3State() and any(rawValue):
                 self.ThreeStateValue = wx.CHK_UNDETERMINED
             else:
-                self.Value = False
+                self.ThreeStateValue = wx.CHK_UNCHECKED
         else:
             self.Value = bool(self.pv.get())
 
