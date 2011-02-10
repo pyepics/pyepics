@@ -32,8 +32,8 @@ class Alarm(object):
        
     example:
        >>> from epics import alarm, poll
-       >>> def alarmHandler(pv=None, **kw):
-       >>>     print 'Alarm!! ', pv.pvname, pv.value
+       >>> def alarmHandler(pvname=None, value=None, **kw):
+       >>>     print 'Alarm!! ', pvname, value
        >>> alarm(pvname = 'XX.VAL',
        >>>       comparison='gt',
        >>>       callback = alarmHandler,
@@ -46,6 +46,7 @@ class Alarm(object):
     
     notes:
       alarm_delay:  The alarm delay avoids over-notification by specifying a
+
                     time period to NOT send messages after a message has been
                     sent, even if a value is changing and out-of-range.  Since
                     Epics callback are used to process events, the alarm state
@@ -94,14 +95,21 @@ class Alarm(object):
             msg = 'alarm requires valid PV, comparison, and trip_point'
             raise UserWarning(msg)
       
-        self.comp_name  = comparison
+       
         self.trip_point = trip_point
 
         self.last_alert  = 0
         self.alert_delay = alert_delay
         self.user_callback = callback
 
-        self.cmp   = self.ops.get(comparison.replace('_', ''), None)
+        if isinstance(comparison, (str, unicode)):
+            self.comp_name  = comparison
+            
+            self.cmp   = self.ops.get(comparison.replace('_', ''), None)
+        elif hasattr(comparison, '__call__'):
+            self.comp_name  = comparison.__name__
+            self.cmp = comparison            
+            
         self.alarm_state = False
         self.pv.add_callback(self.check_alarm)
         self.check_alarm()
@@ -136,7 +144,7 @@ class Alarm(object):
                 self.user_callback(pvname=pvname, value=value,
                                    char_value=char_value,
                                    trip_point=self.trip_point,
-                                   comparison=self.cmp.__name__, **kw)
+                                   comparison=self.comp_name, **kw)
                 
             else:
                 sys.stdout.write('Alarm: %s=%s (%s)\n' % (pvname, char_value,
