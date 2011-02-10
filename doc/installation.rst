@@ -61,6 +61,17 @@ Installation from source on any platform is::
 For more details, especially about how to set paths for LD_LIBRARY_PATH or
 DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.
 
+Acknowledgements
+~~~~~~~~~~~~~~~~~~~~~~
+
+PyEpics was originally written and is maintained by Matt Newville <newville
+@ cars.uchicago.ed>.  Several people have provided valuable additions or
+bug reports, which has greatly improved the quality of the library: Michael
+Abbott, Marco Cammarata, Angus Gratton, Craig Haskins, Pete Jemian, Andrew
+Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Mark Rivers, Friedrich
+Schotte, Steve Wasserman, and Glen Wright.
+
+
 Epics Open License
 ~~~~~~~~~~~~~~~~~~~~~~
 

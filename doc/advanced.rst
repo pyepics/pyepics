@@ -88,7 +88,7 @@ sometimes used to allow Long Strings.  While this can be a common usage for
 character waveforms, this module resists the temptation to implicitly
 convert such byte arrays to strings using ``as_string=True``.
 
-As an exmple, let's say you've created a character waveform PV, as with
+As an example, let's say you've created a character waveform PV, as with
 this EPICS database::
    
      grecord(waveform,"$(P):filename")  {

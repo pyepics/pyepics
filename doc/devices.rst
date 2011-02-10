@@ -48,7 +48,7 @@ In general, PV names will be mapped as prefix+delim+attr.  See
 .. method:: PV(attr[, connect=True[, **kw]]])
 
    returns the `PV` object for a device attribute.  The connect argument
-   and any other keyword wrguments are passed to :meth:`epics.PV`.
+   and any other keyword arguments are passed to :meth:`epics.PV`.
 
 .. method::  put(attr, value[, wait=False[, timeout=10.0]])
 
@@ -67,14 +67,14 @@ In general, PV names will be mapped as prefix+delim+attr.  See
 
 .. method:: add_pv(pvname[, attr=None,[ **kw]])
 
-   adds an expliciltly names :meth:`epics.PV` to the device even though it
+   adds an explicitly names :meth:`epics.PV` to the device even though it
    may violate the normal naming rules (in which `attr` is mapped to
    `epics.PV(prefix+delim+attr)`.   That is, one can say::
 
     import epics
     m1 = epics.Device('XXX:m1', delim='.')
     m1.add_pv('XXX:m2.VAL', attr='other')
-    print m1.VAL     # printe value of XXX:m1.VAL
+    print m1.VAL     # print value of XXX:m1.VAL
     print m1.other   # prints value of XXX:m2.VAL
 
 .. data:: _pvs
@@ -89,7 +89,7 @@ Epics Motor Device
 .. module:: motor
 
 The Epics Motor record has over 100 fields associated with it.  Of course,
-it is often preferrable to think of 1 Motor with many attributes than 100
+it is often preferable to think of 1 Motor with many attributes than 100
 or so separate PVs.  Many of the fields of the Motor record are
 interrelated and influence other settings, including limits on the range of
 motion which need to be respected, and which may send notifications when
@@ -117,7 +117,7 @@ A simple example use would be::
 Which will step the motor through a set of positions.    You'll notice a
 few features for Motor:
 
- 1.  Motors can use english-name aliases for attributes for fields of the
+ 1.  Motors can use English-name aliases for attributes for fields of the
  motor record.  Thus 'VAL' can be spelled 'drive' and 'DESC' can be
  'description'.   The Table
 
@@ -133,7 +133,7 @@ The :class:`epics.Motor` class
 
    :param pvname: prefix name (no '.VAL' needed!) of Epics Process Variable  for a Motor
    :type pvname: string
-   :param timeout:  time (in seconds) to wait befoe giving up trying to connect.
+   :param timeout:  time (in seconds) to wait before giving up trying to connect.
    :type timeout: float
    
 Once created, a Motor should be ready to use.  
@@ -281,7 +281,7 @@ attribute cannot do so::
    :param value: value for attribute
    :param wait:  whether to wait for completion.
    :type wait: ``True`` or ``False``
-   :param timeout:  time (in seconds) to wait befoe giving up trying to connect.
+   :param timeout:  time (in seconds) to wait before giving up trying to connect.
    :type timeout: float
 
 
