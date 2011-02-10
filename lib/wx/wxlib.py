@@ -743,7 +743,7 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
         checkbox" (including with a 3-state value if the right style
         is set) that sets/clears all the PVs in the tuple as one.
         """
-    def __init__(self, parent, pv=None, on_value=1, off_value=0 **kw):
+    def __init__(self, parent, pv=None, on_value=1, off_value=0, **kw):
         self.pv = None
         wx.CheckBox.__init__(self, parent, **kw)
         pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
