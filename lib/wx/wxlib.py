@@ -764,7 +764,7 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
             self.Value = bool(self.pv.get())
 
     def _OnClicked(self, event):
-        self.pv.put(on_value if self.Value else off_value )
+        self.pv.put(self.on_value if self.Value else self.off_value )
 
 
 class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin): 
