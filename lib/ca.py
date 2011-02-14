@@ -722,7 +722,6 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     subscription callback"""
     def unpack_simple(data, count, ntype, use_numpy):
         "simple, native data type"
-        # print 'UNPACK SIMPLE ', data, count, ntype, dbr.STRING
         if count == 1 and ntype != dbr.STRING:
             return data[0]
         if ntype == dbr.STRING:
@@ -737,9 +736,12 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
                 return out[0]
             else:
                 return out
+        # waveform data:
         if ntype == dbr.CHAR:
-            data = copy.copy(data)
-        if use_numpy:
+            if use_numpy:
+                data = numpy.array(data)
+            return copy.copy(data[:])
+        elif use_numpy:
             return copy.copy(numpy.ctypeslib.as_array(data))
         return list(data)
         
