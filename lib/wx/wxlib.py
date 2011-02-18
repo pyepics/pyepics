@@ -323,8 +323,80 @@ class FloatCtrl(wx.TextCtrl):
             self.SetBackgroundColour(self.bgcol_invalid)            
         self.Refresh()
 
+class pvMixin:
+    """ base class mixin for any class that needs PV wx callback
+        support.
+        
+        If you're working with wxwidgets controls, see pvCtrlMixin.
+        If you're working with ogl shapes, see ogllib.pvShapeMixin.
 
-class pvCtrlMixin:
+        Classes deriving directly from pvMixin must override OnPVChange()     
+    """
+    def __init__(self, pv=None, pvname=None):
+        self.pv = None
+        if pv is None and pvname is not None:
+            pv = pvname
+        if pv is not None:
+            self.set_pv(pv)
+
+
+    @EpicsFunction
+    def set_pv(self, pv=None):
+        if isinstance(pv, epics.PV) or isinstance(pv, epics.PVTuple):
+            self.pv = pv
+        elif isinstance(pv, (str, unicode)):
+            self.pv = epics.PV(pv)
+            self.pv.connect()
+        if self.pv is None:
+            return
+
+        epics.poll()
+        self.pv.get_ctrlvars()
+        if not self.pv.connected:
+            return
+        
+        self.OnPVChange(self.pv.get(as_string=True))
+        self.pv.add_callback(self._pvEvent, wid=self.GetId() )
+
+
+    @DelayedEpicsCallback
+    def _pvEvent(self,pvname=None,value=None,wid=None,char_value=None,**kw):
+        # if pvname is None or id == 0: return
+        # print 'generic pv event handler ', pvname, value
+        if pvname is None or value is None or wid is None:  return
+        if char_value is None and value is not None:
+            prec = kw.get('precision',None)
+            if prec not in (None,0):
+                char_value = ("%%.%if" % prec) % value
+            else:
+                char_value = set_float(value)
+        self.OnPVChange(char_value)
+
+
+    @EpicsFunction
+    def update(self,value=None):
+        if value is None and self.pv is not None:
+            value = self.pv.get(as_string=True)
+        self.OnPVChange(value)
+
+    @EpicsFunction
+    def getValue(self,as_string=True):
+        val = self.pv.get(as_string=as_string)
+        result = self.translations.get(val, val)
+        return result
+
+    """ This method is called any time the PV value changes, via update() or via
+        a PV callback
+    """
+    def OnPVChange(self, raw_value):        
+        self._warn("Must override OnPVChange")
+
+    def _warn(self,msg):
+        sys.stderr.write("%s for pv='%s'\n" % (msg,self.pv.pvname))
+
+
+
+class pvCtrlMixin(pvMixin):
     """ mixin for wx Controls with epics PVs:  connects to PV,
     and manages callback events for the PV
 
@@ -335,6 +407,8 @@ class pvCtrlMixin:
 
     def __init__(self, pv=None, pvname=None,
  font=None, fg=None, bg=None):
+        pvMixin.__init__(self, pv, pvname)
+
         self.translations = {}
         self.fgColourTranslations = None
         self.bgColourTranslations = None
@@ -344,7 +418,6 @@ class pvCtrlMixin:
         if font is None:
             font = wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,False)
         
-        self.pv = None
         try:
             if font is not None:  self.SetFont(font)
             if fg   is not None:  self.SetForegroundColour(fg)
@@ -354,15 +427,11 @@ class pvCtrlMixin:
         self.defaultFgColour = None
         self.defaultBgColour = None
 
-        if pv is None and pvname is not None:
-            pv = pvname
-        if pv is not None:
-            self.set_pv(pv)
 
     def _SetValue(self,value):
         self._warn("must override _SetValue")
 
-    def SetControlValue(self, raw_value):        
+    def OnPVChange(self, raw_value):        
         if len(self.fgColourAlarms) > 0 or len(self.bgColourAlarms) > 0:
             self.pv.get_ctrlvars() # load severity if we care about it <-- NB: this may be a performance problem
 
@@ -383,8 +452,10 @@ class pvCtrlMixin:
         self._SetValue(self.translations.get(raw_value, raw_value))
 
 
-    # Call this method to override the control's default foreground colour,
-    # Call with color=None to disable overriding
+    """
+      Call this method to override the control's default foreground colour,
+      Call with colour=None to disable overriding
+    """
     def OverrideForegroundColour(self, colour):
         if colour is None:
             if self.defaultFgColour is not None:
@@ -395,42 +466,57 @@ class pvCtrlMixin:
                 self.defaultFgColour = wx.Window.GetForegroundColour(self)
             wx.Window.SetForegroundColour(self, colour)      
 
-    # Call this method to override the control's default background colour,
-    # Call with color=None to disable overriding
-    def OverrideBackgroundColour(self, color):
-        if color is None:
+    """
+      Call this method to override the control's default background colour,
+      Call with colour=None to disable overriding
+    """
+    def OverrideBackgroundColour(self, colour):
+        if colour is None:
             if self.defaultBgColour is not None:
                 wx.Window.SetBackgroundColour(self, self.defaultBgColour)
         else:
             if self.defaultBgColour is None:
                 self.defaultBgColour = wx.Window.GetBackgroundColour(self)
-            wx.Window.SetBackgroundColour(self, color)
+            wx.Window.SetBackgroundColour(self, colour)
 
 
-    # Override the standard set color methods so we can avoid
-    # changing colour if it's currently being overriden
-
-    def SetForegroundColour(self, color):
-        if self.defaultFgColor is None:
-            wx.Window.SetForegroundColour(self, color)
+    """
+       (Internal method) Override the standard set colour methods so we can avoid
+       changing colour if it's currently being overriden
+    """
+    def SetForegroundColour(self, colour):
+        if self.defaultFgColour is None:
+            wx.Window.SetForegroundColour(self, colour)
         else:
-            self.defaultFgColor = color
+            self.defaultFgColour = colour
 
+    """
+       (Internal method) Override the standard get colour methods so we can avoid
+       changing colour if it's currently being overriden
+    """
     def GetForegroundColour(self):
-        return self.defaultFgColor if self.defaultFgColor is not None else wx.Window.GetForegroundColour(self)
+        return self.defaultFgColour if self.defaultFgColour is not None else wx.Window.GetForegroundColour(self)
         
-    def SetBackgroundColour(self, color):
+    """
+       (Internal method) Override the standard set colour methods so we can avoid
+       changing colour if it's currently being overriden
+    """
+    def SetBackgroundColour(self, colour):
         if self.defaultBgColour is None:
-            wx.Window.SetBackgroundColour(self, color)
+            wx.Window.SetBackgroundColour(self, colour)
         else:
-            self.defaultBgColor = color
+            self.defaultBgColour = colour
 
+    """
+       (Internal method) Override the standard get colour methods so we can avoid
+       changing colour if it's currently being overriden
+    """
     def GetBackgroundColour(self):
-        return self.defaultBgColor if self.defaultBgColor is not None else wx.Window.GetBackgroundColour(self)
+        return self.defaultBgColour if self.defaultBgColour is not None else wx.Window.GetBackgroundColour(self)
 
 
 
-    # Setters for dicts to be used for text value or value->color automatic
+    # Setters for dicts to be used for text value or value->colour automatic
     # translations
 
     def SetTranslations(self, translations):
@@ -441,52 +527,7 @@ class pvCtrlMixin:
 
     def SetBackgroundColourTranslations(self, translations):
         self.bgColourTranslations = translations
-
-    @EpicsFunction
-    def update(self,value=None):
-        if value is None and self.pv is not None:
-            value = self.pv.get(as_string=True)
-        self.SetControlValue(value)
-
-    @EpicsFunction
-    def getValue(self,as_string=True):
-        val = self.pv.get(as_string=as_string)
-        result = self.translations.get(val, val)
-        return result
-        
-    def _warn(self,msg):
-        sys.stderr.write("%s for pv='%s'\n" % (msg,self.pv.pvname))
-    
-    @DelayedEpicsCallback
-    def _pvEvent(self,pvname=None,value=None,wid=None,char_value=None,**kw):
-        # if pvname is None or id == 0: return
-        # print 'generic pv event handler ', pvname, value
-        if pvname is None or value is None or wid is None:  return
-        if char_value is None and value is not None:
-            prec = kw.get('precision',None)
-            if prec not in (None,0):
-                char_value = ("%%.%if" % prec) % value
-            else:
-                char_value = set_float(value)
-        self.SetControlValue(char_value)
-
-    @EpicsFunction
-    def set_pv(self, pv=None):
-        if isinstance(pv, epics.PV) or isinstance(pv, epics.PVTuple):
-            self.pv = pv
-        elif isinstance(pv, (str, unicode)):
-            self.pv = epics.PV(pv)
-            self.pv.connect()
-        if self.pv is None:
-            return
-
-        epics.poll()
-        self.pv.get_ctrlvars()
-        if not self.pv.connected:
-            return
-        
-        self.SetControlValue(self.pv.get(as_string=True))
-        self.pv.add_callback(self._pvEvent, wid=self.GetId() )
+            
 
 
 class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
@@ -644,8 +685,8 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
        pv         epics pv to use for value
        precision  number of digits past decimal point to display (default to PV's precision)
        font       wx font
-       fg         wx foreground color
-       bg         wx background color 
+       fg         wx foreground colour
+       bg         wx background colour 
        
        bell_on_invalid  ring bell when input is out of range
 
