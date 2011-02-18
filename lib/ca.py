@@ -1046,7 +1046,7 @@ def sg_reset(gid):
     "sg reset"
     return libca.ca_sg_reset(gid)
 
-def sg_get(gid, chid, ftype=None):
+def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
     """synchronous-group get of the current value for a Channel.
     same options as get()
     
