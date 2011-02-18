@@ -22,7 +22,8 @@ LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 Downloads
 ~~~~~~~~~~~~
 
-The latest version of the Epics Python Package is 3.0.11.  There are a few ways to get the Epics Python Package:
+The latest stable version of the Epics Python Package is 3.0.11.  There are
+a few ways to get the Epics Python Package: 
 
 .. _epics-3.0.11.tar.gz:          http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.tar.gz
 .. _epics-3.0.11.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.win32-py2.6.exe
@@ -41,15 +42,21 @@ The latest version of the Epics Python Package is 3.0.11.  There are a few ways 
 |  Development Version      |  use `pyepics github repository`_        |
 +---------------------------+------------------------------------------+
 
-All development is done through the `pyepics github repository`_.  To get a
-read-only copy of the atest version, use::
+
+
+The Epics module is still under active development, and enhancements and
+bug-fixes are being added frequently.  All development is done through the
+`pyepics github repository`_.  To get a read-only copy of the atest
+version, use::
 
    git clone http://github.com/newville/pyepics.git
 
-or
+or::
+
    git clone https://github.com/newville/pyepics.git
 
-Older source kits and Windows Binaries can be found at the `PyEpics Source Tree`_.
+Current and older source source kits, and Windows Installers can also be found
+at the `PyEpics Source Tree`_. 
 
 Installation
 ~~~~~~~~~~~~~~
@@ -64,12 +71,12 @@ DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.
 Acknowledgements
 ~~~~~~~~~~~~~~~~~~~~~~
 
-PyEpics was originally written and is maintained by Matt Newville <newville
-@ cars.uchicago.ed>.  Several people have provided valuable additions or
-bug reports, which has greatly improved the quality of the library: Michael
-Abbott, Marco Cammarata, Angus Gratton, Craig Haskins, Pete Jemian, Andrew
-Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Mark Rivers, Friedrich
-Schotte, Steve Wasserman, and Glen Wright.
+PyEpics was originally written and is maintained by Matt Newville
+<newville@cars.uchicago.ed>.  Several people have provided valuable
+additions or bug reports, which has greatly improved the quality of the
+library: Michael Abbott, Marco Cammarata, Angus Gratton, Craig Haskins,
+Pete Jemian, Andrew Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Mark
+Rivers, Friedrich Schotte, Steve Wasserman, and Glen Wright.
 
 
 Epics Open License
@@ -79,5 +86,5 @@ This code and all material associated with it are distributed under the
 Epics Open License:
 
 
-.. literalinclude:: ../license.txt
+.. include:: ../license.txt
 
