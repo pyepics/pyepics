@@ -30,6 +30,7 @@ a few ways to get the Epics Python Package:
 .. _epics-3.0.11.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.win32-py3.1.exe
 .. _pyepics github repository:    http://github.com/newville/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
+.. _PyPi Epics Entry:             http://pypi.python.org/pypi/epics/
 
 +---------------------------+------------------------------------------+
 |  Download Option          |  Location                                |
@@ -43,8 +44,7 @@ a few ways to get the Epics Python Package:
 +---------------------------+------------------------------------------+
 
 
-
-The Epics module is still under active development, and enhancements and
+The PyEpics module is still under active development, and enhancements and
 bug-fixes are being added frequently.  All development is done through the
 `pyepics github repository`_.  To get a read-only copy of the atest
 version, use::
@@ -56,7 +56,14 @@ or::
    git clone https://github.com/newville/pyepics.git
 
 Current and older source source kits, and Windows Installers can also be found
-at the `PyEpics Source Tree`_. 
+at the `PyEpics Source Tree`_.   
+
+Finally, the PyEpics Package is registered with the  Python Package Index
+(PyPI), and can be found at the `PyPi Epics Entry`_ and installed with::
+  
+   easy_install epics
+
+for systems that have the easy_install script installed.
 
 Installation
 ~~~~~~~~~~~~~~
