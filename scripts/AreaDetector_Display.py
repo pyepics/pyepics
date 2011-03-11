@@ -84,7 +84,7 @@ class ImageView(wx.Window):
 
 class AD_Display(wx.Frame):
     """AreaDetector Display """
-    attrs = ('ArrayData', 'UniqueId_RBV',
+    attrs = ('ArrayData', 'UniqueId_RBV', 'NDimensions_RBV',
              'ArraySize0_RBV', 'ArraySize1_RBV', 'ArraySize2_RBV',
              'ColorMode_RBV')
     
@@ -118,7 +118,7 @@ class AD_Display(wx.Frame):
          
         sizer.Add(txtsizer, 0, wx.TOP)
 
-        self.image = ImageView(self, size=(100,100))
+        self.image = ImageView(self, size=(600,500))
 
         sizer.Add(self.image, 1, wx.LEFT|wx.GROW|wx.ALL|wx.ALIGN_CENTER, 0)
         
@@ -141,13 +141,10 @@ class AD_Display(wx.Frame):
 
     @EpicsFunction
     def connect_pvs(self):
-        print 'Connecting... ', self.prefix, self.attrs
+        # print 'Connecting... ', self.prefix, self.attrs
         self.ad_dev = epics.Device(self.prefix, delim='',
                                    attrs=self.attrs)
 
-        print self.ad_dev
-
-        print self.attrs
         if not self.ad_dev.PV('UniqueId_RBV').connected:
             epics.ca.poll()
             if not self.ad_dev.PV('UniqueId_RBV').connected:
@@ -164,7 +161,6 @@ class AD_Display(wx.Frame):
         self.GetImageSize()
         self.timer = EpicsTimer(self, period=100)
         epics.poll()
-        print 'Connected... '
         self.RefreshImage()
         
     @EpicsFunction
@@ -195,8 +191,13 @@ class AD_Display(wx.Frame):
     @EpicsFunction
     def RefreshImage(self):
         d = debugtime()
-        if self.ad_dev.ArrayData is None:
+        imgdim = self.ad_dev.NDimensions_RBV
+        arraysize = self.arrsize[0] * self.arrsize[1]
+        if imgdim == 3:
+            arraysize = arraysize * self.arrsize[2] 
+        if not self.ad_dev.PV('ArrayData').connected:
             return
+
         im_mode = 'L'
         im_size = (self.arrsize[0], self.arrsize[1])
         
@@ -204,7 +205,7 @@ class AD_Display(wx.Frame):
             im_mode = 'RGB'
             im_size = [self.arrsize[1], self.arrsize[2]]
         d.add('know image size/type')
-        rawdata = self.ad_dev.ArrayData
+        rawdata = self.ad_dev.PV('ArrayData').get(count=arraysize)
         d.add('have rawdata')
         
         imbuff =  Image.frombuffer(im_mode, im_size, rawdata,
@@ -212,7 +213,6 @@ class AD_Display(wx.Frame):
         d.add('data to imbuff')
         self.GetImageSize()
         display_size = (int(self.img_h*self.scale), int(self.img_w*self.scale))
-
         if self.img_h < 1 or self.img_w < 1:
             return
 
@@ -226,7 +226,7 @@ class AD_Display(wx.Frame):
         self.image.SetValue(self.wximage)
 
         d.add('wx bitmap set')
-        d.show()
+        # d.show()
         
 if __name__ == '__main__':
     import sys
