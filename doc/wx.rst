@@ -86,6 +86,48 @@ pvFloatCtrl
     a different color.
 
 
+
+pvBitmap
+~~~~~~~~~~~
+
+.. class :: pvBitmap(parent, pv=None, bitmaps={}, defaultBitmap=None)
+
+    A Static Bitmap where the image is based on PV value.
+
+	 If the bitmaps dictionary is set, it should be set as PVValue->Bitmap
+	 where particular bitmaps will be shown if the PV takes those certain 
+	 values.
+
+    If you need to do any more complex or dynamic drawing, you may
+	 want to look at the OGL PV controls.
+
+
+pvCheckBox
+~~~~~~~~~~~
+
+.. class:: pvCheckBox(self, parent, pv=None, on_value=1, off_value=0, **kw)
+    Checkbox based on a binary PV value, both reads/writes the
+    PV on changes.
+
+	 on_value and off_value are the specific values that are mapped to
+	 the checkbox. If the PV is externally set to any other value, it
+	 is assumed to be "off" (unchecked.)
+   
+    If necessary, use the SetTranslations() option to write a
+    dictionary for converting string value PVs to booleans. Otherwise,
+    types that convert via Python's own bool(x) will be accepted.
+        
+    If a PVTuple is assigned, the checkbox can automatically act
+    as a "master checkbox" (including with a 3-state value if the
+    right style is set) that sets/clears all the PVs in the tuple
+    as one. Each PV in the PVTuple must return (or translate to) 
+    a boolean, for this work.
+
+    To do this, you will need to set the tri-state style on the
+    CheckBox constructor (same as if you were setting it on a 
+    wx.CheckBox)
+
+
 pvFloatSpin
 ~~~~~~~~~~~
 

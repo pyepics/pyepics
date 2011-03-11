@@ -816,9 +816,20 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
 
 
 class pvBitmap(wx.StaticBitmap, pvCtrlMixin):
-    """ Static Bitmap where image is based on PV value, with callback for automatic updates"""        
+    """ 
+    Static Bitmap where image is based on PV value, with callback for automatic updates
+
+    """        
     def __init__(self, parent,  pv=None, bitmaps={},
                  defaultBitmap=None, **kw):
+        """
+        bitmaps - a dict of Value->Bitmap mappings, to automatically change
+        the shown bitmap based on the PV value.
+
+        defaultBitmap - the bitmap to show if the PV value doesn't match any
+        of the values in the bitmaps dict.
+
+        """
         wx.StaticBitmap.__init__(self,parent, wx.ID_ANY, bitmap=defaultBitmap, **kw)
         pvCtrlMixin.__init__(self, pv=pv)
 
@@ -834,23 +845,25 @@ class pvBitmap(wx.StaticBitmap, pvCtrlMixin):
             self.SetBitmap(nextBitmap)
 
 class pvCheckBox(wx.CheckBox, pvCtrlMixin):
-    """ Checkbox based on a binary PV value, both reads/writes the
-        PV on changes.
+    """ 
+    Checkbox based on a binary PV value, both reads/writes the
+    PV on changes.
    
-        If necessary, use the SetTranslations() option to write a
-        dictionary for converting string value PVs to booleans. Otherwise,
-        types that convert via Python's own bool(x) will be accepted.
-        
-        If a PVTuple is assigned, the checkbox can automatically act
-        as a "master checkbox" (including with a 3-state value if the
-        right style is set) that sets/clears all the PVs in the tuple
-        as one. Each PV in the PVTuple must return (or translate to) 
-        a boolean, for this work.
+    If necessary, use the SetTranslations() option to write a
+    dictionary for converting string value PVs to booleans. Otherwise,
+    types that convert via Python's own bool(x) will be accepted.
+    
+    If a PVTuple is assigned, the checkbox can automatically act
+    as a "master checkbox" (including with a 3-state value if the
+    right style is set) that sets/clears all the PVs in the tuple
+    as one. Each PV in the PVTuple must return (or translate to) 
+    a boolean, for this work.
+    
+    To do this, you will need to set the tri-state style on the
+    CheckBox constructor (same as if you were setting it on a 
+    wx.CheckBox)
 
-        To do this, you will need to set the tri-state style on the
-        CheckBox constructor (same as if you were setting it on a 
-        wx.CheckBox)
-        """
+    """
     def __init__(self, parent, pv=None, on_value=1, off_value=0, **kw):
         self.pv = None
         wx.CheckBox.__init__(self, parent, **kw)
@@ -882,8 +895,9 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
 
 
 class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin): 
-    """ A FloatSpin (floating-point-aware SpinCtrl) linked to a PV,
-        both reads and writes the PV on changes.
+    """ 
+    A FloatSpin (floating-point-aware SpinCtrl) linked to a PV,
+    both reads and writes the PV on changes.
         
     """
     def __init__(self, parent, pv=None, deadTime=500, min_val=None, max_val=None, 
