@@ -1,3 +1,31 @@
+2011-01-11  Matt Newville  <newville@cars.uchicago.edu>
+
+	* Version 3.0.11:
+
+	- improvements for devices, especially motor, scaler, and struck.
+	- added wx MiniMotorPanel to wx.MotorPanel to provide a smaller,
+     	simpler motor panel.
+
+	- fixed configuration for build on Solaris (from T. Mooney)
+
+	- added 'with_ctrlvars' option (default True) to
+	PV.add_callback(). This will try to make sure that accurate
+	control information is passed into a callback.
+
+	- changed conversion of data from ctypes to numpy to use
+	   numpy.ctypeslib.as_array(data)
+	for waveforms, including CHAR arrays. The as_string=True
+	option still works for CHAR arrays.
+
+	Since numpy.ctypeslib.as_array() is much faster than numpy.array(),
+	all array data is now converted to numpy arrays (if numpy is
+	available and as_numpy is not explicitly set False) without
+	looking at ca.AUTOMONITOR_LENGTH.
+
+	- improved support and performance for getting partial arrays in
+  	ca.py and pv.py, and in caget(), which now has 'count' and
+	'as_numpy' keyword options.
+
 2010-10-21  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.10:
@@ -11,7 +39,7 @@
 	the string representation.
 
 	- several improvements to Motor and MotorPanel to use this new
-	device interface.
+  	device interface.
 
 	- synchronous groupns now work.
 

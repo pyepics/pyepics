@@ -8,7 +8,6 @@ Advanced Topic with Python Channel Access
 Strategies for working with large arrays
 ============================================
 
-
 EPICS Channels / Process Variables usually have values that can be stored
 with a small number of bytes.  This means that their storage and transfer
 speeds over real networks is not a significant concern.  However, some
@@ -17,70 +16,41 @@ megabytes) which means that some of the assumptions about dealing with
 Channels / PVs may need reconsideration.  
 
 When using PVs with large array sizes (here, I'll assert that *large* means
-more than 100 or so elements), it is necessary to make sure that the
+more than 1000 or so elements), it is necessary to make sure that the
 environmental variable ``EPICS_CA_MAX_ARRAY_SIZE`` is suitably set.
 Unfortunately, this represents a pretty crude approach to memory management
 within Epics for handling array data as it is used not only sets how large
 an array the client can accept, but how much memory will be allocated on
 the server.  In addition, this value must be set prior to using the CA
-library -- it cannot be altered during the running of a CA program.  
+library -- it cannot be altered during the running of a CA program.
 
-Normally, the default value for ``EPICS_CA_MAX_ARRAY_SIZE`` is only 16384
-(16k, and it turns out that you cannot set it smaller than this value!).
-As Python is used for clients, generally running on workstations or servers
+Normally, the default value for ``EPICS_CA_MAX_ARRAY_SIZE`` is 16384 (16k,
+and it turns out that you cannot set it smaller than this value!).  As
+Python is used for clients, generally running on workstations or servers
 with sufficient memory, this default value is changed to 2**24, or 16Mb)
 when :mod:`epics.ca` is initialized.  If the environmental variable
 ``EPICS_CA_MAX_ARRAY_SIZE`` has not already been set.
 
-The main issues for large arrays are:
-  * should large arrays automatically be immediately converted to numpy
-    arrays? 
-  * should PVs for large arrays normally be automatically monitored?
-  * should large arrays of character / byte arrays be automatically
-    converted to strings as a way to overcome the very low limit on the
-    length of normal EPICS strings?
+The other main issue for PVs holding large arrays is whether they should be
+automatically monitored.  For PVs holding scalar data or small arrays, any
+penalty for automatically monitoring these variables (that is, causing
+network traffic every time a PV changes) is a small price to pay for being
+assured that the latest value is always available.  As arrays get larger
+(as for data streams from Area Detectors), it is less obvious that
+automatic monitoring is desirable.  
 
-For most scalar PVs and for small arrays, the answer to each of these would
-almost certainly be *Yes*.  As arrays get larger (say, to the size of the
-data stream from a typical Area Detector), answering *Yes* is much less
-obvious.  The Python :mod:`epics.ca` module defines a variable
-:data:`AUTOMONITOR_MAXLENGTH` which controls this behavior.  This value, with
-the default value of 16384, controls both behaviors:
-
- * arrays of size for which PVs are automatically monitored.  That is,
-   arrays with fewer elements than :data:`AUTOMONITOR_MAXLENGTH` will be
-   automatically monitored. In any case,  the auto-monitoring of PVs can
-   be explicitly set with  
+The Python :mod:`epics.ca` module defines a variable
+:data:`AUTOMONITOR_MAXLENGTH` which controls whether array PVs are
+automatically monitored.  The default value for this variable is 16384, but
+can be changed at runtime.  Arrays with fewer elements than
+:data:`AUTOMONITOR_MAXLENGTH` will be automatically monitored, unless
+explicitly set, and arrays larger than :data:`AUTOMONITOR_MAXLENGTH` will
+not be automatically monitored unless explicitly set. Auto-monitoring of
+PVs can be be explicitly set with
 
    >>> pv2 = epics.PV('ScalerPV', auto_monitor=True)
    >>> pv1 = epics.PV('LargeArrayPV', auto_monitor=False)
 
- * array size for automatic conversion of data to numpy arrays.  That is,
-   arrays with fewer elements than :data:`AUTOMONITOR_MAXLENGTH` will be
-   automatically converted to numpy arrays (if appropriate).  In any case,
-   this conversion can be overridden, with
-
-   >>> chid = epics.ca.create_channel('SimplePV')
-   >>> val1 = epics.ca.get(chid,  as_numpy = False)
-   >>>
-   >>> pv2  = epics.PV('ArrayPV')
-   >>> val2 = pv2.get(as_numpy=False)
-
-   When values for large arrays (that is, with more than
-   :data:`AUTOMONITOR_MAXLENGTH` elements) are returned, this will be a *raw
-   ctype* array.   This data can be iterated over or sent to many other
-   modules, such as the :mod:`Image` module.
-
-Finally, though it is common to use arrays of characters or bytes to
-emulate a long string (EPICS sets a limit of 40 characters for its own
-STRING type), this module resists the temptation to implicitly convert
-byte arrays to strings.   You'll have to be explicit and use either
-
-   >>> chid = epics.ca.create_channel('CharArrayPV')
-   >>> val1 = epics.ca.get(chid,  as_string = True)
-   >>>
-   >>> pv2  = epics.PV('CharArrayPV')
-   >>> val2 = pv2.get(as_string=True)
 
 Example handling Large Arrays
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -112,9 +82,14 @@ The result looks like this (taken with a Prosilica GigE camera):
 Example using Character Waveforms as Long Strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 As EPICS strings can be only 40 characters long, Character Waveforms are
-sometimes used to allow Long Strings.  Let's say you've created a character
-waveform PV, as with this EPICS database::
+sometimes used to allow Long Strings.  While this can be a common usage for
+character waveforms, this module resists the temptation to implicitly
+convert such byte arrays to strings using ``as_string=True``.
+
+As an example, let's say you've created a character waveform PV, as with
+this EPICS database::
    
      grecord(waveform,"$(P):filename")  {
              field(DTYP,"Soft Channel")
@@ -147,10 +122,9 @@ You can then use this with:
    'T:\\xas_user\\March2010\\FastMap'
 
 
-This example uses PV objects, but the :meth:`get` method of :mod:`ca` is
+This uses the PV class, but the :meth:`get` method of :mod:`ca` is
 essentially equivalent, as its *as_string* parameter works exactly the same
 way.
-
 
 .. _advanced-threads-label:
 

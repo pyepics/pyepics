@@ -5,7 +5,8 @@ The  epics python module was orignally written by
 Except where explicitly noted, all files in this distribution are licensed
 under the Epics Open License:
 
-==================================================
+------------------------------------------------
+
 Copyright  2010    Matthew Newville, The University of Chicago.  All rights reserved.
 
 The epics python module is distributed subject to the following license conditions:
@@ -72,4 +73,6 @@ Software: epics python module
    BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE OR STRICT LIABILITY), OR
    OTHERWISE, EVEN IF ANY OF SAID PARTIES HAS BEEN WARNED OF THE
    POSSIBILITY OF SUCH LOSS OR DAMAGES. 
-==================================================
+
+------------------------------------------------
+

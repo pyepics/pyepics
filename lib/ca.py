@@ -18,8 +18,8 @@ import ctypes.util
 import os
 import sys
 import time
-import atexit
 import copy
+import atexit
 
 HAS_NUMPY = False
 try:
@@ -71,6 +71,15 @@ def strjoin(sep, seq):
     if isinstance(seq[0], bytes): 
         seq = [BYTES2STR(i) for i in seq]
     return sep.join(seq)
+    
+## print to stdout
+def write(msg, newline=True, flush=True):
+    """write message to stdout"""
+    sys.stdout.write(msg)
+    if newline:
+        sys.stdout.write("\n")
+    if flush:
+        sys.stdout.flush()
     
 ## holder for shared library
 libca = None
@@ -146,7 +155,8 @@ def find_libca():
     ## OK, simplest version didn't work, look explicity through path
     known_hosts = {'Linux':   ('linux-x86', 'linux-x86_64') ,
                    'Darwin':  ('darwin-ppc', 'darwin-x86'),
-                   'solaris': ('solaris-sparc',) }
+                   'SunOS':   ('solaris-sparc', 'solaris-sparc-gnu') }
+
     
     if os.name == 'posix':
         libname = 'libca.so'
@@ -263,7 +273,7 @@ def show_cache(print_out=True):
                                         context))
     out = strjoin('\n', out)
     if print_out:
-        sys.stdout.write("%s\n" % out)
+        write(out)
     else:
         return out
     
@@ -286,12 +296,12 @@ def withCA(fcn):
     Note that CA functions that take a Channel ID (chid) as an
     argument are  NOT wrapped by this: to get a chid, the
     library must have been initialized already."""
-    def wrapper(*args, **kw):
+    def wrapper(*args, **kwds):
         "withCA wrapper"
         global libca
         if libca is None:
             initialize_libca()
-        return fcn(*args, **kw)
+        return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
     wrapper.__dict__.update(fcn.__dict__)
@@ -306,7 +316,7 @@ def withCHID(fcn):
     data of _cache) that could be tested here.  For now, that
     seems slightly 'not low-level' for this module.
     """
-    def wrapper(*args, **kw):
+    def wrapper(*args, **kwds):
         "withCHID wrapper"
         if len(args)>0:
             chid = args[0]
@@ -316,7 +326,7 @@ def withCHID(fcn):
             if not isinstance(chid, dbr.chid_t):
                 raise ChannelAccessException(fcn.__name__,
                                              "not a valid chid!")
-        return fcn(*args, **kw)
+        return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
     wrapper.__dict__.update(fcn.__dict__)
@@ -327,7 +337,7 @@ def withConnectedCHID(fcn):
     """decorator to ensure that first argument to a function is a
     chid that is actually connected. This will attempt to connect
     if needed."""
-    def wrapper(*args, **kw):
+    def wrapper(*args, **kwds):
         "withConnectedCHID wrapper"
         if len(args)>0:
             chid = args[0]
@@ -338,9 +348,9 @@ def withConnectedCHID(fcn):
                 raise ChannelAccessException(fcn.__name__,
                                              "not a valid chid!")
             if not isConnected(chid):
-                timeout = kw.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
+                timeout = kwds.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
                 connect_channel(chid, timeout=timeout)
-        return fcn(*args, **kw)
+        return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
     wrapper.__dict__.update(fcn.__dict__)
@@ -358,16 +368,14 @@ def withSEVCHK(fcn):
     """decorator to raise a ChannelAccessException if the wrapped
     ca function does not return status=ECA_NORMAL
     """
-    def wrapper(*args, **kw):
+    def wrapper(*args, **kwds):
         "withSEVCHK wrapper"
-        status = fcn(*args, **kw)
+        status = fcn(*args, **kwds)
         return PySEVCHK( fcn.__name__, status)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
     wrapper.__dict__.update(fcn.__dict__)
     return wrapper
-
-
 
 ##
 ## Event Handlers for get() event callbacks
@@ -377,25 +385,25 @@ def _onGetEvent(args):
     # print(" onGet Event: ", args.chid, type(args.chid))
     # chid = dbr.chid_t(args.chid)
     pvname = name(args.chid)
-    kwd = {'ftype':args.type, 'count':args.count,
+    kwds = {'ftype':args.type, 'count':args.count,
            'chid':args.chid, 'pvname': pvname,
            'status':args.status}
-    # add kwd arguments for CTRL and TIME variants
+    # add kwds arguments for CTRL and TIME variants
     if args.type >= dbr.CTRL_STRING:
         tmpv = value[0]
         for attr in dbr.ctrl_limits + ('precision', 'units', 'severity'):
             if hasattr(tmpv, attr):        
-                kwd[attr] = getattr(tmpv, attr)
+                kwds[attr] = getattr(tmpv, attr)
         if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
             tmpv.no_str > 0):
-            kwd['enum_strs'] = tuple([tmpv.strs[i].value for 
+            kwds['enum_strs'] = tuple([tmpv.strs[i].value for 
                                       i in range(tmpv.no_str)])
 
     elif args.type >= dbr.TIME_STRING:
         tmpv = value[0]
-        kwd['status']    = tmpv.status
-        kwd['severity']  = tmpv.severity
-        kwd['timestamp'] = (dbr.EPICS2UNIX_EPOCH + tmpv.stamp.secs + 
+        kwds['status']    = tmpv.status
+        kwds['severity']  = tmpv.severity
+        kwds['timestamp'] = (dbr.EPICS2UNIX_EPOCH + tmpv.stamp.secs + 
                             1.e-6*int(tmpv.stamp.nsec/1000.00))
     nelem = args.count
     if args.type in (dbr.STRING, dbr.TIME_STRING, dbr.CTRL_STRING):
@@ -403,7 +411,7 @@ def _onGetEvent(args):
         
     value = _unpack(value, count=nelem, ftype=args.type)
     if hasattr(args.usr, '__call__'):
-        args.usr(value=value, **kwd)
+        args.usr(value=value, **kwds)
 
 ## connection event handler: 
 def _onConnectionEvent(args):
@@ -441,7 +449,7 @@ def _onConnectionEvent(args):
     return 
 
 ## put event handler:
-def _onPutEvent(args, *varargs):
+def _onPutEvent(args, **kwds):
     """set put-has-completed for this channel,
     call optional user-supplied callback"""
     pvname = name(args.chid)
@@ -449,7 +457,7 @@ def _onPutEvent(args, *varargs):
     data = _put_done[pvname][2]
     _put_done[pvname] = (True, None, None)
     if hasattr(fcn, '__call__'):
-        fcn(pvname=pvname, data=data)
+        fcn(pvname=pvname, data=data, **kwds)
 
 # create global reference to these two callbacks
 _CB_CONNECT = ctypes.CFUNCTYPE(None, dbr.connection_args)(_onConnectionEvent)
@@ -581,7 +589,6 @@ def create_channel(pvname, connect=False, callback=None):
     # callback that is run -- the callack here is stored in the _cache
     # and called by _onConnectionEvent.
     pvn = STR2BYTES(pvname)    
-    # sys.stdout.write(' create channel %s \n' % pvn)
     ctx = current_context()
     global _cache
     if ctx not in _cache:
@@ -623,8 +630,8 @@ def connect_channel(chid, timeout=None, verbose=False):
     
     """
     if verbose:
-        sys.stdout.write(' connect channel -> %s %s %s \n' %
-                     (repr(chid), repr(state(chid)), repr(dbr.CS_CONN)))
+        write(' connect channel -> %s %s %s ' %
+               (repr(chid), repr(state(chid)), repr(dbr.CS_CONN)))
     conn = (state(chid) == dbr.CS_CONN)
     if not conn:
         # not connected yet, either indicating a slow network
@@ -721,20 +728,29 @@ def native_type(ftype):
 def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     """unpack raw data returned from an array get or
     subscription callback"""
-
     def unpack_simple(data, count, ntype, use_numpy):
         "simple, native data type"
         if count == 1 and ntype != dbr.STRING:
             return data[0]
         if ntype == dbr.STRING:
-            out = strjoin('', data).rstrip()
-            if '\x00' in out:
-                out = out[:out.index('\x00')]
-            return out
-        elif ntype == dbr.CHAR:
-            return copy.copy(data)
+            out = []
+            for elem in range(min(count, len(data))):
+                this = strjoin('', data[elem]).rstrip()
+                if '\x00' in this:
+                    this = this[:this.index('\x00')]
+                out.append(this)
+
+            if len(out) == 1:
+                return out[0]
+            else:
+                return out
+        # waveform data:
+        if ntype == dbr.CHAR:
+            if use_numpy:
+                data = numpy.array(data)
+            return copy.copy(data[:])
         elif use_numpy:
-            return numpy.array(data)
+            return copy.copy(numpy.ctypeslib.as_array(data))
         return list(data)
         
     def unpack_ctrltime(data, count, ntype, use_numpy):
@@ -747,10 +763,11 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         # fix for CTRL / TIME array data:Thanks to Glen Wright !
         out = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
                                                   dbr.value_offset[ftype])
+
         if ntype == dbr.CHAR:
-            return copy.copy(out)
-        elif use_numpy:
-            return numpy.array(out)
+            out = copy.copy(out)
+        if use_numpy:
+            return copy.copy(numpy.ctypeslib.as_array(out))
         return list(out)
 
     unpack = unpack_simple
@@ -768,8 +785,8 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         ftype = dbr.INT
 
     ntype = native_type(ftype)
-    use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and
-                 count > 1 and count < AUTOMONITOR_MAXLENGTH)
+    use_numpy = (count > 1 and HAS_NUMPY and as_numpy and
+                 ntype != dbr.STRING)
     return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID
@@ -791,18 +808,16 @@ def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
     else:
         count = min(count, element_count(chid))
         
-    nelem = count
-    if ftype == dbr.STRING:
-        nelem = dbr.MAX_STRING_SIZE
-    data = (nelem*dbr.Map[ftype])()
+    data = (count*dbr.Map[ftype])()
+
     ret = libca.ca_array_get(ftype, count, chid, data)
     PySEVCHK('get', ret)
     poll()
     if count > 2:
         tcount = min(count, 1000)
-        poll(evt=tcount*5.e-5, iot=tcount*0.01)
+        poll(evt=tcount*1.e-5, iot=tcount*0.01)
 
-    val = _unpack(data, count=nelem, ftype=ftype, as_numpy=as_numpy)
+    val = _unpack(data, count=count, ftype=ftype, as_numpy=as_numpy)
     if as_string:
         val = _as_string(val, chid, count, ftype)
     return val
@@ -843,11 +858,13 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     ftype = field_type(chid)
     count = element_count(chid)
     data  = (count*dbr.Map[ftype])()    
-    
+
     if ftype == dbr.STRING:
-        data = (dbr.string_t)()
-        count = 1
-        data.value = value
+        if count == 1:
+            data[0].value = value
+        else:
+            for elem in range(min(count, len(value))):
+                data[elem].value = value[elem]
     elif count == 1:
         try:
             data[0] = value
@@ -913,6 +930,7 @@ def get_ctrlvars(chid):
     """
     ftype = promote_type(chid, use_ctrl=True)
     dat = (1*dbr.Map[ftype])()
+
     ret = libca.ca_array_get(ftype, 1, chid, dat)
     PySEVCHK('get_ctrlvars', ret)
     poll()
@@ -939,6 +957,7 @@ def get_timevars(chid):
     """
     ftype = promote_type(chid, use_time=True)
     dat = (1*dbr.Map[ftype])()
+
     ret = libca.ca_array_get(ftype, 1, chid, dat)
     PySEVCHK('get_timevars', ret)
     poll()
@@ -1035,7 +1054,7 @@ def sg_reset(gid):
     "sg reset"
     return libca.ca_sg_reset(gid)
 
-def sg_get(gid, chid, ftype=None):
+def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
     """synchronous-group get of the current value for a Channel.
     same options as get()
     
@@ -1056,15 +1075,15 @@ def sg_get(gid, chid, ftype=None):
         ftype = field_type(chid)
     count = element_count(chid)
 
-    nelem = count
-    if ftype == dbr.STRING:
-        nelem = dbr.MAX_STRING_SIZE
-    
-    data = (nelem*dbr.Map[ftype])()
-   
+    data = (count*dbr.Map[ftype])()
     ret = libca.ca_sg_array_get(gid, ftype, count, chid, data)
     PySEVCHK('sg_get', ret)
-    return data
+    poll()
+
+    val = _unpack(data, count=count, ftype=ftype, as_numpy=as_numpy)
+    if as_string:
+        val = _as_string(val, chid, count, ftype)
+    return val
  
 def sg_put(gid, chid, value):
     "synchronous-group put: cannot wait or get callback!"
@@ -1074,10 +1093,13 @@ def sg_put(gid, chid, value):
     ftype = field_type(chid)
     count = element_count(chid)
     data  = (count*dbr.Map[ftype])()    
+
     if ftype == dbr.STRING:
-        data = (dbr.string_t)()
-        count = 1
-        data.value = value
+        if count == 1:
+            data[0].value = value
+        else:
+            for elem in range(min(count, len(value))):
+                data[elem].value = value[elem]
     elif count == 1:
         try:
             data[0] = value

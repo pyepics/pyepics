@@ -13,8 +13,8 @@ class Device(object):
     string for their names, but having many 'attributes'.
 
     Many groups of PVs will have names made up of
-         Prefix+Delimeter+Attribute
-    with common Prefix and Delimeter, but a range of Attribute names.
+         Prefix+Delimiter+Attribute
+    with common Prefix and Delimiter, but a range of Attribute names.
     Many Epics Records follow this model, but a Device is only about
     PV names, and so is not exactly a mapping to an Epics Record.
 
@@ -139,7 +139,7 @@ class Device(object):
         """put an attribute value, 
         optionally wait for completion or
         up to a supplied timeout value"""
-        thispv  =self.PV(attr)
+        thispv = self.PV(attr)
         thispv.wait_for_connection()
         return thispv.put(value, wait=wait, timeout=timeout)
         
