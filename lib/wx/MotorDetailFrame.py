@@ -36,7 +36,7 @@ class MotorDetailFrame(wx.Frame):
         self.motor = motor
         prec = motor.PREC
         
-        self.SetTitle("Motor Details: %s  | %s |" % (self.motor.name, self.motor.DESC))
+        self.SetTitle("Motor Details: %s  | %s |" % (self.motor._prefix, self.motor.DESC))
 
         panel = wx.Panel(self)# outerpanel)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -241,7 +241,7 @@ class MotorDetailFrame(wx.Frame):
 
         nrow = 0
         ds.Add(xLabel(dp,"Motor Res"),      (nrow,0), (1,1), _textstyle,_textpadding)
-        ds.Add(self.motor_ctrl(dp,'RES'),   (nrow,1), (1,1), wx.ALIGN_CENTER)
+        ds.Add(self.motor_ctrl(dp,'MRES'),  (nrow,1), (1,1), wx.ALIGN_CENTER)
         ds.Add(xLabel(dp,"Encoder Res"),    (nrow,2), (1,1), _textstyle,_textpadding)
         ds.Add(self.motor_ctrl(dp,'ERES'),  (nrow,3), (1,1), wx.ALIGN_CENTER)
 
