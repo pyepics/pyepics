@@ -640,14 +640,17 @@ class PV(_BasePVCallback):
 
 
 class PVTuple(_BasePVCallback):
-    """Epics Process Variable Tuple
+    """EPICS Process Variable Tuple
     
-    A PVTuple encapsulates multiple Epics Process Variables into a single tuple, with a similar/compatible
+    A PVTuple encapsulates multiple Epics Process Variables into a single tuple, with a similar
     interface to a single PV (callback for the tuple when any PV changes, etc.)
    
+    This allows is to be used interchangeably with a PV in some circumstances (ie for a pvCheckBox which
+    sets/clears multiple PVs as one.)
+
     The primary interface methods for a pv are to get() and put() is value::
 
-      >>> p = PV(pv_names...)  # create a pv object given a list or tuple of pv names
+      >>> p = PV(pv_names)  # create a pv object given a list or tuple of pv names
       >>> p.get()          # get value of all PVs as a tuple
 
     Additional important attributes include::
@@ -658,6 +661,9 @@ class PVTuple(_BasePVCallback):
       >>> p.count          # number of PVs in tuple
       >>> p.type           # EPICS data types (as tuple): 'string','double','enum','long',..
       >>> p.pvs            # list of actual PV objects encapsulated
+
+    Note that if you find yourself relying too heavily on this class, it may be better to consider
+    refactoring your EPICS database to support the functionality you need.
 
 """
 
@@ -687,10 +693,11 @@ class PVTuple(_BasePVCallback):
          as_string to return string representations where possible
          as_numpy  to (try to) return a numpy arrays where possible
 
-        >>> p.get('13BMD:m1.DIR')
-        0
-        >>> p.get('13BMD:m1.DIR',as_string=True)
-        'Pos'
+        >>> p.get()
+        (0, 0)
+        >>> p.get(as_string=True)
+        (Off, Off)
+
         """
         return tuple([ p.get(count,as_string,as_numpy) for p in self.pvs])
 

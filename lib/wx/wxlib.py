@@ -328,7 +328,7 @@ class pvMixin:
         support.
         
         If you're working with wxwidgets controls, see pvCtrlMixin.
-        If you're working with ogl shapes, see ogllib.pvShapeMixin.
+        If you're working with wx OGL drawing, see ogllib.pvShapeMixin.
 
         Classes deriving directly from pvMixin must override OnPVChange()     
     """
@@ -397,12 +397,29 @@ class pvMixin:
 
 
 class pvCtrlMixin(pvMixin):
-    """ mixin for wx Controls with epics PVs:  connects to PV,
+    """ 
+    mixin for wx Controls with epics PVs:  connects to PV,
     and manages callback events for the PV
 
     An overriding class must provide a method called _SetValue, which
     will set the contents of the corresponding widget.
     
+
+    Optional Features for descendents
+    =================================
+
+    * Set a translation dictionary of PVValue->Python Value to be used
+      whenever values are received via PV callbacks.
+
+    * Set translation tables for setting particular foreground/background
+      colours when the PV takes certain values.
+
+    * Override foreground/background colours - without knowing what
+      colour is currently set by the user, you can call
+      OverrideForegroundColour()/OverrideBackGroundColor() to set a
+      different colour on the control and then call the override again
+      with None to go back to the original colour.
+      
     """
 
     def __init__(self, pv=None, pvname=None,
@@ -428,6 +445,105 @@ class pvCtrlMixin(pvMixin):
         self.defaultBgColour = None
 
 
+    def SetTranslations(self, translations):
+        """ 
+        Pass a dictionary of value->value translations here if you want some PV values
+        to automatically appear in the event callback as a different value.
+
+        ie, to override PV value 0.0 to say "Disabled", call this method as
+        control.SetTranslations({ 0.0 : "Disabled" })
+
+        It is recommended that you use this function only when it is not possible to change
+        the PV value in the database, or set a string value in the database.
+
+        """
+        self.translations = translations
+
+    def SetForegroundColourTranslations(self, translations):
+        """
+        Pass a dictionary of value->colour translations here if you want the control
+        to automatically set foreground colour based on PV value.
+
+        Values used to lookup colours will be string values if available, but will otherwise
+        be the raw PV value.
+
+        Colour values in the dictionary may be strings or wx.Colour objects.
+
+        """
+        self.fgColourTranslations = translations
+
+    def SetBackgroundColourTranslations(self, translations):
+        """
+        Pass a dictionary of value->colour translations here if you want the control
+        to automatically set background colour based on PV value.
+
+        Values used to lookup colours will be string values if available, but will otherwise
+        be the raw PV value.
+
+        Colour values in the dictionary may be strings or wx.Colour objects.
+
+        """
+        self.bgColourTranslations = translations
+            
+
+
+    def SetForegroundColour(self, colour):
+        """ (Internal override) Needed to support OverrideForegroundColour() """
+        if self.defaultFgColour is None:
+            wx.Window.SetForegroundColour(self, colour)
+        else:
+            self.defaultFgColour = colour
+
+    def GetForegroundColour(self):
+        """ (Internal override) Needed to support OverrideForegroundColour() """
+        return self.defaultFgColour if self.defaultFgColour is not None else wx.Window.GetForegroundColour(self)
+        
+    def SetBackgroundColour(self, colour):
+        """ (Internal override) Needed to support OverrideBackgroundColour() """
+        if self.defaultBgColour is None:
+            wx.Window.SetBackgroundColour(self, colour)
+        else:
+            self.defaultBgColour = colour
+
+    def GetBackgroundColour(self):
+        """ (Internal override) Needed to support OverrideBackgroundColour() """
+        return self.defaultBgColour if self.defaultBgColour is not None else wx.Window.GetBackgroundColour(self)
+
+    def OverrideForegroundColour(self, colour):
+        """
+        Call this method to override the control's current set foreground colour,
+        Call with colour=None to disable overriding and go back to whatever was set.
+
+        Overriding allows SetForegroundColour() to still work as expected, except
+        when the "override" is set.
+
+        """
+        if colour is None:
+            if self.defaultFgColour is not None:
+                wx.Window.SetForegroundColour(self, self.defaultFgColour)
+                self.defaultFgColour = None
+        else:
+            if self.defaultFgColour is None:
+                self.defaultFgColour = wx.Window.GetForegroundColour(self)
+            wx.Window.SetForegroundColour(self, colour)      
+
+    def OverrideBackgroundColour(self, colour):
+        """
+        Call this method to override the control's current set background colour,
+        Call with colour=None to disable overriding and go back to whatever was set.
+
+        Overriding allows SetForegroundColour() to still work as expected, except
+        when the "override" is set.
+
+        """
+        if colour is None:
+            if self.defaultBgColour is not None:
+                wx.Window.SetBackgroundColour(self, self.defaultBgColour)
+        else:
+            if self.defaultBgColour is None:
+                self.defaultBgColour = wx.Window.GetBackgroundColour(self)
+            wx.Window.SetBackgroundColour(self, colour)
+
     def _SetValue(self,value):
         self._warn("must override _SetValue")
 
@@ -452,86 +568,18 @@ class pvCtrlMixin(pvMixin):
         self._SetValue(self.translations.get(raw_value, raw_value))
 
 
-    """
-      Call this method to override the control's default foreground colour,
-      Call with colour=None to disable overriding
-    """
-    def OverrideForegroundColour(self, colour):
-        if colour is None:
-            if self.defaultFgColour is not None:
-                wx.Window.SetForegroundColour(self, self.defaultFgColour)
-                self.defaultFgColour = None
-        else:
-            if self.defaultFgColour is None:
-                self.defaultFgColour = wx.Window.GetForegroundColour(self)
-            wx.Window.SetForegroundColour(self, colour)      
-
-    """
-      Call this method to override the control's default background colour,
-      Call with colour=None to disable overriding
-    """
-    def OverrideBackgroundColour(self, colour):
-        if colour is None:
-            if self.defaultBgColour is not None:
-                wx.Window.SetBackgroundColour(self, self.defaultBgColour)
-        else:
-            if self.defaultBgColour is None:
-                self.defaultBgColour = wx.Window.GetBackgroundColour(self)
-            wx.Window.SetBackgroundColour(self, colour)
-
-
-    """
-       (Internal method) Override the standard set colour methods so we can avoid
-       changing colour if it's currently being overriden
-    """
-    def SetForegroundColour(self, colour):
-        if self.defaultFgColour is None:
-            wx.Window.SetForegroundColour(self, colour)
-        else:
-            self.defaultFgColour = colour
-
-    """
-       (Internal method) Override the standard get colour methods so we can avoid
-       changing colour if it's currently being overriden
-    """
-    def GetForegroundColour(self):
-        return self.defaultFgColour if self.defaultFgColour is not None else wx.Window.GetForegroundColour(self)
-        
-    """
-       (Internal method) Override the standard set colour methods so we can avoid
-       changing colour if it's currently being overriden
-    """
-    def SetBackgroundColour(self, colour):
-        if self.defaultBgColour is None:
-            wx.Window.SetBackgroundColour(self, colour)
-        else:
-            self.defaultBgColour = colour
-
-    """
-       (Internal method) Override the standard get colour methods so we can avoid
-       changing colour if it's currently being overriden
-    """
-    def GetBackgroundColour(self):
-        return self.defaultBgColour if self.defaultBgColour is not None else wx.Window.GetBackgroundColour(self)
 
 
 
-    # Setters for dicts to be used for text value or value->colour automatic
-    # translations
-
-    def SetTranslations(self, translations):
-        self.translations = translations
-
-    def SetForegroundColourTranslations(self, translations):
-        self.fgColourTranslations = translations
-
-    def SetBackgroundColourTranslations(self, translations):
-        self.bgColourTranslations = translations
-            
 
 
 class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
-    """ text control for PV display (as normal string), with callback for automatic updates"""
+    """
+    Text control (ie textbox) for PV display (as normal string), 
+    with callback for automatic updates and option to write value
+    back on input
+
+    """
     def __init__(self, parent,  pv=None, 
                  font=None, fg=None, bg=None, **kw):
 
@@ -556,11 +604,23 @@ class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
         self.SetValue(value)
 
 class pvText(wx.StaticText, pvCtrlMixin):
-    """ static text for PV display, with callback for automatic updates"""
+    """ Static text for displaying a PV value, 
+        with callback for automatic updates
+        
+        Supports changing colour on alarms, by default.
+        """
     def __init__(self, parent, pv=None, as_string=True,
                  font=None, fg=None, bg=None, style=None, 
                  minor_alarm="DARKRED", major_alarm="RED",
                  invalid_alarm="ORANGERED", units="", **kw):
+        """
+        Create a new pvText
+
+        minor_alarm, major_alarm & invalid_alarm are all text colours
+        that will be set depending no the alarm state of the target
+        PV. Set to None if you want no highlighting in that alarm state.
+        """
+
         wstyle = wx.ALIGN_LEFT
         if style is not None:
             wstyle = style
@@ -577,8 +637,6 @@ class pvText(wx.StaticText, pvCtrlMixin):
             2 : major_alarm,
             3 : invalid_alarm } # alarm severities do not have an enum in pyepics
  
-            
-
     def _SetValue(self,value):
         if value is not None:
             self.SetLabel("%s%s" % (value, self.units))
@@ -676,7 +734,7 @@ class pvAlarm(wx.MessageDialog, pvCtrlMixin):
     
         
 class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
-    """ float control for PV display of numerical data,
+    """ Float control for PV display of numerical data,
     with callback for automatic updates, and
     automatic determination of string/float controls
 
@@ -778,11 +836,18 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
         PV on changes.
    
         If necessary, use the SetTranslations() option to write a
-        dictionary for string value PVs to booleans
+        dictionary for converting string value PVs to booleans. Otherwise,
+        types that convert via Python's own bool(x) will be accepted.
         
-        If a PVTuple is assigned, the checkbox can act as a "master
-        checkbox" (including with a 3-state value if the right style
-        is set) that sets/clears all the PVs in the tuple as one.
+        If a PVTuple is assigned, the checkbox can automatically act
+        as a "master checkbox" (including with a 3-state value if the
+        right style is set) that sets/clears all the PVs in the tuple
+        as one. Each PV in the PVTuple must return (or translate to) 
+        a boolean, for this work.
+
+        To do this, you will need to set the tri-state style on the
+        CheckBox constructor (same as if you were setting it on a 
+        wx.CheckBox)
         """
     def __init__(self, parent, pv=None, on_value=1, off_value=0, **kw):
         self.pv = None
@@ -818,12 +883,19 @@ class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin):
     """ A FloatSpin (floating-point-aware SpinCtrl) linked to a PV,
         both reads and writes the PV on changes.
         
+    """
+    def __init__(self, parent, pv=None, deadTime=500, min_val=None, max_val=None, 
+                 increment=1.0, digits=-1, **kw):
+        """
+        Most arguments are common with FloatSpin.
+
         Additional Arguments:
         pv = pv to set
-        deadTime = delay between user typing a value into the field, and it being sent
-    """
-    def __init__(self, parent, pv=None, deadTime=500, **kw):
-        floatspin.FloatSpin.__init__(self, parent, **kw)
+        deadTime = delay between user typing a value into the field, and it being set to the PV
+        
+        """
+        floatspin.FloatSpin.__init__(self, parent, min_val=min_val, max_val=max_val,
+                                     increment=increment, digits=digits, **kw)
         pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         floatspin.EVT_FLOATSPIN(parent, self.GetId(), self._OnChanged)
         
@@ -866,14 +938,15 @@ class pvButton(wx.Button, pvCtrlMixin):
     """ A Button linked to a PV. When the button is pressed, a certain value
         is written to the PV (useful for momentary PVs with HIGH= set.)
 
-        Additional Arguments:
+    """
+    def __init__(self, parent, pv=None, pushValue=1, disablePV=None, disableValue=1, **kw):
+        """
         pv = pv to write back to
         pushValue = value to write when button is pressed
         disablePV = read this PV in order to disable the button
         disableValue = disable the button if/when the disablePV has this value
-        
-    """
-    def __init__(self, parent, pv=None, pushValue=1, disablePV=None, disableValue=1, **kw):
+
+        """
         wx.Button.__init__(self, parent, **kw)
         pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.pushValue = pushValue
@@ -915,8 +988,17 @@ class pvRadioButton(wx.RadioButton, pvCtrlMixin):
        
        Suggested for use in a group where all radio buttons are pvRadioButtons, and they all have a
        discrete value set.
+
     """
     def __init__(self, parent, pv=None, pvValue=None, **kw):
+        """
+        pvValue = This value will be written to the PV when the radiobutton is pushed,
+                  and the radiobutton will become select if/when the PV is set to this 
+                  value.
+                  
+                  The value used is raw numeric, not "as string"
+                  
+        """
         wx.RadioButton.__init__(self, parent, **kw)
         pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.pvValue = pvValue
@@ -932,6 +1014,7 @@ class pvRadioButton(wx.RadioButton, pvCtrlMixin):
         
 class pvComboBox(wx.ComboBox, pvCtrlMixin):
     """ A ComboBox linked to a PV. Both reads/writes the combo value on changes
+
     """
     def __init__(self, parent, pv=None, **kw):
         wx.ComboBox.__init__(self, parent, **kw)
