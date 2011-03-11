@@ -82,7 +82,7 @@ class ImageView(wx.Window):
         if dc is not None:
             dc.DrawBitmap(bmp, diffx, diffy, useMask=True)
 
-class AD_Display(wx.Frame, epics.Device):
+class AD_Display(wx.Frame):
     """AreaDetector Display """
     attrs = ('ArrayData', 'UniqueId_RBV',
              'ArraySize0_RBV', 'ArraySize1_RBV', 'ArraySize2_RBV',
@@ -90,6 +90,7 @@ class AD_Display(wx.Frame, epics.Device):
     
     def __init__(self, prefix=None, scale=1.0, approx_height=600):
 
+        self.ad_device = None
         self.prefix = prefix
         self.scale  = scale
         self.arrsize  = [0,0,0]
@@ -140,34 +141,39 @@ class AD_Display(wx.Frame, epics.Device):
 
     @EpicsFunction
     def connect_pvs(self):
-        epics.Device.__init__(self, self.prefix,
-                              attrs=self.attrs)
+        print 'Connecting... ', self.prefix, self.attrs
+        self.ad_dev = epics.Device(self.prefix, delim='',
+                                   attrs=self.attrs)
 
-        if not self.PV('UniqueId_RBV').connected:
+        print self.ad_dev
+
+        print self.attrs
+        if not self.ad_dev.PV('UniqueId_RBV').connected:
             epics.ca.poll()
-            if not self.PV('UniqueId_RBV').connected:
+            if not self.ad_dev.PV('UniqueId_RBV').connected:
                 return
 
         self.SetTitle("PV Image Display: %s" % self.prefix)
 
-        self.add_callback('UniqueId_RBV',   self.onNewImage)
-        self.add_callback('ArraySize0_RBV', self.onProperty, dim=0)
-        self.add_callback('ArraySize1_RBV', self.onProperty, dim=1)
-        self.add_callback('ArraySize2_RBV', self.onProperty, dim=2)
-        self.add_callback('ColorMode_RBV',  self.onProperty, dim='color')
+        self.ad_dev.add_callback('UniqueId_RBV',   self.onNewImage)
+        self.ad_dev.add_callback('ArraySize0_RBV', self.onProperty, dim=0)
+        self.ad_dev.add_callback('ArraySize1_RBV', self.onProperty, dim=1)
+        self.ad_dev.add_callback('ArraySize2_RBV', self.onProperty, dim=2)
+        self.ad_dev.add_callback('ColorMode_RBV',  self.onProperty, dim='color')
 
         self.GetImageSize()
         self.timer = EpicsTimer(self, period=100)
         epics.poll()
+        print 'Connected... '
         self.RefreshImage()
         
     @EpicsFunction
     def GetImageSize(self):
         self.arrsize = [1,1,1]
-        self.arrsize[0] = self.get('ArraySize0_RBV')
-        self.arrsize[1] = self.get('ArraySize1_RBV')
-        self.arrsize[2] = self.get('ArraySize2_RBV')
-        self.colormode = self.get('ColorMode_RBV')
+        self.arrsize[0] = self.ad_dev.ArraySize0_RBV
+        self.arrsize[1] = self.ad_dev.ArraySize1_RBV
+        self.arrsize[2] = self.ad_dev.ArraySize2_RBV
+        self.colormode = self.ad_dev.ColorMode_RBV
 
         self.img_w = self.arrsize[1]
         self.img_h = self.arrsize[0]
@@ -189,21 +195,21 @@ class AD_Display(wx.Frame, epics.Device):
     @EpicsFunction
     def RefreshImage(self):
         d = debugtime()
-        if self.get('ArrayData') is None:
+        if self.ad_dev.ArrayData is None:
             return
         im_mode = 'L'
         im_size = (self.arrsize[0], self.arrsize[1])
+        
         if self.colormode == 2:
             im_mode = 'RGB'
             im_size = [self.arrsize[1], self.arrsize[2]]
         d.add('know image size/type')
-        rawdata = self.get('ArrayData')
+        rawdata = self.ad_dev.ArrayData
         d.add('have rawdata')
         
         imbuff =  Image.frombuffer(im_mode, im_size, rawdata,
                                    'raw', im_mode, 0, 1)
         d.add('data to imbuff')
-         
         self.GetImageSize()
         display_size = (int(self.img_h*self.scale), int(self.img_w*self.scale))
 

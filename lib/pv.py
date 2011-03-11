@@ -8,7 +8,6 @@
 """
 import time
 import copy
-from sys import stdout
 from math import log10
 
 from . import ca
@@ -161,11 +160,6 @@ class PV(_BasePVCallback):
         if callback is not None:
             self.add_callback(callback)
 
-    def _write(self, msg):
-        "write message"
-        stdout.write("%s\n" % msg)
-        stdout.flush()
-        
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
         # occassionally chid is still None (ie if a second PV is created while 
@@ -193,7 +187,8 @@ class PV(_BasePVCallback):
             self._args['type'] = _ftype_
             self._args['typefull'] = _ftype_
             self._args['ftype'] = dbr.Name(_ftype_, reverse=True)
-            
+
+
             if self.auto_monitor is None:
                 self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
             if self._monref is None and self.auto_monitor:
@@ -203,9 +198,10 @@ class PV(_BasePVCallback):
                                          callback=self.__on_changes)
 
         if hasattr(self.connection_callback, '__call__'):
+            
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
-        elif not conn:
-            self._write("PV '%s' disconnected." % pvname)
+        elif not conn and self.verbose:
+            ca.write("PV '%s' disconnected." % pvname)
 
         # waiting until the very end until to set self.connected prevents
         # threads from thinking a connection is complete when it is actually
@@ -260,19 +256,16 @@ class PV(_BasePVCallback):
         """
         if not self.wait_for_connection():
             return None
+
         if not self.auto_monitor or self._args['value'] is None:
             self._args['value'] = ca.get(self.chid,
                                          count=count,
                                          ftype=self.ftype,
                                          as_numpy=as_numpy)
+
         if as_string:
             self._set_charval(self._args['value'])
             return self._args['char_value']
-        if count is not None and self.count > 1:
-            try:
-                return self._args['value'][:count]
-            except:
-                pass
         return self._args['value']
         
 
@@ -356,10 +349,66 @@ class PV(_BasePVCallback):
 
         if self.verbose:
             now = fmt_time(self._args['timestamp'])
-            self._write('%s: %s (%s)'% (self.pvname,
-                                        self._args['char_value'],
-                                        now))
-        self.run_callbacks()        
+            ca.write('%s: %s (%s)'% (self.pvname,
+                                     self._args['char_value'],
+                                     now))
+        self.run_callbacks()
+        
+    def run_callbacks(self):
+        """run all user-defined callbacks with the current data
+
+        Normally, this is to be run automatically on event, but
+        it is provided here as a separate function for testing
+        purposes.
+
+        Note that callback functions are called with keyword/val
+        arguments including:
+             self._args  (all PV data available, keys = __fields)
+             keyword args included in add_callback()
+             keyword 'cb_info' = (index, self)
+        where the 'cb_info' is provided as a hook so that a callback
+        function  that fails may de-register itself (for example, if
+        a GUI resource is no longer available).
+             
+        """
+        for index in sorted(list(self.callbacks.keys())):
+            fcn, kwargs = self.callbacks[index]
+            kwd = copy.copy(self._args)
+            kwd.update(kwargs)
+            kwd['cb_info'] = (index, self)
+            if hasattr(fcn, '__call__'):
+                fcn(**kwd)
+            
+    def add_callback(self, callback=None, index=None,
+                     with_ctrlvars=True, **kw):
+        """add a callback to a PV.  Optional keyword arguments
+        set here will be preserved and passed on to the callback
+        at runtime.
+
+        Note that a PV may have multiple callbacks, so that each
+        has a unique index (small integer) that is returned by
+        add_callback.  This index is needed to remove a callback."""
+        if not self.wait_for_connection():
+            return None
+        if with_ctrlvars:
+            self.get_ctrlvars()
+        if hasattr(callback, '__call__'):
+            if index is None:
+                index = 1
+                if len(self.callbacks) > 0:
+                    index = 1 + max(self.callbacks.keys())
+            self.callbacks[index] = (callback, kw)
+        return index
+    
+    def remove_callback(self, index=None):
+        """remove a callback by index"""
+        if index in self.callbacks:
+            self.callbacks.pop(index)
+            self.poll()
+
+    def clear_callbacks(self):
+        "clear all callbacks"
+        self.callbacks = {}
 
     def _getinfo(self):
         "get information paragraph"
@@ -591,14 +640,17 @@ class PV(_BasePVCallback):
 
 
 class PVTuple(_BasePVCallback):
-    """Epics Process Variable Tuple
+    """EPICS Process Variable Tuple
     
-    A PVTuple encapsulates multiple Epics Process Variables into a single tuple, with a similar/compatible
+    A PVTuple encapsulates multiple Epics Process Variables into a single tuple, with a similar
     interface to a single PV (callback for the tuple when any PV changes, etc.)
    
+    This allows is to be used interchangeably with a PV in some circumstances (ie for a pvCheckBox which
+    sets/clears multiple PVs as one.)
+
     The primary interface methods for a pv are to get() and put() is value::
 
-      >>> p = PV(pv_names...)  # create a pv object given a list or tuple of pv names
+      >>> p = PV(pv_names)  # create a pv object given a list or tuple of pv names
       >>> p.get()          # get value of all PVs as a tuple
 
     Additional important attributes include::
@@ -609,6 +661,9 @@ class PVTuple(_BasePVCallback):
       >>> p.count          # number of PVs in tuple
       >>> p.type           # EPICS data types (as tuple): 'string','double','enum','long',..
       >>> p.pvs            # list of actual PV objects encapsulated
+
+    Note that if you find yourself relying too heavily on this class, it may be better to consider
+    refactoring your EPICS database to support the functionality you need.
 
 """
 
@@ -638,10 +693,11 @@ class PVTuple(_BasePVCallback):
          as_string to return string representations where possible
          as_numpy  to (try to) return a numpy arrays where possible
 
-        >>> p.get('13BMD:m1.DIR')
-        0
-        >>> p.get('13BMD:m1.DIR',as_string=True)
-        'Pos'
+        >>> p.get()
+        (0, 0)
+        >>> p.get(as_string=True)
+        (Off, Off)
+
         """
         return tuple([ p.get(count,as_string,as_numpy) for p in self.pvs])
 

@@ -38,7 +38,7 @@ setup(name = 'epics',
       license = 'Epics Open License',
       description = "Epics Channel Access Extensions to Python",
       package_dir = {'epics': 'lib'},
-      packages = ['epics','epics.wx','epics.devices', 'epics.compat'],
+      packages = ['epics','epics.wx','epics.devices', 'epics.compat', 'epics.autosave'],
       data_files = data_files )
 
 try:

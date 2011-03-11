@@ -1,4 +1,5 @@
 #!/usr/bin/python 
+"""Epics multichannel analyzer record"""
 import epics
 
 class Mca(epics.Device):
@@ -15,6 +16,7 @@ class Mca(epics.Device):
                               attrs= self.attrs)
 
     def Read(self):
+        "return value"
         attr = 'VAL'
         return self.get(attr)
 

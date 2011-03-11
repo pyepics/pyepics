@@ -28,6 +28,7 @@ wxPython widgets.
    ca
    advanced
    devices
+   alarm
    wx
 
 

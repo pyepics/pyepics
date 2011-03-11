@@ -40,8 +40,8 @@ Overview
 
 Py-Epics3 provides two principle modules: ca, and pv, and functions
 caget(), caput(), and cainfo() for the simplest of interaction with EPICS.
-In addition, there are modules for Epics Motors and Alarms, and special
-widget classes for using EPICS PVs with wxPython.
+In addition, there are modules for Epics Motors and Alarms, autosave support 
+via CA, and special widget classes for using EPICS PVs with wxPython.
 
 
 caget(), caput() and cainfo()

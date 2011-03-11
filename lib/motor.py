@@ -5,7 +5,8 @@
 # Created:        Sept. 16, 2002
 # Modifications:
 #   Oct 15, 2010  MN
-#       API Change, fuller inttegration with epics.Device, much simpler interface
+#       API Change, fuller inttegration with epics.Device,
+#       much simpler interface
 #              m = Motor('XXX:m1')
 #              print m.get_field('drive')  # mapped to .VAL
 #       becomes
@@ -225,8 +226,9 @@ class Motor(device.Device):
         'record_type':     'RTYP',
         'status':          'STAT'}
         
-    _init_list   = ('VAL','DESC', 'RTYP', 'RBV', 'PREC', 'TWV', 'FOFF')
-    _nonpvs = ('_prefix', '_pvs', '_delim', '_init', '_init_list', '_alias', '_extras')
+    _init_list   = ('VAL', 'DESC', 'RTYP', 'RBV', 'PREC', 'TWV', 'FOFF')
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_init', '_init_list',
+               '_alias', '_extras')
         
     def __init__(self, name=None, timeout=3.0):
         if name is None:
@@ -239,7 +241,8 @@ class Motor(device.Device):
 
         self._prefix = name
         device.Device.__init__(self, name, delim='.', 
-                               attrs=self._init_list)
+                               attrs=self._init_list,
+                               timeout=timeout)
 
          # make sure this is really a motor!
         rectype = self.get('RTYP')
@@ -534,7 +537,7 @@ class Motor(device.Device):
     
     def show_info(self):
         " show basic motor settings "
-        self.refresh()
+        ca.poll()
         out = []
         out.append(repr(self))
         out.append( "--------------------------------------")
@@ -543,7 +546,7 @@ class Motor(device.Device):
                 nam = "%s%s" % (nam, ' '*(16-len(nam)))
             out.append("%s = %s" % (nam, val))
         out.append("--------------------------------------")
-        sys.stdout.write("%s\n" % "\n".join(out))
+        ca.write("\n".join(out))
 
     def show_all(self):
         """ show all motor attributes"""
@@ -552,7 +555,7 @@ class Motor(device.Device):
         add("# Motor %s" % (self._prefix))
         add("#  field               value                 PV name")
         add("#------------------------------------------------------------")
-        self.refresh()
+        ca.poll()
         klist = list( self._alias.keys())
         klist.sort()
         for attr in klist:
@@ -567,7 +570,7 @@ class Motor(device.Device):
             # print " %s  %s  %s" % (label, value, pvname)
             add(" %s  %s  %s" % (label, value, pvname))
             
-        sys.stdout.write("%s\n" % "\n".join(out))
+        ca.write("\n".join(out))
 
 if (__name__ == '__main__'):
     for arg in sys.argv[1:]:

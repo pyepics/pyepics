@@ -3,8 +3,8 @@
    Matthew Newville <newville@cars.uchicago.edu>
    CARS, University of Chicago
 
-   version    :  3.0.10
-   last update:  21-Oct-2010
+   version    :  3.0.11
+   last update:  11-Jan-2011
    
 == License:
    Except where explicitly noted, this file and all files in this
@@ -21,7 +21,7 @@
       PV -- Process Variable which will work largely as in EpicsCA 2.*
 """
 
-__version__ = '3.0.10'
+__version__ = '3.0.11'
 
 import time
 import sys
@@ -60,7 +60,7 @@ def __create_pv(pvname, timeout=5.0):
         if time.time()-start_time > timeout:
             break
     if not thispv.connected:
-        sys.stdout.write('cannot connect to %s\n' % pvname)
+        ca.write('cannot connect to %s' % pvname)
         return None
     # save this one for next time
     _CACHE_[pvname] = thispv
@@ -78,7 +78,7 @@ def caput(pvname, value, wait=False, timeout=60):
     if thispv is not None:
         return thispv.put(value, wait=wait, timeout=timeout)
 
-def caget(pvname, as_string=False):
+def caget(pvname, as_string=False, count=None, as_numpy=True):
     """caget(pvname, as_string=False)
     simple get of a pv's value..
        >>> x = caget('xx.VAL')
@@ -86,15 +86,19 @@ def caget(pvname, as_string=False):
     to get the character string representation (formatted double,
     enum string, etc):
        >>> x = caget('xx.VAL', as_string=True)
+
+    to get a truncated amount of data from an array, you can specify
+    the count with
+       >>> x = caget('MyArray.VAL', count=1000)
     """
     thispv = __create_pv(pvname)
     if thispv is not None:
-        val = thispv.get()
-        poll()
         if as_string:
             thispv.get_ctrlvars()
-            poll()
-            return thispv.get(as_string=True)
+        val = thispv.get(count=count,
+                         as_string=as_string,
+                         as_numpy=as_numpy)
+        poll()
         return val
 
 def cainfo(pvname, print_out=True):
@@ -113,7 +117,7 @@ def cainfo(pvname, print_out=True):
         thispv.get()
         thispv.get_ctrlvars()
         if print_out:
-            sys.stdout.write("%s\n" % thispv.info)
+            ca.write(thispv.info)
         else:     
             return thispv.info
 
@@ -142,18 +146,16 @@ def camonitor(pvname, writer=None, callback=None):
     """
 
     if writer is None:
-        writer = sys.stdout.write
+        writer = ca.write
     if callback is None:
-        def callback(pvname=None, value=None, char_value=None, **kw):
+        def callback(pvname=None, value=None, char_value=None, **kwds):
             "generic monitor callback"
             if char_value is None:
                 char_value = repr(value)
-            writer("%.32s %s %s\n" % (pvname, pv.fmt_time(), char_value))
+            writer("%.32s %s %s" % (pvname, pv.fmt_time(), char_value))
         
     thispv = __create_pv(pvname)
     _MONITORS_[pvname] = thispv
     if thispv is not None:
         thispv.get()
-        thispv.add_callback(callback)
-
-
+        thispv.add_callback(callback, with_ctrlvars=True)
