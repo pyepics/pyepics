@@ -289,3 +289,64 @@ will look like this:
 .. image:: wx_motor_many.png
 
 
+
+
+OGL Classes
+===========
+
+OGL is a graphics drawing library shipped with wxPython. Is it built around
+the concept of "shapes" which are added to "canvases" and can be moved, 
+scrolled, zoomed, animated, etc.
+
+There is a pvShapeMixin class which allows PV callback functionality to be
+added to any OGL Shape class, and there are also pvRectangle and pvCircle 
+subclasses already created.
+
+A recommended way to use these OGL classes is to make a static bitmap
+background for your display, place it in an OGL Canvas and then add an
+overlay of shapes which appear/disappear/resize/change colour based on
+the PV values.
+
+pvCtrlMixin
+~~~~~~~~~~~~
+
+.. class:: pvShapeMixin(self, pv=None, pvname=None)
+
+  Similar to pvMixin, this mixin should be added to any 
+  ogl.Shape subclass that needs PV callback support.
+
+  The main method is PVChanged(self, raw_value), which should be
+  overriden in the subclass to provide specific processing based on
+  the changed value.
+
+  There are also some built-in pieces of functionality. These are
+  enough to do simple show/hide or change colour shape functionality,
+  without needing to write specific code.
+
+  SetBrushTranslations(translations) allows setting a dict of PV Value ->
+  wx.Brush mappings, which can be used to automatically repaint the shape
+  foreground (fill) when the PV changes.
+
+  SetPenTranslations(translations) similar to brush translations, but
+  the values are wx.Pen instances that are used to repaint the shape
+  outline when the PV changes.
+
+  SetShownTranslations(translations) sets a dictionary of PV Value ->bool
+  values which are used to show/hide the shape depending on the PV value,
+  as it changes.
+
+
+pvRectangle
+~~~~~~~~~~~
+
+.. class:: pvRectangle(self, w, h, pv=None, pvname=None)
+
+   A pvCtrlMixin for the Rectangle shape class.
+
+
+pvCircle
+~~~~~~~~
+
+.. class::  pvCircle(self, diameter, pv=None, pvname=None)
+
+   A pvCtrlMixin for the Circle shape class.
