@@ -48,11 +48,17 @@ pvCtrlMixin
 pvText       
 ~~~~~~~~
 
-.. class:: pvText(parent, pv=None, font=None, fg=None, bg=None, **kw)
+.. class:: pvText(parent, pv=None, font=None, fg=None, bg=None,
+                  minor_alarm="DARKRED", major_alarm="RED",
+                  invalid_alarm="ORANGERED", **kw)
 
   derived from wx.StaticText and pvCtrlMixin, this is a StaticText widget
   whose value is set to the string representation of the value for the
   corresponding PV.
+
+  By default, the text colour will be overriden when the PV enters an
+  alarm state. These colours can be modified (or disabled by being set
+  to None) as part of the constructor.
 
 
 pvTextCtrl   
@@ -78,6 +84,58 @@ pvFloatCtrl
     of input values.  For a value that is within limits, the value will be
     `put` to the PV on return.  Out-of-limit values will be highlighted in
     a different color.
+
+
+pvFloatSpin
+~~~~~~~~~~~
+
+.. class:: pvFloatSpin(parent, pv=None, deadTime=500, min_val=None, 
+                       max_val=None, increment=1.0, digits=-1, **kw)
+
+    A FloatSpin is a floatin point spinctrl with buttons to increase
+	 and decrease the value by a particular increment. Arrow keys and
+	 page up/down can also be used (the latter changes the value by 10x
+	 the increment.)
+
+	 pvFloatSpin is a special derivation that assigns a PV to the FloatSpin
+	 control. deadTime is the delay (in milliseconds) between when the user
+	 finishes typing a value and when the PV is set to it (to prevent
+	 half-typed numeric values being set.)
+
+
+pvButton
+~~~~~~~~~~~
+
+.. class:: pvButton(parent, pv=None, pushValue=1, disablePV=None, 
+                    disableValue=1, **kw)
+
+    A wx.Button linked to a PV. When the button is pressed, 'pushValue'
+	 is written to the PV (useful for momentary PVs with HIGH= set.)
+
+	 Setting disablePV and disableValue will automatically cause the
+	 button to disable when that PV has a certain value.
+
+
+pvRadioButton
+~~~~~~~~~~~
+
+.. class:: pvRadioButton(parent, pv=None, pvValue=None, **kw)
+
+    A pvRadioButton is a radio button associated with a particular PV 
+	 and one particular value.
+       
+    Suggested for use in a group where all radio buttons are
+    pvRadioButtons, and they all have a discrete value set.
+
+
+
+pvComboBox
+~~~~~~~~~~~
+
+.. class:: pvComboBox(parent, pv=None, **kw)
+
+    A ComboBox linked to a PV. Both reads/writes the combo value on changes.
+
 
 
 pvEnumButtons

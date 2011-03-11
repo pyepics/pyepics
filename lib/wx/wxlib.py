@@ -607,7 +607,9 @@ class pvText(wx.StaticText, pvCtrlMixin):
     """ Static text for displaying a PV value, 
         with callback for automatic updates
         
-        Supports changing colour on alarms, by default.
+        By default the text colour will change on alarm states.
+        This can be overriden or disabled as constructor
+        parameters
         """
     def __init__(self, parent, pv=None, as_string=True,
                  font=None, fg=None, bg=None, style=None, 
@@ -889,9 +891,10 @@ class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin):
         """
         Most arguments are common with FloatSpin.
 
-        Additional Arguments:
-        pv = pv to set
-        deadTime = delay between user typing a value into the field, and it being set to the PV
+        Additional Arguments: 
+        pv = pv to set 
+        deadTime = delay (ms) between user typing a value into the field, 
+        and it being set to the PV
         
         """
         floatspin.FloatSpin.__init__(self, parent, min_val=min_val, max_val=max_val,

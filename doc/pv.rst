@@ -670,3 +670,18 @@ A connection callback:
 .. literalinclude:: ../tests/pv_connection_callback.py
 
 
+
+
+
+The :class:`PVTuple` class
+=======================
+
+.. class:: PVTuple(self, pvnames=None, pvs=[], callback=None)
+
+The PVTuple is a special case of PV that allows you to group a set of PVs
+under a simpilar interface to a single PV, but working with tuple values.
+
+It's only really useful in particular special cases, for example you could
+assign a PVTuple to a wx pvCheckBox when using wxPython, and the checkbox
+will automatic check or uncheck based on -all- the values in the PVs, instead
+of a single value.
