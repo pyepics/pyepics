@@ -455,7 +455,11 @@ def _onPutEvent(args, **kwds):
     data = _put_done[pvname][2]
     _put_done[pvname] = (True, None, None)
     if hasattr(fcn, '__call__'):
-        fcn(pvname=pvname, data=data, **kwds)
+        if isinstance(data, dict):
+            kwds.update(data)
+        elif data is not None:
+            kwds['data'] = data
+        fcn(pvname=pvname, **kwds)
 
 # create global reference to these two callbacks
 _CB_CONNECT = ctypes.CFUNCTYPE(None, dbr.connection_args)(_onConnectionEvent)
@@ -896,6 +900,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     ret = libca.ca_array_put_callback(ftype, count, chid,
                                       data, _CB_PUTWAIT, 0)
     PySEVCHK('put', ret)
+    poll(evt=1.e-4, iot=0.05)
     if wait:
         start_time, finished = time.time(), False
         while not finished:
