@@ -8,8 +8,8 @@
 # is assumed to have count=1
 double_pv = '13IDC:m2.VAL'
 double_pv_host = 'ioc13idc.cars.aps.anl.gov:5064'
-double_pv_units = 'mm'
-double_pv_prec = 4
+double_pv_units = 'microns'
+double_pv_prec = 1
 
 #### 2
 # this pv should be an ENUM. It will NOT be set.
@@ -36,7 +36,7 @@ double_arr_pv = '13IDC:scan1.P1PA'
 ####
 # provide a single motor prefix (to which '.VAL' and '.RBV' etc will be added)
 
-motor1 = '13IDC:m2'
+motor1 = '13IDE:m1'
 
 #### 
 #  Here, provide a PV that changes at least once very 10 seconds
