@@ -109,6 +109,11 @@ callbacks to be executed when the PV changes.
    :type callback: ``None`` or a valid python function
    :param callback_data: extra data to pass on to a user-supplied callback function. 
 
+The `wait` and `callback` arguments, as well as the :attr:`put_complete`
+attribute give a few options  for ensuring that a :meth:`put` has
+completed, or being notified when it has completed.   See
+:ref:`pv-putwait-label` for more details.
+
 
 ..  _pv-get-ctrlvars-label:  
 
@@ -165,9 +170,8 @@ callbacks to be executed when the PV changes.
    :param callback: user-supplied function to run when PV changes.
    :type callback: None or callable
    :param index: identifying key for this callback 
-   :param with_ctrlvars:  whether to (try to) make sure that accurate
-   ``control values`` will be sent to the callback.
-   :type index:: None (integer will be produced) or immutable
+   :param with_ctrlvars:  whether to (try to) make sure that accurate  ``control values`` will be sent to the callback.
+   :type index: None (integer will be produced) or immutable
    :param kw: additional keyword/value arguments to pass to each execution of the callback.
    :rtype:  integer
 
@@ -316,6 +320,11 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
    These are all the various kinds of limits for a PV.
         
+.. attribute:: put_complete
+
+   a boolean (``True``/``False``) value for whether the most recent
+   :meth:`put`  has completed. 
+
 .. attribute:: callbacks
 
    a dictionary of currently defined callbacks, to be run on changes to the
@@ -491,10 +500,75 @@ where *conn* will be either `True` or `False`, specifying whether the PV is
 now connected.   A simple example is given below.
 
 
+..  _pv-putwait-label:
+
+Put with wait, put callbacks, and  put_complete
+========================================================
+
+Some EPICS records take a significant amount of time to fully process, and 
+sometimes you want to wait until the processing completes before going on.
+There are a few ways to accomplish this.  First, one can simply wait until
+the processing is done::
+
+    import epics
+    p = epics.PV('XXX')
+    p.put(1.0, wait=True)
+    print 'Done'
+
+This will hang until the processing of the PV completes (motor moving, etc)
+before printing 'Done'.   You can also specfy a maximum time to wait -- a
+*timeout* (in seconds)::
+
+    p.put(1.0, wait=True, timeout=30)
+
+which will wait up to 30 seconds.  For the pedantic, this timeout should
+not be used as an accurate clock -- the actual wait time may be slightly
+longer.
+
+A second method is to watch for the :attr:`put_complete` attribute to
+become  True after a :meth:`put`.  This is somewhat more flexible than
+using `wait=True` as above because you can more carefully control how often
+you look for a :meth:`put` to complete, and what to do in the interim.  A
+simple example would be::
+    
+    p.put(1.0)
+    waiting = True
+    while waiting:
+        time.sleep(0.001)
+        waiting = not p.put_complete
+
+An additional advantage of this approach is that you can easily wait for
+multiple PVs to complete with python's builtin `all` function, as with::
+
+    pvgroup = (epics.PV('XXX'), epics.PV('YYY'), epics.PV('ZZZ'))
+    newvals = (1.0, 2.0,  3.0)
+    for pv, val in zip(pvgroup, newvals):
+        pv.put(val)
+    
+    waiting = True
+    while waiting:
+        time.sleep(0.001)
+        waiting = all(pv.put_complete for pv in pvgroup)
+    print 'All puts are done!'
+ 
+For maximum flexibility, one can all define a *put callback*, a function to
+be run when the :meth:`put` has completed.   This function requires a
+*pvname* keyword argument, but will receive no others, unless you pass in
+data with the *callback_data* argument (which should be dict-like) to
+:meth`put`.   A simple example would be::
+
+    pv = epics.PV('XXX')
+    def onPutComplete(pvname=None, **kws):
+        print 'Put done for %s' % pvname
+
+    pv.put(1.0, callback=onPutComplete)
+
+  
+
 ..  _pv-examples-label:
 
 Examples
-=========
+============
 
 Some simple examples using PVs follow.  
 
@@ -609,26 +683,6 @@ Or (equivalently):
 
 The :attr:`value` attribute is the only attribute that can be set.
 
-Example of put with wait
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Some EPICS records take a significant amount of time to fully process.  And
-sometimes you want to wait until the processing completes before going on::
-
-    import epics
-    p = epics.PV('XXX')
-    p.put(1.0, wait=True)
-    print 'Done'
-
-This will wait until the processing completes (motor moving, etc) before
-printing 'Done'.   You can also specfy a maximum time to wait -- a
-*timeout* (in seconds)::
-
-    p.put(1.0, wait=True, timeout=30)
-
-which will wait up to 30 seconds.  For the pedantic, this timeout should
-not be used as an accurate clock -- the actual wait time may be slightly
-longer.
 
 
 Example of simple callback
@@ -668,5 +722,7 @@ Example of connection callback
 A connection callback:
 
 .. literalinclude:: ../tests/pv_connection_callback.py
+
+
 
 
