@@ -24,3 +24,14 @@ This program requires the wxPython package and the Python Imaging Library
 This is a simple emulation of the the caget command.
    
    ~> python caget.py  XXX.VAL
+
+
+== save_restore.py
+This is a simple commandline tool for saving/restoring PV values
+ 
+For full options, run:
+   ~> ./save_restore.py -h
+
+Simple uses:
+   ~> ./save_restore.py -d --save /tmp/my_pvs.req /tmp/my_save.sav
+   ~> ./save_restore.py -d --save /tmp/my_save.sav

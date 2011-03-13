@@ -102,10 +102,10 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 
 ## Cache of existing channel IDs:
 #  pvname: {'chid':chid, 'conn': isConnected,
-#           'ts': ts_conn, 'callback': user_callback)
+#           'ts': ts_conn, 'callbacks': [ user_callback... ])
 #  isConnected   = True/False: if connected.
 #  ts_conn       = ts of last connection event or failed attempt.
-#  user_callback = user function to be called on change
+#  user_callback = one or more user functions to be called on change (accumulated in the cache)
 _cache  = {}
 
 ## Cache of pvs waiting for put to be done.
@@ -429,7 +429,7 @@ def _onConnectionEvent(args):
         # print 'adding pvname to ctx ', pvname, ctx 
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
                                'ts':0, 'failures':0, 
-                               'callback': None}
+                               'callbacks': []}
 
     conn = (args.op == dbr.OP_CONN_UP)
     entry = _cache[ctx][pvname]
@@ -438,11 +438,13 @@ def _onConnectionEvent(args):
     entry['ts']   = time.time()
     entry['failures'] = 0
 
-    if 'callback' in entry and hasattr(entry['callback'], '__call__'):
+    callbacks = [ callback for callback in entry.get('callbacks', []) if hasattr(callback, '__call__') ]
+    if len(callbacks) > 0:
         poll(evt=1.e-3, iot=10.0)
-        entry['callback'](pvname=pvname,
-                          chid=entry['chid'],
-                          conn=entry['conn'])
+    for callback in callbacks:
+                callback(pvname=pvname,
+                         chid=entry['chid'],
+                         conn=entry['conn'])
 
     return 
 
@@ -598,13 +600,19 @@ def create_channel(pvname, connect=False, callback=None):
     if pvname not in _cache[ctx]:
         _cache[ctx][pvname] = {'conn':False,  'chid': None, 
                                'ts': 0,  'failures':0, 
-                               'callback': callback}
-
-    chid = dbr.chid_t()
-    # print 'Create Channel ', ctx, chid, pvname
-    ret = libca.ca_create_channel(pvn, _CB_CONNECT, 0, 0, 
-                                  ctypes.byref(chid))
-    PySEVCHK('create_channel', ret)
+                               'callbacks': [ callback ]}
+    else:
+        _cache[ctx][pvname]['callbacks'].append(callback)
+    
+    if not 'chid_p' in _cache[ctx][pvname]:
+        chid = dbr.chid_t()
+        # print 'Create Channel ', ctx, chid, pvname
+        ret = libca.ca_create_channel(pvn, _CB_CONNECT, 0, 0, 
+                                  ctypes.byref(chid))    
+        PySEVCHK('create_channel', ret)
+        _cache[ctx][pvname]['chid_p'] = chid
+    else:
+        chid = _cache[ctx][pvname]['chid_p'] # already waiting on a chid
 
     if connect:
         connect_channel(chid)
