@@ -95,5 +95,3 @@ Epics Open License:
 
 .. include:: ../license.txt
 
-
-.

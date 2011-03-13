@@ -154,7 +154,8 @@ quite good.
   :param count:  number of elements to return for array data.
   :type count:  integer
 
-   :param as_numpy:  whether to return the Numerical Python representation for array data.  
+   :param as_numpy:  whether to return the Numerical Python representation
+   for array data.  
    :type as_numpy:  ``True``/``False``
 
 
@@ -400,33 +401,34 @@ avoiding the C API altogether, migration to Python3 is greatly simplified.
 PyEpics3 does work with both Python 2.* and 3.*.
 
 
+
 Status and To-Do List
-=======================
+=====================
 
 The Epics3 package is under active development.   The current status is that
 most features are working well, and it is starting to be used in production
 code, but more testing and better tests are needed.  
 
-The package is targeted and tested to work with Python 2.5, 2.6, 2.7, and
-3.1 simultaneously (that is, the same code is meant to support all
-versions).  Currently, the package works with Python 3.1, but is not
-extremely well-tested.
+The package is targeted and tested to work with Python 2.5, 2.6, and 3.1
+simultaneously (that is, the same code is meant to support all versions). 
+Currently, the package works with Python 3.1, but is not extremely
+well-tested.
 
 There are several desired features are left undone or unfinished:
  
- *  port CaChannel interface, ca_util, epicsPV (and other interfaces??) to use epics.ca
+ *  port CaChannel interface (and others??) to use epics.ca
 
  *  add more "devices", including low-level epics records.
+
+ *  improve wx_motor.py to be a stand-alone app with:
+     - dialog window to select a set of motors for an "instrument"
+     - enable "save/restore" for named positions of all motors
+       in an instrument, with options to prompt-for-restore and
+       prompt-for-restore-per-motor.
+     - config file per instrument to allow loading a saved
+       instrument definition, with saved positions
+     - tabbed/notebook interface for multiple instruments.
 
  *  further testing for Python 3.1
 
  *  further testing for threading and 'contexts'.
-
- *  include dedicate epics db records to facilitate better automated testing.
-
- *  build and distribute example Epics applications, such as:
-
-     - PV stripcharter
-     - Probe replacement
-     - application to manage saved "positions" of multiple PVs in an
-       "instrument".
