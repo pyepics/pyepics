@@ -25,7 +25,6 @@ from pyparsing import *
 from epics.pv import PV
 import os, datetime
 
-
 def restore_pvs(filepath, debug=False):
     """ 
     Restore pvs from a save file via Channel Access 
@@ -37,15 +36,15 @@ def restore_pvs(filepath, debug=False):
     """
     success = True
     values = [ x for x in sav_file.parseFile(filepath).asList() if len(x) > 0 ]
-    print "Restoring %d values..." % ( len(values) )
+    print( "Restoring %d values..." % ( len(values) ))
     for v in values:
         if debug:
-            print "Setting %s to %s..." % (v[0], v[1])
+            print( "Setting %s to %s..." % (v[0], v[1]))
         try:
             pv = PV(v[0])
             pv.put(v[1]) # hopefully this is good enough as conversions go           
         except Exception,e:
-            print "Error restoring %s to %s : %s" % (v[0], v[1], e)
+            print( "Error restoring %s to %s : %s" % (v[0], v[1], e))
             success = False
     return success
     
@@ -62,7 +61,7 @@ def save_pvs(request_file, save_pvs, debug=False):
     pv_vals = [ (pvname, PV(pvname).get()) for pvname in pvnames ]
     if debug:
         for (pv,val) in pv_vals:
-            print "PV %s = %s" % (pv, val)    
+            print( "PV %s = %s" % (pv, val))
     f = open(save_pvs, "w")
     f.write("# File saved automatically by save_restore.py on %s\n" % 
             datetime.datetime.now().isoformat())
