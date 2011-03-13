@@ -438,13 +438,13 @@ def _onConnectionEvent(args):
     entry['ts']   = time.time()
     entry['failures'] = 0
 
-    callbacks = [ callback for callback in entry.get('callbacks', []) if hasattr(callback, '__call__') ]
-    if len(callbacks) > 0:
+    if len(entry.get('callbacks', [])) > 0:
         poll(evt=1.e-3, iot=10.0)
-    for callback in callbacks:
-                callback(pvname=pvname,
-                         chid=entry['chid'],
-                         conn=entry['conn'])
+    for callback in entry.get('callbacks', []):
+        is hasattr(callback, '__call__'):
+            callback(pvname=pvname,
+                     chid=entry['chid'],
+                     conn=entry['conn'])
 
     return 
 
@@ -604,15 +604,16 @@ def create_channel(pvname, connect=False, callback=None):
     else:
         _cache[ctx][pvname]['callbacks'].append(callback)
     
-    if not 'chid_p' in _cache[ctx][pvname]:
+    if 'chid_p' in _cache[ctx][pvname]:
+        # already waiting on a chid        
+        chid = _cache[ctx][pvname]['chid_p'] 
+    else:
         chid = dbr.chid_t()
         # print 'Create Channel ', ctx, chid, pvname
         ret = libca.ca_create_channel(pvn, _CB_CONNECT, 0, 0, 
                                   ctypes.byref(chid))    
         PySEVCHK('create_channel', ret)
         _cache[ctx][pvname]['chid_p'] = chid
-    else:
-        chid = _cache[ctx][pvname]['chid_p'] # already waiting on a chid
 
     if connect:
         connect_channel(chid)
