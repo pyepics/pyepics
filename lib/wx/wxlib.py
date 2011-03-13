@@ -342,7 +342,8 @@ class pvMixin:
 
     @EpicsFunction
     def set_pv(self, pv=None):
-        if isinstance(pv, epics.PV) or isinstance(pv, epics.PVTuple):
+        if isinstance(pv, epics.PV):
+            # or isinstance(pv, epics.PVTuple):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
             self.pv = epics.PV(pv)
@@ -422,8 +423,7 @@ class pvCtrlMixin(pvMixin):
       
     """
 
-    def __init__(self, pv=None, pvname=None,
- font=None, fg=None, bg=None):
+    def __init__(self, pv=None, pvname=None, font=None, fg=None, bg=None):
         pvMixin.__init__(self, pv, pvname)
 
         self.translations = {}
@@ -566,10 +566,6 @@ class pvCtrlMixin(pvMixin):
         self.OverrideBackgroundColour(colour)
             
         self._SetValue(self.translations.get(raw_value, raw_value))
-
-
-
-
 
 
 
@@ -853,11 +849,14 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
     dictionary for converting string value PVs to booleans. Otherwise,
     types that convert via Python's own bool(x) will be accepted.
     
+    {{MattN 2011-03-11 disabling PVTuples for initial merging
+        of Angus's branch -- should investigate if this is needed!
     If a PVTuple is assigned, the checkbox can automatically act
     as a "master checkbox" (including with a 3-state value if the
     right style is set) that sets/clears all the PVs in the tuple
     as one. Each PV in the PVTuple must return (or translate to) 
     a boolean, for this work.
+    }}
     
     To do this, you will need to set the tri-state style on the
     CheckBox constructor (same as if you were setting it on a 
@@ -874,6 +873,8 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
         self.OnChange = None
 
     def _SetValue(self, value):
+        """{MattN 2011-03-11 disabling PVTuples for initial merging
+            of Angus's branch -- should investigate if this is needed!
         if isinstance(self.pv, epics.PVTuple):
             rawValue = [ bool(r) for r in list(self.pv.get()) ]
             if all(rawValue):
@@ -883,6 +884,8 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
             else:
                 self.ThreeStateValue = wx.CHK_UNCHECKED
         elif value == self.on_value or value == self.off_value:
+        """
+        if value == self.on_value or value == self.off_value:
             self.Value = (value == self.on_value)
         else:
             self.Value = bool(self.pv.get())
