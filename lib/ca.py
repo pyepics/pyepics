@@ -382,7 +382,6 @@ def withSEVCHK(fcn):
 def _onGetEvent(args):
     """Internal Event Handler for get events: not intended for use"""
     value = dbr.cast_args(args).contents
-    # print(" onGet Event: ", args.chid, type(args.chid))
     # chid = dbr.chid_t(args.chid)
     pvname = name(args.chid)
     kwds = {'ftype':args.type, 'count':args.count,
@@ -603,15 +602,14 @@ def create_channel(pvname, connect=False, callback=None):
                                'callbacks': [ callback ]}
     else:
         _cache[ctx][pvname]['callbacks'].append(callback)
-    
+
     if 'chid_p' in _cache[ctx][pvname]:
-        # already waiting on a chid        
-        chid = _cache[ctx][pvname]['chid_p'] 
+        # already waiting on a chid
+        chid = _cache[ctx][pvname]['chid_p']
     else:
         chid = dbr.chid_t()
-        # print 'Create Channel ', ctx, chid, pvname
-        ret = libca.ca_create_channel(pvn, _CB_CONNECT, 0, 0, 
-                                  ctypes.byref(chid))    
+        ret = libca.ca_create_channel(pvn, _CB_CONNECT, 0, 0,
+                                  ctypes.byref(chid))
         PySEVCHK('create_channel', ret)
         _cache[ctx][pvname]['chid_p'] = chid
 
@@ -1072,7 +1070,7 @@ def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
     >>> sg = epics.ca.sg_create() 
     >>> data = epics.ca.sg_get(sg, chid)
     >>> epics.ca.sg_block(sg)
-    print epics.ca._unpack(data, chid=chid)
+    >>> print epics.ca._unpack(data, chid=chid)
     """
     if not isinstance(chid, dbr.chid_t):
         raise ChannelAccessException('sg_get', "not a valid chid!")
