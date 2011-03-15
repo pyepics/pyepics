@@ -60,7 +60,8 @@ class MotorDetailFrame(wx.Frame):
                         (self.motor_textctrl(spanel, 'EGU',    size=(95,40)), 0,  wx.ALIGN_TOP|wx.ALIGN_CENTER)
                         ])
 
-        sizer.Add(ssizer, 0, wx.EXPAND)
+        set_sizer(spanel, ssizer)
+        sizer.Add(spanel, 0, wx.EXPAND)
         sizer.Add(wx.StaticLine(panel,size=(100,2)),  0, wx.EXPAND)
 
         ds = wx.GridBagSizer(6, 4)
