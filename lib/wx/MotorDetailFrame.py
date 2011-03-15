@@ -54,10 +54,10 @@ class MotorDetailFrame(wx.Frame):
 
 
         ssizer = wx.BoxSizer(wx.HORIZONTAL)
-        ssizer.AddMany([(wx.StaticText(spanel,label=' Label ', size=(65,40)), 0,  wx.ALIGN_BOTTOM|wx.ALIGN_CENTER|wx.ALIGN_RIGHT), 
-                        (self.motor_textctrl(spanel, 'DESC',   size=(210,40)), 1, wx.ALIGN_TOP|wx.ALIGN_LEFT),
-                        (wx.StaticText(spanel,label='  units ',size=(75,40)), 0,  wx.ALIGN_BOTTOM|wx.ALIGN_RIGHT), 
-                        (self.motor_textctrl(spanel, 'EGU',    size=(95,40)), 0,  wx.ALIGN_TOP|wx.ALIGN_CENTER)
+        ssizer.AddMany([(wx.StaticText(spanel,label=' Label ', size=(65, -1)), 0,  wx.ALIGN_CENTER|wx.ALIGN_RIGHT), 
+                        (self.motor_textctrl(spanel, 'DESC',   size=(210,-1)), 1,  wx.ALIGN_CENTER|wx.ALIGN_LEFT),
+                        (wx.StaticText(spanel,label='  units ',size=(75, -1)), 0,  wx.ALIGN_CENTER|wx.ALIGN_RIGHT), 
+                        (self.motor_textctrl(spanel, 'EGU',    size=(95, -1)), 0,  wx.ALIGN_CENTER|wx.ALIGN_LEFT)
                         ])
 
         set_sizer(spanel, ssizer)
@@ -163,8 +163,6 @@ class MotorDetailFrame(wx.Frame):
         dp = wx.Panel(panel)
                    
         ds.Add(xLabel(dp, 'Mode: '),      (0,0),(1,1), _textstyle,_textpadding)
-        
-
         
         ds.Add(pvEnumButtons(dp, pv=self.motor.PV('SET'),
                               orientation = wx.HORIZONTAL, 
