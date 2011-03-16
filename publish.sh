@@ -26,7 +26,7 @@ mkdir _tmpdoc
 cp -pr $docbuild/latex/epics.pdf _tmpdoc/pyepics3.pdf
 cp -pr $docbuild/html/*          _tmpdoc/.
 cd _tmpdoc
-tar cvzf ../..pyepics_docs.tar.gz .
+tar cvzf ../../pyepics_docs.tar.gz .
 cd ..
 rm -rf _tmpdoc _images _sources _static *.html *.js *.inv pyepics3.pdf
 

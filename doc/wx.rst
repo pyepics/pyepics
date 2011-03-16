@@ -128,7 +128,7 @@ pvCheckBox
 
 
 pvFloatSpin
-~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. class:: pvFloatSpin(parent, pv=None, deadTime=500, min_val=None, 
                        max_val=None, increment=1.0, digits=-1, **kw)
@@ -158,7 +158,7 @@ pvButton
 
 
 pvRadioButton
-~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 .. class:: pvRadioButton(parent, pv=None, pvValue=None, **kw)
 
