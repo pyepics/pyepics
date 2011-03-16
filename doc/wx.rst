@@ -48,11 +48,17 @@ pvCtrlMixin
 pvText       
 ~~~~~~~~
 
-.. class:: pvText(parent, pv=None, font=None, fg=None, bg=None, **kw)
+.. class:: pvText(parent, pv=None, font=None, fg=None, bg=None,
+                  minor_alarm="DARKRED", major_alarm="RED",
+                  invalid_alarm="ORANGERED", **kw)
 
   derived from wx.StaticText and pvCtrlMixin, this is a StaticText widget
   whose value is set to the string representation of the value for the
   corresponding PV.
+
+  By default, the text colour will be overriden when the PV enters an
+  alarm state. These colours can be modified (or disabled by being set
+  to None) as part of the constructor.
 
 
 pvTextCtrl   
@@ -78,6 +84,99 @@ pvFloatCtrl
     of input values.  For a value that is within limits, the value will be
     `put` to the PV on return.  Out-of-limit values will be highlighted in
     a different color.
+
+
+pvBitmap
+~~~~~~~~~~~
+
+.. class:: pvBitmap(parent, pv=None, bitmaps={}, defaultBitmap=None)
+
+    A Static Bitmap where the image is based on PV value.
+
+	 If the bitmaps dictionary is set, it should be set as PVValue->Bitmap
+	 where particular bitmaps will be shown if the PV takes those certain 
+	 values.
+
+    If you need to do any more complex or dynamic drawing, you may
+	 want to look at the OGL PV controls.
+
+
+pvCheckBox
+~~~~~~~~~~~
+
+.. class:: pvCheckBox(self, parent, pv=None, on_value=1, off_value=0, **kw)
+    Checkbox based on a binary PV value, both reads/writes the
+    PV on changes.
+
+	 on_value and off_value are the specific values that are mapped to
+	 the checkbox. If the PV is externally set to any other value, it
+	 is assumed to be "off" (unchecked.)
+   
+    If necessary, use the SetTranslations() option to write a
+    dictionary for converting string value PVs to booleans. Otherwise,
+    types that convert via Python's own bool(x) will be accepted.
+        
+    If a PVTuple is assigned, the checkbox can automatically act
+    as a "master checkbox" (including with a 3-state value if the
+    right style is set) that sets/clears all the PVs in the tuple
+    as one. Each PV in the PVTuple must return (or translate to) 
+    a boolean, for this work.
+
+    To do this, you will need to set the tri-state style on the
+    CheckBox constructor (same as if you were setting it on a 
+    wx.CheckBox)
+
+
+pvFloatSpin
+~~~~~~~~~~~
+
+.. class:: pvFloatSpin(parent, pv=None, deadTime=500, min_val=None, 
+                       max_val=None, increment=1.0, digits=-1, **kw)
+
+    A FloatSpin is a floatin point spinctrl with buttons to increase
+	 and decrease the value by a particular increment. Arrow keys and
+	 page up/down can also be used (the latter changes the value by 10x
+	 the increment.)
+
+	 pvFloatSpin is a special derivation that assigns a PV to the FloatSpin
+	 control. deadTime is the delay (in milliseconds) between when the user
+	 finishes typing a value and when the PV is set to it (to prevent
+	 half-typed numeric values being set.)
+
+
+pvButton
+~~~~~~~~~~~
+
+.. class:: pvButton(parent, pv=None, pushValue=1, disablePV=None, 
+                    disableValue=1, **kw)
+
+    A wx.Button linked to a PV. When the button is pressed, 'pushValue'
+	 is written to the PV (useful for momentary PVs with HIGH= set.)
+
+	 Setting disablePV and disableValue will automatically cause the
+	 button to disable when that PV has a certain value.
+
+
+pvRadioButton
+~~~~~~~~~~~
+
+.. class:: pvRadioButton(parent, pv=None, pvValue=None, **kw)
+
+    A pvRadioButton is a radio button associated with a particular PV 
+	 and one particular value.
+       
+    Suggested for use in a group where all radio buttons are
+    pvRadioButtons, and they all have a discrete value set.
+
+
+
+pvComboBox
+~~~~~~~~~~~
+
+.. class:: pvComboBox(parent, pv=None, **kw)
+
+    A ComboBox linked to a PV. Both reads/writes the combo value on changes.
+
 
 
 pvEnumButtons
@@ -189,3 +288,63 @@ will look like this:
 .. image:: wx_motor_many.png
 
 
+
+OGL Classes
+===========
+
+OGL is a graphics drawing library shipped with wxPython. Is it built around
+the concept of "shapes" which are added to "canvases" and can be moved, 
+scrolled, zoomed, animated, etc.
+
+There is a pvShapeMixin class which allows PV callback functionality to be
+added to any OGL Shape class, and there are also pvRectangle and pvCircle 
+subclasses already created.
+
+A recommended way to use these OGL classes is to make a static bitmap
+background for your display, place it in an OGL Canvas and then add an
+overlay of shapes which appear/disappear/resize/change colour based on
+the PV values.
+
+pvCtrlMixin
+~~~~~~~~~~~~
+
+.. class:: pvShapeMixin(self, pv=None, pvname=None)
+
+  Similar to pvMixin, this mixin should be added to any 
+  ogl.Shape subclass that needs PV callback support.
+
+  The main method is PVChanged(self, raw_value), which should be
+  overriden in the subclass to provide specific processing based on
+  the changed value.
+
+  There are also some built-in pieces of functionality. These are
+  enough to do simple show/hide or change colour shape functionality,
+  without needing to write specific code.
+
+  SetBrushTranslations(translations) allows setting a dict of PV Value ->
+  wx.Brush mappings, which can be used to automatically repaint the shape
+  foreground (fill) when the PV changes.
+
+  SetPenTranslations(translations) similar to brush translations, but
+  the values are wx.Pen instances that are used to repaint the shape
+  outline when the PV changes.
+
+  SetShownTranslations(translations) sets a dictionary of PV Value ->bool
+  values which are used to show/hide the shape depending on the PV value,
+  as it changes.
+
+
+pvRectangle
+~~~~~~~~~~~
+
+.. class:: pvRectangle(self, w, h, pv=None, pvname=None)
+
+   A pvCtrlMixin for the Rectangle shape class.
+
+
+pvCircle
+~~~~~~~~
+
+.. class::  pvCircle(self, diameter, pv=None, pvname=None)
+
+   A pvCtrlMixin for the Circle shape class.

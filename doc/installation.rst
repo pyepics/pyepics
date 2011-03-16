@@ -20,22 +20,25 @@ use the modules.  For Unix-like systems, these are assumed to be available
 LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 
 Downloads
-~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 The latest stable version of the Epics Python Package is 3.0.11.  There are
 a few ways to get the Epics Python Package: 
 
-.. _epics-3.0.11.tar.gz:          http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.tar.gz
+.. _epics-3.0.11.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.tar.gz
+.. _epics-3.0.11.tar.gz (PyPI):   http://pypi.python.org/packages/source/e/epics/epics-3.0.11.tar.gz
 .. _epics-3.0.11.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.win32-py2.6.exe
 .. _epics-3.0.11.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.win32-py3.1.exe
 .. _pyepics github repository:    http://github.com/newville/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
 .. _PyPi Epics Entry:             http://pypi.python.org/pypi/epics/
+.. _Python Setup Tools:           http://pypi.python.org/pypi/setuptools
 
 +---------------------------+------------------------------------------+
 |  Download Option          |  Location                                |
 +===========================+==========================================+
-|  Source Kit               |  `epics-3.0.11.tar.gz`_                  |
+|  Source Kit               |  `epics-3.0.11.tar.gz (CARS)`_  or       |
+|                           |  `epics-3.0.11.tar.gz (PyPI)`_           |
 +---------------------------+------------------------------------------+
 |  Windows Installers       |  `epics-3.0.11.win32-py2.6.exe`_  or     |
 |                           |  `epics-3.0.11.win32-py3.1.exe`_         |
@@ -43,6 +46,14 @@ a few ways to get the Epics Python Package:
 |  Development Version      |  use `pyepics github repository`_        |
 +---------------------------+------------------------------------------+
 
+if you have `Python Setup Tools`_  installed, you can download and install
+the PyEpics Package simply with::
+
+   easy_install epics
+
+
+Development Version
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 The PyEpics module is still under active development, and enhancements and
 bug-fixes are being added frequently.  All development is done through the
@@ -58,15 +69,9 @@ or::
 Current and older source source kits, and Windows Installers can also be found
 at the `PyEpics Source Tree`_.   
 
-Finally, the PyEpics Package is registered with the  Python Package Index
-(PyPI), and can be found at the `PyPi Epics Entry`_ and installed with::
-  
-   easy_install epics
-
-for systems that have the easy_install script installed.
-
 Installation
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+
 
 Installation from source on any platform is::
 
@@ -74,6 +79,12 @@ Installation from source on any platform is::
 
 For more details, especially about how to set paths for LD_LIBRARY_PATH or
 DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.
+
+Again, if you have `Python Setup Tools`_  installed, you can download and install
+the PyEpics Package with::
+
+   easy_install epics
+
 
 Acknowledgements
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -89,11 +100,23 @@ Rivers, Friedrich Schotte, Steve Wasserman, and Glen Wright.
 Epics Open License
 ~~~~~~~~~~~~~~~~~~~~~~
 
-This code and all material associated with it are distributed under the
-Epics Open License:
-
+The PyEpics source code, this documentation, and all material associated
+with it are distributed under the Epics Open License:
 
 .. include:: ../license.txt
 
 
-.
+In plain words, this means
+
+  a. you can use this software for any purpose.
+
+  b. you can modify and redistribute this software if you keep existing copyright notices intact.
+
+  c. you cannot claim that you wrote this software or remove copyright notices.
+
+  d. you cannot claim the copyright holders endorse your use of this software.
+  
+  e. you cannot claim the copyright holders owe you anything if the software does not work as you expect it to, and 
+
+  f. if you are the US government, you can probably do whatever you want. ;)
+

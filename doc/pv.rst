@@ -723,6 +723,3 @@ A connection callback:
 
 .. literalinclude:: ../tests/pv_connection_callback.py
 
-
-
-
