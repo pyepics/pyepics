@@ -1,0 +1,297 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Downloading and Installation &mdash; Epics Channel Access for Python</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '3.0.11',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Epics Channel Access for Python" href="index.html" />
+    <link rel="next" title="Overview of EPICS Channel Access in Python" href="overview.html" />
+    <link rel="prev" title="Epics Channel Access for Python" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Overview of EPICS Channel Access in Python"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Epics Channel Access for Python"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Epics Channel Access for Python</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Downloading and Installation</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#downloads">Downloads</a></li>
+<li><a class="reference internal" href="#development-version">Development Version</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#acknowledgements">Acknowledgements</a></li>
+<li><a class="reference internal" href="#epics-open-license">Epics Open License</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Epics Channel Access for Python</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="overview.html"
+                        title="next chapter">Overview of EPICS Channel Access in Python</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/installation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="downloading-and-installation">
+<h1>Downloading and Installation<a class="headerlink" href="#downloading-and-installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>This package requires Python version 2.5, 2.6, or 3.1.  I believe that
+Python 2.7 will work, but this has yet not tested.  It is possible that
+Python 2.4 will work if the ctypes package is installed, but this has not
+been tested.</p>
+<p>In addtion, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
+higher, I believe) is required.  More specifically, the shared libraries
+libCom.so and libca.so (or Com.dll and ca.dll on Windows) from <em>Epics Base</em>
+are required to use this module.  For 32-bit Windows, pre-built DLLs are
+included and installed so that no other Epics installation is required to
+use the modules.  For Unix-like systems, these are assumed to be available
+(and findable by Python at runtime) on the system. This may mean setting
+LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.</p>
+</div>
+<div class="section" id="downloads">
+<h2>Downloads<a class="headerlink" href="#downloads" title="Permalink to this headline">¶</a></h2>
+<p>The latest stable version of the Epics Python Package is 3.0.11.  There are
+a few ways to get the Epics Python Package:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="39%" />
+<col width="61%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Download Option</th>
+<th class="head">Location</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>Source Kit</td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.tar.gz">epics-3.0.11.tar.gz (CARS)</a>  or
+<a class="reference external" href="http://pypi.python.org/packages/source/e/epics/epics-3.0.11.tar.gz">epics-3.0.11.tar.gz (PyPI)</a></td>
+</tr>
+<tr><td>Windows Installers</td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.win32-py2.6.exe">epics-3.0.11.win32-py2.6.exe</a>  or
+<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.win32-py3.1.exe">epics-3.0.11.win32-py3.1.exe</a></td>
+</tr>
+<tr><td>Development Version</td>
+<td>use <a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github repository</a></td>
+</tr>
+</tbody>
+</table>
+<p>if you have <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Python Setup Tools</a>  installed, you can download and install
+the PyEpics Package simply with:</p>
+<div class="highlight-python"><pre>easy_install epics</pre>
+</div>
+</div>
+<div class="section" id="development-version">
+<h2>Development Version<a class="headerlink" href="#development-version" title="Permalink to this headline">¶</a></h2>
+<p>The PyEpics module is still under active development, and enhancements and
+bug-fixes are being added frequently.  All development is done through the
+<a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github repository</a>.  To get a read-only copy of the atest
+version, use:</p>
+<div class="highlight-python"><pre>git clone http://github.com/pyepics/pyepics.git</pre>
+</div>
+<p>or:</p>
+<div class="highlight-python"><pre>git clone git@github.com/pyepics/pyepics.git</pre>
+</div>
+<p>Current and older source source kits, and Windows Installers can also be found
+at the <a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src">PyEpics Source Tree</a>.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Installation from source on any platform is:</p>
+<div class="highlight-python"><pre>python setup.py install</pre>
+</div>
+<p>For more details, especially about how to set paths for LD_LIBRARY_PATH or
+DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.</p>
+<p>Again, if you have <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Python Setup Tools</a>  installed, you can download and install
+the PyEpics Package with:</p>
+<div class="highlight-python"><pre>easy_install epics</pre>
+</div>
+</div>
+<div class="section" id="acknowledgements">
+<h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h2>
+<p>PyEpics was originally written and is maintained by Matt Newville
+&lt;<a class="reference external" href="mailto:newville&#37;&#52;&#48;cars&#46;uchicago&#46;ed">newville<span>&#64;</span>cars<span>&#46;</span>uchicago<span>&#46;</span>ed</a>&gt;.  Several people have provided valuable
+additions or bug reports, which has greatly improved the quality of the
+library: Michael Abbott, Marco Cammarata, Angus Gratton, Craig Haskins,
+Pete Jemian, Andrew Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Mark
+Rivers, Friedrich Schotte, Steve Wasserman, and Glen Wright.</p>
+</div>
+<div class="section" id="epics-open-license">
+<h2>Epics Open License<a class="headerlink" href="#epics-open-license" title="Permalink to this headline">¶</a></h2>
+<p>The PyEpics source code, this documentation, and all material associated
+with it are distributed under the Epics Open License:</p>
+<dl class="docutils">
+<dt>The  epics python module was orignally written by</dt>
+<dd>Matthew Newville &lt;<a class="reference external" href="mailto:newville&#37;&#52;&#48;cars&#46;uchicago&#46;edu">newville<span>&#64;</span>cars<span>&#46;</span>uchicago<span>&#46;</span>edu</a>&gt;
+CARS, University of Chicago</dd>
+</dl>
+<p>Except where explicitly noted, all files in this distribution are licensed
+under the Epics Open License:</p>
+<hr class="docutils" />
+<p>Copyright  2010    Matthew Newville, The University of Chicago.  All rights reserved.</p>
+<p>The epics python module is distributed subject to the following license conditions:
+SOFTWARE LICENSE AGREEMENT
+Software: epics python module</p>
+<blockquote>
+<div><p>1.  The &quot;Software&quot;, below, refers to the epics python module (in either
+source code, or binary form and accompanying documentation). Each
+licensee is addressed as &quot;you&quot; or &quot;Licensee.&quot;</p>
+<p>2.  The copyright holders shown above and their third-party licensors
+hereby grant Licensee a royalty-free nonexclusive license, subject to
+the limitations stated herein and U.S. Government license rights.</p>
+<p>3.  You may modify and make a copy or copies of the Software for use
+within your organization, if you meet the following conditions:</p>
+<blockquote>
+<div><p>1. Copies in source code must include the copyright notice and  this
+Software License Agreement.</p>
+<p>2. Copies in binary form must include the copyright notice and  this
+Software License Agreement in the documentation and/or other
+materials provided with the copy.</p>
+</div></blockquote>
+<p>4.  You may modify a copy or copies of the Software or any portion of
+it, thus forming a work based on the Software, and distribute copies of
+such work outside your organization, if you meet all of the following
+conditions:</p>
+<blockquote>
+<div><p>1. Copies in source code must include the copyright notice and this
+Software License Agreement;</p>
+<p>2. Copies in binary form must include the copyright notice and this
+Software License Agreement in the documentation and/or other
+materials provided with the copy;</p>
+<p>3. Modified copies and works based on the Software must carry
+prominent notices stating that you changed specified portions of
+the Software.</p>
+</div></blockquote>
+<p>5.  Portions of the Software resulted from work developed under a
+U.S. Government contract and are subject to the following license: the
+Government is granted for itself and others acting on its behalf a
+paid-up, nonexclusive, irrevocable worldwide license in this computer
+software to reproduce, prepare derivative works, and perform publicly
+and display publicly.</p>
+<p>6.  WARRANTY DISCLAIMER. THE SOFTWARE IS SUPPLIED &quot;AS IS&quot; WITHOUT
+WARRANTY OF ANY KIND. THE COPYRIGHT HOLDERS, THEIR THIRD PARTY
+LICENSORS, THE UNITED STATES, THE UNITED STATES DEPARTMENT OF ENERGY,
+AND THEIR EMPLOYEES: (1) DISCLAIM ANY WARRANTIES, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, TITLE OR NON-INFRINGEMENT, (2) DO NOT
+ASSUME ANY LEGAL LIABILITY OR RESPONSIBILITY FOR THE ACCURACY,
+COMPLETENESS, OR USEFULNESS OF THE SOFTWARE, (3) DO NOT REPRESENT THAT
+USE OF THE SOFTWARE WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS, (4) DO
+NOT WARRANT THAT THE SOFTWARE WILL FUNCTION UNINTERRUPTED, THAT IT IS
+ERROR-FREE OR THAT ANY ERRORS WILL BE CORRECTED.</p>
+<p>7.  LIMITATION OF LIABILITY. IN NO EVENT WILL THE COPYRIGHT HOLDERS,
+THEIR THIRD PARTY LICENSORS, THE UNITED STATES, THE UNITED STATES
+DEPARTMENT OF ENERGY, OR THEIR EMPLOYEES: BE LIABLE FOR ANY INDIRECT,
+INCIDENTAL, CONSEQUENTIAL, SPECIAL OR PUNITIVE DAMAGES OF ANY KIND OR
+NATURE, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS OR LOSS OF DATA,
+FOR ANY REASON WHATSOEVER, WHETHER SUCH LIABILITY IS ASSERTED ON THE
+BASIS OF CONTRACT, TORT (INCLUDING NEGLIGENCE OR STRICT LIABILITY), OR
+OTHERWISE, EVEN IF ANY OF SAID PARTIES HAS BEEN WARNED OF THE
+POSSIBILITY OF SUCH LOSS OR DAMAGES.</p>
+</div></blockquote>
+<hr class="docutils" />
+<p>In plain words, this means</p>
+<blockquote>
+<div><ol class="loweralpha simple">
+<li>you can use this software for any purpose.</li>
+<li>you can modify and redistribute this software if you keep existing copyright notices intact.</li>
+<li>you cannot claim that you wrote this software or remove copyright notices.</li>
+<li>you cannot claim the copyright holders endorse your use of this software.</li>
+<li>you cannot claim the copyright holders owe you anything if the software does not work as you expect it to, and</li>
+<li>if you are the US government, you can probably do whatever you want. ;)</li>
+</ol>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Overview of EPICS Channel Access in Python"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Epics Channel Access for Python"
+             >previous</a> |</li>
+        <li><a href="index.html">Epics Channel Access for Python</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, Matthew Newville.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
