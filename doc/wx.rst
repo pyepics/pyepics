@@ -86,11 +86,10 @@ pvFloatCtrl
     a different color.
 
 
-
 pvBitmap
 ~~~~~~~~~~~
 
-.. class :: pvBitmap(parent, pv=None, bitmaps={}, defaultBitmap=None)
+.. class:: pvBitmap(parent, pv=None, bitmaps={}, defaultBitmap=None)
 
     A Static Bitmap where the image is based on PV value.
 
@@ -287,7 +286,6 @@ Many such MotorPanels can be put in a vertical stack, as generated from the
 will look like this:
 
 .. image:: wx_motor_many.png
-
 
 
 
