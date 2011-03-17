@@ -76,14 +76,9 @@ class PV(object):
         ctx = ca.current_context()
         if ctx not in ca._cache:
             ca._cache[ctx] = {}
-        if self.pvname in ca._cache[ctx]:
-            entry = ca._cache[ctx][pvname]
-            if entry['chid'] is not None:
-                self.chid = entry['chid']
-                self.__on_connect(chid=self.chid, conn=entry['conn'])
-        if self.chid is None:
-            self.chid = ca.create_channel(self.pvname,
-                                          callback=self.__on_connect)
+
+        self.chid = ca.create_channel(self.pvname,
+                                      callback=self.__on_connect)
         self._args['chid'] = self.chid
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
@@ -103,11 +98,13 @@ class PV(object):
             return
         if conn:
             self.poll()
+            self.chid = chid
             try:
                 count = ca.element_count(self.chid)
             except ca.ChannelAccessException:
                 time.sleep(0.025)
                 count = ca.element_count(self.chid)                
+            self._args['chid'] = chid
             self._args['count']  = count
             self._args['host']   = ca.host_name(self.chid)
             self._args['access'] = ca.access(self.chid)

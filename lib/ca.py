@@ -325,7 +325,7 @@ def withCHID(fcn):
                 args[0] = chid = dbr.chid_t(args[0])
             if not isinstance(chid, dbr.chid_t):
                 raise ChannelAccessException(fcn.__name__,
-                                             "not a valid chid!")
+                                             "not a valid chid %s %s args %s kwargs %s!" % (chid, type(chid), args, kwds))
         return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
@@ -432,6 +432,9 @@ def _onConnectionEvent(args):
 
     conn = (args.op == dbr.OP_CONN_UP)
     entry = _cache[ctx][pvname]
+    if isinstance(entry['chid'], dbr.chid_t) and  entry['chid'].value != args.chid:
+        raise ChannelAccessException('connect_channel',
+                                     'Channel IDs do not match in connection callback (%s and %s)' % (entry['chid'], args.chid))
     entry['conn'] = conn
     entry['chid'] = args.chid
     entry['ts']   = time.time()
@@ -596,22 +599,27 @@ def create_channel(pvname, connect=False, callback=None):
     global _cache
     if ctx not in _cache:
         _cache[ctx] = {}
-    if pvname not in _cache[ctx]:
-        _cache[ctx][pvname] = {'conn':False,  'chid': None, 
-                               'ts': 0,  'failures':0, 
-                               'callbacks': [ callback ]}
+    if pvname not in _cache[ctx]: # new PV for this context
+        entry = {'conn':False,  'chid': None, 
+                 'ts': 0,  'failures':0, 
+                 'callbacks': [ callback ]}
+        _cache[ctx][pvname] = entry
     else:
-        _cache[ctx][pvname]['callbacks'].append(callback)
+        entry = _cache[ctx][pvname]
+        if not entry['conn']: # pending connection
+            _cache[ctx][pvname]['callbacks'].append(callback)
+        else: # already connected
+            callback(chid=entry['chid'], conn=entry['conn'])
 
-    if 'chid_p' in _cache[ctx][pvname]:
-        # already waiting on a chid
-        chid = _cache[ctx][pvname]['chid_p']
+    if entry.get('chid', None) is not None:
+        # already have or waiting on a chid
+        chid = _cache[ctx][pvname]['chid']
     else:
         chid = dbr.chid_t()
         ret = libca.ca_create_channel(pvn, _CB_CONNECT, 0, 0,
                                   ctypes.byref(chid))
         PySEVCHK('create_channel', ret)
-        _cache[ctx][pvname]['chid_p'] = chid
+        entry['chid'] = chid
 
     if connect:
         connect_channel(chid)
