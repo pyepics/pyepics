@@ -588,6 +588,9 @@ def create_channel(pvname, connect=False, callback=None):
        pvname   name of PV
        chid     channel ID
        conn     connection state (True/False)
+
+    If the channel is already connected for the PV name, the callback
+    will be called immediately.
     """
     # 
     # Note that _CB_CONNECT (defined below) is a global variable, holding

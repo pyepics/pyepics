@@ -72,11 +72,6 @@ class PV(object):
         self._conn_started = False
         self.chid = None
 
-        # get current thread context to use for ca._cache
-        ctx = ca.current_context()
-        if ctx not in ca._cache:
-            ca._cache[ctx] = {}
-
         self.chid = ca.create_channel(self.pvname,
                                       callback=self.__on_connect)
         self._args['chid'] = self.chid
