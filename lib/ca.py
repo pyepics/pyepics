@@ -440,7 +440,7 @@ def _onConnectionEvent(args):
     if len(entry.get('callbacks', [])) > 0:
         poll(evt=1.e-3, iot=10.0)
     for callback in entry.get('callbacks', []):
-        is hasattr(callback, '__call__'):
+        if hasattr(callback, '__call__'):
             callback(pvname=pvname,
                      chid=entry['chid'],
                      conn=entry['conn'])
