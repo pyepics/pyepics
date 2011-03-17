@@ -894,7 +894,17 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
             self.OnChange(self)
 
     def _OnClicked(self, event):
-        self.pv.put(self.on_value if self.Value else self.off_value )
+        if self.pv is not None:
+            self.pv.put(self.on_value if self.Value else self.off_value )
+
+    def SetValue(self, new_value):
+        old_value = self.Value
+        wx.CheckBox.SetValue(self, new_value)
+        if old_value != new_value:
+            self._OnClicked(None)        
+
+    # need to redefine the value Property as the old property refs old SetValue
+    Value = property(wx.CheckBox.GetValue, SetValue)
 
 
 class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin): 
