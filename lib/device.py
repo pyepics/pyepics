@@ -7,7 +7,7 @@ basic device object defined
 """
 from . import ca
 from . import pv
-
+import time
 class Device(object):
     """A simple collection of related PVs, sharing a common prefix
     string for their names, but having many 'attributes'.
@@ -148,13 +148,71 @@ class Device(object):
         option as_string returns a string representation"""
         return self.PV(attr).get(as_string=as_string)
     
-    def get_all(self):
+    def save_state(self):
         """return a dictionary of the values of all
         current attributes"""
         out = {}
         for key in self._pvs:
             out[key] = self._pvs[key].get()
+            if  (self._pvs[key].count > 1 and
+                 'char' == self._pvs[key].type):
+                out[key] = self._pvs[key].get(as_string=True)
         return out
+
+    def restore_state(self, state):
+        """restore a dictionary of the values, as saved from save_state"""
+        for key, val in state.items():
+            if key in self._pvs and  'write' in self._pvs[key].access:
+                self._pvs[key].put(val)
+
+    def write_state(self, fname, state=None):
+        """write save state  to external file. 
+        If state is not provided, the current state is used
+
+        Note that this only writes data for PVs with write-access, and count=1 (except CHAR """
+        if state is None:
+            state = self.save_state()
+        out = ["#Device Saved State for %s, prefx='%s': %s\n" % (self.__class__.__name__, 
+                                                                 self._prefix, time.ctime())]
+        for key in sorted(state.keys()):
+            if (key in self._pvs and  
+                'write' in self._pvs[key].access and
+                (1 == self._pvs[key].count or 
+                 'char' == self._pvs[key].type)):
+                out.append("%s  %s\n" % (key, state[key]))
+        fout = open(fname, 'w')
+        fout.writelines(out)
+        fout.close()
+
+
+    def read_state(self, fname, restore=False):
+        """read state from file, optionally restore it"""
+        finp = open(fname, 'r')
+        textlines = finp.readlines()
+        finp.close()
+        state = {}
+        for line in textlines:
+            if line.startswith('#'): 
+                continue
+            key, strval =  line[:-1].split(' ', 1)
+            if key in self._pvs:
+                dtype = self._pvs[key].type
+                count = self._pvs[key].count
+                val = strval
+                if dtype in ('double', 'float'):
+                    val = float(val)
+                elif dtype in ('int', 'long', 'short', 'enum'):
+                    val = int(val)
+                state[key] = val
+        if restore:
+            self.restore_state(state)
+        return state
+
+
+    def get_all(self):
+        """return a dictionary of the values of all
+        current attributes"""
+        return self.save_state()
 
     def add_callback(self, attr, callback, **kws):
         """add a callback function to an attribute PV,
@@ -166,7 +224,7 @@ class Device(object):
     def remove_callbacks(self, attr, index=None):
         """remove a callback function to an attribute PV"""
         self.PV(attr).remove_callback(index=index)
-        
+
             
     def __getattr__(self, attr):
         if attr in self._pvs:
