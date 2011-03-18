@@ -156,6 +156,7 @@ class PV(object):
         return self.connected and self.ftype is not None
 
     def reconnect(self):
+        "try to reconnect PV"
         self.auto_monitor = None
         self._monref = None
         self.connected = False
@@ -208,14 +209,14 @@ class PV(object):
             isinstance(value, str) and value in self._args['enum_strs']):
             value = self._args['enum_strs'].index(value)
         if callback is None:
-	    callback = self.__putCallbackStub
+            callback = self.__putCallbackStub
         return ca.put(self.chid, value,
                       wait=wait, timeout=timeout,
                       callback=callback, callback_data=callback_data)
 
     def __putCallbackStub(self, pvname=None, **kws):
         "null put-calback, so that the put_complete attribute is valid"
-	pass
+        pass
 
     def _set_charval(self, val, call_ca=True):
         """ sets the character representation of the value.
@@ -542,10 +543,10 @@ class PV(object):
     @property
     def put_complete(self):
         "returns True if a put-with-wait has completed"
-	putdone_data = ca._put_done.get(self.pvname, None) 
-	if putdone_data is not None:
-	    return putdone_data[0]
-	return True
+        putdone_data = ca._put_done.get(self.pvname, None) 
+        if putdone_data is not None:
+            return putdone_data[0]
+        return True
 
     def __repr__(self):
         "string representation"

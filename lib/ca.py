@@ -105,7 +105,8 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 #           'ts': ts_conn, 'callbacks': [ user_callback... ])
 #  isConnected   = True/False: if connected.
 #  ts_conn       = ts of last connection event or failed attempt.
-#  user_callback = one or more user functions to be called on change (accumulated in the cache)
+#  user_callback = one or more user functions to be called on 
+#                  change (accumulated in the cache)
 _cache  = {}
 
 ## Cache of pvs waiting for put to be done.
@@ -325,7 +326,8 @@ def withCHID(fcn):
                 args[0] = chid = dbr.chid_t(args[0])
             if not isinstance(chid, dbr.chid_t):
                 raise ChannelAccessException(fcn.__name__,
-                                             "not a valid chid %s %s args %s kwargs %s!" % (chid, type(chid), args, kwds))
+                 "not a valid chid %s %s args %s kwargs %s!" %
+                                             (chid, type(chid), args, kwds))
         return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
@@ -430,7 +432,8 @@ def _onConnectionEvent(args):
 
     conn = (args.op == dbr.OP_CONN_UP)
     entry = _cache[ctx][pvname]
-    if isinstance(entry['chid'], dbr.chid_t) and  entry['chid'].value != args.chid:
+    if (isinstance(entry['chid'], dbr.chid_t) and 
+        entry['chid'].value != args.chid):
         msg = 'Channel IDs do not match in connection callback (%s and %s)'
         raise ChannelAccessException('connect_channel',
                                      msg % (entry['chid'], args.chid))
@@ -1021,7 +1024,6 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     
     """
     ftype = promote_type(chid, use_ctrl=use_ctrl, use_time=use_time)
-    count = element_count(chid)
 
     uarg  = ctypes.py_object(callback)
     evid  = ctypes.c_void_p()
