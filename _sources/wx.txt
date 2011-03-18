@@ -109,26 +109,20 @@ pvCheckBox
     PV on changes.
 
 	 on_value and off_value are the specific values that are mapped to
-	 the checkbox. If the PV is externally set to any other value, it
-	 is assumed to be "off" (unchecked.)
-   
-    If necessary, use the SetTranslations() option to write a
-    dictionary for converting string value PVs to booleans. Otherwise,
-    types that convert via Python's own bool(x) will be accepted.
-        
-    If a PVTuple is assigned, the checkbox can automatically act
-    as a "master checkbox" (including with a 3-state value if the
-    right style is set) that sets/clears all the PVs in the tuple
-    as one. Each PV in the PVTuple must return (or translate to) 
-    a boolean, for this work.
+	 the checkbox.
 
-    To do this, you will need to set the tri-state style on the
-    CheckBox constructor (same as if you were setting it on a 
-    wx.CheckBox)
+    There are multiple options for translating PV values to checkbox
+    settings (from least to most complex):
+
+    * Use a PV with values 0 and 1
+    * Use a PV with values that convert via Python's own bool(x)
+    * Set on_value and off_value in the constructor
+    * Use SetTranslations() to set a dictionary for converting various
+      PV values to booleans.
 
 
 pvFloatSpin
-~~~~~~~~~~~~~
+~~~~~~~~~~~
 
 .. class:: pvFloatSpin(parent, pv=None, deadTime=500, min_val=None, 
                        max_val=None, increment=1.0, digits=-1, **kw)
@@ -158,7 +152,7 @@ pvButton
 
 
 pvRadioButton
-~~~~~~~~~~~~~~
+~~~~~~~~~~~
 
 .. class:: pvRadioButton(parent, pv=None, pvValue=None, **kw)
 

@@ -116,7 +116,7 @@ that are imported with:</p>
 </div>
 <p>These components includes</p>
 <blockquote>
-<div><ul class="simple">
+<ul class="simple">
 <li>functions <tt class="xref py py-func docutils literal"><span class="pre">caget()</span></tt>, <tt class="xref py py-func docutils literal"><span class="pre">caput()</span></tt>, <tt class="xref py py-func docutils literal"><span class="pre">camonitor()</span></tt>,
 <tt class="xref py py-func docutils literal"><span class="pre">camonitor_clear()</span></tt>, and <tt class="xref py py-func docutils literal"><span class="pre">cainfo()</span></tt> as described below.</li>
 <li>a <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module, providing the low-level Epics Channel Access
@@ -130,7 +130,7 @@ when a PV's values goes outside an acceptable bounds.</li>
 <li>an <tt class="xref py py-mod docutils literal"><span class="pre">epics.wx</span></tt> module that provides wxPython classes designed for
 use with Epics PVs.</li>
 </ul>
-</div></blockquote>
+</blockquote>
 <p>If you're looking to write quick scripts, using the <tt class="xref py py-func docutils literal"><span class="pre">caget()</span></tt> and
 <tt class="xref py py-func docutils literal"><span class="pre">caput()</span></tt>  functions is probably how you want to start.</p>
 <p>Users looking to build larger-scale solutions recommended to use
@@ -419,7 +419,10 @@ information on writing callback functions for <a class="reference internal" href
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pvname</strong> -- name of Epics Process Variable</td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pvname</strong> -- name of Epics Process Variable</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -466,7 +469,7 @@ EpicsCA had) on top of a complete lower-level interface.  The desire to
 come to a more universally-acceptable Python-Epics interface has definitely
 influenced the goals for this module, which include:</p>
 <blockquote>
-<div><ol class="arabic simple">
+<ol class="arabic simple">
 <li>providing both low-level (C-like) and higher-level access (Pythonic
 objects) to the EPICS Channel Access protocol.</li>
 <li>supporting as many features of Epics 3.14 as possible, including
@@ -475,7 +478,7 @@ preemptive callbacks and thread support.</li>
 <li>being ready for porting to Python3.</li>
 <li>using Python's ctypes library.</li>
 </ol>
-</div></blockquote>
+</blockquote>
 <p>The main implementation feature used here (and difference from EpicsCA) is
 using Python's ctypes library to handle the connection between Python and
 the CA C library.  Using ctypes has many advantages.  Principally, it fully
@@ -502,7 +505,7 @@ versions).  Currently, the package works with Python 3.1, but is not
 extremely well-tested.</p>
 <p>There are several desired features are left undone or unfinished:</p>
 <blockquote>
-<div><ul>
+<ul>
 <li><p class="first">port CaChannel interface, ca_util, epicsPV (and other interfaces??) to use epics.ca</p>
 </li>
 <li><p class="first">add more &quot;devices&quot;, including low-level epics records.</p>
@@ -515,16 +518,16 @@ extremely well-tested.</p>
 </li>
 <li><p class="first">build and distribute example Epics applications, such as:</p>
 <blockquote>
-<div><ul class="simple">
+<ul class="simple">
 <li>PV stripcharter</li>
 <li>Probe replacement</li>
 <li>application to manage saved &quot;positions&quot; of multiple PVs in an
 &quot;instrument&quot;.</li>
 </ul>
-</div></blockquote>
+</blockquote>
 </li>
 </ul>
-</div></blockquote>
+</blockquote>
 </div>
 </div>
 
@@ -554,7 +557,7 @@ extremely well-tested.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.3.
     </div>
   </body>
 </html>
