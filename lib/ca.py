@@ -422,10 +422,8 @@ def _onConnectionEvent(args):
     if ctx is None and len(_cache.keys()) > 0:
         ctx = _cache.keys()[0]
     if ctx not in _cache:
-        # print 'creating empty context ctx=', ctx
         _cache[ctx] = {}
     if pvname not in _cache[ctx]:
-        # print 'adding pvname to ctx ', pvname, ctx 
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
                                'ts':0, 'failures':0, 
                                'callbacks': []}
@@ -433,8 +431,9 @@ def _onConnectionEvent(args):
     conn = (args.op == dbr.OP_CONN_UP)
     entry = _cache[ctx][pvname]
     if isinstance(entry['chid'], dbr.chid_t) and  entry['chid'].value != args.chid:
+        msg = 'Channel IDs do not match in connection callback (%s and %s)'
         raise ChannelAccessException('connect_channel',
-                                     'Channel IDs do not match in connection callback (%s and %s)' % (entry['chid'], args.chid))
+                                     msg % (entry['chid'], args.chid))
     entry['conn'] = conn
     entry['chid'] = args.chid
     entry['ts']   = time.time()
@@ -442,11 +441,11 @@ def _onConnectionEvent(args):
 
     if len(entry.get('callbacks', [])) > 0:
         poll(evt=1.e-3, iot=10.0)
-    for callback in entry.get('callbacks', []):
-        if hasattr(callback, '__call__'):
-            callback(pvname=pvname,
-                     chid=entry['chid'],
-                     conn=entry['conn'])
+        for callback in entry.get('callbacks', []):
+            if hasattr(callback, '__call__'):
+                callback(pvname=pvname, 
+                         chid=entry['chid'],
+                         conn=entry['conn'])
 
     return 
 
@@ -522,7 +521,7 @@ def replace_printf_handler(fcn=None):
 @withCA
 def current_context():
     "return this context"
-    return libca.ca_current_context()
+    return int(libca.ca_current_context())
 
 @withCA
 def client_status(context, level):
@@ -609,9 +608,11 @@ def create_channel(pvname, connect=False, callback=None):
         _cache[ctx][pvname] = entry
     else:
         entry = _cache[ctx][pvname]
-        if not entry['conn']: # pending connection
+        if not entry['conn'] and callback is not None: # pending connection
             _cache[ctx][pvname]['callbacks'].append(callback)
-        else: # already connected
+        elif (hasattr(callback, '__call__') and 
+              not callback in entry['callbacks']):
+            entry['callbacks'].append(callback)
             callback(chid=entry['chid'], conn=entry['conn'])
 
     if entry.get('chid', None) is not None:
@@ -821,7 +822,7 @@ def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
         count = element_count(chid)
     else:
         count = min(count, element_count(chid))
-        
+       
     data = (count*dbr.Map[ftype])()
 
     ret = libca.ca_array_get(ftype, count, chid, data)
@@ -1022,7 +1023,7 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     uarg  = ctypes.py_object(callback)
     evid  = ctypes.c_void_p()
     poll()
-    ret = libca.ca_create_subscription(ftype, count, chid, mask,
+    ret = libca.ca_create_subscription(ftype, 0, chid, mask,
                                        _CB_EVENT, uarg, ctypes.byref(evid))
     PySEVCHK('create_subscription', ret)
     
