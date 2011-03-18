@@ -72,18 +72,9 @@ class PV(object):
         self._conn_started = False
         self.chid = None
 
-        # get current thread context to use for ca._cache
-        ctx = ca.current_context()
-        if ctx not in ca._cache:
-            ca._cache[ctx] = {}
-        if self.pvname in ca._cache[ctx]:
-            entry = ca._cache[ctx][pvname]
-            self.chid = entry['chid']
-            self.__on_connect(chid=self.chid, conn=entry['conn'])
-        if self.chid is None:
-            self.chid = ca.create_channel(self.pvname,
-                                          callback=self.__on_connect)
-        self._args['chid'] = self.chid
+        self._args['chid'] = self.chid = ca.create_channel(self.pvname,
+                                                           callback=self.__on_connect)
+
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
@@ -94,13 +85,15 @@ class PV(object):
 
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
-        # occassionally chid is still None (threading issue???)
-        # just return here, and connection will happen later
+        # occassionally chid is still None (ie if a second PV is created while 
+        # __on_connect is still pending for the first one.)
+        # Just return here, and connection will happen later
         if self.chid is None and chid is None:
             time.sleep(0.001)
             return
         if conn:
             self.poll()
+            self.chid = self._args['chid'] = dbr.chid_t(chid)
             try:
                 count = ca.element_count(self.chid)
             except ca.ChannelAccessException:
@@ -119,7 +112,6 @@ class PV(object):
             self._args['typefull'] = _ftype_
             self._args['ftype'] = dbr.Name(_ftype_, reverse=True)
 
-
             if self.auto_monitor is None:
                 self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
             if self._monref is None and self.auto_monitor:
@@ -129,7 +121,6 @@ class PV(object):
                                          callback=self.__on_changes)
 
         if hasattr(self.connection_callback, '__call__'):
-            
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
         elif not conn and self.verbose:
             ca.write("PV '%s' disconnected." % pvname)
@@ -197,8 +188,13 @@ class PV(object):
         if as_string:
             self._set_charval(self._args['value'])
             return self._args['char_value']
+
+        # this emulates asking for less data than actually exists in the
+        # cached value
+        if count is not None and len(self._args['value']) > 1:
+            count = max(0, min(count, len(self._args['value'])))
+            return self._args['value'][:count]
         return self._args['value']
-        
 
     def put(self, value, wait=False, timeout=30.0,
             callback=None, callback_data=None):
@@ -569,6 +565,10 @@ class PV(object):
         if self._monref is not None:
             cback, uarg, evid = self._monref
             ca.clear_subscription(evid)
+            ctx = ca.current_context()
+            if self.pvname in ca._cache[ctx]:
+                ca._cache[ctx].pop(self.pvname)
+
             del cback
             del uarg
             del evid

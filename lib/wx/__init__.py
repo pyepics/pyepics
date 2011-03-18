@@ -5,7 +5,7 @@ of the widget  when the associated PV changes.
 
 """
 from . import MotorPanel
-from . import wxlib
+from . import wxlib, ogllib
 
 MiniMotorPanel= MotorPanel.MiniMotorPanel
 MotorPanel    = MotorPanel.MotorPanel
@@ -16,6 +16,17 @@ pvFloatCtrl   = wxlib.pvFloatCtrl
 pvTextCtrl    = wxlib.pvTextCtrl
 pvEnumButtons = wxlib.pvEnumButtons
 pvEnumChoice  = wxlib.pvEnumChoice
+pvBitmap      = wxlib.pvBitmap
+pvCheckBox    = wxlib.pvCheckBox
+pvFloatSpin   = wxlib.pvFloatSpin
+pvButton      = wxlib.pvButton
+pvRadioButton = wxlib.pvRadioButton
+pvComboBox    = wxlib.pvComboBox
+
+# OGL shapes
+pvRectangle   = ogllib.pvRectangle
+pvCircle      = ogllib.pvCircle
+
 
 set_sizer = wxlib.set_sizer
 set_float = wxlib.set_float

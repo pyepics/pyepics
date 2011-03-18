@@ -102,10 +102,10 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 
 ## Cache of existing channel IDs:
 #  pvname: {'chid':chid, 'conn': isConnected,
-#           'ts': ts_conn, 'callback': user_callback)
+#           'ts': ts_conn, 'callbacks': [ user_callback... ])
 #  isConnected   = True/False: if connected.
 #  ts_conn       = ts of last connection event or failed attempt.
-#  user_callback = user function to be called on change
+#  user_callback = one or more user functions to be called on change (accumulated in the cache)
 _cache  = {}
 
 ## Cache of pvs waiting for put to be done.
@@ -325,7 +325,7 @@ def withCHID(fcn):
                 args[0] = chid = dbr.chid_t(args[0])
             if not isinstance(chid, dbr.chid_t):
                 raise ChannelAccessException(fcn.__name__,
-                                             "not a valid chid!")
+                                             "not a valid chid %s %s args %s kwargs %s!" % (chid, type(chid), args, kwds))
         return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
@@ -382,7 +382,6 @@ def withSEVCHK(fcn):
 def _onGetEvent(args):
     """Internal Event Handler for get events: not intended for use"""
     value = dbr.cast_args(args).contents
-    # print(" onGet Event: ", args.chid, type(args.chid))
     # chid = dbr.chid_t(args.chid)
     pvname = name(args.chid)
     kwds = {'ftype':args.type, 'count':args.count,
@@ -423,26 +422,30 @@ def _onConnectionEvent(args):
     if ctx is None and len(_cache.keys()) > 0:
         ctx = _cache.keys()[0]
     if ctx not in _cache:
-        # print 'creating empty context ctx=', ctx
         _cache[ctx] = {}
     if pvname not in _cache[ctx]:
-        # print 'adding pvname to ctx ', pvname, ctx 
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
                                'ts':0, 'failures':0, 
-                               'callback': None}
+                               'callbacks': []}
 
     conn = (args.op == dbr.OP_CONN_UP)
     entry = _cache[ctx][pvname]
+    if isinstance(entry['chid'], dbr.chid_t) and  entry['chid'].value != args.chid:
+        msg = 'Channel IDs do not match in connection callback (%s and %s)'
+        raise ChannelAccessException('connect_channel',
+                                     msg % (entry['chid'], args.chid))
     entry['conn'] = conn
     entry['chid'] = args.chid
     entry['ts']   = time.time()
     entry['failures'] = 0
 
-    if 'callback' in entry and hasattr(entry['callback'], '__call__'):
+    if len(entry.get('callbacks', [])) > 0:
         poll(evt=1.e-3, iot=10.0)
-        entry['callback'](pvname=pvname,
-                          chid=entry['chid'],
-                          conn=entry['conn'])
+        for callback in entry.get('callbacks', []):
+            if hasattr(callback, '__call__'):
+                callback(pvname=pvname, 
+                         chid=entry['chid'],
+                         conn=entry['conn'])
 
     return 
 
@@ -518,7 +521,7 @@ def replace_printf_handler(fcn=None):
 @withCA
 def current_context():
     "return this context"
-    return libca.ca_current_context()
+    return int(libca.ca_current_context())
 
 @withCA
 def client_status(context, level):
@@ -584,6 +587,9 @@ def create_channel(pvname, connect=False, callback=None):
        pvname   name of PV
        chid     channel ID
        conn     connection state (True/False)
+
+    If the channel is already connected for the PV name, the callback
+    will be called immediately.
     """
     # 
     # Note that _CB_CONNECT (defined below) is a global variable, holding
@@ -595,16 +601,29 @@ def create_channel(pvname, connect=False, callback=None):
     global _cache
     if ctx not in _cache:
         _cache[ctx] = {}
-    if pvname not in _cache[ctx]:
-        _cache[ctx][pvname] = {'conn':False,  'chid': None, 
-                               'ts': 0,  'failures':0, 
-                               'callback': callback}
+    if pvname not in _cache[ctx]: # new PV for this context
+        entry = {'conn':False,  'chid': None, 
+                 'ts': 0,  'failures':0, 
+                 'callbacks': [ callback ]}
+        _cache[ctx][pvname] = entry
+    else:
+        entry = _cache[ctx][pvname]
+        if not entry['conn'] and callback is not None: # pending connection
+            _cache[ctx][pvname]['callbacks'].append(callback)
+        elif (hasattr(callback, '__call__') and 
+              not callback in entry['callbacks']):
+            entry['callbacks'].append(callback)
+            callback(chid=entry['chid'], conn=entry['conn'])
 
-    chid = dbr.chid_t()
-    # print 'Create Channel ', ctx, chid, pvname
-    ret = libca.ca_create_channel(pvn, _CB_CONNECT, 0, 0, 
+    if entry.get('chid', None) is not None:
+        # already have or waiting on a chid
+        chid = _cache[ctx][pvname]['chid']
+    else:
+        chid = dbr.chid_t()
+        ret = libca.ca_create_channel(pvn, _CB_CONNECT, 0, 0,
                                   ctypes.byref(chid))
-    PySEVCHK('create_channel', ret)
+        PySEVCHK('create_channel', ret)
+        entry['chid'] = chid
 
     if connect:
         connect_channel(chid)
@@ -803,7 +822,7 @@ def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
         count = element_count(chid)
     else:
         count = min(count, element_count(chid))
-        
+       
     data = (count*dbr.Map[ftype])()
 
     ret = libca.ca_array_get(ftype, count, chid, data)
@@ -1004,7 +1023,7 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     uarg  = ctypes.py_object(callback)
     evid  = ctypes.c_void_p()
     poll()
-    ret = libca.ca_create_subscription(ftype, count, chid, mask,
+    ret = libca.ca_create_subscription(ftype, 0, chid, mask,
                                        _CB_EVENT, uarg, ctypes.byref(evid))
     PySEVCHK('create_subscription', ret)
     
@@ -1063,7 +1082,7 @@ def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
     >>> sg = epics.ca.sg_create() 
     >>> data = epics.ca.sg_get(sg, chid)
     >>> epics.ca.sg_block(sg)
-    print epics.ca._unpack(data, chid=chid)
+    >>> print epics.ca._unpack(data, chid=chid)
     """
     if not isinstance(chid, dbr.chid_t):
         raise ChannelAccessException('sg_get', "not a valid chid!")
