@@ -1,0 +1,198 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Epics Channel Access for Python &mdash; Epics Channel Access for Python</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '3.0.11',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Epics Channel Access for Python" href="#" />
+    <link rel="next" title="Downloading and Installation" href="installation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Downloading and Installation"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">Epics Channel Access for Python</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Download</h3>
+<p>Current version: <b>3.0.11</b></p>
+<p>Download Stable Version from:
+<ul>
+  <li>&nbsp; &nbsp; <a href="http://cars9.uchicago.edu/software/python/pyepics3/src/">cars.uchicago.edu</a>
+  <li>&nbsp; &nbsp; <a href="http://pypi.python.org/pypi/epics/">PyPI (Python.org)</a> <br>
+       try <tt>easy_install epics</tt>
+</ul>
+<p>
+
+Development version: <br> &nbsp; &nbsp; <a href="https://github.com/pyepics/pyepics/">github.com</a> <br>
+
+<h3>Documentation</h3>
+
+ <a href="http://pyepics.github.com/pyepics/pyepics3.pdf">
+
+ PDF Format</a>
+<hr> 
+<p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="epics-channel-access-for-python">
+<h1>Epics Channel Access for Python<a class="headerlink" href="#epics-channel-access-for-python" title="Permalink to this headline">¶</a></h1>
+<p>The Epics Python package is an interface for the Channel Access (CA)
+library of the <a class="reference external" href="http://www.aps.anl.gov/epics/">Epics control system</a> to
+the Python Programming language.</p>
+<p>The epics package provides methods for reading from and writing to
+Epics Process Variables via the CA protocol.  The package includes a
+complete, thin layer over the low-level Channel Access library in the
+<a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module, and a few higher-level abstractions built on top of this
+basic functionality.  The <tt class="xref py py-mod docutils literal"><span class="pre">PV</span></tt> class provides a <cite>PV</cite> object for an
+object-oriented approach, and there is also a simple functional approach to
+CA similar to EZCA and the Unix command-line tools <cite>caget</cite>, <cite>caput</cite>,
+<cite>cainfo</cite>, and <cite>camonitor</cite>.  In addition, there are classes for an epics
+<tt class="xref py py-mod docutils literal"><span class="pre">Device</span></tt>, epics <tt class="xref py py-mod docutils literal"><span class="pre">Motor</span></tt>, <tt class="xref py py-mod docutils literal"><span class="pre">Alarm</span></tt>, and special code for
+wxPython widgets.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Downloading and Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#downloads">Downloads</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#development-version">Development Version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#acknowledgements">Acknowledgements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#epics-open-license">Epics Open License</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview of EPICS Channel Access in Python</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#module-epics">Functions defined in <tt class="docutils literal"><span class="pre">epics</span></tt>: caget(), caput(), etc.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#motivation-why-another-python-epics-interface">Motivation: Why another Python-Epics Interface?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#status-and-to-do-list">Status and To-Do List</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pv.html"><tt class="docutils literal"><span class="pre">epics.pv</span></tt>  the PV object</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pv.html#module-pv">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pv.html#the-pv-class">The <tt class="docutils literal"><span class="pre">PV</span></tt> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pv.html#string-representation-for-a-pv">String representation for a PV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pv.html#automatic-monitoring-of-a-pv">Automatic Monitoring of a PV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pv.html#user-supplied-callback-functions">User-supplied Callback functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pv.html#user-supplied-connection-callback-functions">User-supplied Connection Callback functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pv.html#put-with-wait-put-callbacks-and-put-complete">Put with wait, put callbacks, and  put_complete</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pv.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca.html"><tt class="docutils literal"><span class="pre">epics.ca</span></tt> Low-Level Epics Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca.html#general-description-difference-with-c-library">General description, difference with C library</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca.html#module-ca">Initialization, Finalization, and Life-cycle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca.html#using-the-ca-module">Using the CA module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca.html#user-supplied-callback-functions">User-supplied Callback functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca.html#omissions">Omissions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced.html">Advanced Topic with Python Channel Access</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#strategies-for-working-with-large-arrays">Strategies for working with large arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#using-python-threads">Using Python Threads</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced.html#time-sleep-or-epics-poll">time.sleep() or epics.poll()?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autosave.html"><tt class="docutils literal"><span class="pre">epics.autosave</span></tt>  Auto-saving</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autosave.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autosave.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="devices.html"><tt class="docutils literal"><span class="pre">epics.devices</span></tt>   Epics Devices</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="devices.html#module-device">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devices.html#module-motor">Epics Motor Device</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devices.html#other-device-examples">Other Device Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="alarm.html"><tt class="docutils literal"><span class="pre">epics.alarm</span></tt>   Epics Alarm</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="alarm.html#module-alarm">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wx.html"><tt class="docutils literal"><span class="pre">epics.wx</span></tt>   wxPython Widgets for epics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="wx.html#module-wx">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wx.html#wx-widgets-for-epics">wx Widgets for Epics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wx.html#decorators-and-other-utility-functions">Decorators and other Utility Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wx.html#wxmotorpanel-widget">wxMotorPanel Widget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wx.html#ogl-classes">OGL Classes</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Downloading and Installation"
+             >next</a> |</li>
+        <li><a href="#">Epics Channel Access for Python</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, Matthew Newville.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

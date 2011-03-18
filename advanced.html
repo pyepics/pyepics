@@ -1,0 +1,375 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Advanced Topic with Python Channel Access &mdash; Epics Channel Access for Python</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '3.0.11',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Epics Channel Access for Python" href="index.html" />
+    <link rel="next" title="epics.autosave Auto-saving" href="autosave.html" />
+    <link rel="prev" title="epics.ca Low-Level Epics Interface" href="ca.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="autosave.html" title="epics.autosave Auto-saving"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ca.html" title="epics.ca Low-Level Epics Interface"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Epics Channel Access for Python</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Advanced Topic with Python Channel Access</a><ul>
+<li><a class="reference internal" href="#strategies-for-working-with-large-arrays">Strategies for working with large arrays</a><ul>
+<li><a class="reference internal" href="#example-handling-large-arrays">Example handling Large Arrays</a></li>
+<li><a class="reference internal" href="#example-using-character-waveforms-as-long-strings">Example using Character Waveforms as Long Strings</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-python-threads">Using Python Threads</a><ul>
+<li><a class="reference internal" href="#thread-example">Thread Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#time-sleep-or-epics-poll">time.sleep() or epics.poll()?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ca.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">epics.ca</span></tt> Low-Level Epics Interface</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="autosave.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">epics.autosave</span></tt>  Auto-saving</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/advanced.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="advanced-topic-with-python-channel-access">
+<h1>Advanced Topic with Python Channel Access<a class="headerlink" href="#advanced-topic-with-python-channel-access" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="strategies-for-working-with-large-arrays">
+<span id="advanced-large-arrays-label"></span><h2>Strategies for working with large arrays<a class="headerlink" href="#strategies-for-working-with-large-arrays" title="Permalink to this headline">¶</a></h2>
+<p>EPICS Channels / Process Variables usually have values that can be stored
+with a small number of bytes.  This means that their storage and transfer
+speeds over real networks is not a significant concern.  However, some
+Process Variables can store much larger amounts of data (say, several
+megabytes) which means that some of the assumptions about dealing with
+Channels / PVs may need reconsideration.</p>
+<p>When using PVs with large array sizes (here, I'll assert that <em>large</em> means
+more than 1000 or so elements), it is necessary to make sure that the
+environmental variable <tt class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_SIZE</span></tt> is suitably set.
+Unfortunately, this represents a pretty crude approach to memory management
+within Epics for handling array data as it is used not only sets how large
+an array the client can accept, but how much memory will be allocated on
+the server.  In addition, this value must be set prior to using the CA
+library -- it cannot be altered during the running of a CA program.</p>
+<p>Normally, the default value for <tt class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_SIZE</span></tt> is 16384 (16k,
+and it turns out that you cannot set it smaller than this value!).  As
+Python is used for clients, generally running on workstations or servers
+with sufficient memory, this default value is changed to 2**24, or 16Mb)
+when <tt class="xref py py-mod docutils literal"><span class="pre">epics.ca</span></tt> is initialized.  If the environmental variable
+<tt class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_SIZE</span></tt> has not already been set.</p>
+<p>The other main issue for PVs holding large arrays is whether they should be
+automatically monitored.  For PVs holding scalar data or small arrays, any
+penalty for automatically monitoring these variables (that is, causing
+network traffic every time a PV changes) is a small price to pay for being
+assured that the latest value is always available.  As arrays get larger
+(as for data streams from Area Detectors), it is less obvious that
+automatic monitoring is desirable.</p>
+<p>The Python <tt class="xref py py-mod docutils literal"><span class="pre">epics.ca</span></tt> module defines a variable
+<tt class="xref py py-data docutils literal"><span class="pre">AUTOMONITOR_MAXLENGTH</span></tt> which controls whether array PVs are
+automatically monitored.  The default value for this variable is 16384, but
+can be changed at runtime.  Arrays with fewer elements than
+<tt class="xref py py-data docutils literal"><span class="pre">AUTOMONITOR_MAXLENGTH</span></tt> will be automatically monitored, unless
+explicitly set, and arrays larger than <tt class="xref py py-data docutils literal"><span class="pre">AUTOMONITOR_MAXLENGTH</span></tt> will
+not be automatically monitored unless explicitly set. Auto-monitoring of
+PVs can be be explicitly set with</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pv2</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;ScalerPV&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;LargeArrayPV&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="example-handling-large-arrays">
+<h3>Example handling Large Arrays<a class="headerlink" href="#example-handling-large-arrays" title="Permalink to this headline">¶</a></h3>
+<p>Here is an example reading data from an <a class="reference external" href="http://cars9.uchicago.edu/software/epics/areaDetector.html">EPICS areaDetector</a>, as if it
+were an image from a digital camera.  This uses the <a class="reference external" href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> for much of the image
+processing:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">Image</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvname</span> <span class="o">=</span> <span class="s">&#39;13IDCPS1:image1:ArrayData&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img_pv</span>  <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">raw_image</span> <span class="o">=</span> <span class="n">img_pv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">as_numpy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">im_mode</span> <span class="o">=</span> <span class="s">&#39;RGB&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">im_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1360</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">im_mode</span><span class="p">,</span> <span class="n">im_size</span><span class="p">,</span> <span class="n">raw_image</span><span class="p">,</span> <span class="s">&#39;raw&#39;</span><span class="p">,</span> <span class="n">im_mode</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The result looks like this (taken with a Prosilica GigE camera):</p>
+<img alt="_images/AreaDetector1.png" src="_images/AreaDetector1.png" />
+</div>
+<div class="section" id="example-using-character-waveforms-as-long-strings">
+<h3>Example using Character Waveforms as Long Strings<a class="headerlink" href="#example-using-character-waveforms-as-long-strings" title="Permalink to this headline">¶</a></h3>
+<p>As EPICS strings can be only 40 characters long, Character Waveforms are
+sometimes used to allow Long Strings.  While this can be a common usage for
+character waveforms, this module resists the temptation to implicitly
+convert such byte arrays to strings using <tt class="docutils literal"><span class="pre">as_string=True</span></tt>.</p>
+<p>As an example, let's say you've created a character waveform PV, as with
+this EPICS database:</p>
+<div class="highlight-python"><pre>grecord(waveform,"$(P):filename")  {
+        field(DTYP,"Soft Channel")
+        field(DESC,"file name")
+        field(NELM,"128")
+        field(FTVL,"CHAR")
+}</pre>
+</div>
+<p>You can then use this with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvname</span> <span class="o">=</span> <span class="s">&#39;PREFIX:filename.VAL&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pv</span>  <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">pv</span><span class="o">.</span><span class="n">info</span>
+<span class="go">....</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plain_val</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">plain_val</span>
+<span class="go">array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 101, 114,  92,  77,</span>
+<span class="go">     97, 114,  99, 104,  50,  48,  49,  48,  92,  70,  97, 115, 116,</span>
+<span class="go">     77,  97, 112,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,</span>
+<span class="go">      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,</span>
+<span class="go">      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,</span>
+<span class="go">      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,</span>
+<span class="go">      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,</span>
+<span class="go">      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,</span>
+<span class="go">      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,</span>
+<span class="go">      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">char_val</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">char_val</span>
+<span class="go">&#39;T:\\xas_user\\March2010\\FastMap&#39;</span>
+</pre></div>
+</div>
+<p>This uses the PV class, but the <tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt> method of <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> is
+essentially equivalent, as its <em>as_string</em> parameter works exactly the same
+way.</p>
+</div>
+</div>
+<div class="section" id="using-python-threads">
+<span id="advanced-threads-label"></span><h2>Using Python Threads<a class="headerlink" href="#using-python-threads" title="Permalink to this headline">¶</a></h2>
+<p>An important feature of the epics python package is that it can be used
+with Python threads.  This section of the document focuses on using Python
+threads both with the <cite>PV</cite> object and with the procedural functions in the
+<cite>ca</cite> module.</p>
+<p>Using threads in Python is fairly simple, but Channel Access adds a
+complication that the underlying CA library will call Python code within a
+particular thread, and you need to set which thread that is.  The most rule
+for using Threads with the epics module is to use
+<tt class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></tt> =  <tt class="xref docutils literal"><span class="pre">True</span></tt>.   This is the default  value, so
+you usually do not need to change anything.</p>
+<div class="section" id="thread-example">
+<h3>Thread Example<a class="headerlink" href="#thread-example" title="Permalink to this headline">¶</a></h3>
+<p>This is a simplified version of test code using Python threads.  It is
+based on code from Friedrich Schotte, NIH, and included as <cite>thread_test.py</cite>
+in the <cite>tests</cite> directory of the source distribution.</p>
+<p>In this example, we define a <cite>run_test</cite> procedure which will create PVs
+from a supplied list, and monitor these PVs, printing out the values when
+they change.  Two threads are created and run concurrently, with
+overlapping PV lists, though one thread is run for a shorter time than the
+other.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="kn">import</span> <span class="nn">epics</span>
+
+<span class="n">pvlist1</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;13IDA:DMM1Ch2_raw.VAL&#39;</span><span class="p">,</span> <span class="s">&#39;S:SRcurrentAI.VAL&#39;</span><span class="p">)</span>
+<span class="n">pvlist2</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;13IDA:DMM1Ch3_raw.VAL&#39;</span><span class="p">,</span> <span class="s">&#39;S:SRcurrentAI.VAL&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">run_test</span><span class="p">(</span><span class="n">runtime</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pvnames</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>  <span class="n">run_name</span><span class="o">=</span><span class="s">&#39;thread c&#39;</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&#39; |-&gt; thread  &quot;</span><span class="si">%s</span><span class="s">&quot;  will run for </span><span class="si">%.3f</span><span class="s"> sec &#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">run_name</span><span class="p">,</span> <span class="n">runtime</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&#39;      </span><span class="si">%s</span><span class="s"> = </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">,</span> <span class="n">run_name</span><span class="p">)</span>
+
+    <span class="c"># A new CA context must be created per thread</span>
+    <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">context_create</span><span class="p">()</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">pvs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">pvn</span> <span class="ow">in</span> <span class="n">pvnames</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvn</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">onChanges</span><span class="p">)</span>
+        <span class="n">pvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span> <span class="o">&lt;</span> <span class="n">runtime</span><span class="p">:</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pvs</span><span class="p">:</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">clear_callbacks</span><span class="p">()</span>
+    <span class="k">print</span> <span class="s">&#39;Done with Thread &#39;</span><span class="p">,</span> <span class="n">run_name</span>
+    <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">context_destroy</span><span class="p">()</span>
+
+<span class="k">print</span> <span class="s">&quot;Run 2 Threads simultaneously:&quot;</span>
+<span class="n">th1</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_test</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">pvlist1</span><span class="p">,</span>  <span class="s">&#39;A&#39;</span><span class="p">))</span>
+<span class="n">th1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<span class="n">th2</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_test</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">pvlist2</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">))</span>
+<span class="n">th2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<span class="n">th1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<span class="n">th2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+<span class="k">print</span> <span class="s">&#39;Done&#39;</span>
+</pre></div>
+</div>
+<p>The calls to <cite>epics.ca.context_create()</cite> and <cite>epics.ca.context_destroy()</cite>
+are required: forgetting them will suppress all callbacks, and is likely to
+to lead in core dumps.  The output from this will look like:</p>
+<div class="highlight-python"><pre>Run 2 Threads simultaneously:
+ |-&gt; thread  "A"  will run for 3.000 sec
+ |-&gt; thread  "B"  will run for 6.000 sec
+      13IDA:DMM1Ch2_raw.VAL = -183.71218999999999 (A)
+      13IDA:DMM1Ch3_raw.VAL = -133.09033299999999 (B)
+      S:SRcurrentAI.VAL = 102.19321199346312 (A)
+      S:SRcurrentAI.VAL = 102.19321199346312 (B)
+      S:SRcurrentAI.VAL = 102.19109399346311 (A)
+       S:SRcurrentAI.VAL = 102.19109399346311 (B)
+      13IDA:DMM1Ch2_raw.VAL = -183.67300399999999 (A)
+      13IDA:DMM1Ch3_raw.VAL = -133.04856000000001 (B)
+      S:SRcurrentAI.VAL = 102.18830251346313 (A)
+      S:SRcurrentAI.VAL = 102.18830251346313 (B)
+      S:SRcurrentAI.VAL = 102.18780211346312 (B)
+       S:SRcurrentAI.VAL = 102.18780211346312 (A)
+      13IDA:DMM1Ch2_raw.VAL = -183.69587200000001 (A)
+      13IDA:DMM1Ch3_raw.VAL = -133.00154800000001 (B)
+      S:SRcurrentAI.VAL = 102.18441979346312 (A)
+      S:SRcurrentAI.VAL = 102.18441979346312 (B)
+Done with Thread  A
+      S:SRcurrentAI.VAL = 102.18331875346311 (B)
+      13IDA:DMM1Ch3_raw.VAL = -133.170962 (B)
+      S:SRcurrentAI.VAL = 102.18109007346312 (B)
+      S:SRcurrentAI.VAL = 102.18066463346311 (B)
+      13IDA:DMM1Ch3_raw.VAL = -133.09478999999999 (B)
+      S:SRcurrentAI.VAL = 102.17867355346313 (B)
+      S:SRcurrentAI.VAL = 102.17707979346312 (B)
+      13IDA:DMM1Ch3_raw.VAL = -133.04619199999999 (B)
+      S:SRcurrentAI.VAL = 102.17559191346312 (B)
+Done with Thread  B
+Done</pre>
+</div>
+<p>Note that while both threads <em>A</em>  and <em>B</em> are running, a callback for
+the PV <cite>S:SRcurrentAI.VAL</cite> is generated in each thread.</p>
+<p>Note also that the callbacks for the PVs created in each thread are
+<strong>explicitly cleared</strong>  with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pvs</span><span class="p">:</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">clear_callbacks</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Without this, the callbacks for thread <em>A</em>  will persist even after the
+thread has completed!!!</p>
+</div>
+</div>
+<div class="section" id="time-sleep-or-epics-poll">
+<span id="advanced-sleep-label"></span><h2>time.sleep() or epics.poll()?<a class="headerlink" href="#time-sleep-or-epics-poll" title="Permalink to this headline">¶</a></h2>
+<p>In order for a program to communicate with Epics devices, it needs to allow
+some time for this communication to happen.   With
+<a class="reference internal" href="ca.html#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">ca.PREEMPTIVE_CALLBACK</span></tt></a> set to  <tt class="xref docutils literal"><span class="pre">True</span></tt>, this communication  will
+be handled in a thread separate from the main Python thread.  This means
+that CA events can happen at any time, and <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a> does not
+need to be called to explicitly allow for event processing.</p>
+<p>Still, some time must be released from the main Python thread on occasion
+in order for events to be processed.  The simplest way to do this is with
+<tt class="xref py py-meth docutils literal"><span class="pre">time.sleep()</span></tt>, so that an event loop can simply be:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Unfortunately, the <tt class="xref py py-meth docutils literal"><span class="pre">time.sleep()</span></tt> method is not a very high-resolution
+clock, with typical resolutions of 1 to 10 ms, depending on the system.
+Thus, even though events will be asynchronously generated and epics with
+pre-emptive callbacks does not <em>require</em> <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a> or
+<a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a> to be run, better performance may be achieved with an event
+loop of:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">epics</span><span class="o">.</span><span class="n">poll</span><span class="p">(</span><span class="n">evt</span><span class="o">=</span><span class="mf">1.e-5</span><span class="p">,</span> <span class="n">iot</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>as the loop will be run more often than using <tt class="xref py py-meth docutils literal"><span class="pre">time.sleep()</span></tt>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="autosave.html" title="epics.autosave Auto-saving"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ca.html" title="epics.ca Low-Level Epics Interface"
+             >previous</a> |</li>
+        <li><a href="index.html">Epics Channel Access for Python</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, Matthew Newville.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
