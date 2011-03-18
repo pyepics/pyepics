@@ -233,7 +233,10 @@ class PV(object):
                     firstnull  = val.index(0)
                 else:
                     firstnull = len(val)
-                cval = ''.join([chr(i) for i in val[:firstnull]]).rstrip()
+                try:
+                    cval = ''.join([chr(i) for i in val[:firstnull]]).rstrip()
+                except ValueError:
+                    pass
             else:
                 cval = '<array size=%d, type=%s>' % (len(val),
                                                      dbr.Name(ftype).lower())

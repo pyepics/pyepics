@@ -521,7 +521,10 @@ def replace_printf_handler(fcn=None):
 @withCA
 def current_context():
     "return this context"
-    return int(libca.ca_current_context())
+    try:
+        return int(libca.ca_current_context())
+    except:
+        return libca.ca_current_context()
 
 @withCA
 def client_status(context, level):

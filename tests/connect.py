@@ -6,29 +6,28 @@ import epics
 from pvnames import motor_list
 
 pvnames= []
-for a in ('VAL','RBV','DVAL','RVAL','LLM','HLM','DIR','OFF','FOFF','VELO','VBAS','ACCL','DESC','MRES'):
+for a in ('VAL','RBV','DVAL', 'RVAL','LLM','HLM','DIR','OFF',
+          'FOFF','VELO','VBAS','ACCL','DESC','MRES'):
     for m in motor_list:
         pvnames.append("%s.%s" %(m,a))
 
+print pvnames
 
 def testconnect(pvnames,connect=True):
     t0 = time.time()
     pvlist= []
     for pvname in pvnames:
         x = epics.PV(pvname)
-        if connect:    x.connect()
+        if connect:    
+            x.connect()
         pvlist.append(x)
-
+        
     for x in pvlist:
         x.get()
 
     dt = time.time()-t0
-
 #    for x in pvlist:
 #        x.get()
-
-    dt = time.time()-t0
-
     sys.stdout.write('===Connect with PV(connect=%s) to %i pvs\n' % (connect, len(pvlist)))
     sys.stdout.write('   Total Time = %.4f s, Time per PV = %.1f ms\n' % ( dt, 1000.*dt/len(pvlist)))
 
@@ -60,7 +59,8 @@ connection takes less than 8ms per PV.
 
 testconnect(pvnames, False)
 
-epics.pv.PV_cache = {}
 epics.ca._cache = {}
 
 testconnect(pvnames, True)
+
+print 'Done'

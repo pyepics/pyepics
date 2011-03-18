@@ -1,8 +1,7 @@
 import time
 import epics
-
-
-pvname = '13XRM:m2.VAL'
+import pvnames
+pvname = pvname.motor2
 
 mypv = epics.PV(pvname)
 

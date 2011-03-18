@@ -4,16 +4,18 @@
 
 import epics
 import time
+import pvnames
 
-motor1 = '13XRM:m1'
+
+
 import sys
 write = sys.stdout.write
 def onConnectionChange(pvname=None,  **kws):
     write('ca connection status changed:  %s %s\n' % ( pvname, repr(kws)))
     
-chid = epics.ca.create_channel(motor1, callback=onConnectionChange)
+chid = epics.ca.create_channel(pvnames.long_pv, callback=onConnectionChange)
 
-write('Now waiting, watching values and connection changes:\n')
+write('Now, restart simulation IOC -- waiting, watching values and connection changes:\n')
 t0 = time.time()
 while time.time()-t0 < 15:
     time.sleep(0.001)

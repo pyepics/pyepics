@@ -1,9 +1,9 @@
 import time
 import epics
-
+import pvnames
 print '== Test get/put for synchronous groups'
 
-pvs = ('13XRM:m1.VAL', '13XRM:m2.VAL', '13XRM:m3.VAL')
+pvs = pvnames.motor_list
 
 chids = [epics.ca.create_channel(pvname) for pvname in pvs]
 

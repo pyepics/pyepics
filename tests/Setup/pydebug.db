@@ -16,21 +16,28 @@ record(waveform,"$(P)char128")  {
        field(DTYP,"Soft Channel")
        field(DESC,"short char waveform")
        field(NELM,"128")
-       field(FTVL,"CHAR")
+       field(FTVL,"UCHAR")
+}
+
+record(waveform,"$(P)char256")  {
+       field(DTYP,"Soft Channel")
+       field(DESC,"short char waveform")
+       field(NELM,"256")
+       field(FTVL,"UCHAR")
 }
 
 record(waveform,"$(P)char2k")  {
        field(DTYP,"Soft Channel")
        field(DESC,"medium char waveform")
        field(NELM,"2048")
-       field(FTVL,"CHAR")
+       field(FTVL,"UCHAR")
 }
 
 record(waveform,"$(P)char64k")  {
        field(DESC,"long char waveform")
        field(DTYP,"Soft Channel")
        field(NELM,"65536")
-       field(FTVL,"CHAR")
+       field(FTVL,"UCHAR")
 }
 
 record(waveform,"$(P)double128")  {

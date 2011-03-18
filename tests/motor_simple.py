@@ -1,5 +1,7 @@
 import epics
 import time
+import pvnames
+
 epics.ca.DEFAULT_CONNECTION_TIMEOUT=10.
 
 def test1(motorname, start, step, npts):
@@ -28,6 +30,4 @@ def testDial(motorname,start, step, npts, offset=1.0):
     print ' User/Dial/Raw = %f / %f / %f' % (user, dial, raw)
 
 
-# test1('13XRM:m1', 0, 0.10, 10)
-# test1('13XRM:m1', 2, -0.05, 20)
-testDial('13XRM:m2', 0.5, 0.01, 10, offset=0.1)
+testDial(pvnames.motor1, 0.5, 0.01, 10, offset=0.1)
