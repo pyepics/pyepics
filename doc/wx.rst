@@ -152,7 +152,7 @@ pvButton
 
 
 pvRadioButton
-~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. class:: pvRadioButton(parent, pv=None, pvValue=None, **kw)
 
@@ -271,7 +271,6 @@ parameters that looks like:
 
 .. image:: wx_motordetail.png
 
-
 Many such MotorPanels can be put in a vertical stack, as generated from the
 'wx_motor.py' script in the scripts folder of the source distribution as::
 
@@ -280,7 +279,6 @@ Many such MotorPanels can be put in a vertical stack, as generated from the
 will look like this:
 
 .. image:: wx_motor_many.png
-
 
 
 OGL Classes
