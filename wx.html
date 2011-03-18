@@ -123,8 +123,8 @@ source distribution kit.</p>
 <dt id="wx.pvCtrlMixin">
 <em class="property">class </em><tt class="descclassname">wx.</tt><tt class="descname">pvCtrlMixin</tt><big>(</big><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>**kw</em><big>)</big><a class="headerlink" href="#wx.pvCtrlMixin" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
-This is a mixin class for wx Controls with epics PVs:  This connects to
-PV, and manages callback events for the PV.</blockquote>
+<div>This is a mixin class for wx Controls with epics PVs:  This connects to
+PV, and manages callback events for the PV.</div></blockquote>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -202,9 +202,9 @@ a different color.</p>
 <em class="property">class </em><tt class="descclassname">wx.</tt><tt class="descname">pvBitmap</tt><big>(</big><em>parent</em>, <em>pv=None</em>, <em>bitmaps={}</em>, <em>defaultBitmap=None</em><big>)</big><a class="headerlink" href="#wx.pvBitmap" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Static Bitmap where the image is based on PV value.</p>
 <blockquote>
-If the bitmaps dictionary is set, it should be set as PVValue-&gt;Bitmap
+<div>If the bitmaps dictionary is set, it should be set as PVValue-&gt;Bitmap
 where particular bitmaps will be shown if the PV takes those certain
-values.</blockquote>
+values.</div></blockquote>
 <dl class="docutils">
 <dt>If you need to do any more complex or dynamic drawing, you may</dt>
 <dd>want to look at the OGL PV controls.</dd>
@@ -222,8 +222,8 @@ values.</blockquote>
 <dt>
 <tt class="descname">PV on changes.</tt></dt>
 <dd><blockquote>
-on_value and off_value are the specific values that are mapped to
-the checkbox.</blockquote>
+<div>on_value and off_value are the specific values that are mapped to
+the checkbox.</div></blockquote>
 <p>There are multiple options for translating PV values to checkbox
 settings (from least to most complex):</p>
 <ul class="simple">
@@ -382,7 +382,7 @@ message (blank most of the time), the readback value, the drive value,
 arrows to tweak the motor, and a drop-down combobox for tweak values, a
 &quot;Stop&quot; button and a &quot;More&quot; button.  The panel has the following features:</p>
 <blockquote>
-<ul class="simple">
+<div><ul class="simple">
 <li>All controls are &quot;live&quot; and will respond to changes from other source.</li>
 <li>The values for the tweak values in the ComboBox are automatically
 generated from the precision and travel range of the motor.</li>
@@ -397,7 +397,7 @@ closest limit value.</li>
 field), and set the Info field to &quot;Stopped&quot;.  The button label will
 change to &quot;Go&quot;, and the motor will not move until this button is pressed.</li>
 </ul>
-</blockquote>
+</div></blockquote>
 <p>Finally, the &quot;More&quot; button will bring up a more complete form of Motor
 parameters that looks like:</p>
 <img alt="_images/wx_motordetail.png" src="_images/wx_motordetail.png" />
@@ -489,7 +489,7 @@ as it changes.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.3.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>

@@ -179,6 +179,31 @@ may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 </div>
 </dd></dl>
 
+<dl class="method">
+<dt id="device.save_state">
+<tt class="descclassname">device.</tt><tt class="descname">save_state</tt><big>(</big><big>)</big><a class="headerlink" href="#device.save_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a dictionay of all current values -- the ''current state''.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="device.restore_state">
+<tt class="descclassname">device.</tt><tt class="descname">restore_state</tt><big>(</big><em>state</em><big>)</big><a class="headerlink" href="#device.restore_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>restores a saved state, as saved with <a class="reference internal" href="#device.save_state" title="device.save_state"><tt class="xref py py-meth docutils literal"><span class="pre">save_state()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="device.write_state">
+<tt class="descclassname">device.</tt><tt class="descname">write_state</tt><big>(</big><em>fname</em><span class="optional">[</span>, <em>state=None</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#device.write_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>write a saved state to a file.   If no state is provide, the current state is written.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="device.read_state">
+<tt class="descclassname">device.</tt><tt class="descname">read_state</tt><big>(</big><em>fname</em><span class="optional">[</span>, <em>restore=False</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#device.read_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads a state from a file, as written with <a class="reference internal" href="#device.write_state" title="device.write_state"><tt class="xref py py-meth docutils literal"><span class="pre">write_state()</span></tt></a>, and returns it.
+If ''restore'' is <tt class="xref docutils literal"><span class="pre">True</span></tt>, the read state will be restored.</p>
+</dd></dl>
+
 <dl class="data">
 <dt id="device._pvs">
 <tt class="descclassname">device.</tt><tt class="descname">_pvs</tt><a class="headerlink" href="#device._pvs" title="Permalink to this definition">¶</a></dt>
@@ -216,13 +241,13 @@ A simple example use would be:</p>
 <p>Which will step the motor through a set of positions.    You'll notice a
 few features for Motor:</p>
 <blockquote>
-<p>1.  Motors can use English-name aliases for attributes for fields of the
+<div><p>1.  Motors can use English-name aliases for attributes for fields of the
 motor record.  Thus 'VAL' can be spelled 'drive' and 'DESC' can be
 'description'.   The Table</p>
 <ol class="arabic simple" start="2">
 <li>The methods for setting positions can use the User, Dial, or Step coordinate system, and can wait for completion.</li>
 </ol>
-</blockquote>
+</div></blockquote>
 <div class="section" id="the-epics-motor-class">
 <h3>The <tt class="xref py py-class docutils literal"><span class="pre">epics.Motor</span></tt> class<a class="headerlink" href="#the-epics-motor-class" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
@@ -258,8 +283,8 @@ be retrieved either with an attribute or with the <a class="reference internal" 
 A full list of Motor attributes and their aliases for the motor
 record is given in <a class="reference internal" href="#motorattr-table"><em>Table of Motor Attributes</em></a>.</p>
 <blockquote id="motorattr-table">
-Table of Aliases for attributes for the epics <a class="reference internal" href="#motor.Motor" title="motor.Motor"><tt class="xref py py-class docutils literal"><span class="pre">Motor</span></tt></a> class, and the
-corresponding attribute name of the Motor Record field.</blockquote>
+<div>Table of Aliases for attributes for the epics <a class="reference internal" href="#motor.Motor" title="motor.Motor"><tt class="xref py py-class docutils literal"><span class="pre">Motor</span></tt></a> class, and the
+corresponding attribute name of the Motor Record field.</div></blockquote>
 <table border="1" class="docutils">
 <colgroup>
 <col width="21%" />
@@ -648,12 +673,12 @@ violation, and raises a MotorLimitException if it is.</p>
 </table>
 <p>Return codes:</p>
 <blockquote>
-<p>None : unable to move, invalid value given
+<div><p>None : unable to move, invalid value given
 -1   : target value outside limits -- no move attempted
 -2   : with wait=True, wait time exceeded timeout
 0    : move executed successfully</p>
 <p>will raise an exception if a motor limit is met.</p>
-</blockquote>
+</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -922,7 +947,7 @@ directly invoking epics calls:</p>
     </div>
     <div class="footer">
         &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.3.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>

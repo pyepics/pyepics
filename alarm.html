@@ -103,7 +103,7 @@ condition and what to do when that condition is met.</p>
 
 <p>creates an alarm object.</p>
 <blockquote>
-<table class="docutils field-list" frame="void" rules="none">
+<div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
@@ -127,7 +127,7 @@ condition and what to do when that condition is met.</p>
 </tr>
 </tbody>
 </table>
-</blockquote>
+</div></blockquote>
 <p>The alarm works by checking the value of the PV each time it changes.  If
 the new value is outside the acceptable range (violates the trip point),
 then the user-supplied callback function is run.  This callback could be
@@ -137,9 +137,9 @@ Alarm Operators</em></a> or a custom callable function which takes
 the two values (PV.value, trip_point) and returns <tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>
 based on those values.</p>
 <blockquote id="alarmops-table">
-<p>Table of built-in Operators for Alarms:</p>
+<div><p>Table of built-in Operators for Alarms:</p>
 <blockquote>
-<table border="1" class="docutils">
+<div><table border="1" class="docutils">
 <colgroup>
 <col width="33%" />
 <col width="67%" />
@@ -170,8 +170,8 @@ based on those values.</p>
 </tr>
 </tbody>
 </table>
-</blockquote>
-</blockquote>
+</div></blockquote>
+</div></blockquote>
 <p>The <tt class="xref py py-attr docutils literal"><span class="pre">alert_delay</span></tt> prevents the alarm callback from being called too
 many times. For PVs with floating point values, the value may
 fluctuate around the trip_point for a while.  If the value violates the
@@ -228,7 +228,7 @@ message when a PV's value reaches a certain value:</p>
     </div>
     <div class="footer">
         &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.3.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>

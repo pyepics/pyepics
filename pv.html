@@ -255,13 +255,9 @@ should happen automatically. See <a class="reference internal" href="#pv.wait_fo
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>timeout</strong> (<em>double</em>) -- maximum connection time, passed to <a class="reference internal" href="ca.html#ca.connect_channel" title="ca.connect_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></tt></a></li>
-</ul>
-</td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>double</em>) -- maximum connection time, passed to <a class="reference internal" href="ca.html#ca.connect_channel" title="ca.connect_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></tt></a></td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt></p>
-</td>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt></td>
 </tr>
 </tbody>
 </table>
@@ -278,13 +274,9 @@ connection.  Returns  whether the connection has occured.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>timeout</strong> (<em>double</em>) -- maximum connection time.</li>
-</ul>
-</td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>double</em>) -- maximum connection time.</td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt></p>
-</td>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt></td>
 </tr>
 </tbody>
 </table>
@@ -335,14 +327,10 @@ sorting  the keys of the <a class="reference internal" href="#pv.callbacks" titl
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>index</strong> (<em>None or integer</em>) -- index of user-supplied function, as returned by <a class="reference internal" href="#pv.add_callback" title="pv.add_callback"><tt class="xref py py-meth docutils literal"><span class="pre">add_callback()</span></tt></a>,
-and also to key for  this callback in the  <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><tt class="xref py py-attr docutils literal"><span class="pre">callbacks</span></tt></a> dictionary.</li>
-</ul>
-</td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>None or integer</em>) -- index of user-supplied function, as returned by <a class="reference internal" href="#pv.add_callback" title="pv.add_callback"><tt class="xref py py-meth docutils literal"><span class="pre">add_callback()</span></tt></a>,
+and also to key for  this callback in the  <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><tt class="xref py py-attr docutils literal"><span class="pre">callbacks</span></tt></a> dictionary.</td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">integer</p>
-</td>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
 </tr>
 </tbody>
 </table>
@@ -563,10 +551,10 @@ attribute (they are equivalent) needs some further explanation.</p>
 will depend on the native type and count of a <cite>PV</cite>.
 <a class="reference internal" href="#charvalue-table"><em>Table of String Representations</em></a></p>
 <blockquote id="charvalue-table">
-<p>Table of String Representations:  How raw data <a class="reference internal" href="#pv.value" title="pv.value"><tt class="xref py py-attr docutils literal"><span class="pre">value</span></tt></a> is mapped
+<div><p>Table of String Representations:  How raw data <a class="reference internal" href="#pv.value" title="pv.value"><tt class="xref py py-attr docutils literal"><span class="pre">value</span></tt></a> is mapped
 to <a class="reference internal" href="#pv.char_value" title="pv.char_value"><tt class="xref py py-attr docutils literal"><span class="pre">char_value</span></tt></a> for different native data types.</p>
 <blockquote>
-<table border="1" class="docutils">
+<div><table border="1" class="docutils">
 <colgroup>
 <col width="24%" />
 <col width="16%" />
@@ -617,8 +605,8 @@ to <a class="reference internal" href="#pv.char_value" title="pv.char_value"><tt
 </tr>
 </tbody>
 </table>
-</blockquote>
-</blockquote>
+</div></blockquote>
+</div></blockquote>
 <p>For double/float values with large exponents, the formatting will be
 <cite>(&quot;%%.%ig&quot; % (precision)) % value</cite>.  For character waveforms (<em>char</em> data
 with <em>count</em> &gt; 1), the <a class="reference internal" href="#pv.char_value" title="pv.char_value"><tt class="xref py py-attr docutils literal"><span class="pre">char_value</span></tt></a> will be set according to:</p>
@@ -662,17 +650,17 @@ important enhancements to callbacks on <cite>PV</cite> objects.</p>
 <p>When defining a callback function to be run on changes to a PV, as set from
 <a class="reference internal" href="#pv.add_callback" title="pv.add_callback"><tt class="xref py py-meth docutils literal"><span class="pre">add_callback()</span></tt></a>, it is important to know two things:</p>
 <blockquote>
-<ol class="arabic simple">
+<div><ol class="arabic simple">
 <li>how your function will be called.</li>
 <li>what is permissible to do inside your callback function.</li>
 </ol>
-</blockquote>
+</div></blockquote>
 <p>Callback functions will be called with several keyword arguments.  You should be
 prepared to have them passed to your function, and should always include
 <cite>**kw</cite>  to catch all arguments.  Your callback will be sent the following
 keyword parameters:</p>
 <blockquote>
-<ul>
+<div><ul>
 <li><p class="first"><cite>pvname</cite>: the name of the pv</p>
 </li>
 <li><p class="first"><cite>value</cite>: the latest value</p>
@@ -730,7 +718,7 @@ keyword parameters:</p>
 </dl>
 </li>
 </ul>
-</blockquote>
+</div></blockquote>
 <p>Some of these may not be directly applicable to all PV data types, and some
 values may be None if the control parameters have not yet been fetched with
 <a class="reference internal" href="#pv.get_ctrlvars" title="pv.get_ctrlvars"><tt class="xref py py-meth docutils literal"><span class="pre">get_ctrlvars()</span></tt></a>.</p>
@@ -760,11 +748,11 @@ be specified when a PV is created.</p>
 <p>Such a connection callback should be prepared to receive the following
 keyword arguments:</p>
 <blockquote>
-<ul class="simple">
+<div><ul class="simple">
 <li><cite>pvname</cite>: the name of the pv</li>
 <li><cite>conn</cite>: the connection status</li>
 </ul>
-</blockquote>
+</div></blockquote>
 <p>where <em>conn</em> will be either <cite>True</cite> or <cite>False</cite>, specifying whether the PV is
 now connected.   A simple example is given below.</p>
 </div>
@@ -974,7 +962,6 @@ See <a class="reference internal" href="#pv-callbacks-label"><em>User-supplied C
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span>  <span class="nn">pvnames</span> <span class="kn">import</span> <span class="n">motor1</span>
-<span class="n">motor1</span> <span class="o">=</span> <span class="s">&#39;13XRM:m2.VAL&#39;</span>
 
 <span class="n">write</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span>
 <span class="k">def</span> <span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
@@ -1026,7 +1013,7 @@ See <a class="reference internal" href="#pv-callbacks-label"><em>User-supplied C
     </div>
     <div class="footer">
         &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.3.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>
