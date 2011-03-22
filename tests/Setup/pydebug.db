@@ -180,18 +180,18 @@ record(ao,"$(P)ao3") {
 }
 
 record(ao,"$(P)ao4") {
-	field(DESC, "ao")
-	field(VAL,  "1")
+   field(DTYP, "ao")
+   field(VAL,  "1")
 }
 
 record(bo,"$(P)bo1") {
-	field(DESC, "bo")
-	field(VAL,  "1")
+   feld(DTYP, "bi")
+   field(VAL,  "1")
 }
 
 record(bi,"$(P)bi1") {
-	field(DESC, "bi")
-	field(VAL,  "1")
+   feld(DTYP, "bi")
+   field(VAL,  "1")
 }
 
 
@@ -247,5 +247,19 @@ record(waveform, "$(P)wave_test") {
   field(SCAN, "Passive")
   field(FLNK, "$(P)mylinker")
 }
+
+
+record(bi,"$(P)xbi") {
+  field(DESC, "bi")
+  field(VAL,  "1")
+}
+
+record(bo,"$(P)xbo") {
+  field(DESC, "bo")
+  field(VAL,  "0")
+  field(DISV,  "0")
+  field(OUT, "$(P)xbi.VAL CA NMS")
+}
+
 
 
