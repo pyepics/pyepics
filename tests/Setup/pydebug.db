@@ -11,6 +11,25 @@ record(mbbo,"$(P)mbbo1") {
         field(THVL,"3")
         field(THST,"Resume")
 }
+record(mbbo,"$(P)mbbo2") {
+	field(DESC,"mbbo")
+        field(ZRVL,"0")
+        field(ZRST,"Stop")
+        field(ONVL,"1")
+        field(ONST,"Start")
+        field(TWVL,"2")
+        field(TWST,"Pause")
+        field(THVL,"3")
+        field(THST,"Resume")
+}
+
+record(mbbo,"$(P)pause") {
+	field(DESC,"mbbo")
+        field(ZRVL,"0")
+        field(ZRST,"Not Paused")
+        field(ONVL,"1")
+        field(ONST,"Paused")
+}
 
 record(waveform,"$(P)char128")  {
        field(DTYP,"Soft Channel")
@@ -115,6 +134,18 @@ record(longout,"$(P)long2") {
 	field(VAL,  "543210")
 }
 
+record(longout,"$(P)long3") {
+        field(DESC,"longout") 
+	field(DTYP, "Soft Channel")
+	field(VAL,  "543210")
+}
+
+record(longout,"$(P)long4") {
+        field(DESC,"longout") 
+	field(DTYP, "Soft Channel")
+	field(VAL,  "543210")
+}
+
 
 record(stringin,"$(P)str1") {
         field(DESC,"stringin") 
@@ -138,6 +169,20 @@ record(ai,"$(P)ai1") {
 	field(VAL,  "1")
 }
 
+record(ao,"$(P)ao2") {
+	field(DESC, "ao")
+	field(VAL,  "1")
+}
+
+record(ao,"$(P)ao3") {
+	field(DESC, "ao")
+	field(VAL,  "1")
+}
+
+record(ao,"$(P)ao4") {
+	field(DESC, "ao")
+	field(VAL,  "1")
+}
 
 record(bo,"$(P)bo1") {
 	field(DESC, "bo")
@@ -154,38 +199,38 @@ record(bi,"$(P)bi1") {
 
 record(subArray, "$(P)subArr1") {
   field(DESC, "ayb array 1")
-  field(NELM, "4")
+  field(NELM, "16")
   field(INP, "$(P)wave_test.VAL")
   field(INDX, "0")
   field(FTVL, "DOUBLE")
-  field(MALM, "16")
+  field(MALM, "64")
 }
 
 record(subArray, "$(P)subArr2") {
   field(DESC, "ayb array 2")
-  field(NELM, "4")
+  field(NELM, "16")
   field(INP, "$(P)wave_test.VAL")
-  field(INDX, "4")
+  field(INDX, "16")
   field(FTVL, "DOUBLE")
-  field(MALM, "16")
+  field(MALM, "64")
 }
 
 record(subArray, "$(P)subArr3") {
   field(DESC, "ayb array 3")
-  field(NELM, "4")
+  field(NELM, "16")
   field(INP, "$(P)wave_test.VAL")
-  field(INDX, "8")
+  field(INDX, "32")
   field(FTVL, "DOUBLE")
-  field(MALM, "16")
+  field(MALM, "64")
 }
 
 record(subArray, "$(P)subArr4") {
   field(DESC, "ayb array 4")
-  field(NELM, "4")
+  field(NELM, "16")
   field(INP, "$(P)wave_test.VAL")
-  field(INDX, "12")
+  field(INDX, "48")
   field(FTVL, "DOUBLE")
-  field(MALM, "16")
+  field(MALM, "64")
 }
 
 record(fanout, "$(P)mylinker") {
@@ -196,7 +241,7 @@ record(fanout, "$(P)mylinker") {
 }
 
 record(waveform, "$(P)wave_test") {
-  field(NELM, "16")
+  field(NELM, "64")
   field(FTVL, "DOUBLE")
   field(EGU, "Counts")
   field(SCAN, "Passive")

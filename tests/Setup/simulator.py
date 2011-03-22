@@ -20,11 +20,11 @@ def make_pvs(*args, **kwds):
     for i in s: i.connect()
     return s
 
-
-mbbis  = make_pvs("mbbo1",)
-longs = make_pvs("long1", "long2")
+mbbos  = make_pvs("mbbo1","mbbo2")
+pause_pv = make_pvs("pause",)[0]
+longs = make_pvs("long1", "long2", "long3", "long4")
 strs    = make_pvs("str1", "str2")
-analogs =  make_pvs("ao1", "ai1")
+analogs =  make_pvs("ao1", "ai1", "ao2", "ao3")
 binaries = make_pvs("bo1", "bi1")
 
 char_waves = make_pvs("char128", "char256", "char2k", "char64k")
@@ -33,10 +33,12 @@ long_waves = make_pvs("long128", "long2k", "long64k")
 str_waves = make_pvs("string128", "string2k", "string64k")
 
 subarrays =  make_pvs("subArr1", "subArr2", "subArr3", "subArr4" )
-subarray_driver = make_pvs("wave_test")
+subarray_driver = make_pvs("wave_test",)[0]
+
+subarray_driver.put(numpy.arange(64)/10.0)
 
 # initialize data
-for p in mbbis:    p.put(1)
+for p in mbbos:    p.put(1)
 
 for i, p in enumerate(longs):    p.put((i+1))
 
@@ -65,6 +67,8 @@ double_waves[0].put([i+random.randrange(2) for i in range(128)])
 double_waves[1].put([random.random() for i in range(2048)])
 double_waves[2].put([random.random() for i in range(65536)])
 
+pause_pv.put(0)
+
 
 str_waves[0].put([" String %i" % (i+1) for i in range(128)])
 
@@ -90,6 +94,14 @@ epics.ca.show_cache()
 while True:
     time.sleep(0.1) 
     count = count + 1
+    # pause for up to 15 seconds if pause was selected
+    t0 = time.time()
+    while pause_pv.get() == 1:
+        time.sleep(0.5)
+        if time.time() - t0 > 15:
+            pause_pv.put(0)
+
+
     analogs[0].put(count/1000.0)
     analogs[1].put(1.2*(time.time()-t0))
     tx = time.time()

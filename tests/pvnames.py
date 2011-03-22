@@ -11,6 +11,9 @@ double_pv_host = 'vincent:'
 double_pv_units = 'microns'
 double_pv_prec = 4
 
+double_pv2 = 'Py:ao2'
+
+pause_pv  = 'Py:mbbo2'
 #### 2
 # this pv should be an ENUM. It will NOT be set.
 # provide the names of the ENUM states
@@ -18,23 +21,22 @@ double_pv_prec = 4
 #### Theae are PVs of the various native types
 ###  They will NOT be set.
 str_pv   = 'Py:ao1.DESC'
-int_pv   = 'Py:long1'
-long_pv  = 'Py:long1'
-float_pv = 'Py:ai1'
+int_pv   = 'Py:long2'
+long_pv  = 'Py:long2'
+float_pv = 'Py:ao3'
 enum_pv  = 'Py:mbbo1'
 enum_pv_strs = ['Stop', 'Start', 'Pause', 'Resume']
 
 ## Here are some waveform / array data PVs
-
 long_arr_pv   = 'Py:long2k'
-
+double_arr_pv = 'Py:double2k'
+string_arr_pv = 'Py:string128'
 # char / byte array
-char_arr_pv   = 'Py:char256'
+char_arr_pv   = 'Py:char128'
 char_arrays   = ['Py:char128', 'Py:char2k', 'Py:char64k']
 long_arrays   = ['Py:long128', 'Py:long2k', 'Py:long64k']
 double_arrays   = ['Py:double128', 'Py:double2k', 'Py:double64k']
 
-double_arr_pv = 'Py:double2k'
 
 ####
 # provide a single motor prefix (to which '.VAL' and '.RBV' etc will be added)
@@ -50,8 +52,6 @@ updating_str1 = 'Py:char256'
 #### 
 #  Here, provide a list of PVs that  change at least once very 10 seconds
 updating_pvlist = ['Py:ao1', 'Py:ai1', 'Py:long1']
-
-
 #### alarm test
 
 alarm_pv = 'Py:long1'
