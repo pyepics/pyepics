@@ -20,7 +20,6 @@
 	  epics database (tests/Setup/pydebug.db) that can be loaded
 	  and manipulated for testing
 
-
 	- PV nows have a 'put_complete' field that indicates when
 	  a put() has completed.
 
