@@ -12,8 +12,8 @@ for v in vals:
     count = 0
     for i in range(100000):
         time.sleep(0.001)
-	count = count + 1
+        count = count + 1
         if p.put_complete:
             break
-    print 'Done  value= %.3f, elapsed time= %.4f sec (count=%i)' % (v, time.time()-t0, count)
+    print( 'Done  value= %.3f, elapsed time= %.4f sec (count=%i)' % (v, time.time()-t0, count))
 

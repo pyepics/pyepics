@@ -73,7 +73,7 @@ class PV_Tests(unittest.TestCase):
         self.failUnless(len(val[1]) > 1)
         resume_updating()
 
-    def xtest_putwait(self):
+    def test_putwait(self):
         write('Put with wait (using real motor!) \n')
         pv = PV(pvnames.motor1)
         val = pv.get()
@@ -92,7 +92,7 @@ class PV_Tests(unittest.TestCase):
         put_callback_called = False
 
         def onPutdone(pvname=None, **kws):
-            print 'put done ', pvname, kws
+            print( 'put done ', pvname, kws)
             global put_callback_called
             put_callback_called = True
         val = pv.get()
@@ -195,146 +195,6 @@ class PV_Tests(unittest.TestCase):
         self.failUnless(rwacc.startswith('read'))
 
         
-    def xtest_UnConnected(self):
-        write( 'CA Connection Test1: connect to non-existing PV (2sec timeout)\n')
-        chid = ca.create_channel('impossible_pvname_certain_to_fail')
-        conn,dt,n = _ca_connect(chid, timeout=2)
-        self.assertEqual(conn,False)
-
-
-    def xtest_promote_type(self):
-        pvn = pvnames.double_pv
-        chid = ca.create_channel(pvn,connect=True)
-        write( 'CA promote type (%s)\n' % (pvn))
-        f_t  = ca.promote_type(chid,use_time=True)
-        f_c  = ca.promote_type(chid,use_ctrl=True)        
-        self.assertEqual(f_t, ca.dbr.TIME_DOUBLE)
-        self.assertEqual(f_c, ca.dbr.CTRL_DOUBLE)
-
-    def xtest_Enum(self):
-        pvn  = pvnames.enum_pv
-        chid = ca.create_channel(pvn,connect=True)
-        write( 'CA test Enum (%s)\n' % (pvn))
-        enumstrs = ca.get_enum_strings(chid)
-        self.failUnless(len(enumstrs)>1)
-
-        self.failUnless(isinstance(enumstrs[0],str))
-        write( 'CA EnumStrings (%s) = %s\n' % (pvn,repr(enumstrs)))
-        self.failUnless(enumstrs,pvnames.enum_pv_strs)
-
-
-    def xtest_subscription_double(self):
-        pvn = pvnames.updating_pv1
-        chid = ca.create_channel(pvn,connect=True)
-        cb, uarg, eventID = ca.create_subscription(chid, callback=onChanges)
-        
-        start_time = time.time()
-        global CHANGE_DAT
-        while time.time()-start_time < 5.0:
-            time.sleep(0.01)
-            if CHANGE_DAT.get(pvn, None) is not None:
-                break
-        val = CHANGE_DAT.get(pvn, None)
-        ca.clear_subscription(eventID)
-        self.assertNotEqual(val, None)
-
-
-    def xtest_subscription_custom(self):
-        pvn = pvnames.updating_pv1
-        chid = ca.create_channel(pvn,connect=True)
-
-        global change_count 
-        change_count = 0
-
-        def my_callback(pvname=None, value=None, **kws):
-            write( ' Custom Callback  %s  value=%s\n' %(pvname, str(value)))
-            global change_count             
-            change_count = change_count + 1
-            
-        cb, uarg, eventID = ca.create_subscription(chid, callback=my_callback)
-        
-        start_time = time.time()
-        while time.time()-start_time < 2.0:
-            time.sleep(0.01)
-
-        ca.clear_subscription(eventID)
-        time.sleep(0.2)
-        self.assertNotEqual(change_count, 0)
-
-    def xtest_subscription_str(self):
-        
-        pvn = pvnames.updating_str1
-        write(" Subscription on string: %s " % pvn)
-        chid = ca.create_channel(pvn,connect=True)
-        cb, uarg, eventID = ca.create_subscription(chid, callback=onChanges)
-
-        start_time = time.time()
-        global CHANGE_DAT
-        while time.time()-start_time < 3.0:
-            time.sleep(0.01)
-            ca.put(chid, "%.1f" % (time.time()-start_time) )
-            if CHANGE_DAT.get(pvn, None) is not None:
-                break
-        val = CHANGE_DAT.get(pvn, None)
-        # ca.clear_subscription(eventID)
-        self.assertNotEqual(val, None)
-        time.sleep(0.2)
-
-    def xtest_Values(self):
-        write( 'CA test Values (compare 5 values with caget)\n')
-        os.system('rm ./caget.tst')
-        vals = {}
-        pause_updating()
-        for pvn in (pvnames.str_pv,  pvnames.int_pv,
-                    pvnames.float_pv, pvnames.enum_pv,
-                    pvnames.long_pv):
-            os.system('caget  -n -f5 %s >> ./caget.tst' % pvn)
-            chid = ca.create_channel(pvn)
-            ca.connect_channel(chid)
-            vals[pvn] = ca.get(chid)
-        rlines = open('./caget.tst', 'r').readlines()
-        for line in rlines:
-            pvn, sval = [i.strip() for i in line[:-1].split(' ', 1)]
-            tval = str(vals[pvn])
-            if pvn in (pvnames.float_pv,pvnames.double_pv): # use float precision!
-                tval = "%.5f" % vals[pvn]
-            self.assertEqual(tval, sval)
-        resume_updating()
-
-    def xtest_type_converions_1(self):
-        write("CA type conversions scalars\n")
-        pvlist = (pvnames.str_pv, pvnames.int_pv, pvnames.float_pv,       
-                  pvnames.enum_pv,  pvnames.long_pv,  pvnames.double_pv2)
-        chids = []
-        pause_updating()
-        for name in pvlist:
-            chid = ca.create_channel(name)
-            ca.connect_channel(chid)
-            chids.append((chid, name))
-            ca.poll(evt=0.025, iot=5.0)
-        ca.poll(evt=0.05, iot=10.0)
-
-        values = {}
-        for chid, name in chids:
-            values[name] = ca.get(chid, as_string=True)
-
-        for promotion in ('ctrl', 'time'):
-            for chid, pvname in chids:
-                write('=== %s  chid=%s as %s\n' % (ca.name(chid), 
-                                                   repr(chid), promotion))
-                time.sleep(0.01)
-                if promotion == 'ctrl':
-                    ntype = ca.promote_type(chid, use_ctrl=True)
-                else:
-                    ntype = ca.promote_type(chid, use_time=True)
-
-                val  = ca.get(chid, ftype=ntype)
-                cval = ca.get(chid, as_string=True)    
-                if ca.element_count(chid) > 1:
-                    val = val[:12]
-                self.assertEqual(cval, values[pvname])
-        resume_updating()
-
     def xtest_type_converions_2(self):
         write("CA type conversions arrays\n")
         pvlist = (pvnames.char_arr_pv,
