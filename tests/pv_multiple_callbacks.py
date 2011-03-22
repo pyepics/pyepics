@@ -1,7 +1,7 @@
 import time
 import epics
 import pvnames
-pvname = pvname.motor2
+pvname = pvnames.motor2
 
 mypv = epics.PV(pvname)
 
