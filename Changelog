@@ -10,6 +10,8 @@
 
 	- dynamic subarrays supported.
 
+	- upgraded win32 dlls to be 3.14.12, so that dynamic arrays work.
+
 	- string arrays now correctly handled.
 
 	- several small bug fixes to MotoDetailFrame.py (thanks to Mark Vigder)
