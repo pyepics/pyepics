@@ -3,7 +3,7 @@
    Matthew Newville <newville@cars.uchicago.edu>
    CARS, University of Chicago
 
-   version    :  3.0.11
+   version    :  3.1.0rc
    last update:  11-Jan-2011
    
 == License:
@@ -21,7 +21,7 @@
       PV -- Process Variable which will work largely as in EpicsCA 2.*
 """
 
-__version__ = '3.0.11'
+__version__ = '3.1.0rc'
 
 import time
 import sys

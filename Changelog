@@ -1,3 +1,34 @@
+2011-03-22  Matt Newville  <newville@cars.uchicago.edu>
+
+	* Version 3.1.0rc:
+
+	- added Angus Gratton's wx enhanced widgets
+
+	- added Angus Gratton's autosave module
+
+	- move main repository to github.com/pyepics/pyepics
+
+	- dynamic subarrays supported.
+
+	- string arrays now correctly handled.
+
+	- several small bug fixes to MotoDetailFrame.py (thanks to Mark Vigder)
+
+	- dramatically improved testing framework, with dedicated
+	  epics database (tests/Setup/pydebug.db) that can be loaded
+	  and manipulated for testing
+
+
+	- PV nows have a 'put_complete' field that indicates when
+	  a put() has completed.
+
+	- better handling of connection callbacks when a channel or PV
+	  tries to connect several times in rapid succession.
+
+	- fixed some bugs related to array values, being stepped on and
+	  corrupted by subsequent calls.
+
+
 2011-01-11  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.11:
