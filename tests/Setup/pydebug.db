@@ -249,17 +249,5 @@ record(waveform, "$(P)wave_test") {
 }
 
 
-record(bi,"$(P)xbi") {
-  field(DESC, "bi")
-  field(VAL,  "1")
-}
-
-record(bo,"$(P)xbo") {
-  field(DESC, "bo")
-  field(VAL,  "0")
-  field(DISV,  "0")
-  field(OUT, "$(P)xbi.VAL CA NMS")
-}
-
 
 
