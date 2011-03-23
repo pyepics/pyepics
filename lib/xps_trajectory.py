@@ -33,7 +33,7 @@ class config:
     group_name = 'FINE'
     positioners = 'X Y'
     gather_titles = "# XPS Gathering Data\n#--------------"
-    gather_outputs =  ('CurrentPosition', )
+    gather_outputs =  ('CurrentPosition', ) # 'FollowingError')
  
 class XPSTrajectory(object):
     """XPS trajectory....
@@ -248,35 +248,33 @@ Line = %f, %f
         ret, npulses, nx = self.xps.GatheringCurrentNumberGet(self.ssid)
         db.add(' Will Save %i pulses , ret=%i ' % (npulses, ret))
         ret, buff = self.xps.GatheringDataMultipleLinesGet(self.ssid, 0, npulses)
-        db.add('MLGet ret=%i, buff_len = %i ' % (ret, len(buff)))
+
+        db.add('initial MLGet ret=%i, buff_len = %i ' % (ret, len(buff)))
         
         if ret < 0:  # gathering too long: need to read in chunks
             print 'Need to read Data in Chunks!!!'  # how many chunks are needed??
-            Nchunks = 3
-            nx    = int( (npulses-2) / Nchunks)
-            ret = 1
-            while True:
-                time.sleep(0.1)
-                ret, xbuff = self.xps.GatheringDataMultipleLinesGet(self.ssid, 0, nx)
-                if ret == 0:
-                    break
-                Nchunks = Nchunks + 2
-                nx      = int( (npulses-2) / Nchunks)
-                if nChnks > 10:
+            nchunks = 1
+            while ret<0:
+                time.sleep(0.05)
+                nchunks = nchunks + 1
+                chunksize = int( (npulses-1) / nchunks)
+                ret, xbuff = self.xps.GatheringDataMultipleLinesGet(self.ssid, 0, chunksize)
+                if nchunks > 10:
                     print 'looks like something is wrong with the XPS!'                    
                     break
-            print  ' -- will use %i %i Chunks ' % (nx, Nchunks)
-            db.add(' Will use %i chunks ' % (Nchunks))
+            print  ' -- will use %i Chunks, size =%i ' % (nchunks, chunksize)
+            db.add(' Will use %i chunks ' % (nchunks))
+            db.add('   chunk %i, buffsize=%i' % (0, len(xbuff)))
             buff = [xbuff]
-            for i in range(1, Nchunks):
-                ret, xbuff = self.xps.GatheringDataMultipleLinesGet(self.ssid, i*nx, nx)
-                buff.append(xbuff)
-                db.add('   chunk %i' % (i))
-            ret, xbuff = self.xps.GatheringDataMultipleLinesGet(self.ssid, Nchunks*nx,
-                                                                npulses-Nchunks*nx)
-            buff.append(xbuff)
+            for i in range(1, nchunks):
+                ret, xbuff = self.xps.GatheringDataMultipleLinesGet(self.ssid, i*chunksize, chunksize)
+                buff.extend(xbuff)
+                db.add('   chunk %i, buffsize=%i' % (i, len(xbuff)))
+            ret, xbuff = self.xps.GatheringDataMultipleLinesGet(self.ssid, nchunks*chunksize,
+                                                                npulses-nchunks*chunksize)
+            buff.extend(xbuff)
             buff = ''.join(buff)
-            db.add('   chunk last')
+            db.add('   chunk last  buffersize=%i' % (len(xbuff)))
 
         obuff = buff[:]
         for x in ';\r\t':
