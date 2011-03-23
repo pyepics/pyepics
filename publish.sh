@@ -36,6 +36,10 @@ git commit -am "changed docs"
 git push
 git checkout master
 
+cp ../pyepics_docs.tar.gz $installdir/../.
+cd $installdir
+tar xvzf ../pyepics_docs.tar.gz .
+
 # 
 #mv $srcdir/epics* $srcdir/older/.
 #cp -pr Changelog INSTALL README.txt $srcdir/.
