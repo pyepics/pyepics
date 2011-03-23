@@ -66,9 +66,9 @@ class PV_Tests(unittest.TestCase):
         pv = PV(pvnames.string_arr_pv)
         val = pv.get()
         self.failUnless(len(val) > 10)
-        self.failUnless(isinstance(val[0], (str, unicode)))
+        self.failUnless(isinstance(val[0], str))
         self.failUnless(len(val[0]) > 1)
-        self.failUnless(isinstance(val[1], (str, unicode)))
+        self.failUnless(isinstance(val[1], str))
         self.failUnless(len(val[1]) > 1)
         resume_updating()
 
