@@ -17,9 +17,8 @@ def write(msg):
 CONN_DAT ={}
 CHANGE_DAT = {}
 
-
 def onConnect(pvname=None, conn=None, chid=None,  **kws):
-    write('  /// Connection status changed:  %s  %s\n' % (pvname, repr(kws)))
+    write('  :Connection status changed:  %s  connected=%s\n' % (pvname, conn))
     global CONN_DAT
     CONN_DAT[pvname] = conn
     
@@ -135,7 +134,7 @@ class PV_Tests(unittest.TestCase):
 
         caput("%s.NELM" % pvnames.subarr1, len_sub1)
         caput("%s.INDX" % pvnames.subarr1, 0)
-        
+
         subarr1 = PV(pvnames.subarr1)
 
         driver.put(full_data) ;   time.sleep(0.1)
@@ -143,7 +142,7 @@ class PV_Tests(unittest.TestCase):
 
         self.assertEqual(len(subval), len_sub1)
         self.failUnless(numpy.all(subval == full_data[:len_sub1]))
-
+        write("Subarray test:  C\n")
         caput("%s.NELM" % pvnames.subarr2, 19)
         caput("%s.INDX" % pvnames.subarr2, 3)
 
