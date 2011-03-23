@@ -30,6 +30,12 @@ tar cvzf ../../pyepics_docs.tar.gz .
 cd ..
 rm -rf _tmpdoc _images _sources _static *.html *.js *.inv pyepics3.pdf
 
+git checkout gh-pages
+tar xvzf ../../pyepics_docs.tar.gz .
+git commit -am "changed docs"
+git push
+git checkout master
+
 # 
 #mv $srcdir/epics* $srcdir/older/.
 #cp -pr Changelog INSTALL README.txt $srcdir/.
