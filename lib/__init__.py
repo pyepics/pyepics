@@ -1,27 +1,23 @@
 """
    epics python module
-   Matthew Newville <newville@cars.uchicago.edu>
-   CARS, University of Chicago
 
-   version    :  3.1.0rc
-   last update:  11-Jan-2011
-   
+   version    :  3.1.0
+   last update:  23-Mar-2011
+
+   Principle Author:  Matthew Newville <newville@cars.uchicago.edu>
+                      CARS, University of Chicago
+  
 == License:
    Except where explicitly noted, this file and all files in this
    distribution are licensed under the Epics Open License
    See license.txt in the top-level directory of this distribution.
    
 == Overview:
-   rewrite of EpicsCA v 2.*, with major goals of:
-      a) replacing swig interface with ctypes
-      b) better support for thread safety
-      c) more complete low-level support to epics channel access interface
-      
-   major classes will be:
-      PV -- Process Variable which will work largely as in EpicsCA 2.*
+   Python Interface to the Epics Channel Access protocol of the Epics control system.
+
 """
 
-__version__ = '3.1.0rc'
+__version__ = '3.1.0'
 
 import time
 import sys
@@ -31,7 +27,7 @@ from . import pv
 from . import alarm
 from . import device
 from . import motor
-from . import autosave
+
 PV    = pv.PV
 Alarm = alarm.Alarm
 Motor = motor.Motor

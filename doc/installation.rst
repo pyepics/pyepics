@@ -27,6 +27,7 @@ a few ways to get the Epics Python Package:
 .. _epics-3.1.0.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.1.0.tar.gz
 .. _epics-3.1.0.tar.gz (PyPI):   http://pypi.python.org/packages/source/e/epics/epics-3.1.0.tar.gz
 .. _epics-3.1.0.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.1.0.win32-py2.6.exe
+.. _epics-3.1.0.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.1.0.win32-py2.7.exe
 .. _epics-3.1.0.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.1.0.win32-py3.1.exe
 .. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
@@ -36,11 +37,12 @@ a few ways to get the Epics Python Package:
 +---------------------------+------------------------------------------+
 |  Download Option          |  Location                                |
 +===========================+==========================================+
-|  Source Kit               |  `epics-3.1.0.tar.gz (CARS)`_  or       |
-|                           |  `epics-3.1.0.tar.gz (PyPI)`_           |
+|  Source Kit               |  `epics-3.1.0.tar.gz (CARS)`_  or        |
+|                           |  `epics-3.1.0.tar.gz (PyPI)`_            |
 +---------------------------+------------------------------------------+
-|  Windows Installers       |  `epics-3.1.0.win32-py2.6.exe`_  or     |
-|                           |  `epics-3.1.0.win32-py3.1.exe`_         |
+|  Windows Installers       |  `epics-3.1.0.win32-py2.6.exe`_  or      |
+|                           |  `epics-3.1.0.win32-py2.7.exe`_          |
+|                           |  `epics-3.1.0.win32-py3.1.exe`_          |
 +---------------------------+------------------------------------------+
 |  Development Version      |  use `pyepics github repository`_        |
 +---------------------------+------------------------------------------+
