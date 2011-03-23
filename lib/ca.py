@@ -791,9 +791,12 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
                                                   dbr.value_offset[ftype])
 
         if ntype == dbr.CHAR:
-            out = copy.copy(out)
+            out = [i for i in out]
+            if use_numpy:
+                out = numpy.array(out)
         if use_numpy:
             return copy.copy(numpy.ctypeslib.as_array(out))
+        
         return list(out)
 
     unpack = unpack_simple
