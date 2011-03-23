@@ -21,7 +21,10 @@ Web site is http://pyparsing.wikispaces.com/
 
 """
 
-from pyparsing import *
+from pyparsing import Literal, Optional, Word, Combine, Regex, Group, \
+    ZeroOrMore, OneOrMore, LineEnd, LineStart, StringEnd, \
+    alphanums, alphas, nums
+
 from epics.pv import PV
 import os, datetime
 
@@ -88,7 +91,6 @@ def _parse_request_file(request_file, macro_values={}):
             pvname = n[0]
             for m,v in macro_values.items(): # please forgive me this awful macro expansion method
                 pvname = pvname.replace("$(%s)" % m, v)
-                pvname = pvname.replace("${%s}" % m, v)
             result.append(pvname)
         elif n[0] == 'file': # include file
             subfile = n[1]
@@ -99,43 +101,44 @@ def _parse_request_file(request_file, macro_values={}):
         else:
             raise Exception("Unexpected entry parsed from request file: %s" % n)
     return result
-       
-
 
 # request & save file grammar (combined because lots of it is pretty similar)
-
 point = Literal('.')
 minus = Literal('-')
+ignored_quote = Literal('"').suppress()
+ignored_comma = Literal(',').suppress()
+
+file_name = Word(alphanums+":._-+/\\")
+
 number = Word(nums) 
 integer = Combine( Optional(minus) + number )
 float_number = Combine( integer +
-                       Optional( point + Optional(number) )  ).setParseAction(lambda t:float(t[0]))
+                        Optional( point + Optional(number) )
+                        ).setParseAction(lambda t:float(t[0]))
 
 # (originally I had pyparsing pulling out the $(Macro) references from inside names
 # as well, but the framework doesn't work especially well without whitespace delimiters between
 # tokens so we just do simple find/replace in a second pass
 pv_name = Word(alphanums+":._$()")
 
-
 pv_value = (float_number | Word(alphanums))
 pv_assignment = pv_name + pv_value
 
 comment = Literal("#") + Regex(r".*")
 
-macro=Group( Word(alphas) + Literal("=").suppress() + pv_name )
+macro = Group( Word(alphas) + Literal("=").suppress() + pv_name )
 macros = Optional(macro + ZeroOrMore(Word(";,").suppress() + macro) )
 
-file_include = Literal("file") + pv_name + macros
+#file_include = Literal("file") + pv_name + macros
+file_include = Literal("file") + \
+               (file_name | ignored_quote + file_name + ignored_quote) \
+               + Optional(ignored_comma) + macros
 
 def line(contents):
     return LineStart() + ZeroOrMore(Group(contents)) + LineEnd().suppress()
 
 req_line = line( file_include | comment.suppress() | pv_name )
-sav_line = line( comment.suppress() | Literal("<END>").suppress() | pv_assignment )
+sav_line = line( comment.suppress() | Literal("<END>").suppress() | pv_assignment)
 
 req_file = OneOrMore(req_line) + StringEnd().suppress()
 sav_file = OneOrMore(sav_line) + StringEnd().suppress()
-
-
-
-
