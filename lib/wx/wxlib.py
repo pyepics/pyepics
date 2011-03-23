@@ -486,7 +486,6 @@ class pvCtrlMixin(pvMixin):
         self.bgColourTranslations = translations
             
 
-
     def SetForegroundColour(self, colour):
         """ (Internal override) Needed to support OverrideForegroundColour() """
         if self.defaultFgColour is None:
@@ -548,8 +547,12 @@ class pvCtrlMixin(pvMixin):
         self._warn("must override _SetValue")
 
     def OnPVChange(self, raw_value):        
+        if self.pv is None:
+            return
         if len(self.fgColourAlarms) > 0 or len(self.bgColourAlarms) > 0:
-            self.pv.get_ctrlvars() # load severity if we care about it <-- NB: this may be a performance problem
+            # load severity if we care about it
+            # NB: this may be a performance problem
+            self.pv.get_ctrlvars()
 
         colour = None
         if self.fgColourTranslations is not None and raw_value in self.fgColourTranslations:
@@ -920,7 +923,7 @@ class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin):
     def _OnChanged(self, event):
         if self.pv is not None:
             value = self.GetValue()
-            if self.pv.upper_ctrl_limit <> 0 or self.pv.lower_ctrl_limit <> 0: # both zero -> not set
+            if self.pv.upper_ctrl_limit != 0 or self.pv.lower_ctrl_limit != 0: # both zero -> not set
                 if value > self.pv.upper_ctrl_limit:
                     value = self.pv.upper_ctrl_limit
                     self.SetValue(value)
