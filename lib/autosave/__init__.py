@@ -9,7 +9,7 @@ The Debian/Ubuntu package is "python-pyparsing"
 The web site is http://pyparsing.wikispaces.com/
 
 """
-import save_restore
+from . import save_restore
 
-restore_pvs=save_restore.restore_pvs
-save_pvs=save_restore.save_pvs
+restore_pvs = save_restore.restore_pvs
+save_pvs = save_restore.save_pvs

@@ -31,7 +31,7 @@ from . import pv
 from . import alarm
 from . import device
 from . import motor
-
+from . import autosave
 PV    = pv.PV
 Alarm = alarm.Alarm
 Motor = motor.Motor

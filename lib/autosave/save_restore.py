@@ -46,7 +46,7 @@ def restore_pvs(filepath, debug=False):
         try:
             pv = PV(v[0])
             pv.put(v[1]) # hopefully this is good enough as conversions go           
-        except Exception,e:
+        except Exception(e):
             print( "Error restoring %s to %s : %s" % (v[0], v[1], e))
             success = False
     return success
