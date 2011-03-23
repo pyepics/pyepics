@@ -810,8 +810,8 @@ implemented as a Device.</p>
              <span class="s">&#39;HIGH&#39;</span><span class="p">,</span> <span class="s">&#39;LOW&#39;</span><span class="p">,</span> <span class="s">&#39;HHSV&#39;</span><span class="p">,</span> <span class="s">&#39;LLSV&#39;</span><span class="p">,</span> <span class="s">&#39;HSV&#39;</span><span class="p">,</span> <span class="s">&#39;LSV&#39;</span><span class="p">,</span> <span class="s">&#39;HYST&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">prefix</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
-            <span class="n">prefix</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span> <span class="n">prefix</span>
+        <span class="k">if</span> <span class="n">prefix</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">,</span>
                               <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
 </pre></div>
