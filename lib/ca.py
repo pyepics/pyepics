@@ -20,6 +20,11 @@ import sys
 import time
 import copy
 import atexit
+import warnings
+# ignore warning about item size... for now??
+warnings.filterwarnings('ignore',
+                        'Item size computed from the PEP 3118*',
+                        RuntimeWarning)
 
 HAS_NUMPY = False
 try:
