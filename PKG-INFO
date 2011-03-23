@@ -1,26 +1,10 @@
-Metadata-Version: 1.1
+Metadata-Version: 1.0
 Name: epics
 Version: 3.1.0
-Author: Matthew Newville
-Author-email: newville at cars uchicago edu
-Home-page:  http://pyepics.github.com/pyepics/
-Download-url: http://cars9.uchicago.edu/software/python/pyepics3/
 Summary: Epics Channel Access Extensions to Python
+Home-page: http://cars9.uchicago.edu/software/python/pyepics3/
+Author: Matthew Newville
+Author-email: newville@cars.uchicago.edu
 License: Epics Open License
-Description: A Python interface for the Channel Access (CA) library of the Epics Control System.
-Keywords: epics, automation control
-Platform: Linux, Windows, Mac OS X, Solaris
-Requires: python(>=2.5)
-Provides: epics
-Classifier: Development Status :: 4 - Beta
-Classifier: Intended Audience :: Education
-Classifier: Intended Audience :: Science/Research
-Classifier: License :: Free To Use But Restricted
-Classifier: Operating System :: MacOS :: MacOS X
-Classifier: Operating System :: Microsoft :: Windows
-Classifier: Operating System :: POSIX :: Linux
-Classifier: Operating System :: POSIX :: SunOS/Solaris
-Classifier: Programming Language :: Python 
-Classifier: Topic :: Scientific/Engineering
-Classifier: Topic :: Scientific/Engineering :: Physics
-
+Description: UNKNOWN
+Platform: UNKNOWN
