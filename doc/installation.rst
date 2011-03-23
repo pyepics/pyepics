@@ -5,18 +5,23 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-This package requires Python version 2.5, 2.6, 2.7, or 3.1, or 3.2.  I
-It is possible that Python 2.4 will work if the ctypes package is
-installed, but this has not been tested.
+This package requires Python version 2.5, 2.6, 2.7, or 3.1.  I It is
+possible that Python 2.4 will work if the ctypes package is installed, but
+this has not been tested.  In addition, Python 3.2 should work as well, but
+was not tested as of this writing.
 
 In addtion, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
 libCom.so and libca.so (or Com.dll and ca.dll on Windows) from *Epics Base*
-are required to use this module.  For 32-bit Windows, pre-built DLLs are
-included and installed so that no other Epics installation is required to
-use the modules.  For Unix-like systems, these are assumed to be available
-(and findable by Python at runtime) on the system. This may mean setting
-LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
+are required to use this module.  Using a patched version of 3.14.12 is
+recommended -- some of the features for 'subarray records' will only work
+with this latest version.  
+
+For 32-bit Windows, pre-built DLLs from 3.14.12 (patched as of March, 2011)
+are included and installed so that no other Epics installation is required
+to use the modules.  For Unix-like systems, these are assumed to be
+available (and findable by Python at runtime) on the system. This may mean
+setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 
 Downloads
 ~~~~~~~~~~~~~
@@ -51,6 +56,41 @@ if you have `Python Setup Tools`_  installed, you can download and install
 the PyEpics Package simply with::
 
    easy_install epics
+
+
+Testing
+~~~~~~~~~~~~~
+
+Some automated unit-testing is done, using the tests folder from the source
+distribution kit.   The following systems were tested for 3.1.0.   Except
+as noted, all tests pass.  Those tests that fail are generally well-understood.
+
++-----------+-----------------+------------+-----------------------------+
+|  Host OS  | Epics HOST ARCH |  Python    |   Tests Failed, Notes       |
++===========+=================+============+=============================+
+|   Linux   |  linux-x86      |   2.5.1    |   autosave not tested       |
++-----------+-----------------+------------+-----------------------------+
+|   Linux   |  linux-x86      |   2.6      |   subarray  / base 3.14.11  |
++-----------+-----------------+------------+-----------------------------+
+|   Linux   |  linux-x86      |   2.6.6    |   all pass                  |
++-----------+-----------------+------------+-----------------------------+
+|   Linux   |  linux-x86_64   |   2.7      |   all pass                  |
++-----------+-----------------+------------+-----------------------------+
+| Windows   |   win32-x86     |  2.6.5     |   all pass                  |
++-----------+-----------------+------------+-----------------------------+
+| Windows   |   win32-x86     |  2.7.1     |   all pass                  |
++-----------+-----------------+------------+-----------------------------+
+| Windows   |   win32-x86     |  3.1       |   pyparsing/autosave        |
++-----------+-----------------+------------+-----------------------------+
+| Mac OSX   |  darwin-x86     | 2.6.5      |   subarray / base 3.14.11   |
++-----------+-----------------+------------+-----------------------------+
+
+
+Here *subarray/base 3.14.11* means that some tests with subarrays
+failed, as the system was using epics base 3.14.11.  The autosave module
+relies on the 3rd part extension pyparsing, which seems to not work
+correctly for Python3.1 and was not installed on one tested system.
+Note that the wx module is not automatically tested.
 
 
 Development Version
