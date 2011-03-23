@@ -12,6 +12,8 @@ class Mca(epics.Device):
              'ERST', 'NUSE', 'NMAX', 'VAL')
     
     def __init__(self, prefix):
+        if prefix.endswith('.'):
+            prefix = prefix[:-1]
         epics.Device.__init__(self, prefix, delim='.',
                               attrs= self.attrs)
 
@@ -20,3 +22,9 @@ class Mca(epics.Device):
         attr = 'VAL'
         return self.get(attr)
 
+    def calibratio(self):
+        """return calibration values:
+        CALO, CALS, CALQ, TTH
+        """
+        return (self.get('CALO'), self.get('CALS'),
+                self.get('CALQ'), self.get('TTH'))

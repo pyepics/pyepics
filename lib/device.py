@@ -255,10 +255,13 @@ class Device(object):
                 raise AttributeError(msg % (self._prefix, attr))
         else:
             self.__dict__[attr] = val            
+
     def __repr__(self):
         "string representation"
-        return "<Device '%s' %i attributes>" % (self._prefix,
-                                                len(self._pvs))
+        pref = self._prefix
+        if pref.endswith('.'):
+            pref = pref[:-1]
+        return "<Device '%s' %i attributes>" % (pref, len(self._pvs))
     
 
     def pv_property(attr, as_string=False, wait=False, timeout=10.0):
