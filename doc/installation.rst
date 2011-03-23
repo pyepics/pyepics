@@ -131,11 +131,13 @@ Acknowledgements
 ~~~~~~~~~~~~~~~~~~~~~~
 
 PyEpics was originally written and is maintained by Matt Newville
-<newville@cars.uchicago.ed>.  Several people have provided valuable
-additions or bug reports, which has greatly improved the quality of the
-library: Michael Abbott, Marco Cammarata, Angus Gratton, Craig Haskins,
-Pete Jemian, Andrew Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Mark
-Rivers, Friedrich Schotte, Steve Wasserman, and Glen Wright.
+<newville@cars.uchicago.ed>.  Important contributions to the library have
+come from Angus Gratton, at the Australiaon National University.  Several
+other people have provided valuable additions, suggestions, or bug reports,
+which has greatly improved the quality of the library: Michael Abbott,
+Marco Cammarata, Craig Haskins, Pete Jemian, Andrew Johnson, Janko Kolar,
+Irina Kosheleva, Tim Mooney, Mark Rivers, Friedrich Schotte, Mark Vigder,
+Steve Wasserman, and Glen Wright.
 
 
 Epics Open License
