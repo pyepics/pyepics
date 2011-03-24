@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.0',
+        VERSION:     '3.1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -195,9 +195,9 @@ discussion of strategies for how to best deal with very large arrays.</p>
 
 <dl class="method">
 <dt id="pv.put">
-<tt class="descclassname">pv.</tt><tt class="descname">put</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=30.0</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>callback_data=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pv.put" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pv.</tt><tt class="descname">put</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=30.0</em><span class="optional">[</span>, <em>use_complete=False</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>callback_data=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pv.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>set the PV value, optionally waiting to return until processing has
-completed.</p>
+completed, or setting the <a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><tt class="xref py py-attr docutils literal"><span class="pre">put_complete</span></tt></a> to indicate complete-ness.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -206,6 +206,7 @@ completed.</p>
 <li><strong>value</strong> -- value to set PV</li>
 <li><strong>wait</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to wait for processing to complete (or time-out) before returning.</li>
 <li><strong>timeout</strong> (<em>double</em>) -- maximum time to wait for processing to complete before returning anyway.</li>
+<li><strong>use_complete</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to use a builtin callback to set <a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><tt class="xref py py-attr docutils literal"><span class="pre">put_complete</span></tt></a>.</li>
 <li><strong>callback</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or a valid python function) -- user-supplied function to run when processing has completed.</li>
 <li><strong>callback_data</strong> -- extra data to pass on to a user-supplied callback function.</li>
 </ul>
@@ -215,10 +216,9 @@ completed.</p>
 </table>
 </dd></dl>
 
-<p>The <cite>wait</cite> and <cite>callback</cite> arguments, as well as the <a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><tt class="xref py py-attr docutils literal"><span class="pre">put_complete</span></tt></a>
-attribute give a few options  for ensuring that a <a class="reference internal" href="#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a> has
-completed, or being notified when it has completed.   See
-<a class="reference internal" href="#pv-putwait-label"><em>Put with wait, put callbacks, and  put_complete</em></a> for more details.</p>
+<p>The <cite>wait</cite> and <cite>callback</cite> arguments, as well as the 'use_complete' / <a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><tt class="xref py py-attr docutils literal"><span class="pre">put_complete</span></tt></a>
+attribute give a few options for knowing that a <a class="reference internal" href="#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a> has
+completed.   See <a class="reference internal" href="#pv-putwait-label"><em>Put with wait, put callbacks, and  put_complete</em></a> for more details.</p>
 <span class="target" id="pv-get-ctrlvars-label"></span><dl class="method">
 <dt id="pv.get_ctrlvars">
 <tt class="descclassname">pv.</tt><tt class="descname">get_ctrlvars</tt><big>(</big><big>)</big><a class="headerlink" href="#pv.get_ctrlvars" title="Permalink to this definition">¶</a></dt>
@@ -777,12 +777,12 @@ before printing 'Done'.   You can also specfy a maximum time to wait -- a
 <p>which will wait up to 30 seconds.  For the pedantic, this timeout should
 not be used as an accurate clock -- the actual wait time may be slightly
 longer.</p>
-<p>A second method is to watch for the <a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><tt class="xref py py-attr docutils literal"><span class="pre">put_complete</span></tt></a> attribute to
-become  True after a <a class="reference internal" href="#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a>.  This is somewhat more flexible than
-using <cite>wait=True</cite> as above because you can more carefully control how often
-you look for a <a class="reference internal" href="#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a> to complete, and what to do in the interim.  A
-simple example would be:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<p>A second method is to use the 'use_complete' option and watch for the
+<a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><tt class="xref py py-attr docutils literal"><span class="pre">put_complete</span></tt></a> attribute to become True after a <a class="reference internal" href="#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a>.  This is
+somewhat more flexible than using <cite>wait=True</cite> as above, because you can more
+carefully control how often you look for a <a class="reference internal" href="#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a> to complete, and
+what to do in the interim.  A simple example would be:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">use_complete</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="n">waiting</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="k">while</span> <span class="n">waiting</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
@@ -794,7 +794,7 @@ multiple PVs to complete with python's builtin <cite>all</cite> function, as wit
 <div class="highlight-python"><div class="highlight"><pre><span class="n">pvgroup</span> <span class="o">=</span> <span class="p">(</span><span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">),</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;YYY&#39;</span><span class="p">),</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;ZZZ&#39;</span><span class="p">))</span>
 <span class="n">newvals</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span>  <span class="mf">3.0</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">pv</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pvgroup</span><span class="p">,</span> <span class="n">newvals</span><span class="p">):</span>
-    <span class="n">pv</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="n">pv</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">use_complete</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
 <span class="n">waiting</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="k">while</span> <span class="n">waiting</span><span class="p">:</span>
