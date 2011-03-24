@@ -1,3 +1,16 @@
+2011-03-24  Matt Newville  <newville@cars.uchicago.edu>
+
+	* Version 3.1.1:
+
+	- changed package name from epics to pyepics (better tarball names)
+
+	- changed PV.put() so that: 
+	     * a normal ca_put() is the default
+	     * wait=True will hang until completion
+	     * use_complete=True will use a builtin callback that sets
+	       the .put_complete attribute
+	     * a general purpose callback can be specified.
+	
 2011-03-23  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.1.0:

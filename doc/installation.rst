@@ -26,14 +26,14 @@ setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 Downloads
 ~~~~~~~~~~~~~
 
-The latest stable version of the Epics Python Package is 3.1.0.  There are
+The latest stable version of the Epics Python Package is 3.1.1.  There are
 a few ways to get the Epics Python Package: 
 
-.. _pyepics-3.1.0.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.0.tar.gz
-.. _pyepics-3.1.0.tar.gz (PyPI):   http://pypi.python.org/packages/source/e/epics/pyepics-3.1.0.tar.gz
-.. _pyepics-3.1.0.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.0.win32-py2.6.exe
-.. _pyepics-3.1.0.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.0.win32-py2.7.exe
-.. _pyepics-3.1.0.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.0.win32-py3.1.exe
+.. _pyepics-3.1.1.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.tar.gz
+.. _pyepics-3.1.1.tar.gz (PyPI):   http://pypi.python.org/packages/source/e/epics/pyepics-3.1.1.tar.gz
+.. _pyepics-3.1.1.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py2.6.exe
+.. _pyepics-3.1.1.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py2.7.exe
+.. _pyepics-3.1.1.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py3.1.exe
 .. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
 .. _PyPi Epics Entry:             http://pypi.python.org/pypi/epics/
@@ -42,12 +42,12 @@ a few ways to get the Epics Python Package:
 +---------------------------+------------------------------------------+
 |  Download Option          |  Location                                |
 +===========================+==========================================+
-|  Source Kit               |  `pyepics-3.1.0.tar.gz (CARS)`_  or      |
-|                           |  `pyepics-3.1.0.tar.gz (PyPI)`_          |
+|  Source Kit               |  `pyepics-3.1.1.tar.gz (CARS)`_  or      |
+|                           |  `pyepics-3.1.1.tar.gz (PyPI)`_          |
 +---------------------------+------------------------------------------+
-|  Windows Installers       |  `pyepics-3.1.0.win32-py2.6.exe`_  or    |
-|                           |  `pyepics-3.1.0.win32-py2.7.exe`_        |
-|                           |  `pyepics-3.1.0.win32-py3.1.exe`_        |
+|  Windows Installers       |  `pyepics-3.1.1.win32-py2.6.exe`_  or    |
+|                           |  `pyepics-3.1.1.win32-py2.7.exe`_        |
+|                           |  `pyepics-3.1.1.win32-py3.1.exe`_        |
 +---------------------------+------------------------------------------+
 |  Development Version      |  use `pyepics github repository`_        |
 +---------------------------+------------------------------------------+

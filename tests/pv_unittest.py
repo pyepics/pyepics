@@ -110,9 +110,9 @@ class PV_Tests(unittest.TestCase):
         # now using pv.put_complete
         val = pv.get()
         if  val < 5:
-            pv.put(val + 1.0)
+            pv.put(val + 1.0, use_complete=True)
         else:
-            pv.put(val - 1.0)
+            pv.put(val - 1.0, use_complete=True)
         t0 = time.time()
         count = 0
         while time.time()-t0 < dt*1.50:

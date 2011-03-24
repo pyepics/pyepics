@@ -245,7 +245,7 @@ even if the :func:`caput` has not completed.
 This function returns 1 on success, and a negative number if the timeout
 has been exceeded.
 
-    >>> from import epics import caget, caput, cainfo
+    >>> from epics import caget, caput, cainfo
     >>> caput('XXX:m1.VAL',2.30)
     1  
     >>> caput('XXX:m1.VAL',-2.30, wait=True)
