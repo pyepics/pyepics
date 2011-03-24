@@ -23,7 +23,7 @@ echo '# Publishing PyEpics Docs'
 
 echo '# Publishing PyEpics Docs'
 mkdir _tmpdoc
-cp -pr $docbuild/latex/epics.pdf _tmpdoc/pyepics3.pdf
+cp -pr $docbuild/latex/epics.pdf _tmpdoc/pyepics.pdf
 cp -pr $docbuild/html/*          _tmpdoc/.
 cd _tmpdoc
 tar cvzf ../../pyepics_docs.tar.gz .

@@ -24,14 +24,14 @@ html:
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
-epics.pdf: latex
+pyepics.pdf: latex
 	cd $(BUILDDIR)/latex && make all-pdf
-	cp -pr $(BUILDDIR)/latex/epics.pdf .
+	cp -pr $(BUILDDIR)/latex/epics.pdf ./pyepics.pdf
 
-all: html epics.pdf
+all: html pyepics.pdf
 
 install: all
-	cp -pr $(BUILDDIR)/latex/epics.pdf $(INSTALLDIR)/pyepics3.pdf
+	cp -pr $(BUILDDIR)/latex/epics.pdf $(INSTALLDIR)/pyepics.pdf
 	cp -pr $(BUILDDIR)/html/* $(INSTALLDIR)/.
 
 help:
