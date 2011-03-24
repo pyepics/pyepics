@@ -1,8 +1,8 @@
 """
    epics python module
 
-   version    :  3.1.0
-   last update:  23-Mar-2011
+   version    :  3.1.1
+   last update:  24-Mar-2011
 
    Principle Author:  Matthew Newville <newville@cars.uchicago.edu>
                       CARS, University of Chicago
@@ -17,7 +17,7 @@
 
 """
 
-__version__ = '3.1.0'
+__version__ = '3.1.1'
 
 import time
 import sys
