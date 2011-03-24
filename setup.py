@@ -30,7 +30,7 @@ if os.name == 'nt':
     else:
         data_files = [('DLLs', ['dlls/win32/ca.dll','dlls/win32/Com.dll'])]
 
-setup(name = 'epics',
+setup(name = 'pyepics',
       version = lib.__version__,
       author = 'Matthew Newville',
       author_email = 'newville@cars.uchicago.edu',

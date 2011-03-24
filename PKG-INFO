@@ -1,5 +1,5 @@
 Metadata-Version: 1.0
-Name: epics
+Name: pyepics
 Version: 3.1.0
 Summary: Epics Channel Access Extensions to Python
 Home-page: http://cars9.uchicago.edu/software/python/pyepics3/
