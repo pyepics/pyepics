@@ -30,13 +30,13 @@ The latest stable version of the Epics Python Package is 3.1.1.  There are
 a few ways to get the Epics Python Package: 
 
 .. _pyepics-3.1.1.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.tar.gz
-.. _pyepics-3.1.1.tar.gz (PyPI):   http://pypi.python.org/packages/source/e/epics/pyepics-3.1.1.tar.gz
+.. _pyepics-3.1.1.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.1.tar.gz
 .. _pyepics-3.1.1.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py2.6.exe
 .. _pyepics-3.1.1.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py2.7.exe
 .. _pyepics-3.1.1.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py3.1.exe
 .. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
-.. _PyPi Epics Entry:             http://pypi.python.org/pypi/epics/
+.. _PyPi Epics Entry:             http://pypi.python.org/pypi/pyepics/
 .. _Python Setup Tools:           http://pypi.python.org/pypi/setuptools
 
 +---------------------------+------------------------------------------+
