@@ -52,7 +52,7 @@ caput(), and cainfo(), similar to the EZCA interface and to the
 EPICS-supplied command line utilities.  These all take the name of an Epics
 Process Variable as the first argument.
 
-    >>> from import epics import caget, caput, cainfo
+    >>> from epics import caget, caput, cainfo
     >>> print caget('XXX:m1.VAL')
     1.200
     >>> caput('XXX:m1.VAL',2.30)
