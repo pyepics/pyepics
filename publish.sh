@@ -17,11 +17,31 @@ cd doc
 make all
 cd ../
 
-echo '# Publishing PyEpics'
-cp -pr $docbuild/latex/epics.pdf $installdir/pyepics3.pdf
-cp -pr $docbuild/html/*          $installdir/.
+echo '# Publishing PyEpics Docs'
+#cp -pr $docbuild/latex/epics.pdf $installdir/pyepics3.pdf
+#cp -pr $docbuild/html/*          $installdir/.
+
+echo '# Publishing PyEpics Docs'
+mkdir _tmpdoc
+cp -pr $docbuild/latex/epics.pdf _tmpdoc/pyepics3.pdf
+cp -pr $docbuild/html/*          _tmpdoc/.
+cd _tmpdoc
+tar cvzf ../../pyepics_docs.tar.gz .
+cd ..
+rm -rf _tmpdoc _images _sources _static *.html *.js *.inv pyepics3.pdf
+
+git checkout gh-pages
+tar xvzf ../pyepics_docs.tar.gz .
+git commit -am "changed docs"
+git push
+git checkout master
+
+cp ../pyepics_docs.tar.gz $installdir/../.
+cd $installdir
+tar xvzf ../pyepics_docs.tar.gz .
+
 # 
-mv $srcdir/epics* $srcdir/older/.
-cp -pr Changelog INSTALL README.txt $srcdir/.
-cp -pr dist/*  $srcdir/.
+#mv $srcdir/epics* $srcdir/older/.
+#cp -pr Changelog INSTALL README.txt $srcdir/.
+#cp -pr dist/*  $srcdir/.
 # 

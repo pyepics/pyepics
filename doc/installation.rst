@@ -5,68 +5,114 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-This package requires Python version 2.5, 2.6, or 3.1.  I believe that
-Python 2.7 will work, but this has yet not tested.  It is possible that
-Python 2.4 will work if the ctypes package is installed, but this has not
-been tested.
+This package requires Python version 2.5, 2.6, 2.7, or 3.1.  I It is
+possible that Python 2.4 will work if the ctypes package is installed, but
+this has not been tested.  In addition, Python 3.2 should work as well, but
+was not tested as of this writing.
 
 In addtion, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
 libCom.so and libca.so (or Com.dll and ca.dll on Windows) from *Epics Base*
-are required to use this module.  For 32-bit Windows, pre-built DLLs are
-included and installed so that no other Epics installation is required to
-use the modules.  For Unix-like systems, these are assumed to be available
-(and findable by Python at runtime) on the system. This may mean setting
-LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
+are required to use this module.  Using a patched version of 3.14.12 is
+recommended -- some of the features for 'subarray records' will only work
+with this latest version.  
+
+For 32-bit Windows, pre-built DLLs from 3.14.12 (patched as of March, 2011)
+are included and installed so that no other Epics installation is required
+to use the modules.  For Unix-like systems, these are assumed to be
+available (and findable by Python at runtime) on the system. This may mean
+setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 
 Downloads
-~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
-The latest stable version of the Epics Python Package is 3.0.11.  There are
+The latest stable version of the Epics Python Package is 3.1.0.  There are
 a few ways to get the Epics Python Package: 
 
-.. _epics-3.0.11.tar.gz:          http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.tar.gz
-.. _epics-3.0.11.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.win32-py2.6.exe
-.. _epics-3.0.11.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.0.11.win32-py3.1.exe
-.. _pyepics github repository:    http://github.com/newville/pyepics
+.. _epics-3.1.0.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.1.0.tar.gz
+.. _epics-3.1.0.tar.gz (PyPI):   http://pypi.python.org/packages/source/e/epics/epics-3.1.0.tar.gz
+.. _epics-3.1.0.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.1.0.win32-py2.6.exe
+.. _epics-3.1.0.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.1.0.win32-py2.7.exe
+.. _epics-3.1.0.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.1.0.win32-py3.1.exe
+.. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
 .. _PyPi Epics Entry:             http://pypi.python.org/pypi/epics/
+.. _Python Setup Tools:           http://pypi.python.org/pypi/setuptools
 
 +---------------------------+------------------------------------------+
 |  Download Option          |  Location                                |
 +===========================+==========================================+
-|  Source Kit               |  `epics-3.0.11.tar.gz`_                  |
+|  Source Kit               |  `epics-3.1.0.tar.gz (CARS)`_  or        |
+|                           |  `epics-3.1.0.tar.gz (PyPI)`_            |
 +---------------------------+------------------------------------------+
-|  Windows Installers       |  `epics-3.0.11.win32-py2.6.exe`_  or     |
-|                           |  `epics-3.0.11.win32-py3.1.exe`_         |
+|  Windows Installers       |  `epics-3.1.0.win32-py2.6.exe`_  or      |
+|                           |  `epics-3.1.0.win32-py2.7.exe`_          |
+|                           |  `epics-3.1.0.win32-py3.1.exe`_          |
 +---------------------------+------------------------------------------+
 |  Development Version      |  use `pyepics github repository`_        |
 +---------------------------+------------------------------------------+
 
+if you have `Python Setup Tools`_  installed, you can download and install
+the PyEpics Package simply with::
+
+   easy_install epics
+
+
+Testing
+~~~~~~~~~~~~~
+
+Some automated unit-testing is done, using the tests folder from the source
+distribution kit.   The following systems were tested for 3.1.0.   Except
+as noted, all tests pass.  Those tests that fail are generally well-understood.
+
++-----------+-----------------+------------+-----------------------------+
+|  Host OS  | Epics HOST ARCH |  Python    |   Tests Failed, Notes       |
++===========+=================+============+=============================+
+|   Linux   |  linux-x86      |   2.5.1    |   autosave not tested       |
++-----------+-----------------+------------+-----------------------------+
+|   Linux   |  linux-x86      |   2.6      |   subarray  / base 3.14.11  |
++-----------+-----------------+------------+-----------------------------+
+|   Linux   |  linux-x86      |   2.6.6    |   all pass                  |
++-----------+-----------------+------------+-----------------------------+
+|   Linux   |  linux-x86_64   |   2.7      |   all pass                  |
++-----------+-----------------+------------+-----------------------------+
+| Windows   |   win32-x86     |  2.6.5     |   all pass                  |
++-----------+-----------------+------------+-----------------------------+
+| Windows   |   win32-x86     |  2.7.1     |   all pass                  |
++-----------+-----------------+------------+-----------------------------+
+| Windows   |   win32-x86     |  3.1       |   pyparsing/autosave        |
++-----------+-----------------+------------+-----------------------------+
+| Mac OSX   |  darwin-x86     | 2.6.5      |   subarray / base 3.14.11   |
++-----------+-----------------+------------+-----------------------------+
+
+
+Here *subarray/base 3.14.11* means that some tests with subarrays
+failed, as the system was using epics base 3.14.11.  The autosave module
+relies on the 3rd part extension pyparsing, which seems to not work
+correctly for Python3.1 and was not installed on one tested system.
+Note that the wx module is not automatically tested.
+
+
+Development Version
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 The PyEpics module is still under active development, and enhancements and
 bug-fixes are being added frequently.  All development is done through the
 `pyepics github repository`_.  To get a read-only copy of the atest
 version, use::
 
-   git clone http://github.com/newville/pyepics.git
+   git clone http://github.com/pyepics/pyepics.git
 
 or::
 
-   git clone https://github.com/newville/pyepics.git
+   git clone git@github.com/pyepics/pyepics.git
 
 Current and older source source kits, and Windows Installers can also be found
 at the `PyEpics Source Tree`_.   
 
-Finally, the PyEpics Package is registered with the  Python Package Index
-(PyPI), and can be found at the `PyPi Epics Entry`_ and installed with::
-  
-   easy_install epics
-
-for systems that have the easy_install script installed.
-
 Installation
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+
 
 Installation from source on any platform is::
 
@@ -75,23 +121,45 @@ Installation from source on any platform is::
 For more details, especially about how to set paths for LD_LIBRARY_PATH or
 DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.
 
+Again, if you have `Python Setup Tools`_  installed, you can download and install
+the PyEpics Package with::
+
+   easy_install epics
+
+
 Acknowledgements
 ~~~~~~~~~~~~~~~~~~~~~~
 
 PyEpics was originally written and is maintained by Matt Newville
-<newville@cars.uchicago.ed>.  Several people have provided valuable
-additions or bug reports, which has greatly improved the quality of the
-library: Michael Abbott, Marco Cammarata, Angus Gratton, Craig Haskins,
-Pete Jemian, Andrew Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Mark
-Rivers, Friedrich Schotte, Steve Wasserman, and Glen Wright.
+<newville@cars.uchicago.ed>.  Important contributions to the library have
+come from Angus Gratton, at the Australiaon National University.  Several
+other people have provided valuable additions, suggestions, or bug reports,
+which has greatly improved the quality of the library: Michael Abbott,
+Marco Cammarata, Craig Haskins, Pete Jemian, Andrew Johnson, Janko Kolar,
+Irina Kosheleva, Tim Mooney, Mark Rivers, Friedrich Schotte, Mark Vigder,
+Steve Wasserman, and Glen Wright.
 
 
 Epics Open License
 ~~~~~~~~~~~~~~~~~~~~~~
 
-This code and all material associated with it are distributed under the
-Epics Open License:
-
+The PyEpics source code, this documentation, and all material associated
+with it are distributed under the Epics Open License:
 
 .. include:: ../license.txt
+
+
+In plain words, this means
+
+  a. you can use this software for any purpose.
+
+  b. you can modify and redistribute this software if you keep existing copyright notices intact.
+
+  c. you cannot claim that you wrote this software or remove copyright notices.
+
+  d. you cannot claim the copyright holders endorse your use of this software.
+  
+  e. you cannot claim the copyright holders owe you anything if the software does not work as you expect it to, and 
+
+  f. if you are the US government, you can probably do whatever you want. ;)
 

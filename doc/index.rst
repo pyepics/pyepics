@@ -27,6 +27,7 @@ wxPython widgets.
    pv
    ca
    advanced
+   autosave
    devices
    alarm
    wx

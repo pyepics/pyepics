@@ -1,8 +1,20 @@
 This folder contains several tests of the Epics Channel Access Module.
 
-Almost all of these tests require a working set of Epics Channels to run.
-These are all named in the pvnames.py module, which you will probably need
-to customize to run these tests.
+Most of tthese tests require a set of working Epics Channels to run,
+and assume that the epics database 'pyepics.db' (in Setup/) is being
+run in some local IOC.
+
+For most test scripts to work completely, the 'simulator.py' script
+(in Setup/) should also be running on some system.  For some tests,
+the IOC should disconnect and then reconnect -- so you may want to run
+a dedicated test IOC for this purpose.
+
+Some tests also use Real, working motors for testing put-waits and
+motor configurations.
+
+
+These are all named in the pvnames.py module, which you may need
+to customize in order to properly run these tests.
 
 The tests are not (yet?) very automated, and the results should be
 inspected for correctness.

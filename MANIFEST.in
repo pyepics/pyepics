@@ -2,7 +2,7 @@ include README.txt INSTALL MANIFEST.in PKG-INFO Changelog license.txt setup.py u
 recursive-exclude *.pyc core.* *~
 recursive-include lib *.py
 recursive-include scripts *
-recursive-include tests *.py
+recursive-include tests *.py *.db *.cmd *.req
 recursive-exclude tests/Misc *
 recursive-include doc *
 recursive-exclude doc/_build *

@@ -6,83 +6,62 @@
 # this pv should be a DOUBLE.  It will NOT be set, but
 # you should provide the host_name, units, and precision.  It
 # is assumed to have count=1
-double_pv = '13IDC:m2.VAL'
-double_pv_host = 'ioc13idc.cars.aps.anl.gov:5064'
-double_pv_units = 'mm'
+double_pv = 'Py:ao1'
+double_pv_host = 'vincent'
+double_pv_units = 'microns'
 double_pv_prec = 4
 
+double_pv2 = 'Py:ao2'
+
+pause_pv  = 'Py:mbbo2'
 #### 2
 # this pv should be an ENUM. It will NOT be set.
 # provide the names of the ENUM states
 
 #### Theae are PVs of the various native types
 ###  They will NOT be set.
-str_pv   = '13IDC:m2.DESC'
-int_pv   = '13IDC:m2.STOP'
-long_pv  = '13IDC:m2.RVAL'
-float_pv = '13IDC:m2.VERS'
-enum_pv  = '13IDC:m2.DIR'
-enum_pv_strs = ['Neg','Pos']
+str_pv   = 'Py:ao1.DESC'
+int_pv   = 'Py:long2'
+long_pv  = 'Py:long2'
+float_pv = 'Py:ao3'
+enum_pv  = 'Py:mbbo1'
+enum_pv_strs = ['Stop', 'Start', 'Pause', 'Resume']
 
 ## Here are some waveform / array data PVs
-
-long_arr_pv   = '13IDC:str:mca1'
-
+long_arr_pv   = 'Py:long2k'
+double_arr_pv = 'Py:double2k'
+string_arr_pv = 'Py:string128'
 # char / byte array
-char_arr_pv   = '13BMD:edb:dir'
+char_arr_pv   = 'Py:char128'
+char_arrays   = ['Py:char128', 'Py:char2k', 'Py:char64k']
+long_arrays   = ['Py:long128', 'Py:long2k', 'Py:long64k']
+double_arrays   = ['Py:double128', 'Py:double2k', 'Py:double64k']
 
-double_arr_pv = '13IDC:scan1.P1PA'
 
 ####
 # provide a single motor prefix (to which '.VAL' and '.RBV' etc will be added)
 
-motor1 = '13IDC:m2'
-
+motor1 = '13XRM:m1'
+motor2 = '13XRM:m3'
+motor_list = ['13XRM:m1', '13XRM:m2', '13XRM:m3', '13XRM:m4']
 #### 
 #  Here, provide a PV that changes at least once very 10 seconds
-updating_pv1  = '13IDA:DMM1Ch3_calc.VAL'
-updating_str1 = '13XRM:edb:clientID'
+updating_pv1  = 'Py:ao1'
+updating_str1 = 'Py:char256'
 
 #### 
 #  Here, provide a list of PVs that  change at least once very 10 seconds
-updating_pvlist = ['13BMA:DMM1Ch2_calc.VAL',
-                   '13BMA:DMM1Ch3_calc.VAL',
-                   '13IDA:DMM1Ch2_calc.VAL',
-                   '13IDA:DMM1Ch3_calc.VAL',
-                   '13IDA:DMM2Ch9_raw.VAL',
-                   '13IDD:DMM3Dmm_raw.VAL']
-                   
-
-other_pvlist = [ '13IDC:scan1.P1PA',
-           '13IDC:AbortScans.PROC',
-           '13BMD:edb:file',
-           '13BMD:edb:ExecState',
-           '13IDA:m2.VAL', '13IDA:m2.DESC',
-           '13IDA:m2.FOFF', '13IDA:m2.SET', '13IDA:m2.SPMG' ]
-
-string_pvlist = ['13BMA:m1.DESC',
-                 '13BMA:m2.DESC',
-                 '13BMA:m3.DESC',
-                 '13BMA:m4.DESC',
-                 '13IDC:m1.DESC',
-                 '13IDC:m2.DESC',
-                 '13IDC:m3.DESC',
-                 '13IDC:m4.DESC']
-                 
-
+updating_pvlist = ['Py:ao1', 'Py:ai1', 'Py:long1']
 #### alarm test
 
-alarm_pv = '13XRM:m1.VAL'
+alarm_pv = 'Py:long1'
 alarm_comp='ge'
-alarm_trippoint = 2.5
+alarm_trippoint = 7
 
-#### motor list (for connect.py)
-#  Here, provide a list of Epics Motors
-motor_list= [  "13IDC:m1", "13IDC:m2", "13IDC:m3", "13IDC:m4",
-               "13IDC:m5", "13IDC:m6", "13IDC:m7", "13IDC:m8",
-               "13IDC:m9", "13IDC:m10", "13IDC:m11", "13IDC:m12",
-               "13IDC:m13", "13IDC:m14", "13IDC:m15", "13IDC:m16",
-               "13IDC:m17", "13IDC:m18", "13IDC:m19", "13IDC:m20",
-               "13IDC:m21", "13IDC:m22", "13IDC:m23", "13IDC:m24",
-               "13IDC:m25", "13IDC:m26", "13IDC:m27", "13IDC:m28"]
 
+#### subarray test
+subarr_driver = 'Py:wave_test'
+subarr1       = 'Py:subArr1'
+subarr2       = 'Py:subArr2'
+subarr3       = 'Py:subArr3'
+subarr4       = 'Py:subArr4'

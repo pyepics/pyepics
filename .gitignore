@@ -3,6 +3,7 @@
 *#
 doc/_build
 doc/*.pdf
+tests/.coverage*
 build
 dist
 junk

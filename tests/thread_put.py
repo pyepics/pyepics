@@ -8,11 +8,12 @@ import time
 from threading import Thread
 import epics
 import sys
+import pvnames
 
-epics.caput('13XRM:m1.VAL', -2.0)
-epics.caput('13XRM:m3.VAL', 33.0)
+epics.caput(pvnames.motor1, -2.0)
+epics.caput(pvnames.motor2, 33.0)
 time.sleep(0.1)
-epics.caput('13XRM:m3.VAL', -20.0, wait=True)
+epics.caput(pvnames.motor2, -20.0, wait=True)
 sys.stdout.write('done with initial moves')
 
 def run_test(pvname,  target, run_name='thread c'):
@@ -26,8 +27,8 @@ def run_test(pvname,  target, run_name='thread c'):
     sys.stdout.write( 'Done with Thread %s\n' % run_name)
     
 sys.stdout.write( "Run 2 Background Threads doing simultaneous put/waits :")
-th1 = Thread(target=run_test,args=(  '13XRM:m1.VAL',  3.0,  'A'))
-th2 = Thread(target=run_test,args=(  '13XRM:m3.VAL',  33.0,  'B'))
+th1 = Thread(target=run_test,args=(  pvnames.motor1,  3.0,  'A'))
+th2 = Thread(target=run_test,args=(  pvnames.motor2,  33.0,  'B'))
 th1.start()
 th2.start()
 

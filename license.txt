@@ -1,13 +1,18 @@
 The  epics python module was orignally written by
+
    Matthew Newville <newville@cars.uchicago.edu>
    CARS, University of Chicago
 
+There have been several contributions from many others, notably Angus
+Gratton <angus.gratton@anu.edu.au>.  See the Acknowledgements section of
+the documentation for a list of more contributors.
+
 Except where explicitly noted, all files in this distribution are licensed
-under the Epics Open License:
+under the Epics Open License.:
 
 ------------------------------------------------
 
-Copyright  2010    Matthew Newville, The University of Chicago.  All rights reserved.
+Copyright  2010  Matthew Newville, The University of Chicago.  All rights reserved.
 
 The epics python module is distributed subject to the following license conditions:
 SOFTWARE LICENSE AGREEMENT
@@ -23,27 +28,29 @@ Software: epics python module
 
    3.  You may modify and make a copy or copies of the Software for use
    within your organization, if you meet the following conditions:  
-         1. Copies in source code must include the copyright notice and  this 
-         Software License Agreement.
 
-         2. Copies in binary form must include the copyright notice and  this 
-         Software License Agreement in the documentation and/or other 
-         materials provided with the copy.
+       1. Copies in source code must include the copyright notice and  this 
+       Software License Agreement.
+
+       2. Copies in binary form must include the copyright notice and  this 
+       Software License Agreement in the documentation and/or other 
+       materials provided with the copy.
 
    4.  You may modify a copy or copies of the Software or any portion of
    it, thus forming a work based on the Software, and distribute copies of
    such work outside your organization, if you meet all of the following
    conditions:
-         1. Copies in source code must include the copyright notice and this 
-         Software License Agreement;
 
-         2. Copies in binary form must include the copyright notice and this
-         Software License Agreement in the documentation and/or other
-         materials provided with the copy; 
+       1. Copies in source code must include the copyright notice and this 
+       Software License Agreement;
 
-         3. Modified copies and works based on the Software must carry
-         prominent notices stating that you changed specified portions of
-         the Software. 
+       2. Copies in binary form must include the copyright notice and this
+       Software License Agreement in the documentation and/or other
+       materials provided with the copy; 
+
+       3. Modified copies and works based on the Software must carry
+       prominent notices stating that you changed specified portions of
+       the Software. 
 
    5.  Portions of the Software resulted from work developed under a
    U.S. Government contract and are subject to the following license: the

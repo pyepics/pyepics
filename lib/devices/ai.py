@@ -11,7 +11,7 @@ class ai(epics.Device):
              'HIGH', 'LOW', 'HHSV', 'LLSV', 'HSV', 'LSV', 'HYST')
 
     def __init__(self, prefix):
-        if not prefix.endswith('.'):
-            prefix = "%s." % prefix
+        if prefix.endswith('.'):
+            prefix = prefix[:-1]
         epics.Device.__init__(self, prefix, delim='.',
                               attrs=self.attrs)

@@ -4,15 +4,10 @@ import os
 import epics
 
 # a test for possible memory leaks on put()
+import pvnames
 
+pvlist = pvnames.char_arrays #  + pvnames.long_arrays + pvnames.double_arrays
 
-pvlist = [ '13XRM:edb:clientID',
-           '13XRM:edb:serverID',
-           '13XRM:edb:arg01',
-           '13XRM:edb:arg02',
-           '13XRM:edb:arg03',
-           '13XRM:edb:status']
-       
 def show_memory():
     gc.collect()
     if os.name == 'nt':
@@ -23,7 +18,7 @@ def show_memory():
     return 'Memory: VmSize = %i kB  /  VmRss = %i kB' %( int(mem[0])*4 , int(mem[1])*4)
 
 N_new = 0
-def get_callback(pv=None):
+def get_callback(pv=None, **kws):
     global N_new
     N_new = N_new + 1
     # print 'New value: ', pv.pvname, pv.char_value

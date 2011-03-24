@@ -11,6 +11,7 @@ class ao(epics.Device):
                'OIF', 'DRVH', 'DRVL', 'OROC', 'OVAL')
     
     def __init__(self, prefix):
-        if not prefix.endswith('.'):
-            prefix = "%s." % prefix
-        epics.Device.__init__(self, prefix, self.attrs)
+        if prefix.endswith('.'):
+            prefix = prefix[:-1]
+        epics.Device.__init__(self, prefix, delim='.',
+                              attrs=self.attrs)

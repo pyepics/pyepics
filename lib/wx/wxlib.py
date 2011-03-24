@@ -11,6 +11,18 @@ import epics
 import wx.lib.buttons as buttons
 import wx.lib.agw.floatspin as floatspin
 
+
+_conventional_ui_style = False
+
+def SetConventionalUIStyle():
+    """ 
+    Set this method if you want PV controls to look and feel identical to the
+    normal WX control. By default, PV controls have larger fonts on some systems.
+
+    """
+    global _conventional_ui_style
+    _conventional_ui_style = True
+
 def EpicsFunction(f):
     """decorator to wrap function in a wx.CallAfter() so that
     Epics calls can be made in a separate thread, and asynchronously.
@@ -342,7 +354,8 @@ class pvMixin:
 
     @EpicsFunction
     def set_pv(self, pv=None):
-        if isinstance(pv, epics.PV) or isinstance(pv, epics.PVTuple):
+        if isinstance(pv, epics.PV):
+            # or isinstance(pv, epics.PVTuple):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
             self.pv = epics.PV(pv)
@@ -422,8 +435,7 @@ class pvCtrlMixin(pvMixin):
       
     """
 
-    def __init__(self, pv=None, pvname=None,
- font=None, fg=None, bg=None):
+    def __init__(self, pv=None, pvname=None, font=None, fg=None, bg=None):
         pvMixin.__init__(self, pv, pvname)
 
         self.translations = {}
@@ -432,7 +444,7 @@ class pvCtrlMixin(pvMixin):
         self.fgColourAlarms = {}
         self.bgColourAlarms = {}
 
-        if font is None:
+        if font is None and not _conventional_ui_style:
             font = wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,False)
         
         try:
@@ -485,7 +497,6 @@ class pvCtrlMixin(pvMixin):
         """
         self.bgColourTranslations = translations
             
-
 
     def SetForegroundColour(self, colour):
         """ (Internal override) Needed to support OverrideForegroundColour() """
@@ -548,8 +559,12 @@ class pvCtrlMixin(pvMixin):
         self._warn("must override _SetValue")
 
     def OnPVChange(self, raw_value):        
+        if self.pv is None:
+            return
         if len(self.fgColourAlarms) > 0 or len(self.bgColourAlarms) > 0:
-            self.pv.get_ctrlvars() # load severity if we care about it <-- NB: this may be a performance problem
+            # load severity if we care about it
+            # NB: this may be a performance problem
+            self.pv.get_ctrlvars()
 
         colour = None
         if self.fgColourTranslations is not None and raw_value in self.fgColourTranslations:
@@ -566,10 +581,6 @@ class pvCtrlMixin(pvMixin):
         self.OverrideBackgroundColour(colour)
             
         self._SetValue(self.translations.get(raw_value, raw_value))
-
-
-
-
 
 
 
@@ -849,19 +860,14 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
     Checkbox based on a binary PV value, both reads/writes the
     PV on changes.
    
-    If necessary, use the SetTranslations() option to write a
-    dictionary for converting string value PVs to booleans. Otherwise,
-    types that convert via Python's own bool(x) will be accepted.
-    
-    If a PVTuple is assigned, the checkbox can automatically act
-    as a "master checkbox" (including with a 3-state value if the
-    right style is set) that sets/clears all the PVs in the tuple
-    as one. Each PV in the PVTuple must return (or translate to) 
-    a boolean, for this work.
-    
-    To do this, you will need to set the tri-state style on the
-    CheckBox constructor (same as if you were setting it on a 
-    wx.CheckBox)
+    There are multiple options for translating PV values to checkbox
+    settings (from least to most complex):
+
+    * Use a PV with values 0 and 1
+    * Use a PV with values that convert via Python's own bool(x)
+    * Set on_value and off_value in the constructor
+    * Use SetTranslations() to set a dictionary for converting various
+      PV values to booleans.
 
     """
     def __init__(self, parent, pv=None, on_value=1, off_value=0, **kw):
@@ -874,15 +880,7 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
         self.OnChange = None
 
     def _SetValue(self, value):
-        if isinstance(self.pv, epics.PVTuple):
-            rawValue = [ bool(r) for r in list(self.pv.get()) ]
-            if all(rawValue):
-                self.ThreeStateValue = wx.CHK_CHECKED
-            elif self.Is3State() and any(rawValue):
-                self.ThreeStateValue = wx.CHK_UNDETERMINED
-            else:
-                self.ThreeStateValue = wx.CHK_UNCHECKED
-        elif value == self.on_value or value == self.off_value:
+        if value in [ self.on_value, self.off_value ]:
             self.Value = (value == self.on_value)
         else:
             self.Value = bool(self.pv.get())
@@ -891,7 +889,17 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
             self.OnChange(self)
 
     def _OnClicked(self, event):
-        self.pv.put(self.on_value if self.Value else self.off_value )
+        if self.pv is not None:
+            self.pv.put(self.on_value if self.Value else self.off_value )
+
+    def SetValue(self, new_value):
+        old_value = self.Value
+        wx.CheckBox.SetValue(self, new_value)
+        if old_value != new_value:
+            self._OnClicked(None)        
+
+    # need to redefine the value Property as the old property refs old SetValue
+    Value = property(wx.CheckBox.GetValue, SetValue)
 
 
 class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin): 
@@ -927,7 +935,7 @@ class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin):
     def _OnChanged(self, event):
         if self.pv is not None:
             value = self.GetValue()
-            if self.pv.upper_ctrl_limit <> 0 or self.pv.lower_ctrl_limit <> 0: # both zero -> not set
+            if self.pv.upper_ctrl_limit != 0 or self.pv.lower_ctrl_limit != 0: # both zero -> not set
                 if value > self.pv.upper_ctrl_limit:
                     value = self.pv.upper_ctrl_limit
                     self.SetValue(value)

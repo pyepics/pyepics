@@ -6,7 +6,6 @@ import epics
 import time
 import sys
 from  pvnames import motor1
-motor1 = '13XRM:m2.VAL'
 
 write = sys.stdout.write
 def onConnectionChange(pvname=None, conn= None, **kws):

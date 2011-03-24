@@ -1,5 +1,7 @@
 #!/usr/bin/python
-# This module provides support for the EPICS motor record.
+"""
+ This module provides support for the EPICS motor record.
+"""
 # 
 # Author:         Mark Rivers / Matt Newville
 # Created:        Sept. 16, 2002
@@ -490,13 +492,13 @@ class Motor(device.Device):
         except:
             self.PV(attr).clear_callbacks()
 
-    def set_callback(self, attr='VAL', callback=None, kw=None):
+    def set_callback(self, attr='VAL', callback=None, kws=None):
         "define a callback for an attribute"
         self.get(attr)
         kw_args = {}
         kw_args['motor_field'] = attr
-        if kw is not None:
-            kw_args.update(kw)
+        if kws is not None:
+            kw_args.update(kws)
 
         index = self.PV(attr).add_callback(callback=callback, **kw_args)
         self._callbacks[attr] = index

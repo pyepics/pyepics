@@ -71,6 +71,7 @@ ulong_t  = ctypes.c_ulong
 float_t  = ctypes.c_float
 double_t = ctypes.c_double
 byte_t   = ctypes.c_byte
+ubyte_t  = ctypes.c_ubyte
 string_t = ctypes.c_char * MAX_STRING_SIZE
 char_t   = ctypes.c_char
 char_p   = ctypes.c_char_p
@@ -150,7 +151,7 @@ class ctrl_short(ctypes.Structure):
 class ctrl_char(ctypes.Structure):
     "dbr ctrl long"
     _fields_ = list(_STAT_SEV) +[_UNITS] +  _gen_ctrl_lims(t=byte_t)    
-    _fields_.extend([('RISC_pad', byte_t), ('value', byte_t)])
+    _fields_.extend([('RISC_pad', byte_t), ('value', ubyte_t)])
     
 class ctrl_long(ctypes.Structure):
     "dbr ctrl long"
@@ -179,7 +180,7 @@ Map = {STRING: string_t,
        INT:    short_t,
        FLOAT:  float_t,
        ENUM:   ushort_t,
-       CHAR:   byte_t,
+       CHAR:   ubyte_t,
        LONG:   int_t,
        DOUBLE: double_t,
 

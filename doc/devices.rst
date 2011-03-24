@@ -77,9 +77,33 @@ In general, PV names will be mapped as prefix+delim+attr.  See
     print m1.VAL     # print value of XXX:m1.VAL
     print m1.other   # prints value of XXX:m2.VAL
 
+
+.. method:: save_state()
+
+   return a dictionay of all current values -- the ''current state''.
+
+
+.. method:: restore_state(state)
+
+   restores a saved state, as saved with :meth:`save_state`
+
+.. method:: write_state(fname[, state=None])
+
+   write a saved state to a file.   If no state is provide, the current state is written.
+
+.. method:: read_state(fname[, restore=False])
+
+   reads a state from a file, as written with :meth:`write_state`, and returns it. 
+   If ''restore'' is ``True``, the read state will be restored.
+
 .. data:: _pvs
   
    a dictionary of PVs making up the device.
+
+
+
+
+
 
 .. _device-motor-label:
 

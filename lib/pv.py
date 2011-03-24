@@ -21,74 +21,7 @@ def fmt_time(tstamp=None):
     return "%s.%6.6i" % (time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime(tstamp)), 1.e6*frac)
 
-# Common base class for anything that accepts PV & PVTuple callbacks
-# 
-# Uses the _args dictionary (assumed to be defined by the inherited class)
-class _BasePVCallback(object):
-    def __init__(self):
-        self.callbacks  = {}
-
-    def run_callbacks(self):
-        """run all user-defined callbacks with the current data
-
-        Normally, this is to be run automatically on event, but
-        it is provided here as a separate function for testing
-        purposes.
-
-        Note that callback functions are called with keyword/val
-        arguments including:
-             self._args  (all PV data available, keys = __fields)
-             keyword args included in add_callback()
-             keyword 'cb_info' = (index, self)
-        where the 'cb_info' is provided as a hook so that a callback
-        function  that fails may de-register itself (for example, if
-        a GUI resource is no longer available).
-             
-        """
-        for index in sorted(list(self.callbacks.keys())):
-            fcn, kwargs = self.callbacks[index]
-            kwd = copy.copy(self._args)
-            kwd.update(kwargs)
-            kwd['cb_info'] = (index, self)
-            if hasattr(fcn, '__call__'):
-                fcn(**kwd)
-            
-    def add_callback(self, callback=None, index=None, **kw):
-        """add a callback to a PV.  Optional keyword arguments
-        set here will be preserved and passed on to the callback
-        at runtime.
-
-        Note that a PV may have multiple callbacks, so that each
-        has a unique index (small integer) that is returned by
-        add_callback.  This index is needed to remove a callback."""
-        #print "%s add_callback" % self
-
-        if not self.wait_for_connection():
-            print "%s add_callback failed (wait_for_connection)" % self
-            return None
-        if hasattr(callback, '__call__'):
-            if index is None:
-                index = 1
-                if len(self.callbacks) > 0:
-                    index = 1 + max(self.callbacks.keys())
-            self.callbacks[index] = (callback, kw)
-            #print "%s add_callback attached index %s" % (self, index)
-        return index
-    
-    def remove_callback(self, index=None):
-        """remove a callback by index"""
-        if len(self.callbacks)==1:
-            self.callbacks.pop()
-        if index in self.callbacks:
-            self.callbacks.pop(index)
-            self.poll()
-
-    def clear_callbacks(self):
-        "clear all callbacks"
-        self.callbacks = {}
-
-
-class PV(_BasePVCallback):
+class PV(object):
     """Epics Process Variable
     
     A PV encapsulates an Epics Process Variable.
@@ -120,7 +53,6 @@ class PV(_BasePVCallback):
                  verbose=False, auto_monitor=None,
                  connection_callback=None,
                  connection_timeout=None):
-        _BasePVCallback.__init__(self)
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
@@ -135,23 +67,14 @@ class PV(_BasePVCallback):
         self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
         self.connection_callback = connection_callback
+        self.callbacks  = {}
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
         self.chid = None
 
-        # get current thread context to use for ca._cache
-        ctx = ca.current_context()
-        if ctx not in ca._cache:
-            ca._cache[ctx] = {}
-        if self.pvname in ca._cache[ctx]:
-            entry = ca._cache[ctx][pvname]
-            if entry['chid'] is not None:
-                self.chid = entry['chid']
-                self.__on_connect(chid=self.chid, conn=entry['conn'])
-        if self.chid is None:
-            self.chid = ca.create_channel(self.pvname,
-                                          callback=self.__on_connect)
-        self._args['chid'] = self.chid
+        self._args['chid'] = self.chid = ca.create_channel(self.pvname,
+                                                           callback=self.__on_connect)
+
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
@@ -170,6 +93,7 @@ class PV(_BasePVCallback):
             return
         if conn:
             self.poll()
+            self.chid = self._args['chid'] = dbr.chid_t(chid)
             try:
                 count = ca.element_count(self.chid)
             except ca.ChannelAccessException:
@@ -188,7 +112,6 @@ class PV(_BasePVCallback):
             self._args['typefull'] = _ftype_
             self._args['ftype'] = dbr.Name(_ftype_, reverse=True)
 
-
             if self.auto_monitor is None:
                 self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
             if self._monref is None and self.auto_monitor:
@@ -198,7 +121,6 @@ class PV(_BasePVCallback):
                                          callback=self.__on_changes)
 
         if hasattr(self.connection_callback, '__call__'):
-            
             self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
         elif not conn and self.verbose:
             ca.write("PV '%s' disconnected." % pvname)
@@ -234,6 +156,7 @@ class PV(_BasePVCallback):
         return self.connected and self.ftype is not None
 
     def reconnect(self):
+        "try to reconnect PV"
         self.auto_monitor = None
         self._monref = None
         self.connected = False
@@ -266,8 +189,13 @@ class PV(_BasePVCallback):
         if as_string:
             self._set_charval(self._args['value'])
             return self._args['char_value']
+
+        # this emulates asking for less data than actually exists in the
+        # cached value
+        if count is not None and len(self._args['value']) > 1:
+            count = max(0, min(count, len(self._args['value'])))
+            return self._args['value'][:count]
         return self._args['value']
-        
 
     def put(self, value, wait=False, timeout=30.0,
             callback=None, callback_data=None):
@@ -280,10 +208,15 @@ class PV(_BasePVCallback):
         if (self.ftype in (dbr.ENUM, dbr.TIME_ENUM, dbr.CTRL_ENUM) and
             isinstance(value, str) and value in self._args['enum_strs']):
             value = self._args['enum_strs'].index(value)
-
+        if callback is None:
+            callback = self.__putCallbackStub
         return ca.put(self.chid, value,
                       wait=wait, timeout=timeout,
                       callback=callback, callback_data=callback_data)
+
+    def __putCallbackStub(self, pvname=None, **kws):
+        "null put-calback, so that the put_complete attribute is valid"
+        pass
 
     def _set_charval(self, val, call_ca=True):
         """ sets the character representation of the value.
@@ -301,7 +234,10 @@ class PV(_BasePVCallback):
                     firstnull  = val.index(0)
                 else:
                     firstnull = len(val)
-                cval = ''.join([chr(i) for i in val[:firstnull]]).rstrip()
+                try:
+                    cval = ''.join([chr(i) for i in val[:firstnull]]).rstrip()
+                except ValueError:
+                    pass
             else:
                 cval = '<array size=%d, type=%s>' % (len(val),
                                                      dbr.Name(ftype).lower())
@@ -604,6 +540,14 @@ class PV(_BasePVCallback):
         "info string"
         return self._getinfo()
 
+    @property
+    def put_complete(self):
+        "returns True if a put-with-wait has completed"
+        putdone_data = ca._put_done.get(self.pvname, None) 
+        if putdone_data is not None:
+            return putdone_data[0]
+        return True
+
     def __repr__(self):
         "string representation"
 
@@ -625,6 +569,10 @@ class PV(_BasePVCallback):
         if self._monref is not None:
             cback, uarg, evid = self._monref
             ca.clear_subscription(evid)
+            ctx = ca.current_context()
+            if self.pvname in ca._cache[ctx]:
+                ca._cache[ctx].pop(self.pvname)
+
             del cback
             del uarg
             del evid
@@ -636,140 +584,3 @@ class PV(_BasePVCallback):
             self.disconnect()
         except:
             pass
-
-
-
-class PVTuple(_BasePVCallback):
-    """EPICS Process Variable Tuple
-    
-    A PVTuple encapsulates multiple Epics Process Variables into a single tuple, with a similar
-    interface to a single PV (callback for the tuple when any PV changes, etc.)
-   
-    This allows is to be used interchangeably with a PV in some circumstances (ie for a pvCheckBox which
-    sets/clears multiple PVs as one.)
-
-    The primary interface methods for a pv are to get() and put() is value::
-
-      >>> p = PV(pv_names)  # create a pv object given a list or tuple of pv names
-      >>> p.get()          # get value of all PVs as a tuple
-
-    Additional important attributes include::
-
-      >>> p.pvname         # names of all pvs (tuple)
-      >>> p.value          # pv values (can be got only)
-      >>> p.char_value     # string representation of pv values (tuple of strings)
-      >>> p.count          # number of PVs in tuple
-      >>> p.type           # EPICS data types (as tuple): 'string','double','enum','long',..
-      >>> p.pvs            # list of actual PV objects encapsulated
-
-    Note that if you find yourself relying too heavily on this class, it may be better to consider
-    refactoring your EPICS database to support the functionality you need.
-
-"""
-
-    _fmt = "<PV '%(pvnames)s', count=%(count)i, type=%(typefull)s, access=%(access)s>"
-    _fields = ('pvname',  'value',  'char_value',  'status',  'count', 'type', 'pvs' )
-
-    def __init__(self, pvnames=None, pvs=[], callback=None):        
-        _BasePVCallback.__init__(self)
-        if pvnames != None:
-            self.pvs = [ PV(pvname, callback) for pvname in list(pvnames) ]
-        else:
-            self.pvs = pvs
-        self._args = {}.fromkeys(self._fields)
-        self._args['pvname'] = tuple([pv.pvname for pv in self.pvs])
-        self._args['count'] = len(self.pvs)
-        self._args['type'] = []
-        self._args['pvs'] = self.pvs
-        for pv in self.pvs:
-            pv.add_callback(self.change_callback)
-
-    def poll(self, evt=1.e-4, iot=1.0):
-        "poll for changes"        
-        ca.poll(evt=evt, iot=iot)
-
-    def get(self, count=None, as_string=False, as_numpy=True):
-        """returns current value of all PVs, as a tuple. Use the options:
-         as_string to return string representations where possible
-         as_numpy  to (try to) return a numpy arrays where possible
-
-        >>> p.get()
-        (0, 0)
-        >>> p.get(as_string=True)
-        (Off, Off)
-
-        """
-        return tuple([ p.get(count,as_string,as_numpy) for p in self.pvs])
-
-    def put(self, value):
-        """ Put either a tuple of values, one per PV. Or a single value, which will be set to all PVs """
-        if not isinstance(value, tuple):
-            value = [ value for x in range(self.count) ] # same for all
-        elif len(value) != self.count:
-            raise ValueError("Wrong number of elements (%d) in tuple argument to PVTuple.put() (need %d) : %s" 
-                             % (len(value), self.count, value))
-        else:
-            value = list(value)
-        
-        for (pv, value) in zip(self.pvs, value):
-            pv.put(value)
-        
-
-    def change_callback(self, **kw):
-        self._args['char_value'] = tuple([ p._args['char_value'] for p in self.pvs ])        
-        self._args['value'] = tuple([ p._args['value'] for p in self.pvs ])
-        #print "Callback value %s char_value %s" % (self._args['value'], self._args['char_value'])
-        if None in self._args['value']:
-            return # Don't call a callback until each 'value' has been set
-        self._args['type'] = tuple([ p.type for p in self.pvs ])
-        self.run_callbacks()
-
-    def wait_for_connection(self, timeout=None):
-        for p in self.pvs:
-            if not p._conn_started:
-                p.connect()
-
-        return all([p.wait_for_connection(timeout) for p in self.pvs]) # timeout not quite right here        
-
-    def connect(self, timeout=None):
-        return all([p.connect(timeout) for p in self.pvs])
-
-    def reconnect(self):
-        return all([p.reconnect() for p in self.pvs])
-
-    def get_ctrlvars(self):
-        return [p.get_ctrlvars() for p in self.pvs]
-
-    @property
-    def connected(self):
-        #print "%s connected = %s" % (self, [ p.connected for p in self.pvs ] )
-        return all([ p.connected for p in self.pvs ])
-
-    @property
-    def pvname(self):
-        return self._args['pvname']
-
-    @property
-    def value(self):
-        return tuple([ p.value for p in self.pvs ])
-
-    @property
-    def char_value(self):
-        return tuple([ p.char_value for p in self.pvs ])
-
-    @property
-    def count(self):
-        return len(self.pvs)
-
-    @property
-    def type(self):
-        return tuple([ p.type for p in self.pvs ])
-
-    @property
-    def severity(self):
-        return max([ p.severity for p in self.pvs ])
-
-    def __repr__(self):
-        return "<PVTuple %s>" % (self.pvs)
-
-

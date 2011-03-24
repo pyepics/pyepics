@@ -2,8 +2,8 @@ from epics import ca
 
 import time
 import sys
-
-mypv = '13IDA:DMM1Ch3_calc.VAL'
+import pvnames
+mypv = pvnames.updating_pv1
 
 def onChanges(pvname=None, value=None, **kw):
     sys.stdout.write( 'New Value: %s  value=%s, kw=%s\n' %( pvname, str(value), repr(kw)))
