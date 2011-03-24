@@ -11,6 +11,18 @@ import epics
 import wx.lib.buttons as buttons
 import wx.lib.agw.floatspin as floatspin
 
+
+_conventional_ui_style = False
+
+def SetConventionalUIStyle():
+    """ 
+    Set this method if you want PV controls to look and feel identical to the
+    normal WX control. By default, PV controls have larger fonts on some systems.
+
+    """
+    global _conventional_ui_style
+    _conventional_ui_style = True
+
 def EpicsFunction(f):
     """decorator to wrap function in a wx.CallAfter() so that
     Epics calls can be made in a separate thread, and asynchronously.
@@ -432,7 +444,7 @@ class pvCtrlMixin(pvMixin):
         self.fgColourAlarms = {}
         self.bgColourAlarms = {}
 
-        if font is None:
+        if font is None and not _conventional_ui_style:
             font = wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,False)
         
         try:
