@@ -12,6 +12,7 @@
 import wx
 import sys
 import epics
+from epics.motor import MotorException
 from epics.wx.wxlib import pvText, pvFloatCtrl, pvTextCtrl, \
      DelayedEpicsCallback, EpicsFunction, set_float
 
@@ -53,8 +54,12 @@ class MotorPanel(wx.Panel):
             for i in self.__motor_fields:
                 self.motor.clear_callback(attr=i)
 
-        self.motor = epics.Motor(motor)
-        self.motor.get_info()
+        try:
+            self.motor = epics.Motor(motor)
+            self.motor.get_info()
+        except MotorException:
+            pass
+            
 
         self.format = "%%.%if" % self.motor.PREC
         self.FillPanel()
