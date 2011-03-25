@@ -230,7 +230,7 @@ the <a class="reference internal" href="ca.html#ctrlvars-table"><em>Table of Con
 <dl class="method">
 <dt id="pv.poll">
 <tt class="descclassname">pv.</tt><tt class="descname">poll</tt><big>(</big><span class="optional">[</span><em>evt=1.e-4</em><span class="optional">[</span>, <em>iot=1.0</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pv.poll" title="Permalink to this definition">¶</a></dt>
-<dd><p>poll for changes.  This simply calls <cite>ca.poll(evt=evt,iot=iot)</cite></p>
+<dd><p>poll for changes.  This simply calls <a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -790,7 +790,7 @@ what to do in the interim.  A simple example would be:</p>
 </pre></div>
 </div>
 <p>An additional advantage of this approach is that you can easily wait for
-multiple PVs to complete with python's builtin <cite>all</cite> function, as with:</p>
+multiple PVs to complete with python's builtin <em>all</em> function, as with:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">pvgroup</span> <span class="o">=</span> <span class="p">(</span><span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">),</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;YYY&#39;</span><span class="p">),</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;ZZZ&#39;</span><span class="p">))</span>
 <span class="n">newvals</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span>  <span class="mf">3.0</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">pv</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pvgroup</span><span class="p">,</span> <span class="n">newvals</span><span class="p">):</span>
