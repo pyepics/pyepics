@@ -126,7 +126,7 @@ completed.   See :ref:`pv-putwait-label` for more details.
 
 .. method:: poll([evt=1.e-4, [iot=1.0]])
 
-   poll for changes.  This simply calls `ca.poll(evt=evt,iot=iot)` 
+   poll for changes.  This simply calls :meth:`ca.poll` 
 
    :param evt:  time to pass to :meth:`ca.pend_event`
    :type  evt:  double
@@ -539,7 +539,7 @@ what to do in the interim.  A simple example would be::
         waiting = not p.put_complete
 
 An additional advantage of this approach is that you can easily wait for
-multiple PVs to complete with python's builtin `all` function, as with::
+multiple PVs to complete with python's builtin *all* function, as with::
 
     pvgroup = (epics.PV('XXX'), epics.PV('YYY'), epics.PV('ZZZ'))
     newvals = (1.0, 2.0,  3.0)
