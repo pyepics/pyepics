@@ -55,7 +55,7 @@ a few ways to get the Epics Python Package:
 if you have `Python Setup Tools`_  installed, you can download and install
 the PyEpics Package simply with::
 
-   easy_install epics
+   easy_install -U pyepics
 
 
 Testing
@@ -121,10 +121,10 @@ Installation from source on any platform is::
 For more details, especially about how to set paths for LD_LIBRARY_PATH or
 DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.
 
-Again, if you have `Python Setup Tools`_  installed, you can download and install
-the PyEpics Package with::
+Again, if you have `Python Setup Tools`_  installed, you can download and 
+install the PyEpics Package with::
 
-   easy_install epics
+   easy_install -U pyepics
 
 
 Acknowledgements
@@ -136,8 +136,8 @@ come from Angus Gratton, at the Australiaon National University.  Several
 other people have provided valuable additions, suggestions, or bug reports,
 which has greatly improved the quality of the library: Michael Abbott,
 Marco Cammarata, Craig Haskins, Pete Jemian, Andrew Johnson, Janko Kolar,
-Irina Kosheleva, Tim Mooney, Mark Rivers, Friedrich Schotte, Mark Vigder,
-Steve Wasserman, and Glen Wright.
+Irina Kosheleva, Tim Mooney, Eric Norum, Mark Rivers, Friedrich Schotte, 
+Mark Vigder, Steve Wasserman, and Glen Wright.
 
 
 Epics Open License
