@@ -2,7 +2,7 @@
 
 from ConfigParser import  ConfigParser
 from cStringIO import StringIO
-from ordereddict import OrderedDict
+from epicscollect.utils import OrderedDict
 import os
 import time
 

@@ -17,9 +17,8 @@ from epics import Motor
 from epics.wx import finalize_epics,  EpicsFunction
 from epics.wx import MiniMotorPanel
 
-from wx_utils import add_btn, add_menu, popup, Closure , NumericCombo
-from wx_utils import savefile_dialog, openfile_dialog, select_workdir
-from wx_utils import empty_bitmap
+from epicscollect.gui import  empty_bitmap, add_button, add_menu, popup, \
+     Closure , NumericCombo, FileSave, FileOpen, SelectWorkdir
 
 from StageConf import StageConfig
 from Icons import images, app_icon
@@ -92,7 +91,7 @@ class SampleStage(wx.Frame):
                 os.chdir(workdir)
             except:
                 pass
-            ret = select_workdir(self)
+            ret = SelectWorkdir(self)
             if ret is None:
                 self.Destroy()
                 
@@ -205,8 +204,8 @@ class SampleStage(wx.Frame):
     def make_pospanel(self, parent):
         """panel of position lists, with buttons"""
         panel = wx.Panel(parent, size=(145, 200))
-        btn_goto  = add_btn(panel, "Go To",  size=(70, -1), action=self.onGo)
-        btn_erase = add_btn(panel, "Erase",  size=(70, -1),
+        btn_goto  = add_button(panel, "Go To",  size=(70, -1), action=self.onGo)
+        btn_erase = add_button(panel, "Erase",  size=(70, -1),
                             action=self.onErasePosition)
         
         brow = wx.BoxSizer(wx.HORIZONTAL)
@@ -235,7 +234,7 @@ class SampleStage(wx.Frame):
         self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
         
         imglabel  = "Select a position...\n  "
-        self.info = wx.StaticText(panel,  -1, label=imglabel)
+        self.info = wx.StaticText(panel,  label=imglabel)
         self.img  = wx.StaticBitmap(panel, -1,
                                     empty_bitmap(IMG_W, IMG_H, value=200))
         self.info.SetSize((IMG_W, 36))
@@ -294,7 +293,7 @@ class SampleStage(wx.Frame):
 
         if add_buttons is not None:
             for label, action in add_buttons:
-                smotor.Add(add_btn(panel, label, action=action))
+                smotor.Add(add_button(panel, label, action=action))
 
         btnbox = self.make_button_panel(panel, full=is_xy, group=group)
         btnbox_style = CEN_BOT
@@ -400,7 +399,7 @@ class SampleStage(wx.Frame):
             self.Destroy()
 
     def onSave(self, event=None):
-        fname = savefile_dialog(self, 
+        fname = FileSave(self, 
                 wildcard='INI (*.ini)|*.ini|All files (*.*)|*.*',
                                     deffile='SampleStage.ini')
         if fname is not None:
@@ -409,7 +408,7 @@ class SampleStage(wx.Frame):
 
     def onRead(self, event=None):
         # print 'READ Config'
-        fname = openfile_dialog(self, 
+        fname = FileOpen(self, 
                   wildcard='INI (*.ini)|*.ini|All files (*.*)|*.*',
                                 deffile='SampleStage.ini')
         if fname is not None:
@@ -468,7 +467,7 @@ class SampleStage(wx.Frame):
     def onSelectPosition(self, event=None, name=None):
         if name is None:
             name = str(event.GetString().strip())
-        if name is None:
+        if name is None or name not in self.positions:
             return
         self.pos_name.SetValue(name)
         thispos = self.positions[name]
@@ -567,7 +566,7 @@ class SampleStage(wx.Frame):
         except:
             self.write_message('could not open webcam %s')
         if fname is None:
-            fname = savefile_dialog(self, defdir=self.imgdir,
+            fname = FileSave(self, 
                     wildcard='JPEG (*.jpg)|*.jpg|All files (*.*)|*.*',
                                     deffile='sample.jpg')
         if fname is not None:
