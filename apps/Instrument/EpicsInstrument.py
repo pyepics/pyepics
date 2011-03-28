@@ -6,8 +6,11 @@ import wx
 import sys
 import time
 import epics
+from epics.wx import finalize_epics, MotorPanel, EpicsFunction
 
-from epics.wx import finalize_epics, MotorPanel
+from epicscollect.gui import  empty_bitmap, add_button, add_menu, popup, \
+     Closure , NumericCombo, FileSave, FileOpen, SelectWorkdir
+
 
 ID_ABOUT = wx.NewId()
 ID_EXIT  = wx.NewId()
@@ -15,16 +18,15 @@ ID_FREAD = wx.NewId()
 ID_FSAVE = wx.NewId()
 ID_CONF  = wx.NewId()
 
-class SimpleMotorFrame(wx.Frame):
+class InstrumentFrame(wx.Frame):
     def __init__(self, parent=None, motors=None, *args,**kwds):
 
         wx.Frame.__init__(self, parent, wx.ID_ANY, '',
                          wx.DefaultPosition, wx.Size(-1,-1),**kwds)
-        self.SetTitle(" Epics Motors Page")
+        self.SetTitle(" Epics Instruments")
 
         wx.EVT_CLOSE(self, self.onClose)        
-        self.SetFont(wx.Font(12,wx.SWISS,wx.NORMAL,wx.BOLD,False))
-        
+       
         self.createSbar()
         self.createMenus()
         self.buildFrame(motors=motors)
@@ -97,7 +99,7 @@ if __name__ == '__main__':
         motors = sys.argv[1:]
     
     app = wx.App(redirect=False)
-    SimpleMotorFrame(motors=motors).Show()
+    InstrumentFrame(motors=motors).Show()
     
     app.MainLoop()
 
