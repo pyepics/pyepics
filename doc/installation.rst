@@ -26,28 +26,28 @@ setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 Downloads
 ~~~~~~~~~~~~~
 
-The latest stable version of the Epics Python Package is 3.1.0.  There are
+The latest stable version of the Epics Python Package is 3.1.1.  There are
 a few ways to get the Epics Python Package: 
 
-.. _epics-3.1.0.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.1.0.tar.gz
-.. _epics-3.1.0.tar.gz (PyPI):   http://pypi.python.org/packages/source/e/epics/epics-3.1.0.tar.gz
-.. _epics-3.1.0.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.1.0.win32-py2.6.exe
-.. _epics-3.1.0.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.1.0.win32-py2.7.exe
-.. _epics-3.1.0.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/epics-3.1.0.win32-py3.1.exe
+.. _pyepics-3.1.1.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.tar.gz
+.. _pyepics-3.1.1.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.1.tar.gz
+.. _pyepics-3.1.1.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py2.6.exe
+.. _pyepics-3.1.1.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py2.7.exe
+.. _pyepics-3.1.1.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py3.1.exe
 .. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
-.. _PyPi Epics Entry:             http://pypi.python.org/pypi/epics/
+.. _PyPi Epics Entry:             http://pypi.python.org/pypi/pyepics/
 .. _Python Setup Tools:           http://pypi.python.org/pypi/setuptools
 
 +---------------------------+------------------------------------------+
 |  Download Option          |  Location                                |
 +===========================+==========================================+
-|  Source Kit               |  `epics-3.1.0.tar.gz (CARS)`_  or        |
-|                           |  `epics-3.1.0.tar.gz (PyPI)`_            |
+|  Source Kit               |  `pyepics-3.1.1.tar.gz (CARS)`_  or      |
+|                           |  `pyepics-3.1.1.tar.gz (PyPI)`_          |
 +---------------------------+------------------------------------------+
-|  Windows Installers       |  `epics-3.1.0.win32-py2.6.exe`_  or      |
-|                           |  `epics-3.1.0.win32-py2.7.exe`_          |
-|                           |  `epics-3.1.0.win32-py3.1.exe`_          |
+|  Windows Installers       |  `pyepics-3.1.1.win32-py2.6.exe`_  or    |
+|                           |  `pyepics-3.1.1.win32-py2.7.exe`_        |
+|                           |  `pyepics-3.1.1.win32-py3.1.exe`_        |
 +---------------------------+------------------------------------------+
 |  Development Version      |  use `pyepics github repository`_        |
 +---------------------------+------------------------------------------+
@@ -55,7 +55,7 @@ a few ways to get the Epics Python Package:
 if you have `Python Setup Tools`_  installed, you can download and install
 the PyEpics Package simply with::
 
-   easy_install epics
+   easy_install -U pyepics
 
 
 Testing
@@ -121,10 +121,10 @@ Installation from source on any platform is::
 For more details, especially about how to set paths for LD_LIBRARY_PATH or
 DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.
 
-Again, if you have `Python Setup Tools`_  installed, you can download and install
-the PyEpics Package with::
+Again, if you have `Python Setup Tools`_  installed, you can download and 
+install the PyEpics Package with::
 
-   easy_install epics
+   easy_install -U pyepics
 
 
 Acknowledgements
@@ -136,8 +136,8 @@ come from Angus Gratton, at the Australiaon National University.  Several
 other people have provided valuable additions, suggestions, or bug reports,
 which has greatly improved the quality of the library: Michael Abbott,
 Marco Cammarata, Craig Haskins, Pete Jemian, Andrew Johnson, Janko Kolar,
-Irina Kosheleva, Tim Mooney, Mark Rivers, Friedrich Schotte, Mark Vigder,
-Steve Wasserman, and Glen Wright.
+Irina Kosheleva, Tim Mooney, Eric Norum, Mark Rivers, Friedrich Schotte, 
+Mark Vigder, Steve Wasserman, and Glen Wright.
 
 
 Epics Open License

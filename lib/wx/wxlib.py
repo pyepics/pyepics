@@ -444,8 +444,8 @@ class pvCtrlMixin(pvMixin):
         self.fgColourAlarms = {}
         self.bgColourAlarms = {}
 
-        if font is None and not _conventional_ui_style:
-            font = wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,False)
+        #if font is None:
+        #    font = wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,False)
         
         try:
             if font is not None:  self.SetFont(font)

@@ -8,7 +8,7 @@ p = epics.PV(pvnames.motor1)
 
 for v in vals:
     t0 = time.time()
-    p.put(v) 
+    p.put(v, use_complete=True) 
     count = 0
     for i in range(100000):
         time.sleep(0.001)

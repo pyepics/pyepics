@@ -95,24 +95,25 @@ callbacks to be executed when the PV changes.
    numpy module is available.  See :ref:`advanced-large-arrays-label` for a
    discussion of strategies for how to best deal with very large arrays.
 
-.. method:: put(value[, wait=False[, timeout=30.0[, callback=None[, callback_data=None]]]])
+.. method:: put(value[, wait=False[, timeout=30.0[, use_complete=False[, callback=None[, callback_data=None]]]]])
 
    set the PV value, optionally waiting to return until processing has
-   completed. 
+   completed, or setting the :attr:`put_complete` to indicate complete-ness.
 
    :param value:  value to set PV 
    :param wait:  whether to wait for processing to complete (or time-out) before returning.
    :type  wait:  ``True``/``False``
    :param timeout:  maximum time to wait for processing to complete before returning anyway. 
    :type  timeout:  double
+   :param use_complete:  whether to use a builtin callback to set :attr:`put_complete`.
+   :type  use_complete:  ``True``/``False``
    :param callback: user-supplied function to run when processing has completed. 
    :type callback: ``None`` or a valid python function
    :param callback_data: extra data to pass on to a user-supplied callback function. 
 
-The `wait` and `callback` arguments, as well as the :attr:`put_complete`
-attribute give a few options  for ensuring that a :meth:`put` has
-completed, or being notified when it has completed.   See
-:ref:`pv-putwait-label` for more details.
+The `wait` and `callback` arguments, as well as the 'use_complete' / :attr:`put_complete`
+attribute give a few options for knowing that a :meth:`put` has
+completed.   See :ref:`pv-putwait-label` for more details.
 
 
 ..  _pv-get-ctrlvars-label:  
@@ -125,7 +126,7 @@ completed, or being notified when it has completed.   See
 
 .. method:: poll([evt=1.e-4, [iot=1.0]])
 
-   poll for changes.  This simply calls `ca.poll(evt=evt,iot=iot)` 
+   poll for changes.  This simply calls :meth:`ca.poll` 
 
    :param evt:  time to pass to :meth:`ca.pend_event`
    :type  evt:  double
@@ -525,25 +526,25 @@ which will wait up to 30 seconds.  For the pedantic, this timeout should
 not be used as an accurate clock -- the actual wait time may be slightly
 longer.
 
-A second method is to watch for the :attr:`put_complete` attribute to
-become  True after a :meth:`put`.  This is somewhat more flexible than
-using `wait=True` as above because you can more carefully control how often
-you look for a :meth:`put` to complete, and what to do in the interim.  A
-simple example would be::
+A second method is to use the 'use_complete' option and watch for the
+:attr:`put_complete` attribute to become True after a :meth:`put`.  This is
+somewhat more flexible than using `wait=True` as above, because you can more
+carefully control how often you look for a :meth:`put` to complete, and
+what to do in the interim.  A simple example would be::
     
-    p.put(1.0)
+    p.put(1.0, use_complete=True)
     waiting = True
     while waiting:
         time.sleep(0.001)
         waiting = not p.put_complete
 
 An additional advantage of this approach is that you can easily wait for
-multiple PVs to complete with python's builtin `all` function, as with::
+multiple PVs to complete with python's builtin *all* function, as with::
 
     pvgroup = (epics.PV('XXX'), epics.PV('YYY'), epics.PV('ZZZ'))
     newvals = (1.0, 2.0,  3.0)
     for pv, val in zip(pvgroup, newvals):
-        pv.put(val)
+        pv.put(val, use_complete=True)
     
     waiting = True
     while waiting:
@@ -562,7 +563,6 @@ data with the *callback_data* argument (which should be dict-like) to
         print 'Put done for %s' % pvname
 
     pv.put(1.0, callback=onPutComplete)
-
   
 
 ..  _pv-examples-label:

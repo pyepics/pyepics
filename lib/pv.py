@@ -198,7 +198,7 @@ class PV(object):
         return self._args['value']
 
     def put(self, value, wait=False, timeout=30.0,
-            callback=None, callback_data=None):
+            use_complete=False, callback=None, callback_data=None):
         """set value for PV, optionally waiting until the processing is
         complete, and optionally specifying a callback function to be run
         when the processing is complete.        
@@ -208,11 +208,12 @@ class PV(object):
         if (self.ftype in (dbr.ENUM, dbr.TIME_ENUM, dbr.CTRL_ENUM) and
             isinstance(value, str) and value in self._args['enum_strs']):
             value = self._args['enum_strs'].index(value)
-        if callback is None:
+        if use_complete and callback is None:
             callback = self.__putCallbackStub
         return ca.put(self.chid, value,
                       wait=wait, timeout=timeout,
-                      callback=callback, callback_data=callback_data)
+                      callback=callback,
+                      callback_data=callback_data)
 
     def __putCallbackStub(self, pvname=None, **kws):
         "null put-calback, so that the put_complete attribute is valid"
