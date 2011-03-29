@@ -9,8 +9,13 @@ import epics
 from epics.wx import finalize_epics, MotorPanel, EpicsFunction
 
 from epicscollect.gui import  empty_bitmap, add_button, add_menu, popup, \
-     Closure , NumericCombo, FileSave, FileOpen, SelectWorkdir
+     Closure , NumericCombo, FileSave, FileOpen, SelectWorkdir, pack
 
+from configfile import InstrumentConfig
+
+import  wx.lib.filebrowsebutton as filebrowse
+
+FileBrowser = filebrowse.FileBrowseButtonWithHistory
 
 ID_ABOUT = wx.NewId()
 ID_EXIT  = wx.NewId()
@@ -18,9 +23,50 @@ ID_FREAD = wx.NewId()
 ID_FSAVE = wx.NewId()
 ID_CONF  = wx.NewId()
 
-class InstrumentFrame(wx.Frame):
-    def __init__(self, parent=None, motors=None, *args,**kwds):
+class ConnectDialog(wx.Dialog):
+    """Connect to a recent or existing DB File, or create a new one"""
 
+    msg = '''Select Recent Instrument File, create a new one'''
+    
+    def __init__(self, parent=None, filelist=None,
+                 title='Select Instruments File'):
+
+        wx.Dialog.__init__(self, parent, wx.ID_ANY, title=title)
+
+        title = wx.StaticText(parent, label = self.msg)
+        self.filebrowser = FileBrowser(self,  # label='Select File:',
+                                       size=(450, -1))
+
+        self.filebrowser.SetHistory(filelist)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(wx.StaticText(self, label=self.msg), 0,
+                  wx.ALIGN_CENTER|wx.ALL|wx.GROW, 3)
+        sizer.Add(self.filebrowser, 1,
+                  wx.ALIGN_CENTER|wx.ALL|wx.GROW, 3)
+
+        sizer.Add(self.CreateButtonSizer(wx.OK| wx.CANCEL),
+                 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 4)
+
+        pack(self, sizer)
+        
+    
+class InstrumentFrame(wx.Frame):
+    def __init__(self, parent=None, dbname=None, **kwds):
+
+        self.config = InstrumentConfig()
+        if dbname is None:
+            filelist = self.config.get_dblist()        
+            dlg = ConnectDialog(filelist=filelist)
+            dlg.CenterOnScreen()
+            if dlg.ShowModal() == wx.ID_OK:
+                dbname = dlg.filebrowser.GetValue()
+            else:
+                return
+            dlg.Destroy()
+
+        print 'DBNAME = ', dbname
+        
         wx.Frame.__init__(self, parent, wx.ID_ANY, '',
                          wx.DefaultPosition, wx.Size(-1,-1),**kwds)
         self.SetTitle(" Epics Instruments")
@@ -29,7 +75,7 @@ class InstrumentFrame(wx.Frame):
        
         self.createSbar()
         self.createMenus()
-        self.buildFrame(motors=motors)
+        # self.buildFrame()
 
     def buildFrame(self, motors=None):
         self.mainsizer = wx.BoxSizer(wx.VERTICAL)
@@ -93,13 +139,13 @@ class InstrumentFrame(wx.Frame):
         self.Destroy()
 
 if __name__ == '__main__':
-    motors =('13XRM:m2.VAL',)
+    dbname =('MyInstruments.einst')
 
     if len(sys.argv)>1:
         motors = sys.argv[1:]
     
     app = wx.App(redirect=False)
-    InstrumentFrame(motors=motors).Show()
+    InstrumentFrame(dbname=dbname).Show()
     
     app.MainLoop()
 

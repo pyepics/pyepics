@@ -60,12 +60,12 @@ def  make_newdb(dbname, server= 'sqlite'):
                                  PointerCol('instrument')])
 
     instrument_precommand = NamedTable('instrument_precommand', metadata,
-                                       cols=[Column('index', Integer), #  order of commands
+                                       cols=[Column('n_seq', Integer), #  order of commands
                                              PointerCol('command'),
                                              PointerCol('instrument')])
                                      
     instrument_postcommand = NamedTable('instrument_postcommand', metadata,
-                                        cols=[Column('index', Integer), #  order of commands                                       
+                                        cols=[Column('n_seq', Integer), #  order of commands                                       
                                               PointerCol('command'),
                                               PointerCol('instrument')])
 
