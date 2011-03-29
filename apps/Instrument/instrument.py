@@ -102,7 +102,10 @@ class Instrument(_BaseTable):
     pass
 
 class Position(_BaseTable):
-    "instrument table"    
+    "position table"    
+
+class Position_PV(_BaseTable):
+    "position-pv join table"    
 
 class Command(_BaseTable):
     "command table"    
@@ -171,21 +174,27 @@ class InstrumentDB(object):
                            relationship(PV, backref='instrument',
                                         secondary=tables['instrument_pv'])})
                
-             
-
+          
         mapper(PVType,      tables['pvtype'],
                properties={'pv':
                            relationship(PV, backref='pvtype')})
                
-        mapper(Position,      tables['position'])
-        #         ,
-        #                properties={'instrument':
-        #                            relationship(Instrument, backref='position'),
-        #                            'pv':
-        #                            relationship(PV, backref='pv',
-        #                                         secondary=tables['position_pv'])})
-        
-        
+        mapper(Position,      tables['position'], 
+               properties={'instrument':
+                           relationship(Instrument, backref='position'),
+                           'pv':
+                           relationship(PV, backref='position')
+                           # ,  secondary=tables['position_pv'])
+                           })
+
+
+        mapper(Position_PV,      tables['position_pv'], 
+               properties={'instrument':
+                           relationship(Instrument, backref='position_pv'),
+                           'pv':
+                           relationship(PV, backref='position_pv')})
+
+
         mapper(Instrument_Precommand,   tables['instrument_precommand'], 
                properties={'instrument':
                            relationship(Instrument, backref='instrument_precommand'),
