@@ -21,7 +21,7 @@ from datetime import datetime
 from creator import make_newdb, backup_versions
 
 
-from sqlalchemy import MetaData, create_engine
+from sqlalchemy import MetaData, create_engine, and_
 from sqlalchemy.orm import sessionmaker,  mapper, relationship, backref
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import  NoResultFound
@@ -72,6 +72,18 @@ def isotime2datetime(isotime):
 
     return datetime(syear, smon, sday, shour, smin, ssec, susec)
 
+def None_or_one(val, msg='Expected 1 or None result'):
+    """expect result (as from query.all() to return
+    either None or exactly one result
+    """
+    if len(val) == 1:
+        return val[0]
+    elif len(val) == 0:
+        return None
+    else:
+        raise InstrumentDBException(msg)            
+
+
 class InstrumentDBException(Exception):
     """DB Access Exception: General Errors"""
     def __init__(self, msg):
@@ -99,13 +111,19 @@ class Info(_BaseTable):
 
 class Instrument(_BaseTable):
     "instrument table"
-    pass
+    pass 
 
 class Position(_BaseTable):
-    "position table"    
+    "position table"
+    pass
 
 class Position_PV(_BaseTable):
     "position-pv join table"    
+    def __repr__(self):
+        name = self.__class__.__name__
+        fields = ['%s=%s' % (getattr(self, 'pv', '?'),
+                             getattr(self, 'value', '?'))]
+        return "<%s(%s)>" % (name, ', '.join(fields))
 
 class Command(_BaseTable):
     "command table"    
@@ -117,7 +135,7 @@ class PVType(_BaseTable):
 
 class PV(_BaseTable):
     "pv table"
-    pass
+
 
 class Instrument_Precommand(_BaseTable):
     "instrument precommand table"
@@ -152,58 +170,50 @@ class InstrumentDB(object):
             raise IOError("Database '%s' not found!" % dbname)
 
         if not isInstrumentDB(dbname):
-            raise ValueError("'%s' is not an XAS Data Library file!" % dbname)
+            raise ValueError("'%s' is not an Instrument file!" % dbname)
 
         self.dbname = dbname
         self.engine = create_engine('sqlite:///%s' % self.dbname)
-
-       
         self.metadata =  MetaData(self.engine)
         
         self.metadata.reflect()
         tables = self.tables = self.metadata.tables
-
         self.session = sessionmaker(bind=self.engine)()
 
-        mapper(Info,        tables['info'])
-        mapper(Command,     tables['command'])
-        mapper(PV,          tables['pv'])
+        mapper(Info,     tables['info'])
+        mapper(Command,  tables['command'])
+        mapper(PV,       tables['pv'])
                
-        mapper(Instrument,  tables['instrument'],
-               properties={'pv':
-                           relationship(PV, backref='instrument',
-                                        secondary=tables['instrument_pv'])})
+        mapper(Instrument, tables['instrument'],
+               properties={'pvs': relationship(PV,
+                                               backref='instrument',
+                                    secondary=tables['instrument_pv'])})
                
-          
-        mapper(PVType,      tables['pvtype'],
+        mapper(PVType,   tables['pvtype'],
                properties={'pv':
                            relationship(PV, backref='pvtype')})
                
-        mapper(Position,      tables['position'], 
-               properties={'instrument':
-                           relationship(Instrument, backref='position'),
-                           'pv':
-                           relationship(PV, backref='position')
-                           # ,  secondary=tables['position_pv'])
-                           })
+        mapper(Position, tables['position'], 
+               properties={'instrument': relationship(Instrument,
+                                                      backref='positions'),
+                           'pvs': relationship(Position_PV) })
 
-
-        mapper(Position_PV,      tables['position_pv'], 
-               properties={'instrument':
-                           relationship(Instrument, backref='position_pv'),
-                           'pv':
-                           relationship(PV, backref='position_pv')})
-
-
-        mapper(Instrument_Precommand,   tables['instrument_precommand'], 
-               properties={'instrument':
-                           relationship(Instrument, backref='instrument_precommand'),
-                           'command':
-                           relationship(Command, backref='instrument_precommand')
-                           })
-
+        mapper(Position_PV, tables['position_pv'], 
+               properties={'pv':relationship(PV)})
+        
+        mapper(Instrument_Precommand,  tables['instrument_precommand'], 
+               properties={'instrument': relationship(Instrument,
+                                                      backref='precommands'),
+                           'command':   relationship(Command,
+                                                     backref='inst_precoms')})
+        mapper(Instrument_Postcommand,   tables['instrument_postcommand'], 
+               properties={'instrument': relationship(Instrument,
+                                                      backref='postcommands'),
+                           'command':   relationship(Command,
+                                                     backref='inst_postcoms')})
     def commit(self):
         "commit session state"
+        self.set_mod_time()        
         return self.session.commit()
         
     def close(self):
@@ -246,15 +256,14 @@ class InstrumentDB(object):
             setattr(me, key, val)
         try:
             self.session.add(me)
-            self.set_mod_time()
-            self.session.commit()
+            # self.session.commit()
         except IntegrityError, msg:
             self.session.rollback()
-            print msg
-            raise Warning('Could not add data to table %s' % table)
+            raise Warning('Could not add data to table %s\n%s' % (table, msg))
 
-        return self.query(table).filter(getattr(table, arg0)==val0).one()
-
+        return me
+    # return self.query(table).filter(getattr(table, arg0)==val0).one()
+        
 
     def _get_foreign_keyid(self, table, value, name='name',
                            keyid='id', default=None):
@@ -283,15 +292,52 @@ arguments
                 return default
 
         return default
-    
-    def get_instruments(self, show_all=True):
-        """return list of instruments,
-        """
-        for f in self.query(Instrument):
-            out.append((f.name, f))
-        return out
 
-    def add_instrument(self, name, pvs = None, notes=None,
+    def get_instrument(self, name):
+        """return instrument by name
+        """
+        if isinstance(name, Instrument):
+            return name
+        out = self.query(Instrument).filter(Instrument.name==name).all()
+        return None_or_one(out, 'get_instrument expected 1 or None Instrument')
+
+    def get_pv(self, name):
+        """return pv by name
+        """
+        if isinstance(name, PV):
+            return name
+        out = self.query(PV).filter(PV.name==name).all()
+        return None_or_one(out, 'get_pv expected 1 or None PV')
+
+    def get_position(self, name, instrument=None):
+        """return position from namea and instrument
+        """
+        inst = None
+        if instrument is not None:
+            inst = self.get_instrument(instrument)
+
+        filter = Position.name==name
+        if inst is not None:
+            filter = and_(filter, Position.instrument_id==inst.id)
+
+        out =  self.query(Position).filter(filter).all()
+        return None_or_one(out, 'get_position expected 1 or None Position')
+
+    def get_position_pv(self, name, instrument=None):
+        """return position from namea and instrument
+        """
+        inst = None
+        if instrument is not None:
+            inst = self.get_instrument(instrument)
+
+        filter = Position.name==name
+        if inst is not None:
+            filter = and_(filter, Position.instrument_id==inst.id)
+
+        out =  self.query(Position).filter(filter).all()
+        return None_or_one(out, 'get_position expected 1 or None Position')
+
+    def add_instrument(self, name, pvs=None, notes=None,
                        attributes=None, **kws):
         """add instrument
         notes and attributes optional
@@ -301,10 +347,17 @@ arguments
 
         inst = self.__addRow(Instrument, ('name',), (name,), **kws)
         if pvs is not None:
+            pvlist = []
             for pvname in pvs:
-                self.add_pv(pvname)
-                
-
+                thispv = self.get_pv(pvname)
+                if thispv is None:
+                    thispv = self.add_pv(pvname)
+                pvlist.append(thispv)
+            inst.pvs = pvlist
+        self.session.add(inst)
+        self.commit()
+        return inst
+        
     def add_pv(self, name, notes=None, attributes=None, **kws):
         """add pv
         notes and attributes optional
@@ -312,9 +365,77 @@ arguments
         kws['notes'] = notes
         kws['attributes'] = attributes
 
-        inst = self.__addRow(PV, ('name',), (name,), **kws)
-
+        row = self.__addRow(PV, ('name',), (name,), **kws)
+        self.commit()
+        return row
+        
     def add_info(self, key, value):
         """add Info key value pair -- returns Info instance"""
-        return self.__addRow(Info, ('key', 'value'), (key, value))
+        row = self.__addRow(Info, ('key', 'value'), (key, value))
+        self.commit()        
+        return row
+    
+    def save_position(self, posname, inst, values, **kw):
+        """save position for instrument
+        """
+        inst = self.get_instrument(inst)
+        if inst is None:
+            raise InstrumentDBException('Save Postion needs valid instrument')
+            
+        posname = posname.strip()
+        pos  = self.get_position(posname, inst)
+        if pos is None:
+            pos = Position()
+            pos.name = posname
+            pos.instrument = inst
+            pos.date = datetime.now()
+            
+        pvnames = [pv.name for pv in inst.pvs]
 
+        # check for missing pvs in values
+        missing_pvs = []
+        for pv in pvnames:
+            if pv not in values:
+                missing_pvs.append(pv)
+                
+        if len(missing_pvs) > 0:
+            raise InstrumentDBException('Save Postion: missing pvs:\n %s' %
+                                        missing_pvs)
+        
+        pos_pvs = []
+        for name in pvnames:
+            ppv = Position_PV()
+            ppv.pv = self.get_pv(name)
+            ppv.date = datetime.now()
+            ppv.notes = "'%s' / '%s'" % (inst.name, posname)
+            ppv.value = values[name]
+            pos_pvs.append(ppv)
+        pos.pvs = pos_pvs
+        
+        self.session.add(pos)
+        self.commit()
+        
+    def restore_position(self, posname, inst, exclude_pvs=None):
+        """restore named position for instrument
+        """
+        inst = self.get_instrument(inst)
+        if inst is None:
+            raise InstrumentDBException('restore_postion needs valid instrument')
+            
+        posname = posname.strip()
+        pos  = self.get_position(posname, inst)
+        if inst is None:
+            raise InstrumentDBException("restore_postion  position '%s' not found" % posname)
+        
+        if exclude_pvs is None:
+            exclude_pvs = []
+
+        settings = self.get_position(posname, inst)
+        print 'Pre_Commands: ', inst.precommands
+        
+        for pvpos in settings.pvs:
+            pvname = pvpos.pv.name
+            if pvname not in exclude_pvs:
+                print 'caput(%s, %s)' % (pvname, pvpos.value)
+
+        print 'Post_Commands: ',  inst.postcommands

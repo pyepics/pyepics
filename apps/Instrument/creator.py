@@ -52,20 +52,20 @@ def  make_newdb(dbname, server= 'sqlite'):
     
     instrument = NamedTable('instrument', metadata)
     command    = NamedTable('command', metadata,
-                            nameid='command',
-                            cols=[StrCol('arguments')])
-                                      
+                            cols=[StrCol('command'),
+                                  StrCol('arguments')])
+
     position  = NamedTable('position', metadata,
-                           cols=[Column('submission_date', DateTime),
+                           cols=[Column('date', DateTime),
                                  PointerCol('instrument')])
 
     instrument_precommand = NamedTable('instrument_precommand', metadata,
-                                       cols=[Column('n_seq', Integer), #  order of commands
+                                       cols=[Column('nseq', Integer),
                                              PointerCol('command'),
                                              PointerCol('instrument')])
                                      
     instrument_postcommand = NamedTable('instrument_postcommand', metadata,
-                                        cols=[Column('n_seq', Integer), #  order of commands                                       
+                                        cols=[Column('nseq', Integer), 
                                               PointerCol('command'),
                                               PointerCol('instrument')])
 
@@ -78,10 +78,13 @@ def  make_newdb(dbname, server= 'sqlite'):
                           PointerCol('pv'))
 
     position_pv = Table('position_pv', metadata,
-                        Column('id', Integer, primary_key=True),
-                        PointerCol('position') ,
+                        Column('id', Integer, primary_key=True),                         
+                        StrCol('notes'),
+                        Column('date', DateTime),
+                        PointerCol('position'),
                         PointerCol('pv'),
-                        StrCol('value'))                        
+                        StrCol('value'))
+    
                         
                         
     info       = Table('info', metadata,
@@ -104,7 +107,7 @@ def  make_newdb(dbname, server= 'sqlite'):
     session.commit()    
 
 
-def dumpsql(dbname, fname='MyInstrument_init.sql'):
+def dumpsql(dbname, fname='Test_init.sql'):
     """ dump SQL statements for an sqlite db"""
     os.system('echo .dump | sqlite3 %s > %s' % (dbname, fname))
     
@@ -122,7 +125,7 @@ def backup_versions(fname, max=10):
 
     
 if __name__ == '__main__':
-    dbname = 'MyInstrument.einst'
+    dbname = 'Test.einst'
     if os.path.exists(dbname):
         backup_versions(dbname)
         
