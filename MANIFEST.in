@@ -1,12 +1,10 @@
-include README.txt INSTALL MANIFEST.in PKG-INFO Changelog license.txt setup.py use_py3.bat make_wininsts.bat publish.sh
-recursive-exclude *.pyc core.* *~
+include README.txt INSTALL MANIFEST.in PKG-INFO Changelog license.txt setup.py publish.sh *.bat
+exclude *.pyc core.* *~ *.pdf
 recursive-include lib *.py
 recursive-include scripts *
 recursive-include tests *.py *.db *.cmd *.req
-recursive-exclude tests/Misc *
 recursive-include doc *
-recursive-exclude doc/_build *
 recursive-include dlls *
-recursive-exclude junk *
-recursive-exclude work *
-recursive-exclude dist *
+recursive-exclude doc/_build *
+recursive-exclude doc *.pdf
+recursive-exclude tests/Misc *
