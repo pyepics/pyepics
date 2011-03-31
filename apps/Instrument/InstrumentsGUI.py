@@ -81,6 +81,9 @@ class InstrumentPanel(wx.Panel):
     def __init__(self, parent, inst, db=None, size=(-1, -1)):
         self.inst = inst
         self.db   = db
+        self.verify_move = True
+        self.verify_erase = True
+        
         self.pvs  = []
         wx.Panel.__init__(self, parent, size=size)
 
@@ -88,10 +91,10 @@ class InstrumentPanel(wx.Panel):
                                      style=wx.SP_3DSASH|wx.SP_LIVE_UPDATE)
         splitter.SetMinimumPaneSize(150)
        
-        rpanel = wx.Panel(splitter, size=(150, 175))
         lpanel = wx.Panel(splitter, size=(550, 175))
+        rpanel = wx.Panel(splitter, size=(150, 175))
         
-        toprow = wx.Panel(lpanel)
+        toprow = wx.Panel(lpanel, size=(450,-1))
         self.pos_name =  wx.TextCtrl(toprow, value="", size=(220, 25),
                                      style= wx.TE_PROCESS_ENTER)
         self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
@@ -155,20 +158,21 @@ class InstrumentPanel(wx.Panel):
             self.pos_list.Append(pos.name)
 
         rsizer.Add(brow,          0, wx.ALIGN_LEFT|wx.ALL)
-        rsizer.Add(self.pos_list, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER, 1)
+        rsizer.Add(self.pos_list, 1, wx.EXPAND|wx.ALIGN_CENTER, 1)
         pack(rpanel, rsizer)
 
-        splitter.SplitVertically(lpanel, rpanel, 0)
-            
+        splitter.SplitVertically(lpanel, rpanel, 475)
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(splitter, 1, wx.ALIGN_LEFT|wx.GROW|wx.ALL, 3)
+
         pack(self, sizer)
 
     @EpicsFunction
     def PV_Panel(self, panel, sizer, pvname):
         pv = epics.PV(pvname)
         self.pvs.append(pv)
-
+        pv.get_ctrlvars()
+        
         for control in panel.Children:
             control.Destroy()
         sizer.Clear()
@@ -204,7 +208,7 @@ class InstrumentPanel(wx.Panel):
     def save_current_position(self, posname):
         values = {}
         for p in self.pvs:
-            values[p.pvname] = p.value
+            values[p.pvname] = p.get(as_string=True)
         self.db.save_position(posname, self.inst, values)
         
     def onSavePosition(self, evt=None):
@@ -214,21 +218,28 @@ class InstrumentPanel(wx.Panel):
             self.pos_list.Append(posname)
 
     @EpicsFunction
-    def restore_complete(self):
-        val = self.db.restore_complete()
-        return val
-    
-    @EpicsFunction
     def restore_position(self, posname, timeout=5.0):
         self.db.restore_position(posname, self.inst, wait=True)
-        #         t0 = time.time()
-        #         while time.time()-t0 < timeout:
-        #             if self.restore_complete():
-        #                 break
-        #             time.sleep(0.1)
 
     def onGo(self, evt=None):
         posname = self.pos_list.GetStringSelection()
+
+        thispos = self.db.get_position(posname, self.inst)
+        if thispos is None:
+            return
+        
+        postext = []
+        
+        for pvpos in thispos.pvs:
+            postext.append('  %s= %s' % (pvpos.pv.name, pvpos.value))
+        postext = '\n'.join(postext)
+
+        if self.verify_move:
+            ret = popup(self, "Move to %s?: \n%s" % (posname, postext),
+                        'Verify Move',
+                        style=wx.YES_NO|wx.ICON_QUESTION)
+            if ret != wx.ID_YES:
+                return
         self.restore_position(posname)
         
     def onSelectPosition(self, evt=None):
@@ -274,8 +285,17 @@ class InstrumentPanel(wx.Panel):
 
     def onErase(self, evt=None):
         posname = self.pos_list.GetStringSelection()
-        print 'on erase ', evt.GetString(), self.inst, posname
-                  
+        
+        if self.verify_erase:
+            ret = popup(self, "Erase  %s?" % (posname),
+                        'Verify Erase',
+                        style=wx.YES_NO|wx.ICON_QUESTION)
+            if ret != wx.ID_YES:
+                return
+
+        self.db.remove_position(posname, self.inst)
+        ipos  =  self.pos_list.GetSelection()
+        self.pos_list.Delete(ipos)
     
 class InstrumentFrame(wx.Frame):
     def __init__(self, parent=None, conf=None, dbname=None, **kwds):

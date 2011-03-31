@@ -169,7 +169,7 @@ class MotorPanel(wx.Panel):
         self.fillPanelComponents()
                 
         self.twk_list = ['','']
-        self.__twkbox = wx.ComboBox(self, value='', size=(70, 25), 
+        self.__twkbox = wx.ComboBox(self, value='', size=(90, 25), 
                                     choices=self.twk_list,
                                     style=wx.CB_DROPDOWN|wx.TE_PROCESS_ENTER)
 

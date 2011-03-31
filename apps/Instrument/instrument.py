@@ -213,6 +213,9 @@ class InstrumentDB(object):
                                                       backref='postcommands'),
                            'command':   relationship(Command,
                                                      backref='inst_postcoms')})
+
+        self.conn = self.engine.connect()
+        
     def commit(self):
         "commit session state"
         self.set_mod_time()        
@@ -382,6 +385,39 @@ arguments
         self.commit()        
         return row
     
+    def remove_position(self, posname, inst):
+        inst = self.get_instrument(inst)
+        if inst is None:
+            raise InstrumentDBException('Save Postion needs valid instrument')
+
+        posname = posname.strip()
+        pos  = self.get_position(posname, inst)
+        if pos is None:
+            raise InstrumentDBException("Postion '%s' not found for '%s'" % (posname, inst.name))
+
+        tab = self.tables['position_pv']
+        self.conn.execute(tab.delete().where(tab.c.position_id==pos.id))
+        self.conn.execute(tab.delete().where(tab.c.position_id==None))
+
+        tabl = self.tables['position']
+        self.conn.execute(tabl.delete().where(tabl.c.id==pos.id))
+
+        self.commit()
+        
+        
+    def remove_instrument(self, inst):
+        inst = self.get_instrument(inst)
+        if inst is None:
+            raise InstrumentDBException('Save Postion needs valid instrument')
+
+        tab = self.tables['instrument']
+        self.conn.execute(tab.delete().where(tab.c.id==inst.id))
+
+        for tablename in ('position', 'instrument_pv', 'instrument_precommand',
+                          'instrument_postcommand'):
+            tab = self.tables[tablename]
+            self.conn.execute(tab.delete().where(tab.c.instrument_id==inst.id))
+
     def save_position(self, posname, inst, values, **kw):
         """save position for instrument
         """
@@ -418,7 +454,10 @@ arguments
             ppv.value = values[name]
             pos_pvs.append(ppv)
         pos.pvs = pos_pvs
-        
+
+        tab = self.tables['position_pv']
+        self.conn.execute(tab.delete().where(tab.c.position_id == None))
+
         self.session.add(pos)
         self.commit()
 
@@ -460,6 +499,8 @@ arguments
             value  = pvpos.value
             if pvname not in exclude_pvs:
                 thispv = self.pvs[pvname]
+                thispv.connect()
+                thispv.get_ctrlvars()
                 thispv.put(value, use_complete=wait)
                 self.restoring_pvs.append(thispv)
 

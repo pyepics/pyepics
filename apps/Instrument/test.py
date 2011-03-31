@@ -21,7 +21,10 @@ print inst, inst.pvs
 #for pv in pvlist:
 #    values[pv] = 0
 # # 
-db.restore_position(u'apos', 'XAS Table')
+print '====== ', inst.positions
+
+db.remove_position('p3', 'sample_stage')
+
 # print a, a.pvs
 # for p in a.pvs:
 #     print p, p.pv.name, p.value
