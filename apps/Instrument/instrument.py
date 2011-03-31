@@ -14,7 +14,8 @@ classes for Tables:
 import os
 import sys
 import json
-
+import epics
+import time
 import numpy
 from datetime import datetime
 
@@ -152,7 +153,8 @@ class InstrumentDB(object):
         self.session = None
         self.metadata = None
         self.update_mod_time = None
-
+        self.pvs = {}
+        self.restoring_pvs = []        
         if dbname is not None:
             self.connect(dbname)
             
@@ -349,7 +351,7 @@ arguments
         returns Instruments instance"""
         kws['notes'] = notes
         kws['attributes'] = attributes
-
+        name = name.strip()
         inst = self.__addRow(Instrument, ('name',), (name,), **kws)
         if pvs is not None:
             pvlist = []
@@ -419,28 +421,47 @@ arguments
         
         self.session.add(pos)
         self.commit()
+
+    def restore_complete(self):
+        if len(self.restoring_pvs) > 0:
+            return all([p.put_complete for p in self.restoring_pvs])
+        return True
         
-    def restore_position(self, posname, inst, exclude_pvs=None):
+    def restore_position(self, posname, inst, wait=False,
+                         timeout=60, exclude_pvs=None):
         """restore named position for instrument
         """
+
         inst = self.get_instrument(inst)
         if inst is None:
             raise InstrumentDBException('restore_postion needs valid instrument')
             
+        for pv in inst.pvs:
+            pvname = pv.name
+            if isinstance(pvname, unicode):
+                pvname = str(pvname)
+                
+            if pvname not in self.pvs:
+                self.pvs[pvname] = epics.PV(pvname)
+                time.sleep(1.e-3)
+
         posname = posname.strip()
         pos  = self.get_position(posname, inst)
-        if inst is None:
+        if pos is None:
             raise InstrumentDBException("restore_postion  position '%s' not found" % posname)
         
         if exclude_pvs is None:
             exclude_pvs = []
-
-        settings = self.get_position(posname, inst)
+            
         print 'Pre_Commands: ', inst.precommands
-        
-        for pvpos in settings.pvs:
+        self.restoring_pvs = []
+        for pvpos in pos.pvs:
             pvname = pvpos.pv.name
+            value  = pvpos.value
             if pvname not in exclude_pvs:
-                print 'caput(%s, %s)' % (pvname, pvpos.value)
+                thispv = self.pvs[pvname]
+                thispv.put(value, use_complete=wait)
+                self.restoring_pvs.append(thispv)
 
-        print 'Post_Commands: ',  inst.postcommands
+
+        print 'Post_Commands:',  inst.postcommands

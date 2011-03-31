@@ -78,38 +78,41 @@ class ConnectDialog(wx.Dialog):
 class InstrumentPanel(wx.Panel):
     """ create Panel for an instrument"""
 
-    def __init__(self, parent, inst, size=(-1, -1)):
+    def __init__(self, parent, inst, db=None, size=(-1, -1)):
         self.inst = inst
+        self.db   = db
+        self.pvs  = []
         wx.Panel.__init__(self, parent, size=size)
-        
-        splitter = wx.SplitterWindow(self, style=wx.SP_LIVE_UPDATE)
+
+        splitter = wx.SplitterWindow(self,
+                                     style=wx.SP_3DSASH|wx.SP_LIVE_UPDATE)
         splitter.SetMinimumPaneSize(150)
        
-        lpanel = wx.Panel(splitter, size=(550, 175))
         rpanel = wx.Panel(splitter, size=(150, 175))
+        lpanel = wx.Panel(splitter, size=(550, 175))
         
         toprow = wx.Panel(lpanel)
         self.pos_name =  wx.TextCtrl(toprow, value="", size=(220, 25),
                                      style= wx.TE_PROCESS_ENTER)
         self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
 
-        topsizer = wx.BoxSizer(wx.HORIZONTAL)
         tfont = self.GetFont()
         tfont.PointSize += 3
         tfont.SetWeight(wx.BOLD)
 
+        topsizer = wx.BoxSizer(wx.HORIZONTAL)
         topsizer.Add(SimpleText(toprow, inst.name,
-                                font=tfont, colour=(170, 0, 00),
-                                minsize=(175, -1),
-                                style=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL), 0,
-                     wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL, 2)
+                                font=tfont, colour=(80, 10, 10),
+                                minsize=(125, -1),
+                                style=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL),
+                     0, wx.ALIGN_LEFT, 1)
 
         topsizer.Add(SimpleText(toprow, 'Save Current Position:',
-                                style=wx.ALIGN_RIGHT), 0,
-                     wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
+                                style=wx.ALIGN_RIGHT), 1,
+                     wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
 
         topsizer.Add(self.pos_name, 1,
-                     wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.GROW|wx.ALL, 2)
+                     wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.GROW|wx.ALL, 1)
 
         pack(toprow, topsizer)
 
@@ -155,7 +158,7 @@ class InstrumentPanel(wx.Panel):
         rsizer.Add(self.pos_list, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER, 1)
         pack(rpanel, rsizer)
 
-        splitter.SplitVertically(lpanel, rpanel, 1)
+        splitter.SplitVertically(lpanel, rpanel, 0)
             
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(splitter, 1, wx.ALIGN_LEFT|wx.GROW|wx.ALL, 3)
@@ -164,7 +167,8 @@ class InstrumentPanel(wx.Panel):
     @EpicsFunction
     def PV_Panel(self, panel, sizer, pvname):
         pv = epics.PV(pvname)
-        time.sleep(0.002)
+        self.pvs.append(pv)
+
         for control in panel.Children:
             control.Destroy()
         sizer.Clear()
@@ -175,7 +179,7 @@ class InstrumentPanel(wx.Panel):
             pref, suff = pvname.split('.')
         dtype  = epics.caget("%s.RTYP" % pref)
         if dtype.lower() == 'motor':
-            sizer.Add(MotorPanel(panel, pvname, size=(450, 25)), 0,
+            sizer.Add(MotorPanel(panel, pvname, size=(450, 25)), 1,
                       wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
             pack(panel, sizer)
             return
@@ -194,26 +198,82 @@ class InstrumentPanel(wx.Panel):
         sizer.Add(control, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
         pack(panel, sizer)
         sizer.Layout()
-        self.Resize()
-        self.Refresh()
         return
         
+    @EpicsFunction
+    def save_current_position(self, posname):
+        values = {}
+        for p in self.pvs:
+            values[p.pvname] = p.value
+        self.db.save_position(posname, self.inst, values)
+        
     def onSavePosition(self, evt=None):
-        print 'save position', evt.GetString(), self.inst
+        posname = evt.GetString()
+        self.save_current_position(posname)
+        if posname not in self.pos_list.GetItems():
+            self.pos_list.Append(posname)
 
-    def onSelectPosition(self, evt=None):
-        print 'select position', evt.GetString(), self.inst
-
-    def onRightClick(self, evt=None):
-        print 'right click ', evt.GetString(), self.inst        
+    @EpicsFunction
+    def restore_complete(self):
+        val = self.db.restore_complete()
+        return val
+    
+    @EpicsFunction
+    def restore_position(self, posname, timeout=5.0):
+        self.db.restore_position(posname, self.inst, wait=True)
+        #         t0 = time.time()
+        #         while time.time()-t0 < timeout:
+        #             if self.restore_complete():
+        #                 break
+        #             time.sleep(0.1)
 
     def onGo(self, evt=None):
         posname = self.pos_list.GetStringSelection()
-        print 'on go ', evt.GetString(), self.inst, posname
+        self.restore_position(posname)
+        
+    def onSelectPosition(self, evt=None):
+        pass # print 'select position', evt.GetString(), self.inst
+
+    def onRightClick(self, evt=None):
+        menu = wx.Menu()
+        if not hasattr(self, 'popup_up1'):
+            for item in ('popup_up1', 'popup_dn1',
+                         'popup_upall', 'popup_dnall',
+                         'popup_rename'):
+                setattr(self, item,  wx.NewId())
+                self.Bind(wx.EVT_MENU, self.onPosRightEvent,
+                          id=getattr(self, item))
+            
+        menu.Append(self.popup_up1, "Move up")
+        menu.Append(self.popup_dn1, "Move down")
+        menu.Append(self.popup_upall, "Move to top")
+        menu.Append(self.popup_dnall, "Move to bottom")
+        self.PopupMenu(menu)
+        menu.Destroy()
+
+
+    def onPosRightEvent(self, event=None, posname=None):
+        idx = self.pos_list.GetSelection()
+        if idx < 0: # no item selected
+            return
+        
+        wid = event.GetId()
+        namelist = self.pos_list.GetItems()
+        if wid == self.popup_up1 and idx > 0:
+            namelist.insert(idx-1, namelist.pop(idx))
+        elif wid == self.popup_dn1 and idx < len(namelist):
+            namelist.insert(idx+1, namelist.pop(idx))
+        elif wid == self.popup_upall:
+            namelist.insert(0, namelist.pop(idx))            
+        elif wid == self.popup_dnall:
+            namelist.append( namelist.pop(idx))
+
+        self.pos_list.Clear()
+        for posname in namelist:
+            self.pos_list.Append(posname)
 
     def onErase(self, evt=None):
         posname = self.pos_list.GetStringSelection()
-
         print 'on erase ', evt.GetString(), self.inst, posname
                   
     
@@ -260,9 +320,10 @@ class InstrumentFrame(wx.Frame):
 
         self.nb = flat_nb.FlatNotebook(self, wx.ID_ANY, agwStyle=style)
 
-        self.nb.SetActiveTabColour(wx.Colour(250,250,105))
+        self.nb.SetActiveTabColour(wx.Colour(254,254,195))
         self.nb.SetTabAreaColour(wx.Colour(250,250,245))
-        self.nb.SetNonActiveTabTextColour(wx.Colour(10,10,80))
+        self.nb.SetNonActiveTabTextColour(wx.Colour(10,10,180))
+        self.nb.SetActiveTabTextColour(wx.Colour(80,10,10))
         self.nb.SetBackgroundColour(wx.Colour(235,235,225))
 
         mainsizer = wx.BoxSizer(wx.VERTICAL)
@@ -272,7 +333,8 @@ class InstrumentFrame(wx.Frame):
         for inst in self.db.get_all_instruments():
             self.connect_pvs(inst, wait_time=1.0)
 
-            self.nb.AddPage(InstrumentPanel(self, inst), inst.name, True)
+            self.nb.AddPage(InstrumentPanel(self, inst, self.db),
+                            inst.name, True)
         self.Thaw()
             
         pack(self, mainsizer)

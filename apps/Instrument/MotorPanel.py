@@ -147,7 +147,6 @@ class MotorPanel(wx.Panel):
             wx.CallAfter(self.onMotorEvent,
                          pvname=uname, field=f)
 
-            
     def CreatePanel(self,style='normal'):
         " build (but do not fill in) panel components"
         sstyle = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.ST_NO_AUTORESIZE 
