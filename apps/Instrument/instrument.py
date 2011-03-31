@@ -293,6 +293,11 @@ arguments
 
         return default
 
+    def get_all_instruments(self):
+        """return instrument list
+        """
+        return [f for f in self.query(Instrument)]
+
     def get_instrument(self, name):
         """return instrument by name
         """

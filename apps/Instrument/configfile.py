@@ -39,9 +39,11 @@ class InstrumentConfig(object):
     basename = 'epics_insts'
     sections = ('general', 'dbs', 'user_settings') 
     
-    def __init__(self):
-        self.conffile = os.path.join(get_appdir(self.basename),
-                                                'config.ini')
+    def __init__(self, name=None):
+        self.conffile = name
+        if name is None:
+            self.conffile = os.path.join(get_appdir(self.basename),
+                                         'config.ini')
         self.conf = {}
         self.cp =  ConfigParser()
         self.read()
@@ -49,7 +51,7 @@ class InstrumentConfig(object):
     def read(self):
         for s in self.sections:
             self.conf[s] = {}
-
+        print 'Conf file ', self.conffile
         if not os.path.exists(self.conffile):
             self.cp.readfp(StringIO(default_config))
         self.cp.read(self.conffile)
@@ -59,7 +61,6 @@ class InstrumentConfig(object):
                 for opt in self.cp.options(sect):
                     if opt is None:
                         continue
-                    print sect, opt, self.cp.get(sect, opt)
                     self.conf[sect][opt] = self.cp.get(sect, opt)
 
     def write(self, fname=None):
@@ -69,13 +70,14 @@ class InstrumentConfig(object):
         for sect in self.sections:
             out.append('[%s]\n' % sect)
             if sect in self.conf:
-                for key, val in self.conf[sect].itmems():
+                for key in sorted(self.conf[sect]):
+                    val = self.conf[sect][key]
                     out.append('%s = %s\n' % (key, val))
         
         fout = open(fname, 'w')
         fout.writelines(out)
         fout.close()
-        print 'wrote ', fnane
+        print 'wrote ', fname
         
     def get_dblist(self):
         dblist = [self.conf['dbs'].get('most_recent', '')]
@@ -86,6 +88,20 @@ class InstrumentConfig(object):
             if (key != 'most_recent' and len(val) > 0):
                 dblist.append(val)
         return dblist
+
+    def set_current_db(self, dbname):
+        dblist = self.get_dblist()
+        idx = 1
+        newlist = [dbname]
+        for name in dblist:
+            if len(name.strip()) > 0 and name not in newlist:
+                key = '%2.2i' % idx
+                self.conf['dbs'][key] = name
+                idx += 1
+                
+        self.conf['dbs']['most_recent'] = dbname
+        print 'SET CURRENT DB: ', self.conf['dbs']
+        
     
             
         
