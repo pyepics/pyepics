@@ -7,15 +7,19 @@ import wx.lib.filebrowsebutton as filebrowse
 from wx.lib.wordwrap import wordwrap
 import wx.lib.agw.flatnotebook as flat_nb
 
+import wx.lib.mixins.inspection
+
 import sys
 import time
 import epics
-from epics.wx import finalize_epics, MotorPanel, EpicsFunction
+from epics.wx import finalize_epics, EpicsFunction, \
+     pvText, pvFloatCtrl, pvTextCtrl, pvEnumChoice
 
 from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
      Closure, NumericCombo, pack, popup, \
-     FileSave, FileOpen, SelectWorkdir \
+     FileSave, FileOpen, SelectWorkdir 
 
+from MotorPanel import MotorPanel
 
 from configfile import InstrumentConfig
 from instrument import isInstrumentDB, InstrumentDB
@@ -78,41 +82,54 @@ class InstrumentPanel(wx.Panel):
         self.inst = inst
         wx.Panel.__init__(self, parent, size=size)
         
-        lpanel = wx.Panel(self, size=(350,200))
-        rpanel = wx.Panel(self, size=(150,200))
+        splitter = wx.SplitterWindow(self, style=wx.SP_LIVE_UPDATE)
+        splitter.SetMinimumPaneSize(150)
+       
+        lpanel = wx.Panel(splitter, size=(550, 175))
+        rpanel = wx.Panel(splitter, size=(150, 175))
         
         toprow = wx.Panel(lpanel)
-        self.pos_name =  wx.TextCtrl(toprow, value="", size=(180, 25),
+        self.pos_name =  wx.TextCtrl(toprow, value="", size=(220, 25),
                                      style= wx.TE_PROCESS_ENTER)
         self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
 
         topsizer = wx.BoxSizer(wx.HORIZONTAL)
-        tfont  = self.GetFont() # .Bold()
-        tfont.PointSize += 1
+        tfont = self.GetFont()
+        tfont.PointSize += 3
         tfont.SetWeight(wx.BOLD)
 
         topsizer.Add(SimpleText(toprow, inst.name,
-                                font=tfont, colour=wx.BLUE,
-                                minsize=(150,-1),
-                                style=wx.ALIGN_LEFT), 1,
-                     wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
+                                font=tfont, colour=(170, 0, 00),
+                                minsize=(175, -1),
+                                style=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL), 0,
+                     wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL, 2)
 
         topsizer.Add(SimpleText(toprow, 'Save Current Position:',
                                 style=wx.ALIGN_RIGHT), 0,
                      wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
 
         topsizer.Add(self.pos_name, 1,
-                     wx.ALIGN_CENTER_VERTICAL|wx.GROW|wx.ALL, 2)
+                     wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.GROW|wx.ALL, 2)
 
         pack(toprow, topsizer)
 
         lsizer = wx.BoxSizer(wx.VERTICAL)
-        lsizer.Add(toprow, 0,  wx.ALIGN_LEFT|wx.TOP, 1)
+        lsizer.Add(toprow, 0,  wx.GROW|wx.ALIGN_LEFT|wx.TOP, 1)
 
+        self.pvpanels = {}
         for x in inst.pvs:
-            lsizer.Add(wx.StaticText(lpanel, label='pv: %s' % x,
-                                     size=(220,-1)), 1, wx.GROW|wx.EXPAND|wx.ALL, 2)
-
+            thispanel = wx.Panel(lpanel)
+            thissizer = wx.BoxSizer(wx.HORIZONTAL)
+            thissizer.Add(wx.StaticText(thispanel,
+                                        label='Connecting %s' % x.name),
+                          0, wx.ALL|wx.ALIGN_CENTER, 1)
+            pack(thispanel, thissizer)
+                           
+            lsizer.Add(thispanel, 1, wx.TOP|wx.ALL, 2)
+            self.PV_Panel(thispanel, thissizer, x.name)            
+            
+        time.sleep(0.05)
+        
         pack(lpanel, lsizer)
 
         rsizer = wx.BoxSizer(wx.VERTICAL)
@@ -131,20 +148,56 @@ class InstrumentPanel(wx.Panel):
         self.pos_list.Bind(wx.EVT_RIGHT_DOWN, self.onRightClick)
 
         self.pos_list.Clear()
-        print 'Inst Positions: ', inst, inst.positions
         for pos in inst.positions:
             self.pos_list.Append(pos.name)
 
-        
         rsizer.Add(brow,          0, wx.ALIGN_LEFT|wx.ALL)
         rsizer.Add(self.pos_list, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER, 1)
         pack(rpanel, rsizer)
+
+        splitter.SplitVertically(lpanel, rpanel, 1)
             
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(lpanel, 0, wx.ALIGN_LEFT|wx.GROW|wx.ALL, 1)
-        sizer.Add(rpanel, 1, wx.ALIGN_RIGHT|wx.GROW|wx.ALL, 1)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(splitter, 1, wx.ALIGN_LEFT|wx.GROW|wx.ALL, 3)
         pack(self, sizer)
 
+    @EpicsFunction
+    def PV_Panel(self, panel, sizer, pvname):
+        pv = epics.PV(pvname)
+        time.sleep(0.002)
+        for control in panel.Children:
+            control.Destroy()
+        sizer.Clear()
+            
+        # check for motor
+        pref = pvname
+        if '.' in pvname:
+            pref, suff = pvname.split('.')
+        dtype  = epics.caget("%s.RTYP" % pref)
+        if dtype.lower() == 'motor':
+            sizer.Add(MotorPanel(panel, pvname, size=(450, 25)), 0,
+                      wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
+            pack(panel, sizer)
+            return
+        
+        label = SimpleText(panel, pvname, colour=wx.BLUE,
+                           minsize=(100,-1),style=wx.ALIGN_LEFT)
+
+        if pv.type in ('double', 'int', 'long', 'short'):
+            control = pvFloatCtrl(panel, pv=pv)
+        elif pv.type in ('string', 'unicode'):
+            control = pvTextCtrl(panel, pv=pv)
+        elif pv.type == 'enum':
+            control = pvEnumChoice(panel, pv=pv)
+
+        sizer.Add(label,   0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
+        sizer.Add(control, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
+        pack(panel, sizer)
+        sizer.Layout()
+        self.Resize()
+        self.Refresh()
+        return
+        
     def onSavePosition(self, evt=None):
         print 'save position', evt.GetString(), self.inst
 
@@ -188,7 +241,7 @@ class InstrumentFrame(wx.Frame):
         self.config.set_current_db(dbname)
 
         wx.Frame.__init__(self, parent=parent, title='Epics Instruments',
-                          size=(450, 550), **kwds)
+                          size=(700, 350), **kwds)
 
         self.SetBackgroundColour(wx.Colour(245,245,235))
         
@@ -217,6 +270,8 @@ class InstrumentFrame(wx.Frame):
 
         self.Freeze()
         for inst in self.db.get_all_instruments():
+            self.connect_pvs(inst, wait_time=1.0)
+
             self.nb.AddPage(InstrumentPanel(self, inst), inst.name, True)
         self.Thaw()
             
@@ -224,6 +279,21 @@ class InstrumentFrame(wx.Frame):
         mainsizer.Layout()
         self.Refresh()
         self.SendSizeEvent()
+        
+    @EpicsFunction
+    def connect_pvs(self, inst, wait_time=2.0):
+        """connect to PVs for an instrument.."""
+        self.connected = False
+        pvobjs = []
+        for pv in inst.pvs:
+            pvobjs.append(epics.PV(pv.name))
+            time.sleep(0.002)
+        t0 = time.time()
+        while (time.time() - t0) < wait_time:
+            time.sleep(0.002)
+            if all(x.connected for x in pvobjs):
+                break
+        return
         
     def create_Menus(self):
         """create menus"""
@@ -293,15 +363,22 @@ class InstrumentFrame(wx.Frame):
         finalize_epics()
         self.Destroy()
 
+class TestApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
+    def __init__(self, conf=None, dbname=None, **kws):
+        self.conf  = conf
+        self.dbname  = dbname
+        wx.App.__init__(self)
+        
+    def OnInit(self):
+        self.Init() 
+        frame = InstrumentFrame(conf=conf, dbname=dbname)
+        frame.Show()
+        self.SetTopWindow(frame)
+        return True
+
 if __name__ == '__main__':
     dbname = 'Test.einst'
     conf = 'test.conf'
-    if len(sys.argv)>1:
-        motors = sys.argv[1:]
-    
-    app = wx.App(redirect=False)
-    InstrumentFrame(conf=conf, dbname=dbname).Show()
-    
-    app.MainLoop()
+    TestApp(conf=conf, dbname=dbname).MainLoop()
 
 
