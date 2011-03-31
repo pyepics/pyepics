@@ -27,9 +27,12 @@ def get_appdir(appname):
 
 default_config="""
 [general]
-   
+verify_erase = True
+verify_move = True
+query_move = True
+
 [dbs]
-most_recent=
+most_recent=Test.einst
 
 [user]
 name=
@@ -100,5 +103,12 @@ class InstrumentConfig(object):
         self.conf['dbs']['most_recent'] = dbname
         
     
-            
-        
+    def get_dblist(self):
+        dblist = [self.conf['dbs'].get('most_recent', '')]
+        for key in sorted(self.conf['dbs'].keys()):
+            val = self.conf['dbs'][key]
+            if val is None: continue
+            val = val.strip()
+            if (key != 'most_recent' and len(val) > 0):
+                dblist.append(val)
+        return dblist

@@ -55,7 +55,7 @@ class ConnectDialog(wx.Dialog):
 
         wx.Dialog.__init__(self, parent, wx.ID_ANY, title=title)
 
-        title = wx.StaticText(parent, label = self.msg)
+        title = wx.StaticText(self, label = self.msg)
         self.filebrowser = FileBrowser(self,  # label='Select File:',
                                        size=(450, -1))
 
@@ -78,12 +78,12 @@ class ConnectDialog(wx.Dialog):
 class InstrumentPanel(wx.Panel):
     """ create Panel for an instrument"""
 
-    def __init__(self, parent, inst, db=None, size=(-1, -1)):
+    def __init__(self, parent, inst, conf=None, db=None, size=(-1, -1)):
         self.inst = inst
         self.db   = db
+        self.conf = conf
         self.verify_move = True
         self.verify_erase = True
-        
         self.pvs  = []
         wx.Panel.__init__(self, parent, size=size)
 
@@ -234,6 +234,9 @@ class InstrumentPanel(wx.Panel):
             postext.append('  %s= %s' % (pvpos.pv.name, pvpos.value))
         postext = '\n'.join(postext)
 
+        # if self.query_move:
+        #  more detailed frame of saved/current position and yes/no for each move
+        # 
         if self.verify_move:
             ret = popup(self, "Move to %s?: \n%s" % (posname, postext),
                         'Verify Move',
@@ -353,7 +356,8 @@ class InstrumentFrame(wx.Frame):
         for inst in self.db.get_all_instruments():
             self.connect_pvs(inst, wait_time=1.0)
 
-            self.nb.AddPage(InstrumentPanel(self, inst, self.db),
+            self.nb.AddPage(InstrumentPanel(self, inst,
+                                            conf=self.config, db=self.db),
                             inst.name, True)
         self.Thaw()
             
@@ -396,7 +400,7 @@ class InstrumentFrame(wx.Frame):
                  action=self.onInstEdit)                 
         inst_menu.AppendSeparator()
         add_menu(self, inst_menu, "General Stings","Edit Instrument List, etc",
-                 action=self.onInstEdit)                 
+                 action=self.onSettings)                 
         
         add_menu(self, help_menu, 'About',
                  "More information about this program", action=self.onAbout)
@@ -423,8 +427,8 @@ class InstrumentFrame(wx.Frame):
     def onInstEdit(self, event=None):
         print 'edit this inst ', self.nb.GetCurrentPage().inst
 
-    def onInstEdit(self, event=None):
-        print 'edit this inst ', self.nb.GetCurrentPage().inst
+    def onSettings(self, event=None):
+        print 'edit settings ', self.nb.GetCurrentPage().inst
 
         
         
@@ -459,8 +463,11 @@ class TestApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         return True
 
 if __name__ == '__main__':
-    dbname = 'Test.einst'
+    dbname = None # 'Test.einst'
     conf = 'test.conf'
-    TestApp(conf=conf, dbname=dbname).MainLoop()
+    # app = wx.PySimpleApp()
+    # InstrumentFrame(conf=conf, dbname=dbname).Show()
+    app = TestApp(conf=conf, dbname=dbname)
+    app.MainLoop()
 
 
