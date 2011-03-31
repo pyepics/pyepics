@@ -211,7 +211,6 @@ class InstrumentFrame(wx.Frame):
         self.nb.SetTabAreaColour(wx.Colour(250,250,245))
         self.nb.SetNonActiveTabTextColour(wx.Colour(10,10,80))
         self.nb.SetBackgroundColour(wx.Colour(235,235,225))
-        self.Bind(fnb.EVT_FLATNOTEBOOK_PAGE_DROPPED, self.onDrop)
 
         mainsizer = wx.BoxSizer(wx.VERTICAL)
         mainsizer.Add(self.nb, 1, wx.EXPAND)
@@ -230,7 +229,7 @@ class InstrumentFrame(wx.Frame):
         """create menus"""
         mbar = wx.MenuBar()
         file_menu = wx.Menu()
-        opts_menu = wx.Menu()
+        inst_menu = wx.Menu()
         help_menu = wx.Menu()
 
         add_menu(self, file_menu, "&Open", "Open Instruments File")
@@ -239,13 +238,19 @@ class InstrumentFrame(wx.Frame):
         add_menu(self, file_menu, "E&xit", "Terminate the program",
                  action=self.onClose)
 
-        add_menu(self, opts_menu, "&Instruments","Add Instrument")
-
-        add_menu(self, help_menu, '&About',
+        add_menu(self, inst_menu, "&Add Instrument","Add New Instrument",
+                 action=self.onInstAdd)
+        add_menu(self, inst_menu, "&Edit Current Instrument","Edit Current Instrument",
+                 action=self.onInstEdit)                 
+        inst_menu.AppendSeparator()
+        add_menu(self, inst_menu, "General Stings","Edit Instrument List, etc",
+                 action=self.onInstEdit)                 
+        
+        add_menu(self, help_menu, 'About',
                  "More information about this program", action=self.onAbout)
 
         mbar.Append(file_menu, "&File")
-        mbar.Append(opts_menu, "&Options")
+        mbar.Append(inst_menu, "&Instruments")
         mbar.Append(help_menu, "&Help")
 
         self.SetMenuBar(mbar)
@@ -260,9 +265,19 @@ class InstrumentFrame(wx.Frame):
     def write_message(self,text,status='normal'):
         self.SetStatusText(text)
 
-    def onAbout(self, event):
-        print 'Pages: ', [self.nb.GetPage(i).inst for i in range(self.nb.GetPageCount())]
+    def onInstAdd(self, event=None):
+        print 'add inst'
 
+    def onInstEdit(self, event=None):
+        print 'edit this inst ', self.nb.GetCurrentPage().inst
+
+    def onInstEdit(self, event=None):
+        print 'edit this inst ', self.nb.GetCurrentPage().inst
+
+        
+        
+
+    def onAbout(self, event=None):
         # First we create and fill the info object
         info = wx.AboutDialogInfo()
         info.Name = "Epics Instruments"
@@ -272,12 +287,9 @@ class InstrumentFrame(wx.Frame):
         wx.AboutBox(info)
 
 
-    def onDrop(self, event=None):
-        print 'onDrop ', event.GetString(), event.GetSelection(), event.GetOldSelection()
-        print event.GetClientData(), event.GetClientObject(), event.GetId()
-        print dir(event)
-        
     def onClose(self, event):
+        print 'Should Get Page List: ',  [self.nb.GetPage(i).inst for i in range(self.nb.GetPageCount())]
+        print 'Should save config file, with this info'
         finalize_epics()
         self.Destroy()
 
