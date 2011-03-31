@@ -51,7 +51,6 @@ class InstrumentConfig(object):
     def read(self):
         for s in self.sections:
             self.conf[s] = {}
-        print 'Conf file ', self.conffile
         if not os.path.exists(self.conffile):
             self.cp.readfp(StringIO(default_config))
         self.cp.read(self.conffile)
@@ -77,7 +76,6 @@ class InstrumentConfig(object):
         fout = open(fname, 'w')
         fout.writelines(out)
         fout.close()
-        print 'wrote ', fname
         
     def get_dblist(self):
         dblist = [self.conf['dbs'].get('most_recent', '')]
@@ -100,7 +98,6 @@ class InstrumentConfig(object):
                 idx += 1
                 
         self.conf['dbs']['most_recent'] = dbname
-        print 'SET CURRENT DB: ', self.conf['dbs']
         
     
             
