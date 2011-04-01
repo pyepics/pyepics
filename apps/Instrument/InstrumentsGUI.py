@@ -3,302 +3,25 @@
 #  Instruments GUI
 
 import wx
-import wx.lib.filebrowsebutton as filebrowse
 from wx.lib.wordwrap import wordwrap
 import wx.lib.agw.flatnotebook as flat_nb
-
 import wx.lib.mixins.inspection
 
 import sys
 import time
+import shutil
+
 import epics
-from epics.wx import finalize_epics, EpicsFunction, \
-     pvText, pvFloatCtrl, pvTextCtrl, pvEnumChoice
+from epics.wx import finalize_epics, EpicsFunction
 
 from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
      Closure, NumericCombo, pack, popup, \
      FileSave, FileOpen, SelectWorkdir 
 
-from MotorPanel import MotorPanel
-
 from configfile import InstrumentConfig
 from instrument import isInstrumentDB, InstrumentDB
 
-FileBrowser = filebrowse.FileBrowseButtonWithHistory
-
-ALL_EXP  = wx.ALL|wx.EXPAND
-
-class SimpleText(wx.StaticText):
-    "simple static text wrapper"
-    def __init__(self, parent, label, minsize=None,
-                 font=None, colour=None, bgcolour=None,
-                 style=wx.ALIGN_CENTRE,  **kw):
-
-        wx.StaticText.__init__(self, parent, wx.ID_ANY,
-                               label=label, style=style, **kw)
-        if minsize is not None:
-            self.SetMinSize(minsize)
-        if font is not None:
-            self.SetFont(font)
-        if colour is not None:
-            self.SetForegroundColour(colour)
-        if bgcolour is not None:
-            self.SetBackgroundColour(bgcolour)
-
-class ConnectDialog(wx.Dialog):
-    """Connect to a recent or existing DB File, or create a new one"""
-
-    msg = '''Select Recent Instrument File, create a new one'''
-    
-    def __init__(self, parent=None, filelist=None,
-                 title='Select Instruments File'):
-
-        wx.Dialog.__init__(self, parent, wx.ID_ANY, title=title)
-
-        title = wx.StaticText(self, label = self.msg)
-        self.filebrowser = FileBrowser(self,  # label='Select File:',
-                                       size=(450, -1))
-
-        self.filebrowser.SetHistory(filelist)
-        self.filebrowser.SetLabel('File:')
-        if filelist is not None:
-            self.filebrowser.SetValue(filelist[0])
-        
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(wx.StaticText(self, label=self.msg), 0,
-                  wx.ALIGN_CENTER|wx.ALL|wx.GROW, 3)
-        sizer.Add(self.filebrowser, 1,
-                  wx.ALIGN_CENTER|wx.ALL|wx.GROW, 3)
-
-        sizer.Add(self.CreateButtonSizer(wx.OK| wx.CANCEL),
-                 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 4)
-
-        pack(self, sizer)
-        
-class InstrumentPanel(wx.Panel):
-    """ create Panel for an instrument"""
-
-    def __init__(self, parent, inst, conf=None, db=None, size=(-1, -1)):
-        self.inst = inst
-        self.db   = db
-        self.conf = conf
-        self.verify_move = True
-        self.verify_erase = True
-        self.pvs  = []
-        wx.Panel.__init__(self, parent, size=size)
-
-        splitter = wx.SplitterWindow(self,
-                                     style=wx.SP_3DSASH|wx.SP_LIVE_UPDATE)
-        splitter.SetMinimumPaneSize(150)
-       
-        lpanel = wx.Panel(splitter, size=(550, 175))
-        rpanel = wx.Panel(splitter, size=(150, 175))
-        
-        toprow = wx.Panel(lpanel, size=(450,-1))
-        self.pos_name =  wx.TextCtrl(toprow, value="", size=(220, 25),
-                                     style= wx.TE_PROCESS_ENTER)
-        self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
-
-        tfont = self.GetFont()
-        tfont.PointSize += 3
-        tfont.SetWeight(wx.BOLD)
-
-        topsizer = wx.BoxSizer(wx.HORIZONTAL)
-        topsizer.Add(SimpleText(toprow, inst.name,
-                                font=tfont, colour=(80, 10, 10),
-                                minsize=(125, -1),
-                                style=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL),
-                     0, wx.ALIGN_LEFT, 1)
-
-        topsizer.Add(SimpleText(toprow, 'Save Current Position:',
-                                style=wx.ALIGN_RIGHT), 1,
-                     wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
-
-        topsizer.Add(self.pos_name, 1,
-                     wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.GROW|wx.ALL, 1)
-
-        pack(toprow, topsizer)
-
-        lsizer = wx.BoxSizer(wx.VERTICAL)
-        lsizer.Add(toprow, 0,  wx.GROW|wx.ALIGN_LEFT|wx.TOP, 1)
-
-        self.pvpanels = {}
-        for x in inst.pvs:
-            thispanel = wx.Panel(lpanel)
-            thissizer = wx.BoxSizer(wx.HORIZONTAL)
-            thissizer.Add(wx.StaticText(thispanel,
-                                        label='Connecting %s' % x.name),
-                          0, wx.ALL|wx.ALIGN_CENTER, 1)
-            pack(thispanel, thissizer)
-                           
-            lsizer.Add(thispanel, 1, wx.TOP|wx.ALL, 2)
-            self.PV_Panel(thispanel, thissizer, x.name)            
-            
-        time.sleep(0.05)
-        
-        pack(lpanel, lsizer)
-
-        rsizer = wx.BoxSizer(wx.VERTICAL)
-        btn_goto = add_button(rpanel, "Go To",  size=(70, -1),
-                              action=self.onGo)
-        btn_erase = add_button(rpanel, "Erase",  size=(70, -1),
-                               action=self.onErase)
-        
-        brow = wx.BoxSizer(wx.HORIZONTAL)
-        brow.Add(btn_goto,   0, ALL_EXP|wx.ALIGN_LEFT, 1)
-        brow.Add(btn_erase,  0, ALL_EXP|wx.ALIGN_LEFT, 1)
-
-        self.pos_list  = wx.ListBox(rpanel)
-        self.pos_list.SetBackgroundColour(wx.WHITE)
-        self.pos_list.Bind(wx.EVT_LISTBOX,    self.onSelectPosition)
-        self.pos_list.Bind(wx.EVT_RIGHT_DOWN, self.onRightClick)
-
-        self.pos_list.Clear()
-        for pos in inst.positions:
-            self.pos_list.Append(pos.name)
-
-        rsizer.Add(brow,          0, wx.ALIGN_LEFT|wx.ALL)
-        rsizer.Add(self.pos_list, 1, wx.EXPAND|wx.ALIGN_CENTER, 1)
-        pack(rpanel, rsizer)
-
-        splitter.SplitVertically(lpanel, rpanel, 475)
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(splitter, 1, wx.ALIGN_LEFT|wx.GROW|wx.ALL, 3)
-
-        pack(self, sizer)
-
-    @EpicsFunction
-    def PV_Panel(self, panel, sizer, pvname):
-        pv = epics.PV(pvname)
-        self.pvs.append(pv)
-        pv.get_ctrlvars()
-        
-        for control in panel.Children:
-            control.Destroy()
-        sizer.Clear()
-            
-        # check for motor
-        pref = pvname
-        if '.' in pvname:
-            pref, suff = pvname.split('.')
-        dtype  = epics.caget("%s.RTYP" % pref)
-        if dtype.lower() == 'motor':
-            sizer.Add(MotorPanel(panel, pvname, size=(450, 25)), 1,
-                      wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
-            pack(panel, sizer)
-            return
-        
-        label = SimpleText(panel, pvname, colour=wx.BLUE,
-                           minsize=(100,-1),style=wx.ALIGN_LEFT)
-
-        if pv.type in ('double', 'int', 'long', 'short'):
-            control = pvFloatCtrl(panel, pv=pv)
-        elif pv.type in ('string', 'unicode'):
-            control = pvTextCtrl(panel, pv=pv)
-        elif pv.type == 'enum':
-            control = pvEnumChoice(panel, pv=pv)
-
-        sizer.Add(label,   0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
-        sizer.Add(control, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
-        pack(panel, sizer)
-        sizer.Layout()
-        return
-        
-    @EpicsFunction
-    def save_current_position(self, posname):
-        values = {}
-        for p in self.pvs:
-            values[p.pvname] = p.get(as_string=True)
-        self.db.save_position(posname, self.inst, values)
-        
-    def onSavePosition(self, evt=None):
-        posname = evt.GetString()
-        self.save_current_position(posname)
-        if posname not in self.pos_list.GetItems():
-            self.pos_list.Append(posname)
-
-    @EpicsFunction
-    def restore_position(self, posname, timeout=5.0):
-        self.db.restore_position(posname, self.inst, wait=True)
-
-    def onGo(self, evt=None):
-        posname = self.pos_list.GetStringSelection()
-
-        thispos = self.db.get_position(posname, self.inst)
-        if thispos is None:
-            return
-        
-        postext = []
-        
-        for pvpos in thispos.pvs:
-            postext.append('  %s= %s' % (pvpos.pv.name, pvpos.value))
-        postext = '\n'.join(postext)
-
-        # if self.query_move:
-        #  more detailed frame of saved/current position and yes/no for each move
-        # 
-        if self.verify_move:
-            ret = popup(self, "Move to %s?: \n%s" % (posname, postext),
-                        'Verify Move',
-                        style=wx.YES_NO|wx.ICON_QUESTION)
-            if ret != wx.ID_YES:
-                return
-        self.restore_position(posname)
-        
-    def onSelectPosition(self, evt=None):
-        pass # print 'select position', evt.GetString(), self.inst
-
-    def onRightClick(self, evt=None):
-        menu = wx.Menu()
-        if not hasattr(self, 'popup_up1'):
-            for item in ('popup_up1', 'popup_dn1',
-                         'popup_upall', 'popup_dnall',
-                         'popup_rename'):
-                setattr(self, item,  wx.NewId())
-                self.Bind(wx.EVT_MENU, self.onPosRightEvent,
-                          id=getattr(self, item))
-            
-        menu.Append(self.popup_up1, "Move up")
-        menu.Append(self.popup_dn1, "Move down")
-        menu.Append(self.popup_upall, "Move to top")
-        menu.Append(self.popup_dnall, "Move to bottom")
-        self.PopupMenu(menu)
-        menu.Destroy()
-
-
-    def onPosRightEvent(self, event=None, posname=None):
-        idx = self.pos_list.GetSelection()
-        if idx < 0: # no item selected
-            return
-        
-        wid = event.GetId()
-        namelist = self.pos_list.GetItems()
-        if wid == self.popup_up1 and idx > 0:
-            namelist.insert(idx-1, namelist.pop(idx))
-        elif wid == self.popup_dn1 and idx < len(namelist):
-            namelist.insert(idx+1, namelist.pop(idx))
-        elif wid == self.popup_upall:
-            namelist.insert(0, namelist.pop(idx))            
-        elif wid == self.popup_dnall:
-            namelist.append( namelist.pop(idx))
-
-        self.pos_list.Clear()
-        for posname in namelist:
-            self.pos_list.Append(posname)
-
-    def onErase(self, evt=None):
-        posname = self.pos_list.GetStringSelection()
-        
-        if self.verify_erase:
-            ret = popup(self, "Erase  %s?" % (posname),
-                        'Verify Erase',
-                        style=wx.YES_NO|wx.ICON_QUESTION)
-            if ret != wx.ID_YES:
-                return
-
-        self.db.remove_position(posname, self.inst)
-        ipos  =  self.pos_list.GetSelection()
-        self.pos_list.Delete(ipos)
+from utils import ConnectDialog, InstrumentPanel
     
 class InstrumentFrame(wx.Frame):
     def __init__(self, parent=None, conf=None, dbname=None, **kwds):
@@ -322,6 +45,7 @@ class InstrumentFrame(wx.Frame):
             self.db.create_newdb(dbname)            
 
         self.config.set_current_db(dbname)
+        self.dbname = dbname
 
         wx.Frame.__init__(self, parent=parent, title='Epics Instruments',
                           size=(700, 350), **kwds)
@@ -356,8 +80,8 @@ class InstrumentFrame(wx.Frame):
         for inst in self.db.get_all_instruments():
             self.connect_pvs(inst, wait_time=1.0)
 
-            self.nb.AddPage(InstrumentPanel(self, inst,
-                                            conf=self.config, db=self.db),
+            self.nb.AddPage(InstrumentPanel(self, inst, db=self.db,
+                                            writer = self.write_message),
                             inst.name, True)
         self.Thaw()
             
@@ -389,7 +113,8 @@ class InstrumentFrame(wx.Frame):
         help_menu = wx.Menu()
 
         add_menu(self, file_menu, "&Open", "Open Instruments File")
-        add_menu(self, file_menu, "&Save", "Save Instruments File")        
+        add_menu(self, file_menu, "&Save As", "Save Instruments File",
+                 action=self.onSave)        
         file_menu.AppendSeparator()
         add_menu(self, file_menu, "E&xit", "Terminate the program",
                  action=self.onClose)
@@ -430,8 +155,6 @@ class InstrumentFrame(wx.Frame):
     def onSettings(self, event=None):
         print 'edit settings ', self.nb.GetCurrentPage().inst
 
-        
-        
 
     def onAbout(self, event=None):
         # First we create and fill the info object
@@ -443,13 +166,38 @@ class InstrumentFrame(wx.Frame):
         wx.AboutBox(info)
 
 
+    def onSave(self, event=None):
+        wildcard = 'Instrument Files (*.einst)|*.einst|All files (*.*)|*.*'
+        outfile = FileSave(self, 'Save Instrument File As',
+                           wildcard=wildcard,
+                           default_file=self.dbname)
+
+        # save current tab/instrument mapping
+        insts = [(i, self.nb.GetPage(i).inst.name) for i in range(self.nb.GetPageCount())]
+        if outfile is not None:
+            self.db.close()
+            shutil.copy(self.dbname, outfile)
+            time.sleep(1)
+            self.dbname = outfile            
+            self.config.set_current_db(outfile)
+            self.config.write()
+           
+            self.db = InstrumentDB(outfile)
+            # set current tabs to the new db
+            for nbpage, name in insts:
+                self.nb.GetPage(nbpage).db = self.db
+                self.nb.GetPage(nbpage).inst = self.db.get_instrument(name)
+
+            self.message("Saved Instrument File: %s" % outfile)
+                
+        
     def onClose(self, event):
         print 'Should Get Page List: ',  [self.nb.GetPage(i).inst for i in range(self.nb.GetPageCount())]
         print 'Should save config file, with this info'
         finalize_epics()
         self.Destroy()
 
-class TestApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
+class InstrumentApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def __init__(self, conf=None, dbname=None, **kws):
         self.conf  = conf
         self.dbname  = dbname
@@ -467,7 +215,7 @@ if __name__ == '__main__':
     conf = 'test.conf'
     # app = wx.PySimpleApp()
     # InstrumentFrame(conf=conf, dbname=dbname).Show()
-    app = TestApp(conf=conf, dbname=dbname)
+    app = InstrumentApp(conf=conf, dbname=dbname)
     app.MainLoop()
 
 

@@ -23,7 +23,7 @@ from creator import make_newdb, backup_versions
 
 
 from sqlalchemy import MetaData, create_engine, and_
-from sqlalchemy.orm import sessionmaker,  mapper, relationship, backref
+from sqlalchemy.orm import sessionmaker,  mapper, clear_mappers, relationship, backref
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import  NoResultFound
 
@@ -101,7 +101,6 @@ class _BaseTable(object):
         fields = ['%s' % getattr(self, 'name', 'UNNAMED')]
         return "<%s(%s)>" % (name, ', '.join(fields))
 
-
 class Info(_BaseTable):
     "general information table (versions, etc)"
     def __repr__(self):
@@ -176,12 +175,18 @@ class InstrumentDB(object):
 
         self.dbname = dbname
         self.engine = create_engine('sqlite:///%s' % self.dbname)
-        self.metadata =  MetaData(self.engine)
-        
-        self.metadata.reflect()
-        tables = self.tables = self.metadata.tables
+        self.conn = self.engine.connect()
         self.session = sessionmaker(bind=self.engine)()
 
+        self.metadata =  MetaData(self.engine)
+        self.metadata.reflect()
+        tables = self.tables = self.metadata.tables
+        
+        try:
+            clear_mappers()
+        except:
+            print 'clear mappers complained'
+            pass
         mapper(Info,     tables['info'])
         mapper(Command,  tables['command'])
         mapper(PV,       tables['pv'])
@@ -214,8 +219,8 @@ class InstrumentDB(object):
                            'command':   relationship(Command,
                                                      backref='inst_postcoms')})
 
-        self.conn = self.engine.connect()
-        
+
+            
     def commit(self):
         "commit session state"
         self.set_mod_time()        
@@ -231,6 +236,15 @@ class InstrumentDB(object):
         "generic query"
         return self.session.query(*args, **kws)
 
+    def get_info(self, key):
+        """get a value from a key in the info table"""
+        errmsg = "set_info expected 1 or None value for key='%s'"
+        out = self.query(Info).filter(Info.key==key).all()
+        thisrow = None_or_one(out, errmsg % key)
+        if thisrow is None:
+            return None
+        return thisrow.value
+        
     def set_info(self, key, value):
         """set key / value in the info table"""
         table = self.tables['info']

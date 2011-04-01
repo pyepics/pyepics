@@ -41,6 +41,8 @@ def NamedTable(tablename, metadata, keyid='id', nameid='name',
 
 class InitialData:
     info    = [["version", "1.0.0"],
+               ["verify_erase", "1"],
+               ["verify_move",   "1"],    # 0, 1, 2 (No, Yes, FullQuery)
                ["create_date", '<now>'], 
                ["modify_date", '<now>']]
 
@@ -119,7 +121,10 @@ def backup_versions(fname, max=10):
             fb1 = "%s.%i" % (fname, i+1)
             if os.path.exists(fb0):
                 print ' %s -> %s ' % (fb0, fb1)
-                shutil.move(fb0, fb1)
+                try:
+                    shutil.move(fb0, fb1)
+                except:
+                    pass 
         print ' %s -> %s.1 ' % (fname, fname)                
         shutil.move(fname, "%s.1" % fname)        
 
