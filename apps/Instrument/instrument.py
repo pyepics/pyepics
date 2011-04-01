@@ -325,6 +325,22 @@ arguments
         out = self.query(Instrument).filter(Instrument.name==name).all()
         return None_or_one(out, 'get_instrument expected 1 or None Instrument')
 
+    def set_pvtype(self, name, pvtype):
+        """ set a pv type"""
+        pv = self.get_pv(name)
+        out = self.query(PVType).all()
+        _pvtypes = dict([(t.name, t.id) for t in out])
+        if pvtype  in _pvtypes:
+            pv.pvtype_id = _pvtypes[pvtype]
+        else:
+            row = self.__addRow(PVType, ('name',), (pvtype,), **kws)
+            out = self.query(PVType).all()            
+            _pvtypes = dict([(t.name, t.id) for t in out])
+            if pvtype  in _pvtypes:
+                pv.pvtype_id = _pvtypes[typename]
+            
+        self.commit()
+        
     def get_pv(self, name):
         """return pv by name
         """
@@ -382,7 +398,7 @@ arguments
         self.commit()
         return inst
         
-    def add_pv(self, name, notes=None, attributes=None, **kws):
+    def add_pv(self, name, notes=None, attributes=None, pvtype=None, **kws):
         """add pv
         notes and attributes optional
         returns PV instance"""
@@ -390,6 +406,8 @@ arguments
         kws['attributes'] = attributes
 
         row = self.__addRow(PV, ('name',), (name,), **kws)
+        if pvtype is not None:
+            self.set_pvtype(name, pvtype)
         self.commit()
         return row
         

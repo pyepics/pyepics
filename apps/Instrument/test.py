@@ -17,14 +17,16 @@ if inst is None:
 inst = db.get_instrument(iname)
 print inst, inst.pvs, inst.positions
 
-db.close()
-time.sleep(0.1)
-print '=------------------------------------'
-db = instrument.InstrumentDB('Bob.einst')
-inst = db.get_instrument(iname)
-print inst, inst.pvs
-print inst.positions
-
+for p in inst.pvs:
+    print p, p.pvtype
+# db.close()
+# time.sleep(0.1)
+# print '=------------------------------------'
+# db = instrument.InstrumentDB('Bob.einst')
+# inst = db.get_instrument(iname)
+# print inst, inst.pvs
+# print inst.positions
+# ;
 #values = {}
 #for pv in pvlist:
 #    values[pv] = 0

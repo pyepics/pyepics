@@ -22,7 +22,8 @@ from configfile import InstrumentConfig
 from instrument import isInstrumentDB, InstrumentDB
 
 from utils import ConnectDialog, InstrumentPanel
-    
+from settingsframe import SettingsFrame
+from editframe import EditFrame
 class InstrumentFrame(wx.Frame):
     def __init__(self, parent=None, conf=None, dbname=None, **kwds):
 
@@ -80,21 +81,20 @@ class InstrumentFrame(wx.Frame):
         pack(self, sizer)
         self.Refresh()
 
-        # sizer.Layout()
-        # self.SendSizeEvent()
-
     def create_nbpages(self):
         #self.Freeze()
         if self.nb.GetPageCount() > 0:
             self.nb.DeleteAllPages()
 
         for inst in self.db.get_all_instruments():
-            self.connect_pvs(inst, wait_time=1.0)
-            panel = InstrumentPanel(self, inst, db=self.db,
-                                    writer = self.write_message)
-            self.nb.AddPage(panel, inst.name, True)
+            self.add_instrument_page(inst)
         # self.Thaw()
-            
+
+    def add_instrument_page(self, inst):
+        self.connect_pvs(inst, wait_time=1.0)
+        panel = InstrumentPanel(self, inst, db=self.db,
+                                writer = self.write_message)
+        self.nb.AddPage(panel, inst.name, True)
         
     @EpicsFunction
     def connect_pvs(self, inst, wait_time=2.0):
@@ -127,9 +127,9 @@ class InstrumentFrame(wx.Frame):
                  action=self.onClose)
 
         add_menu(self, inst_menu, "&Add New Instrument","Add New Instrument",
-                 action=self.onInstAdd)
+                 action=self.onAddInstrument)
         add_menu(self, inst_menu, "&Edit Current Instrument","Edit Current Instrument",
-                 action=self.onInstEdit)                 
+                 action=self.onEditInstrument)                 
         inst_menu.AppendSeparator()
         add_menu(self, inst_menu, "General Stings","Edit Instrument List, etc",
                  action=self.onSettings)                 
@@ -153,15 +153,19 @@ class InstrumentFrame(wx.Frame):
     def write_message(self,text,status='normal'):
         self.SetStatusText(text)
 
-    def onInstAdd(self, event=None):
-        print 'add inst'
-
-    def onInstEdit(self, event=None):
-        print 'edit this inst ', self.nb.GetCurrentPage().inst
+    def onAddInstrument(self, event=None):
+        EditFrame(parent=self, db=self.db)
+        
+    def onEditInstrument(self, event=None):
+        inst = self.nb.GetCurrentPage().inst
+        EditFrame(parent=self, db=self.db, inst=inst)
 
     def onSettings(self, event=None):
-        print 'edit settings ', self.nb.GetCurrentPage().inst
-
+        try:
+            self.settings_frame.Raise()
+        except:
+            self.settting_frame = SettingsFrame(parent=self, db=self.db)
+        
 
     def onAbout(self, event=None):
         # First we create and fill the info object

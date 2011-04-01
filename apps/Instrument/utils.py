@@ -253,6 +253,7 @@ class InstrumentPanel(wx.Panel):
         self.pvpanels.pop(pvname)
         pv.get_ctrlvars()
 
+        instrument_pvs = [i.name for i in self.inst.pvs]
         # check if pv is a motor
         pref = pvname
         if '.' in pvname:
@@ -262,6 +263,7 @@ class InstrumentPanel(wx.Panel):
             self.pvdesc[pvname] = desc
         dtype = epics.caget("%s.RTYP" % pref)
         if dtype.lower() == 'motor':
+            self.db.set_pvtype(pvname, 'motor')
             sizer.Add(MotorPanel(panel, pvname, size=(450, 25)), 1,
                       wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
             pack(panel, sizer)
@@ -272,9 +274,12 @@ class InstrumentPanel(wx.Panel):
 
         if pv.type in ('double', 'int', 'long', 'short'):
             control = pvFloatCtrl(panel, pv=pv)
+            self.db.set_pvtype(pvname, 'numeric')
         elif pv.type in ('string', 'unicode'):
             control = pvTextCtrl(panel, pv=pv)
-        elif pv.type == 'enum':
+            self.db.set_pvtype(pvname, 'string')
+        elif pv.type == 'enum': 
+            self.db.set_pvtype(pvname, 'enum')
             control = pvEnumChoice(panel, pv=pv)
 
         sizer.Add(label,   0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
@@ -293,6 +298,21 @@ class InstrumentPanel(wx.Panel):
         
     def onSavePosition(self, evt=None):
         posname = evt.GetString()
+        verify = int(self.db.get_info('verify_overwrite'))
+        if verify and posname in self.pos_list.GetItems():
+
+            thispos = self.db.get_position(posname, self.inst)
+            postext = ["\nSaved Values were:\n"]
+            for pvpos in thispos.pvs:
+                postext.append('  %s= %s' % (pvpos.pv.name, pvpos.value))
+            postext = '\n'.join(postext)
+
+            ret = popup(self, "Overwrite %s?: \n%s" % (posname, postext),
+                        'Verify Overwrite',
+                        style=wx.YES_NO|wx.ICON_QUESTION)
+            if ret != wx.ID_YES:
+                return
+
         self.save_current_position(posname)
         if posname not in self.pos_list.GetItems():
             self.pos_list.Append(posname)
@@ -314,21 +334,10 @@ class InstrumentPanel(wx.Panel):
         thispos = self.db.get_position(posname, self.inst)
         if thispos is None:
             return
-        
-        postext = []
-        for pvpos in thispos.pvs:
-            postext.append('  %s= %s' % (pvpos.pv.name, pvpos.value))
-        postext = '\n'.join(postext)
 
         verify = int(self.db.get_info('verify_move'))
         if verify == 0:
             self.restore_position(posname)
-        #  elif verify == 1:
-        #            ret = popup(self, "Move to %s?: \n%s" % (posname, postext),
-        #                         'Verify Move',
-        #                         style=wx.YES_NO|wx.ICON_QUESTION)
-        #             if ret == wx.ID_YES:
-        #                 self.restore_position(posname)
         elif verify == 1:
             dlg = MoveToDialog(posname, self.inst, self.db, self.pvs,
                                pvdesc=self.pvdesc)
@@ -342,7 +351,6 @@ class InstrumentPanel(wx.Panel):
             else:
                 return
             dlg.Destroy()
-
         
     def onRightClick(self, evt=None):
         menu = wx.Menu()
