@@ -35,6 +35,83 @@ class ConnectDialog(wx.Dialog):
                  1, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
         pack(self, sizer)
 
+class MoveToDialog(wx.Dialog):
+    """Full Query for Move To for a Position"""
+    msg = '''Select Recent Instrument File, create a new one'''
+    def __init__(self,  posname, inst, db, pvs, pvdesc=None, **kws):
+
+        self.posname = posname
+        self.inst = inst
+        self.db   = inst
+        self.pvs  = pvs
+        if pvdesc is None:
+            pvdesc = {}
+        
+        thispos = db.get_position(posname, inst)
+        if thispos is None:
+            return
+
+        
+        title = "Move Instrument %s to Position '%s'?" % (inst.name, posname)
+        wx.Dialog.__init__(self, None, wx.ID_ANY, title=title)
+
+        sizer = wx.GridBagSizer(10, 4)
+
+        labstyle  = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.ALL
+        rlabstyle = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL
+        tstyle    = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL
+        # title row
+        tfont = self.GetFont()
+        tfont.PointSize += 2
+        tfont.SetWeight(wx.BOLD)
+        i = 0
+        for titleword in ('  PV', 'Current Value',
+                          'Saved Value', 'Move?'):
+            txt =SimpleText(self, titleword, font=tfont,
+                            minsize=(80, -1), 
+                            colour=(80, 10, 10), style=tstyle)
+            
+            sizer.Add(txt, (0, i), (1, 1), labstyle, 1)
+            i = i + 1
+
+        sizer.Add(wx.StaticLine(self, size=(150, -1),
+                                style=wx.LI_HORIZONTAL),
+                  (1, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 0)
+
+        self.checkboxes = {}
+        for irow, pvpos in enumerate(thispos.pvs):
+            pvname = desc = pvpos.pv.name
+            curr_val = self.pvs[pvname].get(as_string=True)
+            save_val = pvpos.value
+
+            if pvname in pvdesc:
+                desc = "%s (%s)" % (pvdesc[pvname], pvname)
+            
+            label = SimpleText(self, desc, style=tstyle, colour=wx.BLUE)
+            curr  = SimpleText(self, curr_val, style=tstyle)
+            saved = SimpleText(self, save_val, style=tstyle)
+            cbox  = wx.CheckBox(self, -1, "Move")
+            cbox.SetValue(True)
+            self.checkboxes[pvname] = (cbox, save_val)
+
+            sizer.Add(label, (irow+2, 0), (1, 1), labstyle,  2)
+            sizer.Add(curr,  (irow+2, 1), (1, 1), rlabstyle, 2)
+            sizer.Add(saved, (irow+2, 2), (1, 1), rlabstyle, 2)
+            sizer.Add(cbox,  (irow+2, 3), (1, 1), rlabstyle, 2)
+
+        sizer.Add(wx.StaticLine(self, size=(150, -1),
+                                style=wx.LI_HORIZONTAL),
+                  (irow+3, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 0)
+
+        btnsizer = wx.StdDialogButtonSizer()
+        btn = wx.Button(self, wx.ID_OK)
+        btn.SetDefault()
+        btnsizer.AddButton(btn)
+        btnsizer.AddButton(wx.Button(self, wx.ID_CANCEL))
+
+        btnsizer.Realize()
+        sizer.Add(btnsizer, (irow+4, 2), (1, 2), wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
+        pack(self, sizer)
 
 class InstrumentPanel(wx.Panel):
     """ create Panel for an instrument"""
@@ -44,7 +121,8 @@ class InstrumentPanel(wx.Panel):
         self.inst = inst
         self.db   = db
         self.write_message = writer
-        self.pvs  = []
+        self.pvs  = {}
+        self.pvdesc = {}
         wx.Panel.__init__(self, parent, size=size)
 
         splitter = wx.SplitterWindow(self,
@@ -160,7 +238,7 @@ class InstrumentPanel(wx.Panel):
         by the timer"""
         if pvname not in self.pvs:
             pv = epics.PV(pvname)
-            self.pvs.append(pv)
+            self.pvs[pvname] = pv
         else:
             pv = self.pvs[pvname]
             
@@ -179,7 +257,10 @@ class InstrumentPanel(wx.Panel):
         pref = pvname
         if '.' in pvname:
             pref, suff = pvname.split('.')
-        dtype  = epics.caget("%s.RTYP" % pref)
+        desc  = epics.caget("%s.DESC" % pref)
+        if desc is not None:
+            self.pvdesc[pvname] = desc
+        dtype = epics.caget("%s.RTYP" % pref)
         if dtype.lower() == 'motor':
             sizer.Add(MotorPanel(panel, pvname, size=(450, 25)), 1,
                       wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
@@ -217,13 +298,19 @@ class InstrumentPanel(wx.Panel):
             self.pos_list.Append(posname)
 
     @EpicsFunction
-    def restore_position(self, posname, timeout=5.0):
-        self.db.restore_position(posname, self.inst, wait=True)
-        self.write("Moved '%s' to position '%s'" % (self.inst.name, posname))
+    def restore_position(self, posname, exclude_pvs=None, timeout=5.0):
+        self.db.restore_position(posname, self.inst,
+                                 wait=True, timeout=timeout,
+                                 exclude_pvs=exclude_pvs)
+
+        msg= "Moved '%s' to position '%s'" % (self.inst.name, posname)
+        if exclude_pvs is not None and len(exclude_pvs) > 0:
+            msg = "%s (Partial: %i PVs not restored)" % (msg, len(exclude_pvs))
+        self.write(msg)
         
     def onGo(self, evt=None):
+        """ on GoTo"""
         posname = self.pos_list.GetStringSelection()
-
         thispos = self.db.get_position(posname, self.inst)
         if thispos is None:
             return
@@ -236,14 +323,25 @@ class InstrumentPanel(wx.Panel):
         verify = int(self.db.get_info('verify_move'))
         if verify == 0:
             self.restore_position(posname)
+        #  elif verify == 1:
+        #            ret = popup(self, "Move to %s?: \n%s" % (posname, postext),
+        #                         'Verify Move',
+        #                         style=wx.YES_NO|wx.ICON_QUESTION)
+        #             if ret == wx.ID_YES:
+        #                 self.restore_position(posname)
         elif verify == 1:
-            ret = popup(self, "Move to %s?: \n%s" % (posname, postext),
-                        'Verify Move',
-                        style=wx.YES_NO|wx.ICON_QUESTION)
-            if ret == wx.ID_YES:
-                self.restore_position(posname)
-        elif verify == 2:
-            print 'Full Query of Position here!'
+            dlg = MoveToDialog(posname, self.inst, self.db, self.pvs,
+                               pvdesc=self.pvdesc)
+            dlg.Raise()
+            if dlg.ShowModal() == wx.ID_OK:
+                exclude_pvs = []
+                for pvname, data, in dlg.checkboxes.items():
+                    if not data[0].IsChecked():
+                        exclude_pvs.append(pvname)
+                self.restore_position(posname, exclude_pvs=exclude_pvs)
+            else:
+                return
+            dlg.Destroy()
 
         
     def onRightClick(self, evt=None):

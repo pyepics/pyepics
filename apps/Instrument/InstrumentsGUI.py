@@ -73,22 +73,28 @@ class InstrumentFrame(wx.Frame):
         self.nb.SetActiveTabTextColour(wx.Colour(80,10,10))
         self.nb.SetBackgroundColour(wx.Colour(235,235,225))
 
-        mainsizer = wx.BoxSizer(wx.VERTICAL)
-        mainsizer.Add(self.nb, 1, wx.EXPAND)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(self.nb, 1, wx.EXPAND)
 
-        self.Freeze()
+        self.create_nbpages()
+        pack(self, sizer)
+        self.Refresh()
+
+        # sizer.Layout()
+        # self.SendSizeEvent()
+
+    def create_nbpages(self):
+        #self.Freeze()
+        if self.nb.GetPageCount() > 0:
+            self.nb.DeleteAllPages()
+
         for inst in self.db.get_all_instruments():
             self.connect_pvs(inst, wait_time=1.0)
-
-            self.nb.AddPage(InstrumentPanel(self, inst, db=self.db,
-                                            writer = self.write_message),
-                            inst.name, True)
-        self.Thaw()
+            panel = InstrumentPanel(self, inst, db=self.db,
+                                    writer = self.write_message)
+            self.nb.AddPage(panel, inst.name, True)
+        # self.Thaw()
             
-        pack(self, mainsizer)
-        mainsizer.Layout()
-        self.Refresh()
-        self.SendSizeEvent()
         
     @EpicsFunction
     def connect_pvs(self, inst, wait_time=2.0):
@@ -112,14 +118,15 @@ class InstrumentFrame(wx.Frame):
         inst_menu = wx.Menu()
         help_menu = wx.Menu()
 
-        add_menu(self, file_menu, "&Open", "Open Instruments File")
+        add_menu(self, file_menu, "&Open", "Open Instruments File",
+                 action=self.onOpen)        
         add_menu(self, file_menu, "&Save As", "Save Instruments File",
                  action=self.onSave)        
         file_menu.AppendSeparator()
         add_menu(self, file_menu, "E&xit", "Terminate the program",
                  action=self.onClose)
 
-        add_menu(self, inst_menu, "&Add Instrument","Add New Instrument",
+        add_menu(self, inst_menu, "&Add New Instrument","Add New Instrument",
                  action=self.onInstAdd)
         add_menu(self, inst_menu, "&Edit Current Instrument","Edit Current Instrument",
                  action=self.onInstEdit)                 
@@ -166,6 +173,20 @@ class InstrumentFrame(wx.Frame):
         wx.AboutBox(info)
 
 
+    def onOpen(self, event=None):
+        wildcard = 'Instrument Files (*.einst)|*.einst|All files (*.*)|*.*'
+        fname = FileOpen(self, 'Open Instrument File',
+                         wildcard=wildcard,
+                         default_file=self.dbname)
+
+        if fname is not None:
+            self.db.close()
+            time.sleep(1)
+            self.dbname = fname
+            self.config.set_current_db(fname)
+            self.config.write()
+            self.create_nbpages()
+                
     def onSave(self, event=None):
         wildcard = 'Instrument Files (*.einst)|*.einst|All files (*.*)|*.*'
         outfile = FileSave(self, 'Save Instrument File As',
@@ -183,6 +204,7 @@ class InstrumentFrame(wx.Frame):
             self.config.write()
            
             self.db = InstrumentDB(outfile)
+
             # set current tabs to the new db
             for nbpage, name in insts:
                 self.nb.GetPage(nbpage).db = self.db

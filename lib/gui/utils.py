@@ -71,7 +71,7 @@ def FileOpen(parent, message, default_dir=None,
         style = style| wx.MULTIPLE
     dlg = wx.FileDialog(parent, message=message,
                         defaultFile=default_file,
-                        defaulDir=default_dir,
+                        defaultDir=default_dir,
                         wildcard=wildcard,
                         style=style)
 
