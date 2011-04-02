@@ -21,9 +21,10 @@ from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
 from configfile import InstrumentConfig
 from instrument import isInstrumentDB, InstrumentDB
 
-from utils import ConnectDialog, InstrumentPanel
+from utils import GUIParams, ConnectDialog, InstrumentPanel
 from settingsframe import SettingsFrame
 from editframe import EditFrame
+        
 class InstrumentFrame(wx.Frame):
     def __init__(self, parent=None, conf=None, dbname=None, **kwds):
 
@@ -51,10 +52,11 @@ class InstrumentFrame(wx.Frame):
         wx.Frame.__init__(self, parent=parent, title='Epics Instruments',
                           size=(700, 350), **kwds)
 
-        self.SetBackgroundColour(wx.Colour(245,245,235))
-        
+        self.guiparams = GUIParams(self)
+        self.SetBackgroundColour(self.guiparams.colors.bg)
+
+
         wx.EVT_CLOSE(self, self.onClose)        
-       
         self.create_Statusbar()
         self.create_Menus()
         self.create_Frame()
@@ -68,11 +70,12 @@ class InstrumentFrame(wx.Frame):
 
         self.nb = flat_nb.FlatNotebook(self, wx.ID_ANY, agwStyle=style)
 
-        self.nb.SetActiveTabColour(wx.Colour(254,254,195))
-        self.nb.SetTabAreaColour(wx.Colour(250,250,245))
-        self.nb.SetNonActiveTabTextColour(wx.Colour(10,10,180))
-        self.nb.SetActiveTabTextColour(wx.Colour(80,10,10))
-        self.nb.SetBackgroundColour(wx.Colour(235,235,225))
+        colors = self.guiparams.colors
+        self.nb.SetActiveTabColour(colors.nb_active)
+        self.nb.SetTabAreaColour(colors.nb_area)
+        self.nb.SetNonActiveTabTextColour(colors.nb_text)
+        self.nb.SetActiveTabTextColour(colors.nb_activetext)
+        self.nb.SetBackgroundColour(colors.bg)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.nb, 1, wx.EXPAND)
@@ -239,9 +242,9 @@ class InstrumentApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 if __name__ == '__main__':
     dbname = None # 'Test.einst'
     conf = 'test.conf'
-    # app = wx.PySimpleApp()
-    # InstrumentFrame(conf=conf, dbname=dbname).Show()
-    app = InstrumentApp(conf=conf, dbname=dbname)
+    app = wx.PySimpleApp()
+    InstrumentFrame(conf=conf, dbname=dbname).Show()
+    #app = InstrumentApp(conf=conf, dbname=dbname)
     app.MainLoop()
 
 

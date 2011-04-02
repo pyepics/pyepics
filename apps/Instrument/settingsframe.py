@@ -6,32 +6,7 @@ from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
      Closure, NumericCombo, pack, popup, SimpleText, \
      FileSave, FileOpen, SelectWorkdir 
 
-class HideShow(wx.Choice):
-    def __init__(self, parent, default=True, size=(70,-1)):
-        wx.Choice.__init__(self, parent, -1, size=size)
-        self.choices = ('Hide', 'Show')
-        self.Clear()
-        self.SetItems(self.choices)
-        self.SetSelection({False:0, True:1}[default])
-
-class YesNo(wx.Choice):
-    def __init__(self, parent, defaultyes=True, size=(70,-1)):
-        wx.Choice.__init__(self, parent, -1, size=size)
-        self.choices = ('No', 'Yes')
-        self.Clear()
-        self.SetItems(self.choices)
-        self.SetSelection({False:0, True:1}[defaultyes])
-
-    def SetChoices(self, choices):
-        self.Clear()
-        self.SetItems(choices)
-        self.choices = choices
-        
-    def Select(self, choice):
-        if isinstance(choice, int):
-            self.SetSelection(0)
-        elif choice in self.choices:
-            self.SetSelection(self.choices.index(choice))
+from utils import GUIParams, HideShow, YesNo
 
 class SettingsFrame(wx.Frame) :
     """ GUI Configure Frame"""
@@ -52,12 +27,14 @@ class SettingsFrame(wx.Frame) :
         sizer = wx.GridBagSizer(10, 5)
         panel = wx.Panel(self, style=wx.GROW)
         # title row
-        tfont = self.GetFont()
-        tfont.PointSize += 2
-        tfont.SetWeight(wx.BOLD)
-        title = SimpleText(panel, 'General Settings', font=tfont,
+        self.guiparams = GUIParams(self)
+        self.colors = self.guiparams.colors
+        panel.SetBackgroundColour(self.colors.bg)
+
+        title = SimpleText(panel, 'General Settings',
+                           font=self.guiparams.titlefont,
                            minsize=(130, -1), 
-                           colour=(80, 10, 10), style=tstyle)
+                           colour=self.colors.title, style=tstyle)
 
         lab_move = SimpleText(panel, 'Verify Move',  minsize=(95, -1), 
                               style=tstyle)
@@ -86,9 +63,9 @@ class SettingsFrame(wx.Frame) :
                   (irow, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 0)        
 
         title = SimpleText(panel, 'Show / Hide Instruments',
-                           font=tfont,
+                           font=self.guiparams.titlefont,
                            minsize=(130, -1), 
-                           colour=(80, 10, 10), style=tstyle)
+                           colour=self.colors.title, style=tstyle)
         irow += 1
         sizer.Add(title, (irow, 0), (1, 4), labstyle|wx.GROW|wx.ALL, 1)
         self.hideframes = {}
@@ -135,7 +112,6 @@ class SettingsFrame(wx.Frame) :
         pagemap = self.get_page_map()
         for pagename, wid in self.hideframes.items():
             if wid.GetSelection() == 0 and pagename in pagemap:
-                print 'Hide ', pagename, pagemap[pagename]
                 self.parent.nb.DeletePage(pagemap[pagename])
                 pagemap = self.get_page_map()
                 
@@ -143,9 +119,7 @@ class SettingsFrame(wx.Frame) :
                 inst = self.db.get_instrument(pagename)
                 self.parent.add_instrument_page(inst)
                 pagemap = self.get_page_map()
-                
         self.Destroy()
-        
                 
     def onCancel(self, event=None):
         self.Destroy()

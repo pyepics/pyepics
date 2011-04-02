@@ -13,6 +13,53 @@ FileBrowser = filebrowse.FileBrowseButtonWithHistory
 
 ALL_EXP  = wx.ALL|wx.EXPAND
 
+
+class GUIParams(object):
+    def __init__(self, parent):
+        class empty:
+            pass
+        self.colors = empty()
+        self.colors.bg = wx.Colour(240,240,230)
+        self.colors.nb_active = wx.Colour(254,254,195)
+        self.colors.nb_area   = wx.Colour(250,250,245)
+        self.colors.nb_text = wx.Colour(10,10,180)
+        self.colors.nb_activetext = wx.Colour(80,10,10)
+        self.colors.title  = wx.Colour(80,10,10)
+        self.colors.pvname = wx.Colour(10,10,80)
+
+        self.font       = parent.GetFont()
+        self.titlefont  = parent.GetFont()
+        self.titlefont.PointSize += 2
+        self.titlefont.SetWeight(wx.BOLD)
+
+
+class HideShow(wx.Choice):
+    def __init__(self, parent, default=True, size=(100, -1)):
+        wx.Choice.__init__(self, parent, -1, size=size)
+        self.choices = ('Hide', 'Show')
+        self.Clear()
+        self.SetItems(self.choices)
+        self.SetSelection({False:0, True:1}[default])
+
+class YesNo(wx.Choice):
+    def __init__(self, parent, defaultyes=True, size=(75, -1)):
+        wx.Choice.__init__(self, parent, -1, size=size)
+        self.choices = ('No', 'Yes')
+        self.Clear()
+        self.SetItems(self.choices)
+        self.SetSelection({False:0, True:1}[defaultyes])
+
+    def SetChoices(self, choices):
+        self.Clear()
+        self.SetItems(choices)
+        self.choices = choices
+        
+    def Select(self, choice):
+        if isinstance(choice, int):
+            self.SetSelection(0)
+        elif choice in self.choices:
+            self.SetSelection(self.choices.index(choice))
+
 class ConnectDialog(wx.Dialog):
     """Connect to a recent or existing DB File, or create a new one"""
     msg = '''Select Recent Instrument File, create a new one'''
@@ -21,20 +68,28 @@ class ConnectDialog(wx.Dialog):
 
         wx.Dialog.__init__(self, parent, wx.ID_ANY, title=title)
 
-        self.filebrowser = FileBrowser(self, size=(450, -1))
+        panel = wx.Panel(self)
+        self.guiparams = GUIParams(self)
+        panel.SetBackgroundColour(self.guiparams.colors.bg)
+        self.filebrowser = FileBrowser(panel, size=(450, -1))
         self.filebrowser.SetHistory(filelist)
         self.filebrowser.SetLabel('File:')
+        
+
         if filelist is not None:
             self.filebrowser.SetValue(filelist[0])
         
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(wx.StaticText(self, label=self.msg),
+        sizer.Add(wx.StaticText(panel, label=self.msg),
                   0, wx.ALIGN_CENTER|wx.ALL|wx.GROW, 1)
         sizer.Add(self.filebrowser, 1, wx.ALIGN_CENTER|wx.ALL|wx.GROW, 1)
         sizer.Add(self.CreateButtonSizer(wx.OK| wx.CANCEL),
                  1, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
+        pack(panel, sizer)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(panel, 0, 0, 0)
         pack(self, sizer)
-
+        
 class MoveToDialog(wx.Dialog):
     """Full Query for Move To for a Position"""
     msg = '''Select Recent Instrument File, create a new one'''
@@ -50,26 +105,27 @@ class MoveToDialog(wx.Dialog):
         thispos = db.get_position(posname, inst)
         if thispos is None:
             return
-
         
         title = "Move Instrument %s to Position '%s'?" % (inst.name, posname)
         wx.Dialog.__init__(self, None, wx.ID_ANY, title=title)
-
+        panel = wx.Panel(self)
+        self.guiparams = GUIParams(self)
+        colors = self.guiparams.colors
+        panel.SetBackgroundColour(self.guiparams.colors.bg)
         sizer = wx.GridBagSizer(10, 4)
 
         labstyle  = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.ALL
         rlabstyle = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL
         tstyle    = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL
         # title row
-        tfont = self.GetFont()
-        tfont.PointSize += 2
-        tfont.SetWeight(wx.BOLD)
         i = 0
         for titleword in ('  PV', 'Current Value',
                           'Saved Value', 'Move?'):
-            txt =SimpleText(self, titleword, font=tfont,
+            txt =SimpleText(self, titleword,
+                            font=self.guiparams.titlefont,
                             minsize=(80, -1), 
-                            colour=(80, 10, 10), style=tstyle)
+                            colour=colors.title, 
+                            style=tstyle)
             
             sizer.Add(txt, (0, i), (1, 1), labstyle, 1)
             i = i + 1
@@ -87,7 +143,8 @@ class MoveToDialog(wx.Dialog):
             if pvname in pvdesc:
                 desc = "%s (%s)" % (pvdesc[pvname], pvname)
             
-            label = SimpleText(self, desc, style=tstyle, colour=wx.BLUE)
+            label = SimpleText(self, desc, style=tstyle,
+                               colour=colors.pvname)
             curr  = SimpleText(self, curr_val, style=tstyle)
             saved = SimpleText(self, save_val, style=tstyle)
             cbox  = wx.CheckBox(self, -1, "Move")
@@ -125,6 +182,9 @@ class InstrumentPanel(wx.Panel):
         self.pvdesc = {}
         wx.Panel.__init__(self, parent, size=size)
 
+        self.guiparams = GUIParams(self)
+        colors = self.guiparams.colors
+
         splitter = wx.SplitterWindow(self,
                                      style=wx.SP_3DSASH|wx.SP_LIVE_UPDATE)
         splitter.SetMinimumPaneSize(150)
@@ -132,18 +192,16 @@ class InstrumentPanel(wx.Panel):
         lpanel = wx.Panel(splitter, size=(550, 175))
         rpanel = wx.Panel(splitter, size=(150, 175))
         
-        toprow = wx.Panel(lpanel, size=(450,-1))
+        toprow = wx.Panel(lpanel, size=(425,-1))
         self.pos_name =  wx.TextCtrl(toprow, value="", size=(220, 25),
                                      style= wx.TE_PROCESS_ENTER)
         self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
 
-        tfont = self.GetFont()
-        tfont.PointSize += 3
-        tfont.SetWeight(wx.BOLD)
 
         topsizer = wx.BoxSizer(wx.HORIZONTAL)
         topsizer.Add(SimpleText(toprow, inst.name,
-                                font=tfont, colour=(80, 10, 10),
+                                font=self.guiparams.titlefont,
+                                colour=colors.title,
                                 minsize=(125, -1),
                                 style=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL),
                      0, wx.ALIGN_LEFT, 1)
@@ -168,7 +226,7 @@ class InstrumentPanel(wx.Panel):
         self.Bind(wx.EVT_TIMER, self.onTimer, self.etimer)
 
         for x in inst.pvs:
-            ppanel = wx.Panel(lpanel)
+            ppanel = wx.Panel(lpanel, size=(425, -1))
             psizer = wx.BoxSizer(wx.HORIZONTAL)
             init_msg = wx.StaticText(ppanel,
                                      label='Connecting %s' % x.name)
@@ -205,9 +263,14 @@ class InstrumentPanel(wx.Panel):
         rsizer.Add(self.pos_list, 1, wx.EXPAND|wx.ALIGN_CENTER, 1)
         pack(rpanel, rsizer)
 
-        splitter.SplitVertically(lpanel, rpanel, 475)
+        splitter.SplitVertically(lpanel, rpanel, 1)
+        lpanel.SetMinSize((350, 150))
+        rpanel.SetMaxSize((500, -1))
+        rpanel.SetMinSize((100, -1))
+
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(splitter, 1, wx.ALIGN_LEFT|wx.GROW|wx.ALL, 3)
+        sizer.Add(splitter, 1, wx.GROW|wx.ALL, 0)
+        # wx.ALIGN_LEFT|wx.GROW|wx.ALL, 3)
         pack(self, sizer)
 
     def write(self, msg, status='normal'):
@@ -268,8 +331,9 @@ class InstrumentPanel(wx.Panel):
                       wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
             pack(panel, sizer)
             return
-        
-        label = SimpleText(panel, pvname, colour=wx.BLUE,
+
+        label = SimpleText(panel, pvname,
+                           colour=self.guiparams.colors.pvname,
                            minsize=(100,-1),style=wx.ALIGN_LEFT)
 
         if pv.type in ('double', 'int', 'long', 'short'):
