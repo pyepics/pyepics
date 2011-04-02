@@ -19,6 +19,8 @@ print inst, inst.pvs, inst.positions
 
 for p in inst.pvs:
     print p, p.pvtype
+    p.pvtype =
+    
 # db.close()
 # time.sleep(0.1)
 # print '=------------------------------------'

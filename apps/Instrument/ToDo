@@ -1,0 +1,19 @@
+Epics Instrument To Do list:
+
+Add / Edit Instrument Page (Frame)
+   change instrument name
+   add/remove pv -- how to manage connection, type determination??
+    
+Setting Page:
+   remove instruments?
+   fonts, colors?
+
+Move more GUI settings (instrument hide, instrument order) to Info table
+
+Building InstrumentConfigure Page:
+   a wx.Timer might be helpful here too:
+   user types a PV name.  On return / loose focus the PV goes from unknown
+   to unconnected.  On connection, the decision of type (motor, enum,
+   string, float, int) is made
+
+  
