@@ -26,21 +26,13 @@ def get_appdir(appname):
     return appbase
 
 default_config="""
-[general]
-verify_erase = True
-verify_move = True
-query_move = True
-
 [dbs]
 most_recent=Test.einst
-
-[user]
-name=
 """
     
 class InstrumentConfig(object):
     basename = 'epics_insts'
-    sections = ('general', 'dbs', 'user_settings') 
+    sections = ('dbs',)
     
     def __init__(self, name=None):
         self.conffile = name
@@ -96,12 +88,12 @@ class InstrumentConfig(object):
         newlist = [dbname]
         for name in dblist:
             if len(name.strip()) > 0 and name not in newlist:
-                key = '%2.2i' % idx
+                key = 'v%2.2i' % idx
                 self.conf['dbs'][key] = name
                 idx += 1
                 
         self.conf['dbs']['most_recent'] = dbname
-        
+       
     
     def get_dblist(self):
         dblist = [self.conf['dbs'].get('most_recent', '')]

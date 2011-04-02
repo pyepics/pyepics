@@ -16,7 +16,7 @@ class SettingsFrame(wx.Frame) :
         self.db = db
 
         style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL
-        labstyle  = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL
+        labstyle  = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.ALL
         rlabstyle = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL
         tstyle    = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL
         
@@ -25,7 +25,7 @@ class SettingsFrame(wx.Frame) :
                           size=(400, 350),  pos=pos)
 
         sizer = wx.GridBagSizer(10, 5)
-        panel = wx.Panel(self, style=wx.GROW)
+        panel = wx.Panel(self)
         # title row
         self.guiparams = GUIParams(self)
         self.colors = self.guiparams.colors
@@ -40,34 +40,34 @@ class SettingsFrame(wx.Frame) :
                               style=tstyle)
         lab_erase = SimpleText(panel, 'Verify Erase', minsize=(95, -1), 
                                style=tstyle)
-        lab_owrite = SimpleText(panel, 'Verify Overwrite', minsize=(95, -1), 
+        lab_owrite = SimpleText(panel, 'Verify Overwrite', minsize=(105, -1), 
                                style=tstyle)
 
         self.v_move  = YesNo(panel, defaultyes=True)
         self.v_erase = YesNo(panel, defaultyes=True)
         self.v_owrite = YesNo(panel, defaultyes=True)        
 
-        sizer.Add(title, (0, 0), (1, 4), labstyle|wx.GROW|wx.ALL, 1)
+        sizer.Add(title, (0, 0), (1, 4), labstyle|wx.GROW|wx.ALL, 5)
         sizer.Add(wx.StaticLine(panel, size=(150, -1), style=wx.LI_HORIZONTAL),
-                  (1, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 0)
+                  (1, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 3)
 
-        sizer.Add(lab_move,     (2, 0), (1, 1), labstyle,  2)
-        sizer.Add(self.v_move,  (2, 1), (1, 1), labstyle,  2)
-        sizer.Add(lab_erase,    (3, 0), (1, 1), labstyle,  2)
-        sizer.Add(self.v_erase, (3, 1), (1, 1), labstyle,  2)        
-        sizer.Add(lab_owrite,   (2, 2), (1, 1), labstyle,  2)
-        sizer.Add(self.v_owrite,(2, 3), (1, 1), labstyle,  2)
+        sizer.Add(lab_move,     (2, 0), (1, 1), labstyle,  5)
+        sizer.Add(self.v_move,  (2, 1), (1, 1), labstyle,  5)
+        sizer.Add(lab_erase,    (3, 0), (1, 1), labstyle,  5)
+        sizer.Add(self.v_erase, (3, 1), (1, 1), labstyle,  5)        
+        sizer.Add(lab_owrite,   (2, 2), (1, 1), labstyle,  5)
+        sizer.Add(self.v_owrite,(2, 3), (1, 1), labstyle,  5)
 
         irow = 4
         sizer.Add(wx.StaticLine(panel, size=(150, -1), style=wx.LI_HORIZONTAL),
-                  (irow, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 0)        
+                  (irow, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 3)
 
         title = SimpleText(panel, 'Show / Hide Instruments',
                            font=self.guiparams.titlefont,
                            minsize=(130, -1), 
                            colour=self.colors.title, style=tstyle)
         irow += 1
-        sizer.Add(title, (irow, 0), (1, 4), labstyle|wx.GROW|wx.ALL, 1)
+        sizer.Add(title, (irow, 0), (1, 4), labstyle|wx.GROW|wx.ALL, 3)
         self.hideframes = {}
         for inst in self.db.get_all_instruments():
             irow += 1
@@ -76,19 +76,19 @@ class SettingsFrame(wx.Frame) :
             self.hideframes[inst.name] = hide_inst
             label= SimpleText(panel, inst.name,  minsize=(120, -1),
                               style=labstyle)
-            sizer.Add(label,     (irow, 0), (1, 1), labstyle,  3)
-            sizer.Add(hide_inst, (irow, 1), (1, 1), labstyle,  3)                        
+            sizer.Add(label,     (irow, 0), (1, 1), labstyle|wx.GROW|wx.ALL,  5)
+            sizer.Add(hide_inst, (irow, 1), (1, 1), labstyle,  5)
 
         irow += 1
         sizer.Add(wx.StaticLine(panel, size=(150, -1), style=wx.LI_HORIZONTAL),
-                  (irow, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 0)        
+                  (irow, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 5)        
 
         btn_ok     = add_button(panel, 'OK',     size=(70, -1), action=self.onOK)
         btn_cancel = add_button(panel, 'Cancel', size=(70, -1), action=self.onCancel)
                             
         irow += 1
-        sizer.Add(btn_ok,     (irow, 0), (1, 1), labstyle,  2)
-        sizer.Add(btn_cancel, (irow, 1), (1, 1), labstyle,  2)
+        sizer.Add(btn_ok,     (irow, 0), (1, 1), labstyle|wx.GROW|wx.ALL,  5)
+        sizer.Add(btn_cancel, (irow, 1), (1, 1), labstyle|wx.GROW|wx.ALL,  5)
         pack(panel, sizer)
 
         mainsizer = wx.BoxSizer(wx.VERTICAL)
