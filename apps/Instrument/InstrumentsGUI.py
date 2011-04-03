@@ -21,7 +21,7 @@ from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
 from configfile import InstrumentConfig
 from instrument import isInstrumentDB, InstrumentDB
 
-from utils import GUIParams, ConnectDialog, InstrumentPanel
+from utils import GUIColors, ConnectDialog, InstrumentPanel, set_font_with_children
 from settingsframe import SettingsFrame
 from editframe import EditFrame
         
@@ -52,9 +52,8 @@ class InstrumentFrame(wx.Frame):
         wx.Frame.__init__(self, parent=parent, title='Epics Instruments',
                           size=(700, 350), **kwds)
 
-        self.guiparams = GUIParams(self)
-        self.SetBackgroundColour(self.guiparams.colors.bg)
-
+        self.colors = GUIColors()
+        self.SetBackgroundColour(self.colors.bg)
 
         wx.EVT_CLOSE(self, self.onClose)        
         self.create_Statusbar()
@@ -70,7 +69,7 @@ class InstrumentFrame(wx.Frame):
 
         self.nb = flat_nb.FlatNotebook(self, wx.ID_ANY, agwStyle=style)
 
-        colors = self.guiparams.colors
+        colors = self.colors
         self.nb.SetActiveTabColour(colors.nb_active)
         self.nb.SetTabAreaColour(colors.nb_area)
         self.nb.SetNonActiveTabTextColour(colors.nb_text)
@@ -118,6 +117,7 @@ class InstrumentFrame(wx.Frame):
         """create menus"""
         mbar = wx.MenuBar()
         file_menu = wx.Menu()
+        opts_menu = wx.Menu()
         inst_menu = wx.Menu()
         help_menu = wx.Menu()
 
@@ -129,18 +129,26 @@ class InstrumentFrame(wx.Frame):
         add_menu(self, file_menu, "E&xit", "Terminate the program",
                  action=self.onClose)
 
-        add_menu(self, inst_menu, "&Add New Instrument","Add New Instrument",
+        add_menu(self, inst_menu, "&Add New Instrument",
+                 "Add New Instrument",
                  action=self.onAddInstrument)
-        add_menu(self, inst_menu, "&Edit Current Instrument","Edit Current Instrument",
+
+        add_menu(self, inst_menu, "&Edit Current Instrument",
+                 "Edit Current Instrument",
                  action=self.onEditInstrument)                 
-        inst_menu.AppendSeparator()
-        add_menu(self, inst_menu, "General Stings","Edit Instrument List, etc",
-                 action=self.onSettings)                 
+
+        add_menu(self, opts_menu, "Settings",
+                 "Change Settings for GUI behavior",
+                 action=self.onSettings)
+        
+        add_menu(self, opts_menu, "Change Font", "Select Font",
+                 action=self.onSelectFont)                         
         
         add_menu(self, help_menu, 'About',
                  "More information about this program", action=self.onAbout)
 
         mbar.Append(file_menu, "&File")
+        mbar.Append(opts_menu, "&Options")
         mbar.Append(inst_menu, "&Instruments")
         mbar.Append(help_menu, "&Help")
 
@@ -169,7 +177,6 @@ class InstrumentFrame(wx.Frame):
         except:
             self.settting_frame = SettingsFrame(parent=self, db=self.db)
         
-
     def onAbout(self, event=None):
         # First we create and fill the info object
         info = wx.AboutDialogInfo()
@@ -181,7 +188,7 @@ class InstrumentFrame(wx.Frame):
 
 
     def onOpen(self, event=None):
-        wildcard = 'Instrument Files (*.einst)|*.einst|All files (*.*)|*.*'
+        wildcard = 'Instrument Files (*.ein)|*.ein|All files (*.*)|*.*'
         fname = FileOpen(self, 'Open Instrument File',
                          wildcard=wildcard,
                          default_file=self.dbname)
@@ -195,7 +202,7 @@ class InstrumentFrame(wx.Frame):
             self.create_nbpages()
                 
     def onSave(self, event=None):
-        wildcard = 'Instrument Files (*.einst)|*.einst|All files (*.*)|*.*'
+        wildcard = 'Instrument Files (*.ein)|*.ein|All files (*.*)|*.*'
         outfile = FileSave(self, 'Save Instrument File As',
                            wildcard=wildcard,
                            default_file=self.dbname)
@@ -218,11 +225,36 @@ class InstrumentFrame(wx.Frame):
                 self.nb.GetPage(nbpage).inst = self.db.get_instrument(name)
 
             self.message("Saved Instrument File: %s" % outfile)
-                
+
+    def onSelectFont(self, evt=None):
+        fontdata = wx.FontData()
+        fontdata.SetInitialFont(self.GetFont())
+        dlg = wx.FontDialog(self, fontdata)
         
+        if dlg.ShowModal() == wx.ID_OK:
+            font = dlg.GetFontData().GetChosenFont()
+            set_font_with_children(self, font)
+            #print font.PointSize, font.GetWeightString(), \
+            #      font.GetStyleString(), font.GetFaceName()
+
+            # print dir(font)
+            #for i in range(self.nb.GetPageCount()):
+            #    print '===================='
+            #    print i,  self.nb.GetPageText(i)
+            #for x in dir(page):
+            #    if 'set' in x.lower() or 'page' in x.lower():
+            #        print x
+            #print '===================='
+                
+            self.Refresh()
+            self.Layout()
+
+        dlg.Destroy()
+
     def onClose(self, event):
-        print 'Should Get Page List: ',  [self.nb.GetPage(i).inst for i in range(self.nb.GetPageCount())]
-        print 'Should save config file, with this info'
+        print 'Should Get Page List: '
+        print [self.nb.GetPage(i).inst for i in range(self.nb.GetPageCount())]
+        print 'Should save config file, order to database'
         finalize_epics()
         self.Destroy()
 
@@ -240,11 +272,9 @@ class InstrumentApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         return True
 
 if __name__ == '__main__':
-    dbname = None # 'Test.einst'
+    dbname = None # 'Test.ein'
     conf = 'test.conf'
     app = wx.PySimpleApp()
     InstrumentFrame(conf=conf, dbname=dbname).Show()
     #app = InstrumentApp(conf=conf, dbname=dbname)
     app.MainLoop()
-
-

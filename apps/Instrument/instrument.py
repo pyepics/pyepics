@@ -7,8 +7,6 @@ Main Class for full Database:  InstrumentDB
 classes for Tables:
   Instrument
   Position
-
-
 """
 
 import os
@@ -19,8 +17,8 @@ import time
 import numpy
 from datetime import datetime
 
-from creator import make_newdb, backup_versions
-
+from utils import backup_versions, save_backup
+from creator import make_newdb
 
 from sqlalchemy import MetaData, create_engine, and_
 from sqlalchemy.orm import sessionmaker,  mapper, clear_mappers, relationship, backref
@@ -33,7 +31,6 @@ def isInstrumentDB(dbname):
           'info', 'instrument', 'position', 'pv', 
        'info' table must have an entries named 'version' and 'create_date'
     """
-
     try:
         engine  = create_engine('sqlite:///%s' % dbname)
         metadata =  MetaData(engine)
@@ -159,13 +156,12 @@ class InstrumentDB(object):
             
     def create_newdb(self, dbname, connect=False):
         "create a new, empty database"
-        if os.path.exists(dbname):
-            backup_versions(dbname)
+        backup_versions(dbname)
         make_newdb(dbname)
         if connect:
-            self.connect(dbname)
+            self.connect(dbname, backup=False)
 
-    def connect(self, dbname):
+    def connect(self, dbname, backup=True):
         "connect to an existing database"
         if not os.path.exists(dbname):
             raise IOError("Database '%s' not found!" % dbname)
@@ -173,6 +169,8 @@ class InstrumentDB(object):
         if not isInstrumentDB(dbname):
             raise ValueError("'%s' is not an Instrument file!" % dbname)
 
+        if backup:
+            save_backup(dbname)
         self.dbname = dbname
         self.engine = create_engine('sqlite:///%s' % self.dbname)
         self.conn = self.engine.connect()
@@ -181,7 +179,7 @@ class InstrumentDB(object):
         self.metadata =  MetaData(self.engine)
         self.metadata.reflect()
         tables = self.tables = self.metadata.tables
-        
+
         try:
             clear_mappers()
         except:
@@ -219,8 +217,6 @@ class InstrumentDB(object):
                            'command':   relationship(Command,
                                                      backref='inst_postcoms')})
 
-
-            
     def commit(self):
         "commit session state"
         self.set_mod_time()        
@@ -481,7 +477,6 @@ arguments
         for name in pvnames:
             ppv = Position_PV()
             ppv.pv = self.get_pv(name)
-            ppv.date = datetime.now()
             ppv.notes = "'%s' / '%s'" % (inst.name, posname)
             ppv.value = values[name]
             pos_pvs.append(ppv)

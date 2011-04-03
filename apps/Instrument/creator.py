@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 """
-
  provides make_newdb() function to create an empty Epics Instrument Library
 
 """
 import sys
 import os
 
-import shutil
 from datetime import datetime
 
 from sqlalchemy.orm import sessionmaker, create_session
 from sqlalchemy import MetaData, create_engine, \
      Table, Column, Integer, Float, String, Text, DateTime, ForeignKey
+
+from utils import dumpsql, backup_versions
 
 def PointerCol(name, other=None, keyid='id', **kws):
     if other is None:
@@ -40,34 +40,43 @@ def NamedTable(tablename, metadata, keyid='id', nameid='name',
     return Table(tablename, metadata, *args)
 
 class InitialData:
-    info    = [["version", "1.0.0"],
+    info    = [["version", "1.1"],
                ["verify_erase", "1"],
-               ["verify_move",   "1"],    # 0, 1, 2 (No, Yes, FullQuery)
-               ["create_date", '<now>'], 
+               ["verify_move",   "1"],
+               ["create_date", '<now>'],
                ["modify_date", '<now>']]
 
-    pvtype = [['generic','Generic PV'], ['motor','Motor Value']]
+    pvtype = [['generic',   'Generic PV'],
+              ['numeric',   'Numeric Value'],
+              ['enum',      'Enumeration Value'],
+              ['string',    'String Value'],
+              ['motor',     'Motor Value']]
 
 def  make_newdb(dbname, server= 'sqlite'):
     engine  = create_engine('%s:///%s' % (server, dbname))
     metadata =  MetaData(engine)
     
-    instrument = NamedTable('instrument', metadata)
+    instrument = NamedTable('instrument', metadata,
+                            cols=[Column('show', Integer, default=1),
+                                  Column('order', Integer)])
+
     command    = NamedTable('command', metadata,
                             cols=[StrCol('command'),
-                                  StrCol('arguments')])
+                                  StrCol('arguments'),
+                                  StrCol('output_value'),
+                                  StrCol('output_name')])
 
     position  = NamedTable('position', metadata,
                            cols=[Column('date', DateTime),
                                  PointerCol('instrument')])
-
+    
     instrument_precommand = NamedTable('instrument_precommand', metadata,
-                                       cols=[Column('nseq', Integer),
+                                       cols=[Column('iorder', Integer),
                                              PointerCol('command'),
                                              PointerCol('instrument')])
                                      
     instrument_postcommand = NamedTable('instrument_postcommand', metadata,
-                                        cols=[Column('nseq', Integer), 
+                                        cols=[Column('iorder', Integer), 
                                               PointerCol('command'),
                                               PointerCol('instrument')])
 
@@ -80,9 +89,8 @@ def  make_newdb(dbname, server= 'sqlite'):
                           PointerCol('pv'))
 
     position_pv = Table('position_pv', metadata,
-                        Column('id', Integer, primary_key=True),                         
-                        StrCol('notes'),
-                        Column('date', DateTime),
+                        Column('id', Integer, primary_key=True),
+                        StrCol('notes'),                        
                         PointerCol('position'),
                         PointerCol('pv'),
                         StrCol('value'))
@@ -108,32 +116,10 @@ def  make_newdb(dbname, server= 'sqlite'):
 
     session.commit()    
 
-
-def dumpsql(dbname, fname='Test_init.sql'):
-    """ dump SQL statements for an sqlite db"""
-    os.system('echo .dump | sqlite3 %s > %s' % (dbname, fname))
-    
-def backup_versions(fname, max=10):
-    """keep backups of a file -- up to 'max', in order"""
-    if os.path.exists(fname):
-        for i in range(max-1, 0, -1):
-            fb0 = "%s.%i" % (fname, i)
-            fb1 = "%s.%i" % (fname, i+1)
-            if os.path.exists(fb0):
-                print ' %s -> %s ' % (fb0, fb1)
-                try:
-                    shutil.move(fb0, fb1)
-                except:
-                    pass 
-        print ' %s -> %s.1 ' % (fname, fname)                
-        shutil.move(fname, "%s.1" % fname)        
-
     
 if __name__ == '__main__':
-    dbname = 'Test.einst'
-    if os.path.exists(dbname):
-        backup_versions(dbname)
-        
+    dbname = 'Test.ein'
+    backup_versions(dbname)
     make_newdb(dbname)
     print '''%s  created and initialized.''' % dbname
     dumpsql(dbname)

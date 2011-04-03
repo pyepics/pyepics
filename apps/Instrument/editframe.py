@@ -8,8 +8,7 @@ from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
      Closure, NumericCombo, pack, popup, SimpleText, \
      FileSave, FileOpen, SelectWorkdir 
 
-from utils import GUIParams, HideShow, YesNo
-
+from utils import GUIColors, HideShow, YesNo, set_font_with_children
 
 class pvNameCtrl(wx.TextCtrl):
     def __init__(self, parent,  value='', connecting_pvs=None, timer=None,  **kws):
@@ -45,8 +44,16 @@ class EditFrame(wx.Frame) :
 
         wx.Frame.__init__(self, None, -1, title,  size=(550, 550),  pos=pos)
         panel = wx.Panel(self, style=wx.GROW)
-        self.guiparams = GUIParams(self)
-        self.colors = self.guiparams.colors
+        self.colors = GUIColors()
+
+        font = self.GetFont()
+        if parent is not None:
+            font = parent.GetFont()
+            
+        titlefont  = font
+        titlefont.PointSize += 2
+        titlefont.SetWeight(wx.BOLD)
+        
         panel.SetBackgroundColour(self.colors.bg)
 
         self.parent = parent
@@ -84,7 +91,7 @@ class EditFrame(wx.Frame) :
                 if titleword.startswith('Rem'):
                     style = rtstyle
                 txt =SimpleText(panel, titleword,
-                                font=self.guiparams.titlefont,
+                                font=titlefont,
                                 minsize=(120, -1), 
                                 colour=self.colors.title, style=style)
             
@@ -143,6 +150,9 @@ class EditFrame(wx.Frame) :
         mainsizer = wx.BoxSizer(wx.VERTICAL)
         mainsizer.Add(panel, 1, wx.GROW|wx.ALL, 1)
         pack(self, mainsizer)
+
+        set_font_with_children(self, font)
+
         self.Layout()
         self.Show()
         self.Raise()

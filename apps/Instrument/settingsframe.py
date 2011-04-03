@@ -6,7 +6,7 @@ from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
      Closure, NumericCombo, pack, popup, SimpleText, \
      FileSave, FileOpen, SelectWorkdir 
 
-from utils import GUIParams, HideShow, YesNo
+from utils import GUIColors, HideShow, YesNo, set_font_with_children
 
 class SettingsFrame(wx.Frame) :
     """ GUI Configure Frame"""
@@ -19,20 +19,25 @@ class SettingsFrame(wx.Frame) :
         labstyle  = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.ALL
         rlabstyle = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL
         tstyle    = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL
-        
+
         wx.Frame.__init__(self, None, -1,
                           'Epics Instruments: General Settings',
-                          size=(400, 350),  pos=pos)
+                          size=(400, 350), pos=pos)
+
+        font = parent.GetFont()
+
+        titlefont  = self.GetFont()
+        titlefont.PointSize += 2
+        titlefont.SetWeight(wx.BOLD)
 
         sizer = wx.GridBagSizer(10, 5)
         panel = wx.Panel(self)
         # title row
-        self.guiparams = GUIParams(self)
-        self.colors = self.guiparams.colors
+        self.colors = GUIColors()
         panel.SetBackgroundColour(self.colors.bg)
 
         title = SimpleText(panel, 'General Settings',
-                           font=self.guiparams.titlefont,
+                           font=titlefont,
                            minsize=(130, -1), 
                            colour=self.colors.title, style=tstyle)
 
@@ -63,7 +68,7 @@ class SettingsFrame(wx.Frame) :
                   (irow, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 3)
 
         title = SimpleText(panel, 'Show / Hide Instruments',
-                           font=self.guiparams.titlefont,
+                           font=titlefont,
                            minsize=(130, -1), 
                            colour=self.colors.title, style=tstyle)
         irow += 1
@@ -94,6 +99,9 @@ class SettingsFrame(wx.Frame) :
         mainsizer = wx.BoxSizer(wx.VERTICAL)
         mainsizer.Add(panel, 1, wx.GROW|wx.ALL, 1)
         pack(self, mainsizer)
+
+        set_font_with_children(self, font)
+
         self.Layout()
         self.Show()
         self.Raise()
