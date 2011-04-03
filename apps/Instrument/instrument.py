@@ -10,6 +10,7 @@ classes for Tables:
 """
 
 import os
+import glob
 import sys
 import json
 import epics
@@ -31,6 +32,8 @@ def isInstrumentDB(dbname):
           'info', 'instrument', 'position', 'pv', 
        'info' table must have an entries named 'version' and 'create_date'
     """
+    if not os.path.exists(dbname):
+        return False
     try:
         engine  = create_engine('sqlite:///%s' % dbname)
         metadata =  MetaData(engine)
@@ -156,9 +159,27 @@ class InstrumentDB(object):
             
     def create_newdb(self, dbname, connect=False):
         "create a new, empty database"
+#         print 'Create_Newdb' , dbname, os.path.exists(dbname)
+#         p, f = os.path.split(dbname)
+#         
+#         os.chdir(p)
+#         print 'B4 backup version: ', f[:2]
+#         for fx in glob.glob("%s*" % f[:2]):
+#             print fx, os.path.exists(fx), os.stat(fx)
+
         backup_versions(dbname)
+
+#         print 'After backup version: ', f[:2]
+#         for fx in glob.glob("%s*" % f[:2]):
+#             print fx, os.path.exists(fx), os.stat(fx)
+
         make_newdb(dbname)
+        #print 'After makenew version: ', f[:2],  glob.glob("%s*" % f[:2])
+        #for fx in glob.glob("%s*" % f[:2]):
+        #    print fx, os.path.exists(fx), os.stat(fx)
+
         if connect:
+            time.sleep(0.5)
             self.connect(dbname, backup=False)
 
     def connect(self, dbname, backup=True):
@@ -185,6 +206,7 @@ class InstrumentDB(object):
         except:
             print 'clear mappers complained'
             pass
+
         mapper(Info,     tables['info'])
         mapper(Command,  tables['command'])
         mapper(PV,       tables['pv'])

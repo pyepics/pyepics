@@ -2,7 +2,6 @@ import os
 from ConfigParser import  ConfigParser
 from cStringIO import StringIO
 
-
 def get_appdir(appname):
     """gives a user-writeable application directory for config files etc"""
     appbase = None
@@ -16,9 +15,8 @@ def get_appdir(appname):
             appbase = 'C:'
     else:
         appbase = os.environ.get('HOME', '/tmp')
-        appnane = '.%s.d' % appname
-
-    appbase = os.path.join(appbase, appname) 
+        appname = '.%s' % appname
+    appbase = os.path.join(appbase, appname)
     if not os.path.exists(appbase):
         os.makedirs(appbase)
     if not os.path.isdir(appbase):
@@ -27,7 +25,7 @@ def get_appdir(appname):
 
 default_config="""
 [dbs]
-most_recent=Test.einst
+most_recent=Test.ein
 """
     
 class InstrumentConfig(object):
@@ -63,11 +61,16 @@ class InstrumentConfig(object):
         out = []
         for sect in self.sections:
             out.append('[%s]\n' % sect)
+            if sect == 'dbs':
+                maxcount = 10
             if sect in self.conf:
+                count = 0
                 for key in sorted(self.conf[sect]):
                     val = self.conf[sect][key]
-                    out.append('%s = %s\n' % (key, val))
-        
+                    if count < maxcount:
+                        out.append('%s = %s\n' % (key, val))
+                        count += 1
+                        
         fout = open(fname, 'w')
         fout.writelines(out)
         fout.close()
@@ -93,14 +96,3 @@ class InstrumentConfig(object):
                 idx += 1
                 
         self.conf['dbs']['most_recent'] = dbname
-       
-    
-    def get_dblist(self):
-        dblist = [self.conf['dbs'].get('most_recent', '')]
-        for key in sorted(self.conf['dbs'].keys()):
-            val = self.conf['dbs'][key]
-            if val is None: continue
-            val = val.strip()
-            if (key != 'most_recent' and len(val) > 0):
-                dblist.append(val)
-        return dblist

@@ -18,57 +18,11 @@ from epics.wx.wxlib import pvText, pvFloatCtrl, pvTextCtrl, \
 
 from epics.wx.MotorDetailFrame  import MotorDetailFrame
 
-class pvTextXX(wx.StaticText, pvCtrlMixin):
-    """ Static text for displaying a PV value, 
-        with callback for automatic updates
-        
-        By default the text colour will change on alarm states.
-        This can be overriden or disabled as constructor
-        parameters
-        """
-    def __init__(self, parent, pv=None, as_string=True,
-                 font=None, fg=None, bg=None, style=None, 
-                 minor_alarm="DARKRED", major_alarm="RED",
-                 invalid_alarm="ORANGERED", units="", aize=(-1, -1), **kw):
-        """
-        Create a new pvText
-
-        minor_alarm, major_alarm & invalid_alarm are all text colours
-        that will be set depending no the alarm state of the target
-        PV. Set to None if you want no highlighting in that alarm state.
-        """
-        wstyle = wx.ALIGN_LEFT
-        if style is not None:
-            wstyle = style
-        print 'STYLE for pvTextXX' , wstyle
-        wx.StaticText.__init__(self, parent, wx.ID_ANY, label='',
-                               style=wstyle, **kw)
-        pvCtrlMixin.__init__(self, pv=pv, font=font,fg=None, bg=None)
-        
-        self.as_string = as_string
-        self.units = units
-        self.size = self.GetMinSize()
-
-        self.fgColourAlarms = {
-            1 : minor_alarm,
-            2 : major_alarm,
-            3 : invalid_alarm } # alarm severities do not have an enum in pyepics
- 
-    def _SetValue(self, value):
-        if value is not None:
-            self.SetLabel(" %s%s " % (value, self.units))
-        self.SetSize(self.size)
-        self.SetClientSize(self.size)
-        self.SetVirtualSize(self.size)
-
-
-
 class MotorPanel(wx.Panel):
     """ MotorPanel  a simple wx windows panel for controlling an Epics Motor
     """
     __motor_fields = ('SET', 'disabled', 'LLM', 'HLM',  'LVIO', 'TWV',
                       'HLS', 'LLS', 'SPMG')
-    
 
     def __init__(self, parent,  motor=None,  
                  style='normal', messenger=None, *args, **kw):
