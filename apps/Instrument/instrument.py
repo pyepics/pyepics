@@ -10,19 +10,16 @@ classes for Tables:
 """
 
 import os
-import glob
-import sys
 import json
 import epics
 import time
-import numpy
 from datetime import datetime
 
 from utils import backup_versions, save_backup
 from creator import make_newdb
 
 from sqlalchemy import MetaData, create_engine, and_
-from sqlalchemy.orm import sessionmaker,  mapper, clear_mappers, relationship, backref
+from sqlalchemy.orm import sessionmaker,  mapper, clear_mappers, relationship
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import  NoResultFound
 
@@ -63,6 +60,7 @@ def valid_score(score, smin=0, smax=5):
     
 
 def isotime2datetime(isotime):
+    "convert isotime string to datetime object"
     sdate, stime = isotime.replace('T', ' ').split(' ')
     syear, smon, sday = [int(x) for x in sdate.split('-')]
     sfrac = '0'
@@ -103,6 +101,7 @@ class _BaseTable(object):
 
 class Info(_BaseTable):
     "general information table (versions, etc)"
+    key, value = None, None
     def __repr__(self):
         name = self.__class__.__name__
         fields = ['%s=%s' % (getattr(self, 'key', '?'),
@@ -111,14 +110,15 @@ class Info(_BaseTable):
 
 class Instrument(_BaseTable):
     "instrument table"
-    pass 
+    name, notes = None, None
 
 class Position(_BaseTable):
     "position table"
-    pass
-
+    pvs, instrument, instrument_id, date, name, notes = None, None, None, None, None, None
+    
 class Position_PV(_BaseTable):
-    "position-pv join table"    
+    "position-pv join table"
+    name, notes, pv, value = None, None, None, None
     def __repr__(self):
         name = self.__class__.__name__
         fields = ['%s=%s' % (getattr(self, 'pv', '?'),
@@ -127,29 +127,32 @@ class Position_PV(_BaseTable):
 
 class Command(_BaseTable):
     "command table"    
-    pass
+    name, notes = None, None
 
 class PVType(_BaseTable):
     "pvtype table"
-    pass
+    name, notes = None, None
 
 class PV(_BaseTable):
     "pv table"
-
+    name, notes = None, None
 
 class Instrument_Precommand(_BaseTable):
     "instrument precommand table"
-    pass
+    name, notes = None, None
 
 class Instrument_Postcommand(_BaseTable):
     "instrument postcommand table"
-    pass
+    name, notes = None, None
 
 class InstrumentDB(object):
     "interface to Instrument Database"
     def __init__(self, dbname=None):
+        self.dbname = dbname
+        selt.tables = None
         self.engine = None
         self.session = None
+        self.conn    = None
         self.metadata = None
         self.update_mod_time = None
         self.pvs = {}
@@ -159,25 +162,8 @@ class InstrumentDB(object):
             
     def create_newdb(self, dbname, connect=False):
         "create a new, empty database"
-#         print 'Create_Newdb' , dbname, os.path.exists(dbname)
-#         p, f = os.path.split(dbname)
-#         
-#         os.chdir(p)
-#         print 'B4 backup version: ', f[:2]
-#         for fx in glob.glob("%s*" % f[:2]):
-#             print fx, os.path.exists(fx), os.stat(fx)
-
         backup_versions(dbname)
-
-#         print 'After backup version: ', f[:2]
-#         for fx in glob.glob("%s*" % f[:2]):
-#             print fx, os.path.exists(fx), os.stat(fx)
-
         make_newdb(dbname)
-        #print 'After makenew version: ', f[:2],  glob.glob("%s*" % f[:2])
-        #for fx in glob.glob("%s*" % f[:2]):
-        #    print fx, os.path.exists(fx), os.stat(fx)
-
         if connect:
             time.sleep(0.5)
             self.connect(dbname, backup=False)
@@ -204,7 +190,6 @@ class InstrumentDB(object):
         try:
             clear_mappers()
         except:
-            print 'clear mappers complained'
             pass
 
         mapper(Info,     tables['info'])
@@ -283,8 +268,6 @@ class InstrumentDB(object):
     def __addRow(self, table, argnames, argvals, **kws):
         """add generic row"""
         me = table() #
-        arg0 = argnames[0]
-        val0 = argvals[0]
         for name, val in zip(argnames, argvals):
             setattr(me, name, val)
         for key, val in kws.items():
@@ -299,7 +282,7 @@ class InstrumentDB(object):
             raise Warning('Could not add data to table %s\n%s' % (table, msg))
 
         return me
-    # return self.query(table).filter(getattr(table, arg0)==val0).one()
+
         
 
     def _get_foreign_keyid(self, table, value, name='name',
@@ -351,12 +334,11 @@ arguments
         if pvtype  in _pvtypes:
             pv.pvtype_id = _pvtypes[pvtype]
         else:
-            row = self.__addRow(PVType, ('name',), (pvtype,), **kws)
+            self.__addRow(PVType, ('name',), (pvtype,))
             out = self.query(PVType).all()            
             _pvtypes = dict([(t.name, t.id) for t in out])
             if pvtype  in _pvtypes:
-                pv.pvtype_id = _pvtypes[typename]
-            
+                pv.pvtype_id = _pvtypes[pvtype]
         self.commit()
         
     def get_pv(self, name):
@@ -374,7 +356,7 @@ arguments
         if instrument is not None:
             inst = self.get_instrument(instrument)
 
-        filter = Position.name==name
+        filter = (Position.name==name)
         if inst is not None:
             filter = and_(filter, Position.instrument_id==inst.id)
 
@@ -388,7 +370,7 @@ arguments
         if instrument is not None:
             inst = self.get_instrument(instrument)
 
-        filter = Position.name==name
+        filter = (Position.name==name)
         if inst is not None:
             filter = and_(filter, Position.instrument_id==inst.id)
 
@@ -443,7 +425,8 @@ arguments
         posname = posname.strip()
         pos  = self.get_position(posname, inst)
         if pos is None:
-            raise InstrumentDBException("Postion '%s' not found for '%s'" % (posname, inst.name))
+            raise InstrumentDBException("Postion '%s' not found for '%s'" %
+                                        (posname, inst.name))
 
         tab = self.tables['position_pv']
         self.conn.execute(tab.delete().where(tab.c.position_id==pos.id))
@@ -511,18 +494,20 @@ arguments
         self.commit()
 
     def restore_complete(self):
+        "return whether last restore_position has completed"
         if len(self.restoring_pvs) > 0:
             return all([p.put_complete for p in self.restoring_pvs])
         return True
         
     def restore_position(self, posname, inst, wait=False,
-                         timeout=60, exclude_pvs=None):
+                         exclude_pvs=None):
         """restore named position for instrument
         """
 
         inst = self.get_instrument(inst)
         if inst is None:
-            raise InstrumentDBException('restore_postion needs valid instrument')
+            raise InstrumentDBException(
+                'restore_postion needs valid instrument')
             
         for pv in inst.pvs:
             pvname = pv.name
@@ -536,7 +521,8 @@ arguments
         posname = posname.strip()
         pos  = self.get_position(posname, inst)
         if pos is None:
-            raise InstrumentDBException("restore_postion  position '%s' not found" % posname)
+            raise InstrumentDBException(
+                "restore_postion  position '%s' not found" % posname)
         
         if exclude_pvs is None:
             exclude_pvs = []
