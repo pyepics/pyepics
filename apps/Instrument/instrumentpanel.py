@@ -125,8 +125,8 @@ class InstrumentPanel(wx.Panel):
         lpanel = wx.Panel(splitter, size=(550, 175))
         rpanel = wx.Panel(splitter, size=(150, 175))
         
-        toprow = wx.Panel(lpanel, size=(425,-1))
-        self.pos_name =  wx.TextCtrl(toprow, value="", size=(220, 25),
+        toprow = wx.Panel(lpanel, size=(525,-1))
+        self.pos_name =  wx.TextCtrl(toprow, value="", size=(250, 25),
                                      style= wx.TE_PROCESS_ENTER)
         self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
 
@@ -135,11 +135,12 @@ class InstrumentPanel(wx.Panel):
         topsizer.Add(SimpleText(toprow, inst.name,
                                 font=titlefont,
                                 colour=colors.title,
-                                minsize=(125, -1),
+                                minsize=(150, -1),
                                 style=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL),
                      0, wx.ALIGN_LEFT, 1)
 
         topsizer.Add(SimpleText(toprow, 'Save Current Position:',
+                                minsize=(150, -1),                              
                                 style=wx.ALIGN_RIGHT), 1,
                      wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
 
@@ -156,10 +157,11 @@ class InstrumentPanel(wx.Panel):
         timer_id = wx.NewId()
         self.etimer = wx.Timer(self)
         self.etimer_count = 0
+        self.etimer_poll = 100
         self.Bind(wx.EVT_TIMER, self.onTimer, self.etimer)
 
         for x in inst.pvs:
-            ppanel = wx.Panel(lpanel, size=(425, -1))
+            ppanel = wx.Panel(lpanel, size=(475, -1))
             psizer = wx.BoxSizer(wx.HORIZONTAL)
             init_msg = wx.StaticText(ppanel,
                                      label='Connecting %s' % x.name)
@@ -172,7 +174,7 @@ class InstrumentPanel(wx.Panel):
 
         time.sleep(0.010)
         pack(lpanel, lsizer)
-        self.etimer.Start(100)
+        self.etimer.Start(self.etimer_poll)
 
         rsizer = wx.BoxSizer(wx.VERTICAL)
         btn_goto = add_button(rpanel, "Go To",  size=(70, -1),
@@ -196,10 +198,10 @@ class InstrumentPanel(wx.Panel):
         rsizer.Add(self.pos_list, 1, wx.EXPAND|wx.ALIGN_CENTER, 1)
         pack(rpanel, rsizer)
 
-        splitter.SplitVertically(lpanel, rpanel, 1)
-        lpanel.SetMinSize((350, 150))
+        splitter.SplitVertically(lpanel, rpanel, -1)
+        lpanel.SetMinSize((450, 150))
         rpanel.SetMaxSize((500, -1))
-        rpanel.SetMinSize((100, -1))
+        rpanel.SetMinSize((150, -1))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(splitter, 1, wx.GROW|wx.ALL, 0)
@@ -215,7 +217,6 @@ class InstrumentPanel(wx.Panel):
         """Timer Event: look for uncompleted PV panels
         and try to create them ...
         """
-        self.etimer_count += 1
         if len(self.pvpanels) == 0:
             self.etimer.Stop()
         for pvname in self.pvpanels:
@@ -223,9 +224,13 @@ class InstrumentPanel(wx.Panel):
             self.PV_Panel(pvname, pnl, szr, wid)
         # if we've done 100 rounds, there are probably
         # really unconnected PVs -- let's slow down.
+        self.etimer_count += 1
         if self.etimer_count > 100:
             self.etimer.Stop()
-            self.etimer.Start(5000)
+            self.etimer_count = 0
+            self.etimer_poll *=  2
+            self.etimer_poll = min(self.etimer_poll, 10000)
+            self.etimer.Start(self.etimer_poll)
             
     @EpicsFunction
     def PV_Panel(self, pvname, panel, sizer, current_wid=None):
@@ -288,8 +293,8 @@ class InstrumentPanel(wx.Panel):
     @EpicsFunction
     def save_current_position(self, posname):
         values = {}
-        for p in self.pvs:
-            values[p.pvname] = p.get(as_string=True)
+        for pv in self.pvs.values():
+            values[pv.pvname] = pv.get(as_string=True)
         self.db.save_position(posname, self.inst, values)
         self.write("Saved position '%s' for '%s'" % (posname, self.inst.name))
         

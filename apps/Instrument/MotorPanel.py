@@ -104,12 +104,12 @@ class MotorPanel(wx.Panel):
     def CreatePanel(self,style='normal'):
         " build (but do not fill in) panel components"
         sstyle = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.ST_NO_AUTORESIZE 
-        self.desc = pvText(self, size=(90, -1),  style=sstyle)
+        self.desc = pvText(self, size=(90, 25),  style=sstyle)
         self.desc.SetForegroundColour("Blue")
         dfont  = self.desc.GetFont() 
         dfont.SetWeight(wx.BOLD)
         self.desc.SetFont(dfont)
-
+        
         self.info = wx.StaticText(self, label='', size=(70, -1), style=sstyle)
         self.info.SetForegroundColour("Red")
 
@@ -118,14 +118,14 @@ class MotorPanel(wx.Panel):
 
         # wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_CENTER)
 
-        self.drive = pvFloatCtrl(self,  size=(70, 20), style = wx.TE_RIGHT)
+        self.drive = pvFloatCtrl(self,  size=(85, 25), style = wx.TE_RIGHT)
         
         self.fillPanelComponents()
                 
         self.twk_list = ['','']
         self.__twkbox = wx.ComboBox(self, value='', size=(90, 25), 
                                     choices=self.twk_list,
-                                    style=wx.CB_DROPDOWN|wx.TE_PROCESS_ENTER)
+                                    style=wx.CB_DROPDOWN) # |wx.TE_PROCESS_ENTER)
 
         # self.__twkbox.SetFont(wx.Font(13, wx.SWISS, wx.NORMAL, wx.BOLD))
         
@@ -135,8 +135,8 @@ class MotorPanel(wx.Panel):
 
         twkbtn1 = wx.Button(self, label='<',    size=(25, 25))
         twkbtn2 = wx.Button(self, label='>',    size=(25, 25))
-        stopbtn = wx.Button(self, label='Stop', size=(40,25))
-        morebtn = wx.Button(self, label='More', size=(40,25))
+        stopbtn = wx.Button(self, label='Stop', size=(50,25))
+        morebtn = wx.Button(self, label='More', size=(50,25))
         
         twkbtn1.Bind(wx.EVT_BUTTON, self.onLeftButton)
         twkbtn2.Bind(wx.EVT_BUTTON, self.onRightButton)

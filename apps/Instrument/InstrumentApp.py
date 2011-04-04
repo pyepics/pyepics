@@ -271,6 +271,8 @@ class InstrumentFrame(wx.Frame):
         self.Destroy()
 
 ## class InstrumentApp(wx.App):
+
+
 class InstrumentApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def __init__(self, conf=None, dbname=None, **kws):
         self.conf  = conf
@@ -285,9 +287,6 @@ class InstrumentApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         return True
 
 if __name__ == '__main__':
-    dbname = None # 'Test.ein'
-    conf = None # 'test.conf'
-    app = wx.PySimpleApp(); InstrumentFrame(conf=conf, dbname=dbname).Show()
-
-    # app = InstrumentApp()
+    # app = wx.PySimpleApp(); InstrumentFrame().Show()
+    app = InstrumentApp()
     app.MainLoop()

@@ -2,7 +2,7 @@ import wx
 import sys
 import time
 
-from epics import PV
+import epics
 from epics.wx import EpicsFunction
 
 from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
