@@ -6,7 +6,7 @@ def get_appdir(appname):
     """gives a user-writeable application directory for config files etc"""
     appbase = None
     if os.name == 'nt':
-        for vars in ('APPDATA', 'HOMEPATH', 'HOME',
+        for var in ('APPDATA', 'HOMEPATH', 'HOME',
                      'USERPROFILE', 'HOMEDRIVE'):
             appbase = os.environ.get(var, None)
             if appbase is not None:

@@ -25,7 +25,7 @@ from utils import GUIColors, ConnectDialog, set_font_with_children, EIN_WILDCARD
 from instrumentpanel import InstrumentPanel
 
 from settingsframe import SettingsFrame
-from editframe import EditFrame
+from editframe import EditInstrumentFrame
 
 FNB_STYLE = flat_nb.FNB_NO_X_BUTTON|flat_nb.FNB_X_ON_TAB|flat_nb.FNB_SMART_TABS
 FNB_STYLE |= flat_nb.FNB_DROPDOWN_TABS_LIST|flat_nb.FNB_NO_NAV_BUTTONS
@@ -175,11 +175,11 @@ class InstrumentFrame(wx.Frame):
         self.SetStatusText(text)
 
     def onAddInstrument(self, event=None):
-        EditFrame(parent=self, db=self.db)
+        EditInstrumentFrame(parent=self, db=self.db)
         
     def onEditInstrument(self, event=None):
         inst = self.nb.GetCurrentPage().inst
-        EditFrame(parent=self, db=self.db, inst=inst)
+        EditInstrumentFrame(parent=self, db=self.db, inst=inst)
 
     def onSettings(self, event=None):
         try:
