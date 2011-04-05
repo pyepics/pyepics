@@ -149,7 +149,7 @@ class InstrumentDB(object):
     "interface to Instrument Database"
     def __init__(self, dbname=None):
         self.dbname = dbname
-        selt.tables = None
+        self.tables = None
         self.engine = None
         self.session = None
         self.conn    = None
