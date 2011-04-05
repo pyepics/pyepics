@@ -38,7 +38,7 @@ class InstrumentFrame(wx.Frame):
         self.connect_db(dbname)
 
         wx.Frame.__init__(self, parent=parent, title='Epics Instruments',
-                          size=(750, 350), **kwds)
+                          size=(775, 400), **kwds)
 
         self.colors = GUIColors()
         self.SetBackgroundColour(self.colors.bg)
@@ -86,7 +86,7 @@ class InstrumentFrame(wx.Frame):
         sizer.Add(self.nb, 1, wx.EXPAND)
 
         self.create_nbpages()
-        self.SetMinSize((650, 150))
+        self.SetMinSize((725, 300))
         
         pack(self, sizer)
         self.Refresh()

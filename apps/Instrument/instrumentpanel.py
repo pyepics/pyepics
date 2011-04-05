@@ -1,4 +1,5 @@
 import wx
+from wx._core import PyDeadObjectError
 
 import time
 import epics
@@ -113,22 +114,24 @@ class InstrumentPanel(wx.Panel):
 
         colors = GUIColors()
 
+        self.parent = parent
         self.SetFont(parent.GetFont())
         titlefont  = self.GetFont()
         titlefont.PointSize += 2
         titlefont.SetWeight(wx.BOLD)
 
-        splitter = wx.SplitterWindow(self,
-                   style=wx.SP_3DSASH|wx.SP_LIVE_UPDATE)
-        splitter.SetMinimumPaneSize(150)
-        self.splitter = splitter
-        splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.onSashChanged)
+        #splitter = wx.SplitterWindow(self,
+        #           style=wx.SP_3DSASH|wx.SP_LIVE_UPDATE)
+        #splitter.SetMinimumPaneSize(150)
+        #self.splitter = splitter
+        #splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.onSashChanged)
 
-       
-        lpanel = wx.Panel(splitter, size=(550, 175))
-        rpanel = wx.Panel(splitter, size=(150, 175))
+        # splitter = wx.Panel(self)
+
+        lpanel = wx.Panel(self) # itter, size=(550, 175))
+        rpanel = wx.Panel(self) # splitter, size=(150, 175))
         
-        toprow = wx.Panel(lpanel, size=(550,-1))
+        toprow = wx.Panel(lpanel) # , size=(550,-1))
         self.pos_name =  wx.TextCtrl(toprow, value="", size=(250, 25),
                                      style= wx.TE_PROCESS_ENTER)
         self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
@@ -138,17 +141,17 @@ class InstrumentPanel(wx.Panel):
         topsizer.Add(SimpleText(toprow, inst.name,
                                 font=titlefont,
                                 colour=colors.title,
-                                minsize=(150, -1),
+                                minsize=(125, -1),
                                 style=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL),
                      0, wx.ALIGN_LEFT, 1)
 
         topsizer.Add(SimpleText(toprow, 'Save Current Position:',
-                                minsize=(150, -1),                              
+                                minsize=(125, -1),                              
                                 style=wx.ALIGN_RIGHT), 1,
                      wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
 
-        topsizer.Add(self.pos_name, 1,
-                     wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.GROW|wx.ALL, 1)
+        topsizer.Add(self.pos_name, 0,
+                     wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL, 1)
 
         pack(toprow, topsizer)
 
@@ -164,11 +167,11 @@ class InstrumentPanel(wx.Panel):
         self.Bind(wx.EVT_TIMER, self.onTimer, self.etimer)
 
         for x in inst.pvs:
-            ppanel = wx.Panel(lpanel, size=(550, 25))
+            ppanel = wx.Panel(lpanel) # , size=(550, 25))
             psizer = wx.BoxSizer(wx.HORIZONTAL)
             init_msg = wx.StaticText(ppanel,
                                      label='Connecting %s' % x.name,
-                                     size=(525, 25))
+                                     ) # size=(525, 25))
             
             self.pvpanels[x.name] = (ppanel, psizer, init_msg)
             
@@ -202,15 +205,10 @@ class InstrumentPanel(wx.Panel):
         rsizer.Add(self.pos_list, 1, wx.EXPAND|wx.ALIGN_CENTER, 1)
         pack(rpanel, rsizer)
 
-        splitter.SplitVertically(lpanel, rpanel, -1)
-        lpanel.SetMinSize((525, 150))
-        lpanel.SetMaxSize((750, 300))
-        rpanel.SetMaxSize((500, -1))
-        rpanel.SetMinSize((150, -1))
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(lpanel, 0, wx.GROW|wx.ALL, 2)
+        sizer.Add(rpanel, 1, wx.GROW|wx.ALL, 2)
 
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(splitter, 1, wx.GROW|wx.ALL, 0)
-        # wx.ALIGN_LEFT|wx.GROW|wx.ALL, 3)
         pack(self, sizer)
 
     def write(self, msg, status='normal'):
@@ -258,10 +256,16 @@ class InstrumentPanel(wx.Panel):
         # print 'PV Panel ', pvname
 
         if current_wid is not None:
-            current_wid.Destroy()
+            try:
+                current_wid.Destroy()
+            except PyDeadObjectError:
+                pass
             sizer.Clear()
 
-        self.pvpanels.pop(pvname)
+        try:
+            self.pvpanels.pop(pvname)
+        except KeyError:
+            pass
         pv.get_ctrlvars()
 
         instrument_pvs = [i.name for i in self.inst.pvs]
@@ -275,12 +279,13 @@ class InstrumentPanel(wx.Panel):
         dtype = epics.caget("%s.RTYP" % pref)
         if dtype.lower() == 'motor':
             self.db.set_pvtype(pvname, 'motor')
-            sizer.Add(MotorPanel(panel, pvname, size=(575, 25)), 1,
+            sizer.Add(MotorPanel(panel, pvname), 1, # size=(550, 25)), 1,
                       wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
         else:
             label = SimpleText(panel, pvname,
                                colour=colors.pvname,
-                               minsize=(100,-1),style=wx.ALIGN_LEFT)
+                               minsize=(100,-1),
+                               style=wx.ALIGN_LEFT)
 
             if pv.type in ('double', 'int', 'long', 'short'):
                 control = pvFloatCtrl(panel, pv=pv)
@@ -295,7 +300,6 @@ class InstrumentPanel(wx.Panel):
             sizer.Add(label,   0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
             sizer.Add(control, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
         pack(panel, sizer)
-        # sizer.Layout()
         # print 'Splitter '
         # self.splitter.AutoLayout = True
         # self.splitter.Layout()
@@ -333,8 +337,7 @@ class InstrumentPanel(wx.Panel):
 
     @EpicsFunction
     def restore_position(self, posname, exclude_pvs=None, timeout=5.0):
-        self.db.restore_position(posname, self.inst,
-                                 wait=True, timeout=timeout,
+        self.db.restore_position(posname, self.inst, wait=True, 
                                  exclude_pvs=exclude_pvs)
 
         msg= "Moved '%s' to position '%s'" % (self.inst.name, posname)
