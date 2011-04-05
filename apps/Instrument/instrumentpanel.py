@@ -121,11 +121,14 @@ class InstrumentPanel(wx.Panel):
         splitter = wx.SplitterWindow(self,
                    style=wx.SP_3DSASH|wx.SP_LIVE_UPDATE)
         splitter.SetMinimumPaneSize(150)
+        self.splitter = splitter
+        splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.onSashChanged)
+
        
         lpanel = wx.Panel(splitter, size=(550, 175))
         rpanel = wx.Panel(splitter, size=(150, 175))
         
-        toprow = wx.Panel(lpanel, size=(525,-1))
+        toprow = wx.Panel(lpanel, size=(550,-1))
         self.pos_name =  wx.TextCtrl(toprow, value="", size=(250, 25),
                                      style= wx.TE_PROCESS_ENTER)
         self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
@@ -161,10 +164,11 @@ class InstrumentPanel(wx.Panel):
         self.Bind(wx.EVT_TIMER, self.onTimer, self.etimer)
 
         for x in inst.pvs:
-            ppanel = wx.Panel(lpanel, size=(475, -1))
+            ppanel = wx.Panel(lpanel, size=(550, 25))
             psizer = wx.BoxSizer(wx.HORIZONTAL)
             init_msg = wx.StaticText(ppanel,
-                                     label='Connecting %s' % x.name)
+                                     label='Connecting %s' % x.name,
+                                     size=(525, 25))
             
             self.pvpanels[x.name] = (ppanel, psizer, init_msg)
             
@@ -199,7 +203,8 @@ class InstrumentPanel(wx.Panel):
         pack(rpanel, rsizer)
 
         splitter.SplitVertically(lpanel, rpanel, -1)
-        lpanel.SetMinSize((450, 150))
+        lpanel.SetMinSize((525, 150))
+        lpanel.SetMaxSize((750, 300))
         rpanel.SetMaxSize((500, -1))
         rpanel.SetMinSize((150, -1))
 
@@ -232,6 +237,9 @@ class InstrumentPanel(wx.Panel):
             self.etimer_poll = min(self.etimer_poll, 10000)
             self.etimer.Start(self.etimer_poll)
             
+    def onSashChanged(self, evt):
+        pass # print "sash changed to %s\n" % str(evt.GetSashPosition())
+
     @EpicsFunction
     def PV_Panel(self, pvname, panel, sizer, current_wid=None):
         """ try to create a PV Panel for the given pv
@@ -246,6 +254,8 @@ class InstrumentPanel(wx.Panel):
         # return if not connected
         if pv.connected == False:
             return
+
+        # print 'PV Panel ', pvname
 
         if current_wid is not None:
             current_wid.Destroy()
@@ -265,31 +275,33 @@ class InstrumentPanel(wx.Panel):
         dtype = epics.caget("%s.RTYP" % pref)
         if dtype.lower() == 'motor':
             self.db.set_pvtype(pvname, 'motor')
-            sizer.Add(MotorPanel(panel, pvname, size=(450, 25)), 1,
+            sizer.Add(MotorPanel(panel, pvname, size=(575, 25)), 1,
                       wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
-            pack(panel, sizer)
-            return
+        else:
+            label = SimpleText(panel, pvname,
+                               colour=colors.pvname,
+                               minsize=(100,-1),style=wx.ALIGN_LEFT)
 
-        label = SimpleText(panel, pvname,
-                           colour=colors.pvname,
-                           minsize=(100,-1),style=wx.ALIGN_LEFT)
+            if pv.type in ('double', 'int', 'long', 'short'):
+                control = pvFloatCtrl(panel, pv=pv)
+                self.db.set_pvtype(pvname, 'numeric')
+            elif pv.type in ('string', 'unicode'):
+                control = pvTextCtrl(panel, pv=pv)
+                self.db.set_pvtype(pvname, 'string')
+            elif pv.type == 'enum': 
+                self.db.set_pvtype(pvname, 'enum')
+                control = pvEnumChoice(panel, pv=pv)
 
-        if pv.type in ('double', 'int', 'long', 'short'):
-            control = pvFloatCtrl(panel, pv=pv)
-            self.db.set_pvtype(pvname, 'numeric')
-        elif pv.type in ('string', 'unicode'):
-            control = pvTextCtrl(panel, pv=pv)
-            self.db.set_pvtype(pvname, 'string')
-        elif pv.type == 'enum': 
-            self.db.set_pvtype(pvname, 'enum')
-            control = pvEnumChoice(panel, pv=pv)
-
-        sizer.Add(label,   0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
-        sizer.Add(control, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
+            sizer.Add(label,   0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
+            sizer.Add(control, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
         pack(panel, sizer)
-        sizer.Layout()
-        return
-        
+        # sizer.Layout()
+        # print 'Splitter '
+        # self.splitter.AutoLayout = True
+        # self.splitter.Layout()
+        # self.splitter.SendSizeEvent()
+        # self.splitter.SendSizeEventToParent()
+                
     @EpicsFunction
     def save_current_position(self, posname):
         values = {}

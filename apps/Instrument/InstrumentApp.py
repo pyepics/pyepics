@@ -38,7 +38,7 @@ class InstrumentFrame(wx.Frame):
         self.connect_db(dbname)
 
         wx.Frame.__init__(self, parent=parent, title='Epics Instruments',
-                          size=(700, 350), **kwds)
+                          size=(750, 350), **kwds)
 
         self.colors = GUIColors()
         self.SetBackgroundColour(self.colors.bg)
@@ -86,7 +86,7 @@ class InstrumentFrame(wx.Frame):
         sizer.Add(self.nb, 1, wx.EXPAND)
 
         self.create_nbpages()
-        self.SetMinSize((250, 150))
+        self.SetMinSize((650, 150))
         
         pack(self, sizer)
         self.Refresh()
@@ -288,5 +288,7 @@ class InstrumentApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
 if __name__ == '__main__':
     # app = wx.PySimpleApp(); InstrumentFrame().Show()
-    app = InstrumentApp()
+    conf = None
+    dbname = 'Test.ein'
+    app = InstrumentApp(dbname=dbname, conf=conf)
     app.MainLoop()

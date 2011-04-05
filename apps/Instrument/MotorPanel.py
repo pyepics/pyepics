@@ -110,7 +110,7 @@ class MotorPanel(wx.Panel):
         dfont.SetWeight(wx.BOLD)
         self.desc.SetFont(dfont)
         
-        self.info = wx.StaticText(self, label='', size=(70, -1), style=sstyle)
+        self.info = wx.StaticText(self, label='', size=(85, -1), style=sstyle)
         self.info.SetForegroundColour("Red")
 
         self.rbv  = pvText(self, size=(70, -1),
