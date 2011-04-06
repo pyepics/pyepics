@@ -14,7 +14,6 @@ class MoveToDialog(wx.Dialog):
     """Full Query for Move To for a Position"""
     msg = '''Select Recent Instrument File, create a new one'''
     def __init__(self, parent, posname, inst, db, pvs, pvdesc=None, **kws):
-
         self.posname = posname
         self.inst = inst
         self.db   = inst
@@ -94,7 +93,8 @@ class MoveToDialog(wx.Dialog):
         btnsizer.AddButton(wx.Button(panel, wx.ID_CANCEL))
 
         btnsizer.Realize()
-        sizer.Add(btnsizer, (irow+4, 2), (1, 2), wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
+        sizer.Add(btnsizer, (irow+4, 2), (1, 2),
+                  wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
         pack(panel, sizer)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -120,18 +120,10 @@ class InstrumentPanel(wx.Panel):
         titlefont.PointSize += 2
         titlefont.SetWeight(wx.BOLD)
 
-        #splitter = wx.SplitterWindow(self,
-        #           style=wx.SP_3DSASH|wx.SP_LIVE_UPDATE)
-        #splitter.SetMinimumPaneSize(150)
-        #self.splitter = splitter
-        #splitter.Bind(wx.EVT_SPLITTER_SASH_POS_CHANGED, self.onSashChanged)
-
-        # splitter = wx.Panel(self)
-
-        lpanel = wx.Panel(self) # itter, size=(550, 175))
-        rpanel = wx.Panel(self) # splitter, size=(150, 175))
+        lpanel = wx.Panel(self, size=(600, 175)) 
+        rpanel = wx.Panel(self, size=(150, 175)) 
         
-        toprow = wx.Panel(lpanel) # , size=(550,-1))
+        toprow = wx.Panel(lpanel) 
         self.pos_name =  wx.TextCtrl(toprow, value="", size=(250, 25),
                                      style= wx.TE_PROCESS_ENTER)
         self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
@@ -163,7 +155,7 @@ class InstrumentPanel(wx.Panel):
         timer_id = wx.NewId()
         self.etimer = wx.Timer(self)
         self.etimer_count = 0
-        self.etimer_poll = 100
+        self.etimer_poll = 50
         self.Bind(wx.EVT_TIMER, self.onTimer, self.etimer)
 
         for x in inst.pvs:
@@ -171,7 +163,7 @@ class InstrumentPanel(wx.Panel):
             psizer = wx.BoxSizer(wx.HORIZONTAL)
             init_msg = wx.StaticText(ppanel,
                                      label='Connecting %s' % x.name,
-                                     ) # size=(525, 25))
+                                     size=(550, 25))
             
             self.pvpanels[x.name] = (ppanel, psizer, init_msg)
             
@@ -235,9 +227,6 @@ class InstrumentPanel(wx.Panel):
             self.etimer_poll = min(self.etimer_poll, 10000)
             self.etimer.Start(self.etimer_poll)
             
-    def onSashChanged(self, evt):
-        pass # print "sash changed to %s\n" % str(evt.GetSashPosition())
-
     @EpicsFunction
     def PV_Panel(self, pvname, panel, sizer, current_wid=None):
         """ try to create a PV Panel for the given pv
@@ -252,8 +241,6 @@ class InstrumentPanel(wx.Panel):
         # return if not connected
         if pv.connected == False:
             return
-
-        # print 'PV Panel ', pvname
 
         if current_wid is not None:
             try:
@@ -279,7 +266,7 @@ class InstrumentPanel(wx.Panel):
         dtype = epics.caget("%s.RTYP" % pref)
         if dtype.lower() == 'motor':
             self.db.set_pvtype(pvname, 'motor')
-            sizer.Add(MotorPanel(panel, pvname), 1, # size=(550, 25)), 1,
+            sizer.Add(MotorPanel(panel, pvname), 1, 
                       wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
         else:
             label = SimpleText(panel, pvname,
@@ -300,11 +287,6 @@ class InstrumentPanel(wx.Panel):
             sizer.Add(label,   0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
             sizer.Add(control, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
         pack(panel, sizer)
-        # print 'Splitter '
-        # self.splitter.AutoLayout = True
-        # self.splitter.Layout()
-        # self.splitter.SendSizeEvent()
-        # self.splitter.SendSizeEventToParent()
                 
     @EpicsFunction
     def save_current_position(self, posname):

@@ -12,23 +12,14 @@ from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
 from utils import GUIColors, HideShow, YesNo, set_font_with_children
 
 class pvNameCtrl(wx.TextCtrl):
-    def __init__(self, parent,  value='', connecting_pvs=None, timer=None,  **kws):
-        wx.TextCtrl.__init__(self, parent, wx.ID_ANY, value='', **kws)
+    def __init__(self, owner, panel,  value='', **kws):
+        self.owner = owner
+        wx.TextCtrl.__init__(self, panel, wx.ID_ANY, value='', **kws)
         self.Bind(wx.EVT_CHAR, self.onChar)
         self.Bind(wx.EVT_KILL_FOCUS, self.onFocus)
-        #self.Bind(wx.EVT_SET_FOCUS,  self.onFocus)
-
-        if connecting_pvs is None:
-            connecting_pvs = {}
-        self.connecting_pvs = connecting_pvs
-        self.timer = timer
 
     def onFocus(self, evt=None):
-        print 'Lose fOCUS Event: ', 
-        print 'Value = ', self.Value
-        #if (key == wx.WXK_RETURN):
-        #    self.connect_pv(entry)
-
+        self.owner.connect_pv(self.Value, wid=self.GetId())
         evt.Skip()
 
     def onChar(self, event):
@@ -36,17 +27,8 @@ class pvNameCtrl(wx.TextCtrl):
         entry = wx.TextCtrl.GetValue(self).strip()
         pos   = wx.TextCtrl.GetSelection(self)
         if (key == wx.WXK_RETURN):
-            self.connect_pv(entry)
+            self.owner.connect_pv(entry, wid=self.GetId())
         event.Skip()
-            
-    @EpicsFunction
-    def connect_pv(self, pvname):
-        if pvname not in self.connecting_pvs:
-            self.connecting_pvs[pvname] = epics.PV(pvname)
-            if self.timer is not None:
-                if not self.timer.IsRunning():
-                    self.timer.Start(100)
-
 
 class FocusEventFrame(wx.Window):
     """mixin for Frames that all EVT_KILL_FOCUS/EVT_SET_FOCUS events"""
@@ -66,7 +48,8 @@ class FocusEventFrame(wx.Window):
 class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
     """ Edit / Add Instrument"""
     def __init__(self, parent=None, pos=(-1, -1), inst=None, db=None):
-        
+
+        self.pvs = {}
         title = 'Add New Instrument'
         if inst is not None:
             title = 'Edit Instrument  %s ' % inst.name
@@ -167,18 +150,16 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
         
         sizer.Add(txt, (irow, 0), (1, 5), LEFT, 3)
 
-        self.newpvs = []
+        self.newpvs = {}
         for newpvs in range(6):
             irow += 1
-            name = pvNameCtrl(panel, value='',
-                              connecting_pvs=self.connecting_pvs,
-                              timer=self.etimer, size=(175, -1))
+            name = pvNameCtrl(self, panel, value='', size=(175, -1))
             status = SimpleText(panel, 'not connected',  minsize=(120, -1),
                                 style=LSTY)
             sizer.Add(name,     (irow, 0), (1, 1), LSTY,  4)
             sizer.Add(status,   (irow, 1), (1, 1), LSTY,  4)
             
-            self.newpvs.append((name, status))
+            self.newpvs[name.GetId()] = status
 
         btn_panel = wx.Panel(panel)
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -212,10 +193,50 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
             out[self.parent.nb.GetPageText(i)] = i
         return out
         
+            
+    @EpicsFunction
+    def connect_pv(self, pvname, wid=None):
+        print 'Connect PV: ', pvname, wid, self.connecting_pvs
+        if pvname not in self.connecting_pvs:
+            if pvname not in self.pvs:
+                self.pvs[pvname] = epics.PV(pvname)
+            self.connecting_pvs[pvname] = wid
+            
+            if not self.etimer.IsRunning():
+                self.etimer.Start(500)
+                
+
     def onTimer(self, event=None):
         print 'timer ' , len(self.connecting_pvs)
         if len(self.connecting_pvs) == 0:
             self.etimer.Stop()
+        for pvname in self.connecting_pvs:
+            self.new_pv_connected(pvname)
+
+    @EpicsFunction
+    def new_pv_connected(self, pvname):
+        if pvname not in self.pvs:
+            pv = self.pvs[pvname] = epics.PV(pvname)
+        else:
+            pv = self.pvs[pvname]
+        # return if not connected
+        if pv.connected == False:
+            return
+        try:
+            wid = self.connecting_pvs.pop(pvname)
+        except KeyError:
+            wid = None
+        pv.get_ctrlvars()
+        print 'new connected PV ', pv, wid
+        self.newpvs[wid].SetLabel('Connected!')
+        pref = pvname
+        if '.' in pvname:
+            pref, suff = pvname.split('.')
+        desc  = epics.caget("%s.DESC" % pref)
+        dtype = epics.caget("%s.RTYP" % pref)
+        print 'DESC DTYPE ', desc, dtype
+        
+        self.newpvs[wid].SetLabel(dtype)        
         
     def onRemoveInst(self, event=None):
         print 'Remove Instrument -- verify'

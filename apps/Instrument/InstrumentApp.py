@@ -38,7 +38,7 @@ class InstrumentFrame(wx.Frame):
         self.connect_db(dbname)
 
         wx.Frame.__init__(self, parent=parent, title='Epics Instruments',
-                          size=(775, 400), **kwds)
+                          size=(800, 400), **kwds)
 
         self.colors = GUIColors()
         self.SetBackgroundColour(self.colors.bg)
