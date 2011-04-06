@@ -11,6 +11,7 @@ import epics
 import wx.lib.buttons as buttons
 import wx.lib.agw.floatspin as floatspin
 
+
 def EpicsFunction(f):
     """decorator to wrap function in a wx.CallAfter() so that
     Epics calls can be made in a separate thread, and asynchronously.
@@ -1041,3 +1042,72 @@ class pvComboBox(wx.ComboBox, pvCtrlMixin):
     
     def OnText(self, event):
         self.pv.put(self.Value)
+        
+class pvToggleButton(wx.ToggleButton, pvCtrlMixin):
+    """A ToggleButton that can be attached to a bi or bo Epics record."""
+    
+    def __init__(self, parent, pv=None, down=1, up_colour=None, down_colour=None,
+                 **kwargs):
+        """
+        Create a ToggleButton and attach it to a bi or bo record.
+        
+        Toggling the button will toggle the bi/bo record (and vice versa.) The
+        button label is the ONAM or ZNAM values of the record. Note the label
+        displays the opposite state of the bi/bo record, i.e., it shows what
+        will happen if the button is clicked.
+        
+        parent: Parent window of the ToggleButton.
+        pv: Process variable attached to the ToggleButton. A bi/bo record.
+        down: pv.value representing a down button. Default 1.
+        up_colour: Background colour of button when it is up. Default None.
+        down_colour: Background colour of button when it is down. Default None.
+        """
+        wx.ToggleButton.__init__(self, parent, wx.ID_ANY, label='', **kwargs)
+        pvCtrlMixin.__init__(self, pv=pv)
+        
+        self.down = down
+        self.up_colour = up_colour
+        self.down_colour = down_colour
+        self.Bind(wx.EVT_TOGGLEBUTTON, self._onButton)
+
+    @EpicsFunction
+    def _onButton(self, event=None):
+        self.labels = self.pv.enum_strs
+        if self.GetValue():
+            self.SetLabel(self.labels[0])
+            self.pv.put(self.down == 1)
+            self.SetBackgroundColour(self.down_colour)
+        else:
+            self.SetLabel(self.labels[1])
+            self.pv.put(self.down == 0)
+            self.SetBackgroundColour(self.up_colour)
+
+    def _SetValue(self, value):
+        self.labels = self.pv.enum_strs
+        if value==self.labels[1]:
+            self.SetValue(self.down==1)
+            self.SetBackgroundColour(self.down_colour if self.down==1 else self.up_colour)
+            self.SetLabel(self.labels[0])
+        else:
+            self.SetValue(self.down==0)
+            self.SetBackgroundColour(self.down_colour if self.down==0 else self.up_colour)
+            self.SetLabel(self.labels[1])
+
+
+class pvStatusBar(wx.StatusBar, pvMixin):
+    """A status bar that displays a pv value
+    
+    To use in a wxFrame:
+        self.SetStatusBar(pvStatusBar(prent=self, pv=PV(...), style=...)
+    """
+    
+    def __init__(self, parent=None, pv=None, **kwargs):
+        """
+        Create a stsus bar that displays a pv value.
+        """
+        wx.StatusBar.__init__(self, parent, wx.ID_ANY, **kwargs)
+        pvMixin.__init__(self, pv=pv)
+    
+    def OnPVChange(self, rawValue):
+        self.SetStatusText(self.pv.get())
+
