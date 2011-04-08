@@ -1,13 +1,13 @@
 """
-This module provides wxPython widgets specially designed to work as Epics Controls.
-All these controls combine a wx widget with one Epics PV, and allow automatic updating
-of the widget  when the associated PV changes.
-
+This module provides wxPython widgets specially designed to work as
+Epics Controls.  In general,  these controls combine a wx widget with
+an Epics PV, and allow automatic updating of the widget when the
+associated PV changes.
 """
-from . import MotorPanel
+from . import MotorPanel, MiniMotorPanel
 from . import wxlib, ogllib
 
-MiniMotorPanel= MotorPanel.MiniMotorPanel
+MiniMotorPanel = MiniMotorPanel.MiniMotorPanel
 MotorPanel    = MotorPanel.MotorPanel
 
 pvText        = wxlib.pvText
@@ -26,7 +26,6 @@ pvComboBox    = wxlib.pvComboBox
 # OGL shapes
 pvRectangle   = ogllib.pvRectangle
 pvCircle      = ogllib.pvCircle
-
 
 set_sizer = wxlib.set_sizer
 set_float = wxlib.set_float
