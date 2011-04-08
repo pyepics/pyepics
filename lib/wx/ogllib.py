@@ -1,15 +1,14 @@
 """
-wx OGL (2d graphics library) utility functions for Epics and wxPython interaction
+wx OGL (2d graphics library) utility functions for Epics and wxPython
+interaction
 
-OGL is a (somewhat old-fashioned) 2D drawing library included with wxPython. There are
-probably newer/better drawing libraries, but OGL works quite well for drawing simple shapes
-or bitmaps.
+OGL is a (somewhat old-fashioned) 2D drawing library included with wxPython.
+There are probably newer/better drawing libraries, but OGL works quite well
+for drawing simple shapes or bitmaps.
 
 """
-import wx
 import wx.lib.ogl as ogl
 from wxlib import pvMixin
-
 
 class pvShapeMixin(pvMixin):
     """
@@ -86,10 +85,10 @@ class pvShapeMixin(pvMixin):
         (convenience method)
 
         """
-        (w,h) = self.GetBoundingBoxMax()        
+        (w, h) = self.GetBoundingBoxMax()        
         x = self.GetX()
         y = self.GetY()
-        self.GetCanvas().RefreshRect((x-w/2,y-h/2,w,h))
+        self.GetCanvas().RefreshRect((x-w/2, y-h/2, w, h))
         
  
 class pvRectangle(ogl.RectangleShape, pvShapeMixin):
