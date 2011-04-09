@@ -4,11 +4,10 @@ Epics Controls.  In general,  these controls combine a wx widget with
 an Epics PV, and allow automatic updating of the widget when the
 associated PV changes.
 """
-from . import MotorPanel, MiniMotorPanel
+from . import motorpanel
 from . import wxlib, ogllib
 
-MiniMotorPanel = MiniMotorPanel.MiniMotorPanel
-MotorPanel    = MotorPanel.MotorPanel
+MotorPanel    = motorpanel.MotorPanel
 
 pvText        = wxlib.pvText
 pvAlarm       = wxlib.pvAlarm

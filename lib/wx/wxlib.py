@@ -84,8 +84,6 @@ class EpicsTimer:
         "pend/poll"
         epics.ca.poll()
 
-
-
 class pvMixin:
     """ base class mixin for any class that needs PV wx callback
         support.
