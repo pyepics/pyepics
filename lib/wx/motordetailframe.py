@@ -47,11 +47,11 @@ class MotorDetailFrame(wx.Frame):
         ssizer = wx.BoxSizer(wx.HORIZONTAL)
         ssizer.AddMany([(wx.StaticText(spanel, label=' Label ',
                                        size=(65, -1)), 0,  RCEN),
-                        (self.motor_textctrl(spanel, 'DESC',
+                        (self.MotorTextCtrl(spanel, 'DESC',
                                              size=(210, -1)), 1,  LCEN),
                         (wx.StaticText(spanel, label='  units ',
                                        size=(75, -1)), 0, RCEN), 
-                        (self.motor_textctrl(spanel, 'EGU',
+                        (self.MotorTextCtrl(spanel, 'EGU',
                                              size=(95, -1)), 0,  LCEN)
                         ])
 
@@ -76,23 +76,23 @@ class MotorDetailFrame(wx.Frame):
         self.info.SetForegroundColour("Red")
 
         ds.Add(xLabel(dp,"High Limit"),     (nrow, 0), (1, 1), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp,'HLM'),   (nrow, 1), (1, 1), CEN)
-        ds.Add(self.motor_ctrl(dp,'DHLM'),  (nrow, 2), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp,'HLM'),   (nrow, 1), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp,'DHLM'),  (nrow, 2), (1, 1), CEN)
         ds.Add(self.info,                   (nrow, 3), (1, 1), CEN)        
 
         ####
         nrow += 1
         ostyle = RCEN|wx.EXPAND
         ds.Add(xLabel(dp,"Readback"),       (nrow, 0),  (1, 1), LCEN, 5)
-        ds.Add(self.motor_text(dp, 'RBV'),  (nrow, 1),  (1, 1), ostyle, 5)
-        ds.Add(self.motor_text(dp, 'DRBV'), (nrow, 2),  (1, 1), ostyle, 5)
-        ds.Add(self.motor_text(dp, 'RRBV'), (nrow, 3),  (1, 1), ostyle, 5)
+        ds.Add(self.MotorText(dp, 'RBV'),  (nrow, 1),  (1, 1), ostyle, 5)
+        ds.Add(self.MotorText(dp, 'DRBV'), (nrow, 2),  (1, 1), ostyle, 5)
+        ds.Add(self.MotorText(dp, 'RRBV'), (nrow, 3),  (1, 1), ostyle, 5)
 
         ####
         nrow += 1
-        self.drives  = [self.motor_ctrl(dp, 'VAL'),
-                        self.motor_ctrl(dp, 'DVAL'),
-                        self.motor_ctrl(dp, 'RVAL')]
+        self.drives  = [self.MotorCtrl(dp, 'VAL'),
+                        self.MotorCtrl(dp, 'DVAL'),
+                        self.MotorCtrl(dp, 'RVAL')]
 
         ds.Add(xLabel(dp,"Move"),  (nrow, 0), (1, 1), LCEN, 5)
         ds.Add(self.drives[0],     (nrow, 1), (1, 1), CEN)
@@ -101,8 +101,8 @@ class MotorDetailFrame(wx.Frame):
 
         nrow += 1
         ds.Add(xLabel(dp,"Low Limit"),      (nrow, 0), (1, 1), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp, 'LLM'),  (nrow, 1), (1, 1), CEN)
-        ds.Add(self.motor_ctrl(dp, 'DLLM'), (nrow, 2), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'LLM'),  (nrow, 1), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'DLLM'), (nrow, 2), (1, 1), CEN)
 
         ####
 
@@ -113,8 +113,8 @@ class MotorDetailFrame(wx.Frame):
          
         twk_left = wx.Button(twk_panel, label='<',  size=(30, 30))
         twk_right = wx.Button(twk_panel, label='>',  size=(30, 30))
-        twk_left.Bind(wx.EVT_BUTTON,  self.onLeftButton)
-        twk_right.Bind(wx.EVT_BUTTON, self.onRightButton)
+        twk_left.Bind(wx.EVT_BUTTON,  self.OnLeftButton)
+        twk_right.Bind(wx.EVT_BUTTON, self.OnRightButton)
         twk_sizer.AddMany([(twk_left,   0, CEN),
                            (twk_val,    0, CEN),
                            (twk_right,  0, CEN)])
@@ -140,7 +140,7 @@ class MotorDetailFrame(wx.Frame):
 
         for attr in ('LLM', 'HLM', 'DLLM', 'DHLM'):
             pv = self.motor.PV(attr)
-            pv.add_callback(self.onLimitChange, wid=self.GetId(), attr=attr)
+            pv.add_callback(self.OnLimitChange, wid=self.GetId(), attr=attr)
             
         #
         set_sizer(dp, ds) # ,fit=True)
@@ -170,7 +170,7 @@ class MotorDetailFrame(wx.Frame):
                             size=(110, -1)),  (0, 3), (1, 1), CEN)
         
         ds.Add(xLabel(dp, 'Offset Value: '), (1, 2), (1, 1), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp,'OFF'),    (1, 3), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp,'OFF'),    (1, 3), (1, 1), CEN)
 
         set_sizer(dp, ds)
         sizer.Add(dp, 0)
@@ -191,29 +191,29 @@ class MotorDetailFrame(wx.Frame):
         ####
         nrow += 1
         ds.Add(xLabel(dp, "Max Speed"),      (nrow, 0), (1, 1), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp, 'SMAX'),  (nrow, 1), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'SMAX'),  (nrow, 1), (1, 1), CEN)
 
         nrow += 1
         ds.Add(xLabel(dp, "Speed"),           (nrow, 0), (1, 1), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp, 'VELO'),   (nrow, 1), (1, 1), CEN)
-        ds.Add(self.motor_ctrl(dp, 'BVEL'),   (nrow, 2), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'VELO'),   (nrow, 1), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'BVEL'),   (nrow, 2), (1, 1), CEN)
 
         nrow += 1
         ds.Add(xLabel(dp, "Base Speed"),     (nrow, 0), (1, 1), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp, 'VBAS'),  (nrow, 1), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'VBAS'),  (nrow, 1), (1, 1), CEN)
 
         nrow += 1
         ds.Add(xLabel(dp, "Accel (s)"),      (nrow, 0), (1, 1), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp, 'ACCL'),  (nrow, 1), (1, 1), CEN)
-        ds.Add(self.motor_ctrl(dp, 'BACC'),  (nrow, 2), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'ACCL'),  (nrow, 1), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'BACC'),  (nrow, 2), (1, 1), CEN)
 
         nrow += 1
         ds.Add(xLabel(dp, "Backslash Distance"), (nrow, 0), (1, 2), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp, 'BDST'),     (nrow, 2), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'BDST'),     (nrow, 2), (1, 1), CEN)
 
         nrow += 1
         ds.Add(xLabel(dp, "Move Fraction"),  (nrow, 0), (1, 2), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp, 'FRAC'),  (nrow, 2), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'FRAC'),  (nrow, 2), (1, 1), CEN)
 
         set_sizer(dp, ds) # ,fit=True)
         
@@ -228,32 +228,32 @@ class MotorDetailFrame(wx.Frame):
 
         nrow = 0
         ds.Add(xLabel(dp, "Motor Res"),      (nrow, 0), (1, 1), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp, 'MRES'),  (nrow, 1), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'MRES'),  (nrow, 1), (1, 1), CEN)
         ds.Add(xLabel(dp, "Encoder Res"),    (nrow, 2), (1, 1), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp, 'ERES'),  (nrow, 3), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'ERES'),  (nrow, 3), (1, 1), CEN)
 
         nrow += 1
         ds.Add(xLabel(dp, "Steps / Rev"),    (nrow, 0), (1, 1), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp, 'SREV'),  (nrow, 1), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'SREV'),  (nrow, 1), (1, 1), CEN)
         ds.Add(xLabel(dp, "Units / Rev"),    (nrow, 2), (1, 1), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp, 'UREV'),  (nrow, 3), (1, 1), CEN)        
+        ds.Add(self.MotorCtrl(dp, 'UREV'),  (nrow, 3), (1, 1), CEN)        
 
         nrow += 1
         ds.Add(xLabel(dp, "Precision"),      (nrow, 0), (1, 1), LCEN, 5)
-        ds.Add(self.motor_ctrl(dp, 'PREC'),  (nrow, 1), (1, 1), CEN)        
+        ds.Add(self.MotorCtrl(dp, 'PREC'),  (nrow, 1), (1, 1), CEN)        
 
         set_sizer(dp, ds) 
         sizer.Add(dp, 0)
         sizer.Add(wx.StaticLine(panel, size=(100, 2)),  0, wx.EXPAND)        
         
         for attr in self.__motor_fields:
-            self.motor.PV(attr).add_callback(self.onMotorEvent,
+            self.motor.PV(attr).add_callback(self.OnMotorEvent,
                                              wid=self.GetId(), field=attr)
 
         self.info.SetLabel('')
         for f in ('HLS', 'LLS', 'LVIO', 'SET'):
             if self.motor.get(f):
-                wx.CallAfter(self.onMotorEvent,
+                wx.CallAfter(self.OnMotorEvent,
                              pvname=self.motor.PV(f).pvname, field=f)
 
         set_sizer(panel, sizer, fit=True)
@@ -261,7 +261,7 @@ class MotorDetailFrame(wx.Frame):
         self.Raise()
 
     @DelayedEpicsCallback
-    def onMotorEvent(self, pvname=None, field=None, **kws):
+    def OnMotorEvent(self, pvname=None, field=None, **kws):
         "Motor event handler"
         if pvname is None:
             return None
@@ -281,25 +281,25 @@ class MotorDetailFrame(wx.Frame):
                 d.SetBackgroundColour(color)
                 d.Refresh()
                 
-    def motor_ctrl(self, panel, attr):
+    def MotorCtrl(self, panel, attr):
         "pvFloatCtrl for a Motor attribute"        
         return pvFloatCtrl(panel, size=(100, -1), 
                            precision= self.motor.PREC,
                            pv = self.motor.PV(attr),
                            style = wx.TE_RIGHT)
 
-    def motor_text(self, panel, attr):
+    def MotorText(self, panel, attr):
         "pvText for a Motor attribute"
         return pvText(panel,  pv=self.motor.PV(attr), as_string=True,
                       size=(100, -1), style=wx.ALIGN_RIGHT|wx.CENTER)
 
-    def motor_textctrl(self, panel, attr, size=(100, -1)):
+    def MotorTextCtrl(self, panel, attr, size=(100, -1)):
         "pvTextCtrl for a Motor attribute"
         return pvTextCtrl(panel, pv=self.motor.PV(attr), size=size, 
                           style=wx.ALIGN_LEFT|wx.TE_PROCESS_ENTER)
 
     @DelayedEpicsCallback
-    def onLimitChange(self, attr=None, value=None, **kws):
+    def OnLimitChange(self, attr=None, value=None, **kws):
         "limit-change callback"
         funcs = {'low_limit':       self.drives[0].SetMin,
                  'high_limit':      self.drives[0].SetMax,
@@ -309,14 +309,14 @@ class MotorDetailFrame(wx.Frame):
             funcs[attr](value)
             
     @EpicsFunction
-    def onLeftButton(self, event=None):
+    def OnLeftButton(self, event=None):
         "left button event handler"
         if self.motor is not None:
             self.motor.tweak(direction='reverse')
         event.Skip()        
         
     @EpicsFunction
-    def onRightButton(self, event=None):
+    def OnRightButton(self, event=None):
         "right button event handler"        
         if self.motor is not None:
             self.motor.tweak(direction='forward')

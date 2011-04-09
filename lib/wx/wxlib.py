@@ -100,11 +100,9 @@ class pvMixin:
         if pv is not None:
             self.set_pv(pv)
 
-
     @EpicsFunction
     def set_pv(self, pv=None):
         if isinstance(pv, epics.PV):
-            # or isinstance(pv, epics.PVTuple):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
             self.pv = epics.PV(pv)
@@ -124,8 +122,6 @@ class pvMixin:
     @DelayedEpicsCallback
     def _pvEvent(self, pvname=None, value=None, wid=None,
                  char_value=None, **kws):
-        # if pvname is None or id == 0: return
-        # print 'generic pv event handler ', pvname, value
         if pvname is None or value is None or wid is None:
             return
         if char_value is None and value is not None:
@@ -136,20 +132,20 @@ class pvMixin:
                 char_value = set_float(value)
         self.OnPVChange(char_value)
 
-
     @EpicsFunction
-    def update(self, value=None):
+    def Update(self, value=None):
         if value is None and self.pv is not None:
             value = self.pv.get(as_string=True)
         self.OnPVChange(value)
 
     @EpicsFunction
-    def getValue(self, as_string=True):
+    def GetValue(self, as_string=True):
+        "return value"
         val = self.pv.get(as_string=as_string)
         result = self.translations.get(val, val)
         return result
 
-    """ This method is called any time the PV value changes, via update() or via
+    """ This method is called any time the PV value changes, via Update() or via
         a PV callback
     """
     def OnPVChange(self, raw_value):        
@@ -199,9 +195,12 @@ class pvCtrlMixin(pvMixin):
         #    font = wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,False)
         
         try:
-            if font is not None:  self.SetFont(font)
-            if fg   is not None:  self.SetForegroundColour(fg)
-            if bg   is not None:  self.SetBackgroundColour(fg)
+            if font is not None:
+                self.SetFont(font)
+            if fg   is not None:
+                self.SetForegroundColour(fg)
+            if bg   is not None:
+                self.SetBackgroundColour(fg)
         except:
             pass
         self.defaultFgColour = None
@@ -237,11 +236,11 @@ class pvCtrlMixin(pvMixin):
 
     def SetBackgroundColourTranslations(self, translations):
         """
-        Pass a dictionary of value->colour translations here if you want the control
-        to automatically set background colour based on PV value.
+        Pass a dictionary of value->colour translations here if you want the
+        control to automatically set background colour based on PV value.
 
-        Values used to lookup colours will be string values if available, but will otherwise
-        be the raw PV value.
+        Values used to lookup colours will be string values if available,
+        but will otherwise be the raw PV value.
 
         Colour values in the dictionary may be strings or wx.Colour objects.
 
@@ -250,7 +249,8 @@ class pvCtrlMixin(pvMixin):
             
 
     def SetForegroundColour(self, colour):
-        """ (Internal override) Needed to support OverrideForegroundColour() """
+        """ (Internal override) Needed to support OverrideForegroundColour()
+        """
         if self.defaultFgColour is None:
             wx.Window.SetForegroundColour(self, colour)
         else:
@@ -271,18 +271,19 @@ class pvCtrlMixin(pvMixin):
             self.defaultBgColour = colour
 
     def GetBackgroundColour(self):
-        """ (Internal override) Needed to support OverrideBackgroundColour() """
+        """ (Internal override) Needed to support OverrideBackgroundColour()
+        """
         return self.defaultBgColour if self.defaultBgColour is not None \
                else wx.Window.GetBackgroundColour(self)
 
     def OverrideForegroundColour(self, colour):
         """
-        Call this method to override the control's current set foreground colour,
-        Call with colour=None to disable overriding and go back to whatever was set.
+        Call this method to override the control's current set foreground
+        colour.  Call with colour=None to disable overriding and go back to
+        whatever was set.
 
-        Overriding allows SetForegroundColour() to still work as expected, except
-        when the "override" is set.
-
+        Overriding allows SetForegroundColour() to still work as expected, 
+        except when the "override" is set.
         """
         if colour is None:
             if self.defaultFgColour is not None:
@@ -295,12 +296,12 @@ class pvCtrlMixin(pvMixin):
 
     def OverrideBackgroundColour(self, colour):
         """
-        Call this method to override the control's current set background colour,
-        Call with colour=None to disable overriding and go back to whatever was set.
+        Call this method to override the control's current set background
+        colour, Call with colour=None to disable overriding and go back to
+        whatever was set.
 
-        Overriding allows SetForegroundColour() to still work as expected, except
-        when the "override" is set.
-
+        Overriding allows SetForegroundColour() to still work as expected, 
+        except when the "override" is set.
         """
         if colour is None:
             if self.defaultBgColour is not None:
@@ -340,29 +341,25 @@ class pvCtrlMixin(pvMixin):
         self._SetValue(self.translations.get(raw_value, raw_value))
 
 
-
 class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
     """
     Text control (ie textbox) for PV display (as normal string), 
     with callback for automatic updates and option to write value
     back on input
-
     """
     def __init__(self, parent,  pv=None, 
                  font=None, fg=None, bg=None, **kws):
-
         wx.TextCtrl.__init__(self, parent, wx.ID_ANY, value='', **kws)
-        pvCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
-        self.Bind(wx.EVT_CHAR, self.onChar)
+        pvCtrlMixin.__init__(self, pv=pv, font=font, fg=fg, bg=bg)
+        self.Bind(wx.EVT_CHAR, self.OnChar)
 
-    def onChar(self, event):
+    def OnChar(self, event):
         key   = event.GetKeyCode()
         entry = wx.TextCtrl.GetValue(self).strip()
         pos   = wx.TextCtrl.GetSelection(self)
         if (key == wx.WXK_RETURN):
             self._caput(entry)
-        event.Skip()
-            
+        event.Skip()            
 
     @EpicsFunction
     def _caput(self, value):
@@ -477,9 +474,9 @@ class pvEnumChoice(wx.Choice, pvCtrlMixin):
         
         self.AppendItems(pv.enum_strs)
         self.SetSelection(pv.value)
-        self.Bind(wx.EVT_CHOICE, self.onChoice)
+        self.Bind(wx.EVT_CHOICE, self.OnChoice)
 
-    def onChoice(self,event=None, **kw):
+    def OnChoice(self,event=None, **kw):
         if self.pv is None:
             return
         index = self.pv.enum_strs.index(event.GetString())
@@ -504,7 +501,8 @@ class pvAlarm(wx.MessageDialog, pvCtrlMixin):
 
         pvCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
        
-    def _SetValue(self,value): pass
+    def _SetValue(self,value):
+        pass
     
         
 class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
@@ -548,7 +546,8 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
         self.pv.get_ctrlvars()
         # be sure to set precision before value!! or PV may be moved!!
         prec = self.pv.precision
-        if prec is None: prec = 0
+        if prec is None:
+            prec = 0
         self.SetPrecision(prec)
 
         self.SetValue(self.pv.char_value, act=False)
@@ -567,7 +566,8 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
         # if pvname is None or id == 0: return
         # print 'FloatvEvent: ', pvname, value, char_value, wid
 
-        if pvname is None or value is None or wid is None:  return
+        if pvname is None or value is None or wid is None:
+            return
         if char_value is None and value is not None:
             prec = kw.get('precision',None)
             if prec not in (None,0):
@@ -643,17 +643,17 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
         self.OnChange = None
 
     def _SetValue(self, value):
-        if value in [ self.on_value, self.off_value ]:
+        if value in (self.on_value, self.off_value):
             self.Value = (value == self.on_value)
         else:
             self.Value = bool(self.pv.get())
 
-        if self.OnChange != None:
+        if self.OnChange is not None:
             self.OnChange(self)
 
     def _OnClicked(self, event):
         if self.pv is not None:
-            self.pv.put(self.on_value if self.Value else self.off_value )
+            self.pv.put(self.on_value if self.Value else self.off_value)
 
     def SetValue(self, new_value):
         old_value = self.Value
@@ -859,7 +859,7 @@ class pvToggleButton(wx.ToggleButton, pvCtrlMixin):
 
     def _SetValue(self, value):
         self.labels = self.pv.enum_strs
-        if value==self.labels[1]:
+        if value == self.labels[1]:
             self.SetValue(self.down==1)
             self.SetBackgroundColour(self.down_colour if self.down==1 \
                                      else self.up_colour)

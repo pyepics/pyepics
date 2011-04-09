@@ -75,7 +75,7 @@ class MotorPanel(wx.Panel):
                                                  wid=self.GetId(),
                                                  field=attr)
         if self.is_full:
-            self.set_Tweak(self.format % self.motor.TWV)
+            self.SetTweak(self.format % self.motor.TWV)
 
     @EpicsFunction
     def FillPanelComponents(self):
@@ -166,12 +166,12 @@ class MotorPanel(wx.Panel):
             return
 
         self.FillPanelComponents()
-        self.drive.update()
-        self.desc.update()
-        self.rbv.update()
+        self.drive.Update()
+        self.desc.Update()
+        self.rbv.Update()
         if self.is_full:
             self.twk_list = self.make_step_list()
-            self.__Update_StepList()
+            self.UpdateStepList()
         
     @EpicsFunction
     def OnLeftButton(self, event=None):
@@ -248,7 +248,7 @@ class MotorPanel(wx.Panel):
             self.info.SetLabel(label)
             
         elif field == 'TWV' and self.is_full:
-            self.set_Tweak(field_str)
+            self.SetTweak(field_str)
 
         elif field == 'SPMG':
             label, info, color = 'Stop', '', 'White'
@@ -267,11 +267,11 @@ class MotorPanel(wx.Panel):
             pass
         
     @EpicsFunction
-    def set_Tweak(self, val):
+    def SetTweak(self, val):
         if not isinstance(val, str):
             val = self.format % val
         if val not in self.twk_list:
-            self.__Update_StepList(value=val)
+            self.UpdateStepList(value=val)
         self.__twkbox.SetValue(val)
             
     def make_step_list(self):
@@ -281,7 +281,7 @@ class MotorPanel(wx.Panel):
             return []
         return [self.format % i for i in self.motor.make_step_list()]
 
-    def __Update_StepList(self, value=None):
+    def UpdateStepList(self, value=None):
         "add a value and re-sort the list of Step values"
         if value is not None:
             self.twk_list.append(value)
