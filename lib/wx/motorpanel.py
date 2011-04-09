@@ -83,9 +83,9 @@ class MotorPanel(wx.Panel):
             return
         epics.poll()
 
-        self.drive.set_pv(self.motor.PV('VAL'))
-        self.rbv.set_pv(self.motor.PV('RBV'))
-        self.desc.set_pv(self.motor.PV('DESC'))
+        self.drive.SetPV(self.motor.PV('VAL'))
+        self.rbv.SetPV(self.motor.PV('RBV'))
+        self.desc.SetPV(self.motor.PV('DESC'))
 
         descpv = self.motor.PV('DESC').get()
         if not self.is_full:

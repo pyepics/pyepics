@@ -4,7 +4,6 @@ wx utility functions for Epics and wxPython interaction
 import wx
 from wx._core import PyDeadObjectError
                    
-import time
 import sys
 import epics
 import wx.lib.buttons as buttons
@@ -41,7 +40,7 @@ def DelayedEpicsCallback(fcn):
                 if hasattr(pv, 'remove_callback'):
                     try:
                         pv.remove_callback(index=cb_index)
-                    except:
+                    except RuntimeError:
                         pass
         return wx.CallAfter(cb)
     return wrapper
@@ -64,7 +63,7 @@ class EpicsTimer:
     period is in milliseconds.  At each period, epics.ca.poll() will be run.
     
     """
-    def __init__(self, parent, period=100, start = True, **kw):
+    def __init__(self, parent, period=100, start=True):
         self.parent = parent
         self.period = period
         self.timer = wx.Timer(parent)
@@ -80,10 +79,12 @@ class EpicsTimer:
         "start timer"
         self.timer.Start(self.period)
         
+    @EpicsFunction
     def pend(self, event=None):
         "pend/poll"
         epics.ca.poll()
-
+        event.Skip()
+        
 class pvMixin:
     """ base class mixin for any class that needs PV wx callback
         support.
@@ -98,10 +99,10 @@ class pvMixin:
         if pv is None and pvname is not None:
             pv = pvname
         if pv is not None:
-            self.set_pv(pv)
+            self.SetPV(pv)
 
     @EpicsFunction
-    def set_pv(self, pv=None):
+    def SetPV(self, pv=None):
         if isinstance(pv, epics.PV):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
@@ -134,6 +135,7 @@ class pvMixin:
 
     @EpicsFunction
     def Update(self, value=None):
+        "update value"
         if value is None and self.pv is not None:
             value = self.pv.get(as_string=True)
         self.OnPVChange(value)
@@ -145,17 +147,26 @@ class pvMixin:
         result = self.translations.get(val, val)
         return result
 
-    """ This method is called any time the PV value changes, via Update() or via
-        a PV callback
-    """
-    def OnPVChange(self, raw_value):        
+    def OnPVChange(self, str_value):
+        """method is called any time the PV value changes, via
+        Update() or via a PV callback
+        """
         self._warn("Must override OnPVChange")
 
     def _warn(self, msg):
+        "write warning"
         sys.stderr.write("%s for pv='%s'\n" % (msg, self.pv.pvname))
 
-
-
+    @EpicsFunction
+    def GetEnumStrings(self):
+        """try to get list of enum strings,
+        returns enum strings or None"""
+        if isinstance(self.pv, epics.PV):
+            self.pv.get_ctrlvars()
+            if self.pv.type == 'enum':
+                return self.pv.enum_strs
+        
+        
 class pvCtrlMixin(pvMixin):
     """ 
     mixin for wx Controls with epics PVs:  connects to PV,
@@ -209,28 +220,28 @@ class pvCtrlMixin(pvMixin):
 
     def SetTranslations(self, translations):
         """ 
-        Pass a dictionary of value->value translations here if you want some PV values
-        to automatically appear in the event callback as a different value.
+        Pass a dictionary of value->value translations here if you want some P
+        PV values to automatically appear in the event callback as a different
+        value.
 
         ie, to override PV value 0.0 to say "Disabled", call this method as
         control.SetTranslations({ 0.0 : "Disabled" })
 
-        It is recommended that you use this function only when it is not possible to change
-        the PV value in the database, or set a string value in the database.
-
+        It is recommended that you use this function only when it is not
+        possible to change the PV value in the database, or set a string
+        value in the database.
         """
         self.translations = translations
 
     def SetForegroundColourTranslations(self, translations):
         """
-        Pass a dictionary of value->colour translations here if you want the control
-        to automatically set foreground colour based on PV value.
+        Pass a dictionary of value->colour translations here if you want the
+        control to automatically set foreground colour based on PV value.
 
-        Values used to lookup colours will be string values if available, but will otherwise
-        be the raw PV value.
+        Values used to lookup colours will be string values if available,
+        but will otherwise be the raw PV value.
 
         Colour values in the dictionary may be strings or wx.Colour objects.
-
         """
         self.fgColourTranslations = translations
 
@@ -246,8 +257,7 @@ class pvCtrlMixin(pvMixin):
 
         """
         self.bgColourTranslations = translations
-            
-
+           
     def SetForegroundColour(self, colour):
         """ (Internal override) Needed to support OverrideForegroundColour()
         """
@@ -312,9 +322,12 @@ class pvCtrlMixin(pvMixin):
             wx.Window.SetBackgroundColour(self, colour)
 
     def _SetValue(self, value):
+        "set value -- must override"
         self._warn("must override _SetValue")
 
-    def OnPVChange(self, raw_value):        
+    @EpicsFunction
+    def OnPVChange(self, raw_value):
+        "called by PV callback"
         if self.pv is None:
             return
         if len(self.fgColourAlarms) > 0 or len(self.bgColourAlarms) > 0:
@@ -337,7 +350,6 @@ class pvCtrlMixin(pvMixin):
         elif self.pv.severity in self.bgColourAlarms:
             colour = self.bgColourAlarms[self.pv.severity]
         self.OverrideBackgroundColour(colour)
-            
         self._SetValue(self.translations.get(raw_value, raw_value))
 
 
@@ -418,44 +430,43 @@ class pvEnumButtons(wx.Panel, pvCtrlMixin):
         wx.Panel.__init__(self, parent, wx.ID_ANY, **kw)
         pvCtrlMixin.__init__(self, pv=pv)
 
-        time.sleep(0.001)
-        if pv.type != 'enum':
+        enum_strings = self.GetEnumStrings()
+        pv_value = self.GetValue(as_string=True)
+        if self.pv.type != 'enum' or enum_strings is None:
             self._warn('pvEnumButtons needs an enum PV')
             return
-        
-        pv.get(as_string=True)
-        
+
         sizer = wx.BoxSizer(orientation)
         self.buttons = []
-        for i, label in enumerate(pv.enum_strs):
-            b = buttons.GenToggleButton(self, -1, label)
-            self.buttons.append(b)
-            b.Bind(wx.EVT_BUTTON, Closure(self._onButton, index=i) )
-            sizer.Add(b, flag = wx.ALL)
-            b.SetToggle(0)
-
-        self.buttons[pv.value].SetToggle(1)
+        if enum_strings is not None:
+            for i, label in enumerate(enum_strings):
+                b = buttons.GenToggleButton(self, -1, label)
+                self.buttons.append(b)
+                b.Bind(wx.EVT_BUTTON, Closure(self._onButton, index=i) )
+                sizer.Add(b, flag = wx.ALL)
+                b.SetToggle(label==pv_value)
                    
         self.SetAutoLayout(True)
         self.SetSizer(sizer)
         sizer.Fit(self)
-
+        
     @EpicsFunction
     def _onButton(self, event=None, index=None, **kw):
-        if self.pv is None:
-            return
-        if index is not None:
+        "button event handler"
+        if self.pv is not None and index is not None:
             self.pv.put(index)
 
     @DelayedEpicsCallback
     def _pvEvent(self, pvname=None, value=None, wid=None, **kw):
+        "pv event handler"
         if pvname is None or value is None:
             return
         for i, btn in enumerate(self.buttons):
-            btn.up =  (i != value)
+            btn.up = (i != value)
             btn.Refresh()
 
-    def _SetValue(self,value):
+    def _SetValue(self, value):
+        "not implemented"
         pass
 
 class pvEnumChoice(wx.Choice, pvCtrlMixin):
@@ -465,32 +476,33 @@ class pvEnumChoice(wx.Choice, pvCtrlMixin):
         wx.Choice.__init__(self, parent, wx.ID_ANY, **kw)
         pvCtrlMixin.__init__(self, pv=pv)
 
-        if pv.type != 'enum':
+        enum_strings = self.GetEnumStrings()
+        pv_value = self.GetValue(as_string=True)
+        if self.pv.type != 'enum' or enum_strings is None:
             self._warn('pvEnumChoice needs an enum PV')
             return
 
         self.Clear()
-        pv.get(as_string=True)
-        
-        self.AppendItems(pv.enum_strs)
-        self.SetSelection(pv.value)
+        self.AppendItems(enum_strings)
+        self.SetSelection(pv_value)
         self.Bind(wx.EVT_CHOICE, self.OnChoice)
 
-    def OnChoice(self,event=None, **kw):
-        if self.pv is None:
-            return
-        index = self.pv.enum_strs.index(event.GetString())
-        self.pv.put(index)
+    @EpicsFunction
+    def OnChoice(self, event=None, **kw):
+        "choice event handler"        
+        if self.pv is not None:
+            index = self.pv.enum_strs.index(event.GetString())
+            self.pv.put(index)
 
     @DelayedEpicsCallback
-    def _pvEvent(self, pvname=None, value=None, wid=None, **kw):
-        if pvname is None or value is None:
-            return
-        self.SetSelection(value)
+    def _pvEvent(self, value=None, **kw):
+        "pv event handler"
+        if value is not None:
+            self.SetSelection(value)
 
     def _SetValue(self,value):
+        "set value"
         self.SetStringSelection(value)
-
 
 class pvAlarm(wx.MessageDialog, pvCtrlMixin):
     """ Alarm Message for a PV: a MessageDialog will pop up when a
@@ -503,7 +515,6 @@ class pvAlarm(wx.MessageDialog, pvCtrlMixin):
        
     def _SetValue(self,value):
         pass
-    
         
 class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
     """ Float control for PV display of numerical data,
@@ -520,7 +531,6 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
        bg         wx background colour 
        
        bell_on_invalid  ring bell when input is out of range
-
     """
     def __init__(self, parent, pv=None, 
                  font=None, fg=None, bg=None, precision=None, **kw):
@@ -535,7 +545,7 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
         self.SetValue(value)
     
     @EpicsFunction
-    def set_pv(self, pv=None):
+    def SetPV(self, pv=None):
         if isinstance(pv, epics.PV):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
@@ -552,7 +562,7 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
 
         self.SetValue(self.pv.char_value, act=False)
 
-        if self.pv.type in ('string','char'):
+        if self.pv.type in ('string', 'char'):
             self._warn('pvFloatCtrl needs a double or float PV')
             
         self.SetMin(self.pv.lower_ctrl_limit)
@@ -563,14 +573,13 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
     @DelayedEpicsCallback
     def _FloatpvEvent(self, pvname=None, value=None, wid=None,
                       char_value=None, **kw):
-        # if pvname is None or id == 0: return
-        # print 'FloatvEvent: ', pvname, value, char_value, wid
+        "PV callback / event handler for pv change"
 
         if pvname is None or value is None or wid is None:
             return
         if char_value is None and value is not None:
             prec = kw.get('precision',None)
-            if prec not in (None,0):
+            if prec not in (None, 0):
                 char_value = ("%%.%if" % prec) % value
             else:
                 char_value = set_float(value)                
@@ -578,7 +587,8 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
         self.SetValue(char_value, act=False)
 
     @EpicsFunction
-    def _onEnter(self,value=None,**kw):
+    def _onEnter(self, value=None, **kw):
+        "enter/return event"
         if value in (None,'') or self.pv is None:
             return 
         try:
@@ -637,21 +647,23 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
         self.pv = None
         wx.CheckBox.__init__(self, parent, **kw)
         pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
-        wx.EVT_CHECKBOX(parent, self.GetId(), self._OnClicked)
+        wx.EVT_CHECKBOX(parent, self.GetId(), self.OnClicked)
         self.on_value = on_value
         self.off_value = off_value
         self.OnChange = None
 
     def _SetValue(self, value):
+        "set value"
         if value in (self.on_value, self.off_value):
             self.Value = (value == self.on_value)
         else:
             self.Value = bool(self.pv.get())
-
-        if self.OnChange is not None:
+        if hasattr(self.OnChange, '__call__'):
             self.OnChange(self)
 
-    def _OnClicked(self, event):
+    @EpicsFunction
+    def OnClicked(self, event=None):
+        "checkbox event handler"
         if self.pv is not None:
             self.pv.put(self.on_value if self.Value else self.off_value)
 
@@ -659,11 +671,10 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
         old_value = self.Value
         wx.CheckBox.SetValue(self, new_value)
         if old_value != new_value:
-            self._OnClicked(None)        
+            self.OnClicked(None)        
 
     # need to redefine the value Property as the old property refs old SetValue
     Value = property(wx.CheckBox.GetValue, SetValue)
-
 
 class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin): 
     """ 
@@ -682,21 +693,24 @@ class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin):
         and it being set to the PV
         
         """
-        floatspin.FloatSpin.__init__(self, parent,
+        floatspin.FloatSpin.__init__(self, parent, increment=increment,
                                      min_val=min_val, max_val=max_val,
-                                     increment=increment, digits=digits, **kw)
+                                     digits=digits, **kw)
         pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
-        floatspin.EVT_FLOATSPIN(parent, self.GetId(), self._OnChanged)
+        floatspin.EVT_FLOATSPIN(parent, self.GetId(), self.OnSpin)
         
         self.deadTimer = wx.Timer(self)
         self.deadTime = deadTime
-        wx.EVT_TIMER(self, self.deadTimer.GetId(), self._OnCharTimeout)
+        self.deadTimer.Bind(wx.EVT_TIMER, self.OnTimeout)
         
+    @EpicsFunction
     def _SetValue(self, value):
-        value = self.pv.get() # get a non-string value
-        self.SetValue(float(value))
+        "set value"
+        self.SetValue(float(self.pv.get()))
 
-    def _OnChanged(self, event):
+    @EpicsFunction
+    def OnSpin(self, event=None):
+        "spin event handler"
         if self.pv is not None:
             value = self.GetValue()
             if self.pv.upper_ctrl_limit != 0 or self.pv.lower_ctrl_limit != 0:
@@ -709,19 +723,19 @@ class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin):
                     self.SetValue(value)            
             self.pv.put(value)
 
-    def _OnCharTimeout(self, event):
+    def OnTimeout(self, event):
+        "timer event handler"
         # save & restore insertion point before syncing control
         savePoint = self.GetTextCtrl().InsertionPoint
         self.SyncSpinToText()
         self.GetTextCtrl().InsertionPoint = savePoint  
-        self._OnChanged(event)
+        self.OnSpin(event)
 
     def OnChar(self, event):
+        "floatspin char  event"
         floatspin.FloatSpin.OnChar(self, event)
         # Timer will restart if it's already running
         self.deadTimer.Start(milliseconds=self.deadTime, oneShot=True)
-
-
 
        
 class pvButton(wx.Button, pvCtrlMixin):
@@ -741,19 +755,20 @@ class pvButton(wx.Button, pvCtrlMixin):
         wx.Button.__init__(self, parent, **kw)
         pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.pushValue = pushValue
-        wx.EVT_BUTTON(self, self.GetId(), self.OnPress)
+        self.Bind(wx.EVT_BUTTON, self.OnPress)
 
         self.disablePV = disablePV
         self.disableValue = disableValue            
         if disablePV is not None:
             self.disablePV.add_callback(self._disableEvent, wid=self.GetId())
         self.maskedEnabled = True
-            
 
     def Enable(self, value):
+        "enable button"
         self.maskedEnabled = value
         self._UpdateEnabled()
 
+    @EpicsFunction
     def _UpdateEnabled(self):
         enableValue = self.maskedEnabled
         if self.disablePV is not None and \
@@ -770,10 +785,11 @@ class pvButton(wx.Button, pvCtrlMixin):
     def _SetValue(self, event):
         self._UpdateEnabled()
 
+    @EpicsFunction
     def OnPress(self, event):
+        "button press event handler"
         self.pv.put(self.pushValue)
     
-
 class pvRadioButton(wx.RadioButton, pvCtrlMixin):
     """A pvRadioButton is a radio button associated with a particular PV
     and one particular value.       
@@ -791,12 +807,16 @@ class pvRadioButton(wx.RadioButton, pvCtrlMixin):
         wx.RadioButton.__init__(self, parent, **kw)
         pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.pvValue = pvValue
-        wx.EVT_RADIOBUTTON(self, self.GetId(), self.OnPress)
+        self.Bind(wx.EVT_RADIOBUTTON, self.OnPress)
 
+    @EpicsFunction
     def OnPress(self, event):
+        "button press event handler"
         self.pv.put(self.pvValue)
         
+    @EpicsFunction
     def _SetValue(self, value):
+        "set value"
         # uses raw PV val as is not string-converted
         if self.pv.get() == self.pvValue: 
             self.Value = True
@@ -809,13 +829,16 @@ class pvComboBox(wx.ComboBox, pvCtrlMixin):
     def __init__(self, parent, pv=None, **kw):
         wx.ComboBox.__init__(self, parent, **kw)
         pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
-        wx.EVT_TEXT(self, self.GetId(), self.OnText)
+        self.Bind(wx.EVT_TEXT, self.OnText)
         
     def _SetValue(self, value):
+        "set value"
         if value != self.Value:
             self.Value = value
     
+    @EpicsFunction
     def OnText(self, event):
+        "text event"
         self.pv.put(self.Value)
         
 class pvToggleButton(wx.ToggleButton, pvCtrlMixin):
@@ -885,6 +908,8 @@ class pvStatusBar(wx.StatusBar, pvMixin):
         wx.StatusBar.__init__(self, parent, wx.ID_ANY, **kwargs)
         pvMixin.__init__(self, pv=pv)
     
-    def OnPVChange(self, rawValue):
-        self.SetStatusText(self.pv.get())
+    @EpicsFunction
+    def OnPVChange(self, str_value):
+        "called by PV callback"
+        self.SetStatusText(str_value)
 

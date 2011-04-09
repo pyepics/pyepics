@@ -109,7 +109,7 @@ class MotorDetailFrame(wx.Frame):
         twk_sizer = wx.BoxSizer(wx.HORIZONTAL)
         twk_panel = wx.Panel(dp)
         twk_val = pvFloatCtrl(twk_panel, size=(110, -1), precision=prec)
-        twk_val.set_pv(self.motor.PV('TWV'))                
+        twk_val.SetPV(self.motor.PV('TWV'))                
          
         twk_left = wx.Button(twk_panel, label='<',  size=(30, 30))
         twk_right = wx.Button(twk_panel, label='>',  size=(30, 30))
