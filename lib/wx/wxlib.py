@@ -103,6 +103,7 @@ class pvMixin:
 
     @EpicsFunction
     def SetPV(self, pv=None):
+        "set pv, either an epics.PV object or a pvname"
         if isinstance(pv, epics.PV):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
@@ -123,6 +124,7 @@ class pvMixin:
     @DelayedEpicsCallback
     def _pvEvent(self, pvname=None, value=None, wid=None,
                  char_value=None, **kws):
+        "epics PV callback function"
         if pvname is None or value is None or wid is None:
             return
         if char_value is None and value is not None:
@@ -366,6 +368,7 @@ class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
         self.Bind(wx.EVT_CHAR, self.OnChar)
 
     def OnChar(self, event):
+        "char event handler"
         key   = event.GetKeyCode()
         entry = wx.TextCtrl.GetValue(self).strip()
         pos   = wx.TextCtrl.GetSelection(self)
@@ -375,9 +378,11 @@ class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
 
     @EpicsFunction
     def _caput(self, value):
+        "epics pv.put wrapper"
         self.pv.put(value)
     
     def _SetValue(self, value):
+        "set widget value"
         self.SetValue(value)
 
 class pvText(wx.StaticText, pvCtrlMixin):
@@ -418,6 +423,7 @@ class pvText(wx.StaticText, pvCtrlMixin):
                                 #in pyepics??
  
     def _SetValue(self, value):
+        "set widget label"
         if value is not None:
             self.SetLabel("%s%s" % (value, self.units))
 
@@ -500,7 +506,7 @@ class pvEnumChoice(wx.Choice, pvCtrlMixin):
         if value is not None:
             self.SetSelection(value)
 
-    def _SetValue(self,value):
+    def _SetValue(self, value):
         "set value"
         self.SetStringSelection(value)
 
@@ -513,7 +519,8 @@ class pvAlarm(wx.MessageDialog, pvCtrlMixin):
 
         pvCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
        
-    def _SetValue(self,value):
+    def _SetValue(self, value):
+        "set value -- null op for pvAlarm"        
         pass
         
 class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
@@ -538,14 +545,15 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
         self.pv = None
         FloatCtrl.__init__(self, parent, value=0,
                            precision=precision, **kw)
-        pvCtrlMixin.__init__(self,pv=pv,
-                             font=font, fg=None, bg=None)
+        pvCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
 
-    def _SetValue(self,value):
+    def _SetValue(self, value):
+        "set widget value"
         self.SetValue(value)
     
     @EpicsFunction
     def SetPV(self, pv=None):
+        "set pv, either an epics.PV object or a pvname"
         if isinstance(pv, epics.PV):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
@@ -578,7 +586,7 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
         if pvname is None or value is None or wid is None:
             return
         if char_value is None and value is not None:
-            prec = kw.get('precision',None)
+            prec = kw.get('precision', None)
             if prec not in (None, 0):
                 char_value = ("%%.%if" % prec) % value
             else:
@@ -603,7 +611,7 @@ class pvBitmap(wx.StaticBitmap, pvCtrlMixin):
     with callback for automatic updates
 
     """        
-    def __init__(self, parent,  pv=None, bitmaps={},
+    def __init__(self, parent,  pv=None, bitmaps=None,
                  defaultBitmap=None, **kw):
         """
         bitmaps - a dict of Value->Bitmap mappings, to automatically change
@@ -618,9 +626,13 @@ class pvBitmap(wx.StaticBitmap, pvCtrlMixin):
         pvCtrlMixin.__init__(self, pv=pv)
 
         self.defaultBitmap = defaultBitmap
-        self.bitmaps = bitmaps        
+        if bitmaps is None:
+            bitmaps = {}
+        self.bitmaps = bitmaps
+        
 
-    def _SetValue(self, value):        
+    def _SetValue(self, value):
+        "set widget value"        
         if value in self.bitmaps:
             nextBitmap = self.bitmaps[value]
         else:
@@ -653,7 +665,7 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
         self.OnChange = None
 
     def _SetValue(self, value):
-        "set value"
+        "set widget value"
         if value in (self.on_value, self.off_value):
             self.Value = (value == self.on_value)
         else:
@@ -668,6 +680,7 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
             self.pv.put(self.on_value if self.Value else self.off_value)
 
     def SetValue(self, new_value):
+        "set widget value"
         old_value = self.Value
         wx.CheckBox.SetValue(self, new_value)
         if old_value != new_value:
@@ -770,6 +783,7 @@ class pvButton(wx.Button, pvCtrlMixin):
 
     @EpicsFunction
     def _UpdateEnabled(self):
+        "epics function, called by event handler"        
         enableValue = self.maskedEnabled
         if self.disablePV is not None and \
            (self.disablePV.get() == self.disableValue):
@@ -780,9 +794,11 @@ class pvButton(wx.Button, pvCtrlMixin):
         
     @DelayedEpicsCallback
     def _disableEvent(self, **kw):
+        "disable event handler"
         self._UpdateEnabled()
 
     def _SetValue(self, event):
+        "set value"        
         self._UpdateEnabled()
 
     @EpicsFunction
@@ -870,6 +886,7 @@ class pvToggleButton(wx.ToggleButton, pvCtrlMixin):
 
     @EpicsFunction
     def _onButton(self, event=None):
+        "button event handler"
         self.labels = self.pv.enum_strs
         if self.GetValue():
             self.SetLabel(self.labels[0])
@@ -880,7 +897,9 @@ class pvToggleButton(wx.ToggleButton, pvCtrlMixin):
             self.pv.put(self.down == 0)
             self.SetBackgroundColour(self.up_colour)
 
+    @EpicsFunction
     def _SetValue(self, value):
+        "set value"
         self.labels = self.pv.enum_strs
         if value == self.labels[1]:
             self.SetValue(self.down==1)
@@ -892,7 +911,6 @@ class pvToggleButton(wx.ToggleButton, pvCtrlMixin):
             self.SetBackgroundColour(self.down_colour if self.down==0 \
                                      else self.up_colour)
             self.SetLabel(self.labels[1])
-
 
 class pvStatusBar(wx.StatusBar, pvMixin):
     """A status bar that displays a pv value
