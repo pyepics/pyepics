@@ -26,8 +26,7 @@ class MotorPanel(wx.Panel):
     use full=False for a minimal window (no tweak values, stop, or more)
     """
     __motor_fields = ('SET', 'disabled', 'LLM', 'HLM',  'LVIO', 'TWV',
-                      'HLS', 'LLS', 'SPMG')
-    
+                      'HLS', 'LLS', 'SPMG', 'DESC')
 
     def __init__(self, parent,  motor=None,  full=True,
                  messenger=None, prec=None, **kw):
@@ -53,6 +52,7 @@ class MotorPanel(wx.Panel):
     @EpicsFunction
     def SelectMotor(self, motor):
         " set motor to a named motor PV"
+        print 'Select Motor : ', motor, self.is_full
         if motor is None:
             return
 
@@ -88,13 +88,12 @@ class MotorPanel(wx.Panel):
         self.desc.SetPV(self.motor.PV('DESC'))
 
         descpv = self.motor.PV('DESC').get()
+        self.desc.Wrap(45)
         if not self.is_full:
-            if len(descpv.char_value) > 25:
-                self.desc.Wrap(30)
-                self.desc.SetSize( (200, 40))
-            else:
-                self.desc.Wrap(45)
-                self.desc.SetSize( (200, -1))
+            if len(descpv) > 20:
+                font = self.desc.GetFont()
+                font.PointSize -= 1
+                self.desc.SetFont(font)
 
         self.info.SetLabel('')
         for f in ('SET', 'LVIO', 'SPMG', 'LLS', 'HLS', 'disabled'):            
@@ -106,10 +105,9 @@ class MotorPanel(wx.Panel):
         " build (but do not fill in) panel components"
         wdesc, wrbv, winfo, wdrv = 200, 105, 90, 120
         if not self.is_full:
-            wdesc, wrbv, winfo, wdrv = 50, 50, 70, 80
-            
+            wdesc, wrbv, winfo, wdrv = 95, 80, 80, 80
         
-        self.desc = pvText(self, size=(wdesc, 25), style=LTEXT)
+        self.desc = pvText(self, size=(wdesc, 35), style=LTEXT)
         self.desc.SetForegroundColour("Blue")
 
         self.rbv  = pvText(self, size=(wrbv, 25), fg='Blue', style=RCEN)
@@ -246,11 +244,17 @@ class MotorPanel(wx.Panel):
         elif field == 'disabled':
             label = ('','Disabled')[field_val]
             self.info.SetLabel(label)
-            
+
+        elif field == 'DESC':
+            font = self.rbv.GetFont()
+            if len(field_str) > 20:
+                font.PointSize -= 1
+            self.desc.SetFont(font)
+
         elif field == 'TWV' and self.is_full:
             self.SetTweak(field_str)
 
-        elif field == 'SPMG':
+        elif field == 'SPMG' and self.is_full:
             label, info, color = 'Stop', '', 'White'
             if field_val == 0:
                 label, info, color = ' Go ', 'Stopped', 'Yellow'
