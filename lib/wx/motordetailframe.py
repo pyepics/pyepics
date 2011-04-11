@@ -42,7 +42,7 @@ class MotorDetailFrame(wx.Frame):
 
         panel = wx.Panel(self) 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        
+
         spanel = wx.Panel(panel, -1, size=(500, 50))
         ssizer = wx.BoxSizer(wx.HORIZONTAL)
         ssizer.AddMany([(wx.StaticText(spanel, label=' Label ',
@@ -64,7 +64,6 @@ class MotorDetailFrame(wx.Frame):
         nrow = 0
         
         nrow += 1
-
         ds.Add(xTitle(dp,"Drive"), (nrow, 0), (1, 1), LCEN, 5)
         ds.Add(xLabel(dp,"User" ), (nrow, 1), (1, 1), CEN)
         ds.Add(xLabel(dp,"Dial" ), (nrow, 2), (1, 1), CEN)
@@ -225,7 +224,6 @@ class MotorDetailFrame(wx.Frame):
 
         ds = wx.GridBagSizer(4, 4)
         dp = wx.Panel(panel)
-
         nrow = 0
         ds.Add(xLabel(dp, "Motor Res"),      (nrow, 0), (1, 1), LCEN, 5)
         ds.Add(self.MotorCtrl(dp, 'MRES'),  (nrow, 1), (1, 1), CEN)
@@ -246,9 +244,11 @@ class MotorDetailFrame(wx.Frame):
         sizer.Add(dp, 0)
         sizer.Add(wx.StaticLine(panel, size=(100, 2)),  0, wx.EXPAND)        
         
+
         for attr in self.__motor_fields:
             self.motor.PV(attr).add_callback(self.OnMotorEvent,
                                              wid=self.GetId(), field=attr)
+
 
         self.info.SetLabel('')
         for f in ('HLS', 'LLS', 'LVIO', 'SET'):
@@ -282,7 +282,7 @@ class MotorDetailFrame(wx.Frame):
                 d.Refresh()
                 
     def MotorCtrl(self, panel, attr):
-        "pvFloatCtrl for a Motor attribute"        
+        "pvFloatCtrl for a Motor attribute"
         return pvFloatCtrl(panel, size=(100, -1), 
                            precision= self.motor.PREC,
                            pv = self.motor.PV(attr),

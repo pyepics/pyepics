@@ -216,7 +216,7 @@ class MotorPanel(wx.Panel):
         wx.CallAfter(self.motor.PV('TWV').put, val)        
 
     @DelayedEpicsCallback
-    def OnMotorEvent(self, pvname=None, field=None, event=None):
+    def OnMotorEvent(self, pvname=None, field=None, event=None, **kws):
         if pvname is None:
             return None
       

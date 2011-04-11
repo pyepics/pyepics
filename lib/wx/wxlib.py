@@ -4,6 +4,7 @@ wx utility functions for Epics and wxPython interaction
 import wx
 from wx._core import PyDeadObjectError
                    
+import time
 import sys
 import epics
 import wx.lib.buttons as buttons
@@ -104,18 +105,21 @@ class pvMixin:
     @EpicsFunction
     def SetPV(self, pv=None):
         "set pv, either an epics.PV object or a pvname"
+        if pv is None:
+            print 'SetPV pv is None?'
+            return
         if isinstance(pv, epics.PV):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
             self.pv = epics.PV(pv)
             self.pv.connect()
-        if self.pv is None:
-            return
 
         epics.poll()
+        # self.pv.wait_for_connection()
         self.pv.get_ctrlvars()
-        if not self.pv.connected:
-            return
+
+        #if not self.pv.connected:
+        #    return
         
         self.OnPVChange(self.pv.get(as_string=True))
         self.pv.add_callback(self._pvEvent, wid=self.GetId() )
@@ -158,16 +162,18 @@ class pvMixin:
     def _warn(self, msg):
         "write warning"
         sys.stderr.write("%s for pv='%s'\n" % (msg, self.pv.pvname))
-
+        
     @EpicsFunction
     def GetEnumStrings(self):
         """try to get list of enum strings,
         returns enum strings or None"""
+        epics.poll()
+        out = None
         if isinstance(self.pv, epics.PV):
             self.pv.get_ctrlvars()
             if self.pv.type == 'enum':
-                return self.pv.enum_strs
-        
+                out =list(self.pv.enum_strs)
+        return out
         
 class pvCtrlMixin(pvMixin):
     """ 
@@ -436,9 +442,12 @@ class pvEnumButtons(wx.Panel, pvCtrlMixin):
         wx.Panel.__init__(self, parent, wx.ID_ANY, **kw)
         pvCtrlMixin.__init__(self, pv=pv)
 
-        enum_strings = self.GetEnumStrings()
-        pv_value = self.GetValue(as_string=True)
-        if self.pv.type != 'enum' or enum_strings is None:
+        pv.wait_for_connection()
+        pv_value = pv.get(as_string=True)
+        enum_strings = pv.enum_strs
+
+
+        if enum_strings is None:
             self._warn('pvEnumButtons needs an enum PV')
             return
 
@@ -482,19 +491,21 @@ class pvEnumChoice(wx.Choice, pvCtrlMixin):
         wx.Choice.__init__(self, parent, wx.ID_ANY, **kw)
         pvCtrlMixin.__init__(self, pv=pv)
 
-        enum_strings = self.GetEnumStrings()
-        pv_value = self.GetValue(as_string=True)
-        if self.pv.type != 'enum' or enum_strings is None:
+        pv.wait_for_connection()
+        pv_value = pv.get(as_string=True)
+        enum_strings = pv.enum_strs
+        self.pv = pv
+        
+        if enum_strings is None:
             self._warn('pvEnumChoice needs an enum PV')
             return
 
         self.Clear()
         self.AppendItems(enum_strings)
-        self.SetSelection(pv_value)
+        self.SetStringSelection(pv_value)
         self.Bind(wx.EVT_CHOICE, self.OnChoice)
 
-    @EpicsFunction
-    def OnChoice(self, event=None, **kw):
+    def OnChoice(self, event=None, **kws):
         "choice event handler"        
         if self.pv is not None:
             index = self.pv.enum_strs.index(event.GetString())

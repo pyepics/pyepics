@@ -118,7 +118,9 @@ class FloatCtrl(wx.TextCtrl):
         self.bgcol_invalid = (254, 254, 80)
         self.bell_on_invalid = bell_on_invalid
         
-        # set up action 
+        # set up action
+        if action_kw is None:
+            action_kw = {}
         self.SetAction(action, **action_kw)
 
         this_sty =  wx.TE_PROCESS_ENTER|wx.TE_RIGHT

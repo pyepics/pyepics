@@ -5,7 +5,7 @@ an Epics PV, and allow automatic updating of the widget when the
 associated PV changes.
 """
 from . import motorpanel
-from . import wxlib, ogllib
+from . import wxlib, ogllib, utils
 
 MotorPanel    = motorpanel.MotorPanel
 
@@ -26,11 +26,11 @@ pvComboBox    = wxlib.pvComboBox
 pvRectangle   = ogllib.pvRectangle
 pvCircle      = ogllib.pvCircle
 
-set_sizer = wxlib.set_sizer
-set_float = wxlib.set_float
+set_sizer = utils.set_sizer
+set_float = utils.set_float
 
-closure   = wxlib.closure
-FloatCtrl = wxlib.FloatCtrl
+Closure   = utils.Closure
+FloatCtrl = utils.FloatCtrl
 
 DelayedEpicsCallback = wxlib.DelayedEpicsCallback
 EpicsFunction  = wxlib.EpicsFunction
