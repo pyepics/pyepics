@@ -52,7 +52,6 @@ class MotorPanel(wx.Panel):
     @EpicsFunction
     def SelectMotor(self, motor):
         " set motor to a named motor PV"
-        print 'Select Motor : ', motor, self.is_full
         if motor is None:
             return
 
