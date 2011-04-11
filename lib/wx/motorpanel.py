@@ -106,7 +106,7 @@ class MotorPanel(wx.Panel):
         if not self.is_full:
             wdesc, wrbv, winfo, wdrv = 95, 80, 80, 80
         
-        self.desc = pvText(self, size=(wdesc, 35), style=LTEXT)
+        self.desc = pvText(self, size=(wdesc, 25), style=LTEXT)
         self.desc.SetForegroundColour("Blue")
 
         self.rbv  = pvText(self, size=(wrbv, 25), fg='Blue', style=RCEN)
