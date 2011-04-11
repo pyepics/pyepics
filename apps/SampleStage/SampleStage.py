@@ -15,7 +15,7 @@ from  urllib import urlopen
 import epics
 from epics import Motor
 from epics.wx import finalize_epics,  EpicsFunction
-from epics.wx import MiniMotorPanel
+from epics.wx import MotorPanel
 
 from epicscollect.gui import  empty_bitmap, add_button, add_menu, popup, \
      Closure , NumericCombo, FileSave, FileOpen, SelectWorkdir
@@ -55,7 +55,7 @@ class SampleStage(wx.Frame):
         self.SetFont(wx.Font(11, wx.SWISS, wx.NORMAL, wx.BOLD, False))
         self.SetSize((900, 575))
         self.positions = None
-        self.read_config(configfile=configfile, get_dir=True)
+        self.read_config(configfile=configfile, get_dir=False) # True)
         self.SetTitle("XRM Sample Stage")
         wx.EVT_CLOSE(self, self.onClose)        
         
@@ -70,6 +70,7 @@ class SampleStage(wx.Frame):
     def connect_motors(self):
         self.motors = {}
         self.sign = {}
+        # print 'Connect Motors: '
         for pvname, val in self.config['stages'].items():
             pvname = pvname.strip()
             label = val['label']
@@ -287,7 +288,7 @@ class SampleStage(wx.Frame):
 
         for mname in motors:
             if mname is None: continue
-            self.motorwids[mname] = MiniMotorPanel(panel, label=mname)
+            self.motorwids[mname] = MotorPanel(panel, label=mname, full=False)
             self.motorwids[mname].desc.SetLabel(mname)
             smotor.Add(self.motorwids[mname], 1, ALL_EXP|LEFT_TOP)
 
@@ -510,7 +511,7 @@ class SampleStage(wx.Frame):
             if ret != wx.ID_YES:
                 return
         imgfile = '%s.jpg' % time.strftime('%b%d_%H%M%S')
-        print imgfile, self.imgdir
+        # print imgfile, self.imgdir
         self.save_image(fname=os.path.join(self.imgdir, imgfile))
 
         tmp_pos = []
@@ -665,7 +666,7 @@ class StageApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
 if __name__ == '__main__':
     app = wx.PySimpleApp()
-    f = SampleStage()
+    f = SampleStage(configfile='SampleStage.ini')
     f.Show()
     app.MainLoop()
     # StageApp.MainLoop()
