@@ -3,12 +3,11 @@ from epics import caget
 import time
 import instrument
 
-db = instrument.InstrumentDB('Test.einst')
+db = instrument.InstrumentDB('Test.ein')
 
-pvlist = ['13XRM:m1.VAL','13XRM:m2.VAL','13XRM:m3.VAL']
+pvlist = ['13IDE:m1.VAL','13IDE:m2.VAL','13IDE:m3.VAL']
 
-iname = 'sample_stage'
-
+iname = 'XAS Table'
 
 inst = db.get_instrument(iname)
 if inst is None:
@@ -19,8 +18,21 @@ print inst, inst.pvs, inst.positions
 
 for p in inst.pvs:
     print p, p.pvtype
-    p.pvtype =
-    
+
+
+x = db.add_pv('13IDE:m4.VAL')
+print 'Add PV ', x
+
+print inst.pvs
+inst.pvs.append(db.get_pv('13IDE:m4.VAL'))
+
+print '==  And now =='
+for p in inst.pvs:
+    print p, p.pvtype
+
+
+                
+
 # db.close()
 # time.sleep(0.1)
 # print '=------------------------------------'

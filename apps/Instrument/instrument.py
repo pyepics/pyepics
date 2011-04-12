@@ -402,12 +402,17 @@ arguments
         """add pv
         notes and attributes optional
         returns PV instance"""
+        out =  self.query(PV).filter(PV.name==name).all()
+        if len(out) > 0:
+            return
+        
         kws['notes'] = notes
         kws['attributes'] = attributes
 
         row = self.__addRow(PV, ('name',), (name,), **kws)
         if pvtype is not None:
             self.set_pvtype(name, pvtype)
+        self.session.add(row)
         self.commit()
         return row
         
