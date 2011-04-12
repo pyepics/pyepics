@@ -17,19 +17,19 @@ Channels / PVs may need reconsideration.
 
 When using PVs with large array sizes (here, I'll assert that *large* means
 more than 1000 or so elements), it is necessary to make sure that the
-environmental variable ``EPICS_CA_MAX_ARRAY_SIZE`` is suitably set.
+environmental variable ``EPICS_CA_MAX_ARRAY_BYTES`` is suitably set.
 Unfortunately, this represents a pretty crude approach to memory management
 within Epics for handling array data as it is used not only sets how large
 an array the client can accept, but how much memory will be allocated on
 the server.  In addition, this value must be set prior to using the CA
 library -- it cannot be altered during the running of a CA program.
 
-Normally, the default value for ``EPICS_CA_MAX_ARRAY_SIZE`` is 16384 (16k,
+Normally, the default value for ``EPICS_CA_MAX_ARRAY_BYTES`` is 16384 (16k,
 and it turns out that you cannot set it smaller than this value!).  As
 Python is used for clients, generally running on workstations or servers
 with sufficient memory, this default value is changed to 2**24, or 16Mb)
 when :mod:`epics.ca` is initialized.  If the environmental variable
-``EPICS_CA_MAX_ARRAY_SIZE`` has not already been set.
+``EPICS_CA_MAX_ARRAY_BYTES`` has not already been set.
 
 The other main issue for PVs holding large arrays is whether they should be
 automatically monitored.  For PVs holding scalar data or small arrays, any

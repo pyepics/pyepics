@@ -108,18 +108,18 @@ megabytes) which means that some of the assumptions about dealing with
 Channels / PVs may need reconsideration.</p>
 <p>When using PVs with large array sizes (here, I'll assert that <em>large</em> means
 more than 1000 or so elements), it is necessary to make sure that the
-environmental variable <tt class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_SIZE</span></tt> is suitably set.
+environmental variable <tt class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_BYTES</span></tt> is suitably set.
 Unfortunately, this represents a pretty crude approach to memory management
 within Epics for handling array data as it is used not only sets how large
 an array the client can accept, but how much memory will be allocated on
 the server.  In addition, this value must be set prior to using the CA
 library -- it cannot be altered during the running of a CA program.</p>
-<p>Normally, the default value for <tt class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_SIZE</span></tt> is 16384 (16k,
+<p>Normally, the default value for <tt class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_BYTES</span></tt> is 16384 (16k,
 and it turns out that you cannot set it smaller than this value!).  As
 Python is used for clients, generally running on workstations or servers
 with sufficient memory, this default value is changed to 2**24, or 16Mb)
 when <tt class="xref py py-mod docutils literal"><span class="pre">epics.ca</span></tt> is initialized.  If the environmental variable
-<tt class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_SIZE</span></tt> has not already been set.</p>
+<tt class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_BYTES</span></tt> has not already been set.</p>
 <p>The other main issue for PVs holding large arrays is whether they should be
 automatically monitored.  For PVs holding scalar data or small arrays, any
 penalty for automatically monitoring these variables (that is, causing
