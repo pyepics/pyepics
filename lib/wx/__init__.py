@@ -21,6 +21,8 @@ pvFloatSpin   = wxlib.pvFloatSpin
 pvButton      = wxlib.pvButton
 pvRadioButton = wxlib.pvRadioButton
 pvComboBox    = wxlib.pvComboBox
+pvToggleButton= wxlib.pvToggleButton
+pvStatusBar   = wxlib.pvStatusBar
 
 # OGL shapes
 pvRectangle   = ogllib.pvRectangle
