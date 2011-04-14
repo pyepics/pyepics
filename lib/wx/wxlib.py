@@ -97,6 +97,9 @@ class pvMixin:
     """
     def __init__(self, pv=None, pvname=None):
         self.pv = None
+        self._connect_bgcol = self.GetBackgroundColour()
+        self._connect_fgcol = self.GetForegroundColour()
+
         if pv is None and pvname is not None:
             pv = pvname
         if pv is not None:
@@ -115,15 +118,34 @@ class pvMixin:
             self.pv.connect()
 
         epics.poll()
+        self.pv.connection_callbacks.append(self.OnEpicsConnect)
+
         # self.pv.wait_for_connection()
         self.pv.get_ctrlvars()
-
-        #if not self.pv.connected:
-        #    return
         
         self.OnPVChange(self.pv.get(as_string=True))
         self.pv.add_callback(self._pvEvent, wid=self.GetId() )
 
+
+    @DelayedEpicsCallback
+    def OnEpicsConnect(self, pvname=None, conn=None, **kws):
+        """Connect Callback:
+             Enable/Disable widget on change in connection status
+        """
+        print 'onEpics Connect: ', pvname, conn
+        action = getattr(self, 'Enable', None)
+        bgcol = self._connect_bgcol
+        fgcol = self._connect_fgcol        
+        if not conn:
+            action = getattr(self, 'Disable', None)
+            self._connect_bgcol = self.GetBackgroundColour()
+            self._connect_fgcol = self.GetForegroundColour()
+            bgcol = wx.Colour(240, 240, 210)
+            fgcol = wx.Colour(200, 100, 100)
+        if action is not None:
+            self.SetBackgroundColour(bgcol)
+            self.SetForegroundColour(fgcol)
+            action()
 
     @DelayedEpicsCallback
     def _pvEvent(self, pvname=None, value=None, wid=None,
@@ -571,6 +593,7 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
             self.pv = epics.PV(pv)
         if self.pv is None:
             return
+        self.pv.connection_callbacks.append(self.OnEpicsConnect)
         self.pv.get()
         self.pv.get_ctrlvars()
         # be sure to set precision before value!! or PV may be moved!!
@@ -780,7 +803,6 @@ class pvButton(wx.Button, pvCtrlMixin):
         pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.pushValue = pushValue
         self.Bind(wx.EVT_BUTTON, self.OnPress)
-
         self.disablePV = disablePV
         self.disableValue = disableValue            
         if disablePV is not None:
