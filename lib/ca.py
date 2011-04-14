@@ -426,34 +426,43 @@ def _onConnectionEvent(args):
     ctx = current_context()
     pvname = name(args.chid)
     global _cache
+    
     if ctx is None and len(_cache.keys()) > 0:
         ctx = _cache.keys()[0]
     if ctx not in _cache:
         _cache[ctx] = {}
-    if pvname not in _cache[ctx]:
+
+    # search for PV in any context...
+    pv_found = False
+    for context in _cache:
+        if pvname in _cache[context]:
+            pv_found = True
+            break
+        
+    if not pv_found:
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
                                'ts':0, 'failures':0, 
                                'callbacks': []}
+        
+    # set connection time, run connection callbacks
+    # in all contexts
+    for context, cvals in _cache.items():
+        if pvname in cvals:
+            entry = cvals[pvname]
+            ichid = entry['chid']
+            if isinstance(entry['chid'], dbr.chid_t):
+                ichid = entry['chid'].value
+                
+            if int(ichid) == int(args.chid):
+                entry['conn'] = conn = (args.op == dbr.OP_CONN_UP)
+                entry['chid'] = chid = args.chid
+                entry['ts']   = time.time()
+                entry['failures'] = 0
 
-    conn = (args.op == dbr.OP_CONN_UP)
-    entry = _cache[ctx][pvname]
-    if (isinstance(entry['chid'], dbr.chid_t) and 
-        entry['chid'].value != args.chid):
-        msg = 'Channel IDs do not match in connection callback (%s and %s)'
-        raise ChannelAccessException('connect_channel',
-                                     msg % (entry['chid'], args.chid))
-    entry['conn'] = conn
-    entry['chid'] = args.chid
-    entry['ts']   = time.time()
-    entry['failures'] = 0
-
-    if len(entry.get('callbacks', [])) > 0:
-        poll(evt=1.e-3, iot=10.0)
-        for callback in entry.get('callbacks', []):
-            if hasattr(callback, '__call__'):
-                callback(pvname=pvname, 
-                         chid=entry['chid'],
-                         conn=entry['conn'])
+                for callback in entry.get('callbacks', []):
+                    poll()
+                    if hasattr(callback, '__call__'):
+                        callback(pvname=pvname, chid=chid, conn=conn)
 
     return 
 
@@ -529,10 +538,12 @@ def replace_printf_handler(fcn=None):
 @withCA
 def current_context():
     "return this context"
+    ctx = libca.ca_current_context()
     try:
-        return int(libca.ca_current_context())
-    except:
-        return libca.ca_current_context()
+        ctx = int(ctx)
+    except TypeError:
+        pass
+    return ctx 
 
 @withCA
 def client_status(context, level):
