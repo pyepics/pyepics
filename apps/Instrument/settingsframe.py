@@ -21,8 +21,7 @@ class SettingsFrame(wx.Frame) :
         tstyle    = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL
 
         wx.Frame.__init__(self, None, -1,
-                          'Epics Instruments: General Settings',
-                          size=(400, 350), pos=pos)
+                          'Epics Instruments: General Settings')
 
         font = parent.GetFont()
 
@@ -94,10 +93,12 @@ class SettingsFrame(wx.Frame) :
         irow += 1
         sizer.Add(btn_ok,     (irow, 0), (1, 1), labstyle|wx.GROW|wx.ALL,  5)
         sizer.Add(btn_cancel, (irow, 1), (1, 1), labstyle|wx.GROW|wx.ALL,  5)
+
         pack(panel, sizer)
 
         mainsizer = wx.BoxSizer(wx.VERTICAL)
         mainsizer.Add(panel, 1, wx.GROW|wx.ALL, 1)
+
         pack(self, mainsizer)
 
         set_font_with_children(self, font)

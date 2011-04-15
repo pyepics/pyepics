@@ -55,7 +55,7 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
             title = 'Edit Instrument  %s ' % inst.name
 
         style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL
-        wx.Frame.__init__(self, None, -1, title,  size=(550, -1),
+        wx.Frame.__init__(self, None, -1, title, 
                           style=style, pos=pos)
         self.Handle_FocusEvents()
         

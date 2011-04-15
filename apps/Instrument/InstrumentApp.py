@@ -38,7 +38,7 @@ class InstrumentFrame(wx.Frame):
         self.connect_db(dbname)
 
         wx.Frame.__init__(self, parent=parent, title='Epics Instruments',
-                          size=(800, 400), **kwds)
+                          size=(925, 400), **kwds)
 
         self.colors = GUIColors()
         self.SetBackgroundColour(self.colors.bg)
@@ -103,6 +103,7 @@ class InstrumentFrame(wx.Frame):
     def add_instrument_page(self, inst):
         self.connect_pvs(inst, wait_time=1.0)
         panel = InstrumentPanel(self, inst, db=self.db,
+                                size=(925, 300), 
                                 writer = self.write_message)
         self.nb.AddPage(panel, inst.name, True)
         
