@@ -16,7 +16,7 @@ This is a port of Tim Mooney's wrapper around CaChannel to pyepics.
 # Port of Tim Mooney's wrapper around CaChannel to pyepics
 # Tim Mooney 12/05/2008
 
-
+code = '''
 version = "3.0"
 
 import epics
@@ -656,3 +656,4 @@ def printExceptionInfo(maxTBlevel=15):
 		for trace in excTb:
 			print trace,
 	return
+'''
