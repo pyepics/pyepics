@@ -296,7 +296,7 @@ def show_cache(print_out=True):
 def withCA(fcn):
     """decorator to ensure that libca and a context are created
     prior to function calls to the channel access library. This is
-    intended for functions that at the startup of CA, such as
+    intended for functions that need CA started to work, such as
         create_channel
 
     Note that CA functions that take a Channel ID (chid) as an
@@ -463,7 +463,6 @@ def _onConnectionEvent(args):
                     poll()
                     if hasattr(callback, '__call__'):
                         callback(pvname=pvname, chid=chid, conn=conn)
-
     return 
 
 ## put event handler:
@@ -614,7 +613,7 @@ def create_channel(pvname, connect=False, callback=None):
     will be called immediately.
     """
     # 
-    # Note that _CB_CONNECT (defined below) is a global variable, holding
+    # Note that _CB_CONNECT (defined above) is a global variable, holding
     # a reference to _onConnectionEvent:  This is really the connection
     # callback that is run -- the callack here is stored in the _cache
     # and called by _onConnectionEvent.
@@ -938,7 +937,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         PySEVCHK('put', ret)
         poll()
         return ret
-    # wait with wait or callback    # wait with wait or callback
+    # wait with callback (or put_complete) 
     pvname = name(chid)
     _put_done[pvname] = (False, callback, callback_data)
     ret = libca.ca_array_put_callback(ftype, count, chid,
