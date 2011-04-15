@@ -129,8 +129,8 @@ attributes for accessing it's properties.</p>
 <li><strong>callback</strong> (<em>callable or None</em>) -- user-defined callback function on changes to PV value or state.</li>
 <li><strong>form</strong> (<em>string, one of ('native','ctrl', or 'time')</em>) -- which epics <em>data type</em> to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.</li>
 <li><strong>auto_monitor</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt>, <tt class="xref docutils literal"><span class="pre">True</span></tt>, or <tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to automatically monitor the PV for changes.</li>
-<li><strong>connection_callback</strong> (<em>float or None</em>) -- user-defined function called on changes to PV connection status.</li>
-<li><strong>connection_timeout</strong> -- time (in seconds) to wait for connection before giving up</li>
+<li><strong>connection_callback</strong> (<em>callable or None</em>) -- user-defined function called on changes to PV connection status.</li>
+<li><strong>connection_timeout</strong> (<em>float or None</em>) -- time (in seconds) to wait for connection before giving up</li>
 <li><strong>verbose</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to print out debugging messages</li>
 </ul>
 </td>
@@ -540,6 +540,14 @@ methods <a class="reference internal" href="#pv.add_callback" title="pv.add_call
 </dl>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="pv.connection_callbacks">
+<tt class="descclassname">pv.</tt><tt class="descname">connection_callbacks</tt><a class="headerlink" href="#pv.connection_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>a simple list of connection callbacks: functions to be run when the
+connection status of the PV changes. See
+<a class="reference internal" href="#pv-connection-callbacks-label"><em>User-supplied Connection Callback functions</em></a> for more details.</p>
+</dd></dl>
+
 </div>
 </div>
 <div class="section" id="string-representation-for-a-pv">
@@ -743,10 +751,11 @@ code if the widget that the callback is meant to update disappears.</p>
 <p>A <em>connection</em> callback is a user-defined function that is called when the
 connection status of a PV changes -- that is, when a PV initially
 connects, disconnects or reconnects due to the process serving the PV going
-away, or loss of network connection.  Currently, a connection callback must
-be specified when a PV is created.</p>
-<p>Such a connection callback should be prepared to receive the following
-keyword arguments:</p>
+away, or loss of network connection.  A connection callback can be
+specified when a PV is created, or can be added by appending to the
+<a class="reference internal" href="#pv.connection_callbacks" title="pv.connection_callbacks"><tt class="xref py py-attr docutils literal"><span class="pre">connection_callbacks</span></tt></a> list.  If there is more than one connection
+callback defined, they will all be run when the connection state changes.</p>
+<p>A connection callback should be prepared to receive the following keyword arguments:</p>
 <blockquote>
 <div><ul class="simple">
 <li><cite>pvname</cite>: the name of the pv</li>

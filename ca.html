@@ -1217,8 +1217,8 @@ initial connection:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
-<span class="k">def</span> <span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>  <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-    <span class="k">print</span> <span class="s">&#39;ca connection status changed:  &#39;</span><span class="p">,</span> <span class="n">pvname</span><span class="p">,</span>  <span class="n">kw</span>
+<span class="k">def</span> <span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">chid</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&#39;ca connection status changed:  &#39;</span><span class="p">,</span> <span class="n">pvname</span><span class="p">,</span>  <span class="n">conn</span><span class="p">,</span> <span class="n">chid</span>
 
 <span class="c"># create channel, provide connection callback</span>
 <span class="n">motor1</span> <span class="o">=</span> <span class="s">&#39;13IDC:m1&#39;</span>
@@ -1232,8 +1232,9 @@ initial connection:</p>
 </div>
 <p>This will run the supplied callback soon after the channel has been
 created, when a successful connection has been made.  Note that the
-callback should be prepared to accept keyword arguments and that the <cite>**kw</cite>
-form is recommended.</p>
+callback should be prepared to accept keyword arguments of <cite>pvname</cite>,
+<cite>chid</cite>, and <cite>conn</cite> for the PV name, channel ID, and connection state
+(<cite>True</cite> or <cite>False</cite>).</p>
 </div>
 </div>
 </div>
