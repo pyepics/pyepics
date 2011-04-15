@@ -428,7 +428,7 @@ def _onConnectionEvent(args):
     global _cache
     
     if ctx is None and len(_cache.keys()) > 0:
-        ctx = _cache.keys()[0]
+        ctx = list(_cache.keys())[0]
     if ctx not in _cache:
         _cache[ctx] = {}
 
