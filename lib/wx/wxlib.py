@@ -109,7 +109,7 @@ class pvMixin:
     def SetPV(self, pv=None):
         "set pv, either an epics.PV object or a pvname"
         if pv is None:
-            print 'SetPV pv is None?'
+            # print 'SetPV pv is None?'
             return
         if isinstance(pv, epics.PV):
             self.pv = pv
@@ -132,7 +132,7 @@ class pvMixin:
         """Connect Callback:
              Enable/Disable widget on change in connection status
         """
-        print 'onEpics Connect: ', pvname, conn
+        # print 'onEpics Connect: ', pvname, conn
         action = getattr(self, 'Enable', None)
         bgcol = self._connect_bgcol
         fgcol = self._connect_fgcol        
