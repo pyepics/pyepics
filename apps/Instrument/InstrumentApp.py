@@ -288,8 +288,13 @@ class InstrumentApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         return True
 
 if __name__ == '__main__':
-    # app = wx.PySimpleApp(); InstrumentFrame().Show()
     conf = None
     dbname = 'Test.ein'
-    app = InstrumentApp(dbname=dbname, conf=conf)
+    inspect = False
+    if inspect:
+        app = InstrumentApp(dbname=dbname, conf=conf)
+    else:
+        app = wx.PySimpleApp()
+        InstrumentFrame(conf=conf, dbname=dbname).Show()
+        
     app.MainLoop()

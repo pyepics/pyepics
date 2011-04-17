@@ -122,8 +122,8 @@ class InstrumentPanel(wx.Panel):
         splitter = wx.SplitterWindow(self, -1,
                                      style=wx.SP_3D|wx.SP_BORDER|wx.SP_LIVE_UPDATE)
 
-        lpanel = wx.Panel(splitter, style=wx.BORDER_SUNKEN, size=(750, 175))
-        rpanel = wx.Panel(splitter, style=wx.BORDER_SUNKEN, size=(200, 175))
+        lpanel = wx.Panel(splitter, style=wx.BORDER_SUNKEN, size=(-1, 175))
+        rpanel = wx.Panel(splitter, style=wx.BORDER_SUNKEN, size=(-1, 175))
 
         splitter.SetMinimumPaneSize(150)
         
@@ -214,9 +214,9 @@ class InstrumentPanel(wx.Panel):
                                size=(550, 25))
         self.pvpanels[pvname] = [False, ppanel, psizer, wid]
         
-        psizer.Add(wid, 0, wx.ALL|wx.ALIGN_CENTER, 1)
+        psizer.Add(wid, 1, wx.ALL|wx.ALIGN_CENTER, 1)
         pack(ppanel, psizer)
-        self.leftsizer.Add(ppanel, 1, wx.TOP|wx.ALL, 2)
+        self.leftsizer.Add(ppanel, 1, wx.TOP|wx.ALL|wx.GROW, 2)
 
         time.sleep(0.010)
         if not self.etimer.IsRunning():
@@ -286,8 +286,8 @@ class InstrumentPanel(wx.Panel):
         if dtype.lower() == 'motor':
             self.db.set_pvtype(pvname, 'motor')
             # print 'Adding MotorPanel for ', pvname, self.pvpanels[pvname]
-            sizer.Add(MotorPanel(panel, pvname, midsize=True), 1, 
-                      wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
+            sizer.Add(MotorPanel(panel, pvname, midsize=True),  1, 
+                      wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.GROW, 0)
         else:
             label = SimpleText(panel, pvname,
                                colour=colors.pvname,

@@ -11,24 +11,6 @@ FileBrowser = filebrowse.FileBrowseButtonWithHistory
 ALL_EXP  = wx.ALL|wx.EXPAND
 EIN_WILDCARD = 'Epics Instrument Files (*.ein)|*.ein|All files (*.*)|*.*'
         
-def guess_pvtype(devtype, rectype=None):
-    "convert epics record type to pvtype for database"
-    pvtype = 'generic'
-    devtype = devtype.lower()
-    rectype = rectype.lower()
-    if rectype == 'motor':
-        pvtype == 'motor'
-    else:
-        pvtype = devtype
-        if pvtype in ('double', 'float', 'long', 'int'):
-            pvtype = 'numeric'
-        elif pvtype == 'char':
-            pvtype = 'string'
-                
-    if pvtype not in ('numeric', 'string', 'enum', 'motor'):
-        pvtype = 'generic'
-    return pvtype
-
 def dumpsql(dbname, fname=None):
     """ dump SQL statements for an sqlite db"""
     if fname is None:

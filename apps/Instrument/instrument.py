@@ -408,7 +408,7 @@ arguments
         
         kws['notes'] = notes
         kws['attributes'] = attributes
-
+        print " =instrument=  add_pv ", name, pvtype
         row = self.__addRow(PV, ('name',), (name,), **kws)
         if pvtype is not None:
             self.set_pvtype(name, pvtype)
@@ -441,7 +441,6 @@ arguments
         self.conn.execute(tabl.delete().where(tabl.c.id==pos.id))
 
         self.commit()
-        
         
     def remove_instrument(self, inst):
         inst = self.get_instrument(inst)
