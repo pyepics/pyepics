@@ -43,11 +43,11 @@ class InitialData:
     info    = [["version", "1.1"],
                ["verify_erase", "1"],
                ["verify_move",   "1"],
+               ["epics_prefix",   ""],               
                ["create_date", '<now>'],
                ["modify_date", '<now>']]
 
-    pvtype = [['generic',   'Generic PV'],
-              ['numeric',   'Numeric Value'],
+    pvtype = [['numeric',   'Numeric Value'],
               ['enum',      'Enumeration Value'],
               ['string',    'String Value'],
               ['motor',     'Motor Value']]
