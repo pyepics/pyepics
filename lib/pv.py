@@ -209,7 +209,7 @@ class PV(object):
         if not self.wait_for_connection():
             return None
         if (self.ftype in (dbr.ENUM, dbr.TIME_ENUM, dbr.CTRL_ENUM) and
-            isinstance(value, str) and value in self._args['enum_strs']):
+            isinstance(value, (str, unicode)) and value in self._args['enum_strs']):
             value = self._args['enum_strs'].index(value)
         if use_complete and callback is None:
             callback = self.__putCallbackStub
