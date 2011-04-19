@@ -109,7 +109,6 @@ class pvMixin:
     def SetPV(self, pv=None):
         "set pv, either an epics.PV object or a pvname"
         if pv is None:
-            # print 'SetPV pv is None?'
             return
         if isinstance(pv, epics.PV):
             self.pv = pv
@@ -391,6 +390,12 @@ class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
     """
     def __init__(self, parent,  pv=None, 
                  font=None, fg=None, bg=None, **kws):
+
+        if 'style' not in kws:
+            kws['style'] = wx.TE_PROCESS_ENTER
+        else:
+            kws['style'] |= wx.TE_PROCESS_ENTER
+
         wx.TextCtrl.__init__(self, parent, wx.ID_ANY, value='', **kws)
         pvCtrlMixin.__init__(self, pv=pv, font=font, fg=fg, bg=bg)
         self.Bind(wx.EVT_CHAR, self.OnChar)
@@ -400,15 +405,21 @@ class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
         key   = event.GetKeyCode()
         entry = wx.TextCtrl.GetValue(self).strip()
         pos   = wx.TextCtrl.GetSelection(self)
-        if (key == wx.WXK_RETURN):
-            self._caput(entry)
-        event.Skip()            
+        if key == wx.WXK_RETURN:
+            self.SetValue(entry)
+        else:
+            event.Skip()
 
     @EpicsFunction
     def _caput(self, value):
         "epics pv.put wrapper"
         self.pv.put(value)
     
+    def SetValue(self, value):
+        "override all setvalue"
+        self._caput(value)
+        wx.TextCtrl.SetValue(self, value)
+
     def _SetValue(self, value):
         "set widget value"
         self.SetValue(value)
@@ -606,9 +617,12 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
 
         if self.pv.type in ('string', 'char'):
             self._warn('pvFloatCtrl needs a double or float PV')
-            
-        self.SetMin(self.pv.lower_ctrl_limit)
-        self.SetMax(self.pv.upper_ctrl_limit)
+
+        llim = set_float(self.pv.lower_ctrl_limit)
+        hlim = set_float(self.pv.upper_ctrl_limit)
+        if hlim is not None and llim is not None and hlim > llim:
+            self.SetMax(hlim)
+            self.SetMin(llim)
         self.pv.add_callback(self._FloatpvEvent, wid=self.GetId())
         self.SetAction(self._onEnter)
 
