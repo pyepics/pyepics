@@ -21,7 +21,10 @@ def EpicsFunction(f):
     """
     def wrapper(*args, **kwargs):
         "callafter wrapper"
-        wx.CallAfter(f, *args, **kwargs)
+        try:
+            wx.CallAfter(f, *args, **kwargs)
+        except PyDeadObjectError:
+            pass
     return wrapper
 
 def DelayedEpicsCallback(fcn):
