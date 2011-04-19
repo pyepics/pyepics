@@ -5,9 +5,9 @@ import instrument
 
 db = instrument.InstrumentDB('Test.ein')
 
-pvlist = ['13IDE:m1.VAL','13IDE:m2.VAL','13IDE:m3.VAL']
+pvlist = ['13XRM:m1.VAL','13XRM:m2.VAL','13XRM:m3.VAL']
 
-iname = 'XAS Table'
+iname = 'Sample Stage'
 
 inst = db.get_instrument(iname)
 if inst is None:
@@ -20,18 +20,35 @@ for p in inst.pvs:
     print p, p.pvtype
 
 
-x = db.add_pv('13IDE:m4.VAL')
+x = db.add_pv('13XRM:m4.VAL')
 print 'Add PV ', x
 
 print inst.pvs
-inst.pvs.append(db.get_pv('13IDE:m4.VAL'))
 
 print '==  And now =='
 for p in inst.pvs:
     print p, p.pvtype
+    
+print 'Instid = ', inst.id
+IPV = instrument.Instrument_PV
+pvs_ordered = db.query(IPV).filter(IPV.instrument_id==inst.id
+                                   ).order_by(IPV.display_order
+                                              ).all()
+for i, pv in enumerate(inst.pvs):
+    print pv, pv.id
+    for o in pvs_ordered:
+        if o.pv == pv:
+            o.display_order = i+1
+            
+db.commit()    
+    
+# 
+# for ix, entry in enumerate(pvs_ordered):
+#     print entry.pv, entry.display_order
+#     # entry.display_order = ix
+# ;
+# db.commit()
 
-
-                
 
 # db.close()
 # time.sleep(0.1)

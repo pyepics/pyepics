@@ -7,7 +7,7 @@ from epics.wx import EpicsFunction, pvText, pvFloatCtrl, pvTextCtrl, pvEnumChoic
 from epicscollect.gui import  pack, popup, add_button, SimpleText
 from motorpanel import MotorPanel
 
-from utils import ALL_EXP , GUIColors
+from utils import ALL_EXP , GUIColors, get_pvtypes
         
 class MoveToDialog(wx.Dialog):
     """Full Query for Move To for a Position"""
@@ -109,7 +109,7 @@ class InstrumentPanel(wx.Panel):
         self.write_message = writer
         self.pvs  = {}
         self.pvdesc = {}
-        self.pvpanels  = {}
+        self.pv_components  = []
         wx.Panel.__init__(self, parent, size=size)
 
         colors = GUIColors()
@@ -134,12 +134,12 @@ class InstrumentPanel(wx.Panel):
 
 
         topsizer = wx.BoxSizer(wx.HORIZONTAL)
-        topsizer.Add(SimpleText(toprow, inst.name,
+        topsizer.Add(SimpleText(toprow, '  %s  ' % inst.name,
                                 font=titlefont,
                                 colour=colors.title,
                                 minsize=(125, -1),
-                                style=wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL),
-                     0, wx.ALIGN_LEFT, 1)
+                                style=wx.ALIGN_LEFT|wx.ALIGN_BOTTOM), 
+                     0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL, 2)
 
         topsizer.Add(SimpleText(toprow, 'Save Current Position:',
                                 minsize=(125, -1),                              
@@ -150,12 +150,10 @@ class InstrumentPanel(wx.Panel):
                      wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL, 1)
 
         pack(toprow, topsizer)
-
+        self.toprow = toprow
         lsizer = wx.BoxSizer(wx.VERTICAL)
-        lsizer.Add(toprow, 0,  wx.GROW|wx.ALIGN_LEFT|wx.TOP, 1)
 
         # start a timer to check for when to fill in PV panels
-        self.pvpanels = {}
         timer_id = wx.NewId()
         self.etimer = wx.Timer(self)
         self.etimer_count = 0
@@ -164,10 +162,11 @@ class InstrumentPanel(wx.Panel):
 
         self.leftpanel = lpanel
         self.leftsizer = lsizer
-        for x in inst.pvs:
-            self.add_pv(x.name)
 
-        pack(lpanel, lsizer)
+        for ordered_pvs in self.db.get_ordered_instpvs(inst):
+            self.add_pv(ordered_pvs.pv.name)
+
+        self.redraw_leftpanel()
 
         rsizer = wx.BoxSizer(wx.VERTICAL)
         btn_goto = add_button(rpanel, "Go To",  size=(70, -1),
@@ -195,29 +194,43 @@ class InstrumentPanel(wx.Panel):
         splitter.SplitVertically(lpanel, rpanel, -1)
        
         lpanel.SetMinSize((625, 150))
-        rpanel.SetMaxSize((400, -1))
         rpanel.SetMinSize((150, -1))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(splitter, 1, wx.GROW|wx.ALL, 0)        
-
-#         sizer = wx.BoxSizer(wx.HORIZONTAL)
-#         sizer.Add(lpanel, 0, wx.GROW|wx.ALL, 2)
-#         sizer.Add(rpanel, 1, wx.GROW|wx.ALL, 2)
         pack(self, sizer)
 
+    def redraw_leftpanel(self, announce=False):
+        """ redraws the left panel """
+        self.leftsizer.Clear()
+        self.leftpanel.Hide()
+        self.leftsizer.Add(self.toprow, 0,  wx.GROW|wx.ALIGN_LEFT|wx.TOP, 1)
+
+        current_comps = [self.toprow]
+        for pvname, connected, wid in self.pv_components:
+            self.leftsizer.Add(wid, 1, wx.TOP|wx.ALL|wx.GROW, 2)
+            current_comps.append(wid)
+        pack(self.leftpanel, self.leftsizer)
+
+        for wid in self.leftpanel.Children:
+            if wid not in current_comps and wid != self.toprow:
+                try:
+                    time.sleep(0.005)
+                    wid.Destroy()
+                except PyDeadObjectError:
+                    pass
+        self.leftpanel.Show()
+        self.Refresh()
+        self.Layout()
+        if announce:
+            print 'Redraw Left Panel: %i components ' % (len(self.leftpanel.Children))
+        
     def add_pv(self, pvname):
         """add a PV to the left panel"""
-        ppanel = wx.Panel(self.leftpanel) # , size=(550, 25))
-        psizer = wx.BoxSizer(wx.HORIZONTAL)
-        wid    = wx.StaticText(ppanel, label='Connecting %s' % pvname,
-                               size=(550, 25))
-        self.pvpanels[pvname] = [False, ppanel, psizer, wid]
+        wid = wx.StaticText(self.leftpanel,
+                            label="Waiting for Connection for '%s'" % pvname)
+        self.pv_components.append([pvname, False, wid])
         
-        psizer.Add(wid, 1, wx.ALL|wx.ALIGN_CENTER, 1)
-        pack(ppanel, psizer)
-        self.leftsizer.Add(ppanel, 1, wx.TOP|wx.ALL|wx.GROW, 2)
-
         time.sleep(0.010)
         if not self.etimer.IsRunning():
             self.etimer.Start(self.etimer_poll)
@@ -231,11 +244,13 @@ class InstrumentPanel(wx.Panel):
         """Timer Event: look for uncompleted PV panels
         and try to create them ...
         """
-        if all([pnl[0] for pnl in self.pvpanels]): # "all connected"
+        if all([comp[1] for comp in self.pv_components]): # "all connected"
             self.etimer.Stop()
-        for pvname in self.pvpanels:
-            cnx, pnl, szr, wid = self.pvpanels[pvname]
-            self.PV_Panel(pvname, pnl, szr, wid)
+        
+        for component in self.pv_components:
+            pvname, cnx, wid = component
+            self.PV_Panel(pvname)
+
         # if we've done 100 rounds, there are probably
         # really unconnected PVs -- let's slow down.
         self.etimer_count += 1
@@ -247,7 +262,7 @@ class InstrumentPanel(wx.Panel):
             self.etimer.Start(self.etimer_poll)
             
     @EpicsFunction
-    def PV_Panel(self, pvname, panel, sizer, current_wid=None):
+    def PV_Panel(self, pvname): # , panel, sizer, current_wid=None):
         """ try to create a PV Panel for the given pv
         returns quickly for an unconnected PV, to be tried later
         by the timer"""
@@ -261,52 +276,54 @@ class InstrumentPanel(wx.Panel):
         if pv.connected == False:
             return
 
-        if current_wid is not None:
-            try:
-                current_wid.Destroy()
-            except PyDeadObjectError:
-                pass
-            sizer.Clear()
+        thiscomp = None
+        for comp in self.pv_components:
+            if comp[0] == pvname:
+                comp[1] = True
+                thiscomp = comp
+                break
+        if thiscomp is None:
+            print("wait, can't find component for ", pnvame)
+            return
 
-        try:
-            self.pvpanels[pvname][0] = True
-        except KeyError:
-            pass
         pv.get_ctrlvars()
+        colors = GUIColors()
+        pvtype = None
+        db_pv = self.db.get_pv(pvname)
+        try:
+            pvtype = str(db_pv.pvtype.name)
+        except AttributeError:
+            pass
+        
+        if pvtype is None:
+            pvtype  = get_pvtypes(pv)[0]
+            
+        self.db.set_pvtype(pvname, pvtype)        
 
-        instrument_pvs = [i.name for i in self.inst.pvs]
-        # check if pv is a motor
-        pref = pvname
-        if '.' in pvname:
-            pref, suff = pvname.split('.')
-        desc  = epics.caget("%s.DESC" % pref)
-        if desc is not None:
-            self.pvdesc[pvname] = desc
-        dtype = epics.caget("%s.RTYP" % pref)
-        if dtype.lower() == 'motor':
-            self.db.set_pvtype(pvname, 'motor')
-            # print 'Adding MotorPanel for ', pvname, self.pvpanels[pvname]
-            sizer.Add(MotorPanel(panel, pvname, midsize=True),  1, 
-                      wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.GROW, 0)
+        panel = wx.Panel(self.leftpanel)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        if pvtype == 'motor':
+            sizer.Add(MotorPanel(panel, pvname, midsize=True), 
+                      1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.GROW, 0)
         else:
+
             label = SimpleText(panel, pvname,
                                colour=colors.pvname,
-                               minsize=(100,-1),
-                               style=wx.ALIGN_LEFT)
-
-            if pv.type in ('double', 'int', 'long', 'short'):
-                control = pvFloatCtrl(panel, pv=pv)
-                self.db.set_pvtype(pvname, 'numeric')
-            elif pv.type in ('string', 'unicode'):
-                control = pvTextCtrl(panel, pv=pv)
-                self.db.set_pvtype(pvname, 'string')
-            elif pv.type == 'enum': 
-                self.db.set_pvtype(pvname, 'enum')
-                control = pvEnumChoice(panel, pv=pv)
-
+                               minsize=(125,-1),
+                               style=wx.ALIGN_LEFT) 
+            if pvtype == 'enum': 
+                control = pvEnumChoice(panel, pv=pv, size=(250, -1)) 
+            elif pvtype in ('string', 'unicode'):
+                control = pvTextCtrl(panel, pv=pv, size=(250, -1))
+            else:
+                control = pvFloatCtrl(panel, pv=pv, size=(250, -1))
+            
             sizer.Add(label,   0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
-            sizer.Add(control, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
+            sizer.Add(control, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
         pack(panel, sizer)
+        thiscomp[2] = panel
+        self.redraw_leftpanel()
+        
                 
     @EpicsFunction
     def save_current_position(self, posname):

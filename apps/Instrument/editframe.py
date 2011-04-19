@@ -9,56 +9,14 @@ from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
      Closure, NumericCombo, pack, popup, SimpleText, \
      FileSave, FileOpen, SelectWorkdir 
 
-from utils import GUIColors, HideShow, YesNo, set_font_with_children
+from utils import GUIColors, HideShow, YesNo, set_font_with_children, get_pvtypes
 import instrument
 
 REMOVE_MSG = "Permanently Remove Instrument '%s'?\nThis cannot be undone!"
 
-def get_pvtypes(pvobj):
-    """create tuple of choices for PV Type for database,
-    which sets how to display PV entry.
-    
-    if pvobj is an epics.PV, the epics record type and
-    pv.type are used to select the choices.
-
-    if pvobj is an instrument.PV (ie, a db entry), the
-    pvobj.pvtype.name field is used.
-    """    
-
-    choices = ['numeric', 'string']
-    if isinstance(pvobj, epics.PV):
-        prefix = pvobj.pvname
-        suffix = None
-        typename = pvobj.type
-        if '.' in prefix:
-            prefix, suffix = prefix.split('.')
-        rectype = epics.caget("%s.RTYP" % prefix)
-        if rectype == 'motor' and suffix in (None, 'VAL'):
-            typename = 'motor'
-        if pvobj.type == 'char' and pvobj.count > 1:
-            typename = 'string'
-            
-    elif isinstance(pvobj, instrument.PV):
-        typename = str(pvobj.pvtype.name)
-
-    # now we have typename: use as default, add alternate choices
-    if typename == 'motor':
-        choices = ['numeric', 'string']
-    elif typename == 'enum':
-        choices = ['numeric', 'string']
-    elif typename == 'string':
-        choices = ['numeric']
-    else:
-        typename = None
-
-    if typename is not None:
-        choices.insert(0, typename)
-        
-    return tuple(choices)
-
 class PVTypeChoice(wx.Choice):
     def __init__(self, parent, choices=None, size=(95, -1), **kws):
-        wx.Choice.__init__(self, parent, -1, size=size, **kws)
+        wx.Choice.__init__(self, parent, -1, size=size)
         if choices is None:
             choices = ('',)
         self.SetChoices(choices)
@@ -105,12 +63,15 @@ class FocusEventFrame(wx.Window):
             event.Skip()
             
 
-
 class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
     """ Edit / Add Instrument"""
-    def __init__(self, parent=None, pos=(-1, -1), inst=None, db=None):
+    def __init__(self, parent=None, pos=(-1, -1),
+                 inst=None, db=None, epics_pvs=None):
 
-        self.pvs = {}
+        self.epics_pvs = epics_pvs
+        if self.epics_pvs is None:
+            self.epics_pvs = {}
+            
         title = 'Add New Instrument'
         if inst is not None:
             title = 'Edit Instrument  %s ' % inst.name
@@ -177,14 +138,27 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
             sizer.Add(SimpleText(panel, 'Remove?:',
                                  colour=self.colors.title, style=CSTY),
                       (2, 2), (1, 1), RSTY, 2)
-                
-            for pv in inst.pvs:
+
+            opvs  = db.get_ordered_instpvs(inst)
+
+            for instpvs in self.db.get_ordered_instpvs(inst):
+                pv = instpvs.pv
                 irow += 1
-                print 'PV: ', pv, pv.pvtype.name
+                if pv.name in self.epics_pvs:
+                    pvchoices = get_pvtypes(self.epics_pvs[pv.name], instrument)
+                else:
+                    pvchoices = get_pvtypes(pv, instrument)
+
                 label= SimpleText(panel, pv.name,  minsize=(175, -1),
                                   style=LSTY)
-                choices = get_pvtypes(pv)
-                pvtype = PVTypeChoice(panel, choices=choices,  style=LSTY)
+
+                try:
+                    itype = pvchoices.index(pv.pvtype.name)
+                except ValueError:
+                    itype = 0
+
+                pvtype = PVTypeChoice(panel, choices=pvchoices)
+                pvtype.SetSelection(itype)
                 pvtype.SetStringSelection(pv.pvtype.name)
                 del_pv = YesNo(panel, defaultyes=False)
                 self.curpvs[pv.name] = (label, pvtype, del_pv)
@@ -214,7 +188,7 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
         for npv in range(5):
             irow += 1
             name = pvNameCtrl(self, panel, value='', size=(175, -1))
-            pvtype = PVTypeChoice(panel, choices=(''),  style=LSTY)
+            pvtype = PVTypeChoice(panel) 
             del_pv = YesNo(panel, defaultyes=False)
             pvtype.Disable()
             del_pv.Disable()
@@ -241,13 +215,14 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
         sizer.Add(wx.StaticLine(panel, size=(150, -1), style=wx.LI_HORIZONTAL),
                   (irow+2, 0), (1, 3), CEN, 2)
 
+        set_font_with_children(self, font)
+
         pack(panel, sizer)
 
         mainsizer = wx.BoxSizer(wx.VERTICAL)
         mainsizer.Add(panel, 1, LSTY)
         pack(self, mainsizer)
 
-        set_font_with_children(self, font)
 
         self.Layout()
         self.Show()
@@ -265,8 +240,8 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
         if pvname is None or len(pvname) < 1:
             return
         if pvname not in self.connecting_pvs:
-            if pvname not in self.pvs:
-                self.pvs[pvname] = epics.PV(pvname)
+            if pvname not in self.epics_pvs:
+                self.epics_pvs[pvname] = epics.PV(pvname)
             self.connecting_pvs[pvname] = wid
             
             if not self.etimer.IsRunning():
@@ -282,10 +257,10 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
     @EpicsFunction
     def new_pv_connected(self, pvname):
         """if a new epics PV has connected, fill in the form data"""
-        if pvname not in self.pvs:
-            pv = self.pvs[pvname] = epics.PV(pvname)
+        if pvname not in self.epics_pvs:
+            pv = self.epics_pvs[pvname] = epics.PV(pvname)
         else:
-            pv = self.pvs[pvname]
+            pv = self.epics_pvs[pvname]
         if not pv.connected:
             return
         try:
@@ -295,8 +270,8 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
         pv.get_ctrlvars()
         self.newpvs[wid][1].Enable()
         self.newpvs[wid][2].Enable()
-
-        pvchoices = get_pvtypes(pv)
+        
+        pvchoices = get_pvtypes(pv, instrument)
         self.newpvs[wid][1].SetChoices(pvchoices)
         self.newpvs[wid][1].SetSelection(0)
         self.newpvs[wid][2].SetStringSelection('No')
@@ -311,7 +286,6 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
                     style=wx.YES_NO|wx.ICON_QUESTION)
         if ret != wx.ID_YES:
             return
-        print 'Remove Instrument -- verified'
         db.remove_instrument(inst)
         db.commit()
         pagemap = self.get_page_map()
@@ -332,35 +306,55 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
         if page is not None:
             self.parent.nb.SetPageText(page, newname)
 
-        print 'OnDone = newpvs = '
         for namectrl, typectrl, delctrl in self.newpvs.values():
-            
             if delctrl.GetSelection() == 0:
                 pvname = namectrl.GetValue().strip()
-                pvtype = typectrl.GetStringSelection()                
+                pvtype = typectrl.GetStringSelection()
                 if len(pvname) > 0 and typectrl.Enabled:
-                    print 'Add PV: ', pvname, pvtype
                     db.add_pv(pvname, pvtype=pvtype)
                     inst.pvs.append(db.get_pv(pvname))
+                    instpanel.add_pv(pvname)
                     
-        print '  = curpvs = '
         for pvname, ctrls in  self.curpvs.items():
             lctrl, typectrl, delctrl = ctrls
             if delctrl.GetSelection() == 1:
-                print 'Delete PV ', pvname
                 instpv = db.get_pv(pvname)
                 inst.pvs.remove(instpv)
+                instapanel.redraw_leftpanel()                
             else:
                 newtype = typectrl.GetStringSelection()
                 curtype= db.get_pv(pvname).pvtype.name
                 if newtype != curtype:
-                    print 'reset pv type ', pvname, pvtype
-                    db.set_pvtype(pvname, pvtype)
+                    db.set_pvtype(pvname, newtype)
+                    instpanel.PV_Panel(pvname)
+                    
+        db.commit()
+        # set order for PVs (as for next time)
+        
+        ordered_inst_pvs = db.get_ordered_instpvs(inst)
+        for opv in ordered_inst_pvs:
+            opv.display_order = -1
+            
+            
+        for i, pv in enumerate(inst.pvs):
+            for opv in ordered_inst_pvs:
+                if opv.pv == pv:
+                    opv.display_order = i
+        
+        for opv in ordered_inst_pvs:
+            if opv.display_order == -1:
+                i = i + 1
+                opv.display_order = i
+            
+
+            #for opv in ordered_inst_pvs:
+            #    if opv == pv:
+            #        opv.display_order = i+1
                 
-                print 'set pvtype: ', pvname, pvtype
+        db.commit()
+        # for pv in self.db.get_instrument_pvs(inst)            
 
-
-        db.commit()        
+        # instpanel.redraw_leftpanel(announce=True)
             
         #         instpanel = self.parent.nb.GetCurrentPage()
         #         inst = instpanel.inst

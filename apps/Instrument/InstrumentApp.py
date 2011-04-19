@@ -37,6 +37,7 @@ class InstrumentFrame(wx.Frame):
 
         self.connect_db(dbname)
 
+        self.epics_pvs = {}
         wx.Frame.__init__(self, parent=parent, title='Epics Instruments',
                           size=(925, 400), **kwds)
 
@@ -97,7 +98,11 @@ class InstrumentFrame(wx.Frame):
             self.nb.DeleteAllPages()
 
         for inst in self.db.get_all_instruments():
-            self.add_instrument_page(inst)
+            if inst.show is None:
+                inst.show = 1
+            if int(inst.show) == 1:
+                self.add_instrument_page(inst)
+            
         # self.Thaw()
 
     def add_instrument_page(self, inst):
@@ -111,14 +116,13 @@ class InstrumentFrame(wx.Frame):
     def connect_pvs(self, inst, wait_time=2.0):
         """connect to PVs for an instrument.."""
         self.connected = False
-        pvobjs = []
         for pv in inst.pvs:
-            pvobjs.append(epics.PV(pv.name))
+            self.epics_pvs[pv.name]  = epics.PV(pv.name)
             time.sleep(0.002)
         t0 = time.time()
         while (time.time() - t0) < wait_time:
             time.sleep(0.002)
-            if all(x.connected for x in pvobjs):
+            if all(x.connected for x in self.epics_pvs.values()):
                 break
         return
         
@@ -176,11 +180,30 @@ class InstrumentFrame(wx.Frame):
         self.SetStatusText(text)
 
     def onAddInstrument(self, event=None):
-        EditInstrumentFrame(parent=self, db=self.db)
+        "add a new, empty instrument and start adding PVs"
+        newname = basename = 'New Instrument'
+        inst = self.db.get_instrument(newname)
+        count = 1
+        while inst is not None:
+            count += 1
+            newname = "%s(%i)" % (basename, count)
+            inst = self.db.get_instrument(newname)
+
+        inst = self.db.add_instrument(newname)
+
+        panel = InstrumentPanel(self, inst, db=self.db,
+                                size=(925, 300), 
+                                writer = self.write_message)
+
+        self.nb.AddPage(panel, inst.name, True)
+        EditInstrumentFrame(parent=self, db=self.db, inst=inst,
+                            epics_pvs=self.epics_pvs)
         
     def onEditInstrument(self, event=None):
+        "edit the current instrument"
         inst = self.nb.GetCurrentPage().inst
-        EditInstrumentFrame(parent=self, db=self.db, inst=inst)
+        EditInstrumentFrame(parent=self, db=self.db, inst=inst,
+                            epics_pvs=self.epics_pvs)
 
     def onSettings(self, event=None):
         try:
@@ -265,8 +288,16 @@ class InstrumentFrame(wx.Frame):
 
     def onClose(self, event):
         print 'Should Get Page List: '
-        print [self.nb.GetPage(i).inst for i in range(self.nb.GetPageCount())]
-        print 'Should save config file, order to database'
+        all_insts = self.db.get_all_instruments()
+        display_order = [self.nb.GetPage(i).inst.name for i in range(self.nb.GetPageCount())]
+
+        for inst in all_insts:
+            inst.show = 0
+            if inst.name in display_order:
+                inst.show = 1
+                inst.display_order = display_order.index(inst.name)
+        self.db.commit()
+
         self.config.write()
         finalize_epics()
         self.Destroy()
@@ -289,7 +320,7 @@ class InstrumentApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 
 if __name__ == '__main__':
     conf = None
-    dbname = 'Test.ein'
+    dbname = None # 'Test.ein'
     inspect = False
     if inspect:
         app = InstrumentApp(dbname=dbname, conf=conf)

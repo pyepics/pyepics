@@ -43,6 +43,7 @@ class InitialData:
     info    = [["version", "1.1"],
                ["verify_erase", "1"],
                ["verify_move",   "1"],
+               ["verify_overwrite",  "1"],
                ["epics_prefix",   ""],               
                ["create_date", '<now>'],
                ["modify_date", '<now>']]
@@ -58,7 +59,7 @@ def  make_newdb(dbname, server= 'sqlite'):
     
     instrument = NamedTable('instrument', metadata,
                             cols=[Column('show', Integer, default=1),
-                                  Column('order', Integer)])
+                                  Column('display_order', Integer, default=0)])
 
     command    = NamedTable('command', metadata,
                             cols=[StrCol('command'),
@@ -71,12 +72,12 @@ def  make_newdb(dbname, server= 'sqlite'):
                                  PointerCol('instrument')])
     
     instrument_precommand = NamedTable('instrument_precommand', metadata,
-                                       cols=[Column('iorder', Integer),
+                                       cols=[Column('order', Integer),
                                              PointerCol('command'),
                                              PointerCol('instrument')])
                                      
     instrument_postcommand = NamedTable('instrument_postcommand', metadata,
-                                        cols=[Column('iorder', Integer), 
+                                        cols=[Column('order', Integer), 
                                               PointerCol('command'),
                                               PointerCol('instrument')])
 
@@ -85,8 +86,10 @@ def  make_newdb(dbname, server= 'sqlite'):
     
     instrument_pv = Table('instrument_pv', metadata,
                           Column('id', Integer, primary_key=True), 
-                          PointerCol('instrument') ,
-                          PointerCol('pv'))
+                          PointerCol('instrument'),
+                          PointerCol('pv'),
+                          Column('display_order', Integer, default=0))
+
 
     position_pv = Table('position_pv', metadata,
                         Column('id', Integer, primary_key=True),
@@ -95,8 +98,6 @@ def  make_newdb(dbname, server= 'sqlite'):
                         PointerCol('pv'),
                         StrCol('value'))
     
-                        
-                        
     info       = Table('info', metadata,
                        Column('key', Text, primary_key=True, unique=True), 
                        StrCol('value'))

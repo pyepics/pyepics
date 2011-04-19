@@ -6,7 +6,7 @@ from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
      Closure, NumericCombo, pack, popup, SimpleText, \
      FileSave, FileOpen, SelectWorkdir 
 
-from utils import GUIColors, HideShow, YesNo, set_font_with_children
+from utils import GUIColors, set_font_with_children
 
 class SettingsFrame(wx.Frame) :
     """ GUI Configure Frame"""
@@ -15,13 +15,13 @@ class SettingsFrame(wx.Frame) :
         self.parent = parent
         self.db = db
 
-        style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL
+        style    = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL
         labstyle  = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.ALL
         rlabstyle = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL
         tstyle    = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL
 
         wx.Frame.__init__(self, None, -1,
-                          'Epics Instruments: General Settings')
+                          'Epics Instruments:  Settings')
 
         font = parent.GetFont()
 
@@ -35,75 +35,94 @@ class SettingsFrame(wx.Frame) :
         self.colors = GUIColors()
         panel.SetBackgroundColour(self.colors.bg)
 
-        title = SimpleText(panel, 'General Settings',
+        title = SimpleText(panel, 'Positions Settings',
                            font=titlefont,
                            minsize=(130, -1), 
                            colour=self.colors.title, style=tstyle)
 
-        lab_move = SimpleText(panel, 'Verify Move',  minsize=(95, -1), 
-                              style=tstyle)
-        lab_erase = SimpleText(panel, 'Verify Erase', minsize=(95, -1), 
-                               style=tstyle)
-        lab_owrite = SimpleText(panel, 'Verify Overwrite', minsize=(105, -1), 
-                               style=tstyle)
+        self.v_move   = wx.CheckBox(panel, -1, 'Verify Move')# , style=wx.ALIGN_RIGHT)
+        self.v_erase  = wx.CheckBox(panel, -1, 'Verify Erase ')# style=wx.ALIGN_RIGHT)
+        self.v_owrite = wx.CheckBox(panel, -1, 'Verify Overwrie')#, style=wx.ALIGN_RIGHT)
 
-        self.v_move  = YesNo(panel, defaultyes=True)
-        self.v_erase = YesNo(panel, defaultyes=True)
-        self.v_owrite = YesNo(panel, defaultyes=True)        
+        self.v_move.SetValue(1==int(self.db.get_info('verify_move')))
+        self.v_erase.SetValue(1==int(self.db.get_info('verify_erase')))
+        self.v_owrite.SetValue(1==int(self.db.get_info('verify_overwrite')))
+            
+        sizer.Add(title,        (0, 0), (1, 1), labstyle|wx.ALL, 5)
+        sizer.Add(self.v_move,  (1, 0), (1, 1), labstyle,  5)
+        sizer.Add(self.v_erase, (2, 0), (1, 1), labstyle,  5)        
+        sizer.Add(self.v_owrite,(3, 0), (1, 1), labstyle,  5)
 
-        sizer.Add(title, (0, 0), (1, 4), labstyle|wx.GROW|wx.ALL, 5)
-        sizer.Add(wx.StaticLine(panel, size=(150, -1), style=wx.LI_HORIZONTAL),
-                  (1, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 3)
 
-        sizer.Add(lab_move,     (2, 0), (1, 1), labstyle,  5)
-        sizer.Add(self.v_move,  (2, 1), (1, 1), labstyle,  5)
-        sizer.Add(lab_erase,    (3, 0), (1, 1), labstyle,  5)
-        sizer.Add(self.v_erase, (3, 1), (1, 1), labstyle,  5)        
-        sizer.Add(lab_owrite,   (2, 2), (1, 1), labstyle,  5)
-        sizer.Add(self.v_owrite,(2, 3), (1, 1), labstyle,  5)
+        sizer.Add(wx.StaticLine(panel, size=(2, 50), style=wx.LI_VERTICAL),
+                  (0, 2), (4, 1), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 3)
 
+
+        title = SimpleText(panel, ' Epics Database Connection:',
+                           font=titlefont,
+                           colour=self.colors.title, style=tstyle)
+
+        label = SimpleText(panel, 'DB Prefix:')
+        self.epics_prefix = wx.TextCtrl(panel, -1, value='', size=(160, -1))
+        pref = None
+        try:
+            pref = self.db.get_info('epics_prefix')
+        except:
+            pass
+        if pref is None:
+            pref = ''
+        self.epics_prefix.SetValue(pref)
+
+        sizer.Add(title,             (0, 3), (1, 2), labstyle|wx.GROW|wx.ALL, 5)
+        sizer.Add(label,             (1, 3), (1, 1), labstyle|wx.ALL, 5)
+        sizer.Add(self.epics_prefix, (1, 4), (1, 1), labstyle|wx.GROW|wx.ALL, 5)
+
+        
         irow = 4
         sizer.Add(wx.StaticLine(panel, size=(150, -1), style=wx.LI_HORIZONTAL),
-                  (irow, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 3)
+                  (irow, 0), (1, 5), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 3)
 
-        title = SimpleText(panel, 'Show / Hide Instruments',
+        title = SimpleText(panel, 'Show Instruments:',
                            font=titlefont,
                            minsize=(130, -1), 
                            colour=self.colors.title, style=tstyle)
         irow += 1
-        sizer.Add(title, (irow, 0), (1, 4), labstyle|wx.GROW|wx.ALL, 3)
+        sizer.Add(title, (irow, 0), (1, 2), labstyle|wx.ALL, 3)
         self.hideframes = {}
+        strlen = 24
+        for inst in self.db.get_all_instruments():
+            strlen = max(strlen, len(inst.name))
+        
         for inst in self.db.get_all_instruments():
             irow += 1
             isshown = inst.name in self.get_page_map()
-            hide_inst = HideShow(panel, default=isshown)
-            self.hideframes[inst.name] = hide_inst
-            label= SimpleText(panel, inst.name,  minsize=(120, -1),
-                              style=labstyle)
-            sizer.Add(label,     (irow, 0), (1, 1), labstyle|wx.GROW|wx.ALL,  5)
-            sizer.Add(hide_inst, (irow, 1), (1, 1), labstyle,  5)
+
+            iname = (inst.name + ' '*strlen)[:strlen]
+            cb = wx.CheckBox(panel, -1, iname)#, style=wx.ALIGN_RIGHT)
+            cb.SetValue(isshown)
+            self.hideframes[inst.name] = cb
+            sizer.Add(cb, (irow, 0), (1, 1), labstyle,  5)
 
         irow += 1
         sizer.Add(wx.StaticLine(panel, size=(150, -1), style=wx.LI_HORIZONTAL),
-                  (irow, 0), (1, 4), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 5)        
+                  (irow, 0), (1, 5), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 5)        
 
         btn_ok     = add_button(panel, 'OK',     size=(70, -1), action=self.onOK)
         btn_cancel = add_button(panel, 'Cancel', size=(70, -1), action=self.onCancel)
                             
         irow += 1
-        sizer.Add(btn_ok,     (irow, 0), (1, 1), labstyle|wx.GROW|wx.ALL,  5)
-        sizer.Add(btn_cancel, (irow, 1), (1, 1), labstyle|wx.GROW|wx.ALL,  5)
+        sizer.Add(btn_ok,     (irow, 0), (1, 1), labstyle|wx.ALL,  5)
+        sizer.Add(btn_cancel, (irow, 1), (1, 1), labstyle|wx.ALL,  5)
 
+        set_font_with_children(self, font)
+        
         pack(panel, sizer)
 
         mainsizer = wx.BoxSizer(wx.VERTICAL)
         mainsizer.Add(panel, 1, wx.GROW|wx.ALL, 1)
 
+
         pack(self, mainsizer)
-
-        set_font_with_children(self, font)
-
-        self.Layout()
         self.Show()
         self.Raise()
 
@@ -114,17 +133,19 @@ class SettingsFrame(wx.Frame) :
         return out
         
     def onOK(self, event=None):
-        self.db.set_info('verify_move',      str(self.v_move.GetSelection()))
-        self.db.set_info('verify_erase',     str(self.v_erase.GetSelection()))
-        self.db.set_info('verify_overwrite', str(self.v_owrite.GetSelection()))
+        yesno = {True: 1, False: 0}
+        self.db.set_info('verify_move',      yesno[self.v_move.IsChecked()])
+        self.db.set_info('verify_erase',     yesno[self.v_erase.IsChecked()])
+        self.db.set_info('verify_overwrite', yesno[self.v_owrite.IsChecked()])
 
         pagemap = self.get_page_map()
-        for pagename, wid in self.hideframes.items():
-            if wid.GetSelection() == 0 and pagename in pagemap:
+        for pagename, cb in self.hideframes.items():
+            checked = cb.IsChecked()
+            if not checked and pagename in pagemap:
                 self.parent.nb.DeletePage(pagemap[pagename])
                 pagemap = self.get_page_map()
                 
-            elif wid.GetSelection() == 1 and pagename not in pagemap:
+            elif checked and pagename not in pagemap:
                 inst = self.db.get_instrument(pagename)
                 self.parent.add_instrument_page(inst)
                 pagemap = self.get_page_map()

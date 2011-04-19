@@ -15,7 +15,7 @@ import epics
 import time
 from datetime import datetime
 
-from utils import backup_versions, save_backup
+from utils import backup_versions, save_backup, get_pvtypes
 from creator import make_newdb
 
 from sqlalchemy import MetaData, create_engine, and_
@@ -137,6 +137,15 @@ class PV(_BaseTable):
     "pv table"
     name, notes = None, None
 
+class Instrument_PV(_BaseTable):
+    "intruemnt-pv join table"
+    name, id, instrument, pv, display_order = None, None, None, None, None
+    def __repr__(self):
+        name = self.__class__.__name__
+        fields = ['%s/%s' % (getattr(getattr(self, 'instrument', '?'),'name','?'),
+                             getattr(getattr(self, 'pv', '?'), 'name', '?'))]
+        return "<%s(%s)>" % (name, ', '.join(fields))
+
 class Instrument_Precommand(_BaseTable):
     "instrument precommand table"
     name, notes = None, None
@@ -209,6 +218,10 @@ class InstrumentDB(object):
                properties={'instrument': relationship(Instrument,
                                                       backref='positions'),
                            'pvs': relationship(Position_PV) })
+
+        mapper(Instrument_PV, tables['instrument_pv'],
+               properties={'pv':relationship(PV),
+                           'instrument':relationship(Instrument)})
 
         mapper(Position_PV, tables['position_pv'], 
                properties={'pv':relationship(PV)})
@@ -316,7 +329,7 @@ arguments
     def get_all_instruments(self):
         """return instrument list
         """
-        return [f for f in self.query(Instrument)]
+        return [f for f in self.query(Instrument).order_by(Instrument.display_order)]
 
     def get_instrument(self, name):
         """return instrument by name
@@ -326,6 +339,14 @@ arguments
         out = self.query(Instrument).filter(Instrument.name==name).all()
         return None_or_one(out, 'get_instrument expected 1 or None Instrument')
 
+    def get_ordered_instpvs(self, inst):
+        """get ordered list of PVs for an instrument"""
+        inst = self.get_instrument(inst)
+        IPV = Instrument_PV
+        return self.query(IPV).filter(IPV.instrument_id==inst.id
+                                      ).order_by(IPV.display_order).all()
+
+        
     def set_pvtype(self, name, pvtype):
         """ set a pv type"""
         pv = self.get_pv(name)
@@ -410,8 +431,12 @@ arguments
         kws['attributes'] = attributes
         print " =instrument=  add_pv ", name, pvtype
         row = self.__addRow(PV, ('name',), (name,), **kws)
-        if pvtype is not None:
+        if pvtype is None:
+            self.pvs[name] = epics.PV(name)
+            self.pvs[name].get()            
+            pvtype = get_pvtypes(self.pvs[name])[0]
             self.set_pvtype(name, pvtype)
+            
         self.session.add(row)
         self.commit()
         return row
