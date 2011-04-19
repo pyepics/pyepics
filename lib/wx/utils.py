@@ -7,6 +7,13 @@ especially useful for wx functionality
 import wx
 import fpformat
 
+HAS_NUMPY = False
+try:
+    import numpy
+    HAS_NUMPY = True
+except ImportError:
+    pass
+
 # some common abbrevs for wx ALIGNMENT styles
 RIGHT = wx.ALIGN_RIGHT
 LEFT  = wx.ALIGN_LEFT
@@ -44,15 +51,22 @@ def set_sizer(panel, sizer=None, style=wx.VERTICAL, fit=False):
     if fit:
         sizer.Fit(panel)
 
-def set_float(val, default=None):
+def set_float(val):
     """ utility to set a floating value,
     useful for converting from strings """
-    if val in (None, ''):
-        return default
-    try:
-        return float(val)
-    except ValueError:
-        return default
+    out = None
+    if not val in (None, ''):
+        try:
+            out = float(val)
+        except ValueError:
+            return None
+        if HAS_NUMPY:
+            if numpy.isnan(out):
+                out = default
+        else:
+            if not(out > 0) and not(out<0) and not(out==0):
+                out = default
+    return out
 
 
 ###
@@ -251,7 +265,7 @@ class FloatCtrl(wx.TextCtrl):
     def SetMax(self, val):
         "set max value"        
         self.__max = set_float(val)
-    
+            
     def __CheckValid(self, value):
         "check for validity of value"
         val = self.__val
