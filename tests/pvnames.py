@@ -13,7 +13,7 @@ double_pv_prec = 4
 
 double_pv2 = 'Py:ao2'
 
-pause_pv  = 'Py:mbbo2'
+pause_pv  = 'Py:pause'
 #### 2
 # this pv should be an ENUM. It will NOT be set.
 # provide the names of the ENUM states

@@ -82,6 +82,8 @@ class PV(object):
                                       use_time= self.form == 'time')
         
         self._args['type'] = dbr.Name(self.ftype).lower()
+        self.context = ca.current_context()
+
         if callback is not None:
             self.add_callback(callback)
 
@@ -136,6 +138,11 @@ class PV(object):
 
     def wait_for_connection(self, timeout=None):
         """wait for a connection that started with connect() to finish"""
+
+        # make sure we're in the CA context used to create this PV
+        if self.context != ca.current_context():
+            ca.attach_context(self.context)
+
         if not self._conn_started:
             self.connect()
         if not self.connected:

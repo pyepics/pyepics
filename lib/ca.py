@@ -269,15 +269,15 @@ def finalize_libca(maxtime=10.0):
 def show_cache(print_out=True):
     """Show list of cached PVs"""
     out = []
-    out.append('#  PV name    Is Connected?   Channel ID  Context')
+    out.append('#  PVName  ChannelID  Connected? Context')
     out.append('#---------------------------------------')
     global _cache
     for context, context_chids in  list(_cache.items()):
         for vname, val in list(context_chids.items()):
-            out.append(" %s  %s   %s  %i" % (vname,
-                                        repr(isConnected(val['chid'])),
-                                        repr(val['chid']),
-                                        context))
+            out.append(" %s  %s   %s  %s" % (vname,
+                                             repr(val['chid']),
+                                             repr(isConnected(val['chid'])),
+                                             repr(context)))
     out = strjoin('\n', out)
     if print_out:
         write(out)
