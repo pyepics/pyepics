@@ -274,8 +274,9 @@ def show_cache(print_out=True):
     global _cache
     for context, context_chids in  list(_cache.items()):
         for vname, val in list(context_chids.items()):
-            out.append(" %s  %s  %i" % (vname,
+            out.append(" %s  %s   %s  %i" % (vname,
                                         repr(isConnected(val['chid'])),
+                                        repr(val['chid']),
                                         context))
     out = strjoin('\n', out)
     if print_out:
@@ -516,10 +517,10 @@ def context_destroy():
     return ret
     
 @withCA
+@withSEVCHK
 def attach_context(context):
     "attach a context"        
-    ret = libca.ca_attach_context(context) 
-    return PySEVCHK('attach_context', ret, dbr.ECA_ISATTACHED)
+    return libca.ca_attach_context(context) 
         
 @withCA
 def detach_context():
@@ -940,18 +941,20 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     # wait with callback (or put_complete) 
     pvname = name(chid)
     _put_done[pvname] = (False, callback, callback_data)
+    start_time = time.time()
     ret = libca.ca_array_put_callback(ftype, count, chid,
                                       data, _CB_PUTWAIT, 0)
     PySEVCHK('put', ret)
     poll(evt=1.e-4, iot=0.05)
     if wait:
-        start_time, finished = time.time(), False
+        finished = False
         while not finished:
             poll()
             finished = (_put_done[pvname][0] or
                         (time.time()-start_time) > timeout)
         if not _put_done[pvname][0]:
             ret = -ret
+
     return ret
 
 @withConnectedCHID
