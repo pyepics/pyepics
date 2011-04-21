@@ -14,8 +14,8 @@ import numpy
 
 prefix = 'Py:'
 def make_pvs(*args, **kwds):
-    print "Make PVS '  ", prefix,  args
-    print  [("%s%s" % (prefix, name)) for name in args]
+    #print "Make PVS '  ", prefix,  args
+    #print  [("%s%s" % (prefix, name)) for name in args]
     s = [epics.PV("%s%s" % (prefix, name)) for name in args]
     for i in s: i.connect()
     return s
@@ -69,7 +69,6 @@ double_waves[2].put([random.random() for i in range(65536)])
 
 pause_pv.put(0)
 
-
 str_waves[0].put([" String %i" % (i+1) for i in range(128)])
 
 text = '''line 1
@@ -96,12 +95,14 @@ while True:
     count = count + 1
     # pause for up to 15 seconds if pause was selected
     t0 = time.time()
-    while pause_pv.get() == 1:
-        time.sleep(0.5)
-        if time.time() - t0 > 15:
-            pause_pv.put(0)
-
-
+    if pause_pv.get() == 1:
+        t0 = time.time()
+        time.sleep(10)
+        while time.time()-t0 < 15:
+            time.sleep(0.25)
+            if pause_pv.get() == 0:
+                break
+            
     analogs[0].put(count/1000.0)
     analogs[1].put(1.2*(time.time()-t0))
     analogs[2].put(count/10.)
@@ -110,7 +111,7 @@ while True:
         long_update=tx
         lcount = (lcount + 1) % 10
         longs[0].put(lcount)
-        print text[lcount]
+        print ' >> ', text[lcount]
         char_waves[1].put(text[lcount])
 
 
