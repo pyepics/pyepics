@@ -66,7 +66,9 @@ class PV(object):
         self._args['type'] = 'unknown'
         self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
-        self.connection_callback = connection_callback
+        self.connection_callbacks = []
+        if connection_callback is not None:
+            self.connection_callbacks = [connection_callback]
         self.callbacks  = {}
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
@@ -120,10 +122,11 @@ class PV(object):
                                          use_time=(self.form == 'time'),
                                          callback=self.__on_changes)
 
-        if hasattr(self.connection_callback, '__call__'):
-            self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
-        elif not conn and self.verbose:
-            ca.write("PV '%s' disconnected." % pvname)
+        for conn_cb in self.connection_callbacks:
+            if hasattr(conn_cb, '__call__'):
+                conn_cb(pvname=self.pvname, conn=conn, pv=self)
+            elif not conn and self.verbose:
+                ca.write("PV '%s' disconnected." % pvname)
 
         # waiting until the very end until to set self.connected prevents
         # threads from thinking a connection is complete when it is actually
@@ -206,7 +209,7 @@ class PV(object):
         if not self.wait_for_connection():
             return None
         if (self.ftype in (dbr.ENUM, dbr.TIME_ENUM, dbr.CTRL_ENUM) and
-            isinstance(value, str) and value in self._args['enum_strs']):
+            isinstance(value, (str, unicode)) and value in self._args['enum_strs']):
             value = self._args['enum_strs'].index(value)
         if use_complete and callback is None:
             callback = self.__putCallbackStub

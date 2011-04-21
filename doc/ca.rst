@@ -878,8 +878,8 @@ initial connection::
     import epics
     import time
 
-    def onConnectionChange(pvname=None,  **kw):
-        print 'ca connection status changed:  ', pvname,  kw
+    def onConnectionChange(pvname=None, conn=None, chid=None):
+        print 'ca connection status changed:  ', pvname,  conn, chid
 
     # create channel, provide connection callback
     motor1 = '13IDC:m1'
@@ -892,6 +892,6 @@ initial connection::
 
 This will run the supplied callback soon after the channel has been
 created, when a successful connection has been made.  Note that the
-callback should be prepared to accept keyword arguments and that the `**kw`
-form is recommended. 
-
+callback should be prepared to accept keyword arguments of `pvname`,
+`chid`, and `conn` for the PV name, channel ID, and connection state
+(`True` or `False`).

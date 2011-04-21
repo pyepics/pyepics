@@ -21,10 +21,10 @@ source distribution kit.
 wx Widgets for Epics
 =================================
 
-pvCtrlMixin
+pvMixin
 ~~~~~~~~~~~~
 
-.. class:: pvCtrlMixin(parent, pv=None, font=None, fg=None, bg=None, **kw)
+.. class:: pvMixin(parent, pv=None, font=None, fg=None, bg=None, **kw)
 
    This is a mixin class for wx Controls with epics PVs:  This connects to
    PV, and manages callback events for the PV. 

@@ -92,7 +92,7 @@ lcount =1
 
 epics.ca.show_cache()
 while True:
-    time.sleep(0.1) 
+    time.sleep(0.5) 
     count = count + 1
     # pause for up to 15 seconds if pause was selected
     t0 = time.time()
@@ -104,6 +104,7 @@ while True:
 
     analogs[0].put(count/1000.0)
     analogs[1].put(1.2*(time.time()-t0))
+    analogs[2].put(count/10.)
     tx = time.time()
     if tx-long_update >= 1:
         long_update=tx

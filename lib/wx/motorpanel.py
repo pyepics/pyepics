@@ -17,7 +17,7 @@ from epics.wx.wxlib import pvText, pvFloatCtrl, \
 
 from epics.wx.motordetailframe  import MotorDetailFrame
 
-from utils import LCEN, RCEN, CEN, LTEXT, RIGHT
+from epics.wx.utils import LCEN, RCEN, CEN, LTEXT, RIGHT
 
 
 class MotorPanel(wx.Panel):
@@ -28,7 +28,8 @@ class MotorPanel(wx.Panel):
     __motor_fields = ('SET', 'disabled', 'LLM', 'HLM',  'LVIO', 'TWV',
                       'HLS', 'LLS', 'SPMG', 'DESC')
 
-    def __init__(self, parent,  motor=None,  full=True,
+    
+    def __init__(self, parent,  motor=None,  full=True, midsize=False,
                  messenger=None, prec=None, **kw):
 
         wx.Panel.__init__(self, parent, style=wx.TAB_TRAVERSAL)
@@ -43,6 +44,9 @@ class MotorPanel(wx.Panel):
 
         self.motor = None
         self.is_full = full
+        self._size = 'full'
+        if midsize:
+            self._size = 'med'
         self.__sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.CreatePanel()
 
@@ -103,6 +107,8 @@ class MotorPanel(wx.Panel):
     def CreatePanel(self):
         " build (but do not fill in) panel components"
         wdesc, wrbv, winfo, wdrv = 200, 105, 90, 120
+        if self._size == 'med':
+            wdesc, wrbv, winfo, wdrv = 140, 85, 80, 100
         if not self.is_full:
             wdesc, wrbv, winfo, wdrv = 95, 80, 80, 80
         
@@ -139,10 +145,10 @@ class MotorPanel(wx.Panel):
 
             self.stopbtn = stopbtn
         
-        spacer = wx.StaticText(self, label=' ', size=(10, 10), style=RIGHT) 
-        self.__sizer.AddMany([(spacer,      0, CEN),
-                              (self.desc,   0, LCEN),
-                              (self.info,   0, CEN),
+        spacer = wx.StaticText(self, label=' ', size=(5, 5), style=RIGHT) 
+        self.__sizer.AddMany([(spacer,      1, CEN),
+                              (self.desc,   1, LCEN),
+                              (self.info,   1, CEN),
                               (self.rbv,    0, CEN),
                               (self.drive,  0, CEN)])
         if self.is_full:
