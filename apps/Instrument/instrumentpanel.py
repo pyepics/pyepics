@@ -2,6 +2,8 @@ import wx
 from wx._core import PyDeadObjectError
 
 import time
+from threading import Thread
+
 import epics
 from epics.wx import EpicsFunction, pvText, pvFloatCtrl, pvTextCtrl, pvEnumChoice
 from epicscollect.gui import  pack, popup, add_button, SimpleText
@@ -156,9 +158,12 @@ class InstrumentPanel(wx.Panel):
         # start a timer to check for when to fill in PV panels
         timer_id = wx.NewId()
         self.etimer = wx.Timer(self)
+        self.puttimer = wx.Timer(self)        
         self.etimer_count = 0
         self.etimer_poll = 50
-        self.Bind(wx.EVT_TIMER, self.onTimer, self.etimer)
+
+        self.Bind(wx.EVT_TIMER, self.OnConnectTimer, self.etimer)
+        self.Bind(wx.EVT_TIMER, self.OnPutTimer, self.puttimer)
 
         self.leftpanel = lpanel
         self.leftsizer = lsizer
@@ -166,11 +171,9 @@ class InstrumentPanel(wx.Panel):
         for ordered_pvs in self.db.get_ordered_instpvs(inst):
             self.add_pv(ordered_pvs.pv.name)
 
-        self.redraw_leftpanel()
-
         rsizer = wx.BoxSizer(wx.VERTICAL)
         btn_goto = add_button(rpanel, "Go To",  size=(70, -1),
-                              action=self.onGo)
+                              action=self.OnMove)
         btn_erase = add_button(rpanel, "Erase",  size=(70, -1),
                                action=self.onErase)
         
@@ -200,10 +203,22 @@ class InstrumentPanel(wx.Panel):
         sizer.Add(splitter, 1, wx.GROW|wx.ALL, 0)        
         pack(self, sizer)
 
+    def undisplay_pv(self, pvname):
+        "remove pv from display"
+        thisentry = None
+        for entry in self.pv_components:
+            if entry[0] == pvname:
+                thisentry = entry
+                break
+        if thisentry is not None:
+            self.pv_components.remove(thisentry)
+            self.redraw_leftpanel()
+            
     def redraw_leftpanel(self, announce=False):
         """ redraws the left panel """
+        self.Freeze()
+        self.Hide()
         self.leftsizer.Clear()
-        self.leftpanel.Hide()
         self.leftsizer.Add(self.toprow, 0,  wx.GROW|wx.ALIGN_LEFT|wx.TOP, 1)
 
         current_comps = [self.toprow]
@@ -215,16 +230,18 @@ class InstrumentPanel(wx.Panel):
         for wid in self.leftpanel.Children:
             if wid not in current_comps and wid != self.toprow:
                 try:
-                    time.sleep(0.005)
+                    time.sleep(0.010)
                     wid.Destroy()
                 except PyDeadObjectError:
                     pass
-        self.leftpanel.Show()
+
         self.Refresh()
         self.Layout()
+        self.Thaw()        
+        self.Show()            
         if announce:
             print 'Redraw Left Panel: %i components ' % (len(self.leftpanel.Children))
-        
+
     def add_pv(self, pvname):
         """add a PV to the left panel"""
         wid = wx.StaticText(self.leftpanel,
@@ -240,25 +257,31 @@ class InstrumentPanel(wx.Panel):
             return
         self.write_message(msg, status=status) 
         
-    def onTimer(self, evt=None):
+    def OnPutTimer(self, evt=None):
+        """Timer Event for GoTo to look if move is complete."""
+        if self.db.restore_complete():
+            self.puttimer.Stop()
+            print 'would do inst post commands now!'
+
+    def OnConnectTimer(self, evt=None):
         """Timer Event: look for uncompleted PV panels
         and try to create them ...
         """
         if all([comp[1] for comp in self.pv_components]): # "all connected"
             self.etimer.Stop()
-        
+
         for component in self.pv_components:
             pvname, cnx, wid = component
             self.PV_Panel(pvname)
 
-        # if we've done 100 rounds, there are probably
+        # if we've done 20 rounds, there are probably
         # really unconnected PVs -- let's slow down.
         self.etimer_count += 1
-        if self.etimer_count > 100:
+        if self.etimer_count > 20:
             self.etimer.Stop()
             self.etimer_count = 0
             self.etimer_poll *=  2
-            self.etimer_poll = min(self.etimer_poll, 10000)
+            self.etimer_poll = min(self.etimer_poll, 5000)
             self.etimer.Start(self.etimer_poll)
             
     @EpicsFunction
@@ -355,17 +378,17 @@ class InstrumentPanel(wx.Panel):
             self.pos_list.Append(posname)
 
     @EpicsFunction
-    def restore_position(self, posname, exclude_pvs=None, timeout=5.0):
-        self.db.restore_position(posname, self.inst, wait=True, 
+    def restore_position(self, posname, exclude_pvs=None, timeout=60.0):
+        self.db.restore_position(posname, self.inst, 
                                  exclude_pvs=exclude_pvs)
-
-        msg= "Moved '%s' to position '%s'" % (self.inst.name, posname)
+        msg= "Moving to '%s' to position '%s'" % (self.inst.name, posname)
         if exclude_pvs is not None and len(exclude_pvs) > 0:
             msg = "%s (Partial: %i PVs not restored)" % (msg, len(exclude_pvs))
         self.write(msg)
+        self.puttimer.Start(0.025)
         
-    def onGo(self, evt=None):
-        """ on GoTo"""
+    def OnMove(self, evt=None):
+        """ on GoTo """
         posname = self.pos_list.GetStringSelection()
         thispos = self.db.get_position(posname, self.inst)
         if thispos is None:

@@ -320,7 +320,7 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
             if delctrl.GetSelection() == 1:
                 instpv = db.get_pv(pvname)
                 inst.pvs.remove(instpv)
-                instapanel.redraw_leftpanel()                
+                instpanel.undisplay_pv(pvname)
             else:
                 newtype = typectrl.GetStringSelection()
                 curtype= db.get_pv(pvname).pvtype.name

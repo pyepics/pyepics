@@ -93,7 +93,7 @@ class InstrumentFrame(wx.Frame):
         self.Refresh()
 
     def create_nbpages(self):
-        #self.Freeze()
+        self.Freeze()
         if self.nb.GetPageCount() > 0:
             self.nb.DeleteAllPages()
 
@@ -103,7 +103,7 @@ class InstrumentFrame(wx.Frame):
             if int(inst.show) == 1:
                 self.add_instrument_page(inst)
             
-        # self.Thaw()
+        self.Thaw()
 
     def add_instrument_page(self, inst):
         self.connect_pvs(inst, wait_time=1.0)
@@ -215,9 +215,12 @@ class InstrumentFrame(wx.Frame):
         # First we create and fill the info object
         info = wx.AboutDialogInfo()
         info.Name = "Epics Instruments"
-        info.Version = "0.1"
+        info.Version = "0.2"
         info.Copyright = "2011, Matt Newville, University of Chicago"
-        info.Description = """'Epics Instruments' is an application to save and restore Instrument Positions.  Here,an Instrument is defined as a collection of Epics Process Variable and a Position is defined as any named set of values for those Process Variables"""
+        info.Description = """
+        Epics Instruments is an application to save and restore Instrument Positions.
+        An Instrument is defined as a collection of Epics Process Variable and a
+        Position is defined as any named set of values for those Process Variables"""
         wx.AboutBox(info)
 
     def onOpen(self, event=None):
@@ -242,9 +245,7 @@ class InstrumentFrame(wx.Frame):
                            default_file=self.dbname)
 
         # save current tab/instrument mapping
-        insts = [(i, self.nb.GetPage(i).inst.name) for i in range(self.nb.GetPageCount())]
-        print 'onSave ', outfile
-        if outfile is not None:
+        if outfile not in (None, self.dbname):
             self.db.close()
             shutil.copy(self.dbname, outfile)
             time.sleep(1)
@@ -255,6 +256,8 @@ class InstrumentFrame(wx.Frame):
             self.db = InstrumentDB(outfile)
 
             # set current tabs to the new db
+            insts = [(i, self.nb.GetPage(i).inst.name) for i in range(self.nb.GetPageCount())]
+            
             for nbpage, name in insts:
                 self.nb.GetPage(nbpage).db = self.db
                 self.nb.GetPage(nbpage).inst = self.db.get_instrument(name)
@@ -269,29 +272,14 @@ class InstrumentFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             font = dlg.GetFontData().GetChosenFont()
             set_font_with_children(self, font)
-            #print font.PointSize, font.GetWeightString(), \
-            #      font.GetStyleString(), font.GetFaceName()
-
-            # print dir(font)
-            #for i in range(self.nb.GetPageCount()):
-            #    print '===================='
-            #    print i,  self.nb.GetPageText(i)
-            #for x in dir(page):
-            #    if 'set' in x.lower() or 'page' in x.lower():
-            #        print x
-            #print '===================='
-                
             self.Refresh()
             self.Layout()
-
         dlg.Destroy()
 
     def onClose(self, event):
-        print 'Should Get Page List: '
-        all_insts = self.db.get_all_instruments()
         display_order = [self.nb.GetPage(i).inst.name for i in range(self.nb.GetPageCount())]
 
-        for inst in all_insts:
+        for inst in self.db.get_all_instruments():
             inst.show = 0
             if inst.name in display_order:
                 inst.show = 1

@@ -13,6 +13,7 @@ import os
 import json
 import epics
 import time
+from threading import Thread
 from datetime import datetime
 
 from utils import backup_versions, save_backup, get_pvtypes
@@ -22,6 +23,9 @@ from sqlalchemy import MetaData, create_engine, and_
 from sqlalchemy.orm import sessionmaker,  mapper, clear_mappers, relationship
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import  NoResultFound
+
+
+
 
 def isInstrumentDB(dbname):
     """test if a file is a valid Instrument Library file:
@@ -429,7 +433,6 @@ arguments
         
         kws['notes'] = notes
         kws['attributes'] = attributes
-        print " =instrument=  add_pv ", name, pvtype
         row = self.__addRow(PV, ('name',), (name,), **kws)
         if pvtype is None:
             self.pvs[name] = epics.PV(name)
@@ -528,7 +531,7 @@ arguments
             return all([p.put_complete for p in self.restoring_pvs])
         return True
         
-    def restore_position(self, posname, inst, wait=False,
+    def restore_position(self, posname, inst, wait=False, timeout=5.0, 
                          exclude_pvs=None):
         """restore named position for instrument
         """
@@ -538,35 +541,35 @@ arguments
             raise InstrumentDBException(
                 'restore_postion needs valid instrument')
             
-        for pv in inst.pvs:
-            pvname = pv.name
-            if isinstance(pvname, unicode):
-                pvname = str(pvname)
-                
-            if pvname not in self.pvs:
-                self.pvs[pvname] = epics.PV(pvname)
-                time.sleep(1.e-3)
-
         posname = posname.strip()
         pos  = self.get_position(posname, inst)
         if pos is None:
             raise InstrumentDBException(
                 "restore_postion  position '%s' not found" % posname)
         
-        if exclude_pvs is None:
-            exclude_pvs = []
-            
         print 'Pre_Commands: ', inst.precommands
-        self.restoring_pvs = []
+        pvvals = {}        
         for pvpos in pos.pvs:
-            pvname = pvpos.pv.name
-            value  = pvpos.value
+            pvvals[pvpos.pv.name] = pvpos.value
+
+            
+
+        self.restoring_pvs = []
+        epics_pvs = {}
+        for pvname in pvvals:
             if pvname not in exclude_pvs:
-                thispv = self.pvs[pvname]
-                thispv.connect()
-                thispv.get_ctrlvars()
-                thispv.put(value, use_complete=wait)
+                epics_pvs[pvname] =  epics.PV(pvname)
+
+        for pvname, value in pvvals.items():
+            if pvname not in exclude_pvs:
+                thispv = epics_pvs[pvname]
                 self.restoring_pvs.append(thispv)
+                if not thispv.connected:
+                    thispv.wait_for_connection()
+                    thispv.get_ctrlvars()
+                thispv.put(value, use_complete=True)
 
+        # self.move_epics_pvs(pos.pvs, exclude_pvs, wait=wait, timeout=timeout)
+            
+        # print 'Post_Commands:',  inst.postcommands
 
-        print 'Post_Commands:',  inst.postcommands
