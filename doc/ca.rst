@@ -148,8 +148,11 @@ threading contexts are very close to the C library:
 .. function::  context_create()
 .. function::  create_context()
 
-   This will create a new context, using the value of
-   :data:`PREEMPTIVE_CALLBACK` to set the context type.
+   This will create a new context, using the value of :data:`PREEMPTIVE_CALLBACK` to set
+   the context type. Note that CA library function has the irritating name of
+   *context_create*.  Both that and *create_context* (which is more consistent with the
+   Verb_Object of the rest of the CA library) are allowed.
+
 
 .. function::  context_destroy()
 .. function::  destroy_context()

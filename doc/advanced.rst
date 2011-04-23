@@ -166,15 +166,26 @@ throughout an entire process.  This avoids many potential pitfalls (and
 crashes), and can be done fairly simply.  The most explicit way to do
 this is to call :meth:`epics.ca.use_initial_context` at the beginning of
 each function (before any CA calls) that will be called by
-:meth:`Thread.run`.   For functions that might be called either in the
-main thread or in a new thread, this incurs very little penalty, but it
-is a little intrusive to put this at the beginning of each function.
+:meth:`Thread.run`.  Equivalently, you can add a
+:func:`withInitialContext` decorator to the function.  For functions
+that might be called either in the main thread or in a new thread, this
+addition incurs very little penalty, but it is a little intrusive to
+have to do this for each function.
 
-Another option is to use the :class:`CAThread` in the :mod:`ca`
-module.  This is a very thin wrapper around the standard
-:class:`threading.Thread` which does this call of
-:meth:`epics.ca.use_initial_context` for you just before your threaded
-function is run.
+There is an important caveat for using
+:meth:`epics.ca.use_initial_context` which is that CA must actually be
+initialized *in the main thread* for this to work.  If you are writing a
+threaded application in which the first real CA calls are inside a child
+thread, you must either initialize the CA library (say, by creating a
+PV), or use the :func:`epics.ca.create_context` /
+:func:`epics.ca.destroy_context` method.
+
+Another option is to use the :class:`CAThread` in the :mod:`ca` module
+instead of the standard :class:`threading.Thread` class.
+:class:`CAThread` is a very thin wrapper around the standard
+:class:`threading.Thread`, simply adding a call of
+:meth:`epics.ca.use_initial_context` just before your threaded function
+is run.
 
 To recap, the options for using threads (in approximate order of
 reliabilty) are:
@@ -222,7 +233,7 @@ other.::
             print '      %s = %s (%s)' % (pvname, char_value, run_name)
 
         # A new CA context must be created per thread
-        epics.ca.context_create()
+        epics.ca.create_context()
         t0 = time.time()
         pvs = []
         for pvn in pvnames:
@@ -236,8 +247,9 @@ other.::
         for p in pvs:
             p.clear_callbacks()
         print 'Done with Thread ', run_name
-	epics.ca.context_destroy()
+	epics.ca.destroy_context()
 
+    epics.ca.initialize_libca()
     print "Run 2 Threads simultaneously:"
     th1 = Thread(target=run_test,args=(3, pvlist1,  'A'))
     th1.start()
@@ -250,9 +262,7 @@ other.::
 
     print 'Done'
 
-The calls to `epics.ca.context_create()` and `epics.ca.context_destroy()`
-are required: forgetting them will suppress all callbacks, and is likely to
-to lead in core dumps.  The output from this will look like::
+The output from this will look like::
 
     Run 2 Threads simultaneously:
      |-> thread  "A"  will run for 3.000 sec
@@ -297,7 +307,6 @@ Note also that the callbacks for the PVs created in each thread are
 
 Without this, the callbacks for thread *A*  will persist even after the
 thread has completed!!!
-
 
 .. _advanced-sleep-label:
 
