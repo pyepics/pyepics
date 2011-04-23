@@ -16,10 +16,12 @@ from  pvnames import updating_pvlist
 write = sys.stdout.write
 flush = sys.stdout.flush
 
+epics.ca.PREEMPTIVE_CALLBACK=True
 def create_pvs_test(pvnames, runtime, run_name, create_ctx=False, init_ctx=True):
     write(' -> create_pvs thread=%s will run for %.3f sec\n' % (run_name, runtime))
     write(' -> thread=%s: create_ctx=%s, init_ctx=%s\n' % (run_name, create_ctx, init_ctx))
 
+    # print 'Thread: current context= ', epics.ca.current_context()
     def onChanges(pvname=None, value=None, char_value=None, **kw):
         write('   %s= %s (%s)\n' % (pvname, char_value, run_name))
         flush()
@@ -35,7 +37,6 @@ def create_pvs_test(pvnames, runtime, run_name, create_ctx=False, init_ctx=True)
         p = epics.PV(pvn)
         p.get()
         p.add_callback(onChanges)
-
         pvs.append(p)
 
     while time.time()-t0 < runtime:
@@ -51,6 +52,7 @@ def pass_pvs_test(pvs, runtime, run_name, create_ctx=False, init_ctx=False):
     write(' -> pass_pvs thread=%s will run for %.3f sec\n' % (run_name, runtime))
     write(' -> thread=%s: create_ctx=%s, init_ctx=%s\n' % (run_name, create_ctx, init_ctx))
 
+    # print 'Thread: current context= ', epics.ca.current_context()
     def onChanges(pvname=None, value=None, char_value=None, **kw):
         write('   %s= %s (%s)\n' % (pvname, char_value, run_name))
         flush()
@@ -59,6 +61,7 @@ def pass_pvs_test(pvs, runtime, run_name, create_ctx=False, init_ctx=False):
         epics.ca.create_context()
     elif init_ctx:
         epics.ca.use_initial_context()
+
     write('Name=%s, context=%s, %i pvs monitored\n' % (run_name,
                                                        repr(epics.ca.current_context()),
                                                        len(pvs)))
@@ -87,6 +90,7 @@ pvs_b = []
 names_b = []
 for pvname in updating_pvlist:
     pvs_b.append(epics.PV(pvname))
+    # pvs_b.append(pvname)
     names_b.append(pvname)
 
 names_a = names_b[1:]
@@ -94,11 +98,12 @@ pvs_a   = pvs_b[1:]
 
 ##
 write( 'Test 1: use plain threading.Thread, force use of initial CA Context \n')
-kws = dict(create_ctx=False, init_ctx=True)
+kws = dict(create_ctx=True, init_ctx=True)
 th1 = Thread(target=create_pvs_test,args=(names_a, 3, 'A'), kwargs=kws)
 th2 = Thread(target=create_pvs_test,args=(names_b, 5, 'B'), kwargs=kws)
 run_threads(th1, th2)
 write('Test 1 Done\n---------------------\n')
+# sys.exit()
 
 write('Test 2: use plain threading.Thread, create/destroy CA Context \n')
 kws = dict(create_ctx=True, init_ctx=False)

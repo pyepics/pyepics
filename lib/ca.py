@@ -294,6 +294,7 @@ def show_cache(print_out=True):
 #   withCA               libca is initialized
 #   withCHID             1st arg is a chid (dbr.chid_t)
 #   withConnectedCHID    1st arg is a connected chid.
+#   withInitialContext   Force the use of the initially defined context
 #
 #  These tests are not rigorous CA tests (and ctypes.long is
 #  accepted as a chid, connect_channel() is tried, but may fail)
@@ -368,6 +369,19 @@ def withConnectedCHID(fcn):
     wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
+def withInitialContext(fcn):
+    """decorator to ensure that a function uses the initial
+    threading context
+    """
+    def wrapper(*args, **kwds):
+        "withInitialContext wrapper"
+        use_initial_context()
+        return fcn(*args, **kwds)
+    wrapper.__doc__ = fcn.__doc__
+    wrapper.__name__ = fcn.__name__
+    wrapper.__dict__.update(fcn.__dict__)
+    return wrapper
+
 def PySEVCHK(func_name, status, expected=dbr.ECA_NORMAL):
     """raise a ChannelAccessException if the wrapped
     status != ECA_NORMAL
@@ -399,6 +413,7 @@ def _onGetEvent(args):
     kwds = {'ftype':args.type, 'count':args.count,
            'chid':args.chid, 'pvname': pvname,
            'status':args.status}
+    # print("_onGetEvent ", pvname, current_context())
     # add kwds arguments for CTRL and TIME variants
     if args.type >= dbr.CTRL_STRING:
         tmpv = value[0]
