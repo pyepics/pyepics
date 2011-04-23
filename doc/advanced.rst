@@ -13,7 +13,7 @@ with a small number of bytes.  This means that their storage and transfer
 speeds over real networks is not a significant concern.  However, some
 Process Variables can store much larger amounts of data (say, several
 megabytes) which means that some of the assumptions about dealing with
-Channels / PVs may need reconsideration.  
+Channels / PVs may need reconsideration.
 
 When using PVs with large array sizes (here, I'll assert that *large* means
 more than 1000 or so elements), it is necessary to make sure that the
@@ -37,7 +37,7 @@ penalty for automatically monitoring these variables (that is, causing
 network traffic every time a PV changes) is a small price to pay for being
 assured that the latest value is always available.  As arrays get larger
 (as for data streams from Area Detectors), it is less obvious that
-automatic monitoring is desirable.  
+automatic monitoring is desirable.
 
 The Python :mod:`epics.ca` module defines a variable
 :data:`AUTOMONITOR_MAXLENGTH` which controls whether array PVs are
@@ -90,21 +90,21 @@ convert such byte arrays to strings using ``as_string=True``.
 
 As an example, let's say you've created a character waveform PV, as with
 this EPICS database::
-   
+
      grecord(waveform,"$(P):filename")  {
              field(DTYP,"Soft Channel")
              field(DESC,"file name")
              field(NELM,"128")
              field(FTVL,"CHAR")
      }
-  
+
 You can then use this with:
 
    >>> import epics
    >>> pvname = 'PREFIX:filename.VAL'
    >>> pv  = epics.PV(pvname)
    >>> print pv.info
-   .... 
+   ....
    >>> plain_val = pv.get()
    >>> print plain_val
    array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 101, 114,  92,  77,
@@ -122,34 +122,85 @@ You can then use this with:
    'T:\\xas_user\\March2010\\FastMap'
 
 
-This uses the PV class, but the :meth:`get` method of :mod:`ca` is
+This uses the :class:`PV` class, but the :meth:`get` method of :mod:`ca` is
 essentially equivalent, as its *as_string* parameter works exactly the same
 way.
 
 .. _advanced-threads-label:
 
 
-Using Python Threads 
+Using Python Threads
 =========================
 
-An important feature of the epics python package is that it can be used
-with Python threads.  This section of the document focuses on using Python
-threads both with the `PV` object and with the procedural functions in the
-`ca` module.
+An important feature of the PyEpics package is that it can be used with
+Python threads.  Working with threads can be somewhat tricky in the best
+of cases.  The Channel Access library, which supports threading in the C
+library, adds a small level of complication for using CA with Python
+threads.  The result is not too difficult, but is probably not advisable
+for the novice.  This section discusses the strategies for using Python
+threads with PyEpics, including both `PV` object the procedural
+functions in the `ca` module.   I should state clearly that I am not an
+expert on threads.
 
-Using threads in Python is fairly simple, but Channel Access adds a
-complication that the underlying CA library will call Python code within a
-particular thread, and you need to set which thread that is.  The most rule
-for using Threads with the epics module is to use
-:data:`PREEMPTIVE_CALLBACK` =  ``True``.   This is the default  value, so
-you usually do not need to change anything.
+The most important rule for using threads with the PyEpics module is to
+use :data:`epics.ca.PREEMPTIVE_CALLBACK` = ``True``.  This is the
+default value, so you usually do not need to change anything.  If
+:data:`epics.ca.PREEMPTIVE_CALLBACK` had been turned off, threading will
+not work and you are likely to see crashes if you try.
 
-Thread Example
+The second important consideration is that Epics Channel Access uses a
+concept of *contexts* for its own thread model, with contexts holding
+sets of threads as well as Channels and Process Variables that .  For
+non-threaded work, a process will use a single context that is
+initialized prior doing any real CA work (for the Python module, this is
+done in :meth:`ca.initialize_libca`).  With a threaded application,
+however, each new thread is assumed to have its own context.  Thus, each
+new thread will start with a null context that must be replaced either
+by explicitly creating its own context (and then, being a good citizen
+to its peer threads, destroy this context as the thread ends) or attach
+to an existing context.  The result is that there are several ways of
+working with Epica Channel Access and Threads.
+
+The generally recommended approach is to use a single Epics CA context
+throughout an entire process.  This avoids many potential pitfalls (and
+crashes), and can be done fairly simply.  The most explicit way to do
+this is to call :meth:`epics.ca.use_initial_context` at the beginning of
+each function (before any CA calls) that will be called by
+:meth:`Thread.run`.   For functions that might be called either in the
+main thread or in a new thread, this incurs very little penalty, but it
+is a little intrusive to put this at the beginning of each function.
+
+Another option is to use the :class:`CAThread` in the :mod:`ca`
+module.  This is a very thin wrapper around the standard
+:class:`threading.Thread` which does this call of
+:meth:`epics.ca.use_initial_context` for you just before your threaded
+function is run.
+
+To recap, the options for using threads (in approximate order of
+reliabilty) are:
+
+ 1. use :class:`CAThread` instead of :class:`Thread` for threads that
+ will use CA.
+
+ 2. put :func:`epics.ca.use_initial_context` at the top of all
+ functions that might be a Thread target function, or decorate them with
+ :func:`withInitialContext` decorator, *@withInitialContext*.
+
+ 3. use :func:`epics.ca.create_context` at the top of all functions
+ that are inside a new thread, and be sure to put
+ :func:`epics.ca.destroy_context` at the end of the function.
+
+ 4. ignore this advise and hope for the best.  If you're not creating
+ new PVs but only using PVs created in the main thread you may not
+ see a problem for a while. ;)
+
+
+Thread Examples
 ~~~~~~~~~~~~~~~
 
 This is a simplified version of test code using Python threads.  It is
 based on code from Friedrich Schotte, NIH, and included as `thread_test.py`
-in the `tests` directory of the source distribution. 
+in the `tests` directory of the source distribution.
 
 In this example, we define a `run_test` procedure which will create PVs
 from a supplied list, and monitor these PVs, printing out the values when
@@ -160,16 +211,16 @@ other.::
     import time
     from threading import Thread
     import epics
-        
+
     pvlist1 = ('13IDA:DMM1Ch2_raw.VAL', 'S:SRcurrentAI.VAL')
     pvlist2 = ('13IDA:DMM1Ch3_raw.VAL', 'S:SRcurrentAI.VAL')
-       
+
     def run_test(runtime=1, pvnames=None,  run_name='thread c'):
         print ' |-> thread  "%s"  will run for %.3f sec ' % ( run_name, runtime)
-        
+
         def onChanges(pvname=None, value=None, char_value=None, **kw):
             print '      %s = %s (%s)' % (pvname, char_value, run_name)
-                
+
         # A new CA context must be created per thread
         epics.ca.context_create()
         t0 = time.time()
@@ -179,33 +230,33 @@ other.::
             p.get()
             p.add_callback(onChanges)
             pvs.append(p)
-            
+
         while time.time()-t0 < runtime:
             time.sleep(0.01)
-        for p in pvs: 
+        for p in pvs:
             p.clear_callbacks()
         print 'Done with Thread ', run_name
-	epics.ca.context_destroy()     
-            
+	epics.ca.context_destroy()
+
     print "Run 2 Threads simultaneously:"
     th1 = Thread(target=run_test,args=(3, pvlist1,  'A'))
     th1.start()
-    
+
     th2 = Thread(target=run_test,args=(6, pvlist2, 'B'))
     th2.start()
-    
+
     th1.join()
     th2.join()
-     
+
     print 'Done'
-        
+
 The calls to `epics.ca.context_create()` and `epics.ca.context_destroy()`
 are required: forgetting them will suppress all callbacks, and is likely to
 to lead in core dumps.  The output from this will look like::
 
     Run 2 Threads simultaneously:
-     |-> thread  "A"  will run for 3.000 sec 
-     |-> thread  "B"  will run for 6.000 sec 
+     |-> thread  "A"  will run for 3.000 sec
+     |-> thread  "B"  will run for 6.000 sec
           13IDA:DMM1Ch2_raw.VAL = -183.71218999999999 (A)
           13IDA:DMM1Ch3_raw.VAL = -133.09033299999999 (B)
           S:SRcurrentAI.VAL = 102.19321199346312 (A)
@@ -234,20 +285,20 @@ to lead in core dumps.  The output from this will look like::
           S:SRcurrentAI.VAL = 102.17559191346312 (B)
     Done with Thread  B
     Done
-    
+
 Note that while both threads *A*  and *B* are running, a callback for
 the PV `S:SRcurrentAI.VAL` is generated in each thread.
 
 Note also that the callbacks for the PVs created in each thread are
 **explicitly cleared**  with::
 
-    for p in pvs: 
+    for p in pvs:
         p.clear_callbacks()
 
 Without this, the callbacks for thread *A*  will persist even after the
 thread has completed!!!
-     
-    
+
+
 .. _advanced-sleep-label:
 
 time.sleep() or epics.poll()?
@@ -258,12 +309,12 @@ some time for this communication to happen.   With
 :data:`ca.PREEMPTIVE_CALLBACK` set to  ``True``, this communication  will
 be handled in a thread separate from the main Python thread.  This means
 that CA events can happen at any time, and :meth:`ca.pend_event` does not
-need to be called to explicitly allow for event processing.   
+need to be called to explicitly allow for event processing.
 
 Still, some time must be released from the main Python thread on occasion
-in order for events to be processed.  The simplest way to do this is with 
+in order for events to be processed.  The simplest way to do this is with
 :meth:`time.sleep`, so that an event loop can simply be::
- 
+
     >>> while True:
     >>>     time.sleep(0.001)
 
