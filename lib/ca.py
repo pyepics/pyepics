@@ -273,15 +273,17 @@ def finalize_libca(maxtime=10.0):
 def show_cache(print_out=True):
     """Show list of cached PVs"""
     out = []
-    out.append('#  PVName  ChannelID  Connected? Context')
-    out.append('#---------------------------------------')
+    out.append('#  PVName        ChannelID/Context Connected?')
+    out.append('#--------------------------------------------')
     global _cache
     for context, context_chids in  list(_cache.items()):
         for vname, val in list(context_chids.items()):
-            out.append(" %s  %s   %s  %s" % (vname,
-                                             repr(val['chid']),
-                                             repr(isConnected(val['chid'])),
-                                             repr(context)))
+            chid = val['chid']
+            if len(vname) < 15:
+                vname = (vname + ' '*15)[:15]
+            out.append(" %s %s/%s  %s" % (vname, repr(chid),
+                                          repr(context),
+                                          isConnected(chid)))
     out = strjoin('\n', out)
     if print_out:
         write(out)
@@ -550,7 +552,10 @@ def attach_context(context):
 def use_initial_context():
     "attach to the original context"
     global initial_context
-    return libca.ca_attach_context(initial_context)
+    ret = dbr.ECA_NORMAL
+    if initial_context != current_context():
+        ret = libca.ca_attach_context(initial_context)
+    return ret
 
 @withCA
 def detach_context():
