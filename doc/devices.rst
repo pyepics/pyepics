@@ -22,7 +22,7 @@ several different records.::
     motor1.put('VAL', 1)
     print 'Motor %s = %f' % ( motor1.get('DESC'), motor1.get('RBV'))
 
-    motor1.VAL 0 
+    motor1.VAL 0
     print 'Motor %s = %f' % ( motor1.DESC, motor1.RBV )
 
 While useful on its own like this, the real point of a *device* is as a
@@ -93,11 +93,11 @@ In general, PV names will be mapped as prefix+delim+attr.  See
 
 .. method:: read_state(fname[, restore=False])
 
-   reads a state from a file, as written with :meth:`write_state`, and returns it. 
+   reads a state from a file, as written with :meth:`write_state`, and returns it.
    If ''restore'' is ``True``, the read state will be restored.
 
 .. data:: _pvs
-  
+
    a dictionary of PVs making up the device.
 
 
@@ -129,7 +129,7 @@ A simple example use would be::
     m1 = epics.Motor('XXX:m1')
 
     print 'Motor:  ', m1.DESC , ' Currently at ', m1.RBV
-   
+
     m1.tweak_val = 0.10
     m1.move(0.0, dial=True, wait=True)
 
@@ -153,14 +153,14 @@ The :class:`epics.Motor` class
 
 .. class:: Motor(pvname[, timeout=30.])
 
-   create a Motor object for a named Epics Process Variable.  
+   create a Motor object for a named Epics Process Variable.
 
    :param pvname: prefix name (no '.VAL' needed!) of Epics Process Variable  for a Motor
    :type pvname: string
    :param timeout:  time (in seconds) to wait before giving up trying to connect.
    :type timeout: float
-   
-Once created, a Motor should be ready to use.  
+
+Once created, a Motor should be ready to use.
 
       >>> from epics import Motor
       >>> m = Motor('XX:m1')
@@ -176,7 +176,7 @@ be retrieved either with an attribute or with the :meth:`get` method.
 A full list of Motor attributes and their aliases for the motor
 record is given in :ref:`Table of Motor Attributes <motorattr_table>`.
 
-.. _motorattr_table: 
+.. _motorattr_table:
 
    Table of Aliases for attributes for the epics :class:`Motor` class, and the
    corresponding attribute name of the Motor Record field.
@@ -282,7 +282,7 @@ methods for :class:`epics.Motor`
 
    sets a field attribute for the motor.
 
-   :param attr: attribute name 
+   :param attr: attribute name
    :type attr: string (from table above)
    :param as_string:  whether to return string value.
    :type as_string: ``True`` or ``False``
@@ -300,7 +300,7 @@ attribute cannot do so::
 
    sets a field attribute for the motor.
 
-   :param attr: attribute name 
+   :param attr: attribute name
    :type attr: string (from table above)
    :param value: value for attribute
    :param wait:  whether to wait for completion.
@@ -313,13 +313,13 @@ attribute cannot do so::
 
    checks whether the current motor position is causing a motor limit
    violation, and raises a MotorLimitException if it is.
-   
+
    returns ``None`` if there is no limit violation.
 
 .. method:: within_limits(value[, limits='user'])
 
    checks whether a target value **would be** a limit violation.
- 
+
    :param value: target value
    :param limits: one of 'user', 'dial', or 'raw' for which limits to consider
    :type limits: string
@@ -346,25 +346,25 @@ attribute cannot do so::
           -1   : target value outside limits -- no move attempted
           -2   : with wait=True, wait time exceeded timeout
           0    : move executed successfully
-	  
+
           will raise an exception if a motor limit is met.
-          
+
 .. method:: tweak(dir='forward'[, wait=False[, timeout=300.]])
 
    move the motor by the current *tweak value*
 
-   :param dir: direction of motion 
+   :param dir: direction of motion
    :type dir: string: 'forward' (default) or 'reverse'
    :param wait: whether to wait for completion
    :type wait:  ``True`` or ``False``
-   :param timeout:  max time for move to complete (in seconds) [default=300]    
+   :param timeout:  max time for move to complete (in seconds) [default=300]
    :type timeout: float
-  
+
 
 .. method:: get_position(readback=False[, dial=False[, raw=False]])
 
    Returns the motor position in user, dial or raw coordinates.
-      
+
    :param readback:   whether to return the readback position in the
             desired coordinate system.  The default is to return the
             drive position of the motor.
@@ -383,16 +383,16 @@ attribute cannot do so::
    :param position:   The new motor position
    :param dial: whether to set in dial coordinates. The default is user coordinates.
    :param raw:  whether to set in raw coordinates. The default is user  coordinates.
-            
+
     The 'raw' and 'dial' keywords are mutually exclusive.
-         
+
 .. method:: get_pv(attr)
-   
+
    returns the `PV` for the corresponding attribute.
 
 .. method:: set_callback(attr='drive'[, callback=None[, kw=None]])
 
-   sets a callback on the `PV` for a particular attribute. 
+   sets a callback on the `PV` for a particular attribute.
 
 .. method:: clear_callback(attr='drive')
 
@@ -401,7 +401,7 @@ attribute cannot do so::
 .. method:: show_info()
 
    prints out a table of attributes and their current values.
- 
+
 
 
 Other Device Examples
@@ -434,14 +434,14 @@ Epics ai record as Device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is a slightly more useful example: An Epics ai (analog input record)
-implemented as a Device. 
+implemented as a Device.
 
 .. literalinclude:: ../lib/devices/ai.py
 
 Note that we pre-define the fields that are the *suffixes* of an Epics ai
 input record, and simply subclass :class:`Device` with these fields.  This
 :class:`ai` class can then be used simply and cleanly as::
-    
+
     This_ai = ai('XXX.PRES')
     print 'Value: ', This_ai.VAL
     print 'Units: ', This_ai.EGU
@@ -467,9 +467,9 @@ directly invoking epics calls::
    s1.OneShotMode()
    s1.Count(t=5.0)
    print 'Names:       ', s1.getNames()
-   print 'Raw  values: ', s1.Read(use_calcs=False) 
-   print 'Calc values: ', s1.Read(use_calcs=True) 
+   print 'Raw  values: ', s1.Read(use_calcs=False)
+   print 'Calc values: ', s1.Read(use_calcs=True)
 
 
 
- 
+
