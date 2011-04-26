@@ -44,14 +44,14 @@ double_arrays   = ['Py:double128', 'Py:double2k', 'Py:double64k']
 motor1 = '13XRM:m1'
 motor2 = '13XRM:m3'
 motor_list = ['13XRM:m1', '13XRM:m2', '13XRM:m3', '13XRM:m4']
-#### 
+####
 #  Here, provide a PV that changes at least once very 10 seconds
 updating_pv1  = 'Py:ao1'
 updating_str1 = 'Py:char256'
 
-#### 
+####
 #  Here, provide a list of PVs that  change at least once very 10 seconds
-updating_pvlist = ['Py:ao1', 'Py:ai1', 'Py:long1']
+updating_pvlist = ['Py:ao1', 'Py:ai1', 'Py:long1', 'Py:ao2']
 #### alarm test
 
 alarm_pv = 'Py:long1'

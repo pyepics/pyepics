@@ -1,55 +1,43 @@
 """This script tests using EPICS CA and Python threads together
-
 Based on code from  Friedrich Schotte, NIH, modified by Matt Newville
 19-Apr-2010
 """
-
 import time
+from  sys import stdout
 from threading import Thread
 import epics
-import sys
 
 from  pvnames import updating_pvlist
-write = sys.stdout.write
-flush = sys.stdout.flush
+pvlist_a = updating_pvlist[:-1]
+pvlist_b = updating_pvlist[1:]
 
 def run_test(runtime=1, pvnames=None,  run_name='thread c'):
-    write(' -> thread  "%s"  will run for %.3f sec\n ' % ( run_name, runtime))
-    
+    msg = '-> thread "%s" will run for %.3f sec, monitoring %s\n'
+    stdout.write(msg % (run_name, runtime, pvnames))
     def onChanges(pvname=None, value=None, char_value=None, **kw):
-        write('      %s = %s (%s)\n' % (pvname, char_value, run_name))
-        flush()
-        
-    epics.ca.context_create()
-    t0 = time.time()
-    pvs = []
-    for pvn in pvnames:
-        p = epics.PV(pvn)
-        p.get()
-        p.add_callback(onChanges)
-        
-        pvs.append(p)
-    while time.time()-t0 < runtime:
-        time.sleep(0.01)
+        stdout.write('   %s = %s (%s)\n' % (pvname, char_value, run_name))
+        stdout.flush()
 
-    for p in pvs:
-        p.clear_callbacks()
-    write( 'Done with Thread  %s\n' % ( run_name))
-    epics.ca.context_destroy()
-    
-write( "First, run test in Foreground:\n")
-run_test(2.0,  updating_pvlist, 'initial')
+    epics.ca.use_initial_context()   #  epics.ca.create_context()
+    start_time = time.time()
+    pvs = [epics.PV(pvn, callback=onChanges) for pvn in pvnames]
 
-write("Run 2 Background Threads simultaneously:\n")
-th1 = Thread(target=run_test,args=(3, updating_pvlist,  'A'))
+    while time.time()-start_time < runtime:
+        time.sleep(0.1)
 
-th2 = Thread(target=run_test,args=(7, updating_pvlist, 'B'))
+    [p.clear_callbacks() for p in pvs]
+    stdout.write( 'Completed Thread  %s\n' % ( run_name))
+
+stdout.write( "First, create a PV in the main thread:\n")
+p = epics.PV(updating_pvlist[0])
+
+stdout.write("Run 2 Background Threads simultaneously:\n")
+th1 = Thread(target=run_test,args=(3, pvlist_a,  'A'))
 th1.start()
+
+th2 = Thread(target=run_test,args=(6, pvlist_b, 'B'))
 th2.start()
 
-th1.join()
 th2.join()
-time.sleep(0.001)
-write('Done\n')
-
-epics.ca.show_cache()
+th1.join()
+stdout.write('Done\n')
