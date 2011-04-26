@@ -2,8 +2,8 @@
 wxFrame for Detailed Motor Settings, ala medm More (+Setup) screen
 """
 import wx
-from epics.wx.wxlib import pvText, pvFloatCtrl, pvTextCtrl, \
-     pvEnumButtons, pvEnumChoice, \
+from epics.wx.wxlib import PVText, PVFloatCtrl, PVTextCtrl, \
+     PVEnumButtons, PVEnumChoice, \
      DelayedEpicsCallback, EpicsFunction
 
 from utils import set_sizer, LCEN, RCEN, CEN
@@ -107,7 +107,7 @@ class MotorDetailFrame(wx.Frame):
 
         twk_sizer = wx.BoxSizer(wx.HORIZONTAL)
         twk_panel = wx.Panel(dp)
-        twk_val = pvFloatCtrl(twk_panel, size=(110, -1), precision=prec)
+        twk_val = PVFloatCtrl(twk_panel, size=(110, -1), precision=prec)
         twk_val.SetPV(self.motor.PV('TWV'))                
          
         twk_left = wx.Button(twk_panel, label='<',  size=(30, 30))
@@ -126,12 +126,12 @@ class MotorDetailFrame(wx.Frame):
 
         epv = self.motor.PV('disabled')
 
-        able_btns = pvEnumButtons(dp, pv=epv, orientation = wx.VERTICAL, 
+        able_btns = PVEnumButtons(dp, pv=epv, orientation = wx.VERTICAL, 
                                   size=(110, -1))
 
         ds.Add(able_btns,   (nrow-1, 3), (2, 1), CEN)
 
-        stop_btns = pvEnumButtons(dp, pv=self.motor.PV('SPMG'),
+        stop_btns = PVEnumButtons(dp, pv=self.motor.PV('SPMG'),
                                   orientation = wx.VERTICAL, 
                                   size=(110,-1))
 
@@ -155,17 +155,17 @@ class MotorDetailFrame(wx.Frame):
                    
         ds.Add(xLabel(dp, 'Mode: '),  (0, 0), (1, 1), LCEN, 5)
         
-        ds.Add(pvEnumButtons(dp, pv=self.motor.PV('SET'),
+        ds.Add(PVEnumButtons(dp, pv=self.motor.PV('SET'),
                               orientation = wx.HORIZONTAL, 
                               size=(110, -1)), (0, 1), (1, 1), wx.ALIGN_LEFT)
 
         ds.Add(xLabel(dp, 'Direction: '), (1, 0), (1, 1), LCEN, 5)
-        ds.Add(pvEnumButtons(dp, pv=self.motor.PV('DIR'),
+        ds.Add(PVEnumButtons(dp, pv=self.motor.PV('DIR'),
                               orientation=wx.HORIZONTAL, 
                               size=(110, -1)), (1, 1), (1, 1), wx.ALIGN_LEFT)
 
         ds.Add(xLabel(dp, 'Freeze Offset: '), (0, 2), (1, 1), LCEN, 5)
-        ds.Add(pvEnumChoice(dp, pv=self.motor.PV('FOFF'),
+        ds.Add(PVEnumChoice(dp, pv=self.motor.PV('FOFF'),
                             size=(110, -1)),  (0, 3), (1, 1), CEN)
         
         ds.Add(xLabel(dp, 'Offset Value: '), (1, 2), (1, 1), LCEN, 5)
@@ -282,20 +282,20 @@ class MotorDetailFrame(wx.Frame):
                 d.Refresh()
                 
     def MotorCtrl(self, panel, attr):
-        "pvFloatCtrl for a Motor attribute"
-        return pvFloatCtrl(panel, size=(100, -1), 
+        "PVFloatCtrl for a Motor attribute"
+        return PVFloatCtrl(panel, size=(100, -1), 
                            precision= self.motor.PREC,
                            pv = self.motor.PV(attr),
                            style = wx.TE_RIGHT)
 
     def MotorText(self, panel, attr):
-        "pvText for a Motor attribute"
-        return pvText(panel,  pv=self.motor.PV(attr), as_string=True,
+        "PVText for a Motor attribute"
+        return PVText(panel,  pv=self.motor.PV(attr), as_string=True,
                       size=(100, -1), style=wx.ALIGN_RIGHT|wx.CENTER)
 
     def MotorTextCtrl(self, panel, attr, size=(100, -1)):
-        "pvTextCtrl for a Motor attribute"
-        return pvTextCtrl(panel, pv=self.motor.PV(attr), size=size, 
+        "PVTextCtrl for a Motor attribute"
+        return PVTextCtrl(panel, pv=self.motor.PV(attr), size=size, 
                           style=wx.ALIGN_LEFT|wx.TE_PROCESS_ENTER)
 
     @DelayedEpicsCallback
