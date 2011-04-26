@@ -1,3 +1,18 @@
+2011-04-25  Matt Newville  <newville@cars.uchicago.edu>
+
+	* Version 3.1.2:
+
+	- changed threading defaults, so that a single main context is the
+	default threading model.  Add ca.CAThread class to set initial
+	context on entering a Thread target
+
+	- ca/pv: multiple user-level connection callbacks now supported.
+
+	- wx: refactored so that pvText is now named PVText, and similarly
+  	      for all PV-enabled widgets (PVMixin, etc).
+	- wx: connection callbacks now Enables/Disables wx Widget.
+	- wx: Many other small tweaks and improvements.
+
 2011-03-24  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.1.1:
