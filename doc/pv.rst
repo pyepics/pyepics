@@ -18,14 +18,13 @@ attributes for accessing it's properties.
 The :class:`PV` class
 =======================
 
-.. class:: PV(pvname[, callback=None[, form='native'[, auto_monitor=None[, connection_callback=None[,  connection_timeout=None[, verbose=False]]]]]])
-
-   create a PV object for a named Epics Process Variable.  
+.. class:: PV(pvname[, callback=None[, form='native'[, auto_monitor=None[, connection_callback=None[,  connection_timeout=None[, verbose=False]]]]]] )
+   create a PV object for a named Epics Process Variable.
 
    :param pvname: name of Epics Process Variable
    :param callback:  user-defined callback function on changes to PV value or state.
    :type callback: callable or None
-   :param form:  which epics *data type* to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.  
+   :param form:  which epics *data type* to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.
    :type form: string, one of ('native','ctrl', or 'time')
    :param auto_monitor:  whether to automatically monitor the PV for changes.
    :type auto_monitor: ``None``, ``True``, or ``False``
@@ -35,13 +34,13 @@ The :class:`PV` class
    :type connection_timeout:  float or None
    :param verbose:  whether to print out debugging messages
    :type verbose: ``True``/``False``
-   
+
 Once created, a PV should (barring any network issues) automatically
-connect and be ready to use. 
+connect and be ready to use.
 
       >>> from epics import PV
-      >>> p = PV('XX:m1.VAL')      
-      >>> print p.get()   
+      >>> p = PV('XX:m1.VAL')
+      >>> print p.get()
       >>> print p.count, p.type
 
 
@@ -82,7 +81,7 @@ callbacks to be executed when the PV changes.
 
    :param count:  maximum number of array elements to return
    :type count:  integer or None
-   :param as_string:  whether to return the string representation of the  value.  
+   :param as_string:  whether to return the string representation of the  value.
    :type as_string: ``True``/``False``
    :param as_numpy:  whether to try to return a numpy array where appropriate.
    :type as_string: ``True``/``False``
@@ -100,33 +99,33 @@ callbacks to be executed when the PV changes.
    set the PV value, optionally waiting to return until processing has
    completed, or setting the :attr:`put_complete` to indicate complete-ness.
 
-   :param value:  value to set PV 
+   :param value:  value to set PV
    :param wait:  whether to wait for processing to complete (or time-out) before returning.
    :type  wait:  ``True``/``False``
-   :param timeout:  maximum time to wait for processing to complete before returning anyway. 
+   :param timeout:  maximum time to wait for processing to complete before returning anyway.
    :type  timeout:  double
    :param use_complete:  whether to use a builtin callback to set :attr:`put_complete`.
    :type  use_complete:  ``True``/``False``
-   :param callback: user-supplied function to run when processing has completed. 
+   :param callback: user-supplied function to run when processing has completed.
    :type callback: ``None`` or a valid python function
-   :param callback_data: extra data to pass on to a user-supplied callback function. 
+   :param callback_data: extra data to pass on to a user-supplied callback function.
 
 The `wait` and `callback` arguments, as well as the 'use_complete' / :attr:`put_complete`
 attribute give a few options for knowing that a :meth:`put` has
 completed.   See :ref:`pv-putwait-label` for more details.
 
 
-..  _pv-get-ctrlvars-label:  
+..  _pv-get-ctrlvars-label:
 
 .. method:: get_ctrlvars()
 
-   returns a dictionary of the **control values** for the PV.  This 
+   returns a dictionary of the **control values** for the PV.  This
    dictionary may have many members, depending on the data type of PV.  See
    the :ref:`Table of Control Attributes <ctrlvars_table>`  for details.
 
 .. method:: poll([evt=1.e-4, [iot=1.0]])
 
-   poll for changes.  This simply calls :meth:`ca.poll` 
+   poll for changes.  This simply calls :meth:`ca.poll`
 
    :param evt:  time to pass to :meth:`ca.pend_event`
    :type  evt:  double
@@ -134,7 +133,7 @@ completed.   See :ref:`pv-putwait-label` for more details.
    :type  iot:  double
 
 .. method:: connect([timeout=None])
- 
+
    this explicitly connects a PV, and returns whether or not it has
    successfully connected.  It is probably not that useful, as connection
    should happen automatically. See :meth:`wait_for_connection`.
@@ -143,34 +142,34 @@ completed.   See :ref:`pv-putwait-label` for more details.
    :type  timeout:  double
    :rtype:    ``True``/``False``
 
-   if timeout is None, the PVs connection_timeout paramater will be used. If that is also None, 
+   if timeout is None, the PVs connection_timeout paramater will be used. If that is also None,
    :data:`ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
 
 .. method:: wait_for_connection([timeout=None])
- 
+
    this waits until a PV is connected, or has timed-out waiting for a
    connection.  Returns  whether the connection has occured.
 
    :param timeout:  maximum connection time.
    :type  timeout:  double
    :rtype:    ``True``/``False``
-   
-   if timeout is None, the PVs connection_timeout paramater will be used. If that is also None, 
+
+   if timeout is None, the PVs connection_timeout paramater will be used. If that is also None,
    :data:`ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
 
 
 .. method:: disconnect()
- 
+
    disconnect a PV, clearing all callbacks.
 
 .. method:: add_callback(callback=None[, index=None [, with_ctrlvars=True[, **kw]])
- 
+
    adds a user-defined callback routine to be run on each change event for
    this PV.  Returns the integer *index*  for the callback.
 
    :param callback: user-supplied function to run when PV changes.
    :type callback: None or callable
-   :param index: identifying key for this callback 
+   :param index: identifying key for this callback
    :param with_ctrlvars:  whether to (try to) make sure that accurate  ``control values`` will be sent to the callback.
    :type index: None (integer will be produced) or immutable
    :param kw: additional keyword/value arguments to pass to each execution of the callback.
@@ -218,7 +217,7 @@ that can change, the PV attribute will hold the latest value for the
 corresponding property,  Most attributes are **read-only**, and cannot be
 assigned to.  The exception to this rule is the :attr:`value` attribute.
 
-.. attribute:: value 
+.. attribute:: value
 
    The current value of the PV.
 
@@ -228,13 +227,13 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
    Assigning to :attr:`value` is equivalent to setting the value with the
    :meth:`put` method.
-   
+
    >>> from epics import PV
    >>> p1 = PV('xxx.VAL')
    >>> print p1.value
    1.00
    >>> p1.value = 2.00
-  
+
 .. attribute:: char_value
 
    The string representation of the string, as described in :meth:`get`.
@@ -244,20 +243,20 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
    The PV status, which will be 1 for a Normal, connected PV.
 
 .. attribute:: type
-  
+
    string describing data type of PV, such as `double`, `float`, `enum`, `string`,
    `int`,  `long`, `char`, or one of the `ctrl` or `time` variants of these, which
-   will be named `ctrl_double`, `time_enum`, and so on.  See the 
+   will be named `ctrl_double`, `time_enum`, and so on.  See the
    :ref:`Table of DBR Types <dbrtype_table>`
 
 
 .. attribute:: ftype
-  
+
   The integer value (from the underlying C library) indicating the PV data
   type according to :ref:`Table of DBR Types <dbrtype_table>`
-    
+
 .. attribute:: host
-    
+
     string of host machine provide this PV.
 
 .. attribute:: count
@@ -320,11 +319,11 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 .. attribute:: lower_ctrl_limit
 
    These are all the various kinds of limits for a PV.
-        
+
 .. attribute:: put_complete
 
    a boolean (``True``/``False``) value for whether the most recent
-   :meth:`put`  has completed. 
+   :meth:`put`  has completed.
 
 .. attribute:: callbacks
 
@@ -335,8 +334,8 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
    keyword_arguments)`.
 
    **Note**: The :attr:`callbacks` attribute can be assigned to or
-    	  manipulated directly.  This is not recommended. Use the 
-          methods :meth:`add_callback`, :meth:`remove_callback`, and 
+    	  manipulated directly.  This is not recommended. Use the
+          methods :meth:`add_callback`, :meth:`remove_callback`, and
           :meth:`clear_callbacks` instead of altering this dictionary directly.
 
 .. attribute:: connection_callbacks
@@ -355,10 +354,10 @@ The string representation for a `PV`, as returned either with the
 attribute (they are equivalent) needs some further explanation.
 
 The value of the string representation (hereafter, the :attr:`char_value`),
-will depend on the native type and count of a `PV`.  
-:ref:`Table of String Representations <charvalue_table>` 
+will depend on the native type and count of a `PV`.
+:ref:`Table of String Representations <charvalue_table>`
 
-.. _charvalue_table: 
+.. _charvalue_table:
 
    Table of String Representations:  How raw data :attr:`value` is mapped
    to :attr:`char_value` for different native data types.
@@ -366,13 +365,13 @@ will depend on the native type and count of a `PV`.
     =============== ========== ==============================
      *data types*    *count*     *char_value*
     =============== ========== ==============================
-     string               1       = value   
-     char                 1      = value   
-     short                1      = str(value) 
+     string               1       = value
+     char                 1      = value
+     short                1      = str(value)
      long                 1      = str(value)
      enum                 1      = enum_str[value]
      double               1      = ("%%.%if" % (precision)) % value
-     float                1      = ("%%.%if" % (precision)) % value 
+     float                1      = ("%%.%if" % (precision)) % value
      char               > 1      = long string from bytes in array
      all others         > 1      = <array size=*count*, type=*type*>
     =============== ========== ==============================
@@ -434,10 +433,10 @@ When defining a callback function to be run on changes to a PV, as set from
 
 Callback functions will be called with several keyword arguments.  You should be
 prepared to have them passed to your function, and should always include
-`**kw`  to catch all arguments.  Your callback will be sent the following 
+`**kw`  to catch all arguments.  Your callback will be sent the following
 keyword parameters:
 
-    * `pvname`: the name of the pv 
+    * `pvname`: the name of the pv
     * `value`: the latest value
     * `char_value`: string representation of value
     * `count`: the number of data elements
@@ -461,13 +460,13 @@ keyword parameters:
     * `lower_warning_limit`:  lower warning limit
     * `upper_ctrl_limit`:  upper control limit
     * `lower_ctrl_limit`:  lower control limit
-    * `chid`:  integer channel ID 
-    * `cb_info`:  (index, self) tuple containing callback ID 
+    * `chid`:  integer channel ID
+    * `cb_info`:  (index, self) tuple containing callback ID
                   and the PV object
 
 Some of these may not be directly applicable to all PV data types, and some
-values may be None if the control parameters have not yet been fetched with 
-:meth:`get_ctrlvars`.  
+values may be None if the control parameters have not yet been fetched with
+:meth:`get_ctrlvars`.
 
 Note that a the user-supplied callback will be run *inside* a CA function,
 and cannot reliably make any other CA calls.  It is helpful to think "this
@@ -480,9 +479,9 @@ after :func:`pend_event` has completed.
 
 The `cb_info` parameter supplied to the callback needs special attention,
 as it is the only non-Epics information passed.   The `cb_info` parameter
-will be a tuple containing (:attr:`index`, :attr:`self`) where 
-:attr:`index` is the key for the :attr:`callbacks` dictionary for the PV 
-and :attr:`self` *is* PV object.  A principle use of this tuple is to 
+will be a tuple containing (:attr:`index`, :attr:`self`) where
+:attr:`index` is the key for the :attr:`callbacks` dictionary for the PV
+and :attr:`self` *is* PV object.  A principle use of this tuple is to
 **remove the current callback**  if an error happens, as for example in GUI
 code if the widget that the callback is meant to update disappears.
 
@@ -501,8 +500,8 @@ callback defined, they will all be run when the connection state changes.
 
 A connection callback should be prepared to receive the following keyword arguments:
 
-    * `pvname`: the name of the pv 
-    * `conn`: the connection status 
+    * `pvname`: the name of the pv
+    * `conn`: the connection status
 
 where *conn* will be either `True` or `False`, specifying whether the PV is
 now connected.   A simple example is given below.
@@ -513,7 +512,7 @@ now connected.   A simple example is given below.
 Put with wait, put callbacks, and  put_complete
 ========================================================
 
-Some EPICS records take a significant amount of time to fully process, and 
+Some EPICS records take a significant amount of time to fully process, and
 sometimes you want to wait until the processing completes before going on.
 There are a few ways to accomplish this.  First, one can simply wait until
 the processing is done::
@@ -538,7 +537,7 @@ A second method is to use the 'use_complete' option and watch for the
 somewhat more flexible than using `wait=True` as above, because you can more
 carefully control how often you look for a :meth:`put` to complete, and
 what to do in the interim.  A simple example would be::
-    
+
     p.put(1.0, use_complete=True)
     waiting = True
     while waiting:
@@ -552,13 +551,13 @@ multiple PVs to complete with python's builtin *all* function, as with::
     newvals = (1.0, 2.0,  3.0)
     for pv, val in zip(pvgroup, newvals):
         pv.put(val, use_complete=True)
-    
+
     waiting = True
     while waiting:
         time.sleep(0.001)
         waiting = all(pv.put_complete for pv in pvgroup)
     print 'All puts are done!'
- 
+
 For maximum flexibility, one can all define a *put callback*, a function to
 be run when the :meth:`put` has completed.   This function requires a
 *pvname* keyword argument, but will receive no others, unless you pass in
@@ -570,32 +569,32 @@ data with the *callback_data* argument (which should be dict-like) to
         print 'Put done for %s' % pvname
 
     pv.put(1.0, callback=onPutComplete)
-  
+
 
 ..  _pv-examples-label:
 
 Examples
 ============
 
-Some simple examples using PVs follow.  
+Some simple examples using PVs follow.
 
 Basic Use
 ~~~~~~~~~~~~
 
 The simplest approach is to simply create a PV and use its :attr:`value`
-attribute: 
+attribute:
 
    >>> from epics import PV
    >>> p1 = PV('xxx.VAL')
    >>> print p1.value
    1.00
    >>> p1.value = 2.00
- 
+
 The *print p1.value* line automatically fetches the current PV value.  The
 *p1.value = 2.00* line does a :func:`put` to set the value, causing any
-necessary processing over the network.   
+necessary processing over the network.
 
-The above example is equivalent to 
+The above example is equivalent to
 
    >>> from epics import PV
    >>> p1 = PV('xxx.VAL')
@@ -603,12 +602,12 @@ The above example is equivalent to
    1.00
    >>> p1.put(value = 2.00)
 
-To get a string representation of the value, you can use either 
+To get a string representation of the value, you can use either
 
    >>> print p1.get(as_string=True)
    '1.000'
 
-or, equivilently 
+or, equivilently
 
    >>> print p1.char_value
    '1.000'
@@ -620,8 +619,8 @@ Example of using info and more properties examples
 A PV has many attributes.  This can be seen from its *info* paragraph:
 
 >>> import epics
->>> p = epics.PV('13IDA:m3')       
->>> print p.info    
+>>> p = epics.PV('13IDA:m3')
+>>> print p.info
 == 13IDA:m3  (native_double) ==
    value      = 0.2
    char_value = '0.200'
@@ -656,7 +655,7 @@ double
 mm 3 -14.5060658455
 
 
-Getting a string value 
+Getting a string value
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is not uncommon to want a string representation of a PVs value, for
@@ -671,7 +670,7 @@ value.
 To get the string representation of a PVs value, use either the
 :attr:`char_value` attribute or the *as_string=True* argument to :meth:`get`
 
- 
+
 Example of :meth:`put`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -698,7 +697,7 @@ Example of simple callback
 It is ofen useful to get a notification of when a PV changes.  In general,
 it would be inconvenient (and possibly inefficient) to have to continually
 ask if a PVs value has changed.  Instead, it is better to set a *callback*
-function: a function to be run when the value has changed. 
+function: a function to be run when the value has changed.
 
 A simple example of this would be::
 
@@ -714,7 +713,7 @@ A simple example of this would be::
     print 'Now wait for changes'
 
     t0 = time.time()
-    while time.time() - t0 < 60.0: 
+    while time.time() - t0 < 60.0:
         time.sleep(1.e-3)
     print 'Done.'
 
