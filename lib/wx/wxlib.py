@@ -21,7 +21,10 @@ def EpicsFunction(f):
     """
     def wrapper(*args, **kwargs):
         "callafter wrapper"
-        wx.CallAfter(f, *args, **kwargs)
+        try:
+            wx.CallAfter(f, *args, **kwargs)
+        except PyDeadObjectError:
+            pass
     return wrapper
 
 def DelayedEpicsCallback(fcn):
@@ -97,6 +100,9 @@ class PVMixin(object):
     """
     def __init__(self, pv=None, pvname=None):
         self.pv = None
+        self._connect_bgcol = self.GetBackgroundColour()
+        self._connect_fgcol = self.GetForegroundColour()
+
         if pv is None and pvname is not None:
             pv = pvname
         if pv is not None:
@@ -106,7 +112,6 @@ class PVMixin(object):
     def SetPV(self, pv=None):
         "set pv, either an epics.PV object or a pvname"
         if pv is None:
-            print 'SetPV pv is None?'
             return
         if isinstance(pv, epics.PV):
             self.pv = pv
@@ -115,15 +120,34 @@ class PVMixin(object):
             self.pv.connect()
 
         epics.poll()
+        self.pv.connection_callbacks.append(self.OnEpicsConnect)
+
         # self.pv.wait_for_connection()
         self.pv.get_ctrlvars()
-
-        #if not self.pv.connected:
-        #    return
         
         self.OnPVChange(self.pv.get(as_string=True))
         self.pv.add_callback(self._pvEvent, wid=self.GetId() )
 
+
+    @DelayedEpicsCallback
+    def OnEpicsConnect(self, pvname=None, conn=None, **kws):
+        """Connect Callback:
+             Enable/Disable widget on change in connection status
+        """
+        # print 'onEpics Connect: ', pvname, conn
+        action = getattr(self, 'Enable', None)
+        bgcol = self._connect_bgcol
+        fgcol = self._connect_fgcol        
+        if not conn:
+            action = getattr(self, 'Disable', None)
+            self._connect_bgcol = self.GetBackgroundColour()
+            self._connect_fgcol = self.GetForegroundColour()
+            bgcol = wx.Colour(240, 240, 210)
+            fgcol = wx.Colour(200, 100, 100)
+        if action is not None:
+            self.SetBackgroundColour(bgcol)
+            self.SetForegroundColour(fgcol)
+            action()
 
     @DelayedEpicsCallback
     def _pvEvent(self, pvname=None, value=None, wid=None,
@@ -369,6 +393,12 @@ class PVTextCtrl(wx.TextCtrl, PVCtrlMixin):
     """
     def __init__(self, parent,  pv=None, 
                  font=None, fg=None, bg=None, **kws):
+
+        if 'style' not in kws:
+            kws['style'] = wx.TE_PROCESS_ENTER
+        else:
+            kws['style'] |= wx.TE_PROCESS_ENTER
+
         wx.TextCtrl.__init__(self, parent, wx.ID_ANY, value='', **kws)
         PVCtrlMixin.__init__(self, pv=pv, font=font, fg=fg, bg=bg)
         self.Bind(wx.EVT_CHAR, self.OnChar)
@@ -378,15 +408,21 @@ class PVTextCtrl(wx.TextCtrl, PVCtrlMixin):
         key   = event.GetKeyCode()
         entry = wx.TextCtrl.GetValue(self).strip()
         pos   = wx.TextCtrl.GetSelection(self)
-        if (key == wx.WXK_RETURN):
-            self._caput(entry)
-        event.Skip()            
+        if key == wx.WXK_RETURN:
+            self.SetValue(entry)
+        else:
+            event.Skip()
 
     @EpicsFunction
     def _caput(self, value):
         "epics pv.put wrapper"
         self.pv.put(value)
     
+    def SetValue(self, value):
+        "override all setvalue"
+        self._caput(value)
+        wx.TextCtrl.SetValue(self, value)
+
     def _SetValue(self, value):
         "set widget value"
         self.SetValue(value)
@@ -571,6 +607,7 @@ class PVFloatCtrl(FloatCtrl, PVCtrlMixin):
             self.pv = epics.PV(pv)
         if self.pv is None:
             return
+        self.pv.connection_callbacks.append(self.OnEpicsConnect)
         self.pv.get()
         self.pv.get_ctrlvars()
         # be sure to set precision before value!! or PV may be moved!!
@@ -583,9 +620,12 @@ class PVFloatCtrl(FloatCtrl, PVCtrlMixin):
 
         if self.pv.type in ('string', 'char'):
             self._warn('pvFloatCtrl needs a double or float PV')
-            
-        self.SetMin(self.pv.lower_ctrl_limit)
-        self.SetMax(self.pv.upper_ctrl_limit)
+
+        llim = set_float(self.pv.lower_ctrl_limit)
+        hlim = set_float(self.pv.upper_ctrl_limit)
+        if hlim is not None and llim is not None and hlim > llim:
+            self.SetMax(hlim)
+            self.SetMin(llim)
         self.pv.add_callback(self._FloatpvEvent, wid=self.GetId())
         self.SetAction(self._onEnter)
 
@@ -780,7 +820,6 @@ class PVButton(wx.Button, PVCtrlMixin):
         PVCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.pushValue = pushValue
         self.Bind(wx.EVT_BUTTON, self.OnPress)
-
         self.disablePV = disablePV
         self.disableValue = disableValue            
         if disablePV is not None:

@@ -274,8 +274,9 @@ def show_cache(print_out=True):
     global _cache
     for context, context_chids in  list(_cache.items()):
         for vname, val in list(context_chids.items()):
-            out.append(" %s  %s  %i" % (vname,
+            out.append(" %s  %s   %s  %i" % (vname,
                                         repr(isConnected(val['chid'])),
+                                        repr(val['chid']),
                                         context))
     out = strjoin('\n', out)
     if print_out:
@@ -296,7 +297,7 @@ def show_cache(print_out=True):
 def withCA(fcn):
     """decorator to ensure that libca and a context are created
     prior to function calls to the channel access library. This is
-    intended for functions that at the startup of CA, such as
+    intended for functions that need CA started to work, such as
         create_channel
 
     Note that CA functions that take a Channel ID (chid) as an
@@ -426,35 +427,43 @@ def _onConnectionEvent(args):
     ctx = current_context()
     pvname = name(args.chid)
     global _cache
+    
     if ctx is None and len(_cache.keys()) > 0:
-        ctx = _cache.keys()[0]
+        ctx = list(_cache.keys())[0]
     if ctx not in _cache:
         _cache[ctx] = {}
-    if pvname not in _cache[ctx]:
+
+    # search for PV in any context...
+    pv_found = False
+    for context in _cache:
+        if pvname in _cache[context]:
+            pv_found = True
+            break
+        
+    if not pv_found:
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
                                'ts':0, 'failures':0, 
                                'callbacks': []}
+        
+    # set connection time, run connection callbacks
+    # in all contexts
+    for context, cvals in _cache.items():
+        if pvname in cvals:
+            entry = cvals[pvname]
+            ichid = entry['chid']
+            if isinstance(entry['chid'], dbr.chid_t):
+                ichid = entry['chid'].value
+                
+            if int(ichid) == int(args.chid):
+                entry['conn'] = conn = (args.op == dbr.OP_CONN_UP)
+                entry['chid'] = chid = args.chid
+                entry['ts']   = time.time()
+                entry['failures'] = 0
 
-    conn = (args.op == dbr.OP_CONN_UP)
-    entry = _cache[ctx][pvname]
-    if (isinstance(entry['chid'], dbr.chid_t) and 
-        entry['chid'].value != args.chid):
-        msg = 'Channel IDs do not match in connection callback (%s and %s)'
-        raise ChannelAccessException('connect_channel',
-                                     msg % (entry['chid'], args.chid))
-    entry['conn'] = conn
-    entry['chid'] = args.chid
-    entry['ts']   = time.time()
-    entry['failures'] = 0
-
-    if len(entry.get('callbacks', [])) > 0:
-        poll(evt=1.e-3, iot=10.0)
-        for callback in entry.get('callbacks', []):
-            if hasattr(callback, '__call__'):
-                callback(pvname=pvname, 
-                         chid=entry['chid'],
-                         conn=entry['conn'])
-
+                for callback in entry.get('callbacks', []):
+                    poll()
+                    if hasattr(callback, '__call__'):
+                        callback(pvname=pvname, chid=chid, conn=conn)
     return 
 
 ## put event handler:
@@ -508,10 +517,10 @@ def context_destroy():
     return ret
     
 @withCA
+@withSEVCHK
 def attach_context(context):
     "attach a context"        
-    ret = libca.ca_attach_context(context) 
-    return PySEVCHK('attach_context', ret, dbr.ECA_ISATTACHED)
+    return libca.ca_attach_context(context) 
         
 @withCA
 def detach_context():
@@ -529,10 +538,12 @@ def replace_printf_handler(fcn=None):
 @withCA
 def current_context():
     "return this context"
+    ctx = libca.ca_current_context()
     try:
-        return int(libca.ca_current_context())
-    except:
-        return libca.ca_current_context()
+        ctx = int(ctx)
+    except TypeError:
+        pass
+    return ctx 
 
 @withCA
 def client_status(context, level):
@@ -603,7 +614,7 @@ def create_channel(pvname, connect=False, callback=None):
     will be called immediately.
     """
     # 
-    # Note that _CB_CONNECT (defined below) is a global variable, holding
+    # Note that _CB_CONNECT (defined above) is a global variable, holding
     # a reference to _onConnectionEvent:  This is really the connection
     # callback that is run -- the callack here is stored in the _cache
     # and called by _onConnectionEvent.
@@ -927,21 +938,23 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         PySEVCHK('put', ret)
         poll()
         return ret
-    # wait with wait or callback    # wait with wait or callback
+    # wait with callback (or put_complete) 
     pvname = name(chid)
     _put_done[pvname] = (False, callback, callback_data)
+    start_time = time.time()
     ret = libca.ca_array_put_callback(ftype, count, chid,
                                       data, _CB_PUTWAIT, 0)
     PySEVCHK('put', ret)
     poll(evt=1.e-4, iot=0.05)
     if wait:
-        start_time, finished = time.time(), False
+        finished = False
         while not finished:
             poll()
             finished = (_put_done[pvname][0] or
                         (time.time()-start_time) > timeout)
         if not _put_done[pvname][0]:
             ret = -ret
+
     return ret
 
 @withConnectedCHID

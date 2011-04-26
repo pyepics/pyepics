@@ -21,7 +21,8 @@ source distribution kit.
 wx Widgets for Epics
 =================================
 
-PVCtrlMixin
+
+PVMixin
 ~~~~~~~~~~~~
 
 .. class:: PVMixin([pv=None[, pvname=None]])

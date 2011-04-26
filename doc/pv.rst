@@ -32,7 +32,7 @@ The :class:`PV` class
    :param connection_callback: user-defined function called on changes to PV connection status.
    :type connection_callback:  callable or None
    :param connection_timeout:  time (in seconds) to wait for connection before giving up
-   :type connection_callback:  float or None
+   :type connection_timeout:  float or None
    :param verbose:  whether to print out debugging messages
    :type verbose: ``True``/``False``
    
@@ -339,6 +339,12 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
           methods :meth:`add_callback`, :meth:`remove_callback`, and 
           :meth:`clear_callbacks` instead of altering this dictionary directly.
 
+.. attribute:: connection_callbacks
+
+   a simple list of connection callbacks: functions to be run when the
+   connection status of the PV changes. See
+   :ref:`pv-connection_callbacks-label` for more details.
+
 ..  _pv-as-string-label:
 
 String representation for a PV
@@ -488,14 +494,15 @@ User-supplied Connection Callback functions
 A *connection* callback is a user-defined function that is called when the
 connection status of a PV changes -- that is, when a PV initially
 connects, disconnects or reconnects due to the process serving the PV going
-away, or loss of network connection.  Currently, a connection callback must
-be specified when a PV is created.
+away, or loss of network connection.  A connection callback can be
+specified when a PV is created, or can be added by appending to the
+:attr:`connection_callbacks` list.  If there is more than one connection
+callback defined, they will all be run when the connection state changes.
 
-Such a connection callback should be prepared to receive the following
-keyword arguments:
+A connection callback should be prepared to receive the following keyword arguments:
 
     * `pvname`: the name of the pv 
-    * `conn`: the connection status
+    * `conn`: the connection status 
 
 where *conn* will be either `True` or `False`, specifying whether the PV is
 now connected.   A simple example is given below.
