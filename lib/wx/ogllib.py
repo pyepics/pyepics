@@ -8,15 +8,15 @@ for drawing simple shapes or bitmaps.
 
 """
 import wx.lib.ogl as ogl
-from wxlib import pvMixin
+from wxlib import PVMixin
 
-class pvShapeMixin(pvMixin):
+class PVShapeMixin(PVMixin):
     """
     Mixin for any Shape that has PV callback support
 
     """
     def __init__(self, pv=None, pvname=None):        
-        pvMixin.__init__(self, pv, pvname)
+        PVMixin.__init__(self, pv, pvname)
         self.brushTranslations = {}
         self.penTranslations = {}
         self.shownTranslations = {}
@@ -91,21 +91,21 @@ class pvShapeMixin(pvMixin):
         self.GetCanvas().RefreshRect((x-w/2, y-h/2, w, h))
         
  
-class pvRectangle(ogl.RectangleShape, pvShapeMixin):
+class PVRectangle(ogl.RectangleShape, PVShapeMixin):
     """
     A RectangleShape which is associated with a particular PV value
     
     """    
     def __init__(self, w, h, pv=None, pvname=None):
         ogl.RectangleShape.__init__(self, w, h)
-        pvShapeMixin.__init__(self, pv, pvname)
+        PVShapeMixin.__init__(self, pv, pvname)
 
-class pvCircle(ogl.CircleShape, pvShapeMixin):
+class PVCircle(ogl.CircleShape, PVShapeMixin):
     """
     A CircleShape which is associated with a particular PV value
 
     """
     def __init__(self, diameter, pv=None, pvname=None):
         ogl.CircleShape.__init__(self, diameter)
-        pvShapeMixin.__init__(self, pv, pvname)
+        PVShapeMixin.__init__(self, pv, pvname)
 

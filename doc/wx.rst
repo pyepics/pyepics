@@ -21,12 +21,50 @@ source distribution kit.
 wx Widgets for Epics
 =================================
 
-pvCtrlMixin
+PVCtrlMixin
 ~~~~~~~~~~~~
 
-.. class:: pvCtrlMixin(parent, pv=None, font=None, fg=None, bg=None, **kw)
+.. class:: PVMixin([pv=None[, pvname=None]])
 
    This is a mixin class for wx Controls with epics PVs:  This connects to
+   PV, and manages connection and callback events for the PV.  It provides
+   the following basic methods used by most of the PV<->widget classes
+   below.
+
+.. method::   SetPV(pv=None)
+   
+   set the PV corresponding to the widget.
+
+.. method::   Update(value=None)
+
+   set the widgets value from the PV's value.   If value=None, the current
+   value for the PV is used.
+
+.. method::   GetValue(as_string=True)
+
+   return the PVs value.
+
+.. method::   OnEpicsConnect()
+
+   PV connection event handler.
+
+.. method::   OnPVChange(value)
+
+   PV monitor (subscription) event handler.  Must be overwritten for each
+   widget type.
+
+.. method::  GetEnumStrings()
+
+   return enumeration strings for the PV
+
+
+PVCtrlMixin
+~~~~~~~~~~~~
+
+.. class:: PVCtrlMixin(parent, pv=None, font=None, fg=None, bg=None, **kw)
+
+   This is a mixin class for wx Controls with epics PVs:  This sibclasses
+   PVCtrlMixin and adds colour translations
    PV, and manages callback events for the PV. 
 
   :param parent: wx parent widget
@@ -45,14 +83,14 @@ pvCtrlMixin
    the PV value.
 
 
-pvText       
+PVText       
 ~~~~~~~~
 
-.. class:: pvText(parent, pv=None, font=None, fg=None, bg=None,
+.. class:: PVText(parent, pv=None, font=None, fg=None, bg=None,
                   minor_alarm="DARKRED", major_alarm="RED",
                   invalid_alarm="ORANGERED", **kw)
 
-  derived from wx.StaticText and pvCtrlMixin, this is a StaticText widget
+  derived from wx.StaticText and PVCtrlMixin, this is a StaticText widget
   whose value is set to the string representation of the value for the
   corresponding PV.
 
@@ -61,21 +99,21 @@ pvText
   to None) as part of the constructor.
 
 
-pvTextCtrl   
+PVTextCtrl   
 ~~~~~~~~~~~
 
-.. class:: pvTextCtrl(parent, pv=None, font=None, fg=None, bg=None, **kw)
+.. class:: PVTextCtrl(parent, pv=None, font=None, fg=None, bg=None, **kw)
 
-    derived from wx.TextCtrl and pvCtrlMixin, this is a TextCtrl widget
+    derived from wx.TextCtrl and PVCtrlMixin, this is a TextCtrl widget
     whose value is set to the string representation of the value for the
     corresponding PV.  Setting the value (hitting Return or Enter) of the
     widget will set the PV value.
 
 
-pvFloatCtrl  
+PVFloatCtrl  
 ~~~~~~~~~~~
 
-.. class:: pvFloatCtrl(parent, pv=None, font=None, fg=None, bg=None, **kw)
+.. class:: PVFloatCtrl(parent, pv=None, font=None, fg=None, bg=None, **kw)
 
     A special variation of a wx.TextCtrl that allows only floating point
     numbers, as associated with a double, float, or integer PV.  Trying to
@@ -86,30 +124,27 @@ pvFloatCtrl
     a different color.
 
 
-pvBitmap
+PVBitmap
 ~~~~~~~~~~~
 
-.. class:: pvBitmap(parent, pv=None, bitmaps={}, defaultBitmap=None)
+.. class:: PVBitmap(parent, pv=None, bitmaps={}, defaultBitmap=None)
 
     A Static Bitmap where the image is based on PV value.
 
-	 If the bitmaps dictionary is set, it should be set as PVValue->Bitmap
-	 where particular bitmaps will be shown if the PV takes those certain 
-	 values.
+   If the bitmaps dictionary is set, it should be set as PV.Value(Bitmap)
+   where particular bitmaps will be shown if the PV takes those certain values.
 
-    If you need to do any more complex or dynamic drawing, you may
-	 want to look at the OGL PV controls.
+   If you need to do any more complex or dynamic drawing, you may want to look at the OGL PV controls.
 
 
-pvCheckBox
+PVCheckBox
 ~~~~~~~~~~~
 
-.. class:: pvCheckBox(self, parent, pv=None, on_value=1, off_value=0, **kw)
+.. class:: PVCheckBox(self, parent, pv=None, on_value=1, off_value=0, **kw)
     Checkbox based on a binary PV value, both reads/writes the
     PV on changes.
 
-	 on_value and off_value are the specific values that are mapped to
-	 the checkbox.
+    on_value and off_value are the specific values that are mapped to the checkbox.
 
     There are multiple options for translating PV values to checkbox
     settings (from least to most complex):
@@ -121,10 +156,10 @@ pvCheckBox
       PV values to booleans.
 
 
-pvFloatSpin
+PVFloatSpin
 ~~~~~~~~~~~
 
-.. class:: pvFloatSpin(parent, pv=None, deadTime=500, min_val=None, 
+.. class:: PVFloatSpin(parent, pv=None, deadTime=500, min_val=None, 
                        max_val=None, increment=1.0, digits=-1, **kw)
 
     A FloatSpin is a floatin point spinctrl with buttons to increase
@@ -132,16 +167,16 @@ pvFloatSpin
 	 page up/down can also be used (the latter changes the value by 10x
 	 the increment.)
 
-	 pvFloatSpin is a special derivation that assigns a PV to the FloatSpin
+	 PVFloatSpin is a special derivation that assigns a PV to the FloatSpin
 	 control. deadTime is the delay (in milliseconds) between when the user
 	 finishes typing a value and when the PV is set to it (to prevent
 	 half-typed numeric values being set.)
 
 
-pvButton
+PVButton
 ~~~~~~~~~~~
 
-.. class:: pvButton(parent, pv=None, pushValue=1, disablePV=None, 
+.. class:: PVButton(parent, pv=None, pushValue=1, disablePV=None, 
                     disableValue=1, **kw)
 
     A wx.Button linked to a PV. When the button is pressed, 'pushValue'
@@ -151,51 +186,51 @@ pvButton
 	 button to disable when that PV has a certain value.
 
 
-pvRadioButton
+PVRadioButton
 ~~~~~~~~~~~~~
 
-.. class:: pvRadioButton(parent, pv=None, pvValue=None, **kw)
+.. class:: PVRadioButton(parent, pv=None, pvValue=None, **kw)
 
-    A pvRadioButton is a radio button associated with a particular PV 
+    A PVRadioButton is a radio button associated with a particular PV 
 	 and one particular value.
        
     Suggested for use in a group where all radio buttons are
-    pvRadioButtons, and they all have a discrete value set.
+    PVRadioButtons, and they all have a discrete value set.
 
 
 
-pvComboBox
+PVComboBox
 ~~~~~~~~~~~
 
-.. class:: pvComboBox(parent, pv=None, **kw)
+.. class:: PVComboBox(parent, pv=None, **kw)
 
     A ComboBox linked to a PV. Both reads/writes the combo value on changes.
 
 
 
-pvEnumButtons
+PVEnumButtons
 ~~~~~~~~~~~~~~~~~~
 
-.. class:: pvEnumButtons(parent, pv=None, font=None, fg=None, bg=None, **kw)
+.. class:: PVEnumButtons(parent, pv=None, font=None, fg=None, bg=None, **kw)
 
    This will create a wx.Panel of buttons (a button bar), 1 for each
    enumeration state of an enum PV.  The set of buttons will correspond to
    the current state of the PV
 
 
-pvEnumChoice 
+PVEnumChoice 
 ~~~~~~~~~~~~~~~~~~
 
-.. class:: pvEnumChoice(parent, pv=None, font=None, fg=None, bg=None, **kw)
+.. class:: PVEnumChoice(parent, pv=None, font=None, fg=None, bg=None, **kw)
 
    This will create a dropdown list (a wx.Choice) with a list of enumeration
    states for an enum PV.  
 
 
-pvAlarm   
+PVAlarm   
 ~~~~~~~~~~
 
-.. class:: pvAlarm(parent, pv=None, font=None, fg=None, bg=None, trip_point=None, **kw)
+.. class:: PVAlarm(parent, pv=None, font=None, fg=None, bg=None, trip_point=None, **kw)
 
     This will create a pop-up message (wx.MessageDialog) that is shown when
     the corresponding PV trips the alarm level.
@@ -288,8 +323,8 @@ OGL is a graphics drawing library shipped with wxPython. Is it built around
 the concept of "shapes" which are added to "canvases" and can be moved, 
 scrolled, zoomed, animated, etc.
 
-There is a pvShapeMixin class which allows PV callback functionality to be
-added to any OGL Shape class, and there are also pvRectangle and pvCircle 
+There is a PVShapeMixin class which allows PV callback functionality to be
+added to any OGL Shape class, and there are also PVRectangle and PVCircle 
 subclasses already created.
 
 A recommended way to use these OGL classes is to make a static bitmap
@@ -297,12 +332,12 @@ background for your display, place it in an OGL Canvas and then add an
 overlay of shapes which appear/disappear/resize/change colour based on
 the PV values.
 
-pvCtrlMixin
-~~~~~~~~~~~~
+PVShapeMixin
+~~~~~~~~~~~~~~~~
 
-.. class:: pvShapeMixin(self, pv=None, pvname=None)
+.. class:: PVShapeMixin(self, pv=None, pvname=None)
 
-  Similar to pvMixin, this mixin should be added to any 
+  Similar to PVMixin, this mixin should be added to any 
   ogl.Shape subclass that needs PV callback support.
 
   The main method is PVChanged(self, raw_value), which should be
@@ -326,17 +361,17 @@ pvCtrlMixin
   as it changes.
 
 
-pvRectangle
+PVRectangle
 ~~~~~~~~~~~
 
-.. class:: pvRectangle(self, w, h, pv=None, pvname=None)
+.. class:: PVRectangle(self, w, h, pv=None, pvname=None)
 
-   A pvCtrlMixin for the Rectangle shape class.
+   A PVCtrlMixin for the Rectangle shape class.
 
 
-pvCircle
+PVCircle
 ~~~~~~~~
 
-.. class::  pvCircle(self, diameter, pv=None, pvname=None)
+.. class::  PVCircle(self, diameter, pv=None, pvname=None)
 
-   A pvCtrlMixin for the Circle shape class.
+   A PVCtrlMixin for the Circle shape class.
