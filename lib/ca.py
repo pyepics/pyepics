@@ -75,7 +75,9 @@ def strjoin(sep, seq):
 
     if isinstance(sep, bytes):
         sep = BYTES2STR(sep)
-    if isinstance(seq[0], bytes):
+    if len(seq) == 0:
+        seq = ''
+    elif isinstance(seq[0], bytes):
         seq = [BYTES2STR(i) for i in seq]
     return sep.join(seq)
 
