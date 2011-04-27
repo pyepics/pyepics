@@ -168,6 +168,7 @@ class PV_Tests(unittest.TestCase):
         pv = PV(pvnames.enum_pv)
         self.assertNotEqual(pv, None)
         pv.put('Stop')
+        time.sleep(0.1)
         val = pv.get()
         self.assertEqual(val, 0)
 
