@@ -9,24 +9,22 @@ from . import wxlib, ogllib, utils
 
 MotorPanel    = motorpanel.MotorPanel
 
-pvText        = wxlib.pvText
-pvAlarm       = wxlib.pvAlarm
-pvFloatCtrl   = wxlib.pvFloatCtrl
-pvTextCtrl    = wxlib.pvTextCtrl
-pvEnumButtons = wxlib.pvEnumButtons
-pvEnumChoice  = wxlib.pvEnumChoice
-pvBitmap      = wxlib.pvBitmap
-pvCheckBox    = wxlib.pvCheckBox
-pvFloatSpin   = wxlib.pvFloatSpin
-pvButton      = wxlib.pvButton
-pvRadioButton = wxlib.pvRadioButton
-pvComboBox    = wxlib.pvComboBox
-pvToggleButton= wxlib.pvToggleButton
-pvStatusBar   = wxlib.pvStatusBar
+PVText        = pvText        = wxlib.PVText
+PVAlarm       = pvAlarm       = wxlib.PVAlarm
+PVFloatCtrl   = pvFloatCtrl   = wxlib.PVFloatCtrl
+PVTextCtrl    = pvTextCtrl    = wxlib.PVTextCtrl
+PVEnumButtons = pvEnumButtons = wxlib.PVEnumButtons
+PVEnumChoice  = pvEnumChoice  = wxlib.PVEnumChoice
+PVBitmap      = pvBitmap      = wxlib.PVBitmap
+PVCheckBox    = pvCheckBox    = wxlib.PVCheckBox
+PVFloatSpin   = pvFloatSpin   = wxlib.PVFloatSpin
+PVButton      = pvButton      = wxlib.PVButton
+PVRadioButton = pvRadioButton = wxlib.PVRadioButton
+PVComboBox    = pvComboBox    = wxlib.PVComboBox
 
 # OGL shapes
-pvRectangle   = ogllib.pvRectangle
-pvCircle      = ogllib.pvCircle
+PVRectangle   = pvRectangle   = ogllib.PVRectangle
+PVCircle      = pvCircle      = ogllib.PVCircle
 
 set_sizer = utils.set_sizer
 set_float = utils.set_float

@@ -89,14 +89,14 @@ class EpicsTimer:
         epics.ca.poll()
         event.Skip()
         
-class pvMixin:
+class PVMixin(object):
     """ base class mixin for any class that needs PV wx callback
         support.
         
-        If you're working with wxwidgets controls, see pvCtrlMixin.
+        If you're working with wxwidgets controls, see PVCtrlMixin.
         If you're working with wx OGL drawing, see ogllib.pvShapeMixin.
 
-        Classes deriving directly from pvMixin must override OnPVChange()     
+        Classes deriving directly from PVMixin must override OnPVChange()     
     """
     def __init__(self, pv=None, pvname=None):
         self.pv = None
@@ -199,7 +199,7 @@ class pvMixin:
                 out =list(self.pv.enum_strs)
         return out
         
-class pvCtrlMixin(pvMixin):
+class PVCtrlMixin(PVMixin):
     """ 
     mixin for wx Controls with epics PVs:  connects to PV,
     and manages callback events for the PV
@@ -226,7 +226,7 @@ class pvCtrlMixin(pvMixin):
     """
 
     def __init__(self, pv=None, pvname=None, font=None, fg=None, bg=None):
-        pvMixin.__init__(self, pv, pvname)
+        PVMixin.__init__(self, pv, pvname)
 
         self.translations = {}
         self.fgColourTranslations = None
@@ -385,7 +385,7 @@ class pvCtrlMixin(pvMixin):
         self._SetValue(self.translations.get(raw_value, raw_value))
 
 
-class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
+class PVTextCtrl(wx.TextCtrl, PVCtrlMixin):
     """
     Text control (ie textbox) for PV display (as normal string), 
     with callback for automatic updates and option to write value
@@ -400,7 +400,7 @@ class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
             kws['style'] |= wx.TE_PROCESS_ENTER
 
         wx.TextCtrl.__init__(self, parent, wx.ID_ANY, value='', **kws)
-        pvCtrlMixin.__init__(self, pv=pv, font=font, fg=fg, bg=bg)
+        PVCtrlMixin.__init__(self, pv=pv, font=font, fg=fg, bg=bg)
         self.Bind(wx.EVT_CHAR, self.OnChar)
 
     def OnChar(self, event):
@@ -427,7 +427,7 @@ class pvTextCtrl(wx.TextCtrl, pvCtrlMixin):
         "set widget value"
         self.SetValue(value)
 
-class pvText(wx.StaticText, pvCtrlMixin):
+class PVText(wx.StaticText, PVCtrlMixin):
     """ Static text for displaying a PV value, 
         with callback for automatic updates
         
@@ -453,7 +453,7 @@ class pvText(wx.StaticText, pvCtrlMixin):
 
         wx.StaticText.__init__(self, parent, wx.ID_ANY, label='',
                                style=wstyle, **kw)
-        pvCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
+        PVCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
         
         self.as_string = as_string
         self.units = units
@@ -470,13 +470,13 @@ class pvText(wx.StaticText, pvCtrlMixin):
             self.SetLabel("%s%s" % (value, self.units))
 
         
-class pvEnumButtons(wx.Panel, pvCtrlMixin):
+class PVEnumButtons(wx.Panel, PVCtrlMixin):
     """ a panel of buttons for Epics ENUM controls """
     def __init__(self, parent, pv=None, 
                  orientation=wx.HORIZONTAL,  **kw):
 
         wx.Panel.__init__(self, parent, wx.ID_ANY, **kw)
-        pvCtrlMixin.__init__(self, pv=pv)
+        PVCtrlMixin.__init__(self, pv=pv)
 
         pv.wait_for_connection()
         pv_value = pv.get(as_string=True)
@@ -520,12 +520,12 @@ class pvEnumButtons(wx.Panel, pvCtrlMixin):
         "not implemented"
         pass
 
-class pvEnumChoice(wx.Choice, pvCtrlMixin):
+class PVEnumChoice(wx.Choice, PVCtrlMixin):
     """ a dropdown choice for Epics ENUM controls """
     
     def __init__(self, parent, pv=None, **kw):
         wx.Choice.__init__(self, parent, wx.ID_ANY, **kw)
-        pvCtrlMixin.__init__(self, pv=pv)
+        PVCtrlMixin.__init__(self, pv=pv)
 
         pv.wait_for_connection()
         pv_value = pv.get(as_string=True)
@@ -557,20 +557,20 @@ class pvEnumChoice(wx.Choice, pvCtrlMixin):
         "set value"
         self.SetStringSelection(value)
 
-class pvAlarm(wx.MessageDialog, pvCtrlMixin):
+class PVAlarm(wx.MessageDialog, PVCtrlMixin):
     """ Alarm Message for a PV: a MessageDialog will pop up when a
     PV trips some alarm level"""
    
     def __init__(self, parent,  pv=None, 
                  font=None, fg=None, bg=None, trip_point=None, **kw):
 
-        pvCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
+        PVCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
        
     def _SetValue(self, value):
         "set value -- null op for pvAlarm"        
         pass
         
-class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
+class PVFloatCtrl(FloatCtrl, PVCtrlMixin):
     """ Float control for PV display of numerical data,
     with callback for automatic updates, and
     automatic determination of string/float controls
@@ -592,7 +592,7 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
         self.pv = None
         FloatCtrl.__init__(self, parent, value=0,
                            precision=precision, **kw)
-        pvCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
+        PVCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
 
     def _SetValue(self, value):
         "set widget value"
@@ -656,7 +656,7 @@ class pvFloatCtrl(FloatCtrl, pvCtrlMixin):
         except:
             pass
 
-class pvBitmap(wx.StaticBitmap, pvCtrlMixin):
+class PVBitmap(wx.StaticBitmap, PVCtrlMixin):
     """ 
     Static Bitmap where image is based on PV value,
     with callback for automatic updates
@@ -674,7 +674,7 @@ class pvBitmap(wx.StaticBitmap, pvCtrlMixin):
         """
         wx.StaticBitmap.__init__(self, parent, wx.ID_ANY,
                                  bitmap=defaultBitmap, **kw)
-        pvCtrlMixin.__init__(self, pv=pv)
+        PVCtrlMixin.__init__(self, pv=pv)
 
         self.defaultBitmap = defaultBitmap
         if bitmaps is None:
@@ -691,7 +691,7 @@ class pvBitmap(wx.StaticBitmap, pvCtrlMixin):
         if nextBitmap != self.GetBitmap():
             self.SetBitmap(nextBitmap)
 
-class pvCheckBox(wx.CheckBox, pvCtrlMixin):
+class PVCheckBox(wx.CheckBox, PVCtrlMixin):
     """ 
     Checkbox based on a binary PV value, both reads/writes the
     PV on changes.
@@ -709,7 +709,7 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
     def __init__(self, parent, pv=None, on_value=1, off_value=0, **kw):
         self.pv = None
         wx.CheckBox.__init__(self, parent, **kw)
-        pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
+        PVCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         wx.EVT_CHECKBOX(parent, self.GetId(), self.OnClicked)
         self.on_value = on_value
         self.off_value = off_value
@@ -740,7 +740,7 @@ class pvCheckBox(wx.CheckBox, pvCtrlMixin):
     # need to redefine the value Property as the old property refs old SetValue
     Value = property(wx.CheckBox.GetValue, SetValue)
 
-class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin): 
+class PVFloatSpin(floatspin.FloatSpin, PVCtrlMixin): 
     """ 
     A FloatSpin (floating-point-aware SpinCtrl) linked to a PV,
     both reads and writes the PV on changes.
@@ -760,7 +760,7 @@ class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin):
         floatspin.FloatSpin.__init__(self, parent, increment=increment,
                                      min_val=min_val, max_val=max_val,
                                      digits=digits, **kw)
-        pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
+        PVCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         floatspin.EVT_FLOATSPIN(parent, self.GetId(), self.OnSpin)
         
         self.deadTimer = wx.Timer(self)
@@ -802,7 +802,7 @@ class pvFloatSpin(floatspin.FloatSpin, pvCtrlMixin):
         self.deadTimer.Start(milliseconds=self.deadTime, oneShot=True)
 
        
-class pvButton(wx.Button, pvCtrlMixin):
+class PVButton(wx.Button, PVCtrlMixin):
     """ A Button linked to a PV. When the button is pressed, a certain value
         is written to the PV (useful for momentary PVs with HIGH= set.)
 
@@ -817,7 +817,7 @@ class pvButton(wx.Button, pvCtrlMixin):
 
         """
         wx.Button.__init__(self, parent, **kw)
-        pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
+        PVCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.pushValue = pushValue
         self.Bind(wx.EVT_BUTTON, self.OnPress)
         self.disablePV = disablePV
@@ -856,7 +856,7 @@ class pvButton(wx.Button, pvCtrlMixin):
         "button press event handler"
         self.pv.put(self.pushValue)
     
-class pvRadioButton(wx.RadioButton, pvCtrlMixin):
+class PVRadioButton(wx.RadioButton, PVCtrlMixin):
     """A pvRadioButton is a radio button associated with a particular PV
     and one particular value.       
     Suggested for use in a group where all radio buttons are
@@ -871,7 +871,7 @@ class pvRadioButton(wx.RadioButton, pvCtrlMixin):
            The value used is raw numeric, not "as string"
         """
         wx.RadioButton.__init__(self, parent, **kw)
-        pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
+        PVCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.pvValue = pvValue
         self.Bind(wx.EVT_RADIOBUTTON, self.OnPress)
 
@@ -888,13 +888,13 @@ class pvRadioButton(wx.RadioButton, pvCtrlMixin):
             self.Value = True
 
         
-class pvComboBox(wx.ComboBox, pvCtrlMixin):
+class PVComboBox(wx.ComboBox, PVCtrlMixin):
     """ A ComboBox linked to a PV. Both reads/writes the combo value on changes
 
     """
     def __init__(self, parent, pv=None, **kw):
         wx.ComboBox.__init__(self, parent, **kw)
-        pvCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
+        PVCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.Bind(wx.EVT_TEXT, self.OnText)
         
     def _SetValue(self, value):
@@ -907,7 +907,7 @@ class pvComboBox(wx.ComboBox, pvCtrlMixin):
         "text event"
         self.pv.put(self.Value)
         
-class pvToggleButton(wx.ToggleButton, pvCtrlMixin):
+class PVToggleButton(wx.ToggleButton, PVCtrlMixin):
     """A ToggleButton that can be attached to a bi or bo Epics record."""
     
     def __init__(self, parent, pv=None, down=1, up_colour=None,
@@ -927,7 +927,7 @@ class pvToggleButton(wx.ToggleButton, pvCtrlMixin):
         down_colour: Background colour of button when it is down. Default None.
         """
         wx.ToggleButton.__init__(self, parent, wx.ID_ANY, label='', **kwargs)
-        pvCtrlMixin.__init__(self, pv=pv)
+        PVCtrlMixin.__init__(self, pv=pv)
         
         self.down = down
         self.up_colour = up_colour
@@ -962,7 +962,7 @@ class pvToggleButton(wx.ToggleButton, pvCtrlMixin):
                                      else self.up_colour)
             self.SetLabel(self.labels[1])
 
-class pvStatusBar(wx.StatusBar, pvMixin):
+class PVStatusBar(wx.StatusBar, PVMixin):
     """A status bar that displays a pv value
     
     To use in a wxFrame:
@@ -974,7 +974,7 @@ class pvStatusBar(wx.StatusBar, pvMixin):
         Create a stsus bar that displays a pv value.
         """
         wx.StatusBar.__init__(self, parent, wx.ID_ANY, **kwargs)
-        pvMixin.__init__(self, pv=pv)
+        PVMixin.__init__(self, pv=pv)
     
     @EpicsFunction
     def OnPVChange(self, str_value):

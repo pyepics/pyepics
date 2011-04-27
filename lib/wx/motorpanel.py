@@ -12,7 +12,7 @@ provides two classes:
 #
 import wx
 import epics
-from epics.wx.wxlib import pvText, pvFloatCtrl, \
+from epics.wx.wxlib import PVText, PVFloatCtrl, \
      DelayedEpicsCallback, EpicsFunction
 
 from epics.wx.motordetailframe  import MotorDetailFrame
@@ -112,15 +112,15 @@ class MotorPanel(wx.Panel):
         if not self.is_full:
             wdesc, wrbv, winfo, wdrv = 95, 80, 80, 80
         
-        self.desc = pvText(self, size=(wdesc, 25), style=LTEXT)
+        self.desc = PVText(self, size=(wdesc, 25), style=LTEXT)
         self.desc.SetForegroundColour("Blue")
 
-        self.rbv  = pvText(self, size=(wrbv, 25), fg='Blue', style=RCEN)
+        self.rbv  = PVText(self, size=(wrbv, 25), fg='Blue', style=RCEN)
         self.info = wx.StaticText(self, label='',
                                   size=(winfo, 25), style=RCEN)
         self.info.SetForegroundColour("Red")
 
-        self.drive = pvFloatCtrl(self, size=(wdrv, -1), style = wx.TE_RIGHT)
+        self.drive = PVFloatCtrl(self, size=(wdrv, -1), style = wx.TE_RIGHT)
         
         self.FillPanelComponents()
                 

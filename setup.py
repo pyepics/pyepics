@@ -26,9 +26,11 @@ if os.name == 'nt':
     except:
         nbits = '32bit'
     if nbits.startswith('64'):
-        data_files = [('DLLs', ['dlls/win64/ca.dll','dlls/win64/Com.dll'])]
+        data_files = [('DLLs', ['dlls/win64/ca.dll','dlls/win64/Com.dll']),
+                      ('', ['dlls/win64/carepeater.exe'])]        
     else:
-        data_files = [('DLLs', ['dlls/win32/ca.dll','dlls/win32/Com.dll'])]
+        data_files = [('DLLs', ['dlls/win32/ca.dll','dlls/win32/Com.dll']),
+                      ('', ['dlls/win32/carepeater.exe'])]
 
 setup(name = 'pyepics',
       version = lib.__version__,

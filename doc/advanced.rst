@@ -82,7 +82,6 @@ The result looks like this (taken with a Prosilica GigE camera):
 Example using Character Waveforms as Long Strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 As EPICS strings can be only 40 characters long, Character Waveforms are
 sometimes used to allow Long Strings.  While this can be a common usage for
 character waveforms, this module resists the temptation to implicitly
@@ -133,62 +132,55 @@ Using Python Threads
 =========================
 
 An important feature of the PyEpics package is that it can be used with
-Python threads.  Even in the best of cases, working with threads can be
-somewhat tricky and lead to unexpected behavior.  The Channel Access
-library supports threading in the C library and adds a small level of
-complication for using CA with Python threads.  The result is not too
-difficult, but some precautions are in order.  This section discusses
-the strategies for using threads with PyEpics, including both `PV`
-object the procedural functions in the `ca` module.  I should state
-clearly that I am not an expert on threads (or Channel Access).
+Python threads, as Epics 3.14 supports threads for client code.  Even in
+the best of cases, working with threads can be somewhat tricky and lead to
+unexpected behavior, and the Channel Access library adds a small level of
+complication for using CA with Python threads.  The result is that some
+precautions are in order when using PyEpics and threads.  This section
+discusses the strategies for using threads with PyEpics.
 
-To use threads with Channel Access, you must have
+First, to use threads with Channel Access, you must have
 :data:`epics.ca.PREEMPTIVE_CALLBACK` = ``True``.  This is the default
 value, but if :data:`epics.ca.PREEMPTIVE_CALLBACK` has been set to
 ``False``, threading will not work.
 
-Channel Access uses a concept of *contexts* for its own thread model, with
-contexts holding sets of threads as well as Channels and Process Variables.
-For non-threaded work, a process will use a single context that is
-initialized prior doing any real CA work (done in
-:meth:`ca.initialize_libca`).  With a threaded application, however, the C
-library starts each new thread with a new, uninitialized context that must be
-initialized or replaced.  Thus each new thread must either by explicitly
-create its own context (and then, being a good citizen, destroy this
-context as the thread ends) or attach to an existing context.
+Second, it is important to know a little about threading with Channel
+Access.  The Channel Access library uses a concept of *contexts* for its
+own thread model, with contexts holding sets of threads as well as Channels
+and Process Variables.  For non-threaded work, a process will use a single
+context that is initialized prior doing any real CA work (done in
+:meth:`ca.initialize_libca`).  In a threaded application, each new thread
+with a new, uninitialized context that must be initialized or replaced.
+Thus each new python thread that will interact with CA *must* either
+explicitly create its own context with :meth:`ca.create_context` (and then,
+being a good citizen, destroy this context as the thread ends with
+:meth:`ca.destroy_context`) or attach to an existing context.
 
-Because of the need for each thread to identify its CA context, there are
-several ways of working with Epica Channel Access and Threads.  The
-generally recommended approach is to use a single Epics CA context
-throughout an entire process.  This avoids many potential pitfalls (and
-crashes), and can be done fairly simply.  The most explicit way to do this
-is to call :meth:`epics.ca.use_initial_context` at the beginning of each
-function (before any CA calls) that will be called by :meth:`Thread.run`.
+The generally recommended approach is to use a single CA context throughout
+an entire process.  This avoids many potential pitfalls (and crashes), and
+can be done fairly simply.  The most explicit way to do this is to call
+:meth:`epics.ca.use_initial_context` at the beginning of each function
+(before any CA calls) that will be called by :meth:`Thread.run`.
 Equivalently, you can add a :func:`withInitialContext` decorator to the
-function.  For functions that might be called either in the main thread or
-in a new thread, this addition incurs very little penalty, but it is a
-little intrusive to have to do this for each function.
+function. Of course, this approach requres CA to be initialized *in the
+main thread*.  If you are writing a threaded application in which the first
+real CA calls are inside a child thread, you must either initialize the CA
+library (say, by creating a PV), or use the :func:`epics.ca.create_context`
+/ :func:`epics.ca.destroy_context` method.
 
-There is an important caveat for using
-:meth:`epics.ca.use_initial_context` which is that CA must actually be
-initialized *in the main thread* for this to work.  If you are writing a
-threaded application in which the first real CA calls are inside a child
-thread, you must either initialize the CA library (say, by creating a
-PV), or use the :func:`epics.ca.create_context` /
-:func:`epics.ca.destroy_context` method.
 
-Another option is to use the :class:`CAThread` in the :mod:`ca` module
-instead of the standard :class:`threading.Thread` class.
-:class:`CAThread` is a very thin wrapper around the standard
-:class:`threading.Thread`, simply adding a call of
-:meth:`epics.ca.use_initial_context` just before your threaded function
-is run.
+As a convenience, the :class:`CAThread` in the :mod:`ca` module is 
+is a very thin wrapper around the standard :class:`threading.Thread` which
+adding a call of  :meth:`epics.ca.use_initial_context` just before your
+threaded function is run.  This allows your target functions to not
+explicitly set the context, but still ensures that the initial context is
+used in all functions.
 
-To recap, to use threads you must use PREEMPTIVE_CALLBACK.  Furthermore,
-it is recommended that you use a single context, and that you initialize CA in
-the main program thread so that your single CA context belongs to the
-main thread.   The options for using threads (in approximate order of
-reliability) are then:
+To recap, to use threads you must use run in PREEMPTIVE_CALLBACK mode.
+Furthermore, it is recommended that you use a single context, and that you
+initialize CA in the main program thread so that your single CA context
+belongs to the main thread.  The options for using threads (in approximate
+order of reliability) are then:
 
  1. use :class:`CAThread` instead of :class:`Thread` for threads that
  will use CA.
