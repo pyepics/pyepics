@@ -36,7 +36,6 @@ th1.start()
 th2.start()
 
 epics.ca.show_cache()
-print 'JOIN:: '
 th2.join()
 th1.join()
 

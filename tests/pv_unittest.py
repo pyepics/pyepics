@@ -169,10 +169,7 @@ class PV_Tests(unittest.TestCase):
         self.assertNotEqual(pv, None)
         pv.put('Stop')
         val = pv.get()
-        print pv, val
-
         self.assertEqual(val, 0)
-
 
 
     def xtest_DoubleVal(self):
