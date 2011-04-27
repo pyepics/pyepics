@@ -53,6 +53,7 @@ class PV(object):
                  verbose=False, auto_monitor=None,
                  connection_callback=None,
                  connection_timeout=None):
+
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
@@ -73,6 +74,10 @@ class PV(object):
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
         self.chid = None
+        
+        if ca.current_context() is None:
+            ca.use_initial_context() 
+        self.context = ca.current_context()
 
         self._args['chid'] = self.chid = ca.create_channel(self.pvname,
                                                            callback=self.__on_connect)
@@ -82,7 +87,7 @@ class PV(object):
                                       use_time= self.form == 'time')
 
         self._args['type'] = dbr.Name(self.ftype).lower()
-        self.context = ca.current_context()
+        
 
         if callback is not None:
             self.add_callback(callback)
@@ -216,7 +221,7 @@ class PV(object):
         if not self.wait_for_connection():
             return None
         if (self.ftype in (dbr.ENUM, dbr.TIME_ENUM, dbr.CTRL_ENUM) and
-            value is not None and value in self._args['enum_strs']):
+            isinstance(value, str) and value in self._args['enum_strs']):
             value = self._args['enum_strs'].index(value)
         if use_complete and callback is None:
             callback = self.__putCallbackStub
