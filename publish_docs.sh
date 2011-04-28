@@ -4,7 +4,7 @@ docbuild='doc/_build'
 cd doc 
 echo '# Making docs'
 
-make all
+# make all
 cd ../
 echo '# Building tarball of docs'
 mkdir _tmpdoc
@@ -14,6 +14,8 @@ cd _tmpdoc
 tar czf ../../pyepics_docs.tar.gz .
 cd ..
 rm -rf _tmpdoc 
+
+# 
 
 echo "# Switching to gh-pages branch"
 git checkout gh-pages
@@ -44,16 +46,3 @@ if  [ $? -ne 0 ]  ; then
   echo ' failed.'
   exit 
 fi
-# 
-# install locally
-echo "# Installing docs to CARS web pages"
-cp ../pyepics_docs.tar.gz $installdir/../.
-
-cd $installdir
-if  [ $? -ne 0 ]  ; then 
-  echo ' failed.'
-  exit 
-fi
-
-tar xvf ../pyepics_docs.tar.gz .
-
