@@ -10,7 +10,7 @@ possible that Python 2.4 will work if the ctypes package is installed, but
 this has not been tested.  In addition, Python 3.2 should work as well, but
 was not tested as of this writing.
 
-In addtion, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
+In addition, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
 libCom.so and libca.so (or Com.dll and ca.dll on Windows) from *Epics Base*
 are required to use this module.  Using a patched version of 3.14.12 is
@@ -26,14 +26,14 @@ setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 Downloads
 ~~~~~~~~~~~~~
 
-The latest stable version of the Epics Python Package is 3.1.1.  There are
+The latest stable version of the Epics Python Package is 3.1.2.  There are
 a few ways to get the Epics Python Package: 
 
-.. _pyepics-3.1.1.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.tar.gz
-.. _pyepics-3.1.1.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.1.tar.gz
-.. _pyepics-3.1.1.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py2.6.exe
-.. _pyepics-3.1.1.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py2.7.exe
-.. _pyepics-3.1.1.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py3.1.exe
+.. _pyepics-3.1.2.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.tar.gz
+.. _pyepics-3.1.2.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.2.tar.gz
+.. _pyepics-3.1.2.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.win32-py2.6.exe
+.. _pyepics-3.1.2.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.win32-py2.7.exe
+.. _pyepics-3.1.2.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.win32-py3.1.exe
 .. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
 .. _PyPi Epics Entry:             http://pypi.python.org/pypi/pyepics/
@@ -42,12 +42,12 @@ a few ways to get the Epics Python Package:
 +---------------------------+------------------------------------------+
 |  Download Option          |  Location                                |
 +===========================+==========================================+
-|  Source Kit               |  `pyepics-3.1.1.tar.gz (CARS)`_  or      |
-|                           |  `pyepics-3.1.1.tar.gz (PyPI)`_          |
+|  Source Kit               |  `pyepics-3.1.2.tar.gz (CARS)`_  or      |
+|                           |  `pyepics-3.1.2.tar.gz (PyPI)`_          |
 +---------------------------+------------------------------------------+
-|  Windows Installers       |  `pyepics-3.1.1.win32-py2.6.exe`_  or    |
-|                           |  `pyepics-3.1.1.win32-py2.7.exe`_        |
-|                           |  `pyepics-3.1.1.win32-py3.1.exe`_        |
+|  Windows Installers       |  `pyepics-3.1.2.win32-py2.6.exe`_  or    |
+|                           |  `pyepics-3.1.2.win32-py2.7.exe`_        |
+|                           |  `pyepics-3.1.2.win32-py3.1.exe`_        |
 +---------------------------+------------------------------------------+
 |  Development Version      |  use `pyepics github repository`_        |
 +---------------------------+------------------------------------------+
@@ -62,19 +62,22 @@ Testing
 ~~~~~~~~~~~~~
 
 Some automated unit-testing is done, using the tests folder from the source
-distribution kit.   The following systems were tested for 3.1.0.   Except
-as noted, all tests pass.  Those tests that fail are generally well-understood.
+distribution kit.  The following systems were tested for 3.1.2, all with
+Epics base 3.14.12.1.  Except as noted, all tests pass.  Those tests that
+fail are generally well-understood.
 
 +-----------+-----------------+------------+-----------------------------+
 |  Host OS  | Epics HOST ARCH |  Python    |   Tests Failed, Notes       |
 +===========+=================+============+=============================+
-|   Linux   |  linux-x86      |   2.5.1    |   autosave not tested       |
+| Linux     |  linux-x86      |  2.5.1     |   autosave not tested       |
 +-----------+-----------------+------------+-----------------------------+
-|   Linux   |  linux-x86      |   2.6      |   subarray  / base 3.14.11  |
+| Linux     |  linux-x86      |  2.6       |   all pass                  |
 +-----------+-----------------+------------+-----------------------------+
-|   Linux   |  linux-x86      |   2.6.6    |   all pass                  |
+| Linux     |  linux-x86      |  2.6.6     |   all pass                  |
 +-----------+-----------------+------------+-----------------------------+
-|   Linux   |  linux-x86_64   |   2.7      |   all pass                  |
+| Linux     |  linux-x86_64   |  2.7       |   all pass                  |
++-----------+-----------------+------------+-----------------------------+
+| Linux     |  linux-x86_64   |  3.1       |   all pass                  |
 +-----------+-----------------+------------+-----------------------------+
 | Windows   |   win32-x86     |  2.6.5     |   all pass                  |
 +-----------+-----------------+------------+-----------------------------+
@@ -82,15 +85,15 @@ as noted, all tests pass.  Those tests that fail are generally well-understood.
 +-----------+-----------------+------------+-----------------------------+
 | Windows   |   win32-x86     |  3.1       |   pyparsing/autosave        |
 +-----------+-----------------+------------+-----------------------------+
-| Mac OSX   |  darwin-x86     | 2.6.5      |   subarray / base 3.14.11   |
+| Mac OSX   |  darwin-x86     |  2.6.5     |   all pass                  |
 +-----------+-----------------+------------+-----------------------------+
 
 
-Here *subarray/base 3.14.11* means that some tests with subarrays
-failed, as the system was using epics base 3.14.11.  The autosave module
-relies on the 3rd part extension pyparsing, which seems to not work
-correctly for Python3.1 and was not installed on one tested system.
-Note that the wx module is not automatically tested.
+Note that tests involving subarrays are known to fail with Epics base of
+3.14.11 and earlier.  The autosave module relies on the 3rd part extension
+pyparsing, which seems to not work correctly for Python3.1 and was not
+installed on one tested system.  The wx module is not automatically
+tested. 
 
 
 Development Version
@@ -98,7 +101,7 @@ Development Version
 
 The PyEpics module is still under active development, and enhancements and
 bug-fixes are being added frequently.  All development is done through the
-`pyepics github repository`_.  To get a read-only copy of the atest
+`pyepics github repository`_.  To get a read-only copy of the latest
 version, use::
 
    git clone http://github.com/pyepics/pyepics.git
@@ -113,7 +116,6 @@ at the `PyEpics Source Tree`_.
 Installation
 ~~~~~~~~~~~~~~~~~
 
-
 Installation from source on any platform is::
 
    python setup.py install
@@ -127,12 +129,12 @@ install the PyEpics Package with::
    easy_install -U pyepics
 
 
-Acknowledgements
+Acknowledgments
 ~~~~~~~~~~~~~~~~~~~~~~
 
 PyEpics was originally written and is maintained by Matt Newville
 <newville@cars.uchicago.ed>.  Important contributions to the library have
-come from Angus Gratton, at the Australiaon National University.  Several
+come from Angus Gratton, at the Australian National University.  Several
 other people have provided valuable additions, suggestions, or bug reports,
 which has greatly improved the quality of the library: Michael Abbott,
 Marco Cammarata, Craig Haskins, Pete Jemian, Andrew Johnson, Janko Kolar,

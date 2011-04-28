@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.1',
+        VERSION:     '3.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -71,6 +71,7 @@
 </li>
 <li><a class="reference internal" href="#user-supplied-callback-functions">User-supplied Callback functions</a></li>
 <li><a class="reference internal" href="#omissions">Omissions</a></li>
+<li><a class="reference internal" href="#cathread-class"><tt class="docutils literal"><span class="pre">CAThread</span></tt> class</a></li>
 <li><a class="reference internal" href="#examples">Examples</a><ul>
 <li><a class="reference internal" href="#create-connect-get-value-of-channel">Create, Connect, Get Value of Channel</a></li>
 <li><a class="reference internal" href="#put-waiting-for-completion">Put, waiting for completion</a></li>
@@ -188,7 +189,7 @@ initialization and finalization tasks are handled in the following way:</p>
 <div><ul class="simple">
 <li>The <tt class="xref py py-data docutils literal"><span class="pre">libca</span></tt> variable in the <a class="reference internal" href="#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module holds a permanent,
 global reference to the CA shared object library (DLL).</li>
-<li>the function <tt class="xref py py-func docutils literal"><span class="pre">initialize_libca()</span></tt> is called to initialize libca.
+<li>the function <a class="reference internal" href="#ca.initialize_libca" title="ca.initialize_libca"><tt class="xref py py-func docutils literal"><span class="pre">initialize_libca()</span></tt></a> is called to initialize libca.
 This function takes no arguments, but does use the global Boolean
 <a class="reference internal" href="#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></tt></a> (default value of <tt class="xref docutils literal"><span class="pre">True</span></tt>) to control
 whether preemptive callbacks are used.</li>
@@ -224,7 +225,7 @@ func:<cite>pend_event</cite>.</p>
 <dt id="ca.AUTOMONITOR_MAXLENGTH">
 <tt class="descclassname">ca.</tt><tt class="descname">AUTOMONITOR_MAXLENGTH</tt><a class="headerlink" href="#ca.AUTOMONITOR_MAXLENGTH" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets the default array length (ie, how many elements an array has) above
-which automatic conversion to numpy arrays <em>and</em> automatica monitoring
+which automatic conversion to numpy arrays <em>and</em> automatic monitoring
 for PV variables is suppressed.  The default value is 16384.  To be
 clear: waveforms with fewer elements than this value will be
 automatically monitored changes, and will be converted to numpy arrays
@@ -238,11 +239,25 @@ automatically monitored changes, and will be converted to numpy arrays
 <p>Many general-purpose CA functions that deal with general communication and
 threading contexts are very close to the C library:</p>
 <dl class="function">
+<dt id="ca.initialize_libca">
+<tt class="descclassname">ca.</tt><tt class="descname">initialize_libca</tt><big>(</big><big>)</big><a class="headerlink" href="#ca.initialize_libca" title="Permalink to this definition">¶</a></dt>
+<dd><p>This initializes the CA library.  This must be called prior to any
+actual use of the CA library, but it is called automatically by the  <a class="reference internal" href="#ca.withCA" title="ca.withCA"><tt class="xref py py-func docutils literal"><span class="pre">withCA()</span></tt></a>
+decorator, so you should never need to call this in a real program.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="ca.context_create">
-<tt class="descclassname">ca.</tt><tt class="descname">context_create</tt><big>(</big><span class="optional">[</span><em>context=None</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.context_create" title="Permalink to this definition">¶</a></dt>
-<dd><p>here, you can explicitly set context to 1 to enable  preemptive
-callbacks, 0 to disable them, or leave as <tt class="xref docutils literal"><span class="pre">None</span></tt> to use the value of
-<a class="reference internal" href="#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></tt></a> to set the context.</p>
+<tt class="descclassname">ca.</tt><tt class="descname">context_create</tt><big>(</big><big>)</big><a class="headerlink" href="#ca.context_create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="ca.create_context">
+<tt class="descclassname">ca.</tt><tt class="descname">create_context</tt><big>(</big><big>)</big><a class="headerlink" href="#ca.create_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will create a new context, using the value of <a class="reference internal" href="#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></tt></a> to set
+the context type. Note that CA library function has the irritating name of
+<em>context_create</em>.  Both that and <em>create_context</em> (which is more consistent with the
+Verb_Object of the rest of the CA library) are allowed.</p>
 </dd></dl>
 
 <dl class="function">
@@ -251,19 +266,36 @@ callbacks, 0 to disable them, or leave as <tt class="xref docutils literal"><spa
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="ca.attach_context">
-<tt class="descclassname">ca.</tt><tt class="descname">attach_context</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#ca.attach_context" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="ca.detach_context">
-<tt class="descclassname">ca.</tt><tt class="descname">detach_context</tt><big>(</big><big>)</big><a class="headerlink" href="#ca.detach_context" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="ca.destroy_context">
+<tt class="descclassname">ca.</tt><tt class="descname">destroy_context</tt><big>(</big><big>)</big><a class="headerlink" href="#ca.destroy_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will destroy the current context.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ca.current_context">
 <tt class="descclassname">ca.</tt><tt class="descname">current_context</tt><big>(</big><big>)</big><a class="headerlink" href="#ca.current_context" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This returns an integer value for the current context.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ca.attach_context">
+<tt class="descclassname">ca.</tt><tt class="descname">attach_context</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#ca.attach_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>This attaches to the context supplied.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ca.detach_context">
+<tt class="descclassname">ca.</tt><tt class="descname">detach_context</tt><big>(</big><big>)</big><a class="headerlink" href="#ca.detach_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>This detaches from the current context.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ca.use_initial_context">
+<tt class="descclassname">ca.</tt><tt class="descname">use_initial_context</tt><big>(</big><big>)</big><a class="headerlink" href="#ca.use_initial_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>This attaches to the context created when libca is initialized.
+Using this function is recommended when writing Threaded programs that
+using CA.  See <a class="reference internal" href="advanced.html#advanced-threads-label"><em>Using Python Threads</em></a> for further discussion.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ca.client_status">
@@ -310,7 +342,7 @@ to <tt class="xref py py-func docutils literal"><span class="pre">sys.stderr.wri
 <div class="section" id="creating-and-connecting-to-channels">
 <h3>Creating and Connecting to Channels<a class="headerlink" href="#creating-and-connecting-to-channels" title="Permalink to this headline">¶</a></h3>
 <p>The basic channel object is the Channel ID or <tt class="docutils literal"><span class="pre">chid</span></tt>.  With the CA
-library (and <tt class="docutils literal"><span class="pre">ca</span></tt> module), onee creates and acts on the <tt class="docutils literal"><span class="pre">chid</span></tt> values.
+library (and <tt class="docutils literal"><span class="pre">ca</span></tt> module), one creates and acts on the <tt class="docutils literal"><span class="pre">chid</span></tt> values.
 These are simply <tt class="xref py py-data docutils literal"><span class="pre">ctypes.c_long</span></tt> (C long integers) that hold the
 memory address of the C representation of the channel, but it is probably
 a good idea to treat these as object instances.</p>
@@ -725,7 +757,7 @@ identify this group and is passed to all other synchronous group commands.</p>
 
 <dl class="function">
 <dt id="ca.sg_get">
-<tt class="descclassname">ca.</tt><tt class="descname">sg_get</tt><big>(</big><em>gid</em>, <em>chid</em><span class="optional">[</span>, <em>fype=None</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.sg_get" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ca.</tt><tt class="descname">sg_get</tt><big>(</big><em>gid</em>, <em>chid</em><span class="optional">[</span>, <em>ftype=None</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.sg_get" title="Permalink to this definition">¶</a></dt>
 <dd><p>perform a <cite>get</cite> within a synchronous group.</p>
 <p>This function will not immediately return the value, of course, but the
 address of the underlying data.</p>
@@ -790,7 +822,7 @@ completion.</p>
     <span class="n">ca</span><span class="o">.</span><span class="n">sg_put</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span> <span class="n">chid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
 
-<span class="k">print</span> <span class="s">&#39;sg_put done, but not blocked / commited. Sleep for 5 seconds &#39;</span>
+<span class="k">print</span> <span class="s">&#39;sg_put done, but not blocked / committed. Sleep for 5 seconds &#39;</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">sg_block</span><span class="p">(</span><span class="n">sg</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&#39;done.&#39;</span>
@@ -953,7 +985,7 @@ whose return value should be <tt class="docutils literal"><span class="pre">dbr.
 <div class="section" id="function-decorators">
 <h3>Function Decorators<a class="headerlink" href="#function-decorators" title="Permalink to this headline">¶</a></h3>
 <p>In addition to <a class="reference internal" href="#ca.withSEVCHK" title="ca.withSEVCHK"><tt class="xref py py-func docutils literal"><span class="pre">withSEVCHK()</span></tt></a>, several other decorator functions are
-used heavily inside of ca.py</p>
+used heavily inside of ca.py or are available for your convenience.</p>
 <dl class="function">
 <dt id="ca.withCA">
 <tt class="descclassname">ca.</tt><tt class="descname">withCA</tt><big>(</big><big>)</big><a class="headerlink" href="#ca.withCA" title="Permalink to this definition">¶</a></dt>
@@ -978,6 +1010,13 @@ the CA library.</p>
 <dd><p>ensures that the first argument of a function is a connected <tt class="docutils literal"><span class="pre">chid</span></tt>.
 This test is (intended to be) robust, and will (try to) make sure a
 <tt class="docutils literal"><span class="pre">chid</span></tt> is actually connected before calling the decorated function.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ca.withInitialContext">
+<tt class="descclassname">ca.</tt><tt class="descname">withInitialContext</tt><big>(</big><big>)</big><a class="headerlink" href="#ca.withInitialContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>ensures that the called function uses the threading context initially defined.
+The See <a class="reference internal" href="advanced.html#advanced-threads-label"><em>Using Python Threads</em></a> for further discussion.</p>
 </dd></dl>
 
 </div>
@@ -1145,6 +1184,20 @@ functions.</p>
 DBR_STS and DBR_GR variants are not. Several <cite>dbr_XXX</cite> functions are also
 not supported, as they are needed only to dynamically allocate memory.</p>
 </div>
+<div class="section" id="cathread-class">
+<h2><a class="reference internal" href="#ca.CAThread" title="ca.CAThread"><tt class="xref py py-class docutils literal"><span class="pre">CAThread</span></tt></a> class<a class="headerlink" href="#cathread-class" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ca.CAThread">
+<em class="property">class </em><tt class="descclassname">ca.</tt><tt class="descname">CAThread</tt><big>(</big><em>group=None</em><span class="optional">[</span>, <em>target=None</em><span class="optional">[</span>, <em>name=None</em><span class="optional">[</span>, <em>args=()</em><span class="optional">[</span>, <em>kwargs={}</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.CAThread" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a CA-aware subclass of a standard Python <tt class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></tt>.  See the
+standard library documentation for further information on how to use Thread objects.</p>
+<p>A <cite>CAThread</cite> simply runs <a class="reference internal" href="#ca.use_initial_context" title="ca.use_initial_context"><tt class="xref py py-func docutils literal"><span class="pre">use_initial_context()</span></tt></a> prior to running each target
+function, so that <a class="reference internal" href="#ca.use_initial_context" title="ca.use_initial_context"><tt class="xref py py-func docutils literal"><span class="pre">use_initial_context()</span></tt></a> does not have to be explicitly put inside
+the target function.</p>
+<p>The See <a class="reference internal" href="advanced.html#advanced-threads-label"><em>Using Python Threads</em></a> for further discussion.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <p>Here are some example sessions using the <a class="reference internal" href="#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module.</p>
@@ -1206,7 +1259,7 @@ standard output:</p>
 </div>
 <p>It is <strong>vital</strong> that the return value from <a class="reference internal" href="#ca.create_subscription" title="ca.create_subscription"><tt class="xref py py-meth docutils literal"><span class="pre">create_subscription()</span></tt></a> is
 kept in a variable so that it cannot be garbage collected.  Failure to keep
-this value will cause trouble, inlcuding almost immediate segmentation
+this value will cause trouble, including almost immediate segmentation
 faults (on Windows) or seemingly inexplicable crashes later (on linux).</p>
 </div>
 <div class="section" id="define-a-connection-callback">

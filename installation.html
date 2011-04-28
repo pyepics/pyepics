@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.1',
+        VERSION:     '3.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -55,7 +55,7 @@
 <li><a class="reference internal" href="#testing">Testing</a></li>
 <li><a class="reference internal" href="#development-version">Development Version</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#acknowledgements">Acknowledgements</a></li>
+<li><a class="reference internal" href="#acknowledgments">Acknowledgments</a></li>
 <li><a class="reference internal" href="#epics-open-license">Epics Open License</a></li>
 </ul>
 </li>
@@ -101,7 +101,7 @@
 possible that Python 2.4 will work if the ctypes package is installed, but
 this has not been tested.  In addition, Python 3.2 should work as well, but
 was not tested as of this writing.</p>
-<p>In addtion, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
+<p>In addition, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
 libCom.so and libca.so (or Com.dll and ca.dll on Windows) from <em>Epics Base</em>
 are required to use this module.  Using a patched version of 3.14.12 is
@@ -115,7 +115,7 @@ setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.</p>
 </div>
 <div class="section" id="downloads">
 <h2>Downloads<a class="headerlink" href="#downloads" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the Epics Python Package is 3.1.1.  There are
+<p>The latest stable version of the Epics Python Package is 3.1.2.  There are
 a few ways to get the Epics Python Package:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -129,13 +129,13 @@ a few ways to get the Epics Python Package:</p>
 </thead>
 <tbody valign="top">
 <tr><td>Source Kit</td>
-<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.tar.gz">pyepics-3.1.1.tar.gz (CARS)</a>  or
-<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.1.tar.gz">pyepics-3.1.1.tar.gz (PyPI)</a></td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.tar.gz">pyepics-3.1.2.tar.gz (CARS)</a>  or
+<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.2.tar.gz">pyepics-3.1.2.tar.gz (PyPI)</a></td>
 </tr>
 <tr><td>Windows Installers</td>
-<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py2.6.exe">pyepics-3.1.1.win32-py2.6.exe</a>  or
-<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py2.7.exe">pyepics-3.1.1.win32-py2.7.exe</a>
-<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.1.win32-py3.1.exe">pyepics-3.1.1.win32-py3.1.exe</a></td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.win32-py2.6.exe">pyepics-3.1.2.win32-py2.6.exe</a>  or
+<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.win32-py2.7.exe">pyepics-3.1.2.win32-py2.7.exe</a>
+<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.win32-py3.1.exe">pyepics-3.1.2.win32-py3.1.exe</a></td>
 </tr>
 <tr><td>Development Version</td>
 <td>use <a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github repository</a></td>
@@ -150,8 +150,9 @@ the PyEpics Package simply with:</p>
 <div class="section" id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
 <p>Some automated unit-testing is done, using the tests folder from the source
-distribution kit.   The following systems were tested for 3.1.0.   Except
-as noted, all tests pass.  Those tests that fail are generally well-understood.</p>
+distribution kit.  The following systems were tested for 3.1.2, all with
+Epics base 3.14.12.1.  Except as noted, all tests pass.  Those tests that
+fail are generally well-understood.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="16%" />
@@ -175,7 +176,7 @@ as noted, all tests pass.  Those tests that fail are generally well-understood.<
 <tr><td>Linux</td>
 <td>linux-x86</td>
 <td>2.6</td>
-<td>subarray  / base 3.14.11</td>
+<td>all pass</td>
 </tr>
 <tr><td>Linux</td>
 <td>linux-x86</td>
@@ -185,6 +186,11 @@ as noted, all tests pass.  Those tests that fail are generally well-understood.<
 <tr><td>Linux</td>
 <td>linux-x86_64</td>
 <td>2.7</td>
+<td>all pass</td>
+</tr>
+<tr><td>Linux</td>
+<td>linux-x86_64</td>
+<td>3.1</td>
 <td>all pass</td>
 </tr>
 <tr><td>Windows</td>
@@ -205,21 +211,21 @@ as noted, all tests pass.  Those tests that fail are generally well-understood.<
 <tr><td>Mac OSX</td>
 <td>darwin-x86</td>
 <td>2.6.5</td>
-<td>subarray / base 3.14.11</td>
+<td>all pass</td>
 </tr>
 </tbody>
 </table>
-<p>Here <em>subarray/base 3.14.11</em> means that some tests with subarrays
-failed, as the system was using epics base 3.14.11.  The autosave module
-relies on the 3rd part extension pyparsing, which seems to not work
-correctly for Python3.1 and was not installed on one tested system.
-Note that the wx module is not automatically tested.</p>
+<p>Note that tests involving subarrays are known to fail with Epics base of
+3.14.11 and earlier.  The autosave module relies on the 3rd part extension
+pyparsing, which seems to not work correctly for Python3.1 and was not
+installed on one tested system.  The wx module is not automatically
+tested.</p>
 </div>
 <div class="section" id="development-version">
 <h2>Development Version<a class="headerlink" href="#development-version" title="Permalink to this headline">¶</a></h2>
 <p>The PyEpics module is still under active development, and enhancements and
 bug-fixes are being added frequently.  All development is done through the
-<a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github repository</a>.  To get a read-only copy of the atest
+<a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github repository</a>.  To get a read-only copy of the latest
 version, use:</p>
 <div class="highlight-python"><pre>git clone http://github.com/pyepics/pyepics.git</pre>
 </div>
@@ -241,11 +247,11 @@ install the PyEpics Package with:</p>
 <div class="highlight-python"><pre>easy_install -U pyepics</pre>
 </div>
 </div>
-<div class="section" id="acknowledgements">
-<h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="acknowledgments">
+<h2>Acknowledgments<a class="headerlink" href="#acknowledgments" title="Permalink to this headline">¶</a></h2>
 <p>PyEpics was originally written and is maintained by Matt Newville
 &lt;<a class="reference external" href="mailto:newville&#37;&#52;&#48;cars&#46;uchicago&#46;ed">newville<span>&#64;</span>cars<span>&#46;</span>uchicago<span>&#46;</span>ed</a>&gt;.  Important contributions to the library have
-come from Angus Gratton, at the Australiaon National University.  Several
+come from Angus Gratton, at the Australian National University.  Several
 other people have provided valuable additions, suggestions, or bug reports,
 which has greatly improved the quality of the library: Michael Abbott,
 Marco Cammarata, Craig Haskins, Pete Jemian, Andrew Johnson, Janko Kolar,

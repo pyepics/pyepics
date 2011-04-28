@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.1',
+        VERSION:     '3.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -67,7 +67,7 @@
    <h1 id="index">Index</h1>
 
    <div class="genindex-jumpbox">
-   <a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a> 
+   <a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a> 
    </div>
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
@@ -119,6 +119,7 @@
     <dt><a href="overview.html#epics.camonitor">camonitor() (in module epics)</a></dt>
     <dt><a href="overview.html#epics.camonitor_clear">camonitor_clear() (in module epics)</a></dt>
     <dt><a href="overview.html#epics.caput">caput() (in module epics)</a></dt>
+    <dt><a href="ca.html#ca.CAThread">CAThread (class in ca)</a></dt>
 </dl></td>
   <td style="width: 33%" valign="top"><dl>
     <dt><a href="ca.html#ca.ChannelAccessException">ChannelAccessException</a></dt>
@@ -136,6 +137,7 @@
     <dt><a href="ca.html#ca.context_destroy">context_destroy() (in module ca)</a></dt>
     <dt><a href="pv.html#pv.count">count (in module pv)</a></dt>
     <dt><a href="ca.html#ca.create_channel">create_channel() (in module ca)</a></dt>
+    <dt><a href="ca.html#ca.create_context">create_context() (in module ca)</a></dt>
     <dt><a href="ca.html#ca.create_subscription">create_subscription() (in module ca)</a></dt>
     <dt><a href="ca.html#ca.current_context">current_context() (in module ca)</a></dt>
 </dl></td>
@@ -146,6 +148,7 @@
   <td style="width: 33%" valign="top"><dl>
     <dt><a href="ca.html#ca.DEFAULT_CONNECTION_TIMEOUT">DEFAULT_CONNECTION_TIMEOUT (in module ca)</a></dt>
     <dt><a href="wx.html#wx.DelayedEpicsCallback">DelayedEpicsCallback() (in module wx)</a></dt>
+    <dt><a href="ca.html#ca.destroy_context">destroy_context() (in module ca)</a></dt>
     <dt><a href="ca.html#ca.detach_context">detach_context() (in module ca)</a></dt>
 </dl></td>
   <td style="width: 33%" valign="top"><dl>
@@ -195,12 +198,14 @@
     <dt><a href="ca.html#ca.get_enum_strings">get_enum_strings() (in module ca)</a></dt>
     <dt><a href="devices.html#motor.get_position">get_position() (in module motor)</a></dt>
     <dt><a href="ca.html#ca.get_precision">get_precision() (in module ca)</a></dt>
+    <dt><a href="devices.html#motor.get_pv">get_pv() (in module motor)</a></dt>
 </dl></td>
   <td style="width: 33%" valign="top"><dl>
-    <dt><a href="devices.html#motor.get_pv">get_pv() (in module motor)</a></dt>
     <dt><a href="ca.html#ca.get_severity">get_severity() (in module ca)</a></dt>
     <dt><a href="ca.html#ca.get_timestamp">get_timestamp() (in module ca)</a></dt>
     <dt><a href="ca.html#ca.get_timevars">get_timevars() (in module ca)</a></dt>
+    <dt><a href="wx.html#wx.GetEnumStrings">GetEnumStrings() (in module wx)</a></dt>
+    <dt><a href="wx.html#wx.GetValue">GetValue() (in module wx)</a></dt>
 </dl></td>
 </tr></table>
 
@@ -218,6 +223,7 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
     <dt><a href="pv.html#pv.info">info (in module pv)</a></dt>
+    <dt><a href="ca.html#ca.initialize_libca">initialize_libca() (in module ca)</a></dt>
 </dl></td>
   <td style="width: 33%" valign="top"><dl>
     <dt><a href="ca.html#ca.isConnected">isConnected() (in module ca)</a></dt>
@@ -255,6 +261,16 @@
 </dl></td>
 </tr></table>
 
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+    <dt><a href="wx.html#wx.OnEpicsConnect">OnEpicsConnect() (in module wx)</a></dt>
+</dl></td>
+  <td style="width: 33%" valign="top"><dl>
+    <dt><a href="wx.html#wx.OnPVChange">OnPVChange() (in module wx)</a></dt>
+</dl></td>
+</tr></table>
+
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
@@ -277,21 +293,22 @@
     <dt><a href="pv.html#pv.PV">PV (class in pv)</a></dt>
     <dt><a href="pv.html#module-pv">pv (module)</a></dt>
     <dt><a href="devices.html#device.PV">PV() (in module device)</a></dt>
-    <dt><a href="wx.html#wx.pvAlarm">pvAlarm (class in wx)</a></dt>
-    <dt><a href="wx.html#wx.pvBitmap">pvBitmap (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVAlarm">PVAlarm (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVBitmap">PVBitmap (class in wx)</a></dt>
 </dl></td>
   <td style="width: 33%" valign="top"><dl>
-    <dt><a href="wx.html#wx.pvCheckBox">pvCheckBox (class in wx)</a></dt>
-    <dt><a href="wx.html#wx.pvCircle">pvCircle (class in wx)</a></dt>
-    <dt><a href="wx.html#wx.pvComboBox">pvComboBox (class in wx)</a></dt>
-    <dt><a href="wx.html#wx.pvEnumButtons">pvEnumButtons (class in wx)</a></dt>
-    <dt><a href="wx.html#wx.pvEnumChoice">pvEnumChoice (class in wx)</a></dt>
-    <dt><a href="wx.html#wx.pvFloatCtrl">pvFloatCtrl (class in wx)</a></dt>
-    <dt><a href="wx.html#wx.pvMixin">pvMixin (class in wx)</a></dt>
-    <dt><a href="wx.html#wx.pvRadioButton">pvRadioButton (class in wx)</a></dt>
-    <dt><a href="wx.html#wx.pvRectangle">pvRectangle (class in wx)</a></dt>
-    <dt><a href="wx.html#wx.pvShapeMixin">pvShapeMixin (class in wx)</a></dt>
-    <dt><a href="wx.html#wx.pvTextCtrl">pvTextCtrl (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVCheckBox">PVCheckBox (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVCircle">PVCircle (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVComboBox">PVComboBox (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVCtrlMixin">PVCtrlMixin (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVEnumButtons">PVEnumButtons (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVEnumChoice">PVEnumChoice (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVFloatCtrl">PVFloatCtrl (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVMixin">PVMixin (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVRadioButton">PVRadioButton (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVRectangle">PVRectangle (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVShapeMixin">PVShapeMixin (class in wx)</a></dt>
+    <dt><a href="wx.html#wx.PVTextCtrl">PVTextCtrl (class in wx)</a></dt>
     <dt><a href="ca.html#ca.PySEVCHK">PySEVCHK() (in module ca)</a></dt>
 </dl></td>
 </tr></table>
@@ -317,13 +334,14 @@
     <dt><a href="devices.html#device.save_state">save_state() (in module device)</a></dt>
     <dt><a href="devices.html#motor.set_callback">set_callback() (in module motor)</a></dt>
     <dt><a href="devices.html#motor.set_position">set_position() (in module motor)</a></dt>
+    <dt><a href="wx.html#wx.SetPV">SetPV() (in module wx)</a></dt>
     <dt><a href="pv.html#pv.severity">severity (in module pv)</a></dt>
     <dt><a href="ca.html#ca.sg_block">sg_block() (in module ca)</a></dt>
     <dt><a href="ca.html#ca.sg_create">sg_create() (in module ca)</a></dt>
     <dt><a href="ca.html#ca.sg_delete">sg_delete() (in module ca)</a></dt>
-    <dt><a href="ca.html#ca.sg_get">sg_get() (in module ca)</a></dt>
 </dl></td>
   <td style="width: 33%" valign="top"><dl>
+    <dt><a href="ca.html#ca.sg_get">sg_get() (in module ca)</a></dt>
     <dt><a href="ca.html#ca.sg_put">sg_put() (in module ca)</a></dt>
     <dt><a href="ca.html#ca.sg_reset">sg_reset() (in module ca)</a></dt>
     <dt><a href="ca.html#ca.sg_test">sg_test() (in module ca)</a></dt>
@@ -349,12 +367,14 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
     <dt><a href="pv.html#pv.units">units (in module pv)</a></dt>
+    <dt><a href="wx.html#wx.Update">Update() (in module wx)</a></dt>
     <dt><a href="pv.html#pv.upper_alarm_limit">upper_alarm_limit (in module pv)</a></dt>
     <dt><a href="pv.html#pv.upper_ctrl_limit">upper_ctrl_limit (in module pv)</a></dt>
 </dl></td>
   <td style="width: 33%" valign="top"><dl>
     <dt><a href="pv.html#pv.upper_disp_limit">upper_disp_limit (in module pv)</a></dt>
     <dt><a href="pv.html#pv.upper_warning_limit">upper_warning_limit (in module pv)</a></dt>
+    <dt><a href="ca.html#ca.use_initial_context">use_initial_context() (in module ca)</a></dt>
 </dl></td>
 </tr></table>
 
@@ -373,6 +393,7 @@
     <dt><a href="ca.html#ca.withCHID">withCHID() (in module ca)</a></dt>
     <dt><a href="ca.html#ca.withConnectedCHID">withConnectedCHID() (in module ca)</a></dt>
     <dt><a href="devices.html#motor.within_limits">within_limits() (in module motor)</a></dt>
+    <dt><a href="ca.html#ca.withInitialContext">withInitialContext() (in module ca)</a></dt>
 </dl></td>
   <td style="width: 33%" valign="top"><dl>
     <dt><a href="ca.html#ca.withSEVCHK">withSEVCHK() (in module ca)</a></dt>

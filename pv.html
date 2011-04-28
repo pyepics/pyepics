@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.1',
+        VERSION:     '3.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -119,8 +119,9 @@ attributes for accessing it's properties.</p>
 <dl class="class">
 <dt id="pv.PV">
 <em class="property">class </em><tt class="descclassname">pv.</tt><tt class="descname">PV</tt><big>(</big><em>pvname</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>form='native'</em><span class="optional">[</span>, <em>auto_monitor=None</em><span class="optional">[</span>, <em>connection_callback=None</em><span class="optional">[</span>, <em>connection_timeout=None</em><span class="optional">[</span>, <em>verbose=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pv.PV" title="Permalink to this definition">¶</a></dt>
-<dd><p>create a PV object for a named Epics Process Variable.</p>
-<table class="docutils field-list" frame="void" rules="none">
+<dt>
+<tt class="descname">create a PV object for a named Epics Process Variable.</tt></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
@@ -261,7 +262,7 @@ should happen automatically. See <a class="reference internal" href="#pv.wait_fo
 </tr>
 </tbody>
 </table>
-<p>if timeout is None, the PVs connection_timeout paramater will be used. If that is also None,
+<p>if timeout is None, the PVs connection_timeout parameter will be used. If that is also None,
 <a class="reference internal" href="ca.html#ca.DEFAULT_CONNECTION_TIMEOUT" title="ca.DEFAULT_CONNECTION_TIMEOUT"><tt class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_CONNECTION_TIMEOUT</span></tt></a>  will be used.</p>
 </dd></dl>
 
@@ -269,7 +270,7 @@ should happen automatically. See <a class="reference internal" href="#pv.wait_fo
 <dt id="pv.wait_for_connection">
 <tt class="descclassname">pv.</tt><tt class="descname">wait_for_connection</tt><big>(</big><span class="optional">[</span><em>timeout=None</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#pv.wait_for_connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>this waits until a PV is connected, or has timed-out waiting for a
-connection.  Returns  whether the connection has occured.</p>
+connection.  Returns  whether the connection has occurred.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -280,7 +281,7 @@ connection.  Returns  whether the connection has occured.</p>
 </tr>
 </tbody>
 </table>
-<p>if timeout is None, the PVs connection_timeout paramater will be used. If that is also None,
+<p>if timeout is None, the PVs connection_timeout parameter will be used. If that is also None,
 <a class="reference internal" href="ca.html#ca.DEFAULT_CONNECTION_TIMEOUT" title="ca.DEFAULT_CONNECTION_TIMEOUT"><tt class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_CONNECTION_TIMEOUT</span></tt></a>  will be used.</p>
 </dd></dl>
 
@@ -778,7 +779,7 @@ the processing is done:</p>
 </pre></div>
 </div>
 <p>This will hang until the processing of the PV completes (motor moving, etc)
-before printing 'Done'.   You can also specfy a maximum time to wait -- a
+before printing 'Done'.   You can also specify a maximum time to wait -- a
 <em>timeout</em> (in seconds):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 </pre></div>
@@ -855,7 +856,7 @@ necessary processing over the network.</p>
 <span class="go">&#39;1.000&#39;</span>
 </pre></div>
 </div>
-<p>or, equivilently</p>
+<p>or, equivalently</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">char_value</span>
 <span class="go">&#39;1.000&#39;</span>
 </pre></div>
@@ -909,7 +910,7 @@ PVs and integer PVs, this is a simple task.  For floating point values,
 there is ambiguity how many significant digits to show. EPICS PVs all have
 a <a class="reference internal" href="#pv.precision" title="pv.precision"><tt class="xref py py-attr docutils literal"><span class="pre">precision</span></tt></a> field. which sets how many digits after the decimal
 place should be described.  In addition, for ENUM PVs, it would be
-desireable to get at the name of the ENUM state, not just its integer
+desire able to get at the name of the ENUM state, not just its integer
 value.</p>
 <p>To get the string representation of a PVs value, use either the
 <a class="reference internal" href="#pv.char_value" title="pv.char_value"><tt class="xref py py-attr docutils literal"><span class="pre">char_value</span></tt></a> attribute or the <em>as_string=True</em> argument to <a class="reference internal" href="#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a></p>
@@ -933,7 +934,7 @@ used:</p>
 </div>
 <div class="section" id="example-of-simple-callback">
 <h3>Example of simple callback<a class="headerlink" href="#example-of-simple-callback" title="Permalink to this headline">¶</a></h3>
-<p>It is ofen useful to get a notification of when a PV changes.  In general,
+<p>It is often useful to get a notification of when a PV changes.  In general,
 it would be inconvenient (and possibly inefficient) to have to continually
 ask if a PVs value has changed.  Instead, it is better to set a <em>callback</em>
 function: a function to be run when the value has changed.</p>

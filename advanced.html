@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.1',
+        VERSION:     '3.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -56,7 +56,9 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#using-python-threads">Using Python Threads</a><ul>
-<li><a class="reference internal" href="#thread-example">Thread Example</a></li>
+<li><a class="reference internal" href="#channel-access-contexts">Channel Access Contexts</a></li>
+<li><a class="reference internal" href="#how-to-work-with-ca-and-threads">How to work with CA and Threads</a></li>
+<li><a class="reference internal" href="#thread-examples">Thread Examples</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#time-sleep-or-epics-poll">time.sleep() or epics.poll()?</a></li>
@@ -167,12 +169,12 @@ character waveforms, this module resists the temptation to implicitly
 convert such byte arrays to strings using <tt class="docutils literal"><span class="pre">as_string=True</span></tt>.</p>
 <p>As an example, let's say you've created a character waveform PV, as with
 this EPICS database:</p>
-<div class="highlight-python"><pre>grecord(waveform,"$(P):filename")  {
-        field(DTYP,"Soft Channel")
-        field(DESC,"file name")
-        field(NELM,"128")
-        field(FTVL,"CHAR")
-}</pre>
+<div class="highlight-python"><pre>record(waveform,"$(P):filename")  {
+          field(DTYP,"Soft Channel")
+          field(DESC,"file name")
+          field(NELM,"128")
+          field(FTVL,"CHAR")
+ }</pre>
 </div>
 <p>You can then use this with:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
@@ -197,121 +199,203 @@ this EPICS database:</p>
 <span class="go">&#39;T:\\xas_user\\March2010\\FastMap&#39;</span>
 </pre></div>
 </div>
-<p>This uses the PV class, but the <tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt> method of <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> is
+<p>This uses the <tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt> class, but the <tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt> method of <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> is
 essentially equivalent, as its <em>as_string</em> parameter works exactly the same
 way.</p>
 </div>
 </div>
 <div class="section" id="using-python-threads">
 <span id="advanced-threads-label"></span><h2>Using Python Threads<a class="headerlink" href="#using-python-threads" title="Permalink to this headline">¶</a></h2>
-<p>An important feature of the epics python package is that it can be used
-with Python threads.  This section of the document focuses on using Python
-threads both with the <cite>PV</cite> object and with the procedural functions in the
-<cite>ca</cite> module.</p>
-<p>Using threads in Python is fairly simple, but Channel Access adds a
-complication that the underlying CA library will call Python code within a
-particular thread, and you need to set which thread that is.  The most rule
-for using Threads with the epics module is to use
-<tt class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></tt> =  <tt class="xref docutils literal"><span class="pre">True</span></tt>.   This is the default  value, so
-you usually do not need to change anything.</p>
-<div class="section" id="thread-example">
-<h3>Thread Example<a class="headerlink" href="#thread-example" title="Permalink to this headline">¶</a></h3>
+<p>An important feature of the PyEpics package is that it can be used with
+Python threads, as Epics 3.14 supports threads for client code.  Even in
+the best of cases, working with threads can be somewhat tricky and lead to
+unexpected behavior, and the Channel Access library adds a small level of
+complication for using CA with Python threads.  The result is that some
+precautions may be in order when using PyEpics and threads.  This section
+discusses the strategies for using threads with PyEpics.</p>
+<p>First, to use threads with Channel Access, you must have
+<tt class="xref py py-data docutils literal"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></tt> = <tt class="xref docutils literal"><span class="pre">True</span></tt>.  This is the default
+value, but if <tt class="xref py py-data docutils literal"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></tt> has been set to
+<tt class="xref docutils literal"><span class="pre">False</span></tt>, threading will not work.</p>
+<p>Second, if you are using <tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt> objects and not making heavy use of
+the <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module (that is, not making and passing around chids), then
+the complications below are mostly hidden from you.   If you're writing
+threaded code, it's probably a good idea to read this just to understand
+what the issues are.</p>
+<div class="section" id="channel-access-contexts">
+<h3>Channel Access Contexts<a class="headerlink" href="#channel-access-contexts" title="Permalink to this headline">¶</a></h3>
+<p>The Channel Access library uses a concept of <em>contexts</em> for its own thread
+model, with contexts holding sets of threads as well as Channels and
+Process Variables.  For non-threaded work, a process will use a single
+context that is initialized prior doing any real CA work (done in
+<a class="reference internal" href="ca.html#ca.initialize_libca" title="ca.initialize_libca"><tt class="xref py py-meth docutils literal"><span class="pre">ca.initialize_libca()</span></tt></a>).  In a threaded application, each new thread
+begins with a new, uninitialized context that must be initialized or
+replaced.  Thus each new python thread that will interact with CA must
+either explicitly create its own context with <a class="reference internal" href="ca.html#ca.create_context" title="ca.create_context"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_context()</span></tt></a>
+(and then, being a good citizen, destroy this context as the thread ends
+with <a class="reference internal" href="ca.html#ca.destroy_context" title="ca.destroy_context"><tt class="xref py py-meth docutils literal"><span class="pre">ca.destroy_context()</span></tt></a>) or attach to an existing context.</p>
+<p>The generally recommended approach is to use a single CA context throughout
+an entire process and have each thread attach to the first context created
+(probably from the main thread).  This avoids many potential pitfalls (and
+crashes), and can be done fairly simply.  It is the default mode when using
+PV objects.</p>
+<p>The most explicit use of contexts is to put <tt class="xref py py-func docutils literal"><span class="pre">epics.ca.create_context()</span></tt>
+at the start of each function call as a thread target, and
+<tt class="xref py py-func docutils literal"><span class="pre">epics.ca.destroy_context()</span></tt> at the end of each thread.  This will
+cause all the activity in that thread to be done in its own context.  This
+works, but means more care is needed, and so is not the recommended.</p>
+<p>The best way to attach to the initially created context is to call
+<tt class="xref py py-meth docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt> before any other CA calls in each
+function that will be called by <tt class="xref py py-meth docutils literal"><span class="pre">Thread.run()</span></tt>.  Equivalently, you can
+add a <tt class="xref py py-func docutils literal"><span class="pre">withInitialContext()</span></tt> decorator to the function.  Creating a PV
+object will implicitly do this for you, as long as it is your first CA
+action in the function.  Each time you do a <tt class="xref py py-meth docutils literal"><span class="pre">PV.get()</span></tt> or
+<tt class="xref py py-meth docutils literal"><span class="pre">PV.put()</span></tt> (or a few other methods), it will also check that the initial
+context is being used.</p>
+<p>Of course, this approach requires CA to be initialized already.  Doing that
+<em>in the main thread</em> is highly recommended.  If it happens in a child
+thread, that thread must exist for all CA work, so either the life of the
+process or with great care for processes that do only some CA calls.  If
+you are writing a threaded application in which the first real CA calls are
+inside a child thread, it is recommended that you initialize CA in the main
+thread,</p>
+<p>As a convenience, the <tt class="xref py py-class docutils literal"><span class="pre">CAThread</span></tt> in the <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module is
+is a very thin wrapper around the standard <tt class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></tt> which
+adding a call of  <tt class="xref py py-meth docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt> just before your
+threaded function is run.  This allows your target functions to not
+explicitly set the context, but still ensures that the initial context is
+used in all functions.</p>
+</div>
+<div class="section" id="how-to-work-with-ca-and-threads">
+<h3>How to work with CA and Threads<a class="headerlink" href="#how-to-work-with-ca-and-threads" title="Permalink to this headline">¶</a></h3>
+<p>Summarizing the discussion above, to use threads you must use run in
+PREEMPTIVE_CALLBACK mode.  Furthermore, it is recommended that you use a
+single context, and that you initialize CA in the main program thread so
+that your single CA context belongs to the main thread.  Using PV objects
+exclusively makes this easy, but it can also be accomplished relatively
+easily using the lower-level ca interface.  The options for using threads
+(in approximate order of reliability) are then:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>use PV objects for threading work.</li>
+</ol>
+<p>2. use <tt class="xref py py-class docutils literal"><span class="pre">CAThread</span></tt> instead of <tt class="xref py py-class docutils literal"><span class="pre">Thread</span></tt> for threads that
+will use CA calls.</p>
+<p>3. put <tt class="xref py py-func docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt> at the top of all
+functions that might be a Thread target function, or decorate them with
+<tt class="xref py py-func docutils literal"><span class="pre">withInitialContext()</span></tt> decorator, <em>&#64;withInitialContext</em>.</p>
+<p>4. use <tt class="xref py py-func docutils literal"><span class="pre">epics.ca.create_context()</span></tt> at the top of all functions
+that are inside a new thread, and be sure to put
+<tt class="xref py py-func docutils literal"><span class="pre">epics.ca.destroy_context()</span></tt> at the end of the function.</p>
+<p>5. ignore this advise and hope for the best.  If you're not creating
+new PVs and only reading values of PVs created in the main thread
+inside a child thread, you may not see a problems, at least not until
+you try to do something fancier.</p>
+</div></blockquote>
+</div>
+<div class="section" id="thread-examples">
+<h3>Thread Examples<a class="headerlink" href="#thread-examples" title="Permalink to this headline">¶</a></h3>
 <p>This is a simplified version of test code using Python threads.  It is
-based on code from Friedrich Schotte, NIH, and included as <cite>thread_test.py</cite>
-in the <cite>tests</cite> directory of the source distribution.</p>
+based on code originally from Friedrich Schotte, NIH, and included as
+<cite>thread_test.py</cite> in the <cite>tests</cite> directory of the source distribution.</p>
 <p>In this example, we define a <cite>run_test</cite> procedure which will create PVs
 from a supplied list, and monitor these PVs, printing out the values when
 they change.  Two threads are created and run concurrently, with
 overlapping PV lists, though one thread is run for a shorter time than the
-other.:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">time</span>
+other.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="sd">&quot;&quot;&quot;This script tests using EPICS CA and Python threads together</span>
+<span class="sd">Based on code from  Friedrich Schotte, NIH, modified by Matt Newville</span>
+<span class="sd">19-Apr-2010</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span>  <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stdout</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
 <span class="kn">import</span> <span class="nn">epics</span>
 
-<span class="n">pvlist1</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;13IDA:DMM1Ch2_raw.VAL&#39;</span><span class="p">,</span> <span class="s">&#39;S:SRcurrentAI.VAL&#39;</span><span class="p">)</span>
-<span class="n">pvlist2</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;13IDA:DMM1Ch3_raw.VAL&#39;</span><span class="p">,</span> <span class="s">&#39;S:SRcurrentAI.VAL&#39;</span><span class="p">)</span>
+<span class="kn">from</span>  <span class="nn">pvnames</span> <span class="kn">import</span> <span class="n">updating_pvlist</span>
+<span class="n">pvlist_a</span> <span class="o">=</span> <span class="n">updating_pvlist</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">pvlist_b</span> <span class="o">=</span> <span class="n">updating_pvlist</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 
 <span class="k">def</span> <span class="nf">run_test</span><span class="p">(</span><span class="n">runtime</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pvnames</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>  <span class="n">run_name</span><span class="o">=</span><span class="s">&#39;thread c&#39;</span><span class="p">):</span>
-    <span class="k">print</span> <span class="s">&#39; |-&gt; thread  &quot;</span><span class="si">%s</span><span class="s">&quot;  will run for </span><span class="si">%.3f</span><span class="s"> sec &#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">run_name</span><span class="p">,</span> <span class="n">runtime</span><span class="p">)</span>
-
+    <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;-&gt; thread &quot;</span><span class="si">%s</span><span class="s">&quot; will run for </span><span class="si">%.3f</span><span class="s"> sec, monitoring </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span>
+    <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="p">(</span><span class="n">run_name</span><span class="p">,</span> <span class="n">runtime</span><span class="p">,</span> <span class="n">pvnames</span><span class="p">))</span>
     <span class="k">def</span> <span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-        <span class="k">print</span> <span class="s">&#39;      </span><span class="si">%s</span><span class="s"> = </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">,</span> <span class="n">run_name</span><span class="p">)</span>
+        <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;   </span><span class="si">%s</span><span class="s"> = </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">,</span> <span class="n">run_name</span><span class="p">))</span>
+        <span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
-    <span class="c"># A new CA context must be created per thread</span>
-    <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">context_create</span><span class="p">()</span>
-    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">pvs</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">pvn</span> <span class="ow">in</span> <span class="n">pvnames</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvn</span><span class="p">)</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">onChanges</span><span class="p">)</span>
-        <span class="n">pvs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="c"># epics.ca.use_initial_context()   #  epics.ca.create_context()</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">pvs</span> <span class="o">=</span> <span class="p">[</span><span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvn</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onChanges</span><span class="p">)</span> <span class="k">for</span> <span class="n">pvn</span> <span class="ow">in</span> <span class="n">pvnames</span><span class="p">]</span>
 
-    <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span> <span class="o">&lt;</span> <span class="n">runtime</span><span class="p">:</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pvs</span><span class="p">:</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">clear_callbacks</span><span class="p">()</span>
-    <span class="k">print</span> <span class="s">&#39;Done with Thread &#39;</span><span class="p">,</span> <span class="n">run_name</span>
-    <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">context_destroy</span><span class="p">()</span>
+    <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">start_time</span> <span class="o">&lt;</span> <span class="n">runtime</span><span class="p">:</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="s">&quot;Run 2 Threads simultaneously:&quot;</span>
-<span class="n">th1</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_test</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">pvlist1</span><span class="p">,</span>  <span class="s">&#39;A&#39;</span><span class="p">))</span>
+    <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">clear_callbacks</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pvs</span><span class="p">]</span>
+    <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s">&#39;Completed Thread  </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">run_name</span><span class="p">))</span>
+
+<span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s">&quot;First, create a PV in the main thread:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">updating_pvlist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;Run 2 Background Threads simultaneously:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="n">th1</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_test</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">pvlist_a</span><span class="p">,</span>  <span class="s">&#39;A&#39;</span><span class="p">))</span>
 <span class="n">th1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-<span class="n">th2</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_test</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">pvlist2</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">))</span>
+<span class="n">th2</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_test</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">pvlist_b</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">))</span>
 <span class="n">th2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-<span class="n">th1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 <span class="n">th2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-
-<span class="k">print</span> <span class="s">&#39;Done&#39;</span>
+<span class="n">th1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;Done</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The calls to <cite>epics.ca.context_create()</cite> and <cite>epics.ca.context_destroy()</cite>
-are required: forgetting them will suppress all callbacks, and is likely to
-to lead in core dumps.  The output from this will look like:</p>
-<div class="highlight-python"><pre>Run 2 Threads simultaneously:
- |-&gt; thread  "A"  will run for 3.000 sec
- |-&gt; thread  "B"  will run for 6.000 sec
-      13IDA:DMM1Ch2_raw.VAL = -183.71218999999999 (A)
-      13IDA:DMM1Ch3_raw.VAL = -133.09033299999999 (B)
-      S:SRcurrentAI.VAL = 102.19321199346312 (A)
-      S:SRcurrentAI.VAL = 102.19321199346312 (B)
-      S:SRcurrentAI.VAL = 102.19109399346311 (A)
-       S:SRcurrentAI.VAL = 102.19109399346311 (B)
-      13IDA:DMM1Ch2_raw.VAL = -183.67300399999999 (A)
-      13IDA:DMM1Ch3_raw.VAL = -133.04856000000001 (B)
-      S:SRcurrentAI.VAL = 102.18830251346313 (A)
-      S:SRcurrentAI.VAL = 102.18830251346313 (B)
-      S:SRcurrentAI.VAL = 102.18780211346312 (B)
-       S:SRcurrentAI.VAL = 102.18780211346312 (A)
-      13IDA:DMM1Ch2_raw.VAL = -183.69587200000001 (A)
-      13IDA:DMM1Ch3_raw.VAL = -133.00154800000001 (B)
-      S:SRcurrentAI.VAL = 102.18441979346312 (A)
-      S:SRcurrentAI.VAL = 102.18441979346312 (B)
-Done with Thread  A
-      S:SRcurrentAI.VAL = 102.18331875346311 (B)
-      13IDA:DMM1Ch3_raw.VAL = -133.170962 (B)
-      S:SRcurrentAI.VAL = 102.18109007346312 (B)
-      S:SRcurrentAI.VAL = 102.18066463346311 (B)
-      13IDA:DMM1Ch3_raw.VAL = -133.09478999999999 (B)
-      S:SRcurrentAI.VAL = 102.17867355346313 (B)
-      S:SRcurrentAI.VAL = 102.17707979346312 (B)
-      13IDA:DMM1Ch3_raw.VAL = -133.04619199999999 (B)
-      S:SRcurrentAI.VAL = 102.17559191346312 (B)
-Done with Thread  B
+<p>In light of the long discussion above, a few remarks are in order: This
+code uses the standard Thread library and explicitly calls
+<tt class="xref py py-func docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt> prior to any CA calls in the target
+function.  Also note that the <tt class="xref py py-func docutils literal"><span class="pre">run_test()</span></tt> function is first called
+from the main thread, so that the initial CA context does belong to the
+main thread.  Finally, the <tt class="xref py py-func docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt> call in
+<tt class="xref py py-func docutils literal"><span class="pre">run_test()</span></tt> above could be replaced with
+<tt class="xref py py-func docutils literal"><span class="pre">epics.ca.create_context()</span></tt>, and run OK.</p>
+<p>The output from this will look like:</p>
+<div class="highlight-python"><pre>First, create a PV in the main thread:
+Run 2 Background Threads simultaneously:
+-&gt; thread "A" will run for 3.000 sec, monitoring ['Py:ao1', 'Py:ai1', 'Py:long1']
+-&gt; thread "B" will run for 6.000 sec, monitoring ['Py:ai1', 'Py:long1', 'Py:ao2']
+   Py:ao1 = 8.3948 (A)
+   Py:ai1 = 3.14 (B)
+   Py:ai1 = 3.14 (A)
+   Py:ao1 = 0.7404 (A)
+   Py:ai1 = 4.07 (B)
+   Py:ai1 = 4.07 (A)
+   Py:long1 = 3 (B)
+   Py:long1 = 3 (A)
+   Py:ao1 = 13.0861 (A)
+   Py:ai1 = 8.49 (B)
+   Py:ai1 = 8.49 (A)
+   Py:ao2 = 30 (B)
+Completed Thread  A
+   Py:ai1 = 9.42 (B)
+   Py:ao2 = 30 (B)
+   Py:long1 = 4 (B)
+   Py:ai1 = 3.35 (B)
+   Py:ao2 = 31 (B)
+   Py:ai1 = 4.27 (B)
+   Py:ao2 = 31 (B)
+   Py:long1 = 5 (B)
+   Py:ai1 = 8.20 (B)
+   Py:ao2 = 31 (B)
+Completed Thread  B
 Done</pre>
 </div>
-<p>Note that while both threads <em>A</em>  and <em>B</em> are running, a callback for
-the PV <cite>S:SRcurrentAI.VAL</cite> is generated in each thread.</p>
+<p>Note that while both threads <em>A</em> and <em>B</em> are running, a callback for the
+PV <cite>Py:ai1</cite> is generated in each thread.</p>
 <p>Note also that the callbacks for the PVs created in each thread are
 <strong>explicitly cleared</strong>  with:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pvs</span><span class="p">:</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">clear_callbacks</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">clear_callbacks</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pvs</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Without this, the callbacks for thread <em>A</em>  will persist even after the
-thread has completed!!!</p>
+thread has completed!</p>
 </div>
 </div>
 <div class="section" id="time-sleep-or-epics-poll">
