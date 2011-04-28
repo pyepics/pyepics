@@ -41,7 +41,7 @@ cd $installdir
 tar xvzf ../pyepics_docs.tar.gz .
 
 # 
-#mv $srcdir/epics* $srcdir/older/.
-#cp -pr Changelog INSTALL README.txt $srcdir/.
-#cp -pr dist/*  $srcdir/.
+mv $srcdir/pyepics* $srcdir/older/.
+cp -pr Changelog INSTALL README.txt $srcdir/.
+cp -pr dist/*  $srcdir/.
 # 
