@@ -124,7 +124,7 @@ initialization and finalization tasks are handled in the following way:
 .. data:: AUTOMONITOR_MAXLENGTH
 
    sets the default array length (ie, how many elements an array has) above
-   which automatic conversion to numpy arrays *and* automatica monitoring
+   which automatic conversion to numpy arrays *and* automatic monitoring
    for PV variables is suppressed.  The default value is 16384.  To be
    clear: waveforms with fewer elements than this value will be
    automatically monitored changes, and will be converted to numpy arrays
@@ -204,7 +204,7 @@ Creating and Connecting to Channels
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The basic channel object is the Channel ID or ``chid``.  With the CA
-library (and ``ca`` module), onee creates and acts on the ``chid`` values.
+library (and ``ca`` module), one creates and acts on the ``chid`` values.
 These are simply :data:`ctypes.c_long` (C long integers) that hold the
 memory address of the C representation of the channel, but it is probably
 a good idea to treat these as object instances.
@@ -522,7 +522,7 @@ and :func:`sg_get` to execute.
 
    block for a synchronous group to complete processing
 
-.. function::  sg_get(gid, chid[, fype=None[, as_string=False[, as_numpy=True]]])
+.. function::  sg_get(gid, chid[, ftype=None[, as_string=False[, as_numpy=True]]])
 
    perform a `get` within a synchronous group.
 
@@ -585,7 +585,7 @@ An example use of a synchronous group::
         ca.sg_put(sg, chid, 0)
 
 
-    print 'sg_put done, but not blocked / commited. Sleep for 5 seconds '
+    print 'sg_put done, but not blocked / committed. Sleep for 5 seconds '
     time.sleep(5.0)
     ca.sg_block(sg)
     print 'done.'
@@ -688,7 +688,7 @@ used heavily inside of ca.py or are available for your convenience.
 
 ..  function:: withInitialContext
 
-    ensures that the called function uses the threading context initally defined.
+    ensures that the called function uses the threading context initially defined.
     The See :ref:`advanced-threads-label` for further discussion.
 
 
@@ -906,7 +906,7 @@ standard output::
 
 It is **vital** that the return value from :meth:`create_subscription` is
 kept in a variable so that it cannot be garbage collected.  Failure to keep
-this value will cause trouble, inlcuding almost immediate segmentation
+this value will cause trouble, including almost immediate segmentation
 faults (on Windows) or seemingly inexplicable crashes later (on linux).
 
 Define a connection callback

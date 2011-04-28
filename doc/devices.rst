@@ -80,7 +80,7 @@ In general, PV names will be mapped as prefix+delim+attr.  See
 
 .. method:: save_state()
 
-   return a dictionay of all current values -- the ''current state''.
+   return a dictionary of all current values -- the ''current state''.
 
 
 .. method:: restore_state(state)

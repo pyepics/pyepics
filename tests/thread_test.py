@@ -18,7 +18,7 @@ def run_test(runtime=1, pvnames=None,  run_name='thread c'):
         stdout.write('   %s = %s (%s)\n' % (pvname, char_value, run_name))
         stdout.flush()
 
-    epics.ca.use_initial_context()   #  epics.ca.create_context()
+    # epics.ca.use_initial_context()   #  epics.ca.create_context()
     start_time = time.time()
     pvs = [epics.PV(pvn, callback=onChanges) for pvn in pvnames]
 
