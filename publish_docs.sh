@@ -46,3 +46,15 @@ if  [ $? -ne 0 ]  ; then
   echo ' failed.'
   exit 
 fi
+
+# install locally
+echo "# Installing docs to CARS web pages"
+cp ../pyepics_docs.tar.gz $installdir/../.
+
+cd $installdir
+if  [ $? -ne 0 ]  ; then 
+  echo ' failed.'
+  exit 
+fi
+
+tar xvf ../pyepics_docs.tar.gz .
