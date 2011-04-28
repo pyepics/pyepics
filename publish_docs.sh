@@ -4,7 +4,7 @@ docbuild='doc/_build'
 cd doc 
 echo '# Making docs'
 
-# make all
+make all
 cd ../
 echo '# Building tarball of docs'
 mkdir _tmpdoc
