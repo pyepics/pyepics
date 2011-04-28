@@ -4,7 +4,7 @@ docbuild='doc/_build'
 cd doc 
 echo '# Making docs'
 
-make all
+# make all
 cd ../
 echo '# Building tarball of docs'
 mkdir _tmpdoc
@@ -20,6 +20,13 @@ rm -rf _tmpdoc
 echo "# Switching to gh-pages branch"
 git checkout gh-pages
 
+if  [ $? -ne 0 ]  ; then 
+  echo ' failed.'
+  exit 
+fi
+
+echo "# Make sure this script is updated!"
+git checkout master publish_docs.sh
 if  [ $? -ne 0 ]  ; then 
   echo ' failed.'
   exit 
