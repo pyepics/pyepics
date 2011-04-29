@@ -11,6 +11,7 @@ provides two classes:
 #  Aug 21 2004 M Newville:  initial working version.
 #
 import wx
+from wx._core import PyDeadObjectError
 import epics
 from epics.wx.wxlib import PVText, PVFloatCtrl, \
      DelayedEpicsCallback, EpicsFunction
@@ -51,7 +52,12 @@ class MotorPanel(wx.Panel):
         self.CreatePanel()
 
         if motor is not None:
-            self.SelectMotor(motor)
+            try:
+                self.SelectMotor(motor)
+            except PyDeadObjectError:
+                pass
+
+
 
     @EpicsFunction
     def SelectMotor(self, motor):
@@ -59,16 +65,20 @@ class MotorPanel(wx.Panel):
         if motor is None:
             return
 
-        # if self.motor already exists
-        if self.motor is not None:
-            for i in self.__motor_fields:
-                self.motor.clear_callback(attr=i)
+        epics.poll()
+        try: 
+            if self.motor is not None:
+                for i in self.__motor_fields:
+                    self.motor.clear_callback(attr=i)
+        except PyDeadObjectError:
+            return
 
         if isinstance(motor, (str, unicode)):
             self.motor = epics.Motor(motor)
         elif isinstance(motor, epics.Motor):
             self.motor = motor
         self.motor.get_info()
+
 
         if self.format is None:
             self.format = "%%.%if" % self.motor.PREC
@@ -82,9 +92,12 @@ class MotorPanel(wx.Panel):
 
     @EpicsFunction
     def FillPanelComponents(self):
-        if self.motor is None:
-            return
         epics.poll()
+        try:
+            if self.motor is None:
+                return
+        except PyDeadObjectError:
+            return
 
         self.drive.SetPV(self.motor.PV('VAL'))
         self.rbv.SetPV(self.motor.PV('RBV'))
@@ -122,7 +135,11 @@ class MotorPanel(wx.Panel):
 
         self.drive = PVFloatCtrl(self, size=(wdrv, -1), style = wx.TE_RIGHT)
         
-        self.FillPanelComponents()
+        try:
+            self.FillPanelComponents()
+        except PyDeadObjectError:
+            return            
+
                 
         if self.is_full:
             self.twk_list = ['','']
