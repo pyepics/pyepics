@@ -152,26 +152,26 @@ class MotorDetailFrame(wx.Frame):
         sizer.Add((5, 5), 0)
         sizer.Add(xTitle(panel, 'Calibration'), 0, LCEN, 5)        
 
-        ds = wx.GridBagSizer(6, 4)
+        ds = wx.GridBagSizer(6, 5)
         dp = wx.Panel(panel)
                    
         ds.Add(xLabel(dp, 'Mode: '),  (0, 0), (1, 1), LCEN, 5)
         
         ds.Add(PVEnumButtons(dp, pv=self.motor.PV('SET'),
                              orientation = wx.HORIZONTAL, 
-                             size=(110, -1)), (0, 1), (1, 1), wx.ALIGN_LEFT)
+                             size=(-1, -1)), (0, 1), (1, 2), wx.ALIGN_LEFT)
 
         ds.Add(xLabel(dp, 'Direction: '), (1, 0), (1, 1), LCEN, 5)
         ds.Add(PVEnumButtons(dp, pv=self.motor.PV('DIR'),
                              orientation=wx.HORIZONTAL, 
-                             size=(110, -1)), (1, 1), (1, 1), wx.ALIGN_LEFT)
+                             size=(-1, -1)), (1, 1), (1, 2), wx.ALIGN_LEFT)
 
-        ds.Add(xLabel(dp, 'Freeze Offset: '), (0, 2), (1, 1), LCEN, 5)
+        ds.Add(xLabel(dp, 'Freeze Offset: '), (0, 4), (1, 1), LCEN, 5)
         ds.Add(PVEnumChoice(dp, pv=self.motor.PV('FOFF'),
-                            size=(110, -1)),  (0, 3), (1, 1), CEN)
+                            size=(110, -1)),  (0, 5), (1, 1), CEN)
         
-        ds.Add(xLabel(dp, 'Offset Value: '), (1, 2), (1, 1), LCEN, 5)
-        ds.Add(self.MotorCtrl(dp,'OFF'),    (1, 3), (1, 1), CEN)
+        ds.Add(xLabel(dp, 'Offset Value: '), (1, 4), (1, 1), LCEN, 5)
+        ds.Add(self.MotorCtrl(dp,'OFF'),    (1, 5), (1, 1), CEN)
 
         set_sizer(dp, ds)
         sizer.Add(dp, 0)
