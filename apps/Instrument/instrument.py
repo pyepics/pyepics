@@ -25,8 +25,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import  NoResultFound
 
 
-
-
 def isInstrumentDB(dbname):
     """test if a file is a valid Instrument Library file:
        must be a sqlite db file, with tables named
@@ -256,13 +254,13 @@ class InstrumentDB(object):
         "generic query"
         return self.session.query(*args, **kws)
 
-    def get_info(self, key):
+    def get_info(self, key, default=None):
         """get a value from a key in the info table"""
         errmsg = "set_info expected 1 or None value for key='%s'"
         out = self.query(Info).filter(Info.key==key).all()
         thisrow = None_or_one(out, errmsg % key)
         if thisrow is None:
-            return None
+            return default
         return thisrow.value
         
     def set_info(self, key, value):
@@ -535,7 +533,6 @@ arguments
                          exclude_pvs=None):
         """restore named position for instrument
         """
-
         inst = self.get_instrument(inst)
         if inst is None:
             raise InstrumentDBException(
@@ -547,14 +544,15 @@ arguments
             raise InstrumentDBException(
                 "restore_postion  position '%s' not found" % posname)
         
-        print 'Pre_Commands: ', inst.precommands
-        pvvals = {}        
+        # print 'Do Pre_Commands: ', inst.precommands
+        pvvals = {}
         for pvpos in pos.pvs:
-            pvvals[pvpos.pv.name] = pvpos.value
-
+            pvvals[pvpos.pv.name] = str(pvpos.value)
             
 
         self.restoring_pvs = []
+        if exclude_pvs is None:
+            exclude_pvs = []
         epics_pvs = {}
         for pvname in pvvals:
             if pvname not in exclude_pvs:
@@ -568,8 +566,4 @@ arguments
                     thispv.wait_for_connection()
                     thispv.get_ctrlvars()
                 thispv.put(value, use_complete=True)
-
-        # self.move_epics_pvs(pos.pvs, exclude_pvs, wait=wait, timeout=timeout)
-            
-        # print 'Post_Commands:',  inst.postcommands
 

@@ -5,9 +5,10 @@ import time
 from threading import Thread
 
 import epics
-from epics.wx import EpicsFunction, pvText, pvFloatCtrl, pvTextCtrl, pvEnumChoice
+from epics.wx import (EpicsFunction, PVText, PVFloatCtrl, PVTextCtrl,
+                      PVEnumChoice, MotorPanel)
+
 from epicscollect.gui import  pack, popup, add_button, SimpleText
-from motorpanel import MotorPanel
 
 from utils import ALL_EXP , GUIColors, get_pvtypes
         
@@ -335,11 +336,11 @@ class InstrumentPanel(wx.Panel):
                                minsize=(125,-1),
                                style=wx.ALIGN_LEFT) 
             if pvtype == 'enum': 
-                control = pvEnumChoice(panel, pv=pv, size=(250, -1)) 
+                control = PVEnumChoice(panel, pv=pv, size=(250, -1)) 
             elif pvtype in ('string', 'unicode'):
-                control = pvTextCtrl(panel, pv=pv, size=(250, -1))
+                control = PTextCtrl(panel, pv=pv, size=(250, -1))
             else:
-                control = pvFloatCtrl(panel, pv=pv, size=(250, -1))
+                control = PVFloatCtrl(panel, pv=pv, size=(250, -1))
             
             sizer.Add(label,   0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
             sizer.Add(control, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)

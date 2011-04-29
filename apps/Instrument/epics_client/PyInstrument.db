@@ -1,0 +1,86 @@
+# This database contains fields to allow communication between
+# the Epics Instrument GUI and other Channel Access clients
+
+record(stringin,"$(P)$(Q):TSTAMP") {
+        field(DTYP,"Soft Channel") 
+	field(DESC, "timestamp")
+	field(VAL,  "Starting")
+}
+
+record(longout,"$(P)$(Q):UNIXTS") {
+        field(DTYP,"Soft Channel") 
+	field(DESC, "timestamp")
+	field(VAL,  0)
+}
+
+record(mbbo,"$(P)$(Q):ExecCommand") {
+	field(DESC,"Exec Command")
+        field(ZRVL,"0")
+        field(ZRST,"Stop")
+        field(ONVL,"1")
+        field(ONST,"Go")
+}
+ 
+record(busy,"$(P)$(Q):Move") {
+	field(DESC,"Client Move Request")
+}
+
+record(stringin,"$(P)$(Q):InstName") {
+        field(DTYP,"Soft Channel") 
+	field(DESC, "instrument name")
+	field(VAL,  "")
+}
+
+record(stringin,"$(P)$(Q):PosName") {
+        field(DTYP,"Soft Channel") 
+	field(DESC, "position name")
+	field(VAL,  "")
+}
+
+
+record(bo,"$(P)$(Q):InstOK") {
+   field(VAL,  "0")
+}
+
+
+record(bo,"$(P)$(Q):PosOK") {
+   field(VAL,  "0")
+}
+
+record(stringin,"$(P)$(Q):CommandName") {
+  field(DTYP,"Soft Channel") 
+  field(DESC, "command name")
+  field(VAL,  "")
+}
+
+
+record(bo,"$(P)$(Q):CommandOK") {
+   field(DESC,"Command found")
+   field(VAL,  "0")
+}
+
+record(stringin,"$(P)$(Q):CommandArg1")  {
+       field(DTYP,"Soft Channel")
+       field(DESC,"command arg 1")
+       field(VAL, "")
+}
+
+record(stringin,"$(P)$(Q):CommandArg2")  {
+       field(DTYP,"Soft Channel")
+       field(DESC,"command arg 2")
+       field(VAL, "")
+}
+
+record(stringout,"$(P)$(Q):Message")  {
+       field(DTYP,"Soft Channel")
+       field(DESC,"output message")
+       field(VAL, "")
+}
+
+record(waveform,"$(P)$(Q):Info")  {
+       field(DTYP,"Soft Channel")
+       field(DESC,"info string")
+       field(NELM,"128")
+       field(FTVL,"CHAR")
+}
+

@@ -282,7 +282,7 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
         inst = instpanel.inst
         iname = inst.name
         ret = popup(self, REMOVE_MSG % iname,
-                    'Remove Instrument',
+                   'Remove Instrument',
                     style=wx.YES_NO|wx.ICON_QUESTION)
         if ret != wx.ID_YES:
             return
@@ -290,6 +290,8 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
         db.commit()
         pagemap = self.get_page_map()
         self.parent.nb.DeletePage(pagemap[iname])
+        self.Destroy()
+
         
     def OnDone(self, event=None):
         """ Done Button Event: save and exit"""

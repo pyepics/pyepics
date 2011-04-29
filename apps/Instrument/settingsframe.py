@@ -64,19 +64,16 @@ class SettingsFrame(wx.Frame) :
 
         label = SimpleText(panel, 'DB Prefix:')
         self.epics_prefix = wx.TextCtrl(panel, -1, value='', size=(160, -1))
-        pref = None
-        try:
-            pref = self.db.get_info('epics_prefix')
-        except:
-            pass
-        if pref is None:
-            pref = ''
-        self.epics_prefix.SetValue(pref)
+        self.epics_use    = wx.CheckBox(panel, -1, 'Use Epics Db')
+
+
+        self.epics_use.SetValue(1==int(self.db.get_info('epics_use', default=0)))
+        self.epics_prefix.SetValue(self.db.get_info('epics_prefix', default=''))
 
         sizer.Add(title,             (0, 3), (1, 2), labstyle|wx.GROW|wx.ALL, 5)
         sizer.Add(label,             (1, 3), (1, 1), labstyle|wx.ALL, 5)
         sizer.Add(self.epics_prefix, (1, 4), (1, 1), labstyle|wx.GROW|wx.ALL, 5)
-
+        sizer.Add(self.epics_use,    (2, 3), (1, 2), labstyle|wx.GROW|wx.ALL, 5)
         
         irow = 4
         sizer.Add(wx.StaticLine(panel, size=(150, -1), style=wx.LI_HORIZONTAL),
@@ -107,8 +104,8 @@ class SettingsFrame(wx.Frame) :
         sizer.Add(wx.StaticLine(panel, size=(150, -1), style=wx.LI_HORIZONTAL),
                   (irow, 0), (1, 5), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 5)        
 
-        btn_ok     = add_button(panel, 'OK',     size=(70, -1), action=self.onOK)
-        btn_cancel = add_button(panel, 'Cancel', size=(70, -1), action=self.onCancel)
+        btn_ok     = add_button(panel, 'OK',     size=(70, -1), action=self.OnOK)
+        btn_cancel = add_button(panel, 'Cancel', size=(70, -1), action=self.OnCancel)
                             
         irow += 1
         sizer.Add(btn_ok,     (irow, 0), (1, 1), labstyle|wx.ALL,  5)
@@ -132,12 +129,19 @@ class SettingsFrame(wx.Frame) :
             out[self.parent.nb.GetPageText(i)] = i
         return out
         
-    def onOK(self, event=None):
+    def OnOK(self, event=None):
         yesno = {True: 1, False: 0}
         self.db.set_info('verify_move',      yesno[self.v_move.IsChecked()])
         self.db.set_info('verify_erase',     yesno[self.v_erase.IsChecked()])
         self.db.set_info('verify_overwrite', yesno[self.v_owrite.IsChecked()])
+        self.db.set_info('epics_use',        yesno[self.epics_use.IsChecked()])
 
+        epics_prefix = str(self.epics_prefix.GetValue()).strip()
+        if self.epics_use.IsChecked() and epics_prefix is not None:
+            self.db.set_info('epics_prefix',    epics_prefix)
+            self.db.set_info('epics_use',    1)
+            self.parent.enable_epics_server()
+            
         pagemap = self.get_page_map()
         for pagename, cb in self.hideframes.items():
             checked = cb.IsChecked()
@@ -151,6 +155,6 @@ class SettingsFrame(wx.Frame) :
                 pagemap = self.get_page_map()
         self.Destroy()
                 
-    def onCancel(self, event=None):
+    def OnCancel(self, event=None):
         self.Destroy()
 
