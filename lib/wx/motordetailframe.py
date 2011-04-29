@@ -1,6 +1,8 @@
 """
 wxFrame for Detailed Motor Settings, ala medm More (+Setup) screen
 """
+
+import time
 import wx
 from epics.wx.wxlib import PVText, PVFloatCtrl, PVTextCtrl, \
      PVEnumButtons, PVEnumChoice, \
@@ -125,7 +127,7 @@ class MotorDetailFrame(wx.Frame):
         ds.Add(twk_panel,             (nrow, 1), (1, 2), wx.ALIGN_LEFT)
 
         epv = self.motor.PV('disabled')
-
+        
         able_btns = PVEnumButtons(dp, pv=epv, orientation = wx.VERTICAL, 
                                   size=(110, -1))
 
@@ -156,13 +158,13 @@ class MotorDetailFrame(wx.Frame):
         ds.Add(xLabel(dp, 'Mode: '),  (0, 0), (1, 1), LCEN, 5)
         
         ds.Add(PVEnumButtons(dp, pv=self.motor.PV('SET'),
-                              orientation = wx.HORIZONTAL, 
-                              size=(110, -1)), (0, 1), (1, 1), wx.ALIGN_LEFT)
+                             orientation = wx.HORIZONTAL, 
+                             size=(110, -1)), (0, 1), (1, 1), wx.ALIGN_LEFT)
 
         ds.Add(xLabel(dp, 'Direction: '), (1, 0), (1, 1), LCEN, 5)
         ds.Add(PVEnumButtons(dp, pv=self.motor.PV('DIR'),
-                              orientation=wx.HORIZONTAL, 
-                              size=(110, -1)), (1, 1), (1, 1), wx.ALIGN_LEFT)
+                             orientation=wx.HORIZONTAL, 
+                             size=(110, -1)), (1, 1), (1, 1), wx.ALIGN_LEFT)
 
         ds.Add(xLabel(dp, 'Freeze Offset: '), (0, 2), (1, 1), LCEN, 5)
         ds.Add(PVEnumChoice(dp, pv=self.motor.PV('FOFF'),
@@ -265,8 +267,9 @@ class MotorDetailFrame(wx.Frame):
         "Motor event handler"
         if pvname is None:
             return None
-        
+
         field_val = self.motor.get(field)
+        print 'OnMotorEvent ', pvname, field, field_val
         if field in ('LVIO', 'HLS', 'LLS'):
             s = ''
             if field_val != 0:
@@ -285,22 +288,25 @@ class MotorDetailFrame(wx.Frame):
         "PVFloatCtrl for a Motor attribute"
         return PVFloatCtrl(panel, size=(100, -1), 
                            precision= self.motor.PREC,
-                           pv = self.motor.PV(attr),
+                           pv=self.motor.PV(attr), 
                            style = wx.TE_RIGHT)
 
     def MotorText(self, panel, attr):
         "PVText for a Motor attribute"
-        return PVText(panel,  pv=self.motor.PV(attr), as_string=True,
+        pv = self.motor.PV(attr)
+        return PVText(panel,  pv=pv, as_string=True,
                       size=(100, -1), style=wx.ALIGN_RIGHT|wx.CENTER)
 
     def MotorTextCtrl(self, panel, attr, size=(100, -1)):
         "PVTextCtrl for a Motor attribute"
-        return PVTextCtrl(panel, pv=self.motor.PV(attr), size=size, 
+        pv = self.motor.PV(attr)
+        return PVTextCtrl(panel, pv=pv, size=size, 
                           style=wx.ALIGN_LEFT|wx.TE_PROCESS_ENTER)
 
     @DelayedEpicsCallback
     def OnLimitChange(self, attr=None, value=None, **kws):
         "limit-change callback"
+        print 'OnLimitChange ', attr, value
         funcs = {'low_limit':       self.drives[0].SetMin,
                  'high_limit':      self.drives[0].SetMax,
                  'dial_low_limit':  self.drives[1].SetMin,
