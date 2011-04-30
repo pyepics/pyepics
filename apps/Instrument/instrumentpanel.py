@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import wx
 from wx._core import PyDeadObjectError
 
@@ -5,9 +7,7 @@ import time
 from threading import Thread
 
 import epics
-from epics.wx import (EpicsFunction, PVText, PVFloatCtrl, PVTextCtrl,
-                      PVEnumChoice, MotorPanel)
-
+from epics.wx import (EpicsFunction, PVText, PVFloatCtrl, PVTextCtrl, PVEnumChoice, MotorPanel)
 from epicscollect.gui import  pack, popup, add_button, SimpleText
 
 from utils import ALL_EXP , GUIColors, get_pvtypes
@@ -256,13 +256,13 @@ class InstrumentPanel(wx.Panel):
     def write(self, msg, status='normal'):
         if self.write_message is None:
             return
-        self.write_message(msg, status=status) 
+        self.write_message(msg, status=status)
         
     def OnPutTimer(self, evt=None):
         """Timer Event for GoTo to look if move is complete."""
         if self.db.restore_complete():
             self.puttimer.Stop()
-            print 'would do inst post commands now!'
+            # print 'would do inst post commands now!'
 
     def OnConnectTimer(self, evt=None):
         """Timer Event: look for uncompleted PV panels
@@ -464,3 +464,5 @@ class InstrumentPanel(wx.Panel):
         ipos  =  self.pos_list.GetSelection()
         self.pos_list.Delete(ipos)
         self.write("Erased position '%s' for '%s'" % (posname, self.inst.name))
+
+

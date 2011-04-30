@@ -24,6 +24,9 @@ from sqlalchemy.orm import sessionmaker,  mapper, clear_mappers, relationship
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import  NoResultFound
 
+# needed for py2exe?
+import sqlalchemy.dialects.sqlite
+
 
 def isInstrumentDB(dbname):
     """test if a file is a valid Instrument Library file:
@@ -533,6 +536,7 @@ arguments
                          exclude_pvs=None):
         """restore named position for instrument
         """
+
         inst = self.get_instrument(inst)
         if inst is None:
             raise InstrumentDBException(

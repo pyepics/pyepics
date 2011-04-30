@@ -12,8 +12,6 @@ from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
 from utils import GUIColors, HideShow, YesNo, set_font_with_children, get_pvtypes
 import instrument
 
-REMOVE_MSG = "Permanently Remove Instrument '%s'?\nThis cannot be undone!"
-
 class PVTypeChoice(wx.Choice):
     def __init__(self, parent, choices=None, size=(95, -1), **kws):
         wx.Choice.__init__(self, parent, -1, size=size)
@@ -115,18 +113,15 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
         # Name row
         label  = SimpleText(panel, 'Instrument Name: ',
                             minsize=(150, -1), style=LSTY)
-        self.name =  wx.TextCtrl(panel, value='', size=(250, -1))
+        self.name =  wx.TextCtrl(panel, value='', size=(260, -1))
 
-        btn_remove = add_button(panel, 'Remove', size=(85, -1),
-                                action=self.OnRemoveInst)
         sizer.Add(label,      (0, 0), (1, 1), LSTY, 2)
-        sizer.Add(self.name,  (0, 1), (1, 1), LSTY, 2)
-        sizer.Add(btn_remove, (0, 2), (1, 1), RSTY, 2)
+        sizer.Add(self.name,  (0, 1), (1, 2), LSTY, 2)
         sizer.Add(wx.StaticLine(panel, size=(195, -1), style=wx.LI_HORIZONTAL),
                   (1, 0), (1, 3), CEN, 2)
 
         irow = 2
-        self.curpvs, self.newpvs = {}, {}
+        self.curpvs, self.newpvs = [], {}
         if inst is not None:
             self.name.SetValue(inst.name)
             sizer.Add(SimpleText(panel, 'Current PVs:', font=titlefont,
@@ -161,7 +156,7 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
                 pvtype.SetSelection(itype)
                 pvtype.SetStringSelection(pv.pvtype.name)
                 del_pv = YesNo(panel, defaultyes=False)
-                self.curpvs[pv.name] = (label, pvtype, del_pv)
+                self.curpvs.append((pv.name, label, pvtype, del_pv))
 
                 sizer.Add(label,     (irow, 0), (1, 1), LSTY,  3)
                 sizer.Add(pvtype,    (irow, 1), (1, 1), CSTY,  3)
@@ -196,7 +191,8 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
             sizer.Add(pvtype,   (irow, 1), (1, 1), CSTY,  3)
             sizer.Add(del_pv,   (irow, 2), (1, 1), RSTY,  3)
                         
-            self.newpvs[name.GetId()] = (name, pvtype, del_pv)
+            self.newpvs[name.GetId()] = dict(index=npv, name=name,
+                                             type=pvtype, delpv=del_pv)
 
         btn_panel = wx.Panel(panel, size=(75, -1))
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -268,30 +264,13 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
         except KeyError:
             wid = None
         pv.get_ctrlvars()
-        self.newpvs[wid][1].Enable()
-        self.newpvs[wid][2].Enable()
+        self.newpvs[wid]['type'].Enable()
+        self.newpvs[wid]['delpv'].Enable()
         
         pvchoices = get_pvtypes(pv, instrument)
-        self.newpvs[wid][1].SetChoices(pvchoices)
-        self.newpvs[wid][1].SetSelection(0)
-        self.newpvs[wid][2].SetStringSelection('No')
-        
-    def OnRemoveInst(self, event=None):
-        instpanel = self.parent.nb.GetCurrentPage()
-        db = instpanel.db
-        inst = instpanel.inst
-        iname = inst.name
-        ret = popup(self, REMOVE_MSG % iname,
-                   'Remove Instrument',
-                    style=wx.YES_NO|wx.ICON_QUESTION)
-        if ret != wx.ID_YES:
-            return
-        db.remove_instrument(inst)
-        db.commit()
-        pagemap = self.get_page_map()
-        self.parent.nb.DeletePage(pagemap[iname])
-        self.Destroy()
-
+        self.newpvs[wid]['type'].SetChoices(pvchoices)
+        self.newpvs[wid]['type'].SetSelection(0)
+        self.newpvs[wid]['delpv'].SetStringSelection('No')
         
     def OnDone(self, event=None):
         """ Done Button Event: save and exit"""
@@ -308,17 +287,24 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
         if page is not None:
             self.parent.nb.SetPageText(page, newname)
 
-        for namectrl, typectrl, delctrl in self.newpvs.values():
-            if delctrl.GetSelection() == 0:
-                pvname = namectrl.GetValue().strip()
-                pvtype = typectrl.GetStringSelection()
-                if len(pvname) > 0 and typectrl.Enabled:
-                    db.add_pv(pvname, pvtype=pvtype)
-                    inst.pvs.append(db.get_pv(pvname))
-                    instpanel.add_pv(pvname)
+        # make sure newpvs from dictionary are inserted in order
+        # of "index", as appear on the GUI screen.
+        new_pvs = [None]* len(self.newpvs)
+        for entry in self.newpvs.values():
+            if entry['delpv'].GetSelection() == 0 and entry['type'].Enabled:
+                pvname = str(entry['name'].GetValue().strip())
+                if len(pvname) > 0:
+                    pvtype = str(entry['type'].GetStringSelection())
+                    new_pvs[entry['index']] = (pvname, pvtype)
+
+        for newpvs in new_pvs:
+            if newpvs is not None:
+                pvname, pvtype = newpvs
+                db.add_pv(pvname, pvtype=pvtype)
+                inst.pvs.append(db.get_pv(pvname))
+                instpanel.add_pv(pvname)
                     
-        for pvname, ctrls in  self.curpvs.items():
-            lctrl, typectrl, delctrl = ctrls
+        for pvname, lctrl, typectrl, delctrl in  self.curpvs:
             if delctrl.GetSelection() == 1:
                 instpv = db.get_pv(pvname)
                 inst.pvs.remove(instpv)
@@ -332,11 +318,9 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
                     
         db.commit()
         # set order for PVs (as for next time)
-        
         ordered_inst_pvs = db.get_ordered_instpvs(inst)
         for opv in ordered_inst_pvs:
             opv.display_order = -1
-            
             
         for i, pv in enumerate(inst.pvs):
             for opv in ordered_inst_pvs:

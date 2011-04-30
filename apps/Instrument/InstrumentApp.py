@@ -32,6 +32,8 @@ from epics_instrument import EpicsInstrument
 FNB_STYLE = flat_nb.FNB_NO_X_BUTTON|flat_nb.FNB_X_ON_TAB|flat_nb.FNB_SMART_TABS
 FNB_STYLE |= flat_nb.FNB_DROPDOWN_TABS_LIST|flat_nb.FNB_NO_NAV_BUTTONS
         
+ICON_FILE = 'instrument.ico'
+
 class InstrumentFrame(wx.Frame):
     def __init__(self, parent=None, conf=None, dbname=None, **kwds):
 
@@ -100,10 +102,11 @@ class InstrumentFrame(wx.Frame):
         self.SetMinSize((725, 300))
         
         pack(self, sizer)
+        self.SetIcon(wx.Icon(ICON_FILE, wx.BITMAP_TYPE_ICO))
         self.Refresh()
 
     def create_nbpages(self):
-        self.Freeze()
+        # self.Freeze()
         if self.nb.GetPageCount() > 0:
             self.nb.DeleteAllPages()
 
@@ -113,7 +116,7 @@ class InstrumentFrame(wx.Frame):
             if int(inst.show) == 1:
                 self.add_instrument_page(inst)
             
-        self.Thaw()
+        # self.Thaw()
 
     def add_instrument_page(self, inst):
         self.connect_pvs(inst, wait_time=1.0)
@@ -162,6 +165,12 @@ class InstrumentFrame(wx.Frame):
                  "Edit Current Instrument",
                  action=self.onEditInstrument)                 
 
+        inst_menu.AppendSeparator()
+        add_menu(self, inst_menu, "&Remove Current Instrument",
+                 "Permanently Remove Current Instrument",
+                 action=self.onRemoveInstrument)                 
+
+        
         add_menu(self, opts_menu, "&Settings",
                  "Change Settings for GUI behavior",
                  action=self.onSettings)
@@ -274,6 +283,26 @@ class InstrumentFrame(wx.Frame):
         EditInstrumentFrame(parent=self, db=self.db, inst=inst,
                             epics_pvs=self.epics_pvs)
 
+        
+    def onRemoveInstrument(self, event=None):
+        inst = self.nb.GetCurrentPage().inst
+        iname = inst.name
+
+        MSG = "Permanently Remove Instrument '%s'?\nThis cannot be undone!"
+
+        ret = popup(self, MSG % iname,
+                    'Remove Instrument',
+                    style=wx.YES_NO|wx.ICON_QUESTION)
+        if ret != wx.ID_YES:
+            return
+        self.db.remove_instrument(inst)
+        self.db.commit()
+        pages = {}
+        for i in range(self.nb.GetPageCount()):
+            pages[self.nb.GetPageText(i)] = i
+
+        self.nb.DeletePage(pages[iname])
+
     def onSettings(self, event=None):
         try:
             self.settings_frame.Raise()
@@ -331,15 +360,10 @@ class InstrumentFrame(wx.Frame):
             self.db = InstrumentDB(outfile)
             
             # set current tabs to the new db
-            print 'onSAVE ', self.db
 
             insts = [(i, self.nb.GetPageText(i)) for i in range(self.nb.GetPageCount())]
 
-            print 'onSave ', insts
-
             for nbpage, name in insts:
-                print 'NB : ', nbpage, name, self.db.get_instrument
-                print 'NB : ', self.db.get_instrument(name)
                 self.nb.GetPage(nbpage).db = self.db
                 self.nb.GetPage(nbpage).inst = self.db.get_instrument(name)
                 
@@ -357,6 +381,7 @@ class InstrumentFrame(wx.Frame):
             self.Layout()
         dlg.Destroy()
 
+    @EpicsFunction
     def onClose(self, event):
         display_order = [self.nb.GetPage(i).inst.name for i in range(self.nb.GetPageCount())]
 
@@ -367,11 +392,15 @@ class InstrumentFrame(wx.Frame):
                 inst.display_order = display_order.index(inst.name)
         self.db.commit()
 
+        epics.poll()
+
         if self.epics_server is not None:
             self.epics_server.Shutdown()
-       
+            
         self.config.write()
-        finalize_epics()
+
+        time.sleep(0.5)
+       
         self.Destroy()
 
 ## class InstrumentApp(wx.App):
