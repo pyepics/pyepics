@@ -17,7 +17,7 @@ from epics.wx import finalize_epics, EpicsFunction
 
 from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
      Closure, NumericCombo, pack, popup, \
-     FileSave, FileOpen, SelectWorkdir 
+     FileSave, FileOpen, SelectWorkdir
 
 from configfile import InstrumentConfig
 from instrument import isInstrumentDB, InstrumentDB
@@ -27,11 +27,11 @@ from instrumentpanel import InstrumentPanel
 
 from settingsframe import SettingsFrame
 from editframe import EditInstrumentFrame
-from epics_instrument import EpicsInstrument
+from epics_server import EpicsInstrumentServer
 
 FNB_STYLE = flat_nb.FNB_NO_X_BUTTON|flat_nb.FNB_X_ON_TAB|flat_nb.FNB_SMART_TABS
 FNB_STYLE |= flat_nb.FNB_DROPDOWN_TABS_LIST|flat_nb.FNB_NO_NAV_BUTTONS
-        
+
 ICON_FILE = 'instrument.ico'
 
 class InstrumentFrame(wx.Frame):
@@ -50,13 +50,13 @@ class InstrumentFrame(wx.Frame):
         self.colors = GUIColors()
         self.SetBackgroundColour(self.colors.bg)
 
-        wx.EVT_CLOSE(self, self.onClose)        
+        wx.EVT_CLOSE(self, self.onClose)
         self.create_Statusbar()
         self.create_Menus()
         self.create_Frame()
 
         self.enable_epics_server()
-        
+
 
     def connect_db(self, dbname=None, new=False):
         """connects to a db, possibly creating a new one"""
@@ -73,12 +73,12 @@ class InstrumentFrame(wx.Frame):
             else:
                 return
             dlg.Destroy()
-            
+
         self.db = InstrumentDB()
         if isInstrumentDB(dbname):
             self.db.connect(dbname)
         else:
-            self.db.create_newdb(dbname, connect=True)            
+            self.db.create_newdb(dbname, connect=True)
         self.config.set_current_db(dbname)
         self.dbname = dbname
 
@@ -100,7 +100,7 @@ class InstrumentFrame(wx.Frame):
 
         self.create_nbpages()
         self.SetMinSize((725, 300))
-        
+
         pack(self, sizer)
         self.SetIcon(wx.Icon(ICON_FILE, wx.BITMAP_TYPE_ICO))
         self.Refresh()
@@ -115,16 +115,16 @@ class InstrumentFrame(wx.Frame):
                 inst.show = 1
             if int(inst.show) == 1:
                 self.add_instrument_page(inst)
-            
+
         # self.Thaw()
 
     def add_instrument_page(self, inst):
         self.connect_pvs(inst, wait_time=1.0)
         panel = InstrumentPanel(self, inst, db=self.db,
-                                size=(925, 300), 
+                                size=(925, 300),
                                 writer = self.write_message)
         self.nb.AddPage(panel, inst.name, True)
-        
+
     @EpicsFunction
     def connect_pvs(self, inst, wait_time=2.0):
         """connect to PVs for an instrument.."""
@@ -138,7 +138,7 @@ class InstrumentFrame(wx.Frame):
             if all(x.connected for x in self.epics_pvs.values()):
                 break
         return
-        
+
     def create_Menus(self):
         """create menus"""
         mbar = wx.MenuBar()
@@ -150,9 +150,9 @@ class InstrumentFrame(wx.Frame):
         add_menu(self, file_menu, "&New File", "Create New Instruments File",
                  action=self.onNew)
         add_menu(self, file_menu, "&Open File", "Open Instruments File",
-                 action=self.onOpen)        
+                 action=self.onOpen)
         add_menu(self, file_menu, "&Save As", "Save Instruments File",
-                 action=self.onSave)        
+                 action=self.onSave)
         file_menu.AppendSeparator()
         add_menu(self, file_menu, "E&xit", "Terminate the program",
                  action=self.onClose)
@@ -163,21 +163,21 @@ class InstrumentFrame(wx.Frame):
 
         add_menu(self, inst_menu, "&Edit Current Instrument",
                  "Edit Current Instrument",
-                 action=self.onEditInstrument)                 
+                 action=self.onEditInstrument)
 
         inst_menu.AppendSeparator()
         add_menu(self, inst_menu, "&Remove Current Instrument",
                  "Permanently Remove Current Instrument",
-                 action=self.onRemoveInstrument)                 
+                 action=self.onRemoveInstrument)
 
-        
+
         add_menu(self, opts_menu, "&Settings",
                  "Change Settings for GUI behavior",
                  action=self.onSettings)
-        
+
         add_menu(self, opts_menu, "Change &Font", "Select Font",
-                 action=self.onSelectFont)                         
-        
+                 action=self.onSelectFont)
+
         add_menu(self, help_menu, 'About',
                  "More information about this program", action=self.onAbout)
 
@@ -194,7 +194,7 @@ class InstrumentFrame(wx.Frame):
         self.statusbar.SetStatusWidths([-4,-1])
         for index, name  in enumerate(("Messages", "Status")):
             self.statusbar.SetStatusText('', index)
-            
+
     def write_message(self,text,status='normal'):
         self.SetStatusText(text)
 
@@ -210,7 +210,7 @@ class InstrumentFrame(wx.Frame):
 
         self.epics_server = EpicsInstrument(epics_prefix, db=self.db)
         self.epics_server.Start('Initializing...')
-        
+
         if self.epics_server is not None and self.server_timer is not None:
             self.epics_server.SetInfo(os.path.abspath(self.dbname))
             self.server_timer.Start(150)
@@ -218,8 +218,8 @@ class InstrumentFrame(wx.Frame):
     def OnServerTimer(self, evt=None):
         """Epics Server Events:
         responds to requests from EpicsInstrument Db
-        
-        This allows an outside client to make move requests to 
+
+        This allows an outside client to make move requests to
         pre-defined instruments/positions in this database.
         """
         server = self.epics_server
@@ -227,17 +227,17 @@ class InstrumentFrame(wx.Frame):
         req = server._request
         if server._inst is None and len(server.InstName)>1:
             server._inst = self.db.get_instrument(server.InstName)
-        
+
         if server._moving and self.db.restore_complete():
             server.MoveDone()
-            
+
         elif 'Move' in req:
             move = req.pop('Move')
             if move and server.PosOK==1 and server.InstOK==1:
                 server._moving = 1
                 self.db.restore_position(server.PosName, server._inst)
                 server.Message = 'Moving to %s' % server.PosName
-                
+
         elif 'Pos' in req:
             posname = req.pop('Pos')
             pos = None
@@ -254,9 +254,9 @@ class InstrumentFrame(wx.Frame):
 
             pos = self.db.get_position(server.PosName, instrument=server._inst)
             server.PosOK = {True:1, False:0}[pos is not None]
-            
 
-            
+
+
     def onAddInstrument(self, event=None):
         "add a new, empty instrument and start adding PVs"
         newname = basename = 'New Instrument'
@@ -270,20 +270,20 @@ class InstrumentFrame(wx.Frame):
         inst = self.db.add_instrument(newname)
 
         panel = InstrumentPanel(self, inst, db=self.db,
-                                size=(925, 300), 
+                                size=(925, 300),
                                 writer = self.write_message)
 
         self.nb.AddPage(panel, inst.name, True)
         EditInstrumentFrame(parent=self, db=self.db, inst=inst,
                             epics_pvs=self.epics_pvs)
-        
+
     def onEditInstrument(self, event=None):
         "edit the current instrument"
         inst = self.nb.GetCurrentPage().inst
         EditInstrumentFrame(parent=self, db=self.db, inst=inst,
                             epics_pvs=self.epics_pvs)
 
-        
+
     def onRemoveInstrument(self, event=None):
         inst = self.nb.GetCurrentPage().inst
         iname = inst.name
@@ -308,7 +308,7 @@ class InstrumentFrame(wx.Frame):
             self.settings_frame.Raise()
         except:
             self.settting_frame = SettingsFrame(parent=self, db=self.db)
-        
+
     def onAbout(self, event=None):
         # First we create and fill the info object
         info = wx.AboutDialogInfo()
@@ -336,7 +336,7 @@ class InstrumentFrame(wx.Frame):
     def onNew(self, event=None):
         self.connect_db(dbname=self.dbname, new=True)
         self.create_nbpages()
-                
+
     def onSave(self, event=None):
         outfile = FileSave(self, 'Save Instrument File As',
                            wildcard=EIN_WILDCARD,
@@ -344,21 +344,21 @@ class InstrumentFrame(wx.Frame):
 
         # save current tab/instrument mapping
         fulldbname = os.path.abspath(self.dbname)
-        
+
         if outfile not in (None, self.dbname, fulldbname):
             self.db.close()
             try:
                 shutil.copy(self.dbname, outfile)
             except shutil.Error:
                 pass
-                
+
             time.sleep(1.0)
-            self.dbname = outfile            
+            self.dbname = outfile
             self.config.set_current_db(outfile)
             self.config.write()
-           
+
             self.db = InstrumentDB(outfile)
-            
+
             # set current tabs to the new db
 
             insts = [(i, self.nb.GetPageText(i)) for i in range(self.nb.GetPageCount())]
@@ -366,14 +366,14 @@ class InstrumentFrame(wx.Frame):
             for nbpage, name in insts:
                 self.nb.GetPage(nbpage).db = self.db
                 self.nb.GetPage(nbpage).inst = self.db.get_instrument(name)
-                
+
             self.write_message("Saved Instrument File: %s" % outfile)
 
     def onSelectFont(self, evt=None):
         fontdata = wx.FontData()
         fontdata.SetInitialFont(self.GetFont())
         dlg = wx.FontDialog(self, fontdata)
-        
+
         if dlg.ShowModal() == wx.ID_OK:
             font = dlg.GetFontData().GetChosenFont()
             set_font_with_children(self, font)
@@ -396,11 +396,11 @@ class InstrumentFrame(wx.Frame):
 
         if self.epics_server is not None:
             self.epics_server.Shutdown()
-            
+
         self.config.write()
 
         time.sleep(0.5)
-       
+
         self.Destroy()
 
 ## class InstrumentApp(wx.App):
@@ -410,9 +410,9 @@ class InstrumentApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
         self.conf  = conf
         self.dbname  = dbname
         wx.App.__init__(self)
-        
+
     def OnInit(self):
-        self.Init() 
+        self.Init()
         frame = InstrumentFrame(conf=self.conf, dbname=self.dbname)
         frame.Show()
         self.SetTopWindow(frame)
@@ -427,5 +427,5 @@ if __name__ == '__main__':
     else:
         app = wx.PySimpleApp()
         InstrumentFrame(conf=conf, dbname=dbname).Show()
-        
+
     app.MainLoop()
