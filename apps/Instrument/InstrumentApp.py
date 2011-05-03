@@ -208,7 +208,7 @@ class InstrumentFrame(wx.Frame):
         if not connect:
             return
 
-        self.epics_server = EpicsInstrument(epics_prefix, db=self.db)
+        self.epics_server = EpicsInstrumentServer(epics_prefix, db=self.db)
         self.epics_server.Start('Initializing...')
 
         if self.epics_server is not None and self.server_timer is not None:
