@@ -25,7 +25,7 @@ def get_appdir(appname):
 
 default_config="""
 [dbs]
-most_recent=Test.ein
+most_recent=MyInstruments.ein
 """
     
 class InstrumentConfig(object):
