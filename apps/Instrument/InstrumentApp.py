@@ -34,6 +34,16 @@ FNB_STYLE |= flat_nb.FNB_DROPDOWN_TABS_LIST|flat_nb.FNB_NO_NAV_BUTTONS
 
 ICON_FILE = 'instrument.ico'
 
+FILE_IN_USE_MSG = """The instrument file  %s
+may be in use:
+    Machine = %s
+    Process = %s
+
+Using two applications with a single file can cause data corruption!
+
+Would you like this application to use this instrument file?
+"""
+
 class InstrumentFrame(wx.Frame):
     def __init__(self, parent=None, conf=None, dbname=None, **kwds):
 
@@ -54,9 +64,7 @@ class InstrumentFrame(wx.Frame):
         self.create_Statusbar()
         self.create_Menus()
         self.create_Frame()
-
         self.enable_epics_server()
-
 
     def connect_db(self, dbname=None, new=False):
         """connects to a db, possibly creating a new one"""
@@ -77,6 +85,18 @@ class InstrumentFrame(wx.Frame):
         self.db = InstrumentDB()
         if isInstrumentDB(dbname):
             self.db.connect(dbname)
+            set_hostpid = True
+            if not self.db.check_hostpid():
+                hostname = self.db.get_info('host_name')
+                pid     = self.db.get_info('process_id')
+                ret = popup(None, FILE_IN_USE_MSG % (os.path.abspath(dbname),
+                                                     hostname, pid),
+                            'Database in use',
+                            style=wx.YES_NO|wx.ICON_EXCLAMATION)
+                set_hostpid = (ret != wx.ID_YES)
+            if set_hostpid:
+                self.db.set_hostpid()
+
         else:
             self.db.create_newdb(dbname, connect=True)
         self.config.set_current_db(dbname)
@@ -213,7 +233,7 @@ class InstrumentFrame(wx.Frame):
 
         if self.epics_server is not None and self.server_timer is not None:
             self.epics_server.SetInfo(os.path.abspath(self.dbname))
-            self.server_timer.Start(150)
+            self.server_timer.Start(100)
 
     def OnServerTimer(self, evt=None):
         """Epics Server Events:
@@ -234,9 +254,12 @@ class InstrumentFrame(wx.Frame):
         elif 'Move' in req:
             move = req.pop('Move')
             if move and server.PosOK==1 and server.InstOK==1:
-                server._moving = 1
-                self.db.restore_position(server.PosName, server._inst)
-                server.Message = 'Moving to %s' % server.PosName
+                if 1 == int(self.db.get_info('epics_use', default=0)):
+                    server._moving = 1
+                    self.db.restore_position(server.PosName, server._inst)
+                    server.Message = 'Moving to %s' % server.PosName
+                else:
+                    server.MoveDone()
 
         elif 'Pos' in req:
             posname = req.pop('Pos')
@@ -390,6 +413,7 @@ class InstrumentFrame(wx.Frame):
             if inst.name in display_order:
                 inst.show = 1
                 inst.display_order = display_order.index(inst.name)
+        self.db.clear_hostpid()
         self.db.commit()
 
         epics.poll()
@@ -400,7 +424,6 @@ class InstrumentFrame(wx.Frame):
         self.config.write()
 
         time.sleep(0.5)
-
         self.Destroy()
 
 ## class InstrumentApp(wx.App):

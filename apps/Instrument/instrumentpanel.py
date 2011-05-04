@@ -11,7 +11,7 @@ from epics.wx import (EpicsFunction, PVText, PVFloatCtrl, PVTextCtrl, PVEnumChoi
 from epicscollect.gui import  pack, popup, add_button, SimpleText
 
 from utils import ALL_EXP , GUIColors, get_pvtypes
-        
+
 class MoveToDialog(wx.Dialog):
     """Full Query for Move To for a Position"""
     msg = '''Select Recent Instrument File, create a new one'''
@@ -22,11 +22,11 @@ class MoveToDialog(wx.Dialog):
         self.pvs  = pvs
         if pvdesc is None:
             pvdesc = {}
-        
+
         thispos = db.get_position(posname, inst)
         if thispos is None:
             return
-        
+
         title = "Move Instrument %s to Position '%s'?" % (inst.name, posname)
         wx.Dialog.__init__(self, parent, wx.ID_ANY, title=title)
         panel = wx.Panel(self)
@@ -49,10 +49,10 @@ class MoveToDialog(wx.Dialog):
                           'Saved Value', 'Move?'):
             txt =SimpleText(panel, titleword,
                             font=titlefont,
-                            minsize=(80, -1), 
-                            colour=colors.title, 
+                            minsize=(80, -1),
+                            colour=colors.title,
                             style=tstyle)
-            
+
             sizer.Add(txt, (0, i), (1, 1), labstyle, 1)
             i = i + 1
 
@@ -70,7 +70,7 @@ class MoveToDialog(wx.Dialog):
 
             if pvname in pvdesc:
                 desc = "%s (%s)" % (pvdesc[pvname], pvname)
-            
+
             label = SimpleText(panel, desc, style=tstyle,
                                colour=colors.pvname)
             curr  = SimpleText(panel, curr_val, style=tstyle)
@@ -129,8 +129,8 @@ class InstrumentPanel(wx.Panel):
         rpanel = wx.Panel(splitter, style=wx.BORDER_SUNKEN, size=(-1, 175))
 
         splitter.SetMinimumPaneSize(150)
-        
-        toprow = wx.Panel(lpanel) 
+
+        toprow = wx.Panel(lpanel)
         self.pos_name =  wx.TextCtrl(toprow, value="", size=(250, 25),
                                      style= wx.TE_PROCESS_ENTER)
         self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
@@ -141,11 +141,11 @@ class InstrumentPanel(wx.Panel):
                                 font=titlefont,
                                 colour=colors.title,
                                 minsize=(125, -1),
-                                style=wx.ALIGN_LEFT|wx.ALIGN_BOTTOM), 
+                                style=wx.ALIGN_LEFT|wx.ALIGN_BOTTOM),
                      0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL, 2)
 
         topsizer.Add(SimpleText(toprow, 'Save Current Position:',
-                                minsize=(125, -1),                              
+                                minsize=(125, -1),
                                 style=wx.ALIGN_RIGHT), 1,
                      wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
 
@@ -159,7 +159,7 @@ class InstrumentPanel(wx.Panel):
         # start a timer to check for when to fill in PV panels
         timer_id = wx.NewId()
         self.etimer = wx.Timer(self)
-        self.puttimer = wx.Timer(self)        
+        self.puttimer = wx.Timer(self)
         self.etimer_count = 0
         self.etimer_poll = 50
 
@@ -177,7 +177,7 @@ class InstrumentPanel(wx.Panel):
                               action=self.OnMove)
         btn_erase = add_button(rpanel, "Erase",  size=(70, -1),
                                action=self.onErase)
-        
+
         brow = wx.BoxSizer(wx.HORIZONTAL)
         brow.Add(btn_goto,   0, ALL_EXP|wx.ALIGN_LEFT, 1)
         brow.Add(btn_erase,  0, ALL_EXP|wx.ALIGN_LEFT, 1)
@@ -194,14 +194,14 @@ class InstrumentPanel(wx.Panel):
         rsizer.Add(self.pos_list, 1, wx.EXPAND|wx.ALIGN_CENTER, 1)
         pack(rpanel, rsizer)
 
-        
+
         splitter.SplitVertically(lpanel, rpanel, -1)
-       
+
         lpanel.SetMinSize((625, 150))
         rpanel.SetMinSize((150, -1))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(splitter, 1, wx.GROW|wx.ALL, 0)        
+        sizer.Add(splitter, 1, wx.GROW|wx.ALL, 0)
         pack(self, sizer)
 
     def undisplay_pv(self, pvname):
@@ -214,7 +214,7 @@ class InstrumentPanel(wx.Panel):
         if thisentry is not None:
             self.pv_components.remove(thisentry)
             self.redraw_leftpanel()
-            
+
     def redraw_leftpanel(self, announce=False):
         """ redraws the left panel """
         self.Freeze()
@@ -238,8 +238,8 @@ class InstrumentPanel(wx.Panel):
 
         self.Refresh()
         self.Layout()
-        self.Thaw()        
-        self.Show()            
+        self.Thaw()
+        self.Show()
         if announce:
             print 'Redraw Left Panel: %i components ' % (len(self.leftpanel.Children))
 
@@ -248,7 +248,7 @@ class InstrumentPanel(wx.Panel):
         wid = wx.StaticText(self.leftpanel,
                             label="Waiting for Connection for '%s'" % pvname)
         self.pv_components.append([pvname, False, wid])
-        
+
         time.sleep(0.010)
         if not self.etimer.IsRunning():
             self.etimer.Start(self.etimer_poll)
@@ -257,7 +257,7 @@ class InstrumentPanel(wx.Panel):
         if self.write_message is None:
             return
         self.write_message(msg, status=status)
-        
+
     def OnPutTimer(self, evt=None):
         """Timer Event for GoTo to look if move is complete."""
         if self.db.restore_complete():
@@ -284,7 +284,7 @@ class InstrumentPanel(wx.Panel):
             self.etimer_poll *=  2
             self.etimer_poll = min(self.etimer_poll, 5000)
             self.etimer.Start(self.etimer_poll)
-            
+
     @EpicsFunction
     def PV_Panel(self, pvname): # , panel, sizer, current_wid=None):
         """ try to create a PV Panel for the given pv
@@ -295,7 +295,7 @@ class InstrumentPanel(wx.Panel):
             self.pvs[pvname] = pv
         else:
             pv = self.pvs[pvname]
-            
+
         # return if not connected
         if pv.connected == False:
             return
@@ -318,37 +318,37 @@ class InstrumentPanel(wx.Panel):
             pvtype = str(db_pv.pvtype.name)
         except AttributeError:
             pass
-        
+
         if pvtype is None:
             pvtype  = get_pvtypes(pv)[0]
-            
-        self.db.set_pvtype(pvname, pvtype)        
+
+        self.db.set_pvtype(pvname, pvtype)
 
         panel = wx.Panel(self.leftpanel)
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         if pvtype == 'motor':
-            sizer.Add(MotorPanel(panel, pvname, midsize=True), 
+            sizer.Add(MotorPanel(panel, pvname, midsize=True),
                       1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.GROW, 0)
         else:
 
             label = SimpleText(panel, pvname,
                                colour=colors.pvname,
                                minsize=(125,-1),
-                               style=wx.ALIGN_LEFT) 
-            if pvtype == 'enum': 
-                control = PVEnumChoice(panel, pv=pv, size=(250, -1)) 
+                               style=wx.ALIGN_LEFT)
+            if pvtype == 'enum':
+                control = PVEnumChoice(panel, pv=pv, size=(250, -1))
             elif pvtype in ('string', 'unicode'):
                 control = PTextCtrl(panel, pv=pv, size=(250, -1))
             else:
                 control = PVFloatCtrl(panel, pv=pv, size=(250, -1))
-            
+
             sizer.Add(label,   0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
             sizer.Add(control, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
         pack(panel, sizer)
         thiscomp[2] = panel
         self.redraw_leftpanel()
-        
-                
+
+
     @EpicsFunction
     def save_current_position(self, posname):
         values = {}
@@ -356,7 +356,7 @@ class InstrumentPanel(wx.Panel):
             values[pv.pvname] = pv.get(as_string=True)
         self.db.save_position(posname, self.inst, values)
         self.write("Saved position '%s' for '%s'" % (posname, self.inst.name))
-        
+
     def onSavePosition(self, evt=None):
         posname = evt.GetString()
         verify = int(self.db.get_info('verify_overwrite'))
@@ -380,14 +380,14 @@ class InstrumentPanel(wx.Panel):
 
     @EpicsFunction
     def restore_position(self, posname, exclude_pvs=None, timeout=60.0):
-        self.db.restore_position(posname, self.inst, 
+        self.db.restore_position(posname, self.inst,
                                  exclude_pvs=exclude_pvs)
         msg= "Moving to '%s' to position '%s'" % (self.inst.name, posname)
         if exclude_pvs is not None and len(exclude_pvs) > 0:
             msg = "%s (Partial: %i PVs not restored)" % (msg, len(exclude_pvs))
         self.write(msg)
-        self.puttimer.Start(0.025)
-        
+        self.puttimer.Start(50)
+
     def OnMove(self, evt=None):
         """ on GoTo """
         posname = self.pos_list.GetStringSelection()
@@ -411,7 +411,7 @@ class InstrumentPanel(wx.Panel):
             else:
                 return
             dlg.Destroy()
-        
+
     def onRightClick(self, evt=None):
         menu = wx.Menu()
         if not hasattr(self, 'popup_up1'):
@@ -421,7 +421,7 @@ class InstrumentPanel(wx.Panel):
                 setattr(self, item,  wx.NewId())
                 self.Bind(wx.EVT_MENU, self.onPosRightEvent,
                           id=getattr(self, item))
-            
+
         menu.Append(self.popup_up1, "Move up")
         menu.Append(self.popup_dn1, "Move down")
         menu.Append(self.popup_upall, "Move to top")
@@ -433,7 +433,7 @@ class InstrumentPanel(wx.Panel):
         idx = self.pos_list.GetSelection()
         if idx < 0: # no item selected
             return
-        
+
         wid = event.GetId()
         namelist = self.pos_list.GetItems()
         if wid == self.popup_up1 and idx > 0:
@@ -441,7 +441,7 @@ class InstrumentPanel(wx.Panel):
         elif wid == self.popup_dn1 and idx < len(namelist):
             namelist.insert(idx+1, namelist.pop(idx))
         elif wid == self.popup_upall:
-            namelist.insert(0, namelist.pop(idx))            
+            namelist.insert(0, namelist.pop(idx))
         elif wid == self.popup_dnall:
             namelist.append( namelist.pop(idx))
 

@@ -13,6 +13,7 @@ import os
 import json
 import epics
 import time
+import socket
 from threading import Thread
 from datetime import datetime
 
@@ -27,11 +28,10 @@ from sqlalchemy.orm.exc import  NoResultFound
 # needed for py2exe?
 import sqlalchemy.dialects.sqlite
 
-
 def isInstrumentDB(dbname):
     """test if a file is a valid Instrument Library file:
        must be a sqlite db file, with tables named
-          'info', 'instrument', 'position', 'pv', 
+          'info', 'instrument', 'position', 'pv',
        'info' table must have an entries named 'version' and 'create_date'
     """
     if not os.path.exists(dbname):
@@ -62,7 +62,7 @@ def valid_score(score, smin=0, smax=5):
     """ensure that the input score is an integr
     in the range [smin, smax]  (inclusive)"""
     return max(smin, min(smax, int(score)))
-    
+
 
 def isotime2datetime(isotime):
     "convert isotime string to datetime object"
@@ -85,7 +85,7 @@ def None_or_one(val, msg='Expected 1 or None result'):
     elif len(val) == 0:
         return None
     else:
-        raise InstrumentDBException(msg)            
+        raise InstrumentDBException(msg)
 
 
 class InstrumentDBException(Exception):
@@ -120,7 +120,7 @@ class Instrument(_BaseTable):
 class Position(_BaseTable):
     "position table"
     pvs, instrument, instrument_id, date, name, notes = None, None, None, None, None, None
-    
+
 class Position_PV(_BaseTable):
     "position-pv join table"
     name, notes, pv, value = None, None, None, None
@@ -131,7 +131,7 @@ class Position_PV(_BaseTable):
         return "<%s(%s)>" % (name, ', '.join(fields))
 
 class Command(_BaseTable):
-    "command table"    
+    "command table"
     name, notes = None, None
 
 class PVType(_BaseTable):
@@ -170,10 +170,10 @@ class InstrumentDB(object):
         self.metadata = None
         self.update_mod_time = None
         self.pvs = {}
-        self.restoring_pvs = []        
+        self.restoring_pvs = []
         if dbname is not None:
             self.connect(dbname)
-            
+
     def create_newdb(self, dbname, connect=False):
         "create a new, empty database"
         backup_versions(dbname)
@@ -209,17 +209,17 @@ class InstrumentDB(object):
         mapper(Info,     tables['info'])
         mapper(Command,  tables['command'])
         mapper(PV,       tables['pv'])
-               
+
         mapper(Instrument, tables['instrument'],
                properties={'pvs': relationship(PV,
                                                backref='instrument',
                                     secondary=tables['instrument_pv'])})
-               
+
         mapper(PVType,   tables['pvtype'],
                properties={'pv':
                            relationship(PV, backref='pvtype')})
-               
-        mapper(Position, tables['position'], 
+
+        mapper(Position, tables['position'],
                properties={'instrument': relationship(Instrument,
                                                       backref='positions'),
                            'pvs': relationship(Position_PV) })
@@ -228,15 +228,15 @@ class InstrumentDB(object):
                properties={'pv':relationship(PV),
                            'instrument':relationship(Instrument)})
 
-        mapper(Position_PV, tables['position_pv'], 
+        mapper(Position_PV, tables['position_pv'],
                properties={'pv':relationship(PV)})
-        
-        mapper(Instrument_Precommand,  tables['instrument_precommand'], 
+
+        mapper(Instrument_Precommand,  tables['instrument_precommand'],
                properties={'instrument': relationship(Instrument,
                                                       backref='precommands'),
                            'command':   relationship(Command,
                                                      backref='inst_precoms')})
-        mapper(Instrument_Postcommand,   tables['instrument_postcommand'], 
+        mapper(Instrument_Postcommand,   tables['instrument_postcommand'],
                properties={'instrument': relationship(Instrument,
                                                       backref='postcommands'),
                            'command':   relationship(Command,
@@ -244,11 +244,12 @@ class InstrumentDB(object):
 
     def commit(self):
         "commit session state"
-        self.set_mod_time()        
+        self.set_mod_time()
         return self.session.commit()
-        
+
     def close(self):
         "close session"
+        self.clear_hostpid()
         self.session.commit()
         self.session.flush()
         self.session.close()
@@ -259,13 +260,13 @@ class InstrumentDB(object):
 
     def get_info(self, key, default=None):
         """get a value from a key in the info table"""
-        errmsg = "set_info expected 1 or None value for key='%s'"
+        errmsg = "get_info expected 1 or None value for key='%s'"
         out = self.query(Info).filter(Info.key==key).all()
         thisrow = None_or_one(out, errmsg % key)
         if thisrow is None:
             return default
         return thisrow.value
-        
+
     def set_info(self, key, value):
         """set key / value in the info table"""
         table = self.tables['info']
@@ -275,7 +276,25 @@ class InstrumentDB(object):
             table.insert().execute(key=key, value=value)
         else:
             table.update(whereclause="key='%s'" % key).execute(value=value)
-            
+
+    def set_hostpid(self):
+        """set hostname and process ID, as on intial set up"""
+        self.set_info('host_name', socket.gethostname())
+        self.set_info('process_id', str(os.getpid()))
+
+    def clear_hostpid(self):
+        """clear the hostname and process ID, as on shutdown"""
+        self.set_info('host_name', '')
+        self.set_info('process_id', 0)
+
+    def check_hostpid(self):
+        """check whether hostname and process ID match current config"""
+        db_host_name = self.get_info('host_name', default='')
+        db_process_id  = self.get_info('process_id', default='0')
+        return ((db_host_name == '' and db_process_id == '0') or
+                (db_host_name == socket.gethostname() and
+                 db_process_id == str(os.getpid())))
+
     def set_mod_time(self):
         """set modify_date in info table"""
         if self.update_mod_time is None:
@@ -301,7 +320,7 @@ class InstrumentDB(object):
 
         return me
 
-        
+
 
     def _get_foreign_keyid(self, table, value, name='name',
                            keyid='id', default=None):
@@ -351,7 +370,7 @@ arguments
         return self.query(IPV).filter(IPV.instrument_id==inst.id
                                       ).order_by(IPV.display_order).all()
 
-        
+
     def set_pvtype(self, name, pvtype):
         """ set a pv type"""
         pv = self.get_pv(name)
@@ -361,12 +380,12 @@ arguments
             pv.pvtype_id = _pvtypes[pvtype]
         else:
             self.__addRow(PVType, ('name',), (pvtype,))
-            out = self.query(PVType).all()            
+            out = self.query(PVType).all()
             _pvtypes = dict([(t.name, t.id) for t in out])
             if pvtype  in _pvtypes:
                 pv.pvtype_id = _pvtypes[pvtype]
         self.commit()
-        
+
     def get_pv(self, name):
         """return pv by name
         """
@@ -423,7 +442,7 @@ arguments
         self.session.add(inst)
         self.commit()
         return inst
-        
+
     def add_pv(self, name, notes=None, attributes=None, pvtype=None, **kws):
         """add pv
         notes and attributes optional
@@ -431,26 +450,26 @@ arguments
         out =  self.query(PV).filter(PV.name==name).all()
         if len(out) > 0:
             return
-        
+
         kws['notes'] = notes
         kws['attributes'] = attributes
         row = self.__addRow(PV, ('name',), (name,), **kws)
         if pvtype is None:
             self.pvs[name] = epics.PV(name)
-            self.pvs[name].get()            
+            self.pvs[name].get()
             pvtype = get_pvtypes(self.pvs[name])[0]
             self.set_pvtype(name, pvtype)
-            
+
         self.session.add(row)
         self.commit()
         return row
-        
+
     def add_info(self, key, value):
         """add Info key value pair -- returns Info instance"""
         row = self.__addRow(Info, ('key', 'value'), (key, value))
-        self.commit()        
+        self.commit()
         return row
-    
+
     def remove_position(self, posname, inst):
         inst = self.get_instrument(inst)
         if inst is None:
@@ -470,7 +489,7 @@ arguments
         self.conn.execute(tabl.delete().where(tabl.c.id==pos.id))
 
         self.commit()
-        
+
     def remove_instrument(self, inst):
         inst = self.get_instrument(inst)
         if inst is None:
@@ -490,7 +509,7 @@ arguments
         inst = self.get_instrument(inst)
         if inst is None:
             raise InstrumentDBException('Save Postion needs valid instrument')
-            
+
         posname = posname.strip()
         pos  = self.get_position(posname, inst)
         if pos is None:
@@ -498,7 +517,7 @@ arguments
             pos.name = posname
             pos.instrument = inst
             pos.date = datetime.now()
-            
+
         pvnames = [pv.name for pv in inst.pvs]
 
         # check for missing pvs in values
@@ -506,11 +525,11 @@ arguments
         for pv in pvnames:
             if pv not in values:
                 missing_pvs.append(pv)
-                
+
         if len(missing_pvs) > 0:
             raise InstrumentDBException('Save Postion: missing pvs:\n %s' %
                                         missing_pvs)
-        
+
         pos_pvs = []
         for name in pvnames:
             ppv = Position_PV()
@@ -531,8 +550,8 @@ arguments
         if len(self.restoring_pvs) > 0:
             return all([p.put_complete for p in self.restoring_pvs])
         return True
-        
-    def restore_position(self, posname, inst, wait=False, timeout=5.0, 
+
+    def restore_position(self, posname, inst, wait=False, timeout=5.0,
                          exclude_pvs=None):
         """restore named position for instrument
         """
@@ -541,18 +560,18 @@ arguments
         if inst is None:
             raise InstrumentDBException(
                 'restore_postion needs valid instrument')
-            
+
         posname = posname.strip()
         pos  = self.get_position(posname, inst)
         if pos is None:
             raise InstrumentDBException(
                 "restore_postion  position '%s' not found" % posname)
-        
+
         # print 'Do Pre_Commands: ', inst.precommands
         pvvals = {}
         for pvpos in pos.pvs:
             pvvals[pvpos.pv.name] = str(pvpos.value)
-            
+
 
         self.restoring_pvs = []
         if exclude_pvs is None:
