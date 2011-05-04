@@ -286,6 +286,7 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
             inst.name = newname
         if page is not None:
             self.parent.nb.SetPageText(page, newname)
+            instpanel.inst_title.SetLabel(' %s ' % newname)
 
         # make sure newpvs from dictionary are inserted in order
         # of "index", as appear on the GUI screen.

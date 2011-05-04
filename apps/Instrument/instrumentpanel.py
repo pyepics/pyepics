@@ -134,15 +134,15 @@ class InstrumentPanel(wx.Panel):
         self.pos_name =  wx.TextCtrl(toprow, value="", size=(250, 25),
                                      style= wx.TE_PROCESS_ENTER)
         self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
-
+        
+        self.inst_title = SimpleText(toprow,  ' %s ' % inst.name,
+                                     font=titlefont,
+                                     colour=colors.title,
+                                     minsize=(125, -1),
+                                     style=wx.ALIGN_LEFT|wx.ALIGN_BOTTOM)
 
         topsizer = wx.BoxSizer(wx.HORIZONTAL)
-        topsizer.Add(SimpleText(toprow, '  %s  ' % inst.name,
-                                font=titlefont,
-                                colour=colors.title,
-                                minsize=(125, -1),
-                                style=wx.ALIGN_LEFT|wx.ALIGN_BOTTOM),
-                     0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL, 2)
+        topsizer.Add(self.inst_title, 0, wx.ALIGN_CENTER|wx.ALIGN_CENTER_VERTICAL, 12)
 
         topsizer.Add(SimpleText(toprow, 'Save Current Position:',
                                 minsize=(125, -1),

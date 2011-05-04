@@ -243,6 +243,8 @@ class InstrumentFrame(wx.Frame):
         pre-defined instruments/positions in this database.
         """
         server = self.epics_server
+        if not server._pvs['TSTAMP'].connected:
+            return
         server.SetTimeStamp()
         req = server._request
         if server._inst is None and len(server.InstName)>1:
