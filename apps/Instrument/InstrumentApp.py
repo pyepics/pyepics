@@ -55,7 +55,7 @@ class InstrumentFrame(wx.Frame):
         self.epics_server = None
         self.server_timer = None
         wx.Frame.__init__(self, parent=parent, title='Epics Instruments',
-                          size=(925, 400), **kwds)
+                          size=(925, -1), **kwds)
 
         self.colors = GUIColors()
         self.SetBackgroundColour(self.colors.bg)
@@ -141,7 +141,7 @@ class InstrumentFrame(wx.Frame):
     def add_instrument_page(self, inst):
         self.connect_pvs(inst, wait_time=1.0)
         panel = InstrumentPanel(self, inst, db=self.db,
-                                size=(925, 300),
+                                size=(925, -1),
                                 writer = self.write_message)
         self.nb.AddPage(panel, inst.name, True)
 
@@ -295,7 +295,7 @@ class InstrumentFrame(wx.Frame):
         inst = self.db.add_instrument(newname)
 
         panel = InstrumentPanel(self, inst, db=self.db,
-                                size=(925, 300),
+                                size=(925, -1),
                                 writer = self.write_message)
 
         self.nb.AddPage(panel, inst.name, True)
