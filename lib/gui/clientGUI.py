@@ -8,7 +8,7 @@ import time
 import epics
 from epics.wx import DelayedEpicsCallback
 from datetime import timedelta
-from wx_utils import FloatCtrl, SText, addtoMenu, EpicsFunction
+from wx_utils import FloatCtrl, SText, add_menu, EpicsFunction
 from util import new_filename, increment_filename, nativepath
 
 from configFile import FastMapConfig, conf_files, default_conf
@@ -46,7 +46,7 @@ class SetupFrame(wx.Frame):
         self.SetFont(self.Font10)
 
         fmenu = wx.Menu()
-        addtoMenu(self,fmenu, "&Quit", "Quit Setup",  self.onClose)
+        add_menu(self,fmenu, "&Quit", "Quit Setup",  self.onClose)
 
         mbar = wx.MenuBar()
         mbar.Append(fmenu, "&File")
@@ -258,32 +258,32 @@ class FastMapGUI(wx.Frame):
         self.menubar = wx.MenuBar()
         # file
         fmenu = wx.Menu()
-        addtoMenu(self,fmenu, "&Read Scan File",
+        add_menu(self,fmenu, "&Read Scan File",
                   "Read Scan Parameter or Configuration File",
                   self.onReadConfigFile)
                     
-        addtoMenu(self,fmenu,"&Save Scan File",
+        add_menu(self,fmenu,"&Save Scan File",
                   "Save Scan Parameters File", self.onSaveScanFile)
                     
-        addtoMenu(self,fmenu, "Save Full Configuration",
+        add_menu(self,fmenu, "Save Full Configuration",
                   "Save Configuration File", self.onSaveConfigFile)
 
         fmenu.AppendSeparator()
-        addtoMenu(self,fmenu,'Change &Working Folder',
+        add_menu(self,fmenu,'Change &Working Folder',
                   "Choose working directory",
                   self.onFolderSelect)
         fmenu.AppendSeparator()        
-        addtoMenu(self,fmenu, "E&xit",
+        add_menu(self,fmenu, "E&xit",
                   "Terminate the program", self.onClose)
 
         # options
         omenu = wx.Menu()
-        addtoMenu(self,omenu, "&Options",
+        add_menu(self,omenu, "&Options",
                   "Setup Motors, Detectors, other Options",
                   self.onSetup)
         # help
         hmenu = wx.Menu()
-        addtoMenu(self,hmenu, "&About",
+        add_menu(self,hmenu, "&About",
                   "More information about this program",  self.onAbout)
 
         self.menubar.Append(fmenu, "&File")
