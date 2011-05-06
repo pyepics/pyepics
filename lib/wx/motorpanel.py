@@ -18,8 +18,7 @@ from epics.wx.wxlib import PVText, PVFloatCtrl, PVButton, PVComboBox, \
 
 from epics.wx.motordetailframe  import MotorDetailFrame
 
-from epics.wx.utils import LCEN, RCEN, CEN, LTEXT, RIGHT
-
+from epics.wx.utils import LCEN, RCEN, CEN, LTEXT, RIGHT, pack, add_button
 
 class MotorPanel(wx.Panel):
     """ MotorPanel  a simple wx windows panel for controlling an Epics Motor
@@ -153,13 +152,8 @@ class MotorPanel(wx.Panel):
             self.twr = PVButton(self, label='<',  size=(30, 30))
             self.twf = PVButton(self, label='>',  size=(30, 30))
 
-            stopbtn = wx.Button(self, label=' Stop ')
-            morebtn = wx.Button(self, label=' More ')
-            
-            stopbtn.Bind(wx.EVT_BUTTON, self.OnStopButton)
-            morebtn.Bind(wx.EVT_BUTTON, self.OnMoreButton)
-
-            self.stopbtn = stopbtn
+            self.stopbtn = add_button(self, label=' Stop ', action=self.OnStopButton)
+            self.morebtn = add_button(self, label=' More ', action=self.OnMoreButton)
         
         spacer = wx.StaticText(self, label=' ', size=(5, 5), style=RIGHT) 
         self.__sizer.AddMany([(spacer,      1, CEN),
@@ -171,12 +165,11 @@ class MotorPanel(wx.Panel):
             self.__sizer.AddMany([(self.twr,      0, CEN),
                                   (self.__twkbox, 0, CEN),
                                   (self.twf,      0, CEN),
-                                  (stopbtn,       0, CEN),
-                                  (morebtn,       0, CEN)])
+                                  (self.stopbtn,  0, CEN),
+                                  (self.morebtn,  0, CEN)])
         
         self.SetAutoLayout(1)
-        self.SetSizer(self.__sizer)
-        self.__sizer.Fit(self)
+        pack(self, self.__sizer)
 
     @EpicsFunction
     def FillPanel(self):
