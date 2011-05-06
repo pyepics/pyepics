@@ -5,7 +5,7 @@ import shutil
 import time
 import epics
 
-from epicscollect.gui import  pack, popup, add_button, SimpleText
+from epics.wx.utils import  pack
 
 FileBrowser = filebrowse.FileBrowseButtonWithHistory
 

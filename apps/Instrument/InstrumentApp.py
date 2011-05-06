@@ -14,10 +14,8 @@ import wx.lib.mixins.inspection
 
 import epics
 from epics.wx import finalize_epics, EpicsFunction
-
-from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
-     Closure, NumericCombo, pack, popup, \
-     FileSave, FileOpen, SelectWorkdir
+from epics.wx.utils import  (empty_bitmap, add_button, add_menu, pack, popup, 
+                    Closure, NumericCombo, FileSave, FileOpen, SelectWorkdir)
 
 from configfile import InstrumentConfig
 from instrument import isInstrumentDB, InstrumentDB

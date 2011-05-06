@@ -7,9 +7,10 @@ import time
 from threading import Thread
 
 import epics
-from epics.wx import (EpicsFunction, PVText, PVFloatCtrl, PVTextCtrl, PVEnumChoice, MotorPanel)
-from epicscollect.gui import  pack, popup, add_button, SimpleText
-from epicscollect.gui.ordereddict import OrderedDict
+from epics.wx import (EpicsFunction, PVText, PVFloatCtrl, PVTextCtrl,
+                      PVEnumChoice, MotorPanel)
+from epics.wx.utils import  pack, popup, add_button, SimpleText
+from epics.wx.ordereddict import OrderedDict
 
 from utils import ALL_EXP , GUIColors, get_pvtypes
 

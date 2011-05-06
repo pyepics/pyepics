@@ -5,9 +5,9 @@ import time
 import epics
 from epics.wx import EpicsFunction
 
-from epicscollect.gui import  empty_bitmap, add_button, add_menu, \
-     Closure, NumericCombo, pack, popup, SimpleText, \
-     FileSave, FileOpen, SelectWorkdir 
+from epics.wx.utils import  (empty_bitmap, add_button, add_menu, 
+                             Closure, NumericCombo, pack, popup, SimpleText, 
+                             FileSave, FileOpen, SelectWorkdir)
 
 from utils import GUIColors, HideShow, YesNo, set_font_with_children, get_pvtypes
 import instrument
