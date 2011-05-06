@@ -338,12 +338,15 @@ class InstrumentFrame(wx.Frame):
         # First we create and fill the info object
         info = wx.AboutDialogInfo()
         info.Name = "Epics Instruments"
-        info.Version = "0.2"
+        info.Version = "0.3"
         info.Copyright = "2011, Matt Newville, University of Chicago"
         info.Description = """
-        Epics Instruments is an application to save and restore Instrument Positions.
-        An Instrument is defined as a collection of Epics Process Variable and a
-        Position is defined as any named set of values for those Process Variables"""
+        Epics Instruments is an application to manage Epics PVs.
+        An Instrument is defined as a collection of Epics PV.
+        For each Instrument, any number of Positions can be
+        saved and later restored simply by selecting that name.
+        """
+
         wx.AboutBox(info)
 
     def onOpen(self, event=None):
