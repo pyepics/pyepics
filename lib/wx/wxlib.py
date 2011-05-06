@@ -825,9 +825,10 @@ class PVButton(wx.Button, PVCtrlMixin):
             self.disablePV.add_callback(self._disableEvent, wid=self.GetId())
         self.maskedEnabled = True
 
-    def Enable(self, value):
+    def Enable(self, value=None):
         "enable button"
-        self.maskedEnabled = value
+        if value is not None:
+            self.maskedEnabled = value
         self._UpdateEnabled()
 
     @EpicsFunction

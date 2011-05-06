@@ -251,7 +251,6 @@ class MotorDetailFrame(wx.Frame):
             self.motor.PV(attr).add_callback(self.OnMotorEvent,
                                              wid=self.GetId(), field=attr)
 
-
         self.info.SetLabel('')
         for f in ('HLS', 'LLS', 'LVIO', 'SET'):
             if self.motor.get(f):
@@ -269,7 +268,6 @@ class MotorDetailFrame(wx.Frame):
             return None
 
         field_val = self.motor.get(field)
-        print 'OnMotorEvent ', pvname, field, field_val
         if field in ('LVIO', 'HLS', 'LLS'):
             s = ''
             if field_val != 0:
@@ -306,7 +304,6 @@ class MotorDetailFrame(wx.Frame):
     @DelayedEpicsCallback
     def OnLimitChange(self, attr=None, value=None, **kws):
         "limit-change callback"
-        print 'OnLimitChange ', attr, value
         funcs = {'low_limit':       self.drives[0].SetMin,
                  'high_limit':      self.drives[0].SetMax,
                  'dial_low_limit':  self.drives[1].SetMin,
