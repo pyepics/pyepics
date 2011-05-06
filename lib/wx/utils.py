@@ -212,7 +212,10 @@ class FloatCtrl(wx.TextCtrl):
         # really, the order here is important:
         # 1. return sends to ValidateEntry
         if key == wx.WXK_RETURN:
-            self.SetValue(entry)
+            if not self.is_valid:
+                wx.TextCtrl.SetValue(self, self.format % set_float(self.__bound_val))
+            else:
+                self.SetValue(entry)
             return
 
         # 2. other non-text characters are passed without change
@@ -270,8 +273,8 @@ class FloatCtrl(wx.TextCtrl):
     def __CheckValid(self, value):
         "check for validity of value"
         val = self.__val
+        self.is_valid = True
         try:
-            self.is_valid = True
             val = set_float(value)
             if self.__min is not None and (val < self.__min):
                 self.is_valid = False
@@ -281,11 +284,11 @@ class FloatCtrl(wx.TextCtrl):
                 val = self.__max
         except:
             self.is_valid = False
-
         self.__bound_val = self.__val = val
         fgcol, bgcol = self.fgcol_valid, self.bgcol_valid
         if not self.is_valid:
             fgcol, bgcol = self.fgcol_invalid, self.bgcol_invalid
+
         self.SetForegroundColour(fgcol)
         self.SetBackgroundColour(bgcol)
         self.Refresh()
