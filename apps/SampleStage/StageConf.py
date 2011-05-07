@@ -2,7 +2,7 @@
 
 from ConfigParser import  ConfigParser
 from cStringIO import StringIO
-from epicscollect.utils import OrderedDict
+from epics.wx.ordereddict import OrderedDict
 import os
 import time
 
@@ -28,28 +28,23 @@ finey_dir = 1
 3   = 13XRM:m3   || theta || Theta          ||    1
 4   = 13XRM:m4   ||   X   || Stage X        ||    1
 5   = 13XRM:m5   ||   Z   || Stage Z (focus)||    1
-6   = 13XRM:m6   ||   Y   || Stage Y (vert) ||    1 
+6   = 13XRM:m6   ||   Y   || Stage Y (vert) ||    1
 #--------------------------#
 [positions]
 # index = xxxxname      || imagefile     || finex, finey, theta, coarsex, coarsez, coarsey
 001 =   p1 || p1.jpg ||  0, 0, 0, 90, 70, 350
 """
-
 conf_sects = {'setup':{'bools': ('verify_move','verify_erase', 'verify_overwrite'),
-                       'ints': ('finex_dir', 'finey_dir'),
-                       },
+                       'ints': ('finex_dir', 'finey_dir')},
               'stages': {'ordered':True},
               'positions': {'ordered':True} }
-
 
 conf_objs = OrderedDict( (('setup', ('verify_move', 'verify_erase', 'verify_overwrite',
                                      'webcam', 'imgdir', 'finex_dir', 'finey_dir')),
                           ('stages', None),
                           ('positions', None)) )
-    
-        
-conf_files = ('SampleStage_autosave.ini',
-              'SampleStage.ini',
+
+conf_files = ('SampleStage_autosave.ini', 'SampleStage.ini',
               '//cars5/Data/xas_user/config/SampleStage.ini')
 
 class StageConfig(object):
@@ -63,13 +58,13 @@ class StageConfig(object):
                 if os.path.exists(fname) and os.path.isfile(fname):
                     filename = fname
                     break
-        
+
         if filename is not None:
             self.Read(fname=filename)
         else:
             self.cp.readfp(StringIO(DEFAULT_CONF))
             self._process_data()
-            
+
     def Read(self,fname=None):
         if fname is not None:
             ret = self.cp.read(fname)
@@ -91,7 +86,7 @@ class StageConfig(object):
             is_ordered = False
             if 'ordered' in opts:
                 is_ordered = True
-            
+
             for opt in self.cp.options(sect):
                 get = self.cp.get
                 if opt in bools:
@@ -99,7 +94,7 @@ class StageConfig(object):
                 elif opt in floats:
                     get = self.cp.getfloat
                 elif opt in ints:
-                    get = self.cp.getint                    
+                    get = self.cp.getint
                 val = get(sect,opt)
                 if is_ordered and '||' in val:
                     nam, val = val.split('||', 1)
@@ -119,11 +114,11 @@ class StageConfig(object):
                 pos = [float(i) for i in posval.split(',')]
                 out[name] = dict(image=img.strip(), position= pos)
             self.config['positions'] = out
-                
+
         if 'stages' in self.config:
             out = OrderedDict()
             skeys = list(self.config['stages'].keys())
-            skeys.sort()            
+            skeys.sort()
             for key in skeys:
                 name, val = self.config['stages'][key]
                 name = name.strip()
@@ -136,7 +131,7 @@ class StageConfig(object):
         o = []
         cnf = self.config
         if fname is not None:
-            self.filename = fname        
+            self.filename = fname
         o.append('## Sample Stage Configuration (saved: %s)'  % (time.ctime()))
         for sect, optlist in conf_objs.items():
             o.append('#--------------------------#\n[%s]'%sect)
@@ -144,7 +139,7 @@ class StageConfig(object):
                 o.append(POS_LEGEND)
                 fmt =  "%3.3i = %s || %s || %s"
                 pfmt =  ', '.join(['%f' for i in range(self.nstages)])
-                idx = 1 
+                idx = 1
                 for name, val in cnf['positions'].items():
                     img = val['image']
                     pos = pfmt % tuple(val['position'])
@@ -153,10 +148,10 @@ class StageConfig(object):
             elif sect == 'stages':
                 o.append(STAGE_LEGEND)
                 fmt =  "%i = %s || %s || %s || %i"
-                idx = 1 
+                idx = 1
                 for name, val in cnf['stages'].items():
                     label = val['label']
-                    desc  = val['desc']                    
+                    desc  = val['desc']
                     sign  = val['sign']
                     o.append(fmt % (idx, name, label, desc, sign))
                     idx = idx + 1
@@ -184,25 +179,4 @@ class StageConfig(object):
         if value is None:
             return self.config[section]
         else:
-            return self.config[section][value]            
-            
-        
-if __name__ == "__main__":
-    a = StageConfig(filename='test.cnf')
-    a.Save('test2.cnf')
-    print a.config['positions']
-    print '================================='
-    print 'STAGE'
-    for k, v in a.config['stages'].items():
-        print k,  ' --- > ', v
-    print '================================='
-    
-#     print 'POS'
-#     print a.config['positions'].keys()
-#     for k, v in a.config['positions'].items():
-#         print k,  ' --- > ', v
-# 
-#    print a.config['stages']
-#     a.Read('xmap.001.cnf')
-#     print a.config['scan']
-# ;
+            return self.config[section][value]

@@ -12,13 +12,12 @@ import wx.lib.mixins.inspection
 from  cStringIO import StringIO
 from  urllib import urlopen
 
-import epics
 from epics import Motor
-from epics.wx import finalize_epics,  EpicsFunction
-from epics.wx import MotorPanel
+from epics.wx import finalize_epics,  EpicsFunction, MotorPanel
 
-from epicscollect.gui import  empty_bitmap, add_button, add_menu, popup, \
-     Closure , NumericCombo, FileSave, FileOpen, SelectWorkdir
+from epics.wx.utils import  (empty_bitmap, add_button, add_menu, popup,
+                             pack, Closure , NumericCombo,
+                             FileSave, FileOpen,SelectWorkdir)
 
 from StageConf import StageConfig
 from Icons import images, app_icon
@@ -35,6 +34,7 @@ IMG_W, IMG_H = 280, 210
 CONFIG_DIR  = '//cars5/Data/xas_user/config/SampleStage/'
 WORKDIR_FILE = os.path.join(CONFIG_DIR, 'workdir.txt')
 ICON_FILE = os.path.join(CONFIG_DIR, 'micro.ico')
+
 class SampleStage(wx.Frame):
     """Main Sample Stage Class
     """
@@ -57,35 +57,37 @@ class SampleStage(wx.Frame):
         self.positions = None
         self.read_config(configfile=configfile, get_dir=False) # True)
         self.SetTitle("XRM Sample Stage")
-        wx.EVT_CLOSE(self, self.onClose)        
-        
+        wx.EVT_CLOSE(self, self.onClose)
+
         self.tweaks = {}
         self.motors = None
         self.motorwids = {}
-        self.create_frame()        
+        self.create_frame()
         self.connect_motors()
         self.set_position_list()
 
     #@EpicsFunction
     def connect_motors(self):
+        "connect to epics motors"
         self.motors = {}
         self.sign = {}
-        # print 'Connect Motors: '
         for pvname, val in self.config['stages'].items():
             pvname = pvname.strip()
             label = val['label']
             self.motors[label] = Motor(name=pvname)
             self.sign[label] = val['sign']
-        
+
         for mname in self.motorwids:
             self.motorwids[mname].SelectMotor(self.motors[mname])
 
     def begin_htmllog(self):
+        "initialize log file"
         fout = open(self.htmllog, 'w')
         fout.write(self.html_header)
         fout.close()
 
     def read_config(self, configfile=None, get_dir=False):
+        "open/read ini config file"
         if get_dir:
             try:
                 workdir = open(WORKDIR_FILE, 'r').readline()[:-1]
@@ -95,7 +97,7 @@ class SampleStage(wx.Frame):
             ret = SelectWorkdir(self)
             if ret is None:
                 self.Destroy()
-                
+
         self.cnf = StageConfig(configfile)
         self.config = self.cnf.config
         self.positions = self.config['positions']
@@ -111,10 +113,11 @@ class SampleStage(wx.Frame):
             os.makedirs(self.imgdir)
         if not os.path.exists(self.htmllog):
             self.begin_htmllog()
-            
+
         self.get_tweakvalues()
 
     def get_tweakvalues(self):
+        "get settings for tweak values for combo boxes"
         def maketweak(prec=3, tmin=0, tmax=10,
                       decades=7, steps=(1,2,5)):
             steplist = []
@@ -129,24 +132,23 @@ class SampleStage(wx.Frame):
         self.tweaklist['focus']  = maketweak(tmax=70.0)
         self.tweaklist['theta']  = maketweak(tmax=9.0)
         self.tweaklist['theta'].extend([10, 20, 30, 45, 90, 180])
-        
+
     def write_message(self, msg='', index=0):
+        "write to status bar"
         self.statusbar.SetStatusText(msg, index)
-        
+
     def create_menus(self):
-        # Create the menubar
+        "Create the menubar"
         mbar = wx.MenuBar()
         fmenu   = wx.Menu()
         omenu   = wx.Menu()
-       
-        add_menu(self, fmenu, label="&Save", text="Save Configuration", 
+        add_menu(self, fmenu, label="&Save", text="Save Configuration",
                  action = self.onSave)
-
-        add_menu(self, fmenu, label="&Read", text="Read Configuration", 
+        add_menu(self, fmenu, label="&Read", text="Read Configuration",
                  action = self.onRead)
 
         fmenu.AppendSeparator()
-        add_menu(self, fmenu, label="E&xit",  text="Quit Program", 
+        add_menu(self, fmenu, label="E&xit",  text="Quit Program",
                  action = self.onClose)
 
         vmove  = wx.NewId()
@@ -155,7 +157,7 @@ class SampleStage(wx.Frame):
         self.menu_opts = {vmove: 'v_move',
                           verase: 'v_erase',
                           vreplace: 'v_replace'}
-        
+
         mitem = omenu.Append(vmove, "Verify Go To ",
                              "Prompt to Verify Moving with 'Go To'",
                              wx.ITEM_CHECK)
@@ -169,46 +171,49 @@ class SampleStage(wx.Frame):
 
         mitem = omenu.Append(vreplace, "Verify Overwrite",
                      "Prompt to Verify Overwriting Positions",  wx.ITEM_CHECK)
-        mitem.Check()        
+        mitem.Check()
         self.Bind(wx.EVT_MENU, self.onMenuOption, mitem)
 
         mbar.Append(fmenu, '&File')
         mbar.Append(omenu, '&Options')
         self.SetMenuBar(mbar)
 
+        self.popup_up1 = wx.NewId()
+        self.popup_dn1 = wx.NewId()
+        self.popup_upall = wx.NewId()
+        self.popup_dnall = wx.NewId()
+
     def onMenuOption(self, evt=None):
         """events for options menu: move, erase, overwrite """
         setattr(self, self.menu_opts[evt.GetId()], evt.Checked())
-        
+
     def create_frame(self):
         "build main frame"
         self.create_menus()
         # status bars
         self.statusbar = self.CreateStatusBar(2, wx.CAPTION|wx.THICK_FRAME)
         self.statusbar.SetStatusWidths([-4, -1])
-        for index, name  in enumerate(("Messages", "Status")):
+        for index in range(2):
             self.statusbar.SetStatusText('', index)
-        
+
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.AddMany([
             (self.make_mainpanel(self), 0, ALL_EXP|wx.ALIGN_LEFT, 1),
             (self.make_imgpanel(self),  0, ALL_EXP|LEFT_CEN,  1),
             (self.make_pospanel(self),  1, ALL_EXP|wx.ALIGN_RIGHT, 1)])
-        self.SetSizer(sizer)
-        sizer.Fit(self)
 
-        #import win23api
-        #exename = win32api.GetModuleFileName(win32api.GetModuleHandle(None))
+        pack(self, sizer)
+
         icon = wx.Icon(ICON_FILE, wx.BITMAP_TYPE_ICO)
         self.SetIcon(icon)
-        
+
     def make_pospanel(self, parent):
         """panel of position lists, with buttons"""
         panel = wx.Panel(parent, size=(145, 200))
         btn_goto  = add_button(panel, "Go To",  size=(70, -1), action=self.onGo)
         btn_erase = add_button(panel, "Erase",  size=(70, -1),
                             action=self.onErasePosition)
-        
+
         brow = wx.BoxSizer(wx.HORIZONTAL)
         brow.Add(btn_goto,   0, ALL_EXP|wx.ALIGN_LEFT, 1)
         brow.Add(btn_erase,  0, ALL_EXP|wx.ALIGN_LEFT, 1)
@@ -221,8 +226,8 @@ class SampleStage(wx.Frame):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(brow,          0, wx.ALIGN_LEFT|wx.ALL)
         sizer.Add(self.pos_list, 1, ALL_EXP|wx.ALIGN_CENTER, 3)
-        panel.SetSizer(sizer)
-        sizer.Fit(panel)
+
+        pack(panel, sizer)
         panel.SetAutoLayout(1)
         return panel
 
@@ -233,7 +238,7 @@ class SampleStage(wx.Frame):
         self.pos_name =  wx.TextCtrl(panel, value="", size=(180, 25),
                                      style= wx.TE_PROCESS_ENTER)
         self.pos_name.Bind(wx.EVT_TEXT_ENTER, self.onSavePosition)
-        
+
         imglabel  = "Select a position...\n  "
         self.info = wx.StaticText(panel,  label=imglabel)
         self.img  = wx.StaticBitmap(panel, -1,
@@ -242,7 +247,7 @@ class SampleStage(wx.Frame):
         savebox = wx.BoxSizer(wx.HORIZONTAL)
         savebox.Add(wlabel,        1, LEFT_CEN, 1)
         savebox.Add(self.pos_name, 0, wx.EXPAND|LEFT_CEN, 1)
-        
+
         sizer  = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(savebox,      0, CEN_TOP,  2)
         sizer.Add((3, 5))
@@ -250,8 +255,7 @@ class SampleStage(wx.Frame):
         sizer.Add(self.info,    0, LEFT_TOP, 2)
         sizer.Add((3, 5))
 
-        panel.SetSizer(sizer)
-        sizer.Fit(panel)
+        pack(panel, sizer)
         return panel
 
     def group_panel(self, parent, label='Fine Stages',
@@ -263,9 +267,8 @@ class SampleStage(wx.Frame):
         is_xy = motors[1] is not None
 
         if collapseable:
-            STY = wx.CP_GTK_EXPANDER 
-            # cp = wx.CollapsiblePane(parent, style=STY)
-            cpane = CP.PyCollapsiblePane(parent, agwStyle=STY)
+            cpane = CP.PyCollapsiblePane(parent,
+                                         agwStyle=wx.CP_GTK_EXPANDER)
             cpane.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED,
                     Closure(self.onCollapse, panel=cpane, label=label))
             cpane.Collapse(True)
@@ -304,12 +307,12 @@ class SampleStage(wx.Frame):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(smotor, 0, ALL_EXP|LEFT_TOP)
         sizer.Add(btnbox, 0, btnbox_style, 1)
-        panel.SetSizer(sizer)
-        sizer.Fit(panel)
+
+        pack(panel, sizer)
         if collapseable:
             return cpane
         return panel
-    
+
     def make_mainpanel(self, parent):
         "create right hand panel"
         panel = wx.Panel(parent)
@@ -320,27 +323,23 @@ class SampleStage(wx.Frame):
                                       collapseable=True,
                                       add_buttons=[('Zero Fine Motors',
                                                    self.onZeroFineMotors)])
-        
+
         sizer.Add(fine_panel,   0, ALL_EXP|LEFT_TOP)
         sizer.Add((2, 2))
         sizer.Add(wx.StaticLine(panel, size=(300, 3)), 0, CEN_TOP)
         sizer.Add(self.group_panel(panel, label='Coarse Stages',
-                                   group='coarse'),
-                  0, ALL_EXP|LEFT_TOP)
+                                   group='coarse'),  0, ALL_EXP|LEFT_TOP)
         sizer.Add((2, 2))
         sizer.Add(wx.StaticLine(panel, size=(300, 3)), 0, CEN_TOP)
         sizer.Add(self.group_panel(panel, label='Focus',
-                                   group='focus'),
-                  0, ALL_EXP|LEFT_TOP)
+                                   group='focus'),   0, ALL_EXP|LEFT_TOP)
         sizer.Add((2, 2))
         sizer.Add(wx.StaticLine(panel, size=(300, 3)), 0, CEN_TOP)
         sizer.Add(self.group_panel(panel, label='Theta', collapseable=True,
                                    group='theta'),
                   0, ALL_EXP|LEFT_TOP)
-        panel.SetSizer(sizer)
-        sizer.Fit(panel)
+        pack(panel, sizer)
         return panel
-
 
     def make_button_panel(self, parent, group='', full=True):
         panel = wx.Panel(parent)
@@ -369,11 +368,10 @@ class SampleStage(wx.Frame):
             sizer.Add(_btn('ww'),     0, wx.ALL, 0)
             sizer.Add(wx.StaticText(panel, label='', size=(1, 1)))
             sizer.Add(_btn('ee'),     0, wx.ALL, 0)
-            
-        panel.SetSizer(sizer)
-        sizer.Fit(panel)
+
+        pack(panel, sizer)
         return panel
-       
+
     def set_position_list(self):
         "set the list of position on the left-side panel"
         self.pos_list.Clear()
@@ -382,9 +380,6 @@ class SampleStage(wx.Frame):
             self.positions = self.config['positions']
         for name in self.positions:
             self.pos_list.Append(name)
-            
-    def write_message(self, text, status='normal'):
-        self.SetStatusText(text)
 
     def onClose(self, event=None):
         ret = popup(self, "Really Quit?", "Exit Sample Stage?",
@@ -400,18 +395,17 @@ class SampleStage(wx.Frame):
             self.Destroy()
 
     def onSave(self, event=None):
-        fname = FileSave(self, 
-                wildcard='INI (*.ini)|*.ini|All files (*.*)|*.*',
-                                    deffile='SampleStage.ini')
+        fname = FileSave(self, 'Save Configuration File',
+                         wildcard='INI (*.ini)|*.ini|All files (*.*)|*.*',
+                         default_file='SampleStage.ini')
         if fname is not None:
             self.cnf.Save(fname)
         self.write_message('Saved Configuration File %s' % fname)
 
     def onRead(self, event=None):
-        # print 'READ Config'
-        fname = FileOpen(self, 
-                  wildcard='INI (*.ini)|*.ini|All files (*.*)|*.*',
-                                deffile='SampleStage.ini')
+        fname = FileOpen(self, 'Read Configuration File',
+                         wildcard='INI (*.ini)|*.ini|All files (*.*)|*.*',
+                         default_file='SampleStage.ini')
         if fname is not None:
             self.read_config(fname)
             self.connect_motors()
@@ -420,32 +414,25 @@ class SampleStage(wx.Frame):
 
     def onPosRightClick(self, event=None):
         menu = wx.Menu()
-        if not hasattr(self, 'popup_up1'):
-            for item in ('popup_up1', 'popup_dn1',
-                         'popup_upall', 'popup_dnall',
-                         'popup_rename'):
-                setattr(self, item,  wx.NewId())
-                self.Bind(wx.EVT_MENU, self.onPosRightEvent,
-                          id=getattr(self, item))
-            
-        menu.Append(self.popup_up1, "Move up")
-        menu.Append(self.popup_dn1, "Move down")
-        menu.Append(self.popup_upall, "Move to top")
-        menu.Append(self.popup_dnall, "Move to bottom")
-        # menu.Append(self.popup_rename, "Rename")        
+        # make basic widgets for popup menu
+        for item, name in (('popup_up1', 'Move up'),
+                           ('popup_dn1', 'Move down'),
+                           ('popup_upall', 'Move to top'),
+                           ('popup_dnall', 'Move to bottom')):
+            setattr(self, item,  wx.NewId())
+            wid = getattr(self, item)
+            self.Bind(wx.EVT_MENU, self.onPosRightEvent, wid)
+            menu.Append(wid, name)
         self.PopupMenu(menu)
         menu.Destroy()
 
-
-    def onPosRightEvent(self, event=None, posname=None):
+    def onPosRightEvent(self, event=None):
+        "popup box event handler"
         idx = self.pos_list.GetSelection()
         if idx < 0: # no item selected
             return
-        thisname = self.pos_list.GetStringSelection()
-        
         wid = event.GetId()
         namelist = list(self.positions.keys())[:]
-        origlist = list(self.positions.keys())[:]        
         stmp = {}
         for name in namelist:
             stmp[name] = self.positions[name]
@@ -455,7 +442,7 @@ class SampleStage(wx.Frame):
         elif wid == self.popup_dn1 and idx < len(namelist):
             namelist.insert(idx+1, namelist.pop(idx))
         elif wid == self.popup_upall:
-            namelist.insert(0, namelist.pop(idx))            
+            namelist.insert(0, namelist.pop(idx))
         elif wid == self.popup_dnall:
             namelist.append( namelist.pop(idx))
 
@@ -466,6 +453,7 @@ class SampleStage(wx.Frame):
         self.autosave()
 
     def onSelectPosition(self, event=None, name=None):
+        "Event handler for selecting a named position"
         if name is None:
             name = str(event.GetString().strip())
         if name is None or name not in self.positions:
@@ -481,7 +469,7 @@ class SampleStage(wx.Frame):
             except:
                 tstamp = ''
         self.display_imagefile(fname=imgfile, name=name, tstamp=tstamp)
-            
+
     def onErasePosition(self, event):
         posname = self.pos_list.GetStringSelection()
         ipos  =  self.pos_list.GetSelection()
@@ -493,16 +481,15 @@ class SampleStage(wx.Frame):
                         style=wx.YES_NO|wx.ICON_QUESTION)
             if ret != wx.ID_YES:
                 return
-        print 'erase  ' , posname, ipos
         self.positions.pop(posname)
         self.pos_list.Delete(ipos)
         self.pos_name.Clear()
         self.display_imagefile(fname=None)
         self.write_message('Erased Position %s' % posname)
-        
+
     def onSavePosition(self, event=None):
         name = event.GetString().strip()
-        
+
         if self.v_replace and name in self.config['positions']:
             ret = popup(self, "Overwrite Position %s?" %name,
                         "Veriry Overwrite Position",
@@ -511,7 +498,6 @@ class SampleStage(wx.Frame):
             if ret != wx.ID_YES:
                 return
         imgfile = '%s.jpg' % time.strftime('%b%d_%H%M%S')
-        # print imgfile, self.imgdir
         self.save_image(fname=os.path.join(self.imgdir, imgfile))
 
         tmp_pos = []
@@ -521,13 +507,13 @@ class SampleStage(wx.Frame):
         self.positions[name] = {'image': imgfile,
                                 'timestamp': time.strftime('%b %d %H:%M:%S'),
                                 'position': tmp_pos}
-        
+
         if name not in self.pos_list.GetItems():
             self.pos_list.Append(name)
-            
+
         self.pos_name.Clear()
         self.onSelectPosition(event=None, name=name)
-        self.pos_list.SetStringSelection(name)        
+        self.pos_list.SetStringSelection(name)
         # auto-save file
         self.config['positions'] = self.positions
         self.autosave()
@@ -543,7 +529,7 @@ class SampleStage(wx.Frame):
         imgfile = thispos['image']
         tstamp  = thispos['timestamp']
         pos     = ', '.join([str(i) for i in thispos['position']])
-        pvnames = ', '.join([i.strip() for i in self.stages.keys()])        
+        pvnames = ', '.join([i.strip() for i in self.stages.keys()])
         labels  = ', '.join([i['label'].strip() for i in self.stages.values()])
         fout = open(self.htmllog, 'a')
         fout.write("""<hr>
@@ -557,8 +543,6 @@ class SampleStage(wx.Frame):
     </table></td></tr>
 </table>""" % (imgfile, imgfile, name, tstamp, labels, pvnames, pos))
         fout.close()
-                   
-        
 
     def save_image(self, fname=None):
         "save image to file"
@@ -567,14 +551,14 @@ class SampleStage(wx.Frame):
         except:
             self.write_message('could not open webcam %s')
         if fname is None:
-            fname = FileSave(self, 
-                    wildcard='JPEG (*.jpg)|*.jpg|All files (*.*)|*.*',
-                                    deffile='sample.jpg')
+            fname = FileSave(self, 'Save Image File',
+                             wildcard='JPEG (*.jpg)|*.jpg|All files (*.*)|*.*',
+                             default_file='sample.jpg')
         if fname is not None:
             out = open(fname,"wb")
             out.write(img)
             out.close()
-            self.write_message('saved image to %s' % fname)            
+            self.write_message('saved image to %s' % fname)
         return fname
 
     def onGo(self, event):
@@ -597,17 +581,16 @@ class SampleStage(wx.Frame):
         for name, val in zip(stage_names, pos_vals):
             self.motorwids[name['label']].drive.SetValue("%f" % val)
         self.write_message('moved to %s' % posname)
-            
+
     #@EpicsFunction
     def onMove(self, event, name=None, group=None):
         if name == 'camera':
             return self.save_image()
 
-        # print self.tweaks[group].GetStringSelection()
         twkval = float(self.tweaks[group].GetStringSelection())
         ysign = {'n':1, 's':-1}.get(name[0], 0)
         xsign = {'e':1, 'w':-1}.get(name[1], 0)
-        
+
         x, y = self.motorgroups[group]
 
         val = float(self.motorwids[x].drive.GetValue())
@@ -621,8 +604,9 @@ class SampleStage(wx.Frame):
                 self.motors[y].TWV = twkval
         except:
             pass
-        
-    def onZeroFineMotors(self, event, name=None, group=None):
+
+    def onZeroFineMotors(self, event=None):
+        "event handler for Zero Fine Motors"
         mot = self.motors
         mot['X'].VAL +=  self.finex_dir * mot['fineX'].VAL
         mot['Y'].VAL +=  self.finey_dir * mot['fineY'].VAL
@@ -652,12 +636,11 @@ class SampleStage(wx.Frame):
         if panel.IsExpanded():
             txt = 'Hide'
         panel.SetLabel('%s %s' % (txt, label))
-        # self.Layout()
-        self.Refresh()        
-                
+        self.Refresh()
+
 class StageApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
     def OnInit(self):
-        self.Init() 
+        self.Init()
         frame = SampleStage()
         frame.Show()
         self.SetTopWindow(frame)
@@ -669,5 +652,5 @@ if __name__ == '__main__':
     f = SampleStage(configfile='SampleStage.ini')
     f.Show()
     app.MainLoop()
-    # StageApp.MainLoop()
-    
+
+
