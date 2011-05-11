@@ -16,7 +16,7 @@ from epics import Motor
 from epics.wx import finalize_epics,  EpicsFunction, MotorPanel
 
 from epics.wx.utils import  (empty_bitmap, add_button, add_menu, popup,
-                             pack, Closure , NumericCombo,
+                             pack, Closure , NumericCombo, SimpleText, 
                              FileSave, FileOpen,SelectWorkdir)
 
 from StageConf import StageConfig
@@ -34,6 +34,66 @@ IMG_W, IMG_H = 280, 210
 CONFIG_DIR  = '//cars5/Data/xas_user/config/SampleStage/'
 WORKDIR_FILE = os.path.join(CONFIG_DIR, 'workdir.txt')
 ICON_FILE = os.path.join(CONFIG_DIR, 'micro.ico')
+
+class SettingsFrame(wx.Frame):
+    def __init__(self, parent=None,  *args, **kwds):
+        wx.Frame.__init__(self, None, wx.ID_ANY, '',
+                          wx.DefaultPosition, wx.Size(-1,-1), **kwds)
+        
+        STY  = wx.GROW|wx.ALL|wx.ALIGN_CENTER_VERTICAL
+        LSTY = wx.ALIGN_LEFT|wx.ALL|wx.ALIGN_CENTER_VERTICAL
+        CEN  = wx.ALIGN_CENTER|wx.GROW|wx.ALL
+
+        self.parent = parent
+        sizer = wx.GridBagSizer(10, 2)
+        panel = wx.Panel(self, style=wx.GROW)
+        
+        irow = 0
+        sizer.Add(wx.StaticLine(panel, size=(150, -1), style=wx.LI_HORIZONTAL),
+                  (irow, 0), (1, 2), CEN, 2)
+
+        irow += 1
+        self.webcam_name =  wx.TextCtrl(panel, value=parent.webcam, size=(260, -1))
+        sizer.Add(SimpleText(panel, 'Webcam: '), (irow, 0), (1, 1), LSTY, 2)
+        sizer.Add(self.webcam_name,              (irow, 1), (1, 1), LSTY, 2)
+
+        irow += 1
+        self.image_dir  =  wx.TextCtrl(panel, value=parent.imgdir, size=(260, -1))
+        sizer.Add(SimpleText(panel, 'Image Folder: '), (irow, 0), (1, 1), LSTY, 2)
+        sizer.Add(self.image_dir,                      (irow, 1), (1, 1), LSTY, 2)
+
+
+        irow += 1
+        sizer.Add(wx.StaticLine(panel, size=(150, -1), style=wx.LI_HORIZONTAL),
+                  (irow, 0), (1, 2), CEN, 2)
+        
+        btn_ok     = add_button(panel, 'Done',   size=(70, -1), action=self.OnDone)
+        btn_cancel = add_button(panel, 'Cancel', size=(70, -1), action=self.OnCancel)
+        
+        irow += 1
+        sizer.Add(btn_ok,     (irow, 0), (1, 1), LSTY, 2)
+        sizer.Add(btn_cancel, (irow, 1), (1, 1), LSTY, 2)
+
+        pack(panel, sizer)
+        mainsizer = wx.BoxSizer(wx.VERTICAL)
+        mainsizer.Add(panel, 1, LSTY)
+        pack(self, mainsizer)
+
+        self.Layout()
+        self.Show()
+        self.Raise()
+
+    def OnDone(self, event=None):
+        self.parent.webcam =  self.webcam_name.GetValue()
+        self.parent.config['setup']['webcam'] = self.parent.webcam       
+
+        self.parent.imgdir  =  self.image_dir.GetValue()
+        self.parent.config['setup']['imgdir'] = self.parent.imgdir
+        self.Destroy()
+
+        
+    def OnCancel(self, event=None):
+        self.Destroy()
 
 class SampleStage(wx.Frame):
     """Main Sample Stage Class
@@ -174,6 +234,10 @@ class SampleStage(wx.Frame):
         mitem.Check()
         self.Bind(wx.EVT_MENU, self.onMenuOption, mitem)
 
+        omenu.AppendSeparator()
+        add_menu(self, omenu, label="Webcam Settings",  text="Edit Webcam Settings",
+                 action = self.onSettings)
+
         mbar.Append(fmenu, '&File')
         mbar.Append(omenu, '&Options')
         self.SetMenuBar(mbar)
@@ -186,6 +250,10 @@ class SampleStage(wx.Frame):
     def onMenuOption(self, evt=None):
         """events for options menu: move, erase, overwrite """
         setattr(self, self.menu_opts[evt.GetId()], evt.Checked())
+
+    def onSettings(self, evt=None):
+        """events for settings menu"""
+        SettingsFrame(parent=self)
 
     def create_frame(self):
         "build main frame"
@@ -489,7 +557,7 @@ class SampleStage(wx.Frame):
 
     def onSavePosition(self, event=None):
         name = event.GetString().strip()
-
+        print 'OnSave Postion ', name
         if self.v_replace and name in self.config['positions']:
             ret = popup(self, "Overwrite Position %s?" %name,
                         "Veriry Overwrite Position",
@@ -498,7 +566,8 @@ class SampleStage(wx.Frame):
             if ret != wx.ID_YES:
                 return
         imgfile = '%s.jpg' % time.strftime('%b%d_%H%M%S')
-        self.save_image(fname=os.path.join(self.imgdir, imgfile))
+        fname =  os.path.join(self.imgdir, imgfile)
+        self.save_image(fname=fname)
 
         tmp_pos = []
         for v in self.config['stages'].values():
@@ -518,7 +587,7 @@ class SampleStage(wx.Frame):
         self.config['positions'] = self.positions
         self.autosave()
         self.write_htmllog(name)
-        self.write_message('Saved Position %s,  autosave file written.' % name)
+        self.write_message("Saved Position '%s', image in %s" % (name, fname))
 
     def autosave(self):
         self.cnf.Save('SampleStage_autosave.ini')
@@ -549,12 +618,14 @@ class SampleStage(wx.Frame):
         try:
             img = urlopen(self.webcam).read()
         except:
-            self.write_message('could not open webcam %s')
+            self.write_message('could not open webcam: %s' % self.webcam)
+            return 
+
         if fname is None:
             fname = FileSave(self, 'Save Image File',
                              wildcard='JPEG (*.jpg)|*.jpg|All files (*.*)|*.*',
                              default_file='sample.jpg')
-        if fname is not None:
+        if img is not None and fname is not None:
             out = open(fname,"wb")
             out.write(img)
             out.close()
