@@ -9,6 +9,7 @@ classes for Tables:
   Position
 """
 
+
 import os
 import json
 import epics
@@ -17,18 +18,20 @@ import socket
 from threading import Thread
 from datetime import datetime
 
-from utils import backup_versions, save_backup, get_pvtypes
-from creator import make_newdb
+from utils import backup_versions, save_backup, dumpsql
 
-from sqlalchemy import MetaData, create_engine, and_
-from sqlalchemy.orm import sessionmaker,  mapper, clear_mappers, relationship
+from sqlalchemy import MetaData, create_engine, and_, \
+     Table, Column, Integer, Float, String, Text, DateTime, ForeignKey
+
+from sqlalchemy.orm import sessionmaker,  mapper, clear_mappers, relationship, create_session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import  NoResultFound
+
 
 # needed for py2exe?
 import sqlalchemy.dialects.sqlite
 
-def isInstrumentDB(dbname):
+def isCollectorDB(dbname, server='sqlite'):
     """test if a file is a valid Instrument Library file:
        must be a sqlite db file, with tables named
           'info', 'instrument', 'position', 'pv',
@@ -37,7 +40,7 @@ def isInstrumentDB(dbname):
     if not os.path.exists(dbname):
         return False
     try:
-        engine  = create_engine('sqlite:///%s' % dbname)
+        engine = create_engine('%s:///%s' % (server, dbname))
         metadata =  MetaData(engine)
         metadata.reflect()
     except:
@@ -169,8 +172,6 @@ class InstrumentDB(object):
         self.conn    = None
         self.metadata = None
         self.update_mod_time = None
-        self.pvs = {}
-        self.restoring_pvs = []
         if dbname is not None:
             self.connect(dbname)
 
@@ -182,7 +183,7 @@ class InstrumentDB(object):
             time.sleep(0.5)
             self.connect(dbname, backup=False)
 
-    def connect(self, dbname, backup=True):
+    def connect(self, dbname, server='sqlite', backup=True):
         "connect to an existing database"
         if not os.path.exists(dbname):
             raise IOError("Database '%s' not found!" % dbname)
@@ -193,7 +194,7 @@ class InstrumentDB(object):
         if backup:
             save_backup(dbname)
         self.dbname = dbname
-        self.engine = create_engine('sqlite:///%s' % self.dbname)
+        self.engine = create_engine('%s:///%s' % (server, dbname))
         self.conn = self.engine.connect()
         self.session = sessionmaker(bind=self.engine)()
 
@@ -590,28 +591,13 @@ arguments
                     thispv.get_ctrlvars()
                 thispv.put(value, use_complete=True)
 
-#!/usr/bin/env python
-"""
- provides make_newdb() function to create an empty Epics Instrument Library
-
-"""
-import sys
-import os
-
-from datetime import datetime
-
-from sqlalchemy.orm import sessionmaker, create_session
-from sqlalchemy import MetaData, create_engine, \
-     Table, Column, Integer, Float, String, Text, DateTime, ForeignKey
-
-from utils import dumpsql, backup_versions
 
 def PointerCol(name, other=None, keyid='id', **kws):
     if other is None:
         other = name
     return Column("%s_%s" % (name, keyid), None,
                   ForeignKey('%s.%s' % (other, keyid), **kws))
-    
+
 def StrCol(name, size=None, **kws):
     if size is None:
         return Column(name, Text, **kws)
@@ -632,73 +618,107 @@ def NamedTable(tablename, metadata, keyid='id', nameid='name',
     return Table(tablename, metadata, *args)
 
 class InitialData:
-    info    = [["version", "1.1"],
-               ["verify_erase", "1"],
-               ["verify_move",   "1"],
-               ["verify_overwrite",  "1"],
-               ["epics_prefix",   ""],               
+    info    = [["version", "0.1"],
                ["create_date", '<now>'],
                ["modify_date", '<now>']]
+
+    commands = [['xas_scan',       'X-ray Absorption Spectra Scan, multi-segment'],
+                ['line_scan',      'Simple Linear Stp Scan'],
+                ['epics_scan',     'Load and Run a Scan with the Epics SScan Record'],
+                ['fast_map',       'Continuous Map Scan'],
+                ['webcam_collect', 'Save Image from URL'],
+                ['xrf_collect',    'Expose and Save Integrated Spectra from XRF detector'],
+                ['ad_collect',     'Expose and Save Image from Epics Area Detector'],
+                ['moveto_pos',     'Move an Instrument to a named Position'],
+                ['caput',          'Basic Epics caput'],
+                ['caget',          'Basic Epics caget, storing value'],
+                ['run_script',     'Run a Named Script of Commands'],
+                ]
+    status = ['requested', 'withdrawn', 'executing', 'completed', 'aborted', 'failed']
 
     pvtype = [['numeric',   'Numeric Value'],
               ['enum',      'Enumeration Value'],
               ['string',    'String Value'],
               ['motor',     'Motor Value']]
 
-def  make_newdb(dbname, server= 'sqlite'):
-    engine  = create_engine('%s:///%s' % (server, dbname))
+
+def  make_newdb(dbname, server='sqlite'):
+    engine = create_engine('%s:///%s' % (server, dbname))
     metadata =  MetaData(engine)
-    
+
+    info = Table('info', metadata,
+                 Column('key', Text, primary_key=True, unique=True),
+                 StrCol('value'))
+
+
     instrument = NamedTable('instrument', metadata,
                             cols=[Column('show', Integer, default=1),
                                   Column('display_order', Integer, default=0)])
 
-    command    = NamedTable('command', metadata,
-                            cols=[StrCol('command'),
-                                  StrCol('arguments'),
-                                  StrCol('output_value'),
-                                  StrCol('output_name')])
-
     position  = NamedTable('position', metadata,
                            cols=[Column('date', DateTime),
                                  PointerCol('instrument')])
-    
-    instrument_precommand = NamedTable('instrument_precommand', metadata,
-                                       cols=[Column('order', Integer),
-                                             PointerCol('command'),
-                                             PointerCol('instrument')])
-                                     
-    instrument_postcommand = NamedTable('instrument_postcommand', metadata,
-                                        cols=[Column('order', Integer), 
-                                              PointerCol('command'),
-                                              PointerCol('instrument')])
 
     pvtype  = NamedTable('pvtype', metadata)
     pv      = NamedTable('pv', metadata, cols=[PointerCol('pvtype')])
-    
+
     instrument_pv = Table('instrument_pv', metadata,
-                          Column('id', Integer, primary_key=True), 
+                          Column('id', Integer, primary_key=True),
                           PointerCol('instrument'),
                           PointerCol('pv'),
                           Column('display_order', Integer, default=0))
 
-
     position_pv = Table('position_pv', metadata,
                         Column('id', Integer, primary_key=True),
-                        StrCol('notes'),                        
+                        StrCol('notes'),
                         PointerCol('position'),
                         PointerCol('pv'),
                         StrCol('value'))
-    
-    info       = Table('info', metadata,
-                       Column('key', Text, primary_key=True, unique=True), 
-                       StrCol('value'))
+
+    command = NamedTable('command', metadata,
+                         cols=[StrCol('parameters'),
+                               PointerCol('cmd_type'),
+                               StrCol('user_notes'),
+                               StrCol('output_datafile'),
+                               StrCol('result'),
+                               Column('request_datetime', DateTime),
+                               Column('finish_datetime', DateTime),
+                               PointerCol('cmd_status')
+                               ])
+
+    cmd_types = NamedTable('cmd_type', metadata)
+    cmd_status=  NamedTable('cmd_status', metadata)
+
+    config = NamedTable('config', metadata,
+                        cols=[Column('date', DateTime),
+                                 PointerCol('instrument')])
+
+    scan_info = NamedTable('scan_info', metadata,
+                           cols=[Column('maxpts', Integer),
+                                 PointerCol('command'),
+                                 StrCol('ordinate_name'),
+                                 StrCol('column_names') ])
+
+    scan_data = NamedTable('scan_data', metadata,
+                           cols=[Column('npt', Integer),
+                                 PointerCol('scan_info'),
+                                 StrCol('ordinate'),
+                                 StrCol('columns') ])
+
+    monitored_pvs = Table('monitored_pvs', metadata,
+                          Column('id', Integer, primary_key=True),
+                          Column('timestamp', DateTime),
+                          StrCol('pvname'),
+                          StrCol('value'))
 
     metadata.create_all()
     session = sessionmaker(bind=engine)()
 
-    for name, notes in InitialData.pvtype:
-        pvtype.insert().execute(name=name, notes=notes)
+    for name, notes in InitialData.commands:
+        command.insert().execute(name=name, notes=notes)
+
+    for name in InitialData.status:
+        cmd_status.insert().execute(name=name)
 
     now = datetime.isoformat(datetime.now())
 
@@ -707,12 +727,12 @@ def  make_newdb(dbname, server= 'sqlite'):
             value = now
         info.insert().execute(key=key, value=value)
 
-    session.commit()    
+    session.commit()
 
-    
+
 if __name__ == '__main__':
-    dbname = 'Test.ein'
-    backup_versions(dbname)
+    dbname = 'Test.sdb'
+    # backup_versions(dbname)
     make_newdb(dbname)
     print '''%s  created and initialized.''' % dbname
     dumpsql(dbname)
