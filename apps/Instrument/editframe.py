@@ -238,18 +238,20 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
         if pvname not in self.connecting_pvs:
             if pvname not in self.epics_pvs:
                 self.epics_pvs[pvname] = epics.PV(pvname)
-            self.connecting_pvs[pvname] = wid
+            self.connecting_pvs[pvname] = (wid, time.time())
             
             if not self.etimer.IsRunning():
                 self.etimer.Start(500)
                 
     def onTimer(self, event=None):
-        "timer event handler: look for connecting_pvs"
+        "timer event handler: look for connecting_pvs give up after 30 seconds"
         if len(self.connecting_pvs) == 0:
             self.etimer.Stop()
         for pvname in self.connecting_pvs:
             self.new_pv_connected(pvname)
-
+            if time.time() - self.connecting_pvs[pvname][1] > 30:
+                self.connecting_pvs.pop(pvname)
+            
     @EpicsFunction
     def new_pv_connected(self, pvname):
         """if a new epics PV has connected, fill in the form data"""
@@ -257,13 +259,16 @@ class EditInstrumentFrame(wx.Frame, FocusEventFrame) :
             pv = self.epics_pvs[pvname] = epics.PV(pvname)
         else:
             pv = self.epics_pvs[pvname]
+            pv.poll()
+            
         if not pv.connected:
             return
         try:
-            wid = self.connecting_pvs.pop(pvname)
+            wid, itime = self.connecting_pvs.pop(pvname)
         except KeyError:
             wid = None
         pv.get_ctrlvars()
+        
         self.newpvs[wid]['type'].Enable()
         self.newpvs[wid]['delpv'].Enable()
         
