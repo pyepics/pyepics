@@ -100,14 +100,14 @@ class MotorPanel(wx.Panel):
 
         self.drive.SetPV(self.motor.PV('VAL'))
         self.rbv.SetPV(self.motor.PV('RBV'))
-        self.twf.SetPV(self.motor.PV('TWF'))
-        self.twr.SetPV(self.motor.PV('TWR'))
         self.desc.SetPV(self.motor.PV('DESC'))
 
         descpv = self.motor.PV('DESC').get()
         self.desc.Wrap(45)
-        if not self.is_full:
-            if len(descpv) > 20:
+        if self.is_full:
+            self.twf.SetPV(self.motor.PV('TWF'))
+            self.twr.SetPV(self.motor.PV('TWR'))
+        elif len(descpv) > 20:
                 font = self.desc.GetFont()
                 font.PointSize -= 1
                 self.desc.SetFont(font)
