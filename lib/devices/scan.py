@@ -22,23 +22,73 @@ class Scan(epics.Device):
              'PAUS', 'CPT')
     
     posit_attrs = ('P%iPV', 'P%iSP', 'P%iEP', 'T%iPV', 'D0%iPV')
+    
+    _alias = {
+              'device':         'P1PV',
+              'start':          'P1SP',
+              'end':            'P1EP',
+              'npts':           'NPTS',
+              'execute':        'EXSC',
+              'trigger':        'T1PV',
+              'pause':          'PAUS',
+              'current_point':  'CPT'}
 
-    def __init__(self, prefix):
+    def __init__(self, name):
         """
         Initialize the scan.
         
-        prefix: The prefix of the scan record.
+        name: The name of the scan record.
         """
         attrs = list(self.attrs)
         for i in range(1,NUM_POSITIONERS):
             for att in self.posit_attrs:
                 attrs.append(att % i)
         
-        epics.Device.__init__(self, prefix, delim='.', attrs=attrs)
+        epics.Device.__init__(self, name, delim='.', attrs=attrs)
+        
+        # make sure this is really a sscan!
+        rectype = self.get('RTYP')
+        if rectype != 'sscan':
+            raise ScanException("%s is not an Epics Scan" % name)
+
         self.put('SMSG', '')
         self.put('NPTS]', 0)
         for i in range(1, NUM_POSITIONERS):
             self.put('T%iPV' % i, '')
+
+    def __getattr__(self, attr):
+        " internal method "
+        if attr in self._alias:
+            attr = self._alias[attr]
+        if attr in self._pvs:
+            return self.get(attr)
+        if not attr.startswith('__'):
+            try:
+                self.PV(attr)
+                return self.get(attr)
+            except:
+                raise ScanException("EpicsMotor has no attribute %s" % attr)
+        else:
+            return self.__dict__[attr]
+                
+    def __setattr__(self, attr, val):
+        if attr in ('name', '_prefix', '_pvs', '_delim', '_init',
+                    '_alias', '_nonpvs', '_extra', '_callbacks'):
+            self.__dict__[attr] = val
+            return 
+        if attr in self._alias:
+            attr = self._alias[attr]
+        if attr in self._pvs:
+            return self.put(attr, val)
+        elif attr in self.__dict__: 
+            self.__dict__[attr] = val           
+        elif self._init:
+            try:
+                self.PV(attr)
+                return self.put(attr, val)
+            except:
+                raise ScanException("EpicsScan has no attribute %s" % attr)
+
 
     def setPositioner(self, positioner = None, index=1):
         """
@@ -105,6 +155,15 @@ class Scan(epics.Device):
         print('EP = %s' % self.get('P1EP'))
         print('NPTS = %s' % self.get('NPTS'))
         print(' T = %s' % self.get('T1PV'))
+
+class ScanException(Exception):
+    """ raised to indicate a problem with a scan"""
+    def __init__(self, msg, *args):
+        Exception.__init__(self, *args)
+        self.msg = msg
+    def __str__(self):
+        return str(self.msg)
+
 
 if __name__ == '__main__':
     print('starting')
