@@ -164,6 +164,13 @@ class PV_Tests(unittest.TestCase):
         self.assertEqual(len(subval), 5)
         self.failUnless(numpy.all(subval == full_data[13:5+13]))
 
+    def testEnumPut(self):
+        pv = PV(pvnames.enum_pv)
+        self.assertNotEqual(pv, None)
+        pv.put('Stop')
+        time.sleep(0.1)
+        val = pv.get()
+        self.assertEqual(val, 0)
 
 
     def xtest_DoubleVal(self):

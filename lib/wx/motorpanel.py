@@ -11,14 +11,14 @@ provides two classes:
 #  Aug 21 2004 M Newville:  initial working version.
 #
 import wx
+from wx._core import PyDeadObjectError
 import epics
-from epics.wx.wxlib import PVText, PVFloatCtrl, \
+from epics.wx.wxlib import PVText, PVFloatCtrl, PVButton, PVComboBox, \
      DelayedEpicsCallback, EpicsFunction
 
 from epics.wx.motordetailframe  import MotorDetailFrame
 
-from epics.wx.utils import LCEN, RCEN, CEN, LTEXT, RIGHT
-
+from epics.wx.utils import LCEN, RCEN, CEN, LTEXT, RIGHT, pack, add_button
 
 class MotorPanel(wx.Panel):
     """ MotorPanel  a simple wx windows panel for controlling an Epics Motor
@@ -51,7 +51,12 @@ class MotorPanel(wx.Panel):
         self.CreatePanel()
 
         if motor is not None:
-            self.SelectMotor(motor)
+            try:
+                self.SelectMotor(motor)
+            except PyDeadObjectError:
+                pass
+
+
 
     @EpicsFunction
     def SelectMotor(self, motor):
@@ -59,16 +64,20 @@ class MotorPanel(wx.Panel):
         if motor is None:
             return
 
-        # if self.motor already exists
-        if self.motor is not None:
-            for i in self.__motor_fields:
-                self.motor.clear_callback(attr=i)
+        epics.poll()
+        try: 
+            if self.motor is not None:
+                for i in self.__motor_fields:
+                    self.motor.clear_callback(attr=i)
+        except PyDeadObjectError:
+            return
 
         if isinstance(motor, (str, unicode)):
             self.motor = epics.Motor(motor)
         elif isinstance(motor, epics.Motor):
             self.motor = motor
         self.motor.get_info()
+
 
         if self.format is None:
             self.format = "%%.%if" % self.motor.PREC
@@ -82,9 +91,12 @@ class MotorPanel(wx.Panel):
 
     @EpicsFunction
     def FillPanelComponents(self):
-        if self.motor is None:
-            return
         epics.poll()
+        try:
+            if self.motor is None:
+                return
+        except PyDeadObjectError:
+            return
 
         self.drive.SetPV(self.motor.PV('VAL'))
         self.rbv.SetPV(self.motor.PV('RBV'))
@@ -92,8 +104,10 @@ class MotorPanel(wx.Panel):
 
         descpv = self.motor.PV('DESC').get()
         self.desc.Wrap(45)
-        if not self.is_full:
-            if len(descpv) > 20:
+        if self.is_full:
+            self.twf.SetPV(self.motor.PV('TWF'))
+            self.twr.SetPV(self.motor.PV('TWR'))
+        elif len(descpv) > 20:
                 font = self.desc.GetFont()
                 font.PointSize -= 1
                 self.desc.SetFont(font)
@@ -122,28 +136,24 @@ class MotorPanel(wx.Panel):
 
         self.drive = PVFloatCtrl(self, size=(wdrv, -1), style = wx.TE_RIGHT)
         
-        self.FillPanelComponents()
+        try:
+            self.FillPanelComponents()
+        except PyDeadObjectError:
+            return
                 
         if self.is_full:
             self.twk_list = ['','']
             self.__twkbox = wx.ComboBox(self, value='', size=(100, -1), 
                                         choices=self.twk_list,
-                               style=wx.CB_DROPDOWN|wx.TE_PROCESS_ENTER)
-
+                                        style=wx.CB_DROPDOWN|wx.TE_PROCESS_ENTER)
             self.__twkbox.Bind(wx.EVT_COMBOBOX,    self.OnTweakBoxComboEvent)
             self.__twkbox.Bind(wx.EVT_TEXT_ENTER,  self.OnTweakBoxEnterEvent)
 
-            twkbtn1 = wx.Button(self, label='<',  size=(30, 30))
-            twkbtn2 = wx.Button(self, label='>',  size=(30, 30))
-            stopbtn = wx.Button(self, label=' Stop ')
-            morebtn = wx.Button(self, label=' More ')
-            
-            twkbtn1.Bind(wx.EVT_BUTTON, self.OnLeftButton)
-            twkbtn2.Bind(wx.EVT_BUTTON, self.OnRightButton)
-            stopbtn.Bind(wx.EVT_BUTTON, self.OnStopButton)
-            morebtn.Bind(wx.EVT_BUTTON, self.OnMoreButton)
+            self.twr = PVButton(self, label='<',  size=(30, 30))
+            self.twf = PVButton(self, label='>',  size=(30, 30))
 
-            self.stopbtn = stopbtn
+            self.stopbtn = add_button(self, label=' Stop ', action=self.OnStopButton)
+            self.morebtn = add_button(self, label=' More ', action=self.OnMoreButton)
         
         spacer = wx.StaticText(self, label=' ', size=(5, 5), style=RIGHT) 
         self.__sizer.AddMany([(spacer,      1, CEN),
@@ -152,15 +162,14 @@ class MotorPanel(wx.Panel):
                               (self.rbv,    0, CEN),
                               (self.drive,  0, CEN)])
         if self.is_full:
-            self.__sizer.AddMany([(twkbtn1,       0, CEN),
+            self.__sizer.AddMany([(self.twr,      0, CEN),
                                   (self.__twkbox, 0, CEN),
-                                  (twkbtn2,       0, CEN),
-                                  (stopbtn,       0, CEN),
-                                  (morebtn,       0, CEN)])
+                                  (self.twf,      0, CEN),
+                                  (self.stopbtn,  0, CEN),
+                                  (self.morebtn,  0, CEN)])
         
         self.SetAutoLayout(1)
-        self.SetSizer(self.__sizer)
-        self.__sizer.Fit(self)
+        pack(self, self.__sizer)
 
     @EpicsFunction
     def FillPanel(self):
@@ -176,18 +185,6 @@ class MotorPanel(wx.Panel):
             self.twk_list = self.make_step_list()
             self.UpdateStepList()
         
-    @EpicsFunction
-    def OnLeftButton(self, event=None):
-        "left button"
-        if self.motor is not None:
-            self.motor.tweak(direction='reverse')
-        
-    @EpicsFunction
-    def OnRightButton(self, event=None):
-        "right button"
-        if self.motor is not None:
-            self.motor.tweak(direction='foreward')
-
     @EpicsFunction
     def OnStopButton(self, event=None):
         "stop button"

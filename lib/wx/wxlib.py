@@ -406,7 +406,7 @@ class PVTextCtrl(wx.TextCtrl, PVCtrlMixin):
     def OnChar(self, event):
         "char event handler"
         key   = event.GetKeyCode()
-        entry = wx.TextCtrl.GetValue(self).strip()
+        entry = str(wx.TextCtrl.GetValue(self).strip())
         pos   = wx.TextCtrl.GetSelection(self)
         if key == wx.WXK_RETURN:
             self.SetValue(entry)
@@ -416,16 +416,15 @@ class PVTextCtrl(wx.TextCtrl, PVCtrlMixin):
     @EpicsFunction
     def _caput(self, value):
         "epics pv.put wrapper"
-        self.pv.put(value)
+        self.pv.put(str(value))
     
     def SetValue(self, value):
         "override all setvalue"
         self._caput(value)
-        wx.TextCtrl.SetValue(self, value)
 
     def _SetValue(self, value):
         "set widget value"
-        self.SetValue(value)
+        wx.TextCtrl.SetValue(self, value)
 
 class PVText(wx.StaticText, PVCtrlMixin):
     """ Static text for displaying a PV value, 
@@ -826,9 +825,10 @@ class PVButton(wx.Button, PVCtrlMixin):
             self.disablePV.add_callback(self._disableEvent, wid=self.GetId())
         self.maskedEnabled = True
 
-    def Enable(self, value):
+    def Enable(self, value=None):
         "enable button"
-        self.maskedEnabled = value
+        if value is not None:
+            self.maskedEnabled = value
         self._UpdateEnabled()
 
     @EpicsFunction
