@@ -142,19 +142,19 @@ completed.   See :ref:`pv-putwait-label` for more details.
    :type  timeout:  double
    :rtype:    ``True``/``False``
 
-   if timeout is None, the PVs connection_timeout paramater will be used. If that is also None,
+   if timeout is None, the PVs connection_timeout parameter will be used. If that is also None,
    :data:`ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
 
 .. method:: wait_for_connection([timeout=None])
 
    this waits until a PV is connected, or has timed-out waiting for a
-   connection.  Returns  whether the connection has occured.
+   connection.  Returns  whether the connection has occurred.
 
    :param timeout:  maximum connection time.
    :type  timeout:  double
    :rtype:    ``True``/``False``
 
-   if timeout is None, the PVs connection_timeout paramater will be used. If that is also None,
+   if timeout is None, the PVs connection_timeout parameter will be used. If that is also None,
    :data:`ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
 
 
@@ -523,7 +523,7 @@ the processing is done::
     print 'Done'
 
 This will hang until the processing of the PV completes (motor moving, etc)
-before printing 'Done'.   You can also specfy a maximum time to wait -- a
+before printing 'Done'.   You can also specify a maximum time to wait -- a
 *timeout* (in seconds)::
 
     p.put(1.0, wait=True, timeout=30)
@@ -607,7 +607,7 @@ To get a string representation of the value, you can use either
    >>> print p1.get(as_string=True)
    '1.000'
 
-or, equivilently
+or, equivalently
 
    >>> print p1.char_value
    '1.000'
@@ -664,7 +664,7 @@ PVs and integer PVs, this is a simple task.  For floating point values,
 there is ambiguity how many significant digits to show. EPICS PVs all have
 a :attr:`precision` field. which sets how many digits after the decimal
 place should be described.  In addition, for ENUM PVs, it would be
-desireable to get at the name of the ENUM state, not just its integer
+desire able to get at the name of the ENUM state, not just its integer
 value.
 
 To get the string representation of a PVs value, use either the
@@ -694,7 +694,7 @@ The :attr:`value` attribute is the only attribute that can be set.
 Example of simple callback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It is ofen useful to get a notification of when a PV changes.  In general,
+It is often useful to get a notification of when a PV changes.  In general,
 it would be inconvenient (and possibly inefficient) to have to continually
 ask if a PVs value has changed.  Instead, it is better to set a *callback*
 function: a function to be run when the value has changed.

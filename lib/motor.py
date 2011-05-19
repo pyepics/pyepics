@@ -266,12 +266,11 @@ class Motor(device.Device):
 
     def __getattr__(self, attr):
         " internal method "
-        # print 'GET ATTR ', attr
         if attr in self._alias:
             attr = self._alias[attr]
-        elif attr in self._pvs:
+        if attr in self._pvs:
             return self.get(attr)
-        elif not attr.startswith('__'):
+        if not attr.startswith('__'):
             try:
                 self.PV(attr)
                 return self.get(attr)
