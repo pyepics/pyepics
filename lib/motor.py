@@ -278,7 +278,7 @@ class Motor(device.Device):
             except:
                 raise MotorException("EpicsMotor has no attribute %s" % attr)
         else:
-            return self.__dict__[attr]
+            return self._pvs[attr]
                 
     def __setattr__(self, attr, val):
         # print 'SET ATTR ', attr, val
