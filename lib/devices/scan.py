@@ -3,13 +3,6 @@ Epics scan record
 """
 import lib as epics
 import threading
-import sys
-
-if sys.version[0] == '2':
-    import Queue as queue
-else:
-    import queue
-
 
 NUM_POSITIONERS = 4
 
@@ -17,13 +10,6 @@ class Scan(epics.Device):
     """
     A Epics scan record.
     
-    A Scan object is a pyepics Device that represents a scan record. Current
-    version is limited to linear scans. Typical usage for a simple scan:
-    
-       >>> s1 = Scan('L3:scan1')
-       >>> s1.setPositioner(positioner='L3:psi', start=0. end=300)
-       >>> s1.setNpts(20)
-       >>> s1.run()
     """
     
     attrs = ('VAL', 'SMSG', 'CMND', 'NPTS', 'EXSC', 'NAME', 'PDLY',
@@ -51,7 +37,6 @@ class Scan(epics.Device):
         for i in range(1,NUM_POSITIONERS):
             for att in self.posit_attrs:
                 attrs.append(att % i)
-        #        self.waitSemaphore = threading.Semaphore(value=1)
         self.waitSemaphore = threading.Semaphore(0)
         epics.Device.__init__(self, name, delim='.', attrs=attrs)
         for attr, pv in Scan._alias.items():
@@ -64,41 +49,9 @@ class Scan(epics.Device):
             raise ScanException("%s is not an Epics Scan" % name)
 
         self.put('SMSG', '')
-        self.put('NPTS]', 0)
+        self.put('NPTS', 0)
         for i in range(1, NUM_POSITIONERS):
             self.put('T%iPV' % i, '')
-
-
-    def setPositioner(self, positioner = None, index=1):
-        """
-        Define a positioner for the scan
-        
-        index: Positioner id, (1,2,3 or 4). Default 1
-        positioner: PV name of the positioner
-        start: Start position of scan
-        end:  End position of scan
-        """
-        if not positioner:
-            #TODO: this is an error. Do something
-            return
-        
-        self.put('P%iPV' % index, positioner)
-
-        
-    def setNpts(self, npts):
-        """
-        Define the number of points for the scan
-        """
-        self.put('NPTS', npts)
-        
-    def setStart(self, start=0, index=1):
-        self.put("P%iSP" % index, start)
-
-    def setEnd(self, end=0, index=1):
-        self.put("P%iEP" % index, end)
-
-    def setDelay(self, delay):
-        self.put('PDLY', delay)
 
     def run(self, wait=False):
         """
@@ -120,13 +73,6 @@ class Scan(epics.Device):
         for i in range(1, NUM_POSITIONERS):
             self.put('T%iPV' % i, '')
             self.put('P%iPV' % i, '')
-    
-    def setPause(self, value):
-        self.put('PAUS', value)
-        
-    def getCpt(self):
-        return self.get('CPT')
-        
 
     def _print(self):
         print('PV = %s' % self.get('P1PV'))
@@ -142,8 +88,3 @@ class ScanException(Exception):
         self.msg = msg
     def __str__(self):
         return str(self.msg)
-
-
-if __name__ == '__main__':
-    s = Scan('L3:scan1')
-    print ('>>>>', s.npts)
