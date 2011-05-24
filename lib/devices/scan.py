@@ -1,7 +1,15 @@
 """
 Epics scan record
 """
-import epics
+import lib as epics
+import threading
+import sys
+
+if sys.version[0] == '2':
+    import Queue as queue
+else:
+    import queue
+
 
 NUM_POSITIONERS = 4
 
@@ -43,8 +51,12 @@ class Scan(epics.Device):
         for i in range(1,NUM_POSITIONERS):
             for att in self.posit_attrs:
                 attrs.append(att % i)
-        
+        #        self.waitSemaphore = threading.Semaphore(value=1)
+        self.waitSemaphore = threading.Semaphore(0)
         epics.Device.__init__(self, name, delim='.', attrs=attrs)
+        for attr, pv in Scan._alias.items():
+            self.add_pv('%s.%s' % (name,pv), attr)
+        
         
         # make sure this is really a sscan!
         rectype = self.get('RTYP')
@@ -55,39 +67,6 @@ class Scan(epics.Device):
         self.put('NPTS]', 0)
         for i in range(1, NUM_POSITIONERS):
             self.put('T%iPV' % i, '')
-
-    def __getattr__(self, attr):
-        " internal method "
-        if attr in self._alias:
-            attr = self._alias[attr]
-        if attr in self._pvs:
-            return self.get(attr)
-        if not attr.startswith('__'):
-            try:
-                self.PV(attr)
-                return self.get(attr)
-            except:
-                raise ScanException("EpicsMotor has no attribute %s" % attr)
-        else:
-            return self.__dict__[attr]
-                
-    def __setattr__(self, attr, val):
-        if attr in ('name', '_prefix', '_pvs', '_delim', '_init',
-                    '_alias', '_nonpvs', '_extra', '_callbacks'):
-            self.__dict__[attr] = val
-            return 
-        if attr in self._alias:
-            attr = self._alias[attr]
-        if attr in self._pvs:
-            return self.put(attr, val)
-        elif attr in self.__dict__: 
-            self.__dict__[attr] = val           
-        elif self._init:
-            try:
-                self.PV(attr)
-                return self.put(attr, val)
-            except:
-                raise ScanException("EpicsScan has no attribute %s" % attr)
 
 
     def setPositioner(self, positioner = None, index=1):
@@ -121,21 +100,21 @@ class Scan(epics.Device):
     def setDelay(self, delay):
         self.put('PDLY', delay)
 
-    def run(self):
+    def run(self, wait=False):
         """
         Execute the scan.
         """
+        if wait:
+            self.add_callback('EXSC', self._onDone)
         self.put('EXSC', 1)
+        if wait:
+            cbindex = self.waitSemaphore.acquire()
+            self.remove_callbacks('EXSC', cbindex)
+
+    def _onDone(self, **kwargs):
+        if kwargs['value'] == 0:
+            self.waitSemaphore.release()
     
-    def trigger(self, inner_scan):
-        """
-        Add an 'inner loop' scan.
-        
-        inner_scan: Scan to be triggered by this scan.
-        """
-        scanName = inner_scan.get('NAME')
-        self.put('T1PV', scanName + '.EXSC')
-        
     def reset(self):
         """Reset scan to some default values"""
         for i in range(1, NUM_POSITIONERS):
@@ -166,21 +145,5 @@ class ScanException(Exception):
 
 
 if __name__ == '__main__':
-    print('starting')
     s = Scan('L3:scan1')
-    s.setPositioner(positioner='L3:psi.VAL')
-    s.setStart(0)
-    s.setEnd(300)
-    s.setNpts(5)
-    
-    sinner = Scan('L3:scan2')
-    sinner.setPositioner(positioner='L3:theta.VAL')
-    sinner.setStart(20)
-    sinner.setEnd(50)
-    sinner.setNpts(3)
-#    sinner.run()
-    
-    s.loop(sinner)
-    s.run()
-    print('ending')
-    
+    print ('>>>>', s.npts)

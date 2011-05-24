@@ -12,6 +12,6 @@ Scaler = scaler.Scaler
 Struck = struck.Struck
 Mca = mca.Mca
 Transform  = transform.Transform
-scan = scan.Scan
+
 
 
