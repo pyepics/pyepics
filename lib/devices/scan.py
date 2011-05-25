@@ -8,7 +8,9 @@ NUM_POSITIONERS = 4
 
 class Scan(epics.Device):
     """
-    A Epics scan record.
+    A Device representing an Epics sscan record.
+    
+    The Scan Device represents an sscan record.
     
     """
     
