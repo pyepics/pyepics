@@ -56,7 +56,7 @@ class MultiXMAP(epics.Device):
     multi-Channel XMAP DXP device
     """
     attrs = ('PresetReal','Dwell','EraseStart','StopAll',
-             'PresetMode',
+             'PresetMode', 'PixelsPerBuffer_RBV', 
              'NextPixel', 'PixelsPerRun', 'Apply', 
              'CollectMode', 'SyncCount', 'BufferSize_RBV')
 
@@ -81,7 +81,7 @@ class MultiXMAP(epics.Device):
         time.sleep(0.1)
         self.filePut('EnableCallbacks',  1)
         self.filePut('AutoSave',   1)
-        self.filePut('FileFormat', 0)
+        self.filePut('FileFormat', 0)  # netCDF mode
 
     def get_calib(self):
         return [m.get_calib() for m in self.mcas]
@@ -114,7 +114,6 @@ class MultiXMAP(epics.Device):
     def Write_CurrentConfig(self, filename=None):
         d = debugtime.debugtime()
 
-        print 'Write Current Config'
         buff = []
         add = buff.append 
         add('#Multi-Element xMAP Settings saved: %s' % time.ctime())
@@ -133,7 +132,7 @@ class MultiXMAP(epics.Device):
             fh.write(buff)
             fh.close()
         d.add('wrote file')
-        d.show()
+        # d.show()
         return buff
 
     def start(self):
@@ -159,10 +158,11 @@ class MultiXMAP(epics.Device):
         "Advance to Next Pixel until CurrentPixel == PixelsPerRun"
         pprun = self.PixelsPerRun
         cur   = self.dxps[0].get('CurrentPixel')
-        print 'XMAP finishing pixels ', cur, ' to ' , pprun
-        for i in range(pprun-cur):
-            self.next_pixel()
-            time.sleep(0.005)
+        if cur < pprun:
+            print 'XMAP finishing pixels ', cur, ' to ' , pprun
+            for i in range(pprun-cur):
+                self.next_pixel()
+                time.sleep(0.01)
         return pprun-cur
 
     def readmca(self,n=1):
@@ -206,22 +206,19 @@ class MultiXMAP(epics.Device):
         f_size = -1
         t0 = time.time()
         while (f_size < 16384) and time.time()-t0 < 10:
-            time.sleep(0.05)
+            time.sleep(0.1)
             for i in range(4):
                 self.NextPixel = 1
                 f_size = self.fileGet('ArraySize0_RBV')
-                time.sleep(0.05)
+                time.sleep(0.1)
                 if f_size > 16384:
                     break
-        # print 'ArrayBuffSize is Now ', f_size, time.time()-t0
         #
         self.PixelsPerRun =  npulses
         self.SyncCount =  1
         debug.add(' >> xmap MCAmode: File Plugin Mode Set: ')
-        if filenumber is None:
-            self.nextFileNumber()
-        else:
-            self.setFileNumber(filenumber)
+
+        self.setFileNumber(filenumber)
         if filename is not None:
             self.setFileName(filename)
         
@@ -231,28 +228,31 @@ class MultiXMAP(epics.Device):
         t0 = time.time()
         debug.add(' >> xmap MCAmode: wait for buffsize')
         while time.time() - t0 < 10:
-            time.sleep(0.01)
+            time.sleep(0.1)
             if self.BufferSize_RBV > 16384:
                 break
         debug.add(' >> xmap MCAmode: BuffSize OK? %i' % self.BufferSize_RBV)
 
         # set expected number of buffers to put in a single file
-        ppbuff = 1.0 * self.PixelsPerBuffer_RBV
-
-        self.setFileNumCapture( 1 + int(npulses/ppbuff) )
+        ppbuff = self.PixelsPerBuffer_RBV
+        time.sleep(0.01)
+        if ppbuff is None:
+            ppbuff = 124        
+        self.setFileNumCapture(1 + int(npulses/(1.0*ppbuff)))
 
         debug.add(' >> xmap MCAmode: FileNumCapture: ')
           
         f_buffsize = -1
         t0 = time.time()
         while time.time()- t0 < 5:
-            time.sleep(0.005)
+            time.sleep(0.1)
             f_buffsize = self.fileGet('ArraySize0_RBV')
             if self.BufferSize_RBV == f_buffsize:
                 break            
 
         debug.add(' >> xmap MCAmode NC ArraySize: %i %i ' % ( f_buffsize, self.BufferSize_RBV))
         # debug.show()
+        time.sleep(2.0)
         return
 
     def filePut(self,attr,value, **kw):
@@ -276,9 +276,12 @@ class MultiXMAP(epics.Device):
     def nextFileNumber(self):
         self.setFileNumber(1+self.fileGet('FileNumber'))
 
-    def setFileNumber(self,fnum):
-        self.filePut('AutoIncrement', 0)
-        return self.filePut('FileNumber',fnum)
+    def setFileNumber(self, fnum=None):
+        if fnum is None:
+            self.filePut('AutoIncrement', 1)
+        else:
+            self.filePut('AutoIncrement', 0)
+            return self.filePut('FileNumber',fnum)
 
     def getLastFileName(self):
         return self.fileGet('FullFileName_RBV',as_string=True)

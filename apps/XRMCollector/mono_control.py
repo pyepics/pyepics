@@ -19,8 +19,8 @@ params = {'Shutter':        'eps_mbbi4',
           'preslit_diff':   'mono_pid2_incalc.N',
           }
 
-MAX_DIFF = 0.1
-MIN_SUM  = 0.1
+MAX_DIFF = 0.100
+MIN_SUM  = 0.050
 
 class mono_control(epics.Device):
     """  mono control and feedback
