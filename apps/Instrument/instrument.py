@@ -394,6 +394,13 @@ arguments
         out = self.query(PV).filter(PV.name==name).all()
         return None_or_one(out, 'get_pv expected 1 or None PV')
 
+    def rename_position(self, oldname, newname, instrument=None):
+        """rename a position"""
+        pos = self.get_position(oldname, instrument=instrument)
+        if pos is not None:
+            pos.name = newname
+            self.commit()
+
     def get_position(self, name, instrument=None):
         """return position from namea and instrument
         """

@@ -14,13 +14,63 @@ from epics.wx.ordereddict import OrderedDict
 
 from utils import ALL_EXP , GUIColors, get_pvtypes
 
+class RenameDialog(wx.Dialog):
+    """Rename a Position"""
+    msg = '''Select Recent Instrument File, create a new one'''
+    def __init__(self, parent, posname, inst, **kws):
+        self.posname = posname
+        self.inst = inst
+        title = "Rename Position '%s' for '%s' ?" % (posname, inst.name)
+        wx.Dialog.__init__(self, parent, wx.ID_ANY, title=title)
+        panel = wx.Panel(self)
+        colors = GUIColors()
+
+        self.SetFont(parent.GetFont())
+        titlefont  = self.GetFont()
+        titlefont.PointSize += 2
+        titlefont.SetWeight(wx.BOLD)
+
+        panel.SetBackgroundColour(colors.bg)
+        sizer = wx.GridBagSizer(10, 3)
+
+        labstyle  = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL|wx.ALL
+        rlabstyle = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL
+        tstyle    = wx.ALIGN_LEFT|wx.ALIGN_CENTER_VERTICAL
+
+        label1  = SimpleText(panel, 'Old name = %s' % posname, style=tstyle)
+        label2  = SimpleText(panel, 'New name = ' , style=tstyle)
+        self.newname =  wx.TextCtrl(panel, value=posname, size=(225, 25))
+
+        sizer.Add(label1, (0, 0), (1, 2), labstyle, 1)
+        sizer.Add(label2, (1, 0), (1, 1), labstyle, 1)
+        sizer.Add(self.newname, (1, 1), (1, 1), labstyle, 1)
+
+        sizer.Add(wx.StaticLine(panel, size=(250, -1),
+                                style=wx.LI_HORIZONTAL),
+                  (2, 0), (1, 2), wx.ALIGN_CENTER|wx.GROW|wx.ALL, 0)
+
+        btnsizer = wx.StdDialogButtonSizer()
+        btn = wx.Button(panel, wx.ID_OK)
+        btn.SetDefault()
+        btnsizer.AddButton(btn)
+        btnsizer.AddButton(wx.Button(panel, wx.ID_CANCEL))
+
+        btnsizer.Realize()
+        sizer.Add(btnsizer, (3, 0), (1, 2),
+                  wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1)
+        pack(panel, sizer)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(panel, 0, 0, 0)
+        pack(self, sizer)
+
+
 class MoveToDialog(wx.Dialog):
     """Full Query for Move To for a Position"""
     msg = '''Select Recent Instrument File, create a new one'''
     def __init__(self, parent, posname, inst, db, pvs, pvdesc=None, **kws):
         self.posname = posname
         self.inst = inst
-        self.db   = inst
         self.pvs  = pvs
         if pvdesc is None:
             pvdesc = {}
@@ -240,16 +290,16 @@ class InstrumentPanel(wx.Panel):
                 panel = wx.Panel(self.leftpanel)
                 sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-                label = SimpleText(panel, ' %s' % pvname,
+                label = SimpleText(panel, '  %s' % pvname,
                                    colour=self.colors.pvname,
-                                   minsize=(150,-1), style=wx.ALIGN_LEFT)
+                                   minsize=(180,-1), style=wx.ALIGN_LEFT)
 
                 if pvtype == 'enum':
-                    ctrl = PVEnumChoice(panel, pv=pv, size=(150, -1))
+                    ctrl = PVEnumChoice(panel, pv=pv, size=(120, -1))
                 elif pvtype in ('string', 'unicode'):
-                    ctrl = PVTextCtrl(panel, pv=pv, size=(150, -1))
+                    ctrl = PVTextCtrl(panel, pv=pv, size=(120, -1))
                 else:
-                    ctrl = PVFloatCtrl(panel, pv=pv, size=(150, -1))
+                    ctrl = PVFloatCtrl(panel, pv=pv, size=(120, -1))
 
                 current_comps.append(ctrl)        
                 current_comps.append(label)
@@ -262,15 +312,15 @@ class InstrumentPanel(wx.Panel):
                     conn, pvtype2, pv2 = pvcomps[icomp+1][1]
                     skip.append(pv2.pvname)
                  
-                    l2 = SimpleText(panel, '     %s' % pv2.pvname,
+                    l2 = SimpleText(panel, '  %s' % pv2.pvname,
                                     colour=self.colors.pvname,
-                                    minsize=(150,-1), style=wx.ALIGN_LEFT)
+                                    minsize=(180,-1), style=wx.ALIGN_LEFT)
                     if pvtype2 == 'enum':
-                        c2 = PVEnumChoice(panel, pv=pv2, size=(150, -1))
+                        c2 = PVEnumChoice(panel, pv=pv2, size=(120, -1))
                     elif pvtype2 in ('string', 'unicode'):
-                        c2 = PVTextCtrl(panel, pv=pv2, size=(150, -1))
+                        c2 = PVTextCtrl(panel, pv=pv2, size=(120, -1))
                     else:
-                        c2 = PVFloatCtrl(panel, pv=pv2, size=(150, -1))
+                        c2 = PVFloatCtrl(panel, pv=pv2, size=(120, -1))
                         
                     sizer.Add(l2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
                     sizer.Add(c2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 2)
@@ -448,6 +498,7 @@ class InstrumentPanel(wx.Panel):
                 self.Bind(wx.EVT_MENU, self.onPosRightEvent,
                           id=getattr(self, item))
 
+        menu.Append(self.popup_rename, "Rename Position")
         menu.Append(self.popup_up1, "Move up")
         menu.Append(self.popup_dn1, "Move down")
         menu.Append(self.popup_upall, "Move to top")
@@ -470,7 +521,20 @@ class InstrumentPanel(wx.Panel):
             namelist.insert(0, namelist.pop(idx))
         elif wid == self.popup_dnall:
             namelist.append( namelist.pop(idx))
-
+        elif wid == self.popup_rename:
+            posname = namelist[idx]
+            newname = None
+            dlg = RenameDialog(self, posname, self.inst)
+            dlg.Raise()
+            if dlg.ShowModal() == wx.ID_OK:
+                newname = dlg.newname.GetValue()
+            dlg.Destroy()
+            # print '--> ', posname, newname
+            if newname is not None:
+                self.db.rename_position(posname, newname, instrument=self.inst)
+                namelist[idx] = newname
+            
+            
         self.pos_list.Clear()
         for posname in namelist:
             self.pos_list.Append(posname)
