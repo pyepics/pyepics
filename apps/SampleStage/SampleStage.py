@@ -2,8 +2,8 @@
 #
 # Sample Stage Control
 """ GSECARS Sample Stage Control Application
-
 """
+
 import os
 import time
 import wx
@@ -443,7 +443,7 @@ class SampleStage(wx.Frame):
     def set_position_list(self):
         "set the list of position on the left-side panel"
         self.pos_list.Clear()
-        # print self.positions, self.config
+
         if self.positions is None:
             self.positions = self.config['positions']
         for name in self.positions:
@@ -557,7 +557,7 @@ class SampleStage(wx.Frame):
 
     def onSavePosition(self, event=None):
         name = event.GetString().strip()
-        print 'OnSave Postion ', name
+
         if self.v_replace and name in self.config['positions']:
             ret = popup(self, "Overwrite Position %s?" %name,
                         "Veriry Overwrite Position",
