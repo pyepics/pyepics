@@ -24,20 +24,23 @@ __c = (('general', ('mapdb', 'struck', 'scaler', 'xmap',
 
 conf_objs = OrderedDict(__c)
         
-conf_files = ('MapDefault.in',
-              '//cars5/Data/xas_user/config/FastMapDefault.ini')
+conf_files = ('MapDefault.ini',
+              '//cars5/Data/xas_user/config/FastMap/Default.ini')
 
+
+##struck = 13IDC:str:
+##scaler = 13IDC:scaler2
 
 default_conf = """# FastMap configuration file (default)
 [general]
 mapdb = 13XRM:map:
-struck = 13IDC:str:
-scaler = 13IDC:scaler2
+struck = 13IDE:SIS1
+scaler = 13IDE:scaler1
 xmap = 13SDD1:
 fileplugin = netCDF1:
-basedir = //cars5/Data/xas_user/
+basedir = //cars5/Data/xas_user/June2011/_Setup
 scandir = Scan00001
-envfile = //cars5/Data/xas_user/config/XRM_XMAP_PVS.DAT
+envfile = //cars5/Data/xas_user/config/XRM_XMAP_PVS_IDE.DAT
 [xps]
 host = 164.54.160.180
 user   = Administrator
@@ -60,12 +63,12 @@ step2 = 0.01
 1 = 13XRM:m1 | X
 2 = 13XRM:m2 | Y
 [slow_positioners]
-1 = 13XRM:m1 | X
-2 = 13XRM:m2 | Y
-3 = 13XRM:m3 | Theta
-4 = 13XRM:m5 | Stage Z (focus)
-5 = 13XRM:m4 | Stage X
-6 = 13XRM:m6 | Stage Y (vert)
+1 = 13XRM:m1  | X
+2 = 13XRM:m2  | Y
+3 = 13XRM:m3  | Theta
+4 = 13XRM:pm1 | Stage Z (focus)
+5 = 13XRM:pm2 | Stage X
+6 = 13XRM:m6  | Stage Y (vert)
 """
 
 class FastMapConfig(object):
