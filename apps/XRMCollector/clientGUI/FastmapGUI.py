@@ -4,11 +4,12 @@ import os
 import wx
 import wx.lib.newevent
 import time
+import shutil
 
 import epics
 from epics.wx import DelayedEpicsCallback
 from datetime import timedelta
-from wx_utils import FloatCtrl, SText, add_menu, EpicsFunction
+from wx_utils import FloatCtrl, SText, addtoMenu, EpicsFunction
 from util import new_filename, increment_filename, nativepath
 
 from configFile import FastMapConfig, conf_files, default_conf
@@ -20,7 +21,6 @@ from EscanWriter import EscanWriter
 DataSaverEvent, EVT_SAVE_DATA = wx.lib.newevent.NewEvent()
 
 SAVE_ESCAN = False
-SAVE_ESCAN = True
 
 def Connect_Motors():
     conf = FastMapConfig().config
@@ -46,7 +46,7 @@ class SetupFrame(wx.Frame):
         self.SetFont(self.Font10)
 
         fmenu = wx.Menu()
-        add_menu(self,fmenu, "&Quit", "Quit Setup",  self.onClose)
+        addtoMenu(self,fmenu, "&Quit", "Quit Setup",  self.onClose)
 
         mbar = wx.MenuBar()
         mbar.Append(fmenu, "&File")
@@ -72,7 +72,7 @@ class FastMapGUI(wx.Frame):
   Matt Newville <newville @ cars.uchicago.edu>
   """
     _scantypes = ('Line Scan', 'Map')
-    _cnf_wildcard = "Scan Definition Files(*.cnf)|*.cnf|All files (*.*)|*.*"
+    _cnf_wildcard = "Scan Definition Files(*.ini)|*.ini|All files (*.*)|*.*"
 
     def __init__(self, configfile=None, motorpvs=None,  **kwds):
 
@@ -99,20 +99,26 @@ class FastMapGUI(wx.Frame):
         self.dimchoice.Clear()
         self.dimchoice.AppendItems(self._scantypes)
         self.dimchoice.SetSelection(1)
-        self.m1time.SetAction(self.onM1time)
+
+        self.pixtime.SetAction(self.onPixelTime)
+        
         self.m1start.SetAction(self.onM1step)
         self.m1stop.SetAction(self.onM1step)
         self.m1step.SetAction(self.onM1step)
+
         self.m2start.SetAction(self.onM2step)        
         self.m2stop.SetAction(self.onM2step)        
         self.m2step.SetAction(self.onM2step)
 
+        self.escan_saver = None
+        self.data_fname  = None
+        self.data_mode   = 'w'        
         self.mapconf = None
         self._pvs = motorpvs
         self.start_time = time.time() - 100.0
         self.configfile = configfile
         self.ReadConfigFile()
-        
+
     def buildFrame(self):
         pane = wx.Panel(self, -1)
 
@@ -124,7 +130,8 @@ class FastMapGUI(wx.Frame):
         self.m1step   = FloatCtrl(pane, precision=4,value=0.1)
 
         self.m1npts   = SText(pane, "0",minsize=(55,20))
-        self.m1time   = FloatCtrl(pane, precision=1,value=10.,min=0.)
+        # self.rowtime  = FloatCtrl(pane, precision=1, value=10., min=0.)
+        self.pixtime  = FloatCtrl(pane, precision=3, value=0.100, min=0.)        
 
         self.m2choice = wx.Choice(pane, size=(120,30),choices=[])
         self.m2units  = SText(pane, "",minsize=(50,20))
@@ -134,8 +141,9 @@ class FastMapGUI(wx.Frame):
         self.m2npts   = SText(pane, "0",minsize=(60,20))
         
         self.maptime  = SText(pane, "0")
-        self.pixtime  = SText(pane, "0")
-
+        self.rowtime  = SText(pane, "0")
+        self.t_rowtime = 0.0
+        
         self.filename = wx.TextCtrl(pane, -1, "")
         self.filename.SetMinSize((350, 25))
         
@@ -187,8 +195,8 @@ class FastMapGUI(wx.Frame):
         gs.Add(SText(pane, "Stop"),   (nr,4), (1,1), all_bot)
         gs.Add(SText(pane, "Step"),   (nr,5), (1,1), all_bot)
         gs.Add(SText(pane, "Npoints"),(nr,6), (1,1), all_bot)
-        gs.Add(SText(pane, "Time for Line (s)",
-                         minsize=(140,20)),(nr,7), (1,1), all_cvert|wx.ALIGN_LEFT)
+        gs.Add(SText(pane, "Time Per Point (s)",
+                     minsize=(140,20)),(nr,7), (1,1), all_cvert|wx.ALIGN_LEFT)
         # fast motor row
         nr +=1
         gs.Add(SText(pane, "Fast Motor", minsize=(90,20)),
@@ -199,7 +207,7 @@ class FastMapGUI(wx.Frame):
         gs.Add(self.m1stop,   (nr,4)) # 0, all_cen)
         gs.Add(self.m1step,   (nr,5))
         gs.Add(self.m1npts,   (nr,6),(1,1),wx.ALIGN_CENTER_HORIZONTAL)
-        gs.Add(self.m1time,   (nr,7))
+        gs.Add(self.pixtime,  (nr,7))
 
         # slow motor row
         nr +=1
@@ -220,19 +228,19 @@ class FastMapGUI(wx.Frame):
         gs.Add(SText(pane, "File Name", minsize=(90,20)), (nr,0))
         gs.Add(self.filename, (nr,1), (1,4))
 
-        gs.Add(SText(pane, "Time per pixel:",
-                     minsize=(160,20),style=wx.ALIGN_RIGHT),
-               (nr,5), (1,2), wx.ALIGN_RIGHT)
-        gs.Add(self.pixtime, (nr,7))
+        gs.Add(SText(pane, "Time per line (sec):",
+                     minsize=(-1, 20), style=wx.ALIGN_LEFT),
+               (nr,5), (1,2), wx.ALIGN_LEFT)
+        gs.Add(self.rowtime, (nr,7))
 
         # title row 
         nr +=1
         gs.Add(SText(pane, "Comments ",
                      minsize=(80,50)), (nr,0))
         gs.Add(self.usertitles,        (nr,1),(1,4))
-        gs.Add(SText(pane, "Time for map:",
-                         minsize=(160,20),style=wx.ALIGN_RIGHT),
-               (nr,5), (1,2), wx.ALIGN_RIGHT)
+        gs.Add(SText(pane, "Time for map (H:Min:Sec):",
+                     minsize=(-1,20), style=wx.ALIGN_LEFT),
+               (nr,5), (1,2), wx.ALIGN_LEFT)
         gs.Add(self.maptime, (nr,7))
 
         # button row 
@@ -258,32 +266,32 @@ class FastMapGUI(wx.Frame):
         self.menubar = wx.MenuBar()
         # file
         fmenu = wx.Menu()
-        add_menu(self,fmenu, "&Read Scan File",
+        addtoMenu(self,fmenu, "&Read Scan File",
                   "Read Scan Parameter or Configuration File",
                   self.onReadConfigFile)
                     
-        add_menu(self,fmenu,"&Save Scan File",
+        addtoMenu(self,fmenu,"&Save Scan File",
                   "Save Scan Parameters File", self.onSaveScanFile)
                     
-        add_menu(self,fmenu, "Save Full Configuration",
+        addtoMenu(self,fmenu, "Save Full Configuration",
                   "Save Configuration File", self.onSaveConfigFile)
 
         fmenu.AppendSeparator()
-        add_menu(self,fmenu,'Change &Working Folder',
+        addtoMenu(self,fmenu,'Change &Working Folder',
                   "Choose working directory",
                   self.onFolderSelect)
         fmenu.AppendSeparator()        
-        add_menu(self,fmenu, "E&xit",
+        addtoMenu(self,fmenu, "E&xit",
                   "Terminate the program", self.onClose)
 
         # options
         omenu = wx.Menu()
-        add_menu(self,omenu, "&Options",
+        addtoMenu(self,omenu, "&Options",
                   "Setup Motors, Detectors, other Options",
                   self.onSetup)
         # help
         hmenu = wx.Menu()
-        add_menu(self,hmenu, "&About",
+        addtoMenu(self,hmenu, "&About",
                   "More information about this program",  self.onAbout)
 
         self.menubar.Append(fmenu, "&File")
@@ -324,7 +332,8 @@ class FastMapGUI(wx.Frame):
 
     def onSaveConfigFile(self,evt=None,scan_only=False):
         fout=self.configfile
-        if fout is None: fout = 'config.cnf'
+        if fout is None:
+            fout = 'config.ini'
         dlg = wx.FileDialog(self,
                             message="Save Scan Definition File",
                             defaultDir=os.getcwd(), 
@@ -364,7 +373,7 @@ class FastMapGUI(wx.Frame):
         cnf['scan']['start1'] = str(self.m1start.GetValue())
         cnf['scan']['stop1']  = str(self.m1stop.GetValue())
         cnf['scan']['step1']  = str(self.m1step.GetValue())
-        cnf['scan']['time1']  = str(self.m1time.GetValue())        
+        cnf['scan']['time1']  = str(self.t_rowtime)
 
         if dim > 1:
             sm_values = cnf['slow_positioners'].values()
@@ -419,7 +428,16 @@ class FastMapGUI(wx.Frame):
         self.m1start.SetValue(cnf['scan']['start1'])
         self.m1stop.SetValue(cnf['scan']['stop1'])
         self.m1step.SetValue(cnf['scan']['step1'])
-        self.m1time.SetValue(cnf['scan']['time1'])
+        self.t_rowtime = float(cnf['scan']['time1'])
+
+        s1 = float(cnf['scan']['start1'])
+        s2 = float(cnf['scan']['stop1'])
+        ds = float(cnf['scan']['step1'])
+        npts = 1 + int(0.5  + abs(s2-s1)/(max(ds,1.e-10)))
+
+        pixtime = self.t_rowtime / (max(2, npts) - 1)
+        
+        self.pixtime.SetValue(pixtime)
 
         self.m2start.SetValue(cnf['scan']['start2'])
         self.m2stop.SetValue(cnf['scan']['stop2'])
@@ -455,12 +473,21 @@ class FastMapGUI(wx.Frame):
         if not SAVE_ESCAN:
             return
         new_lines = 0
-        # print 'Save Escan Data ', self.data_fname
-        if (time.time() - self.start_time < 5.0):
+        if self.data_fname is None:
+            self.data_fname = os.path.abspath(os.path.join(nativepath(self.mapper.basedir),
+                                                           self.mapper.filename))
+            
+        if self.escan_saver is None:
+            self.data_fname = os.path.abspath(os.path.join(nativepath(self.mapper.basedir),
+                                                           self.mapper.filename))
+            
+            self.escan_saver = EscanWriter(folder=self.mapper.workdir)        
+
+
+        if (time.time() - self.start_time < 2.0):
             return
         
         self.escan_saver.folder =self.mapper.workdir
-        
         new_lines = self.escan_saver.process()
 
         if new_lines > 0:
@@ -477,7 +504,7 @@ class FastMapGUI(wx.Frame):
     @DelayedEpicsCallback
     def onMapRow(self,pvname=None,value=0,**kw):
         " the map row changed -- another row is finished"
-        rowtime  = 0.5 + float(self.m1time.GetValue())
+        rowtime  = 0.5 + self.t_rowtime
         nrows    = float(self.m2npts.GetLabel().strip())
         time_left = int(0.5+ rowtime * max(0, nrows - value))
         message = "Estimated Time remaining: %s" % timedelta(seconds=time_left)       
@@ -505,6 +532,10 @@ class FastMapGUI(wx.Frame):
 
             self.usertitles.Enable()
             self.filename.Enable()        
+
+            fname = str(self.filename.GetValue())
+            if os.path.exists(fname):
+                self.filename.SetValue(increment_filename(fname))
 
             if SAVE_ESCAN:
                 self.SaveEscanData()
@@ -610,14 +641,14 @@ class FastMapGUI(wx.Frame):
             s1 = self.m2start.GetValue()
             s2 = self.m2stop.GetValue()
             ds = self.m2step.GetValue()
-            t  = self.m1time.GetValue()
-            npts = 1 + int(0.5  + abs(s2-s1)/(max(ds,1.e-10)))
-            if npts > MAX_POINTS: npts = MAX_POINTS
+            npts2 = 1 + int(0.5  + abs(s2-s1)/(max(ds,1.e-10)))
+            if npts2 > MAX_POINTS:
+                npts2 = MAX_POINTS
             if self.config['scan']['dimension'] == 1:
-                npts = 1
-            self.m2npts.SetLabel("  %i" % npts)
-            total = 2 + int( (t + 0.5) * max(1,npts))
-            self.maptime.SetLabel("%s" % timedelta(seconds=total))
+                npts2 = 1
+            self.m2npts.SetLabel("  %i" % npts2)
+            maptime = int((self.t_rowtime + 1.25) * max(1, npts2))            
+            self.maptime.SetLabel("%s" % timedelta(seconds=maptime))
         except AttributeError:
             pass            
         
@@ -626,21 +657,25 @@ class FastMapGUI(wx.Frame):
             s1 = self.m1start.GetValue()
             s2 = self.m1stop.GetValue()
             ds = self.m1step.GetValue()
-            t  = self.m1time.GetValue()
+            pixt = self.pixtime.GetValue()
             npts = 1 + int(0.5  + abs(s2-s1)/(max(ds,1.e-10)))
-            if npts > MAX_POINTS: npts = MAX_POINTS
+            if npts > MAX_POINTS:
+                npts = MAX_POINTS
             self.m1npts.SetLabel("  %i" % npts)
-            self.pixtime.SetLabel("%.3f s" % (t/max(1,(npts-1))))
+            self.t_rowtime = pixt * max(1, npts-1)
+            self.rowtime.SetLabel("%.1f" % (self.t_rowtime))
         except AttributeError:
             pass
             
-    def onM1time(self,value=None,**kw):
+    def onPixelTime(self,value=None,**kw):
         try:
             npts1 = float(self.m1npts.GetLabel().strip())
             npts2 = float(self.m2npts.GetLabel().strip())
-            total = int((value + 1.25) * max(1,npts2))
-            self.maptime.SetLabel("%s" % timedelta(seconds=total))
-            self.pixtime.SetLabel("%.3f s" % (value/max(1,(npts1-1))))
+
+            self.t_rowtime = value * max(1, (npts1-1))
+            maptime = int((self.t_rowtime + 1.25) * max(1, npts2))
+            self.maptime.SetLabel("%s" % timedelta(seconds=maptime))
+            self.rowtime.SetLabel("%.1f" % self.t_rowtime)
         except AttributeError:
             pass       
 
@@ -651,13 +686,15 @@ class FastMapGUI(wx.Frame):
             fname = increment_filename(fname)
             self.filename.SetValue(fname)
 
-        sname = fname + '.cnf'
+        sname = 'CurrentScan.ini'
+        if os.path.exists(sname):
+            shutil.copy(sname, 'PreviousScan.ini')
+            
         self.SaveConfigFile(sname, scan_only=True)
         self.mapper.StartScan(fname, sname)            
 
         # setup escan saver 
         self.data_mode   = 'w'
-
         self.data_fname  = os.path.abspath(os.path.join(nativepath(self.mapper.basedir), self.mapper.filename))
 
         self.usertitles.Disable()
@@ -670,10 +707,8 @@ class FastMapGUI(wx.Frame):
     def onAbortScan(self,evt=None):
         self.mapper.AbortScan()
 
-
 if __name__ == "__main__":
     motorpvs = Connect_Motors()
-
     app  = wx.PySimpleApp(redirect=False,
                           filename='fastmap.log')
                           
