@@ -34,6 +34,12 @@ Motor = motor.Motor
 Device = device.Device 
 poll  = ca.poll
 
+# some constants
+NO_ALARM = 0
+MINOR_ALARM = 1
+MAJOR_ALARM = 2
+INVALID_ALARM = 3
+
 # compatibility with other CA libraries
 # from  .compat import epicsPV
 
