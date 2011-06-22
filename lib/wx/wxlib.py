@@ -213,13 +213,13 @@ class PVCtrlMixin(PVMixin):
     def __init__(self, pv=None, pvname=None, font=None, fg=None, bg=None):
         PVMixin.__init__(self, pv, pvname)
 
-        self.translations = {}
-        self.fgColourTranslations = None
-        self.bgColourTranslations = None
-        self.fgColourAlarms = {}
-        self.bgColourAlarms = {}
-        self._connect_bgcol = self.GetBackgroundColour()
-        self._connect_fgcol = self.GetForegroundColour()
+        self._translations = {}
+        self._fg_colour_translations = None
+        self._bg_colour_translations = None
+        self._fg_colour_alarms = {}
+        self._bg_colour_alarms = {}
+        self._default_fg_colour = None
+        self._default_bg_colour = None
 
         #if font is None:
         #    font = wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,False)
@@ -233,8 +233,8 @@ class PVCtrlMixin(PVMixin):
                 self.SetBackgroundColour(fg)
         except:
             pass
-        self.defaultFgColour = None
-        self.defaultBgColour = None
+        self._connect_bgcol = self.GetBackgroundColour()
+        self._connect_fgcol = self.GetForegroundColour()
 
     @DelayedEpicsCallback
     def OnEpicsConnect(self, pvname=None, conn=None, **kws):
@@ -271,7 +271,7 @@ class PVCtrlMixin(PVMixin):
         possible to change the PV value in the database, or set a string
         value in the database.
         """
-        self.translations = translations
+        self._translations = translations
 
     def SetForegroundColourTranslations(self, translations):
         """
@@ -283,7 +283,7 @@ class PVCtrlMixin(PVMixin):
 
         Colour values in the dictionary may be strings or wx.Colour objects.
         """
-        self.fgColourTranslations = translations
+        self._fg_colour_translations = translations
 
     def SetBackgroundColourTranslations(self, translations):
         """
@@ -296,34 +296,34 @@ class PVCtrlMixin(PVMixin):
         Colour values in the dictionary may be strings or wx.Colour objects.
 
         """
-        self.bgColourTranslations = translations
+        self._bg_colour_translations = translations
            
     def SetForegroundColour(self, colour):
         """ (Internal override) Needed to support OverrideForegroundColour()
         """
-        if self.defaultFgColour is None:
+        if self._default_fg_colour is None:
             wx.Window.SetForegroundColour(self, colour)
         else:
-            self.defaultFgColour = colour
+            self._default_fg_colour = colour
 
     def GetForegroundColour(self):
         """ (Internal override) Needed to support OverrideForegroundColour()
         """
-        return self.defaultFgColour if self.defaultFgColour is not None \
+        return self._default_fg_colour if self._default_fg_colour is not None \
                else wx.Window.GetForegroundColour(self)
         
     def SetBackgroundColour(self, colour):
         """ (Internal override) Needed to support OverrideBackgroundColour()
         """
-        if self.defaultBgColour is None:
+        if self._default_bg_colour is None:
             wx.Window.SetBackgroundColour(self, colour)
         else:
-            self.defaultBgColour = colour
+            self._default_bg_colour = colour
 
     def GetBackgroundColour(self):
         """ (Internal override) Needed to support OverrideBackgroundColour()
         """
-        return self.defaultBgColour if self.defaultBgColour is not None \
+        return self._default_bg_colour if self._default_bg_colour is not None \
                else wx.Window.GetBackgroundColour(self)
 
     def OverrideForegroundColour(self, colour):
@@ -336,12 +336,12 @@ class PVCtrlMixin(PVMixin):
         except when the "override" is set.
         """
         if colour is None:
-            if self.defaultFgColour is not None:
-                wx.Window.SetForegroundColour(self, self.defaultFgColour)
-                self.defaultFgColour = None
+            if self._default_fg_colour is not None:
+                wx.Window.SetForegroundColour(self, self._default_fg_colour)
+                self._default_fg_colour = None
         else:
-            if self.defaultFgColour is None:
-                self.defaultFgColour = wx.Window.GetForegroundColour(self)
+            if self._default_fg_colour is None:
+                self._default_fg_colour = wx.Window.GetForegroundColour(self)
             wx.Window.SetForegroundColour(self, colour)      
 
     def OverrideBackgroundColour(self, colour):
@@ -354,11 +354,11 @@ class PVCtrlMixin(PVMixin):
         except when the "override" is set.
         """
         if colour is None:
-            if self.defaultBgColour is not None:
-                wx.Window.SetBackgroundColour(self, self.defaultBgColour)
+            if self._default_bg_colour is not None:
+                wx.Window.SetBackgroundColour(self, self._default_bg_colour)
         else:
-            if self.defaultBgColour is None:
-                self.defaultBgColour = wx.Window.GetBackgroundColour(self)
+            if self._default_bg_colour is None:
+                self._default_bg_colour = wx.Window.GetBackgroundColour(self)
             wx.Window.SetBackgroundColour(self, colour)
 
     def _SetValue(self, value):
@@ -370,27 +370,27 @@ class PVCtrlMixin(PVMixin):
         "called by PV callback"
         if self.pv is None:
             return
-        if len(self.fgColourAlarms) > 0 or len(self.bgColourAlarms) > 0:
+        if len(self._fg_colour_alarms) > 0 or len(self._bg_colour_alarms) > 0:
             # load severity if we care about it
             # NB: this may be a performance problem
             self.pv.get_ctrlvars()
 
         colour = None
-        if self.fgColourTranslations is not None and \
-           raw_value in self.fgColourTranslations:
-            colour = self.fgColourTranslations[raw_value]
-        elif self.pv.severity in self.fgColourAlarms:
-            colour = self.fgColourAlarms[self.pv.severity]        
+        if self._fg_colour_translations is not None and \
+           raw_value in self._fg_colour_translations:
+            colour = self._fg_colour_translations[raw_value]
+        elif self.pv.severity in self._fg_colour_alarms:
+            colour = self._fg_colour_alarms[self.pv.severity]        
         self.OverrideForegroundColour(colour)
             
         colour = None
-        if self.bgColourTranslations is not None and \
-           raw_value in self.bgColourTranslations:
-            colour = self.bgColourTranslations[raw_value]
-        elif self.pv.severity in self.bgColourAlarms:
-            colour = self.bgColourAlarms[self.pv.severity]
+        if self._bg_colour_translations is not None and \
+           raw_value in self._bg_colour_translations:
+            colour = self._bg_colour_translations[raw_value]
+        elif self.pv.severity in self._bg_colour_alarms:
+            colour = self._bg_colour_alarms[self.pv.severity]
         self.OverrideBackgroundColour(colour)
-        self._SetValue(self.translations.get(raw_value, raw_value))
+        self._SetValue(self._translations.get(raw_value, raw_value))
 
 
 class PVTextCtrl(wx.TextCtrl, PVCtrlMixin):
@@ -470,7 +470,7 @@ class PVText(wx.StaticText, PVCtrlMixin):
         self.auto_units = auto_units
         self.units = units
 
-        self.fgColourAlarms = {
+        self._fg_colour_alarms = {
             epics.MINOR_ALARM : minor_alarm,
             epics.MAJOR_ALARM : major_alarm,
             epics.INVALID_ALARM : invalid_alarm }
