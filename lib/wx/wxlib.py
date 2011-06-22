@@ -100,9 +100,6 @@ class PVMixin(object):
     """
     def __init__(self, pv=None, pvname=None):
         self.pv = None
-        self._connect_bgcol = self.GetBackgroundColour()
-        self._connect_fgcol = self.GetForegroundColour()
-
         if pv is None and pvname is not None:
             pv = pvname
         if pv is not None:
@@ -135,19 +132,7 @@ class PVMixin(object):
              Enable/Disable widget on change in connection status
         """
         # print 'onEpics Connect: ', pvname, conn
-        action = getattr(self, 'Enable', None)
-        bgcol = self._connect_bgcol
-        fgcol = self._connect_fgcol        
-        if not conn:
-            action = getattr(self, 'Disable', None)
-            self._connect_bgcol = self.GetBackgroundColour()
-            self._connect_fgcol = self.GetForegroundColour()
-            bgcol = wx.Colour(240, 240, 210)
-            fgcol = wx.Colour(200, 100, 100)
-        if action is not None:
-            self.SetBackgroundColour(bgcol)
-            self.SetForegroundColour(fgcol)
-            action()
+        pass
 
     @DelayedEpicsCallback
     def _pvEvent(self, pvname=None, value=None, wid=None,
@@ -233,6 +218,8 @@ class PVCtrlMixin(PVMixin):
         self.bgColourTranslations = None
         self.fgColourAlarms = {}
         self.bgColourAlarms = {}
+        self._connect_bgcol = self.GetBackgroundColour()
+        self._connect_fgcol = self.GetForegroundColour()
 
         #if font is None:
         #    font = wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,False)
@@ -248,6 +235,27 @@ class PVCtrlMixin(PVMixin):
             pass
         self.defaultFgColour = None
         self.defaultBgColour = None
+
+    @DelayedEpicsCallback
+    def OnEpicsConnect(self, pvname=None, conn=None, **kws):
+        """Connect Callback:
+             Enable/Disable widget on change in connection status
+        """
+        PVMixin.OnEpicsConnect(self, pvname, conn, kws)
+        action = getattr(self, 'Enable', None)
+        bgcol = self._connect_bgcol
+        fgcol = self._connect_fgcol        
+        if not conn:
+            action = getattr(self, 'Disable', None)
+            self._connect_bgcol = self.GetBackgroundColour()
+            self._connect_fgcol = self.GetForegroundColour()
+            bgcol = wx.Colour(240, 240, 210)
+            fgcol = wx.Colour(200, 100, 100)
+        if action is not None:
+            self.SetBackgroundColour(bgcol)
+            self.SetForegroundColour(fgcol)
+            action()
+
 
 
     def SetTranslations(self, translations):
