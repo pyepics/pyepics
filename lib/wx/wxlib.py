@@ -437,13 +437,17 @@ class PVText(wx.StaticText, PVCtrlMixin):
     def __init__(self, parent, pv=None, as_string=True,
                  font=None, fg=None, bg=None, style=None, 
                  minor_alarm="DARKRED", major_alarm="RED",
-                 invalid_alarm="ORANGERED", units="", **kw):
+                 invalid_alarm="ORANGERED", auto_units=False, units="", **kw):
         """
         Create a new pvText
 
         minor_alarm, major_alarm & invalid_alarm are all text colours
         that will be set depending no the alarm state of the target
         PV. Set to None if you want no highlighting in that alarm state.
+
+        auto_units means the PV value will be displayed with the EGU 
+        "engineering units" as a suffix. Alternately, you can specify
+        an explicit unit string.
         """
 
         wstyle = wx.ALIGN_LEFT
@@ -455,6 +459,7 @@ class PVText(wx.StaticText, PVCtrlMixin):
         PVCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
         
         self.as_string = as_string
+        self.auto_units = auto_units
         self.units = units
 
         self.fgColourAlarms = {
@@ -464,6 +469,8 @@ class PVText(wx.StaticText, PVCtrlMixin):
  
     def _SetValue(self, value):
         "set widget label"
+        if self.auto_units and self.pv.units != "":
+            self.units = " " + self.pv.units    
         if value is not None:
             self.SetLabel("%s%s" % (value, self.units))
 

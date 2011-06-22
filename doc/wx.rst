@@ -89,7 +89,7 @@ PVText
 
 .. class:: PVText(parent, pv=None, font=None, fg=None, bg=None,
                   minor_alarm="DARKRED", major_alarm="RED",
-                  invalid_alarm="ORANGERED", **kw)
+                  invalid_alarm="ORANGERED", auto_units=False, units="", **kw)
 
   derived from wx.StaticText and PVCtrlMixin, this is a StaticText widget
   whose value is set to the string representation of the value for the
@@ -98,6 +98,14 @@ PVText
   By default, the text colour will be overriden when the PV enters an
   alarm state. These colours can be modified (or disabled by being set
   to None) as part of the constructor.
+
+  "units" specifies a unit suffix (like ' A' or ' mm') to put after the text
+  value whenever it is displayed.
+
+  Alternatively, "auto_units" means the control will automatically display
+  the "EGU" units value from the PV, whenever it updates. If this value is 
+  set, "units" is ignored. A space is inserted between the value and the
+  unit.
 
 
 PVTextCtrl   
