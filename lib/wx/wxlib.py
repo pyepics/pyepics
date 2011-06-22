@@ -221,9 +221,6 @@ class PVCtrlMixin(PVMixin):
         self._default_fg_colour = None
         self._default_bg_colour = None
 
-        #if font is None:
-        #    font = wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,False)
-        
         try:
             if font is not None:
                 self.SetFont(font)
