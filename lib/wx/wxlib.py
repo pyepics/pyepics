@@ -458,10 +458,9 @@ class PVText(wx.StaticText, PVCtrlMixin):
         self.units = units
 
         self.fgColourAlarms = {
-            1 : minor_alarm,
-            2 : major_alarm,
-            3 : invalid_alarm } #alarm severities do not have an enum
-                                #in pyepics??
+            epics.MINOR_ALARM : minor_alarm,
+            epics.MAJOR_ALARM : major_alarm,
+            epics.INVALID_ALARM : invalid_alarm }
  
     def _SetValue(self, value):
         "set widget label"
