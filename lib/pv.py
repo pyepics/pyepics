@@ -23,14 +23,14 @@ def fmt_time(tstamp=None):
 
 class PV(object):
     """Epics Process Variable
-    
+
     A PV encapsulates an Epics Process Variable.
-   
+
     The primary interface methods for a pv are to get() and put() is value::
 
       >>> p = PV(pv_name)  # create a pv object given a pv name
       >>> p.get()          # get pv value
-      >>> p.put(val)       # set pv to specified value. 
+      >>> p.put(val)       # set pv to specified value.
 
     Additional important attributes include::
 
@@ -53,6 +53,7 @@ class PV(object):
                  verbose=False, auto_monitor=None,
                  connection_callback=None,
                  connection_timeout=None):
+
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
@@ -66,11 +67,17 @@ class PV(object):
         self._args['type'] = 'unknown'
         self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
-        self.connection_callback = connection_callback
+        self.connection_callbacks = []
+        if connection_callback is not None:
+            self.connection_callbacks = [connection_callback]
         self.callbacks  = {}
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
         self.chid = None
+        
+        if ca.current_context() is None:
+            ca.use_initial_context() 
+        self.context = ca.current_context()
 
         self._args['chid'] = self.chid = ca.create_channel(self.pvname,
                                                            callback=self.__on_connect)
@@ -78,14 +85,16 @@ class PV(object):
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
-        
+
         self._args['type'] = dbr.Name(self.ftype).lower()
+        
+
         if callback is not None:
             self.add_callback(callback)
 
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
-        # occassionally chid is still None (ie if a second PV is created while 
+        # occassionally chid is still None (ie if a second PV is created while
         # __on_connect is still pending for the first one.)
         # Just return here, and connection will happen later
         if self.chid is None and chid is None:
@@ -98,7 +107,7 @@ class PV(object):
                 count = ca.element_count(self.chid)
             except ca.ChannelAccessException:
                 time.sleep(0.025)
-                count = ca.element_count(self.chid)                
+                count = ca.element_count(self.chid)
             self._args['count']  = count
             self._args['host']   = ca.host_name(self.chid)
             self._args['access'] = ca.access(self.chid)
@@ -120,10 +129,11 @@ class PV(object):
                                          use_time=(self.form == 'time'),
                                          callback=self.__on_changes)
 
-        if hasattr(self.connection_callback, '__call__'):
-            self.connection_callback(pvname=self.pvname, conn=conn, pv=self)
-        elif not conn and self.verbose:
-            ca.write("PV '%s' disconnected." % pvname)
+        for conn_cb in self.connection_callbacks:
+            if hasattr(conn_cb, '__call__'):
+                conn_cb(pvname=self.pvname, conn=conn, pv=self)
+            elif not conn and self.verbose:
+                ca.write("PV '%s' disconnected." % pvname)
 
         # waiting until the very end until to set self.connected prevents
         # threads from thinking a connection is complete when it is actually
@@ -133,6 +143,11 @@ class PV(object):
 
     def wait_for_connection(self, timeout=None):
         """wait for a connection that started with connect() to finish"""
+
+        # make sure we're in the CA context used to create this PV
+        if self.context != ca.current_context():
+            ca.attach_context(self.context)
+
         if not self._conn_started:
             self.connect()
         if not self.connected:
@@ -145,7 +160,7 @@ class PV(object):
                    time.time()-start_time < timeout):
                 self.poll()
         return self.connected
-        
+
     def connect(self, timeout=None):
         "check that a PV is connected, forcing a connection if needed"
         if not self.connected:
@@ -162,7 +177,7 @@ class PV(object):
         self.connected = False
         self._conn_started = False
         return self.wait_for_connection()
-    
+
     def poll(self, evt=1.e-4, iot=1.0):
         "poll for changes"
         ca.poll(evt=evt, iot=iot)
@@ -201,13 +216,16 @@ class PV(object):
             use_complete=False, callback=None, callback_data=None):
         """set value for PV, optionally waiting until the processing is
         complete, and optionally specifying a callback function to be run
-        when the processing is complete.        
+        when the processing is complete.
         """
         if not self.wait_for_connection():
             return None
         if (self.ftype in (dbr.ENUM, dbr.TIME_ENUM, dbr.CTRL_ENUM) and
-            isinstance(value, str) and value in self._args['enum_strs']):
-            value = self._args['enum_strs'].index(value)
+            isinstance(value, str)):
+            if self._args['enum_strs'] is None:
+                self.get_ctrlvars()
+            if value in self._args['enum_strs']:
+                value = self._args['enum_strs'].index(value)
         if use_complete and callback is None:
             callback = self.__putCallbackStub
         return ca.put(self.chid, value,
@@ -246,7 +264,7 @@ class PV(object):
             if call_ca and self._args['precision'] is None:
                 self.get_ctrlvars()
             try:
-                prec = getattr(self, 'precision') 
+                prec = getattr(self, 'precision')
                 fmt  = "%%.%if"
                 if 4 < abs(int(log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
@@ -264,15 +282,24 @@ class PV(object):
                 pass
         self._args['char_value'] = cval
         return cval
-    
+
     def get_ctrlvars(self):
         "get control values for variable"
+        return self._get_vars(ca.get_ctrlvars)
+
+    def get_timevars(self):
+        "get time values for variable"
+        return self._get_vars(ca.get_timevars)
+
+    def _get_vars(self, var_fn):
+        "internal, common functionality for retreiving control/times values"
         if not self.wait_for_connection():
             return None
-        kwds = ca.get_ctrlvars(self.chid)
+        kwds = var_fn(self.chid)
         ca.poll()
         self._args.update(kwds)
         return kwds
+
 
     def __on_changes(self, value=None, **kwd):
         """internal callback function: do not overwrite!!
@@ -290,7 +317,7 @@ class PV(object):
                                      self._args['char_value'],
                                      now))
         self.run_callbacks()
-        
+
     def run_callbacks(self):
         """run all user-defined callbacks with the current data
 
@@ -306,7 +333,7 @@ class PV(object):
         where the 'cb_info' is provided as a hook so that a callback
         function  that fails may de-register itself (for example, if
         a GUI resource is no longer available).
-             
+
         """
         for index in sorted(list(self.callbacks.keys())):
             fcn, kwargs = self.callbacks[index]
@@ -315,7 +342,7 @@ class PV(object):
             kwd['cb_info'] = (index, self)
             if hasattr(fcn, '__call__'):
                 fcn(**kwd)
-            
+
     def add_callback(self, callback=None, index=None,
                      with_ctrlvars=True, **kw):
         """add a callback to a PV.  Optional keyword arguments
@@ -336,7 +363,7 @@ class PV(object):
                     index = 1 + max(self.callbacks.keys())
             self.callbacks[index] = (callback, kw)
         return index
-    
+
     def remove_callback(self, index=None):
         """remove a callback by index"""
         if index in self.callbacks:
@@ -363,8 +390,8 @@ class PV(object):
             fmt = '%g'
         elif xtype in ('string','char'):
             fmt = '%s'
-            
-        self._set_charval(self._args['value'], call_ca=False)        
+
+        self._set_charval(self._args['value'], call_ca=False)
         out.append("== %s  (%s_%s) ==" % (self.pvname, mod, xtype))
         if self.count == 1:
             val = self._args['value']
@@ -409,13 +436,13 @@ class PV(object):
             out.append('   PV is NOT internally monitored')
         out.append('=============================')
         return '\n'.join(out)
-        
+
     def _getarg(self, arg):
         "wrapper for property retrieval"
         if self._args['value'] is None:
             self.get()
         return self._args.get(arg, None)
-        
+
     def __getval__(self):
         "get value"
         return self._getarg('value')
@@ -544,7 +571,7 @@ class PV(object):
     @property
     def put_complete(self):
         "returns True if a put-with-wait has completed"
-        putdone_data = ca._put_done.get(self.pvname, None) 
+        putdone_data = ca._put_done.get(self.pvname, None)
         if putdone_data is not None:
             return putdone_data[0]
         return True
@@ -556,7 +583,7 @@ class PV(object):
             return self._fmt % self._args
         else:
             return "<PV '%s': not connected>" % self.pvname
-    
+
     def __eq__(self, other):
         "test for equality"
         try:

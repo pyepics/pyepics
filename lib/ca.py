@@ -21,6 +21,8 @@ import time
 import copy
 import atexit
 import warnings
+from threading import Thread
+
 # ignore warning about item size... for now??
 warnings.filterwarnings('ignore',
                         'Item size computed from the PEP 3118*',
@@ -48,7 +50,7 @@ def get_strconvertors():
     That is, for Python3 one sends and receives sequences of
     bytes to libca. This function returns the translators
     (STR2BYTES, BYTES2STR), assuming the encoding defined in
-    EPICS_STR_ENCODING (which is 'ASCII' by default).  
+    EPICS_STR_ENCODING (which is 'ASCII' by default).
     """
     if PY_VERSION >= 3:
         def s2b(st1):
@@ -73,10 +75,12 @@ def strjoin(sep, seq):
 
     if isinstance(sep, bytes):
         sep = BYTES2STR(sep)
-    if isinstance(seq[0], bytes): 
+    if len(seq) == 0:
+        seq = ''
+    elif isinstance(seq[0], bytes):
         seq = [BYTES2STR(i) for i in seq]
     return sep.join(seq)
-    
+
 ## print to stdout
 def write(msg, newline=True, flush=True):
     """write message to stdout"""
@@ -85,13 +89,14 @@ def write(msg, newline=True, flush=True):
         sys.stdout.write("\n")
     if flush:
         sys.stdout.flush()
-    
+
 ## holder for shared library
 libca = None
+initial_context = None
 
 ## PREEMPTIVE_CALLBACK determines the CA context
 PREEMPTIVE_CALLBACK = True
-# PREEMPTIVE_CALLBACK = False
+
 
 AUTO_CLEANUP = True
 
@@ -110,13 +115,13 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 #           'ts': ts_conn, 'callbacks': [ user_callback... ])
 #  isConnected   = True/False: if connected.
 #  ts_conn       = ts of last connection event or failed attempt.
-#  user_callback = one or more user functions to be called on 
+#  user_callback = one or more user functions to be called on
 #                  change (accumulated in the cache)
 _cache  = {}
 
 ## Cache of pvs waiting for put to be done.
 _put_done =  {}
-        
+
 class ChannelAccessException(Exception):
     """Channel Access Exception: General Errors"""
     def __init__(self, fcn, msg):
@@ -147,13 +152,13 @@ def find_libca():
     if os.name == 'nt':
         path_sep = ';'
         search_path.append(os.path.join(sys.prefix, 'DLLs'))
-    
+
     search_path.extend(os.environ['PATH'].split(path_sep))
 
-    os.environ['PATH'] = path_sep.join(search_path)  
+    os.environ['PATH'] = path_sep.join(search_path)
 
     # first, try the ctypes utility, which *should* work
-    # with LD_LIBRARY_PATH or ldconfig 
+    # with LD_LIBRARY_PATH or ldconfig
     dllpath  = ctypes.util.find_library('ca')
     if dllpath is not None:
         return dllpath
@@ -163,7 +168,7 @@ def find_libca():
                    'Darwin':  ('darwin-ppc', 'darwin-x86'),
                    'SunOS':   ('solaris-sparc', 'solaris-sparc-gnu') }
 
-    
+
     if os.name == 'posix':
         libname = 'libca.so'
         ldpath = os.environ.get('LD_LIBRARY_PATH', '').split(':')
@@ -189,20 +194,20 @@ def find_libca():
 def initialize_libca():
     """ load DLL (shared object library) to establish Channel Access
     Connection. The value of PREEMPTIVE_CALLBACK sets the pre-emptive
-    callback model: 
+    callback model:
         False  no preemptive callbacks. pend_io/pend_event must be used.
         True   preemptive callbaks will be done.
-    Returns libca where 
+    Returns libca where
         libca = ca library object, used for all subsequent ca calls
 
  Note that this function must be called prior to any real ca calls.
     """
     if 'EPICS_CA_MAX_ARRAY_BYTES' not in os.environ:
         os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = "%i" %  2**24
-        
+
     dllname = find_libca()
     load_dll = ctypes.cdll.LoadLibrary
-    global libca
+    global libca, initial_context
     if os.name == 'nt':
         load_dll = ctypes.windll.LoadLibrary
     try:
@@ -210,7 +215,7 @@ def initialize_libca():
     except:
         raise ChannelAccessException('initialize_libca',
                                      'Loading Epics CA DLL failed')
-        
+
     ca_context = {False:0, True:1}[PREEMPTIVE_CALLBACK]
     ret = libca.ca_context_create(ca_context)
     if ret != dbr.ECA_NORMAL:
@@ -233,6 +238,7 @@ def initialize_libca():
     # save value offests used for unpacking
     # TIME and CTRL data as an array in dbr module
     dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
+    initial_context = current_context()
 
     if AUTO_CLEANUP:
         atexit.register(finalize_libca)
@@ -269,26 +275,30 @@ def finalize_libca(maxtime=10.0):
 def show_cache(print_out=True):
     """Show list of cached PVs"""
     out = []
-    out.append('#  PV name    Is Connected?   Channel ID  Context')
-    out.append('#---------------------------------------')
+    out.append('#  PVName        ChannelID/Context Connected?')
+    out.append('#--------------------------------------------')
     global _cache
     for context, context_chids in  list(_cache.items()):
         for vname, val in list(context_chids.items()):
-            out.append(" %s  %s  %i" % (vname,
-                                        repr(isConnected(val['chid'])),
-                                        context))
+            chid = val['chid']
+            if len(vname) < 15:
+                vname = (vname + ' '*15)[:15]
+            out.append(" %s %s/%s  %s" % (vname, repr(chid),
+                                          repr(context),
+                                          isConnected(chid)))
     out = strjoin('\n', out)
     if print_out:
         write(out)
     else:
         return out
-    
+
 ## decorator functions for ca functionality:
 #  decorator name      ensures before running decorated function:
 #  --------------      -----------------------------------------------
-#   withCA               libca is initialized 
+#   withCA               libca is initialized
 #   withCHID             1st arg is a chid (dbr.chid_t)
 #   withConnectedCHID    1st arg is a connected chid.
+#   withInitialContext   Force the use of the initially defined context
 #
 #  These tests are not rigorous CA tests (and ctypes.long is
 #  accepted as a chid, connect_channel() is tried, but may fail)
@@ -296,7 +306,7 @@ def show_cache(print_out=True):
 def withCA(fcn):
     """decorator to ensure that libca and a context are created
     prior to function calls to the channel access library. This is
-    intended for functions that at the startup of CA, such as
+    intended for functions that need CA started to work, such as
         create_channel
 
     Note that CA functions that take a Channel ID (chid) as an
@@ -363,6 +373,19 @@ def withConnectedCHID(fcn):
     wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
+def withInitialContext(fcn):
+    """decorator to ensure that a function uses the initial
+    threading context
+    """
+    def wrapper(*args, **kwds):
+        "withInitialContext wrapper"
+        use_initial_context()
+        return fcn(*args, **kwds)
+    wrapper.__doc__ = fcn.__doc__
+    wrapper.__name__ = fcn.__name__
+    wrapper.__dict__.update(fcn.__dict__)
+    return wrapper
+
 def PySEVCHK(func_name, status, expected=dbr.ECA_NORMAL):
     """raise a ChannelAccessException if the wrapped
     status != ECA_NORMAL
@@ -394,68 +417,77 @@ def _onGetEvent(args):
     kwds = {'ftype':args.type, 'count':args.count,
            'chid':args.chid, 'pvname': pvname,
            'status':args.status}
+    # print("_onGetEvent ", pvname, current_context())
     # add kwds arguments for CTRL and TIME variants
     if args.type >= dbr.CTRL_STRING:
         tmpv = value[0]
         for attr in dbr.ctrl_limits + ('precision', 'units', 'severity'):
-            if hasattr(tmpv, attr):        
+            if hasattr(tmpv, attr):
                 kwds[attr] = getattr(tmpv, attr)
         if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
             tmpv.no_str > 0):
-            kwds['enum_strs'] = tuple([tmpv.strs[i].value for 
+            kwds['enum_strs'] = tuple([tmpv.strs[i].value for
                                       i in range(tmpv.no_str)])
 
     elif args.type >= dbr.TIME_STRING:
         tmpv = value[0]
         kwds['status']    = tmpv.status
         kwds['severity']  = tmpv.severity
-        kwds['timestamp'] = (dbr.EPICS2UNIX_EPOCH + tmpv.stamp.secs + 
+        kwds['timestamp'] = (dbr.EPICS2UNIX_EPOCH + tmpv.stamp.secs +
                             1.e-6*int(tmpv.stamp.nsec/1000.00))
     nelem = args.count
     if args.type in (dbr.STRING, dbr.TIME_STRING, dbr.CTRL_STRING):
         nelem = dbr.MAX_STRING_SIZE
-        
+
     value = _unpack(value, count=nelem, ftype=args.type)
     if hasattr(args.usr, '__call__'):
         args.usr(value=value, **kwds)
 
-## connection event handler: 
+## connection event handler:
 def _onConnectionEvent(args):
     """set flag in cache holding whteher channel is
     connected. if provided, run a user-function"""
     ctx = current_context()
     pvname = name(args.chid)
     global _cache
+
     if ctx is None and len(_cache.keys()) > 0:
-        ctx = _cache.keys()[0]
+        ctx = list(_cache.keys())[0]
     if ctx not in _cache:
         _cache[ctx] = {}
-    if pvname not in _cache[ctx]:
+
+    # search for PV in any context...
+    pv_found = False
+    for context in _cache:
+        if pvname in _cache[context]:
+            pv_found = True
+            break
+
+    if not pv_found:
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
-                               'ts':0, 'failures':0, 
+                               'ts':0, 'failures':0,
                                'callbacks': []}
 
-    conn = (args.op == dbr.OP_CONN_UP)
-    entry = _cache[ctx][pvname]
-    if (isinstance(entry['chid'], dbr.chid_t) and 
-        entry['chid'].value != args.chid):
-        msg = 'Channel IDs do not match in connection callback (%s and %s)'
-        raise ChannelAccessException('connect_channel',
-                                     msg % (entry['chid'], args.chid))
-    entry['conn'] = conn
-    entry['chid'] = args.chid
-    entry['ts']   = time.time()
-    entry['failures'] = 0
+    # set connection time, run connection callbacks
+    # in all contexts
+    for context, cvals in _cache.items():
+        if pvname in cvals:
+            entry = cvals[pvname]
+            ichid = entry['chid']
+            if isinstance(entry['chid'], dbr.chid_t):
+                ichid = entry['chid'].value
 
-    if len(entry.get('callbacks', [])) > 0:
-        poll(evt=1.e-3, iot=10.0)
-        for callback in entry.get('callbacks', []):
-            if hasattr(callback, '__call__'):
-                callback(pvname=pvname, 
-                         chid=entry['chid'],
-                         conn=entry['conn'])
+            if int(ichid) == int(args.chid):
+                entry['conn'] = conn = (args.op == dbr.OP_CONN_UP)
+                entry['chid'] = chid = args.chid
+                entry['ts']   = time.time()
+                entry['failures'] = 0
 
-    return 
+                for callback in entry.get('callbacks', []):
+                    poll()
+                    if hasattr(callback, '__call__'):
+                        callback(pvname=pvname, chid=chid, conn=conn)
+    return
 
 ## put event handler:
 def _onPutEvent(args, **kwds):
@@ -474,11 +506,11 @@ def _onPutEvent(args, **kwds):
 
 # create global reference to these two callbacks
 _CB_CONNECT = ctypes.CFUNCTYPE(None, dbr.connection_args)(_onConnectionEvent)
-_CB_PUTWAIT = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)  
-_CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onGetEvent)   
+_CB_PUTWAIT = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)
+_CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onGetEvent)
 
 ###
-# 
+#
 # Now we're ready to wrap libca functions
 #
 ###
@@ -487,32 +519,46 @@ _CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onGetEvent)
 @withCA
 @withSEVCHK
 def context_create(context=None):
-    "create a context -- context=1 for preemptive callbacks"
-    if not PREEMPTIVE_CALLBACK:
-        raise ChannelAccessException('context_create',
-            'Cannot create new context with PREEMPTIVE_CALLBACK=False')
-    if context is None:
-        context = {False:0, True:1}[PREEMPTIVE_CALLBACK]
-    return libca.ca_context_create(context)
+    "create a context -- argument ignored in favor of PREEMPTIVE_CALLBACK"
+    ctx = {False:0, True:1}[PREEMPTIVE_CALLBACK]
+    return libca.ca_context_create(ctx)
+
+def create_context():
+    "create a context (fixed naming bug)"
+    context_create(context=None)
 
 @withCA
 def context_destroy():
     "destroy current context"
     global _cache
-    ctx = current_context() 
+    ctx = current_context()
     ret = libca.ca_context_destroy()
     if ctx in _cache:
         for key in list(_cache[ctx].keys()):
             _cache[ctx].pop(key)
         _cache.pop(ctx)
     return ret
-    
+
+def destroy_context():
+    "destroy current context (fixed naming bug)"
+    return context_destroy()
+
 @withCA
+@withSEVCHK
 def attach_context(context):
-    "attach a context"        
-    ret = libca.ca_attach_context(context) 
-    return PySEVCHK('attach_context', ret, dbr.ECA_ISATTACHED)
-        
+    "attach a context"
+    return libca.ca_attach_context(context)
+
+@withCA
+@withSEVCHK
+def use_initial_context():
+    "attach to the original context"
+    global initial_context
+    ret = dbr.ECA_NORMAL
+    if initial_context != current_context():
+        ret = libca.ca_attach_context(initial_context)
+    return ret
+
 @withCA
 def detach_context():
     "detach a context"
@@ -529,10 +575,12 @@ def replace_printf_handler(fcn=None):
 @withCA
 def current_context():
     "return this context"
+    ctx = libca.ca_current_context()
     try:
-        return int(libca.ca_current_context())
-    except:
-        return libca.ca_current_context()
+        ctx = int(ctx)
+    except TypeError:
+        pass
+    return ctx
 
 @withCA
 def client_status(context, level):
@@ -556,7 +604,7 @@ def version():
 
 @withCA
 def pend_io(timeout=1.0):
-    """polls CA for i/o. """    
+    """polls CA for i/o. """
     ret = libca.ca_pend_io(timeout)
     try:
         return PySEVCHK('pend_io', ret)
@@ -565,7 +613,7 @@ def pend_io(timeout=1.0):
 
 ## @withCA
 def pend_event(timeout=1.e-4):
-    """polls CA for events """    
+    """polls CA for events """
     ret = libca.ca_pend_event(timeout)
     try:
         return PySEVCHK( 'pend_event', ret,  dbr.ECA_TIMEOUT)
@@ -576,7 +624,7 @@ def pend_event(timeout=1.e-4):
 def poll(evt=1.e-4, iot=1.0):
     """polls CA for events and i/o. """
     pend_event(evt)
-    return pend_io(iot)    
+    return pend_io(iot)
 
 @withCA
 def test_io():
@@ -602,26 +650,26 @@ def create_channel(pvname, connect=False, callback=None):
     If the channel is already connected for the PV name, the callback
     will be called immediately.
     """
-    # 
-    # Note that _CB_CONNECT (defined below) is a global variable, holding
+    #
+    # Note that _CB_CONNECT (defined above) is a global variable, holding
     # a reference to _onConnectionEvent:  This is really the connection
     # callback that is run -- the callack here is stored in the _cache
     # and called by _onConnectionEvent.
-    pvn = STR2BYTES(pvname)    
+    pvn = STR2BYTES(pvname)
     ctx = current_context()
     global _cache
     if ctx not in _cache:
         _cache[ctx] = {}
     if pvname not in _cache[ctx]: # new PV for this context
-        entry = {'conn':False,  'chid': None, 
-                 'ts': 0,  'failures':0, 
+        entry = {'conn':False,  'chid': None,
+                 'ts': 0,  'failures':0,
                  'callbacks': [ callback ]}
         _cache[ctx][pvname] = entry
     else:
         entry = _cache[ctx][pvname]
         if not entry['conn'] and callback is not None: # pending connection
             _cache[ctx][pvname]['callbacks'].append(callback)
-        elif (hasattr(callback, '__call__') and 
+        elif (hasattr(callback, '__call__') and
               not callback in entry['callbacks']):
             entry['callbacks'].append(callback)
             callback(chid=entry['chid'], conn=entry['conn'])
@@ -653,7 +701,7 @@ def connect_channel(chid, timeout=None, verbose=False):
     'failures' (number of failed connection attempts) from
     the _cache will be used to prevent spending too much time
     waiting for a connection that may never happen.
-    
+
     """
     if verbose:
         write(' connect channel -> %s %s %s ' %
@@ -702,7 +750,7 @@ def read_access(chid):
 
 @withCHID
 def write_access(chid):
-    "write access for channel"    
+    "write access for channel"
     return libca.ca_write_access(chid)
 
 @withCHID
@@ -712,7 +760,7 @@ def field_type(chid):
 
 @withCHID
 def clear_channel(chid):
-    "clear channel"    
+    "clear channel"
     return libca.ca_clear_channel(chid)
 
 @withCHID
@@ -733,9 +781,9 @@ def promote_type(chid, use_time=False, use_ctrl=False):
     "promote native field type to TIME or CTRL variant"
     ftype = field_type(chid)
     if   use_ctrl:
-        ftype += dbr.CTRL_STRING 
+        ftype += dbr.CTRL_STRING
     elif use_time:
-        ftype += dbr.TIME_STRING 
+        ftype += dbr.TIME_STRING
     if ftype == dbr.CTRL_STRING:
         ftype = dbr.TIME_STRING
     return ftype
@@ -778,7 +826,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         elif use_numpy:
             return copy.copy(numpy.ctypeslib.as_array(data))
         return list(data)
-        
+
     def unpack_ctrltime(data, count, ntype, use_numpy):
         "ctrl and time data types"
         if count == 1 or ntype == dbr.STRING:
@@ -796,7 +844,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
                 out = numpy.array(out)
         if use_numpy:
             return copy.copy(numpy.ctypeslib.as_array(out))
-        
+
         return list(out)
 
     unpack = unpack_simple
@@ -826,7 +874,7 @@ def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
                    of the value returned.  This is not nearly as
                    featured as for a PV -- see pv.py for more details.
        as_numpy    flag(True/False) to use numpy array as the
-                   return type for array data.       
+                   return type for array data.
     """
     if ftype is None:
         ftype = field_type(chid)
@@ -836,7 +884,7 @@ def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
         count = element_count(chid)
     else:
         count = min(count, element_count(chid))
-       
+
     data = (count*dbr.Map[ftype])()
 
     ret = libca.ca_array_get(ftype, count, chid, data)
@@ -863,9 +911,9 @@ def _as_string(val, chid, count, ftype):
             val = '<array count=%d, type=%d>' % (count, ftype)
         val = str(val)
     except ValueError:
-        pass            
+        pass
     return val
-                    
+
 @withConnectedCHID
 def put(chid, value, wait=False, timeout=30, callback=None,
         callback_data=None):
@@ -880,13 +928,13 @@ def put(chid, value, wait=False, timeout=30, callback=None,
                  finished processing.
        callback_data  data passed on to user-defined callback
 
-    Specifying a callback does NOT require a blocking put().  
-    
+    Specifying a callback does NOT require a blocking put().
+
     returns 1 on sucess and -1 on timed-out
     """
     ftype = field_type(chid)
     count = element_count(chid)
-    data  = (count*dbr.Map[ftype])()    
+    data  = (count*dbr.Map[ftype])()
 
     if ftype == dbr.STRING:
         if count == 1:
@@ -918,45 +966,47 @@ def put(chid, value, wait=False, timeout=30, callback=None,
                 value = value[:ndata]
             data[:len(value)] = list(value)
         except (ValueError, IndexError):
-            errmsg = "Cannot put array data to PV of type '%s'"            
+            errmsg = "Cannot put array data to PV of type '%s'"
             raise ChannelAccessException('put', errmsg % (repr(value)))
-      
+
     # simple put, without wait or callback
     if not (wait or hasattr(callback, '__call__')):
         ret =  libca.ca_array_put(ftype, count, chid, data)
         PySEVCHK('put', ret)
         poll()
         return ret
-    # wait with wait or callback    # wait with wait or callback
+    # wait with callback (or put_complete)
     pvname = name(chid)
     _put_done[pvname] = (False, callback, callback_data)
+    start_time = time.time()
     ret = libca.ca_array_put_callback(ftype, count, chid,
                                       data, _CB_PUTWAIT, 0)
     PySEVCHK('put', ret)
     poll(evt=1.e-4, iot=0.05)
     if wait:
-        start_time, finished = time.time(), False
+        finished = False
         while not finished:
             poll()
             finished = (_put_done[pvname][0] or
                         (time.time()-start_time) > timeout)
         if not _put_done[pvname][0]:
             ret = -ret
+
     return ret
 
 @withConnectedCHID
 def get_ctrlvars(chid):
-    """return the CTRL fields for a Channel.  Depending on 
+    """return the CTRL fields for a Channel.  Depending on
     the native type, these fields may include
         status  severity precision  units  enum_strs
         upper_disp_limit     lower_disp_limit
         upper_alarm_limit    lower_alarm_limit
         upper_warning_limit  lower_warning_limit
         upper_ctrl_limit    lower_ctrl_limit
-        
+
     note (difference with C lib): enum_strs will be a
     list of strings for the names of ENUM states.
-    
+
     """
     ftype = promote_type(chid, use_ctrl=True)
     dat = (1*dbr.Map[ftype])()
@@ -981,7 +1031,7 @@ def get_ctrlvars(chid):
 
 @withConnectedCHID
 def get_timevars(chid):
-    """return the TIME fields for a Channel.  Depending on 
+    """return the TIME fields for a Channel.  Depending on
     the native type, these fields may include
         status  severity timestamp
     """
@@ -1029,7 +1079,7 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     Important Note:
         KEEP The returned tuple in named variable: if the return argument
         gets garbage collected, a coredump will occur.
-    
+
     """
     ftype = promote_type(chid, use_ctrl=use_ctrl, use_time=use_time)
 
@@ -1039,7 +1089,7 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     ret = libca.ca_create_subscription(ftype, 0, chid, mask,
                                        _CB_EVENT, uarg, ctypes.byref(evid))
     PySEVCHK('create_subscription', ret)
-    
+
     poll()
     return (_CB_EVENT, uarg, evid)
 
@@ -1086,13 +1136,13 @@ def sg_reset(gid):
 def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
     """synchronous-group get of the current value for a Channel.
     same options as get()
-    
+
     Note that the returned tuple from a sg_get() will have to be
     unpacked with the '_unpack' method:
 
     >>> chid = epics.ca.create_channel(PV_Name)
     >>> epics.ca.connect_channel(chid1)
-    >>> sg = epics.ca.sg_create() 
+    >>> sg = epics.ca.sg_create()
     >>> data = epics.ca.sg_get(sg, chid)
     >>> epics.ca.sg_block(sg)
     >>> print epics.ca._unpack(data, chid=chid)
@@ -1113,7 +1163,7 @@ def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
     if as_string:
         val = _as_string(val, chid, count, ftype)
     return val
- 
+
 def sg_put(gid, chid, value):
     "synchronous-group put: cannot wait or get callback!"
     if not isinstance(chid, dbr.chid_t):
@@ -1121,7 +1171,7 @@ def sg_put(gid, chid, value):
 
     ftype = field_type(chid)
     count = element_count(chid)
-    data  = (count*dbr.Map[ftype])()    
+    data  = (count*dbr.Map[ftype])()
 
     if ftype == dbr.STRING:
         if count == 1:
@@ -1154,10 +1204,19 @@ def sg_put(gid, chid, value):
                 value = value[:ndata]
             data[:len(value)] = list(value)
         except:
-            errmsg = "Cannot put array data to PV of type '%s'"            
+            errmsg = "Cannot put array data to PV of type '%s'"
             raise ChannelAccessException('put', errmsg % (repr(value)))
-      
+
     ret =  libca.ca_sg_array_put(gid, ftype, count, chid, data)
     PySEVCHK('sg_put', ret)
     # poll()
     return ret
+
+class CAThread(Thread):
+    """
+    Sub-class of threading.Thread to ensure that the
+    initial CA context is used.
+    """
+    def run(self):
+        use_initial_context()
+        Thread.run(self)

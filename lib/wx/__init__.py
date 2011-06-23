@@ -1,38 +1,35 @@
 """
-This module provides wxPython widgets specially designed to work as Epics Controls.
-All these controls combine a wx widget with one Epics PV, and allow automatic updating
-of the widget  when the associated PV changes.
-
+This module provides wxPython widgets specially designed to work as
+Epics Controls.  In general,  these controls combine a wx widget with
+an Epics PV, and allow automatic updating of the widget when the
+associated PV changes.
 """
-from . import MotorPanel
-from . import wxlib, ogllib
+from . import motorpanel, wxlib, ogllib, utils
 
-MiniMotorPanel= MotorPanel.MiniMotorPanel
-MotorPanel    = MotorPanel.MotorPanel
+MotorPanel    = motorpanel.MotorPanel
 
-pvText        = wxlib.pvText
-pvAlarm       = wxlib.pvAlarm
-pvFloatCtrl   = wxlib.pvFloatCtrl
-pvTextCtrl    = wxlib.pvTextCtrl
-pvEnumButtons = wxlib.pvEnumButtons
-pvEnumChoice  = wxlib.pvEnumChoice
-pvBitmap      = wxlib.pvBitmap
-pvCheckBox    = wxlib.pvCheckBox
-pvFloatSpin   = wxlib.pvFloatSpin
-pvButton      = wxlib.pvButton
-pvRadioButton = wxlib.pvRadioButton
-pvComboBox    = wxlib.pvComboBox
+PVText        = pvText        = wxlib.PVText
+PVAlarm       = pvAlarm       = wxlib.PVAlarm
+PVFloatCtrl   = pvFloatCtrl   = wxlib.PVFloatCtrl
+PVTextCtrl    = pvTextCtrl    = wxlib.PVTextCtrl
+PVEnumButtons = pvEnumButtons = wxlib.PVEnumButtons
+PVEnumChoice  = pvEnumChoice  = wxlib.PVEnumChoice
+PVBitmap      = pvBitmap      = wxlib.PVBitmap
+PVCheckBox    = pvCheckBox    = wxlib.PVCheckBox
+PVFloatSpin   = pvFloatSpin   = wxlib.PVFloatSpin
+PVButton      = pvButton      = wxlib.PVButton
+PVRadioButton = pvRadioButton = wxlib.PVRadioButton
+PVComboBox    = pvComboBox    = wxlib.PVComboBox
 
 # OGL shapes
-pvRectangle   = ogllib.pvRectangle
-pvCircle      = ogllib.pvCircle
+PVRectangle   = pvRectangle   = ogllib.PVRectangle
+PVCircle      = pvCircle      = ogllib.PVCircle
 
+set_sizer = utils.set_sizer
+set_float = utils.set_float
 
-set_sizer = wxlib.set_sizer
-set_float = wxlib.set_float
-
-closure   = wxlib.closure
-FloatCtrl = wxlib.FloatCtrl
+Closure   = utils.Closure
+FloatCtrl = utils.FloatCtrl
 
 DelayedEpicsCallback = wxlib.DelayedEpicsCallback
 EpicsFunction  = wxlib.EpicsFunction

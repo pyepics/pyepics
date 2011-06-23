@@ -1,6 +1,6 @@
 
 ============================================
-Overview of EPICS Channel Access in Python 
+Overview of EPICS Channel Access in Python
 ============================================
 
 The epics python package consists of several modules to interact with EPICS
@@ -15,7 +15,7 @@ The :mod:`epics` package consists of several functions, modules and classes
 that are imported with::
 
      import epics
-    
+
 These components includes
 
     * functions :func:`caget`, :func:`caput`, :func:`camonitor`,
@@ -88,10 +88,10 @@ Object Oriented Approach: PV
 If you want to repeatedly access the same PV, you may find it more
 convenient to ''create a PV object'' and use it in a more object-oriented
 manner.
-  
+
    >>> from epics import PV
    >>> pv1 = PV('XXX:m1.VAL')
-   
+
 PV objects have several methods and attributes.  The most important methods
 are  :meth:`get` and :meth:`put` to receive and send the PV's value, and
 the :attr:`value` attribute which stores the current value.  In analogy to
@@ -150,11 +150,11 @@ quite good.
   :param pvname: name of Epics Process Variable
   :param as_string:  whether to return string representation of the PV value.
   :type as_string:  ``True``/``False``
- 
+
   :param count:  number of elements to return for array data.
   :type count:  integer
 
-   :param as_numpy:  whether to return the Numerical Python representation for array data.  
+   :param as_numpy:  whether to return the Numerical Python representation for array data.
    :type as_numpy:  ``True``/``False``
 
 
@@ -176,10 +176,10 @@ state is returned::
     0.10000000000000001
 
     >>> print caget('XXX:m1.DESC')    # A string PV
-    'Motor 1'                                                                                                        
-    >>> print caget('XXX:m1.FOFF')    # An Enum PV  
+    'Motor 1'
+    >>> print caget('XXX:m1.FOFF')    # An Enum PV
     1
-   
+
 Adding the `as_string=True` argument always results in string being
 returned, with the conversion method depending on the data type::
 
@@ -196,7 +196,7 @@ depending on the size and type of the waveform.  An array of doubles might
 be::
 
     >>> print caget('XXX:scan1.P1PA')  # A Double Waveform
-    array([-0.08      , -0.078     , -0.076     , ...,  
+    array([-0.08      , -0.078     , -0.076     , ...,
         1.99599814, 1.99799919,  2.     ])
 
     >>> print caget('XXX:scan1.P1PA', as_string=True)
@@ -207,24 +207,24 @@ strings when *as_string* is ``True``.  This is to work around the low limit
 of the maximum length (40 characters!) of EPICS strings, and means that it
 is fairly common to use CHAR waveforms when long strings are desired::
 
-    >>> print caget('XXX:dir')      # A CHAR waveform 
-    array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 
-       101, 114,  92,  77,  97, 114,  99, 104,  50,  48,  
-        49,  48,  92,  70,  97, 115, 116,  77,  97, 112,   
+    >>> print caget('XXX:dir')      # A CHAR waveform
+    array([ 84,  58,  92, 120,  97, 115,  95, 117, 115,
+       101, 114,  92,  77,  97, 114,  99, 104,  50,  48,
+        49,  48,  92,  70,  97, 115, 116,  77,  97, 112,
          0,   0, ... 0])
 
     >>> print caget('XXX:dir',as_string=True)
     'T:\\xas_user\\March2010\\FastMap'
 
 Of course, some character waveforms are not used for long strings but to
-hold byte array data. 
+hold byte array data.
 
 :func:`caput`
 ~~~~~~~~~~~~~
 
 ..  function:: caput(pvname, value[, wait=False[, timeout=60]])
 
-  set the value of the named PV.  
+  set the value of the named PV.
 
   :param pvname: name of Epics Process Variable
   :param value:  value to send.
@@ -247,10 +247,10 @@ has been exceeded.
 
     >>> from epics import caget, caput, cainfo
     >>> caput('XXX:m1.VAL',2.30)
-    1  
+    1
     >>> caput('XXX:m1.VAL',-2.30, wait=True)
     ... waits a few seconds ...
-    1  
+    1
 
 :func:`cainfo`
 ~~~~~~~~~~~~~~
@@ -261,7 +261,7 @@ has been exceeded.
   including Control Settings.
 
   :param pvname: name of Epics Process Variable
-  :param print_out:  whether to write results to standard output 
+  :param print_out:  whether to write results to standard output
                  (otherwise the string is returned).
   :type print_out: True or False
 
@@ -405,7 +405,7 @@ Status and To-Do List
 
 The Epics3 package is under active development.   The current status is that
 most features are working well, and it is starting to be used in production
-code, but more testing and better tests are needed.  
+code, but more testing and better tests are needed.
 
 The package is targeted and tested to work with Python 2.5, 2.6, 2.7, and
 3.1 simultaneously (that is, the same code is meant to support all
@@ -413,19 +413,16 @@ versions).  Currently, the package works with Python 3.1, but is not
 extremely well-tested.
 
 There are several desired features are left undone or unfinished:
- 
+
  *  port CaChannel interface, ca_util, epicsPV (and other interfaces??) to use epics.ca
 
  *  add more "devices", including low-level epics records.
 
  *  further testing for Python 3.1
 
- *  further testing for threading and 'contexts'.
-
- *  include dedicate epics db records to facilitate better automated testing.
+ *  further testing for threading and contexts.
 
  *  build and distribute example Epics applications, such as:
-
      - PV stripcharter
      - Probe replacement
      - application to manage saved "positions" of multiple PVs in an
