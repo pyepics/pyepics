@@ -285,12 +285,21 @@ class PV(object):
 
     def get_ctrlvars(self):
         "get control values for variable"
+        return self._get_vars(ca.get_ctrlvars)
+
+    def get_timevars(self):
+        "get time values for variable"
+        return self._get_vars(ca.get_timevars)
+
+    def _get_vars(self, var_fn):
+        "internal, common functionality for retreiving control/times values"
         if not self.wait_for_connection():
             return None
-        kwds = ca.get_ctrlvars(self.chid)
+        kwds = var_fn(self.chid)
         ca.poll()
         self._args.update(kwds)
         return kwds
+
 
     def __on_changes(self, value=None, **kwd):
         """internal callback function: do not overwrite!!

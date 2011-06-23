@@ -367,9 +367,9 @@ class PVCtrlMixin(PVMixin):
         "called by PV callback"
         if self.pv is None:
             return
-        if len(self._fg_colour_alarms) > 0 or len(self._bg_colour_alarms) > 0:
-            # load severity if we care about it
-            # NB: this may be a performance problem
+        if self.pv.form == "native" \
+                and ( len(self._fg_colour_alarms) > 0 or len(self._bg_colour_alarms) > 0 ):            
+            # native PVs don't update severity on callback, so we need to do the same manually
             self.pv.get_ctrlvars()
 
         colour = None
