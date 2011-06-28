@@ -210,13 +210,19 @@ the PV value.</p>
 <dt>
 <tt class="descname">minor_alarm=&quot;DARKRED&quot;, major_alarm=&quot;RED&quot;,</tt></dt>
 <dt>
-<tt class="descname">invalid_alarm=&quot;ORANGERED&quot;, **kw)</tt></dt>
+<tt class="descname">invalid_alarm=&quot;ORANGERED&quot;, auto_units=False, units=&quot;&quot;, **kw)</tt></dt>
 <dd><p>derived from wx.StaticText and PVCtrlMixin, this is a StaticText widget
 whose value is set to the string representation of the value for the
 corresponding PV.</p>
 <p>By default, the text colour will be overriden when the PV enters an
 alarm state. These colours can be modified (or disabled by being set
 to None) as part of the constructor.</p>
+<p>&quot;units&quot; specifies a unit suffix (like ' A' or ' mm') to put after the text
+value whenever it is displayed.</p>
+<p>Alternatively, &quot;auto_units&quot; means the control will automatically display
+the &quot;EGU&quot; units value from the PV, whenever it updates. If this value is
+set, &quot;units&quot; is ignored. A space is inserted between the value and the
+unit.</p>
 </dd></dl>
 
 </div>

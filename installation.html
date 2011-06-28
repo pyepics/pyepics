@@ -55,6 +55,7 @@
 <li><a class="reference internal" href="#testing">Testing</a></li>
 <li><a class="reference internal" href="#development-version">Development Version</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#getting-started-setting-up-the-epics-environment">Getting Started, Setting up the Epics Environment</a></li>
 <li><a class="reference internal" href="#acknowledgments">Acknowledgments</a></li>
 <li><a class="reference internal" href="#epics-open-license">Epics Open License</a></li>
 </ul>
@@ -246,6 +247,48 @@ DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.</p>
 install the PyEpics Package with:</p>
 <div class="highlight-python"><pre>easy_install -U pyepics</pre>
 </div>
+</div>
+<div class="section" id="getting-started-setting-up-the-epics-environment">
+<h2>Getting Started, Setting up the Epics Environment<a class="headerlink" href="#getting-started-setting-up-the-epics-environment" title="Permalink to this headline">¶</a></h2>
+<p>In order for Epics Channel Access to work correctly, you must be able to</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Find the CA library: <em>libca.so</em> on Unix, <em>libca.dylib</em> on Mac OS X,  or <em>ca.dll</em> on Windows.</li>
+<li>Connect to Epics Process Variables served by Epics IOCs on you network.</li>
+</ol>
+</div></blockquote>
+<p>In order for PyEpics to work at all, it must be able to find and load the
+Channel Access dynamic library (<em>libca.so</em>, <em>libca.dylib</em>, or <em>ca.dll</em>
+depending on the system).  This dynamic library needs to found at runtime.</p>
+<p>There are a few ways to specify how to find this library:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">set the environmental variable <tt class="docutils literal"><span class="pre">PYEPICS_LIBCA</span></tt> to the full path of the dynamic library, for example:</p>
+<div class="highlight-python"><pre>&gt; export PYEPICS_LIBCA=/usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so</pre>
+</div>
+</li>
+<li><p class="first">set the environmental variables <tt class="docutils literal"><span class="pre">EPICS_BASE</span></tt> and  <tt class="docutils literal"><span class="pre">EPICS_HOST_ARCH</span></tt> to point to where the library was built.   For example:</p>
+<div class="highlight-python"><pre>&gt; export EPICS_BASE=/usr/local/epics/base-3.14.12.1
+&gt; export EPICS_HOST_ARCH=linux-x86</pre>
+</div>
+</li>
+</ol>
+<p>will find the library at /usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so.</p>
+<ol class="arabic simple" start="3">
+<li>Place the dynamic library somewhere in the Python path.  A convenient
+place might be the same <tt class="docutils literal"><span class="pre">site-packages/pyepics</span> <span class="pre">library</span></tt> folder as the python package is installed.</li>
+</ol>
+</div></blockquote>
+<p>Note, that For Windows users, the DLLs (ca.dll and Com.dll) are included in the
+installation kit, and automaically installed to where they can be found at
+runtime (following rule 3 above).</p>
+<p>With the Epics library loaded, it will be necessary to connect to Epics
+Process Variables. Generally, these variables are provided by Epics I/O
+controllers (IOCs) that are processes running on some device on the
+network.   If you're connecting to PVs provided by IOCs on your local
+subnet, you should have no trouble.  If trying to reach further network,
+you may need to set the environmental variable <tt class="docutils literal"><span class="pre">EPICS_CA_ADDR_LIST</span></tt> to
+specify which networks to search for PVs.</p>
 </div>
 <div class="section" id="acknowledgments">
 <h2>Acknowledgments<a class="headerlink" href="#acknowledgments" title="Permalink to this headline">¶</a></h2>
