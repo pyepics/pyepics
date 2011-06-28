@@ -145,31 +145,40 @@ def find_libca():
     """
     find location of ca dynamic library
     """
-    search_path = [os.path.split( os.path.abspath(__file__))[0]]
-    search_path.extend(sys.path)
+    # Test 1: if PYEPICS_LIBCA env var is set, use it.
+    dllpath = os.environ.get('PYEPICS_LIBCA', None)
+    if (dllpath is not None and os.path.exists(dllpath) and
+        os.path.isfile(dllpath)):
+        return dllpath
+
+    # Test 2: look through Python path and PATH env var for dll
     path_sep = ':'
+    dylib   = 'lib'
     # For windows, we assume the DLLs are installed with the library
     if os.name == 'nt':
         path_sep = ';'
-        search_path.append(os.path.join(sys.prefix, 'DLLs'))
+        dylib = 'DLLs'
 
+    search_path = [os.path.split( os.path.abspath(__file__))[0]]
+    search_path.extend(sys.path)
+    search_path.append(os.path.join(sys.prefix, dylib))
     search_path.extend(os.environ['PATH'].split(path_sep))
 
     os.environ['PATH'] = path_sep.join(search_path)
 
-    # first, try the ctypes utility, which *should* work
-    # with LD_LIBRARY_PATH or ldconfig
+    # with PATH set above, the ctypes utility, find_library *should*
+    # find the dll....
     dllpath  = ctypes.util.find_library('ca')
     if dllpath is not None:
         return dllpath
 
-    ## OK, simplest version didn't work, look explicity through path
-    known_hosts = {'Linux':   ('linux-x86', 'linux-x86_64') ,
-                   'Darwin':  ('darwin-ppc', 'darwin-x86'),
-                   'SunOS':   ('solaris-sparc', 'solaris-sparc-gnu') }
-
-
+    # Test 3: on unixes, look expliticly with EPICS_BASE env var and 
+    # known architectures for ca.so 
     if os.name == 'posix':
+        known_hosts = {'Linux':   ('linux-x86', 'linux-x86_64') ,
+                       'Darwin':  ('darwin-ppc', 'darwin-x86'),
+                       'SunOS':   ('solaris-sparc', 'solaris-sparc-gnu') }
+
         libname = 'libca.so'
         ldpath = os.environ.get('LD_LIBRARY_PATH', '').split(':')
 

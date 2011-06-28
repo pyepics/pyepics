@@ -129,6 +129,50 @@ install the PyEpics Package with::
    easy_install -U pyepics
 
 
+
+Getting Started, Setting up the Epics Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order for Epics Channel Access to work correctly, you must be able to
+
+   1. Find the CA library: *libca.so* on Unix, *libca.dylib* on Mac OS X,  or *ca.dll* on Windows.
+   2. Connect to Epics Process Variables served by Epics IOCs on you network.
+
+
+In order for PyEpics to work at all, it must be able to find and load the
+Channel Access dynamic library (*libca.so*, *libca.dylib*, or *ca.dll*
+depending on the system).  This dynamic library needs to found at runtime.
+
+There are a few ways to specify how to find this library:
+
+ 1. set the environmental variable ``PYEPICS_LIBCA`` to the full path of the dynamic library, for example:: 
+
+     > export PYEPICS_LIBCA=/usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so
+
+ 2. set the environmental variables ``EPICS_BASE`` and  ``EPICS_HOST_ARCH`` to point to where the library was built.   For example::
+
+     > export EPICS_BASE=/usr/local/epics/base-3.14.12.1
+     > export EPICS_HOST_ARCH=linux-x86
+   
+ will find the library at /usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so.
+ 
+ 3. Place the dynamic library somewhere in the Python path.  A convenient
+    place might be the same ``site-packages/pyepics library`` folder as the python package is installed.
+
+Note, that For Windows users, the DLLs (ca.dll and Com.dll) are included in the
+installation kit, and automaically installed to where they can be found at
+runtime (following rule 3 above).
+
+
+With the Epics library loaded, it will be necessary to connect to Epics
+Process Variables. Generally, these variables are provided by Epics I/O
+controllers (IOCs) that are processes running on some device on the
+network.   If you're connecting to PVs provided by IOCs on your local
+subnet, you should have no trouble.  If trying to reach further network, 
+you may need to set the environmental variable ``EPICS_CA_ADDR_LIST`` to
+specify which networks to search for PVs.
+
+
 Acknowledgments
 ~~~~~~~~~~~~~~~~~~~~~~
 
