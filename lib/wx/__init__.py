@@ -35,3 +35,4 @@ DelayedEpicsCallback = wxlib.DelayedEpicsCallback
 EpicsFunction  = wxlib.EpicsFunction
 finalize_epics  = wxlib.finalize_epics
 EpicsTimer      = wxlib.EpicsTimer
+

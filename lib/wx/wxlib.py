@@ -830,6 +830,9 @@ class PVButton(wx.Button, PVCtrlMixin):
         PVCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.pushValue = pushValue
         self.Bind(wx.EVT_BUTTON, self.OnPress)
+        if isinstance(disablePV, (str, unicode)):
+            disablePV = epics.PV(pv)
+            disablePV.connect()            
         self.disablePV = disablePV
         self.disableValue = disableValue            
         if disablePV is not None:
