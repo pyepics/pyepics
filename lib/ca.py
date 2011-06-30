@@ -159,10 +159,17 @@ def find_libca():
         path_sep = ';'
         dylib = 'DLLs'
 
-    search_path = [os.path.split( os.path.abspath(__file__))[0]]
-    search_path.extend(sys.path)
-    search_path.append(os.path.join(sys.prefix, dylib))
-    search_path.extend(os.environ['PATH'].split(path_sep))
+    _path = [os.path.split(os.path.abspath(__file__))[0],
+             os.path.split(os.path.dirname(os.__file__))[0],
+             os.path.join(sys.prefix, dylib)]
+
+    search_path = []
+    for adir in (_path + sys.path +
+                 os.environ.get('PATH','').split(path_sep) +
+                 os.environ.get('LD_LIBRARY_PATH','').split(path_sep) +
+                 os.environ.get('DYLD_LIBRARY_PATH','').split(path_sep)):
+        if adir not in search_path and os.path.isdir(adir):
+            search_path.append(adir)
 
     os.environ['PATH'] = path_sep.join(search_path)
 
@@ -173,17 +180,14 @@ def find_libca():
         return dllpath
 
     # Test 3: on unixes, look expliticly with EPICS_BASE env var and 
-    # known architectures for ca.so 
+    # known architectures for ca.so q
     if os.name == 'posix':
         known_hosts = {'Linux':   ('linux-x86', 'linux-x86_64') ,
                        'Darwin':  ('darwin-ppc', 'darwin-x86'),
                        'SunOS':   ('solaris-sparc', 'solaris-sparc-gnu') }
 
         libname = 'libca.so'
-        ldpath = os.environ.get('LD_LIBRARY_PATH', '').split(':')
-
         if sys.platform == 'darwin':
-            ldpath = os.environ.get('DYLD_LIBRARY_PATH', '').split(':')
             libname = 'libca.dylib'
 
         epics_base = os.environ.get('EPICS_BASE', '.')
@@ -192,7 +196,7 @@ def find_libca():
             epicspath = []
             for adir in known_hosts[host_arch]:
                 epicspath.append(os.path.join(epics_base, 'lib', adir))
-        for adir in search_path + ldpath + epicspath + sys.path:
+        for adir in search_path + epicspath:
             if os.path.exists(adir) and os.path.isdir(adir):
                 if libname in os.listdir(adir):
                     return os.path.join(adir, libname)
