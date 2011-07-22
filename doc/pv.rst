@@ -261,7 +261,18 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
 .. attribute:: count
 
-   number of data elements in a PV.  1 except for waveform PVs
+   number of data elements in a PV.  1 except for waveform PVs, where it
+   gives the number of elements in the waveform. For recent versions of
+   Epics Base (3.14.11 and later?), this gives the `.NORD` field, which
+   gives the number of elements last put into the PV and which may be less
+   than the maximum number allowed (see `nelm` below).
+
+.. attribute:: nelm
+
+   number of data elements in a PV.  1 except for waveform PVs where it
+   gives the maximum number of elements in the waveform. For recent
+   versions of Epics Base (3.14.11 and later?), this gives the `.NELM`
+   parameter.  See also the `count` attribute above.
 
 .. attribute:: read_access
 
