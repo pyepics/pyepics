@@ -947,6 +947,9 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     """
     ftype = field_type(chid)
     count = element_count(chid)
+    if count > 1:
+        count = min(len(value), count)
+
     data  = (count*dbr.Map[ftype])()
 
     if ftype == dbr.STRING:
