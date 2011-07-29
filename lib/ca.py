@@ -23,6 +23,12 @@ import atexit
 import warnings
 from threading import Thread
 
+# create_subscription mask constants
+DBE_VALUE = 1
+DBE_LOG = 2
+DBE_ALARM = 4
+DBE_PROPERTY = 8
+
 # ignore warning about item size... for now??
 warnings.filterwarnings('ignore',
                         'Item size computed from the PEP 3118*',
@@ -1088,7 +1094,7 @@ def get_enum_strings(chid):
 
 @withConnectedCHID
 def create_subscription(chid, use_time=False, use_ctrl=False,
-                        mask=7, callback=None):
+                        mask=DBE_VALUE|DBE_LOG|DBE_ALARM, callback=None):
     """
     setup a callback function to be called when a PVs value or state changes.
 
