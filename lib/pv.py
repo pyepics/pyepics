@@ -41,7 +41,8 @@ class PV(object):
       >>> p.type           # EPICS data type: 'string','double','enum','long',..
 """
 
-    _fmt = "<PV '%(pvname)s', count=%(count)i, type=%(typefull)s, access=%(access)s>"
+    _fmtsca = "<PV '%(pvname)s', count=%(count)i, type=%(typefull)s, access=%(access)s>"
+    _fmtarr = "<PV '%(pvname)s', count=%(count)i/%(nelm)i, type=%(typefull)s, access=%(access)s>"    
     _fields = ('pvname',  'value',  'char_value',  'status',  'ftype',  'chid',
                'host', 'count', 'access', 'write_access', 'read_access',
                'severity', 'timestamp', 'precision', 'units', 'enum_strs',
@@ -64,6 +65,7 @@ class PV(object):
         self._args      = {}.fromkeys(self._fields)
         self._args['pvname'] = self.pvname
         self._args['count'] = -1
+        self._args['nelm']  = -1        
         self._args['type'] = 'unknown'
         self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
@@ -109,6 +111,7 @@ class PV(object):
                 time.sleep(0.025)
                 count = ca.element_count(self.chid)
             self._args['count']  = count
+            self._args['nelm']  = count
             self._args['host']   = ca.host_name(self.chid)
             self._args['access'] = ca.access(self.chid)
             self._args['read_access'] = (1 == ca.read_access(self.chid))
@@ -401,8 +404,9 @@ class PV(object):
             elems = range(min(5, self.count))
             aval = [fmt % self._args['value'][i] for i in elems]
             out.append("   value      = array  [%s%s]" % (",".join(aval), ext))
-        for nam in ('char_value', 'count', 'type', 'units', 'precision',
-                    'host', 'access', 'status', 'severity', 'timestamp',
+        for nam in ('char_value', 'count', 'nelm', 'type', 'units',
+                    'precision', 'host', 'access',
+                    'status', 'severity', 'timestamp',
                     'upper_ctrl_limit', 'lower_ctrl_limit',
                     'upper_disp_limit', 'lower_disp_limit',
                     'upper_alarm_limit', 'lower_alarm_limit',
@@ -462,7 +466,7 @@ class PV(object):
     def status(self):
         "pv status"
         return self._getarg('status')
-
+    
     @property
     def type(self):
         "pv type"
@@ -480,8 +484,17 @@ class PV(object):
 
     @property
     def count(self):
-        "count (number of elements)"
+        """count (number of elements). For array data and later EPICS versions,
+        this is equivalent to the .NORD field.  See also 'nelm' property"""
         return self._getarg('count')
+
+    @property
+    def nelm(self):
+        """native count (number of elements). For array data this will return the
+        full array size (ie, the .NELM field).  See also 'count' property"""
+        if self._getarg('count') == 1:
+            return 1
+        return ca.element_count(self.chid)
 
     @property
     def read_access(self):
@@ -580,7 +593,10 @@ class PV(object):
         "string representation"
 
         if self.connected:
-            return self._fmt % self._args
+            if self.count == 1:
+                return self._fmtsca % self._args
+            else:
+                return self._fmtarr % self._args
         else:
             return "<PV '%s': not connected>" % self.pvname
 
