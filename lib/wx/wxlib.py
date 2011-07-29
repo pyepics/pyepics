@@ -756,7 +756,7 @@ class PVFloatSpin(floatspin.FloatSpin, PVCtrlMixin):
     both reads and writes the PV on changes.
         
     """
-    def __init__(self, parent, pv=None, deadTime=500,
+    def __init__(self, parent, pv=None, deadTime=800,
                  min_val=None, max_val=None, increment=1.0, digits=-1, **kw):
         """
         Most arguments are common with FloatSpin.
@@ -775,7 +775,7 @@ class PVFloatSpin(floatspin.FloatSpin, PVCtrlMixin):
         
         self.deadTimer = wx.Timer(self)
         self.deadTime = deadTime
-        self.deadTimer.Bind(wx.EVT_TIMER, self.OnTimeout)
+        wx.EVT_TIMER(self, self.deadTimer.GetId(), self.OnTimeout)
         
     @EpicsFunction
     def _SetValue(self, value):
