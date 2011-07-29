@@ -780,7 +780,7 @@ class PVFloatSpin(floatspin.FloatSpin, PVCtrlMixin):
     @EpicsFunction
     def _SetValue(self, value):
         "set value"
-        self.SetValue(float(self.pv.get()))
+        floatspin.FloatSpin.SetValue(self, float(self.pv.get()))
 
     @EpicsFunction
     def OnSpin(self, event=None):
@@ -791,11 +791,9 @@ class PVFloatSpin(floatspin.FloatSpin, PVCtrlMixin):
                 # both zero -> not set
                 if value > self.pv.upper_ctrl_limit:
                     value = self.pv.upper_ctrl_limit
-                    self.SetValue(value)
                 if value < self.pv.lower_ctrl_limit:
                     value = self.pv.lower_ctrl_limit
-                    self.SetValue(value)            
-            self.pv.put(value)
+                self.SetValue(value)
 
     def OnTimeout(self, event):
         "timer event handler"
@@ -810,6 +808,11 @@ class PVFloatSpin(floatspin.FloatSpin, PVCtrlMixin):
         floatspin.FloatSpin.OnChar(self, event)
         # Timer will restart if it's already running
         self.deadTimer.Start(milliseconds=self.deadTime, oneShot=True)
+
+    def SetValue(self, value):
+        floatspin.FloatSpin.SetValue(self, value)
+        if hasattr(self, "pv"): # can be called before PV is assigned
+            self.pv.put(value)
 
        
 class PVButton(wx.Button, PVCtrlMixin):
