@@ -1094,7 +1094,7 @@ def get_enum_strings(chid):
 
 @withConnectedCHID
 def create_subscription(chid, use_time=False, use_ctrl=False,
-                        mask=DBE_VALUE|DBE_LOG|DBE_ALARM, callback=None):
+                        mask=DBE_VALUE|DBE_ALARM, callback=None):
     """
     setup a callback function to be called when a PVs value or state changes.
 
