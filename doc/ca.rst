@@ -393,7 +393,7 @@ to best deal with very large arrays.
 
    For more on this *put callback*, see :ref:`ca-callbacks-label` below.
 
-.. method::   create_subscription(chid, [use_time=False, [use_ctrl=False, [mask=7, [userfcn=None]]]])
+.. method::   create_subscription(chid, [use_time=False, [use_ctrl=False, [mask=None, [userfcn=None]]]])
 
    create a *subscription to changes*, The user-supplied callback function
    will be called on any changes to the PV.
@@ -402,7 +402,7 @@ to best deal with very large arrays.
    :type use_time:  ``True``/``False``
    :param use_ctrl: whether to use the CTRL variant for the PV type
    :type use_ctrl:  ``True``/``False``
-   :param  mask:    integer bitmask to control which changes result in a  callback
+   :param  mask:    bitmask (of dbr.DBE_ALARM, dbr.DBE_LOG, dbr.DBE_VALUE) to control which changes result in a callback. Defaults to :data:`DEFAULT_SUBSCRIPTION_MASK`.
    :type mask:      integer
    :param userfcn:  user-supplied callback function
    :type userfcn:   ``None`` or callable
@@ -431,6 +431,20 @@ to best deal with very large arrays.
        Abort (core dumped)
 
    is a hint that you have *not* kept this data.
+
+
+.. data:: DEFAULT_SUBSCRIPTION_MASK
+
+	This value is the default subscription type used when calling
+	:meth:`create_subscription` with mask=None. It is also used by default when creating a
+	:class:`PV` object with auto_monitor is set to True.
+
+	The initial default value is *dbr.DBE_ALARM|dbr.DBE_VALUE* (ie update
+	on alarm changes or value changes which exceeds the monitor deadband.) The other possible flag
+	in the bitmask is *dbr.DBE_LOG* for archive-deadband changes.
+
+	If this value is changed, it will change the default for all subsequent calls to
+	:meth:`create_subscription`, but it will not change any existing subscriptions.
 
 
 .. method:: clear_subscription(event_id)

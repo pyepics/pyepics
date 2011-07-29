@@ -60,6 +60,13 @@ MAX_ENUMS            = 16
 
 EPICS2UNIX_EPOCH = 631173600.0 - time.timezone
 
+# create_subscription mask constants
+DBE_VALUE = 1
+DBE_LOG = 2
+DBE_ALARM = 4
+DBE_PROPERTY = 8
+
+
 chid_t   = ctypes.c_long
 
 short_t  = ctypes.c_short
