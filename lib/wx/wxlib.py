@@ -127,7 +127,7 @@ class PVMixin(object):
 
 
     @DelayedEpicsCallback
-    def OnEpicsConnect(self, pvname=None, conn=None, **kws):
+    def OnEpicsConnect(self, pvname=None, conn=None, pv=None):
         """Connect Callback:
              Enable/Disable widget on change in connection status
         """
@@ -234,11 +234,11 @@ class PVCtrlMixin(PVMixin):
         self._connect_fgcol = self.GetForegroundColour()
 
     @DelayedEpicsCallback
-    def OnEpicsConnect(self, pvname=None, conn=None, **kws):
+    def OnEpicsConnect(self, pvname=None, conn=None, pv=None):
         """Connect Callback:
              Enable/Disable widget on change in connection status
         """
-        PVMixin.OnEpicsConnect(self, pvname, conn, kws)
+        PVMixin.OnEpicsConnect(self, pvname, conn, pv)
         action = getattr(self, 'Enable', None)
         bgcol = self._connect_bgcol
         fgcol = self._connect_fgcol        
