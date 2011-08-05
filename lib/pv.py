@@ -127,10 +127,15 @@ class PV(object):
             if self.auto_monitor is None:
                 self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
             if self._monref is None and self.auto_monitor:
+                # you can explicitly request a subscription mask (ie dbr.DBE_ALARM|dbr.DBE_LOG) by
+                # passing it as the auto_monitor arg, otherwise if you specify 'True' you'll just
+                # get the default set in ca.DEFAULT_SUBSCRIPTION_MASK
+                mask = self.auto_monitor if type(self.auto_monitor) is int else None
                 self._monref = ca.create_subscription(self.chid,
                                          use_ctrl=(self.form == 'ctrl'),
                                          use_time=(self.form == 'time'),
-                                         callback=self.__on_changes)
+                                         callback=self.__on_changes,
+                                         mask=mask)
 
         for conn_cb in self.connection_callbacks:
             if hasattr(conn_cb, '__call__'):

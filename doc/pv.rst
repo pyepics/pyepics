@@ -27,7 +27,7 @@ The :class:`PV` class
    :param form:  which epics *data type* to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.
    :type form: string, one of ('native','ctrl', or 'time')
    :param auto_monitor:  whether to automatically monitor the PV for changes.
-   :type auto_monitor: ``None``, ``True``, or ``False``
+   :type auto_monitor: ``None``, ``True``, ``False``, or bitmask (see :ref:`pv-automonitor-label`)
    :param connection_callback: user-defined function called on changes to PV connection status.
    :type connection_callback:  callable or None
    :param connection_timeout:  time (in seconds) to wait for connection before giving up
@@ -410,19 +410,48 @@ PV will see all changes (and run callbacks) without any additional
 interaction from the user. The PV's value will always be up-to-date and no
 unnecessary network traffic is needed.
 
+Possible values:
+
+False
+~~~~~
+
 For some PVs, especially those that change much more rapidly than you care
 about or those that contain large arrays as values, auto_monitoring can add
 network traffic that you don't need.  For these, you may wish to create
-*your PVs with *auto_monitor=False*.  When you do this, you will need to
+your PVs with *auto_monitor=False*.  When you do this, you will need to
 make calls to :meth:`get` to explicitly get the latest value.
 
-The default value for *auto_monitor* is ``None``, and is set to ``True`` if
-the element count for the PV is smaller than 16384 (The value is set as
-:data:`ca.AUTOMONITOR_MAXLENGTH`).  To suppress monitoring of PVs with
-fewer array values, you will have to explicitly turn *auto_monitor* to
-``False``. For waveform arrays larger than 16384 items, automatic
-monitoring will be ``False`` unless you explicitly set it to ``True``.  See
+None
+~~~~
+
+The default value for *auto_monitor* is ``None``, and is set to
+``True`` if the element count for the PV is smaller than 16384 (The
+value is set as :data:`ca.AUTOMONITOR_MAXLENGTH`).  To suppress
+monitoring of PVs with fewer array values, you will have to explicitly
+turn *auto_monitor* to ``False``. For waveform arrays larger than
+16384 items, automatic monitoring will be ``False`` unless you
+explicitly set it to ``True`` or an explicit mask.  See
 :ref:`advanced-large-arrays-label` for more details.
+
+True
+~~~~
+
+When *auto_monitor* is set to True, the value will be monitored using
+the default subscription mask set at :data:`ca.DEFAULT_SUBSCRIPTION_MASK`.
+
+This mask determines which kinds of changes cause the PV to update. By
+default, the subscription updates when the PV value changes by more
+than the monitor deadband, or when the PV alarm status changes. This
+behaviour is the same as the default in EPICS' *camonitor* tool.
+
+Mask
+~~~~
+
+It is also possible to request an explicit type of CA subscription by
+setting *auto_monitor* to a numeric subscription mask made up of
+dbr.DBE_ALARM, dbr.DBE_LOG and/or dbr.DBE_VALUE. This mask will be
+passed directly to :meth:`ca.create_subscription`
+
 
 ..  _pv-callbacks-label:
 

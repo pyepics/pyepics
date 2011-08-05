@@ -998,3 +998,23 @@ class PVStatusBar(wx.StatusBar, PVMixin):
         "called by PV callback"
         self.SetStatusText(str_value)
 
+
+class PVCollapsiblePane(wx.CollapsiblePane, PVCtrlMixin):
+    """A collapsible pane where the display on the collapsed line is set
+    from a PV value
+    """
+
+    def __init__(self, parent, pv=None, minor_alarm="DARKRED", major_alarm="RED", invalid_alarm="ORANGERED", **kw):
+        wx.CollapsiblePane.__init__(self, parent, **kw)
+        PVCtrlMixin.__init__(self, pv=pv, font=None, fg=None, bg=None)
+        self._fg_colour_alarms = {
+            epics.MINOR_ALARM : minor_alarm,
+            epics.MAJOR_ALARM : major_alarm,
+            epics.INVALID_ALARM : invalid_alarm }
+        if self.pv:
+            _SetValue(self.pv.value)
+
+    def _SetValue(self, value):
+        if value:
+            self.SetLabel(value)
+

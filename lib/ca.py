@@ -1092,17 +1092,27 @@ def get_enum_strings(chid):
         return get_ctrlvars(chid).get('enum_strs', None)
     return None
 
+##
+# Default mask for subscriptions (means update on value changes exceeding MDEL, and on
+# alarm level changes.) Other option is dbr.DBE_LOG for archive changes (ie exceeding ADEL)
+DEFAULT_SUBSCRIPTION_MASK = dbr.DBE_VALUE|dbr.DBE_ALARM
+
+
 @withConnectedCHID
 def create_subscription(chid, use_time=False, use_ctrl=False,
-                        mask=DBE_VALUE|DBE_ALARM, callback=None):
+                        mask=None, callback=None):
     """
     setup a callback function to be called when a PVs value or state changes.
+
+    mask is some combination of dbr.DBE_VALUE, dbr.DBE_ALARM, or default as set above.
 
     Important Note:
         KEEP The returned tuple in named variable: if the return argument
         gets garbage collected, a coredump will occur.
 
     """
+    mask = mask or DEFAULT_SUBSCRIPTION_MASK
+
     ftype = promote_type(chid, use_ctrl=use_ctrl, use_time=use_time)
 
     uarg  = ctypes.py_object(callback)
