@@ -244,6 +244,28 @@ PVAlarm
     This will create a pop-up message (wx.MessageDialog) that is shown when
     the corresponding PV trips the alarm level.
 
+PVCollapsiblePane
+~~~~~~~~~~~~~~~~~
+
+.. class:: PVCollapsiblePane(parent,  pv=None, minor_alarm="DARKRED", major_alarm="RED", invalid_alarm="ORANGERED", **kw)
+
+	This is equivalent to wx.CollapsiblePane, except the label shown
+	on the pane's "expansion button" comes from a PV.
+
+	The additional keyword arguments can be any of the other constructor arguments
+	supported by wx.CollapsiblePane.
+
+	By default, the foreground colour of the pane button will be
+  	overriden when the PV enters an alarm state. On GTK, this means
+  	the colour of the triangular drop-down button but not the label
+	text. These colours can be modified (or disabled by being set to
+	None) as part of the constructor.
+
+	Supports the .SetTranslation() method, whose argument is a dictionary
+	mapping PV values to display labels. If the PV value is not found
+	in the dictionary, it will displayed verbatim as the label.
+
+
 Decorators and other Utility Functions
 ==========================================
 
