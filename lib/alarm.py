@@ -102,13 +102,15 @@ class Alarm(object):
         self.alert_delay = alert_delay
         self.user_callback = callback
 
-        if isinstance(comparison, (str, unicode)):
-            self.comp_name  = comparison
-            
-            self.cmp   = self.ops.get(comparison.replace('_', ''), None)
-        elif hasattr(comparison, '__call__'):
+        self.cmp = None
+        self.comp_name = 'Not Defined'
+        if hasattr(comparison, '__call__'):
             self.comp_name  = comparison.__name__
             self.cmp = comparison            
+        elif comparison is not None:
+            self.cmp   = self.ops.get(comparison.replace('_', ''), None)
+            if self.cmp is not None:
+                self.comp_name  = comparison
             
         self.alarm_state = False
         self.pv.add_callback(self.check_alarm)
