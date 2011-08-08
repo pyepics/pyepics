@@ -21,7 +21,7 @@ def create_pvs_test(pvnames, runtime, run_name, create_ctx=False, init_ctx=True)
     write(' -> create_pvs thread=%s will run for %.3f sec\n' % (run_name, runtime))
     write(' -> thread=%s: create_ctx=%s, init_ctx=%s\n' % (run_name, create_ctx, init_ctx))
 
-    ###print 'Thread: current context= ', run_name, epics.ca.current_context(), epics.ca.initial_context
+    ###write('Thread: current context= ', run_name, epics.ca.current_context(), epics.ca.initial_context)
     def onChanges(pvname=None, value=None, char_value=None, **kw):
         write('   %s= %s (%s)\n' % (pvname, char_value, run_name))
         flush()
@@ -52,7 +52,7 @@ def pass_pvs_test(pvs, runtime, run_name, create_ctx=False, init_ctx=False):
     write(' -> pass_pvs thread=%s will run for %.3f sec\n' % (run_name, runtime))
     write(' -> thread=%s: create_ctx=%s, init_ctx=%s\n' % (run_name, create_ctx, init_ctx))
 
-    # print 'Thread: current context= ', epics.ca.current_context()
+    # print( 'Thread: current context= ', epics.ca.current_context())
     def onChanges(pvname=None, value=None, char_value=None, **kw):
         write('   %s= %s (%s)\n' % (pvname, char_value, run_name))
         flush()

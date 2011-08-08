@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import sys
 import time
 
@@ -11,7 +13,7 @@ for a in ('VAL','RBV','DVAL', 'RVAL','LLM','HLM','DIR','OFF',
     for m in motor_list:
         pvnames.append("%s.%s" %(m,a))
 
-print pvnames
+print( pvnames)
 
 def testconnect(pvnames,connect=True):
     t0 = time.time()
@@ -63,4 +65,4 @@ epics.ca._cache = {}
 
 testconnect(pvnames, True)
 
-print 'Done'
+print( 'Done')
