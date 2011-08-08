@@ -244,6 +244,4 @@ if __name__ == '__main__':
 #                              callback=onConnect)
 #     
 #     time.sleep(0.1)
-#     print chid, ca.name(chid)
-#     print CONN_DAT
-# ;    
+

@@ -410,48 +410,48 @@ PV will see all changes (and run callbacks) without any additional
 interaction from the user. The PV's value will always be up-to-date and no
 unnecessary network traffic is needed.
 
-Possible values:
+Possible values for :attr:`auto_monitor` are:
 
-False
-~~~~~
+``False``
+   For some PVs, especially those that change much more rapidly than you care
+   about or those that contain large arrays as values, auto_monitoring can add
+   network traffic that you don't need.  For these, you may wish to create
+   your PVs with *auto_monitor=False*.  When you do this, you will need to
+   make calls to :meth:`get` to explicitly get the latest value.
 
-For some PVs, especially those that change much more rapidly than you care
-about or those that contain large arrays as values, auto_monitoring can add
-network traffic that you don't need.  For these, you may wish to create
-your PVs with *auto_monitor=False*.  When you do this, you will need to
-make calls to :meth:`get` to explicitly get the latest value.
+``None``
+  The default value for *auto_monitor* is ``None``, and is set to
+  ``True`` if the element count for the PV is smaller than 16384 (The
+  value is set as :data:`ca.AUTOMONITOR_MAXLENGTH`).  To suppress
+  monitoring of PVs with fewer array values, you will have to explicitly
+  turn *auto_monitor* to ``False``. For waveform arrays larger than
+  16384 items, automatic monitoring will be ``False`` unless you
+  explicitly set it to ``True`` or an explicit mask.  See
+  :ref:`advanced-large-arrays-label` for more details.
 
-None
-~~~~
+``True``
+  When *auto_monitor* is set to True, the value will be monitored using
+  the default subscription mask set at :data:`ca.DEFAULT_SUBSCRIPTION_MASK`.
 
-The default value for *auto_monitor* is ``None``, and is set to
-``True`` if the element count for the PV is smaller than 16384 (The
-value is set as :data:`ca.AUTOMONITOR_MAXLENGTH`).  To suppress
-monitoring of PVs with fewer array values, you will have to explicitly
-turn *auto_monitor* to ``False``. For waveform arrays larger than
-16384 items, automatic monitoring will be ``False`` unless you
-explicitly set it to ``True`` or an explicit mask.  See
-:ref:`advanced-large-arrays-label` for more details.
+  This mask determines which kinds of changes cause the PV to update. By
+  default, the subscription updates when the PV value changes by more
+  than the monitor deadband, or when the PV alarm status changes. This
+  behaviour is the same as the default in EPICS' *camonitor* tool.
 
-True
-~~~~
+*Mask*
+  It is also possible to request an explicit type of CA subscription by
+  setting *auto_monitor* to a numeric subscription mask made up of
+  dbr.DBE_ALARM, dbr.DBE_LOG and/or dbr.DBE_VALUE. This mask will be
+  passed directly to :meth:`ca.create_subscription` An example would be::
 
-When *auto_monitor* is set to True, the value will be monitored using
-the default subscription mask set at :data:`ca.DEFAULT_SUBSCRIPTION_MASK`.
+    pv1 = PV('AAA', auto_monitor=dbr.DBE_VALUE)
+    pv2 = PV('BBB', auto_monitor=dbr.DBE_VALUE|dbr.DBE_ALARM)
+    pv3 = PV('CCC', auto_monitor=dbr.DBE_VALUE|dbr.DBE_ALARM|dbr.DBE_LOG)
 
-This mask determines which kinds of changes cause the PV to update. By
-default, the subscription updates when the PV value changes by more
-than the monitor deadband, or when the PV alarm status changes. This
-behaviour is the same as the default in EPICS' *camonitor* tool.
-
-Mask
-~~~~
-
-It is also possible to request an explicit type of CA subscription by
-setting *auto_monitor* to a numeric subscription mask made up of
-dbr.DBE_ALARM, dbr.DBE_LOG and/or dbr.DBE_VALUE. This mask will be
-passed directly to :meth:`ca.create_subscription`
-
+  which will generate callbacks for pv1 only when the value of 'AAA'
+  changes, while pv2 will receive callbacks if the value or alarm state of
+  'BBB' changes, and pv3 will receive callbacks for all changes to 'CCC'.
+  Note that these dbr.DBE_**** constants are ORed together as a bitmask.
 
 ..  _pv-callbacks-label:
 
@@ -602,7 +602,7 @@ For maximum flexibility, one can all define a *put callback*, a function to
 be run when the :meth:`put` has completed.   This function requires a
 *pvname* keyword argument, but will receive no others, unless you pass in
 data with the *callback_data* argument (which should be dict-like) to
-:meth`put`.   A simple example would be::
+:meth:`put`.   A simple example would be::
 
     pv = epics.PV('XXX')
     def onPutComplete(pvname=None, **kws):

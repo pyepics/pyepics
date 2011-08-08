@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import time
 import gc
 import os
@@ -21,10 +23,10 @@ N_new = 0
 def get_callback(pv=None, **kws):
     global N_new
     N_new = N_new + 1
-    # print 'New value: ', pv.pvname, pv.char_value
+    # print( 'New value: ', pv.pvname, pv.char_value)
     
 def monitor_events(t = 600.0):
-    print 'Processing PV requests:'
+    print('Processing PV requests:')
     t0 = time.time()
     endtime = t0 + t
     nx = 0
@@ -34,7 +36,7 @@ def monitor_events(t = 600.0):
         epics.ca.pend_event(0.05)
         nx  = nx + 1
         if nx >=nnotify:
-            print "changes (%i) / %.3f /  %s" % (N_new,  time.time()-t0, show_memory())
+            print("changes (%i) / %.3f /  %s" % (N_new,  time.time()-t0, show_memory()))
             N_new = 0
             nx = 0
 
@@ -45,10 +47,11 @@ for i in range(500):
     for p in pvs:
         p.put('test: run %i' % (i))
     epics.ca.pend_event(0.02)
-    if i%20 == 0:     print "==run #  ", i,  show_memory()
+    if i%20 == 0:
+        print("==run #  ", i,  show_memory())
     time.sleep(0.02)
     
 epics.ca.pend_io(1.0)
 
-print 'really done.'
+print('really done.')
 

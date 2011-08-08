@@ -163,7 +163,6 @@ Note, that For Windows users, the DLLs (ca.dll and Com.dll) are included in the
 installation kit, and automaically installed to where they can be found at
 runtime (following rule 3 above).
 
-
 With the Epics library loaded, it will be necessary to connect to Epics
 Process Variables. Generally, these variables are provided by Epics I/O
 controllers (IOCs) that are processes running on some device on the

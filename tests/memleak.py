@@ -18,12 +18,11 @@ def show_memory():
 
 N_new = 0
 def get_callback(pvname=None,value=None,**kw):
-    # print 'New value: ', pvname, value
     global N_new
     N_new = N_new + 1
     
 def monitor_events(t = 60.0):
-    print 'Processing PV requests:'
+    print( 'Processing PV requests:')
     t0 = time.time()
     endtime = t0 + t
     global N_new
@@ -31,7 +30,7 @@ def monitor_events(t = 60.0):
     while time.time() < endtime:
         epics.ca.pend_event(0.01)
         if N_new >= nnotify:
-            print "Saw %i changes in %.3f seconds:  %s" % (N_new,  time.time()-t0, show_memory())
+            print( "Saw %i changes in %.3f seconds:  %s" % (N_new,  time.time()-t0, show_memory()))
             N_new = 0
             t0 = time.time()
 
@@ -39,21 +38,21 @@ def run(t=10.0):
     pvs = [epics.PV(i, callback=get_callback) for i in pvlist]
     epics.ca.pend_io(1.0)
     for p in pvs: p.get()
-    print 'Monitoring %i PVs'  % len(pvs)
+    print( 'Monitoring %i PVs'  % len(pvs))
     monitor_events(t=t)
     
-    print 'Destroying PVs: '
+    print( 'Destroying PVs: ')
     for i in pvs:
         i.disconnect()
-    print epics.ca._cache.keys()
+    print( epics.ca._cache.keys())
     epics.ca.show_cache()
     epics.ca.poll(0.01, 10.0)
     time.sleep(1.0)
     
 for i in range(4):
-    print "==run #  ", i+1
+    print( "==run #  ", i+1)
     run(t=15)
 
-print 'memory leak test complete.'
+print( 'memory leak test complete.')
 
 

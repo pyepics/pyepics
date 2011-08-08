@@ -310,7 +310,7 @@ has been exceeded.
 
 One can specify any function that can take a string as *writer*, such as
 the `write` method of a file that has been open for writing.  If left as
-``None``, messages of changes will be sent to :func:`sys.stdout.write`. For
+``None``, messages of changes will be sent to :func:`sy0.stdout.write`. For
 more complete control, one can specify a *callback* function to be called
 on each change event.  This callback should take keyword arguments for
 *pvname*, *value*, and *char_value*.  See :ref:`pv-callbacks-label` for
