@@ -1,4 +1,4 @@
-The  epics python module was orignally written by
+The epics python module was orignally written by
 
    Matthew Newville <newville@cars.uchicago.edu>
    CARS, University of Chicago

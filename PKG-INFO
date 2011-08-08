@@ -1,8 +1,8 @@
 Metadata-Version: 1.0
 Name: pyepics
-Version: 3.1.2
+Version: 3.1.3
 Summary: Epics Channel Access Extensions to Python
-Home-page: http://cars9.uchicago.edu/software/python/pyepics3/
+Home-page: http://pyepics.github.com/pyepics/
 Author: Matthew Newville
 Author-email: newville@cars.uchicago.edu
 License: Epics Open License
