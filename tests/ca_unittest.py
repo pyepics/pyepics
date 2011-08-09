@@ -50,6 +50,24 @@ class CA_BasicTests(unittest.TestCase):
         chid = ca.create_channel(pvnames.double_pv)
         self.assertNotEqual(chid,None)
 
+    def testA_CreateChid_CheckTypeCount(self):
+        write('Simple Test: create chid, check count, type, host, and access\n')
+        chid = ca.create_channel(pvnames.double_pv)
+        ret = ca.connect_channel(chid)
+        ca.pend_event(1.e-3)
+ 
+        ftype  = ca.field_type(chid)
+        count  = ca.element_count(chid)
+        host    = ca.host_name(chid)
+        rwacc = ca.access(chid)
+
+        self.assertNotEqual(chid, None)
+        self.assertNotEqual(host, None)
+        self.assertEqual(count, 1)
+        self.assertEqual(ftype, 6)
+        self.assertEqual(rwacc,'read/write')
+
+        
     def testA_CreateChidWithConn(self):
         write('Simple Test: create chid with conn callback\n')
         chid = ca.create_channel(pvnames.int_pv,
@@ -163,7 +181,6 @@ class CA_BasicTests(unittest.TestCase):
         val = CHANGE_DAT.get(pvn, None)
         ca.clear_subscription(eventID)
         self.assertNotEqual(val, None)
-
 
     def test_subscription_custom(self):
         pvn = pvnames.updating_pv1
