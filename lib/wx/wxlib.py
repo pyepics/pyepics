@@ -471,15 +471,14 @@ class PVText(wx.StaticText, PVCtrlMixin):
             epics.MINOR_ALARM : minor_alarm,
             epics.MAJOR_ALARM : major_alarm,
             epics.INVALID_ALARM : invalid_alarm }
- 
+
     def _SetValue(self, value):
         "set widget label"
-        if self.auto_units and self.pv.units != "":
-            self.units = " " + self.pv.units    
+        if self.auto_units and self.pv.units:
+            self.units = " " + self.pv.units
         if value is not None:
             self.SetLabel("%s%s" % (value, self.units))
 
-        
 class PVEnumButtons(wx.Panel, PVCtrlMixin):
     """ a panel of buttons for Epics ENUM controls """
     def __init__(self, parent, pv=None, 
