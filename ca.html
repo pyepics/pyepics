@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.2',
+        VERSION:     '3.1.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -576,7 +576,7 @@ callback function will be called with keyword arguments</p>
 
 <dl class="method">
 <dt id="ca.create_subscription">
-<tt class="descclassname">ca.</tt><tt class="descname">create_subscription</tt><big>(</big><em>chid</em><span class="optional">[</span>, <em>use_time=False</em><span class="optional">[</span>, <em>use_ctrl=False</em><span class="optional">[</span>, <em>mask=7</em><span class="optional">[</span>, <em>userfcn=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.create_subscription" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ca.</tt><tt class="descname">create_subscription</tt><big>(</big><em>chid</em><span class="optional">[</span>, <em>use_time=False</em><span class="optional">[</span>, <em>use_ctrl=False</em><span class="optional">[</span>, <em>mask=None</em><span class="optional">[</span>, <em>userfcn=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.create_subscription" title="Permalink to this definition">¶</a></dt>
 <dd><p>create a <em>subscription to changes</em>, The user-supplied callback function
 will be called on any changes to the PV.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -586,7 +586,7 @@ will be called on any changes to the PV.</p>
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>use_time</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to use the TIME variant for the PV type</li>
 <li><strong>use_ctrl</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to use the CTRL variant for the PV type</li>
-<li><strong>mask</strong> (<em>integer</em>) -- integer bitmask to control which changes result in a  callback</li>
+<li><strong>mask</strong> (<em>integer</em>) -- bitmask (of dbr.DBE_ALARM, dbr.DBE_LOG, dbr.DBE_VALUE) to control which changes result in a callback. Defaults to <a class="reference internal" href="#ca.DEFAULT_SUBSCRIPTION_MASK" title="ca.DEFAULT_SUBSCRIPTION_MASK"><tt class="xref py py-data docutils literal"><span class="pre">DEFAULT_SUBSCRIPTION_MASK</span></tt></a>.</li>
 <li><strong>userfcn</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or callable) -- user-supplied callback function</li>
 </ul>
 </td>
@@ -617,6 +617,19 @@ Abort (core dumped)</pre>
 </div>
 <p class="last">is a hint that you have <em>not</em> kept this data.</p>
 </div>
+<dl class="data">
+<dt id="ca.DEFAULT_SUBSCRIPTION_MASK">
+<tt class="descclassname">ca.</tt><tt class="descname">DEFAULT_SUBSCRIPTION_MASK</tt><a class="headerlink" href="#ca.DEFAULT_SUBSCRIPTION_MASK" title="Permalink to this definition">¶</a></dt>
+<dd><p>This value is the default subscription type used when calling
+<a class="reference internal" href="#ca.create_subscription" title="ca.create_subscription"><tt class="xref py py-meth docutils literal"><span class="pre">create_subscription()</span></tt></a> with mask=None. It is also used by default when creating a
+<tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt> object with auto_monitor is set to True.</p>
+<p>The initial default value is <em>dbr.DBE_ALARM|dbr.DBE_VALUE</em> (ie update
+on alarm changes or value changes which exceeds the monitor deadband.) The other possible flag
+in the bitmask is <em>dbr.DBE_LOG</em> for archive-deadband changes.</p>
+<p>If this value is changed, it will change the default for all subsequent calls to
+<a class="reference internal" href="#ca.create_subscription" title="ca.create_subscription"><tt class="xref py py-meth docutils literal"><span class="pre">create_subscription()</span></tt></a>, but it will not change any existing subscriptions.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="ca.clear_subscription">
 <tt class="descclassname">ca.</tt><tt class="descname">clear_subscription</tt><big>(</big><em>event_id</em><big>)</big><a class="headerlink" href="#ca.clear_subscription" title="Permalink to this definition">¶</a></dt>

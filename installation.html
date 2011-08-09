@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.2',
+        VERSION:     '3.1.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -116,7 +116,7 @@ setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.</p>
 </div>
 <div class="section" id="downloads">
 <h2>Downloads<a class="headerlink" href="#downloads" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the Epics Python Package is 3.1.2.  There are
+<p>The latest stable version of the E pics Python Package is 3.1.3.  There are
 a few ways to get the Epics Python Package:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -130,13 +130,13 @@ a few ways to get the Epics Python Package:</p>
 </thead>
 <tbody valign="top">
 <tr><td>Source Kit</td>
-<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.tar.gz">pyepics-3.1.2.tar.gz (CARS)</a>  or
-<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.2.tar.gz">pyepics-3.1.2.tar.gz (PyPI)</a></td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.tar.gz">pyepics-3.1.3.tar.gz (CARS)</a>  or
+<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.3.tar.gz">pyepics-3.1.3.tar.gz (PyPI)</a></td>
 </tr>
 <tr><td>Windows Installers</td>
-<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.win32-py2.6.exe">pyepics-3.1.2.win32-py2.6.exe</a>  or
-<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.win32-py2.7.exe">pyepics-3.1.2.win32-py2.7.exe</a>
-<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.win32-py3.1.exe">pyepics-3.1.2.win32-py3.1.exe</a></td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.win32-py2.6.exe">pyepics-3.1.3.win32-py2.6.exe</a>  or
+<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.win32-py2.7.exe">pyepics-3.1.3.win32-py2.7.exe</a>  or
+<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.win32-py3.1.exe">pyepics-3.1.3.win32-py3.1.exe</a></td>
 </tr>
 <tr><td>Development Version</td>
 <td>use <a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github repository</a></td>
@@ -151,28 +151,28 @@ the PyEpics Package simply with:</p>
 <div class="section" id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
 <p>Some automated unit-testing is done, using the tests folder from the source
-distribution kit.  The following systems were tested for 3.1.2, all with
+distribution kit.  The following systems were tested for 3.1.3, all with
 Epics base 3.14.12.1.  Except as noted, all tests pass.  Those tests that
 fail are generally well-understood.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="16%" />
-<col width="25%" />
 <col width="17%" />
-<col width="42%" />
+<col width="27%" />
+<col width="19%" />
+<col width="37%" />
 </colgroup>
 <thead valign="bottom">
 <tr><th class="head">Host OS</th>
 <th class="head">Epics HOST ARCH</th>
 <th class="head">Python</th>
-<th class="head">Tests Failed, Notes</th>
+<th class="head">Failures, Notes</th>
 </tr>
 </thead>
 <tbody valign="top">
 <tr><td>Linux</td>
 <td>linux-x86</td>
 <td>2.5.1</td>
-<td>autosave not tested</td>
+<td>all pass</td>
 </tr>
 <tr><td>Linux</td>
 <td>linux-x86</td>
@@ -192,6 +192,11 @@ fail are generally well-understood.</p>
 <tr><td>Linux</td>
 <td>linux-x86_64</td>
 <td>3.1</td>
+<td>autosave fails</td>
+</tr>
+<tr><td>Mac OSX</td>
+<td>darwin-x86</td>
+<td>2.6.5</td>
 <td>all pass</td>
 </tr>
 <tr><td>Windows</td>
@@ -206,21 +211,23 @@ fail are generally well-understood.</p>
 </tr>
 <tr><td>Windows</td>
 <td>win32-x86</td>
-<td>3.1</td>
-<td>pyparsing/autosave</td>
-</tr>
-<tr><td>Mac OSX</td>
-<td>darwin-x86</td>
-<td>2.6.5</td>
-<td>all pass</td>
+<td>3.1.1</td>
+<td>autosave fails</td>
 </tr>
 </tbody>
 </table>
-<p>Note that tests involving subarrays are known to fail with Epics base of
-3.14.11 and earlier.  The autosave module relies on the 3rd part extension
-pyparsing, which seems to not work correctly for Python3.1 and was not
-installed on one tested system.  The wx module is not automatically
-tested.</p>
+<p>Testing Notes:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>tests involving subarrays are known to fail with Epics base earlier
+than 3.14.11.</li>
+<li>The autosave module relies on the 3rd part extension pyparsing, which seems to not work correctly for Python3.1.</li>
+<li>The wx module is not automatically tested.</li>
+<li>CA is known to not work with 64-bit Python on 64-bit Windows. It <em>does</em>
+work on 64-bit Linux, and CA  works with 32-bit Python on 64-bit
+Windows. This is being investigated....</li>
+</ol>
+</div></blockquote>
 </div>
 <div class="section" id="development-version">
 <h2>Development Version<a class="headerlink" href="#development-version" title="Permalink to this headline">¶</a></h2>
@@ -305,7 +312,7 @@ Mark Vigder, Steve Wasserman, and Glen Wright.</p>
 <h2>Epics Open License<a class="headerlink" href="#epics-open-license" title="Permalink to this headline">¶</a></h2>
 <p>The PyEpics source code, this documentation, and all material associated
 with it are distributed under the Epics Open License:</p>
-<p>The  epics python module was orignally written by</p>
+<p>The epics python module was orignally written by</p>
 <blockquote>
 <div>Matthew Newville &lt;<a class="reference external" href="mailto:newville&#37;&#52;&#48;cars&#46;uchicago&#46;edu">newville<span>&#64;</span>cars<span>&#46;</span>uchicago<span>&#46;</span>edu</a>&gt;
 CARS, University of Chicago</div></blockquote>

@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.2',
+        VERSION:     '3.1.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -62,6 +62,7 @@
 <li><a class="reference internal" href="#pvenumbuttons">PVEnumButtons</a></li>
 <li><a class="reference internal" href="#pvenumchoice">PVEnumChoice</a></li>
 <li><a class="reference internal" href="#pvalarm">PVAlarm</a></li>
+<li><a class="reference internal" href="#pvcollapsiblepane">PVCollapsiblePane</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#decorators-and-other-utility-functions">Decorators and other Utility Functions</a></li>
@@ -377,6 +378,26 @@ states for an enum PV.</p>
 <em class="property">class </em><tt class="descclassname">wx.</tt><tt class="descname">PVAlarm</tt><big>(</big><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>trip_point=None</em>, <em>**kw</em><big>)</big><a class="headerlink" href="#wx.PVAlarm" title="Permalink to this definition">¶</a></dt>
 <dd><p>This will create a pop-up message (wx.MessageDialog) that is shown when
 the corresponding PV trips the alarm level.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvcollapsiblepane">
+<h3>PVCollapsiblePane<a class="headerlink" href="#pvcollapsiblepane" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVCollapsiblePane">
+<em class="property">class </em><tt class="descclassname">wx.</tt><tt class="descname">PVCollapsiblePane</tt><big>(</big><em>parent</em>, <em>pv=None</em>, <em>minor_alarm=&quot;DARKRED&quot;</em>, <em>major_alarm=&quot;RED&quot;</em>, <em>invalid_alarm=&quot;ORANGERED&quot;</em>, <em>**kw</em><big>)</big><a class="headerlink" href="#wx.PVCollapsiblePane" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is equivalent to wx.CollapsiblePane, except the label shown
+on the pane's &quot;expansion button&quot; comes from a PV.</p>
+<p>The additional keyword arguments can be any of the other constructor arguments
+supported by wx.CollapsiblePane.</p>
+<p>By default, the foreground colour of the pane button will be
+overriden when the PV enters an alarm state. On GTK, this means
+the colour of the triangular drop-down button but not the label
+text. These colours can be modified (or disabled by being set to
+None) as part of the constructor.</p>
+<p>Supports the .SetTranslation() method, whose argument is a dictionary
+mapping PV values to display labels. If the PV value is not found
+in the dictionary, it will displayed verbatim as the label.</p>
 </dd></dl>
 
 </div>

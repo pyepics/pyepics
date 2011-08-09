@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.2',
+        VERSION:     '3.1.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -129,7 +129,7 @@ attributes for accessing it's properties.</p>
 <li><strong>pvname</strong> -- name of Epics Process Variable</li>
 <li><strong>callback</strong> (<em>callable or None</em>) -- user-defined callback function on changes to PV value or state.</li>
 <li><strong>form</strong> (<em>string, one of ('native','ctrl', or 'time')</em>) -- which epics <em>data type</em> to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.</li>
-<li><strong>auto_monitor</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt>, <tt class="xref docutils literal"><span class="pre">True</span></tt>, or <tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to automatically monitor the PV for changes.</li>
+<li><strong>auto_monitor</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt>, <tt class="xref docutils literal"><span class="pre">True</span></tt>, <tt class="xref docutils literal"><span class="pre">False</span></tt>, or bitmask (see <a class="reference internal" href="#pv-automonitor-label"><em>Automatic Monitoring of a PV</em></a>)) -- whether to automatically monitor the PV for changes.</li>
 <li><strong>connection_callback</strong> (<em>callable or None</em>) -- user-defined function called on changes to PV connection status.</li>
 <li><strong>connection_timeout</strong> (<em>float or None</em>) -- time (in seconds) to wait for connection before giving up</li>
 <li><strong>verbose</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to print out debugging messages</li>
@@ -417,7 +417,20 @@ type according to <a class="reference internal" href="ca.html#dbrtype-table"><em
 <dl class="attribute">
 <dt id="pv.count">
 <tt class="descclassname">pv.</tt><tt class="descname">count</tt><a class="headerlink" href="#pv.count" title="Permalink to this definition">¶</a></dt>
-<dd><p>number of data elements in a PV.  1 except for waveform PVs</p>
+<dd><p>number of data elements in a PV.  1 except for waveform PVs, where it
+gives the number of elements in the waveform. For recent versions of
+Epics Base (3.14.11 and later?), this gives the <cite>.NORD</cite> field, which
+gives the number of elements last put into the PV and which may be less
+than the maximum number allowed (see <cite>nelm</cite> below).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pv.nelm">
+<tt class="descclassname">pv.</tt><tt class="descname">nelm</tt><a class="headerlink" href="#pv.nelm" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of data elements in a PV.  1 except for waveform PVs where it
+gives the maximum number of elements in the waveform. For recent
+versions of Epics Base (3.14.11 and later?), this gives the <cite>.NELM</cite>
+parameter.  See also the <cite>count</cite> attribute above.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -635,18 +648,47 @@ by the user will be called by this internal callback when changes occur.</p>
 PV will see all changes (and run callbacks) without any additional
 interaction from the user. The PV's value will always be up-to-date and no
 unnecessary network traffic is needed.</p>
-<p>For some PVs, especially those that change much more rapidly than you care
+<p>Possible values for <tt class="xref py py-attr docutils literal"><span class="pre">auto_monitor</span></tt> are:</p>
+<dl class="docutils">
+<dt><tt class="xref docutils literal"><span class="pre">False</span></tt></dt>
+<dd>For some PVs, especially those that change much more rapidly than you care
 about or those that contain large arrays as values, auto_monitoring can add
 network traffic that you don't need.  For these, you may wish to create
-<em>your PVs with *auto_monitor=False</em>.  When you do this, you will need to
-make calls to <a class="reference internal" href="#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> to explicitly get the latest value.</p>
-<p>The default value for <em>auto_monitor</em> is <tt class="xref docutils literal"><span class="pre">None</span></tt>, and is set to <tt class="xref docutils literal"><span class="pre">True</span></tt> if
-the element count for the PV is smaller than 16384 (The value is set as
-<a class="reference internal" href="ca.html#ca.AUTOMONITOR_MAXLENGTH" title="ca.AUTOMONITOR_MAXLENGTH"><tt class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></tt></a>).  To suppress monitoring of PVs with
-fewer array values, you will have to explicitly turn <em>auto_monitor</em> to
-<tt class="xref docutils literal"><span class="pre">False</span></tt>. For waveform arrays larger than 16384 items, automatic
-monitoring will be <tt class="xref docutils literal"><span class="pre">False</span></tt> unless you explicitly set it to <tt class="xref docutils literal"><span class="pre">True</span></tt>.  See
-<a class="reference internal" href="advanced.html#advanced-large-arrays-label"><em>Strategies for working with large arrays</em></a> for more details.</p>
+your PVs with <em>auto_monitor=False</em>.  When you do this, you will need to
+make calls to <a class="reference internal" href="#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> to explicitly get the latest value.</dd>
+<dt><tt class="xref docutils literal"><span class="pre">None</span></tt></dt>
+<dd>The default value for <em>auto_monitor</em> is <tt class="xref docutils literal"><span class="pre">None</span></tt>, and is set to
+<tt class="xref docutils literal"><span class="pre">True</span></tt> if the element count for the PV is smaller than 16384 (The
+value is set as <a class="reference internal" href="ca.html#ca.AUTOMONITOR_MAXLENGTH" title="ca.AUTOMONITOR_MAXLENGTH"><tt class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></tt></a>).  To suppress
+monitoring of PVs with fewer array values, you will have to explicitly
+turn <em>auto_monitor</em> to <tt class="xref docutils literal"><span class="pre">False</span></tt>. For waveform arrays larger than
+16384 items, automatic monitoring will be <tt class="xref docutils literal"><span class="pre">False</span></tt> unless you
+explicitly set it to <tt class="xref docutils literal"><span class="pre">True</span></tt> or an explicit mask.  See
+<a class="reference internal" href="advanced.html#advanced-large-arrays-label"><em>Strategies for working with large arrays</em></a> for more details.</dd>
+<dt><tt class="xref docutils literal"><span class="pre">True</span></tt></dt>
+<dd><p class="first">When <em>auto_monitor</em> is set to True, the value will be monitored using
+the default subscription mask set at <a class="reference internal" href="ca.html#ca.DEFAULT_SUBSCRIPTION_MASK" title="ca.DEFAULT_SUBSCRIPTION_MASK"><tt class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_SUBSCRIPTION_MASK</span></tt></a>.</p>
+<p class="last">This mask determines which kinds of changes cause the PV to update. By
+default, the subscription updates when the PV value changes by more
+than the monitor deadband, or when the PV alarm status changes. This
+behaviour is the same as the default in EPICS' <em>camonitor</em> tool.</p>
+</dd>
+<dt><em>Mask</em></dt>
+<dd><p class="first">It is also possible to request an explicit type of CA subscription by
+setting <em>auto_monitor</em> to a numeric subscription mask made up of
+dbr.DBE_ALARM, dbr.DBE_LOG and/or dbr.DBE_VALUE. This mask will be
+passed directly to <a class="reference internal" href="ca.html#ca.create_subscription" title="ca.create_subscription"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_subscription()</span></tt></a> An example would be:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">pv1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;AAA&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="p">)</span>
+<span class="n">pv2</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;BBB&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_ALARM</span><span class="p">)</span>
+<span class="n">pv3</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;CCC&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_ALARM</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_LOG</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">which will generate callbacks for pv1 only when the value of 'AAA'
+changes, while pv2 will receive callbacks if the value or alarm state of
+'BBB' changes, and pv3 will receive callbacks for all changes to 'CCC'.
+Note that these dbr.DBE_**** constants are ORed together as a bitmask.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="user-supplied-callback-functions">
 <span id="pv-callbacks-label"></span><h2>User-supplied Callback functions<a class="headerlink" href="#user-supplied-callback-functions" title="Permalink to this headline">¶</a></h2>
@@ -817,7 +859,7 @@ multiple PVs to complete with python's builtin <em>all</em> function, as with:</
 be run when the <a class="reference internal" href="#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a> has completed.   This function requires a
 <em>pvname</em> keyword argument, but will receive no others, unless you pass in
 data with the <em>callback_data</em> argument (which should be dict-like) to
-:meth`put`.   A simple example would be:</p>
+<a class="reference internal" href="#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a>.   A simple example would be:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">pv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">onPutComplete</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
     <span class="k">print</span> <span class="s">&#39;Put done for </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">pvname</span>

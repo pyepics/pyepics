@@ -26,14 +26,14 @@ setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 Downloads
 ~~~~~~~~~~~~~
 
-The latest stable version of the Epics Python Package is 3.1.2.  There are
+The latest stable version of the E pics Python Package is 3.1.3.  There are
 a few ways to get the Epics Python Package: 
 
-.. _pyepics-3.1.2.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.tar.gz
-.. _pyepics-3.1.2.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.2.tar.gz
-.. _pyepics-3.1.2.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.win32-py2.6.exe
-.. _pyepics-3.1.2.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.win32-py2.7.exe
-.. _pyepics-3.1.2.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.2.win32-py3.1.exe
+.. _pyepics-3.1.3.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.tar.gz
+.. _pyepics-3.1.3.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.3.tar.gz
+.. _pyepics-3.1.3.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.win32-py2.6.exe
+.. _pyepics-3.1.3.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.win32-py2.7.exe
+.. _pyepics-3.1.3.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.win32-py3.1.exe
 .. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
 .. _PyPi Epics Entry:             http://pypi.python.org/pypi/pyepics/
@@ -42,12 +42,12 @@ a few ways to get the Epics Python Package:
 +---------------------------+------------------------------------------+
 |  Download Option          |  Location                                |
 +===========================+==========================================+
-|  Source Kit               |  `pyepics-3.1.2.tar.gz (CARS)`_  or      |
-|                           |  `pyepics-3.1.2.tar.gz (PyPI)`_          |
+|  Source Kit               |  `pyepics-3.1.3.tar.gz (CARS)`_  or      |
+|                           |  `pyepics-3.1.3.tar.gz (PyPI)`_          |
 +---------------------------+------------------------------------------+
-|  Windows Installers       |  `pyepics-3.1.2.win32-py2.6.exe`_  or    |
-|                           |  `pyepics-3.1.2.win32-py2.7.exe`_        |
-|                           |  `pyepics-3.1.2.win32-py3.1.exe`_        |
+|  Windows Installers       |  `pyepics-3.1.3.win32-py2.6.exe`_  or    |
+|                           |  `pyepics-3.1.3.win32-py2.7.exe`_  or    |
+|                           |  `pyepics-3.1.3.win32-py3.1.exe`_        |
 +---------------------------+------------------------------------------+
 |  Development Version      |  use `pyepics github repository`_        |
 +---------------------------+------------------------------------------+
@@ -62,39 +62,45 @@ Testing
 ~~~~~~~~~~~~~
 
 Some automated unit-testing is done, using the tests folder from the source
-distribution kit.  The following systems were tested for 3.1.2, all with
+distribution kit.  The following systems were tested for 3.1.3, all with
 Epics base 3.14.12.1.  Except as noted, all tests pass.  Those tests that
 fail are generally well-understood.
 
-+-----------+-----------------+------------+-----------------------------+
-|  Host OS  | Epics HOST ARCH |  Python    |   Tests Failed, Notes       |
-+===========+=================+============+=============================+
-| Linux     |  linux-x86      |  2.5.1     |   autosave not tested       |
-+-----------+-----------------+------------+-----------------------------+
-| Linux     |  linux-x86      |  2.6       |   all pass                  |
-+-----------+-----------------+------------+-----------------------------+
-| Linux     |  linux-x86      |  2.6.6     |   all pass                  |
-+-----------+-----------------+------------+-----------------------------+
-| Linux     |  linux-x86_64   |  2.7       |   all pass                  |
-+-----------+-----------------+------------+-----------------------------+
-| Linux     |  linux-x86_64   |  3.1       |   all pass                  |
-+-----------+-----------------+------------+-----------------------------+
-| Windows   |   win32-x86     |  2.6.5     |   all pass                  |
-+-----------+-----------------+------------+-----------------------------+
-| Windows   |   win32-x86     |  2.7.1     |   all pass                  |
-+-----------+-----------------+------------+-----------------------------+
-| Windows   |   win32-x86     |  3.1       |   pyparsing/autosave        |
-+-----------+-----------------+------------+-----------------------------+
-| Mac OSX   |  darwin-x86     |  2.6.5     |   all pass                  |
-+-----------+-----------------+------------+-----------------------------+
++-----------+-----------------+------------+-----------------------+
+|  Host OS  | Epics HOST ARCH |  Python    |  Failures, Notes      |
++===========+=================+============+=======================+
+| Linux     |  linux-x86      |  2.5.1     |   all pass            |
++-----------+-----------------+------------+-----------------------+
+| Linux     |  linux-x86      |  2.6       |   all pass            |
++-----------+-----------------+------------+-----------------------+
+| Linux     |  linux-x86      |  2.6.6     |   all pass            |
++-----------+-----------------+------------+-----------------------+
+| Linux     |  linux-x86_64   |  2.7       |   all pass            |
++-----------+-----------------+------------+-----------------------+
+| Linux     |  linux-x86_64   |  3.1       |   autosave fails      |
++-----------+-----------------+------------+-----------------------+
+| Mac OSX   |  darwin-x86     |  2.6.5     |   all pass            |
++-----------+-----------------+------------+-----------------------+
+| Windows   |  win32-x86      |  2.6.5     |   all pass            |
++-----------+-----------------+------------+-----------------------+
+| Windows   |  win32-x86      |  2.7.1     |   all pass            |
++-----------+-----------------+------------+-----------------------+
+| Windows   |  win32-x86      |  3.1.1     |   autosave fails      |
++-----------+-----------------+------------+-----------------------+
 
 
-Note that tests involving subarrays are known to fail with Epics base of
-3.14.11 and earlier.  The autosave module relies on the 3rd part extension
-pyparsing, which seems to not work correctly for Python3.1 and was not
-installed on one tested system.  The wx module is not automatically
-tested. 
+Testing Notes:
 
+  1. tests involving subarrays are known to fail with Epics base earlier
+     than 3.14.11.
+  
+  2. The autosave module relies on the 3rd part extension pyparsing, which seems to not work correctly for Python3.1.  
+
+  3. The wx module is not automatically tested. 
+
+  4. CA is known to not work with 64-bit Python on 64-bit Windows. It *does*
+     work on 64-bit Linux, and CA  works with 32-bit Python on 64-bit
+     Windows. This is being investigated.... 
 
 Development Version
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,7 +168,6 @@ There are a few ways to specify how to find this library:
 Note, that For Windows users, the DLLs (ca.dll and Com.dll) are included in the
 installation kit, and automaically installed to where they can be found at
 runtime (following rule 3 above).
-
 
 With the Epics library loaded, it will be necessary to connect to Epics
 Process Variables. Generally, these variables are provided by Epics I/O
