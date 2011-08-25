@@ -6,7 +6,7 @@ import sys
 import time
 import unittest
 import numpy
-from epics import PV, caput
+from epics import PV, caput, caget, ca
 
 import pvnames
 
@@ -49,6 +49,15 @@ class PV_Tests(unittest.TestCase):
         conn = CONN_DAT.get(pvnames.int_pv, None)
         self.assertEqual(conn, True)
         
+    def test_caget(self):
+        write('Simple Test of caget() function\n')
+        pvs = (pvnames.double_pv, pvnames.enum_pv, pvnames.str_pv)
+        for p in pvs:
+            val = caget(p)
+            self.assertNotEqual(val, None)
+        sval = caget(pvnames.str_pv)
+        self.assertEqual(sval, 'ao')        
+        
     def test_get1(self):
         write('Simple Test: test value and char_value on an integer\n')
         pause_updating()
@@ -72,6 +81,24 @@ class PV_Tests(unittest.TestCase):
         self.failUnless(len(val[1]) > 1)
         resume_updating()
 
+    def test_putcomplete(self):
+        write('Put with wait and put_complete (using real motor!) \n')
+        vals = (1.35, 1.50, 1.44, 1.445, 1.45, 1.453, 1.446, 1.447, 1.450, 1.450, 1.490, 1.5, 1.500)
+        p = PV(pvnames.motor1)
+        see_complete = []
+        for v in vals:
+            t0 = time.time()
+            p.put(v, use_complete=True) 
+            count = 0
+            for i in range(100000):
+                time.sleep(0.001)
+                count = count + 1
+                if p.put_complete:
+                    see_complete.append(True)
+                    break
+                # print( 'made it to value= %.3f, elapsed time= %.4f sec (count=%i)' % (v, time.time()-t0, count))
+        self.failUnless(len(see_complete) > (len(vals) - 5))
+        
     def test_putwait(self):
         write('Put with wait (using real motor!) \n')
         pv = PV(pvnames.motor1)
@@ -125,6 +152,26 @@ class PV_Tests(unittest.TestCase):
         self.failUnless(pv.put_complete)            
         self.failUnless(count > 3)
 
+    def test_get_callback(self):
+        write("Callback test:  changing PV must be updated\n")
+        global NEWVALS
+        mypv = PV(pvnames.updating_pv1)
+        NEWVALS = []
+        def onChanges(pvname=None, value=None, char_value=None, **kw):
+            write( 'PV %s %s, %s Changed!\n' % (pvname, repr(value), char_value))
+            NEWVALS.append( repr(value))
+
+        mypv.add_callback(onChanges)
+        write('Added a callback.  Now wait for changes...\n')
+        
+        t0 = time.time()
+        while time.time() - t0 < 3:
+            time.sleep(1.e-4)
+        write('   saw %i changes.\n' % len(NEWVALS))
+        self.failUnless(len(NEWVALS) > 3)            
+        mypv.clear_callbacks()
+        
+        
     def test_subarrays(self):
         write("Subarray test:  dynamic length arrays\n")
         driver = PV(pvnames.subarr_driver)
@@ -173,35 +220,21 @@ class PV_Tests(unittest.TestCase):
         self.assertEqual(val, 0)
 
 
-    def xtest_DoubleVal(self):
+    def test_DoubleVal(self):
         pvn = pvnames.double_pv
-        chid = ca.create_channel(pvn,connect=True)
-        cdict  = ca.get_ctrlvars(chid)
-        write( 'CA testing CTRL Values for a Double (%s)\n'   % (pvn))
-        self.failUnless('units' in cdict)
-        self.failUnless('precision' in cdict)
+        pv = PV(pvn)
+        pv.get()
+        cdict  = pv.get_ctrlvars()
+        write( 'Testing CTRL Values for a Double (%s)\n'   % (pvn))
         self.failUnless('severity' in cdict)
-       
-        hostname = ca.host_name(chid)
-        self.failUnless(hostname.startswith(pvnames.double_pv_host))
-
-        count = ca.element_count(chid)
-        self.assertEqual(count,1)
-
-        ftype= ca.field_type(chid)
-        self.assertEqual(ftype,ca.dbr.DOUBLE)
-
-        prec = ca.get_precision(chid)
-        self.assertEqual(prec, pvnames.double_pv_prec)
-
-        units= ca.get_ctrlvars(chid)['units']
-        self.assertEqual(units, pvnames.double_pv_units)
-
-        rwacc= ca.access(chid)
-        self.failUnless(rwacc.startswith('read'))
+        self.failUnless(pv.host.startswith(pvnames.double_pv_host))
+        self.assertEqual(pv.count,1)
+        self.assertEqual(pv.precision, pvnames.double_pv_prec)
+        self.assertEqual(pv.units, pvnames.double_pv_units)
+        self.failUnless(pv.access.startswith('read'))
 
         
-    def xtest_type_converions_2(self):
+    def test_type_converions_2(self):
         write("CA type conversions arrays\n")
         pvlist = (pvnames.char_arr_pv,
                   pvnames.long_arr_pv,       

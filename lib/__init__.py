@@ -1,12 +1,12 @@
 """
    epics channel access python module
 
-   version    :  3.1.3rc1
-   last update:  5-Aug-2011
+   version    :  3.1.3
+   last update:  9-Aug-2011
 
    Principle Authors:
       Matthew Newville <newville@cars.uchicago.edu>, CARS, University of Chicago
-      Angus Gratton <angus.gratton@anu.edu.au>, Australian National University            
+      Angus Gratton <angus.gratton@anu.edu.au>, Australian National University
   
 == License:
    Except where explicitly noted, this file and all files in this
@@ -18,7 +18,7 @@
 
 """
 
-__version__ = '3.1.3rc1'
+__version__ = '3.1.3'
 
 import time
 import sys
