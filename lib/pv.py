@@ -233,7 +233,12 @@ class PV(object):
             if self._args['enum_strs'] is None:
                 self.get_ctrlvars()
             if value in self._args['enum_strs']:
-                value = self._args['enum_strs'].index(value)
+                # tuple.index() not supported in python2.5
+                # value = self._args['enum_strs'].index(value)
+                for ieval, eval in enumerate(self._args['enum_strs']):
+                    if eval == value:
+                        value = ieval
+                        break
         if use_complete and callback is None:
             callback = self.__putCallbackStub
         return ca.put(self.chid, value,

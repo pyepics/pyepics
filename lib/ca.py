@@ -124,12 +124,9 @@ _put_done =  {}
 
 class ChannelAccessException(Exception):
     """Channel Access Exception: General Errors"""
-    def __init__(self, fcn, msg):
-        Exception.__init__(self)
-        self.fcn = fcn
-        self.msg = msg
-    def __str__(self):
-        return " %s returned '%s'" % (self.fcn, self.msg)
+    def __init__(self, *args):
+        Exception.__init__(self, *args)
+        sys.excepthook(*sys.exc_info())
 
 class CASeverityException(Exception):
     """Channel Access Severity Check Exception:
@@ -179,7 +176,7 @@ def find_libca():
     if dllpath is not None:
         return dllpath
 
-    # Test 3: on unixes, look expliticly with EPICS_BASE env var and 
+    # Test 3: on unixes, look expliticly with EPICS_BASE env var and
     # known architectures for ca.so q
     if os.name == 'posix':
         known_hosts = {'Linux':   ('linux-x86', 'linux-x86_64') ,
@@ -201,8 +198,7 @@ def find_libca():
                 if libname in os.listdir(adir):
                     return os.path.join(adir, libname)
 
-    raise ChannelAccessException('find_libca',
-                                 'Cannot find Epics CA DLL')
+    raise ChannelAccessException('cannot find Epics CA DLL')
 
 def initialize_libca():
     """ load DLL (shared object library) to establish Channel Access
@@ -226,14 +222,12 @@ def initialize_libca():
     try:
         libca = load_dll(dllname)
     except:
-        raise ChannelAccessException('initialize_libca',
-                                     'Loading Epics CA DLL failed')
+        raise ChannelAccessException('loading Epics CA DLL failed')
 
     ca_context = {False:0, True:1}[PREEMPTIVE_CALLBACK]
     ret = libca.ca_context_create(ca_context)
     if ret != dbr.ECA_NORMAL:
-        raise ChannelAccessException('initialize_libca',
-                                     'Cannot create Epics CA Context')
+        raise ChannelAccessException('cannot create Epics CA Context')
 
     # set argtypes and non-default return types
     # for several libca functions here
@@ -353,9 +347,10 @@ def withCHID(fcn):
             if isinstance(chid, int):
                 args[0] = chid = dbr.chid_t(args[0])
             if not isinstance(chid, dbr.chid_t):
-                raise ChannelAccessException(fcn.__name__,
-                 "not a valid chid %s %s args %s kwargs %s!" %
-                                             (chid, type(chid), args, kwds))
+                msg = "%s: not a valid chid %s %s args %s kwargs %s!" % (
+                    (fcn.__name__, chid, type(chid), args, kwds))
+                raise ChannelAccessException(msg)
+
         return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
@@ -375,8 +370,8 @@ def withConnectedCHID(fcn):
             if isinstance(chid, int):
                 args[0] = chid = dbr.chid_t(chid)
             if not isinstance(chid, dbr.chid_t):
-                raise ChannelAccessException(fcn.__name__,
-                                             "not a valid chid!")
+                raise ChannelAccessException("%s: not a valid chid!" % \
+                                             (fcn.__name__))
             if not isConnected(chid):
                 timeout = kwds.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
                 connect_channel(chid, timeout=timeout)
@@ -964,10 +959,10 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         except TypeError:
             data[0] = type(data[0])(value)
         except:
-            errmsg = "Cannot put value '%s' to PV of type '%s'"
+            errmsg = "cannot put value '%s' to PV of type '%s'"
             tname  = dbr.Name(ftype).lower()
-            raise ChannelAccessException('put', \
-                                         errmsg % (repr(value),tname))
+            raise ChannelAccessException(errmsg % (repr(value), tname))
+
     else:
         # auto-convert strings to arrays for character waveforms
         # could consider using
@@ -982,8 +977,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
                 value = value[:ndata]
             data[:len(value)] = list(value)
         except (ValueError, IndexError):
-            errmsg = "Cannot put array data to PV of type '%s'"
-            raise ChannelAccessException('put', errmsg % (repr(value)))
+            errmsg = "cannot put array data to PV of type '%s'"
+            raise ChannelAccessException(errmsg % (repr(value)))
 
     # simple put, without wait or callback
     if not (wait or hasattr(callback, '__call__')):
@@ -1174,7 +1169,7 @@ def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
     >>> print epics.ca._unpack(data, chid=chid)
     """
     if not isinstance(chid, dbr.chid_t):
-        raise ChannelAccessException('sg_get', "not a valid chid!")
+        raise ChannelAccessException("not a valid chid!")
 
     if ftype is None:
         ftype = field_type(chid)
@@ -1193,7 +1188,7 @@ def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
 def sg_put(gid, chid, value):
     "synchronous-group put: cannot wait or get callback!"
     if not isinstance(chid, dbr.chid_t):
-        raise ChannelAccessException('sg_put', "not a valid chid!")
+        raise ChannelAccessException("not a valid chid!")
 
     ftype = field_type(chid)
     count = element_count(chid)
@@ -1213,8 +1208,8 @@ def sg_put(gid, chid, value):
         except:
             errmsg = "Cannot put value '%s' to PV of type '%s'"
             tname   = dbr.Name(ftype).lower()
-            raise ChannelAccessException('put', \
-                                         errmsg % (repr(value),tname))
+            raise ChannelAccessException(errmsg % (repr(value),tname))
+
     else:
         # auto-convert strings to arrays for character waveforms
         # could consider using
@@ -1231,7 +1226,7 @@ def sg_put(gid, chid, value):
             data[:len(value)] = list(value)
         except:
             errmsg = "Cannot put array data to PV of type '%s'"
-            raise ChannelAccessException('put', errmsg % (repr(value)))
+            raise ChannelAccessException(errmsg % (repr(value)))
 
     ret =  libca.ca_sg_array_put(gid, ftype, count, chid, data)
     PySEVCHK('sg_put', ret)
