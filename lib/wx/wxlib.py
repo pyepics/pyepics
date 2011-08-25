@@ -755,7 +755,7 @@ class PVFloatSpin(floatspin.FloatSpin, PVCtrlMixin):
     both reads and writes the PV on changes.
         
     """
-    def __init__(self, parent, pv=None, deadTime=800,
+    def __init__(self, parent, pv=None, deadTime=2500,
                  min_val=None, max_val=None, increment=1.0, digits=-1, **kw):
         """
         Most arguments are common with FloatSpin.
