@@ -1,0 +1,280 @@
+
+file {
+	name="/home/epics/support/CARS/CARSApp/op/adl/PyInstrument.adl"
+	version=030102
+}
+display {
+	object {
+		x=654
+		y=28
+		width=400
+		height=220
+	}
+	clr=14
+	bclr=2
+	cmap=""
+	gridSpacing=5
+	gridOn=1
+	snapToGrid=1
+}
+"color map" {
+	ncolors=65
+	colors {
+		ffffff,
+		ececec,
+		dadada,
+		c8c8c8,
+		bbbbbb,
+		aeaeae,
+		9e9e9e,
+		919191,
+		858585,
+		787878,
+		696969,
+		5a5a5a,
+		464646,
+		2d2d2d,
+		000000,
+		00d800,
+		1ebb00,
+		339900,
+		2d7f00,
+		216c00,
+		fd0000,
+		de1309,
+		be190b,
+		a01207,
+		820400,
+		5893ff,
+		597ee1,
+		4b6ec7,
+		3a5eab,
+		27548d,
+		fbf34a,
+		f9da3c,
+		eeb62b,
+		e19015,
+		cd6100,
+		ffb0ff,
+		d67fe2,
+		ae4ebc,
+		8b1a96,
+		610a75,
+		a4aaff,
+		8793e2,
+		6a73c1,
+		4d52a4,
+		343386,
+		c7bb6d,
+		b79d5c,
+		a47e3c,
+		7d5627,
+		58340f,
+		99ffff,
+		73dfff,
+		4ea5f9,
+		2a63e4,
+		0a00b8,
+		ebf1b5,
+		d4db9d,
+		bbc187,
+		a6a462,
+		8b8239,
+		73ff6b,
+		52da3b,
+		3cb420,
+		289315,
+		1a7309,
+	}
+}
+oval {
+	object {
+		x=360
+		y=115
+		width=15
+		height=15
+	}
+	"basic attribute" {
+		clr=20
+	}
+	"dynamic attribute" {
+		vis="if zero"
+		chan="$(P)$(Q):PosOK"
+	}
+}
+oval {
+	object {
+		x=360
+		y=80
+		width=15
+		height=15
+	}
+	"basic attribute" {
+		clr=20
+	}
+	"dynamic attribute" {
+		vis="if zero"
+		chan="$(P)$(Q):InstOK"
+	}
+}
+text {
+	object {
+		x=8
+		y=8
+		width=140
+		height=20
+	}
+	"basic attribute" {
+		clr=54
+	}
+	textix="Instruments"
+}
+"text entry" {
+	object {
+		x=103
+		y=112
+		width=240
+		height=25
+	}
+	control {
+		chan="$(P)$(Q):PosName"
+		clr=14
+		bclr=0
+	}
+	format="string"
+	limits {
+	}
+}
+text {
+	object {
+		x=13
+		y=112
+		width=50
+		height=18
+	}
+	"basic attribute" {
+		clr=14
+	}
+	textix="Position:"
+}
+"message button" {
+	object {
+		x=10
+		y=150
+		width=75
+		height=25
+	}
+	control {
+		chan="$(P)$(Q):Move"
+		clr=14
+		bclr=55
+	}
+	label="Move"
+	press_msg="1"
+}
+"text update" {
+	object {
+		x=5
+		y=35
+		width=400
+		height=18
+	}
+	monitor {
+		chan="$(P)$(Q):Message"
+		clr=24
+		bclr=1
+	}
+	format="string"
+	limits {
+	}
+}
+"text update" {
+	object {
+		x=195
+		y=10
+		width=200
+		height=18
+	}
+	monitor {
+		chan="$(P)$(Q):TSTAMP"
+		clr=24
+		bclr=1
+	}
+	format="string"
+	limits {
+	}
+}
+"text update" {
+	object {
+		x=5
+		y=195
+		width=410
+		height=14
+	}
+	monitor {
+		chan="$(P)$(Q):Info"
+		clr=24
+		bclr=2
+	}
+	format="string"
+	limits {
+	}
+}
+text {
+	object {
+		x=13
+		y=77
+		width=50
+		height=18
+	}
+	"basic attribute" {
+		clr=14
+	}
+	textix="Instrument:"
+}
+"text entry" {
+	object {
+		x=103
+		y=73
+		width=240
+		height=25
+	}
+	control {
+		chan="$(P)$(Q):InstName"
+		clr=14
+		bclr=0
+	}
+	format="string"
+	limits {
+	}
+}
+oval {
+	object {
+		x=360
+		y=80
+		width=15
+		height=15
+	}
+	"basic attribute" {
+		clr=15
+	}
+	"dynamic attribute" {
+		vis="if not zero"
+		chan="$(P)$(Q):InstOK"
+	}
+}
+oval {
+	object {
+		x=360
+		y=115
+		width=15
+		height=15
+	}
+	"basic attribute" {
+		clr=15
+	}
+	"dynamic attribute" {
+		vis="if not zero"
+		chan="$(P)$(Q):PosOK"
+	}
+}
