@@ -177,16 +177,15 @@ class MotorPanel(wx.Panel):
         try:
             if self.motor is None:
                 return
+            self.FillPanelComponents()
+            self.drive.Update()
+            self.desc.Update()
+            self.rbv.Update()
+            if self.is_full:
+                self.twk_list = self.make_step_list()
+                self.UpdateStepList()
         except PyDeadObjectError:
             pass
-
-        self.FillPanelComponents()
-        self.drive.Update()
-        self.desc.Update()
-        self.rbv.Update()
-        if self.is_full:
-            self.twk_list = self.make_step_list()
-            self.UpdateStepList()
 
     @EpicsFunction
     def OnStopButton(self, event=None):
@@ -282,9 +281,9 @@ class MotorPanel(wx.Panel):
         try:
             if val not in self.twk_list:
                 self.UpdateStepList(value=val)
+            self.__twkbox.SetValue(val)
         except PyDeadObjectError:
             pass
-        self.__twkbox.SetValue(val)
 
     def make_step_list(self):
         """ create initial list of motor steps, based on motor range
