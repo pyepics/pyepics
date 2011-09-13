@@ -28,7 +28,7 @@ class MotorPanel(wx.Panel):
     __motor_fields = ('SET', 'disabled', 'LLM', 'HLM',  'LVIO', 'TWV',
                       'HLS', 'LLS', 'SPMG', 'DESC')
 
-    
+
     def __init__(self, parent,  motor=None,  full=True, midsize=False,
                  messenger=None, prec=None, **kw):
 
@@ -38,7 +38,7 @@ class MotorPanel(wx.Panel):
         if hasattr(messenger, '__call__'):
             self.__messenger = messenger
 
-        self.format = None 
+        self.format = None
         if prec is not None:
             self.format = "%%.%if" % prec
 
@@ -65,7 +65,7 @@ class MotorPanel(wx.Panel):
             return
 
         epics.poll()
-        try: 
+        try:
             if self.motor is not None:
                 for i in self.__motor_fields:
                     self.motor.clear_callback(attr=i)
@@ -113,7 +113,7 @@ class MotorPanel(wx.Panel):
                 self.desc.SetFont(font)
 
         self.info.SetLabel('')
-        for f in ('SET', 'LVIO', 'SPMG', 'LLS', 'HLS', 'disabled'):            
+        for f in ('SET', 'LVIO', 'SPMG', 'LLS', 'HLS', 'disabled'):
             uname = self.motor.PV(f).pvname
             wx.CallAfter(self.OnMotorEvent,
                          pvname=uname, field=f)
@@ -125,7 +125,7 @@ class MotorPanel(wx.Panel):
             wdesc, wrbv, winfo, wdrv = 140, 85, 80, 100
         if not self.is_full:
             wdesc, wrbv, winfo, wdrv = 95, 80, 80, 80
-        
+
         self.desc = PVText(self, size=(wdesc, 25), style=LTEXT)
         self.desc.SetForegroundColour("Blue")
 
@@ -135,15 +135,15 @@ class MotorPanel(wx.Panel):
         self.info.SetForegroundColour("Red")
 
         self.drive = PVFloatCtrl(self, size=(wdrv, -1), style = wx.TE_RIGHT)
-        
+
         try:
             self.FillPanelComponents()
         except PyDeadObjectError:
             return
-                
+
         if self.is_full:
             self.twk_list = ['','']
-            self.__twkbox = wx.ComboBox(self, value='', size=(100, -1), 
+            self.__twkbox = wx.ComboBox(self, value='', size=(100, -1),
                                         choices=self.twk_list,
                                         style=wx.CB_DROPDOWN|wx.TE_PROCESS_ENTER)
             self.__twkbox.Bind(wx.EVT_COMBOBOX,    self.OnTweakBoxComboEvent)
@@ -154,8 +154,8 @@ class MotorPanel(wx.Panel):
 
             self.stopbtn = add_button(self, label=' Stop ', action=self.OnStopButton)
             self.morebtn = add_button(self, label=' More ', action=self.OnMoreButton)
-        
-        spacer = wx.StaticText(self, label=' ', size=(5, 5), style=RIGHT) 
+
+        spacer = wx.StaticText(self, label=' ', size=(5, 5), style=RIGHT)
         self.__sizer.AddMany([(spacer,      1, CEN),
                               (self.desc,   1, LCEN),
                               (self.info,   1, CEN),
@@ -167,15 +167,18 @@ class MotorPanel(wx.Panel):
                                   (self.twf,      0, CEN),
                                   (self.stopbtn,  0, CEN),
                                   (self.morebtn,  0, CEN)])
-        
+
         self.SetAutoLayout(1)
         pack(self, self.__sizer)
 
     @EpicsFunction
     def FillPanel(self):
         " fill in panel components for motor "
-        if self.motor is None:
-            return
+        try:
+            if self.motor is None:
+                return
+        except PyDeadObjectError:
+            pass
 
         self.FillPanelComponents()
         self.drive.Update()
@@ -184,7 +187,7 @@ class MotorPanel(wx.Panel):
         if self.is_full:
             self.twk_list = self.make_step_list()
             self.UpdateStepList()
-        
+
     @EpicsFunction
     def OnStopButton(self, event=None):
         "stop button"
@@ -204,7 +207,7 @@ class MotorPanel(wx.Panel):
         "more button"
         if self.motor is not None:
             MotorDetailFrame(parent=self, motor=self.motor)
-            
+
     @DelayedEpicsCallback
     def OnTweakBoxEnterEvent(self, event=None):
         val = float(self.__twkbox.GetValue())
@@ -213,16 +216,16 @@ class MotorPanel(wx.Panel):
     @DelayedEpicsCallback
     def OnTweakBoxComboEvent(self, event=None):
         val = float(self.__twkbox.GetValue())
-        wx.CallAfter(self.motor.PV('TWV').put, val)        
+        wx.CallAfter(self.motor.PV('TWV').put, val)
 
     @DelayedEpicsCallback
     def OnMotorEvent(self, pvname=None, field=None, event=None, **kws):
         if pvname is None:
             return None
-      
+
         field_val = self.motor.get(field)
         field_str = self.motor.get(field, as_string=True)
-        
+
         if field == 'LLM':
             self.drive.SetMin(self.motor.LLM)
         elif field == 'HLM':
@@ -233,7 +236,7 @@ class MotorPanel(wx.Panel):
             if field_val == 0:
                 s = ''
             self.info.SetLabel(s)
-            
+
         elif field == 'SET':
             label, color = 'Set:','Yellow'
             if field_val == 0:
@@ -271,15 +274,18 @@ class MotorPanel(wx.Panel):
 
         else:
             pass
-        
+
     @EpicsFunction
     def SetTweak(self, val):
         if not isinstance(val, str):
             val = self.format % val
-        if val not in self.twk_list:
-            self.UpdateStepList(value=val)
+        try:
+            if val not in self.twk_list:
+                self.UpdateStepList(value=val)
+        except PyDeadObjectError:
+            pass
         self.__twkbox.SetValue(val)
-            
+
     def make_step_list(self):
         """ create initial list of motor steps, based on motor range
         and precision"""
