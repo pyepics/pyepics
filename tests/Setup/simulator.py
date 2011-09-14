@@ -129,7 +129,7 @@ while True:
     analogs[0].put( 100*(random.random()-0.5))
     analogs[1].put( 76.54321*(time.time()-start_time))
     analogs[2].put( 0.3*numpy.sin(time.time() / 2.302) + noise(scale=0.4)  )
-    analogs[3].put( numpy.exp( (max(0.001,  noise(scale=0.03) + numpy.sqrt((count/21.0) % 120.)))))
+    analogs[3].put( numpy.exp( (max(0.001,  noise(scale=0.03) + numpy.sqrt((count/16.0) % 87.)))))
 
     if t0-long_update >= 1.0:
         long_update=t0
