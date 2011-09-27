@@ -54,6 +54,8 @@ updating_str1 = 'Py:char256'
 updating_pvlist = ['Py:ao1', 'Py:ai1', 'Py:long1', 'Py:ao2']
 #### alarm test
 
+non_updating_pv = 'Py:ao4'
+
 alarm_pv = 'Py:long1'
 alarm_comp='ge'
 alarm_trippoint = 7
