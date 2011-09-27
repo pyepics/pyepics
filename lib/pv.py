@@ -75,6 +75,7 @@ class PV(object):
         self.callbacks  = {}
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
+        self._monitor_started = False
         self.chid = None
         
         if ca.current_context() is None:
@@ -184,6 +185,7 @@ class PV(object):
         self._monref = None
         self.connected = False
         self._conn_started = False
+        self._monitor_started = False
         return self.wait_for_connection()
 
     def poll(self, evt=1.e-4, iot=1.0):
@@ -319,6 +321,7 @@ class PV(object):
         To have user-defined code run when the PV value changes,
         use add_callback()
         """
+        self._monitor_started = True
         self._args.update(kwd)
         self._args['value']  = value
         self._args['timestamp'] = kwd.get('timestamp', time.time())
@@ -337,6 +340,12 @@ class PV(object):
         Normally, this is to be run automatically on event, but
         it is provided here as a separate function for testing
         purposes.
+        """
+        for index in sorted(list(self.callbacks.keys())):
+            self.run_callback(index)
+
+    def run_callback(self, index):
+        """run a specific user-defined callback, specified by index, with the current data
 
         Note that callback functions are called with keyword/val
         arguments including:
@@ -346,15 +355,13 @@ class PV(object):
         where the 'cb_info' is provided as a hook so that a callback
         function  that fails may de-register itself (for example, if
         a GUI resource is no longer available).
-
         """
-        for index in sorted(list(self.callbacks.keys())):
-            fcn, kwargs = self.callbacks[index]
-            kwd = copy.copy(self._args)
-            kwd.update(kwargs)
-            kwd['cb_info'] = (index, self)
-            if hasattr(fcn, '__call__'):
-                fcn(**kwd)
+        fcn, kwargs = self.callbacks[index]
+        kwd = copy.copy(self._args)
+        kwd.update(kwargs)
+        kwd['cb_info'] = (index, self)
+        if hasattr(fcn, '__call__'):
+            fcn(**kwd)
 
     def add_callback(self, callback=None, index=None,
                      with_ctrlvars=True, **kw):
@@ -375,6 +382,9 @@ class PV(object):
                 if len(self.callbacks) > 0:
                     index = 1 + max(self.callbacks.keys())
             self.callbacks[index] = (callback, kw)
+        if self._monitor_started and index is not None:
+            # if create_subscription is already running, simulate the 'initial value' callback
+            self.run_callback(index)
         return index
 
     def remove_callback(self, index=None):

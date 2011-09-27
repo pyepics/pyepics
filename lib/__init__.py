@@ -7,12 +7,12 @@
    Principle Authors:
       Matthew Newville <newville@cars.uchicago.edu>, CARS, University of Chicago
       Angus Gratton <angus.gratton@anu.edu.au>, Australian National University
-  
+
 == License:
    Except where explicitly noted, this file and all files in this
    distribution are licensed under the Epics Open License
    See license.txt in the top-level directory of this distribution.
-   
+
 == Overview:
    Python Interface to the Epics Channel Access protocol of the Epics control system.
 
@@ -32,7 +32,7 @@ from . import motor
 PV    = pv.PV
 Alarm = alarm.Alarm
 Motor = motor.Motor
-Device = device.Device 
+Device = device.Device
 poll  = ca.poll
 
 # some constants
@@ -47,7 +47,7 @@ INVALID_ALARM = 3
 # a local cache for PVs used in caget/caput/cainfo/camonitor functions
 _CACHE_ = {}
 # a local cache for Monitored PVs
-_MONITORS_ = {}  
+_MONITORS_ = {}
 
 def __create_pv(pvname, timeout=5.0):
     "create PV, wait for connection: "
@@ -75,7 +75,7 @@ def caput(pvname, value, wait=False, timeout=60):
 
     to wait for pv to complete processing, use 'wait=True':
        >>> caput('xx.VAL',3.0,wait=True)
-    """ 
+    """
     thispv = __create_pv(pvname)
     if thispv is not None:
         return thispv.put(value, wait=wait, timeout=timeout)
@@ -120,18 +120,20 @@ def cainfo(pvname, print_out=True):
         thispv.get_ctrlvars()
         if print_out:
             ca.write(thispv.info)
-        else:     
+        else:
             return thispv.info
 
 def camonitor_clear(pvname):
     """clear a monitor on a PV"""
     if pvname in _MONITORS_:
-        _MONITORS_[pvname].clear_callbacks()
-        
+        if isinstance(_MONITORS_[pvname], PV):
+            _MONITORS_[pvname].clear_callbacks()
+        _MONITORS_.pop(pvname)
+
 def camonitor(pvname, writer=None, callback=None):
     """ camonitor(pvname, writer=None, callback=None)
 
-    sets a monitor on a PV.  
+    sets a monitor on a PV.
        >>>camonitor('xx.VAL')
 
     This will write a message with the latest value for that PV each
@@ -155,9 +157,9 @@ def camonitor(pvname, writer=None, callback=None):
             if char_value is None:
                 char_value = repr(value)
             writer("%.32s %s %s" % (pvname, pv.fmt_time(), char_value))
-        
+
     thispv = __create_pv(pvname)
-    _MONITORS_[pvname] = thispv
     if thispv is not None:
         thispv.get()
         thispv.add_callback(callback, with_ctrlvars=True)
+        _MONITORS_[pvname] = thispv
