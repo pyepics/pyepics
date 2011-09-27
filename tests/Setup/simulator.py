@@ -17,7 +17,7 @@ prefix = 'Py:'
 global NEEDS_INIT
 
 NEEDS_INIT = True
-SLEEP_TIME = 0.25
+SLEEP_TIME = 0.10
 
 def onConnect(pvname=None, conn=None, **kws):
     global NEEDS_INIT
@@ -122,13 +122,15 @@ while True:
         t0 = time.time()
         time.sleep(10)
         while time.time()-t0 < 15:
-            time.sleep(0.25)
+            time.sleep(SLEEP_TIME)
             if pause_pv.get() == 0:
                 break
-            
+    noise = numpy.random.normal
     analogs[0].put( 100*(random.random()-0.5))
     analogs[1].put( 76.54321*(time.time()-start_time))
-    analogs[2].put( numpy.sqrt(count*7123.) % 100)
+    analogs[2].put( 0.3*numpy.sin(time.time() / 2.302) + noise(scale=0.4)  )
+    analogs[3].put( numpy.exp( (max(0.001,  noise(scale=0.03) + numpy.sqrt((count/16.0) % 87.)))))
+
     if t0-long_update >= 1.0:
         long_update=t0
         lcount = (lcount + 1) % 10
