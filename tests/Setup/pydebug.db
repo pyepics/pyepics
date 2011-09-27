@@ -180,17 +180,17 @@ record(ao,"$(P)ao3") {
 }
 
 record(ao,"$(P)ao4") {
-   field(DTYP, "ao")
+   field(DESC, "ao")
    field(VAL,  "1")
 }
 
 record(bo,"$(P)bo1") {
-   feld(DTYP, "bi")
+   feld(DESC, "bi")
    field(VAL,  "1")
 }
 
 record(bi,"$(P)bi1") {
-   feld(DTYP, "bi")
+   feld(DESC, "bi")
    field(VAL,  "1")
 }
 
