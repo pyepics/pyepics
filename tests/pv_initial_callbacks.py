@@ -12,11 +12,11 @@ write = sys.stdout.write
 got_callback_a = False
 got_callback_b = False
 
-def callback_a():
+def callback_a(pvname=None, value=None, **kw):
     write( "Got callback A (%s, %s)\n" % (pvname, repr(value)) )
     got_callback_a = True
 
-def callback_b():
+def callback_b(pvname=None, value=None, **kw):
     write( "Got callback B (%s, %s)\n" % (pvname, repr(value)) )
     got_callback_b = True
 
