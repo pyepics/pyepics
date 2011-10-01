@@ -7,7 +7,6 @@
 # you should provide the host_name, units, and precision.  It
 # is assumed to have count=1
 double_pv = 'Py:ao1'
-double_pv_host = 'vincent'
 double_pv_units = 'microns'
 double_pv_prec = 4
 

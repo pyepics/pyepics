@@ -180,18 +180,18 @@ record(ao,"$(P)ao3") {
 }
 
 record(ao,"$(P)ao4") {
-   field(DESC, "ao")
-   field(VAL,  "1")
+	field(DESC, "ao")
+	field(VAL,  "1")
 }
 
 record(bo,"$(P)bo1") {
-   feld(DESC, "bi")
-   field(VAL,  "1")
+	field(DESC, "bo")
+	field(VAL,  "1")
 }
 
 record(bi,"$(P)bi1") {
-   feld(DESC, "bi")
-   field(VAL,  "1")
+	field(DESC, "bi")
+	field(VAL,  "1")
 }
 
 
@@ -248,6 +248,18 @@ record(waveform, "$(P)wave_test") {
   field(FLNK, "$(P)mylinker")
 }
 
+
+record(bi,"$(P)xbi") {
+  field(DESC, "bi")
+  field(VAL,  "1")
+  field(FLNK, "$(P)xbo")
+}
+
+
+record(bi,"$(P)xbo") {
+  field(DESC, "bo")
+  field(VAL,  "0")
+}
 
 
 

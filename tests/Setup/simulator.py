@@ -25,8 +25,8 @@ def onConnect(pvname=None, conn=None, **kws):
 
         
 def make_pvs(*args, **kwds):
-    #print "Make PVS '  ", prefix,  args
-    #print  [("%s%s" % (prefix, name)) for name in args]
+    # print "Make PVS '  ", prefix,  args
+    # print  [("%s%s" % (prefix, name)) for name in args]
     pvlist = [epics.PV("%s%s" % (prefix, name)) for name in args]
     for pv in pvlist:
         pv.connect()
