@@ -4,9 +4,9 @@ Advanced Topic with Python Channel Access
 
 .. _advanced-large-arrays-label:
 
-
 Strategies for working with large arrays
 ============================================
+
 
 EPICS Channels / Process Variables usually have values that can be stored
 with a small number of bytes.  This means that their storage and transfer
@@ -298,6 +298,112 @@ Note also that the callbacks for the PVs created in each thread are
 Without this, the callbacks for thread *A*  will persist even after the
 thread has completed!
 
+
+.. _advanced-connecting-many-label:
+
+Strategies for connecting to a large number of PVs
+====================================================
+
+Occassionally, you may find that you need to quickly connect to a large
+number of PVs, say to write values to disk.  The most straightforward way
+to do this, say::
+
+    import epics
+
+    pvnamelist = read_list_pvs()
+    pv_vals = {}
+    for name in pvnamelist:
+        pv = epics.PV(name)
+	pv_vals[name] = pv.get()
+
+does incur some small performance penalty.  As shown below, the penalty
+is generally pretty small in absolute terms, but can be noticeable when
+you are connecting to a large number (say, more than 100) PVs at once.
+
+The cause for the penalty, and its remedy, are two-fold.  First, a `PV`
+object automatically use connection and event callbacks.  Normally, these
+are advantages, as you don't need to explicitly deal with them.  But,
+internally, they do pause for network responses using :meth:`ca.pend_event`
+and :meth:`ca.pend_io`, and these pauses can add up.  Second, the
+:meth:`ca.get` also pauses for network response, so that the returned value
+actually containes the latest data right away.
+
+The remedies are to
+   1. not use connection or event callbacks.
+   2. not explicitly pause for values to be returned for each :meth:`get`.
+
+A more complicated but faster approach relies on a carefully-tuned use of
+the CA library, and would be the following::
+
+    from epics import ca
+
+    pvnamelist = read_list_pvs()
+    pv_vals = {}
+
+    channels= []
+    for name in pvnamelist:
+        chid = ca.create_channel(name, auto_cb=False) # note 1
+        channels.append(chid)
+
+    ca.poll()
+
+    tmppdata = {}
+    for chid in channels:
+        name  = ca.name(chid)
+        count = ca.element_count(chid)
+        ftype = ca.field_type(chid)
+        pdat = ca.get(chid, unpack=False)  # note 2
+        tmpdata[name] = ftype, count,  pdat
+
+    ca.poll()  # polls for *all* channels
+
+    for name in pvnames:
+        ftype, count, pdat = data[name]
+        pv_vals[name] = ca._unpack(pdat, count=count, ftype=ftype)
+
+The code here probably needs detailed explanation.  The first thing to
+notice is that this is using the `ca` level, not `PV` objects.  Second
+(Note 1), the `auto_cb=False` option to :meth:`ca.create_channel` which
+will turn off all connection callbacks -- normally this is not what you
+want, but we're aiming for maximum speed.  Next (Note 2), we get the
+*reference* to the value from :meth:`ca.get`, without unpacking it.  We
+also get the data type and count which we'll need to unpack the value
+later.  The main point of not having :meth:`ca.get` unpack the data for
+each channel as we go is that unpacking the value requires a
+:meth:`ca.poll` to pause for network response.  As long as we don't unpack
+the values, we can get through the whole list without doing any calls to
+:meth:`ca.poll`.  Then we do call :meth:`ca.poll` once (not len(channels)
+times).  Finally, we use the :meth:`ca._unpack` method to convert the
+stored pointer to a python value.
+
+How much faster is the more explicit method?  In my tests, I used 20,000
+PVs, all scalar values, all actually connected, and all on the same subnet
+as the test client, though on a mixture of several vxWorks and linux IOCs.
+I found that the simplest, obvious approach as above took around 12 seconds
+to read all 20,000 PVs.  Using the `ca` layer with connection callbacks and
+a normal call to :meth:`ca.get` also took about 12 seconds.  The method
+without connection callbacks and with delayed unpacking above took about 2
+seconds to read all 20,000 PVs.
+
+Is that performance boost from 12 to 2 seconds significant?  If you're
+writing a script that is intended to run once, fetch a large number of PVs
+and get their values (say, an auto-save script that runs on demand), then
+the boost is definitely significant.  On the other hand, if you're writing
+a long running process or a process that will retain the PV connections and
+get their values multiple times, the difference in startup speed is less
+significant.  For a long running auto-save script that periodically writes
+out all the PV values, the "obvious" way using automatically monitored PVs
+may be much *better*, as the time for the initial connection is small, and
+the use of event callbacks will reduce network traffic for PVs that don't
+change between writes.
+
+Note that the tests also show that, with the simplest approach, 1,000 PVs
+should connect and receive values in under 1 second.  Any application that
+is sure it needs to connect to PVs faster than that rate will want to do
+careful timing tests.  Finally, note also that the issues are not really a
+classic *python is slow compared to C* issue, but rather a matter of how
+much pausing with :meth:`ca.poll` one does to make sure values are
+immediately useful.
 
 .. _advanced-sleep-label:
 

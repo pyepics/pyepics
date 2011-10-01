@@ -619,7 +619,7 @@ def pend_io(timeout=1.0):
         return ret
 
 ## @withCA
-def pend_event(timeout=1.e-4):
+def pend_event(timeout=1.e-5):
     """polls CA for events """
     ret = libca.ca_pend_event(timeout)
     try:
