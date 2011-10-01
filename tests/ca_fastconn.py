@@ -1,9 +1,9 @@
 from epics import ca, dbr
-import copy
 import time
-import ctypes
 import debugtime
 
+dt = debugtime.debugtime()
+dt.add('test of fast connection to many PVs')
 pvnames = []
 values = []
 pvlist = [] 
@@ -12,8 +12,7 @@ data   = {}
 for line  in open('fastconn_pvlist.txt','r').readlines():
     pvnames.append(line[:-1])
     
-dt = debugtime.debugtime()
-dt.add('Using epics libca:  Will connect to %i PVs' % len(pvnames))
+dt.add('Read PV list:  Will connect to %i PVs' % len(pvnames))
 
 libca = ca.initialize_libca()
 
@@ -33,21 +32,22 @@ for chid in pvlist:
     ftype = ca.field_type(chid)
     pdat = ca.get(chid, unpack=False)
     data[name] = ftype, count,  pdat
-    
+   
+dt.add("did ca.get() for value references")
 ca.pend_event(1.e-3)
 ca.pend_io(3.0)
+dt.add("pend complete")
 for name in pvnames:
     ftype, count, pdat = data[name]
     val = ca._unpack(pdat, count=count, ftype=ftype)
     values.append(val) 
-dt.add("got PV values")
+dt.add("unpacked PV values")
 
 f = open('fastconn_pvdata.sav', 'w')
 for n,v in zip(pvnames, values):
     f.write("%s %s\n" % (n.strip(), v))
 f.close()
 dt.add("wrote values PVs")
-
 
 dt.show()
 
