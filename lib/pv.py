@@ -76,9 +76,9 @@ class PV(object):
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
         if isinstance(callback, (tuple, list)):
-            for i, cb in enumerate(callback):
-                if hasattr(cb, '__call__'):
-                    self.callbacks[i] = (cb, {})
+            for i, thiscb in enumerate(callback):
+                if hasattr(thiscb, '__call__'):
+                    self.callbacks[i] = (thiscb, {})
         elif hasattr(callback, '__call__'):
             self.callbacks[0] = (callback, {})
 
@@ -127,9 +127,10 @@ class PV(object):
             if self.auto_monitor is None:
                 self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
             if self._monref is None and self.auto_monitor:
-                # you can explicitly request a subscription mask (ie dbr.DBE_ALARM|dbr.DBE_LOG) by
-                # passing it as the auto_monitor arg, otherwise if you specify 'True' you'll just
-                # get the default set in ca.DEFAULT_SUBSCRIPTION_MASK
+                # you can explicitly request a subscription mask
+                # (ie dbr.DBE_ALARM|dbr.DBE_LOG) by passing it as the
+                # auto_monitor arg, otherwise if you specify 'True' you'll 
+                # just get the default set in ca.DEFAULT_SUBSCRIPTION_MASK
                 mask = self.auto_monitor if type(self.auto_monitor) is int else None
                 self._monref = ca.create_subscription(self.chid,
                                          use_ctrl=(self.form == 'ctrl'),
@@ -234,9 +235,9 @@ class PV(object):
             if value in self._args['enum_strs']:
                 # tuple.index() not supported in python2.5
                 # value = self._args['enum_strs'].index(value)
-                for ieval, eval in enumerate(self._args['enum_strs']):
-                    if eval == value:
-                        value = ieval
+                for ival, val in enumerate(self._args['enum_strs']):
+                    if val == value:
+                        value = ival
                         break
         if use_complete and callback is None:
             callback = self.__putCallbackStub
@@ -341,8 +342,8 @@ class PV(object):
             self.run_callback(index)
 
     def run_callback(self, index):
-        """run a specific user-defined callback, specified by index, with the current data
-
+        """run a specific user-defined callback, specified by index, 
+        with the current data
         Note that callback functions are called with keyword/val
         arguments including:
              self._args  (all PV data available, keys = __fields)
@@ -507,8 +508,9 @@ class PV(object):
 
     @property
     def nelm(self):
-        """native count (number of elements). For array data this will return the
-        full array size (ie, the .NELM field).  See also 'count' property"""
+        """native count (number of elements).
+        For array data this will return the full array size (ie, the
+        .NELM field).  See also 'count' property"""
         if self._getarg('count') == 1:
             return 1
         return ca.element_count(self.chid)

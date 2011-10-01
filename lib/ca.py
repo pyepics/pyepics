@@ -284,7 +284,6 @@ def show_cache(print_out=True):
     out = []
     out.append('#  PVName        ChannelID/Context Connected?')
     out.append('#--------------------------------------------')
-    global _cache
     for context, context_chids in  list(_cache.items()):
         for vname, val in list(context_chids.items()):
             chid = val['chid']
@@ -1215,7 +1214,7 @@ def sg_put(gid, chid, value):
         except:
             errmsg = "Cannot put value '%s' to PV of type '%s'"
             tname   = dbr.Name(ftype).lower()
-            raise ChannelAccessException(errmsg % (repr(value),tname))
+            raise ChannelAccessException(errmsg % (repr(value), tname))
 
     else:
         # auto-convert strings to arrays for character waveforms
