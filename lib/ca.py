@@ -629,7 +629,7 @@ def pend_event(timeout=1.e-4):
         return ret
 
 @withCA
-def poll(evt=1.e-4, iot=1.0):
+def poll(evt=1.e-5, iot=1.0):
     """polls CA for events and i/o. """
     pend_event(evt)
     return pend_io(iot)
@@ -641,19 +641,17 @@ def test_io():
 
 ## create channel
 @withCA
-def create_channel(pvname, connect=False, callback=None):
+def create_channel(pvname, connect=False, auto_cb=True, callback=None):
     """ create a Channel for a given pvname
 
-    connect=True will try to wait until connection is complete
-    before returning
-
-    a user-supplied callback function (callback) can be provided
-    as a connection callback. This function will be called when
-    the connection state changes, and will be passed these keyword
-    arguments:
-       pvname   name of PV
-       chid     channel ID
-       conn     connection state (True/False)
+    connect:  try to wait until connection is complete before returning
+    auto_cb:  use the automatic connection callback
+    callback: a user-supplied callback function (callback) can be provided
+       as a connection callback. This function will be called when the
+       connection state changes, and will be passed these keyword args:
+          pvname   name of PV
+          chid     channel ID
+          conn     connection state (True/False)
 
     If the channel is already connected for the PV name, the callback
     will be called immediately.
@@ -682,19 +680,23 @@ def create_channel(pvname, connect=False, callback=None):
             entry['callbacks'].append(callback)
             callback(chid=entry['chid'], conn=entry['conn'])
 
+    conncb = 0
+    if auto_cb:
+        conncb = _CB_CONNECT
     if entry.get('chid', None) is not None:
         # already have or waiting on a chid
         chid = _cache[ctx][pvname]['chid']
     else:
         chid = dbr.chid_t()
-        ret = libca.ca_create_channel(pvn, _CB_CONNECT, 0, 0,
+        ret = libca.ca_create_channel(pvn, conncb, 0, 0,
                                   ctypes.byref(chid))
         PySEVCHK('create_channel', ret)
         entry['chid'] = chid
 
     if connect:
         connect_channel(chid)
-    poll()
+    if conncb != 0:
+        poll()
     return chid
 
 @withCHID
@@ -875,9 +877,12 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID
-def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
+def get(chid, ftype=None, unpack=True,
+        as_string=False, count=None, as_numpy=True):
     """return the current value for a Channel.  Options are
        ftype       field type to use (native type is default)
+       unpack      whether to retun value (default) or pointer to value
+                   that must be later converted with ca._unpack()
        as_string   flag(True/False) to get a string representation
                    of the value returned.  This is not nearly as
                    featured as for a PV -- see pv.py for more details.
@@ -893,16 +898,18 @@ def get(chid, ftype=None, as_string=False, count=None, as_numpy=True):
     else:
         count = min(count, element_count(chid))
 
-    data = (count*dbr.Map[ftype])()
-
-    ret = libca.ca_array_get(ftype, count, chid, data)
+    pdat = (count*dbr.Map[ftype])()
+    ret = libca.ca_array_get(ftype, count, chid, pdat)
     PySEVCHK('get', ret)
+    if not unpack:
+        return pdat
+
     poll()
     if count > 2:
         tcount = min(count, 1000)
         poll(evt=tcount*1.e-5, iot=tcount*0.01)
 
-    val = _unpack(data, count=count, ftype=ftype, as_numpy=as_numpy)
+    val = _unpack(pdat, count=count, ftype=ftype, as_numpy=as_numpy)
     if as_string:
         val = _as_string(val, chid, count, ftype)
     return val
