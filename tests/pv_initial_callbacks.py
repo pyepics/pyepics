@@ -24,12 +24,11 @@ def callback_b(pvname=None, value=None, **kw):
 
 
 pvname = pvnames.non_updating_pv
-mypv = epics.PV(pvname, callback=callback_a)
+mypv = epics.PV(pvname, callback=(callback_a, callback_b))
 
-write('Created PV = %s\n' % mypv)
-mypv.add_callback(callback_b)
+write('Created PV with two callbacks = %s\n' % mypv)
 
-write('Added second callback.  Now wait for changes...\n')
+write('Now wait for changes...\n')
 
 def wait(timeout=10):
     t0 = time.time()
@@ -43,8 +42,8 @@ if not mypv.connected:
     sys.exit(1)
 
 if not (got_callback_a and got_callback_b):
-    write('ERROR: Inconsistent initial value callbacks - callback A = %s, callback B = %s\n' 
+    write('ERROR: Inconsistent initial value callbacks - callback A = %s, callback B = %s\n'
           % (got_callback_a, got_callback_b) )
     sys.exit(1)
 
-write('Got both callbacks OK')
+write('Got both callbacks OK!\n')
