@@ -184,7 +184,6 @@ class PV(object):
         self._monref = None
         self.connected = False
         self._conn_started = False
-        self._monitor_started = False
         return self.wait_for_connection()
 
     def poll(self, evt=1.e-4, iot=1.0):
@@ -204,7 +203,8 @@ class PV(object):
         if not self.wait_for_connection():
             return None
 
-        if not self.auto_monitor or self._args['value'] is None:
+        if ((not self.auto_monitor or self._args['value'] is None) or
+            (count is not None and len(self._args['value']) > 1)):
             self._args['value'] = ca.get(self.chid,
                                          count=count,
                                          ftype=self.ftype,
@@ -214,10 +214,8 @@ class PV(object):
             self._set_charval(self._args['value'])
             return self._args['char_value']
 
-        # this emulates asking for less data than actually exists in the
-        # cached value
-        if count is not None and len(self._args['value']) > 1:
-            count = max(0, min(count, len(self._args['value'])))
+        # allow asking for less data than actually exists in the cached value
+        if count is not None and count < len(self._args['value']):
             return self._args['value'][:count]
         return self._args['value']
 
@@ -320,7 +318,6 @@ class PV(object):
         To have user-defined code run when the PV value changes,
         use add_callback()
         """
-        self._monitor_started = True
         self._args.update(kwd)
         self._args['value']  = value
         self._args['timestamp'] = kwd.get('timestamp', time.time())
