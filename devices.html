@@ -779,8 +779,9 @@ set of PVs.  The examples below show how to build on this generality, and
 may inspire you to build your own device classes.</p>
 <div class="section" id="device-without-a-prefix">
 <h3>Device without a prefix<a class="headerlink" href="#device-without-a-prefix" title="Permalink to this headline">¶</a></h3>
-<p>Here is a simple device, that does not even define a prefix.  Thus, all PVs
-in the device must be <em>fully qualified</em>, and need not share a prefix.:</p>
+<p>Here, we define a very simple device that does not even define a prefix.
+This is not much more than a collection of PVs, All PVs in the device must
+be <em>fully qualified</em>, as they need do not share a common prefix:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">Device</span>
 <span class="n">dev</span> <span class="o">=</span> <span class="n">Device</span><span class="p">()</span>
 <span class="n">p1</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;13IDC:m1.VAL&#39;</span><span class="p">)</span>
@@ -790,8 +791,10 @@ in the device must be <em>fully qualified</em>, and need not share a prefix.:</p
 <span class="k">print</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;13IDC:m3.DIR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This demonstrates that a <cite>Device</cite> is simply a collection of  PVs, which
-can be accessed through <tt class="xref py py-meth docutils literal"><span class="pre">PV()</span></tt>.</p>
+<p>Note that this device cannot use the attributes based on field names.</p>
+<p>This may not look very interesting until you consider <cite>Device</cite> to be a
+starting point for building more complicated objects by adding specialized
+methods.</p>
 </div>
 <div class="section" id="epics-ai-record-as-device">
 <h3>Epics ai record as Device<a class="headerlink" href="#epics-ai-record-as-device" title="Permalink to this headline">¶</a></h3>

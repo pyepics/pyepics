@@ -61,6 +61,7 @@
 <li><a class="reference internal" href="#thread-examples">Thread Examples</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#strategies-for-connecting-to-a-large-number-of-pvs">Strategies for connecting to a large number of PVs</a></li>
 <li><a class="reference internal" href="#time-sleep-or-epics-poll">time.sleep() or epics.poll()?</a></li>
 </ul>
 </li>
@@ -397,6 +398,108 @@ PV <cite>Py:ai1</cite> is generated in each thread.</p>
 <p>Without this, the callbacks for thread <em>A</em>  will persist even after the
 thread has completed!</p>
 </div>
+</div>
+<div class="section" id="strategies-for-connecting-to-a-large-number-of-pvs">
+<span id="advanced-connecting-many-label"></span><h2>Strategies for connecting to a large number of PVs<a class="headerlink" href="#strategies-for-connecting-to-a-large-number-of-pvs" title="Permalink to this headline">¶</a></h2>
+<p>Occassionally, you may find that you need to quickly connect to a large
+number of PVs, say to write values to disk.  The most straightforward way
+to do this, say:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
+
+<span class="n">pvnamelist</span> <span class="o">=</span> <span class="n">read_list_pvs</span><span class="p">()</span>
+<span class="n">pv_vals</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">pvnamelist</span><span class="p">:</span>
+    <span class="n">pv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">pv_vals</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>does incur some small performance penalty.  As shown below, the penalty
+is generally pretty small in absolute terms, but can be noticeable when
+you are connecting to a large number (say, more than 100) PVs at once.</p>
+<p>The cause for the penalty, and its remedy, are two-fold.  First, a <cite>PV</cite>
+object automatically use connection and event callbacks.  Normally, these
+are advantages, as you don't need to explicitly deal with them.  But,
+internally, they do pause for network responses using <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a>
+and <a class="reference internal" href="ca.html#ca.pend_io" title="ca.pend_io"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_io()</span></tt></a>, and these pauses can add up.  Second, the
+<a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> also pauses for network response, so that the returned value
+actually containes the latest data right away.</p>
+<dl class="docutils">
+<dt>The remedies are to</dt>
+<dd><ol class="first last arabic simple">
+<li>not use connection or event callbacks.</li>
+<li>not explicitly pause for values to be returned for each <tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt>.</li>
+</ol>
+</dd>
+</dl>
+<p>A more complicated but faster approach relies on a carefully-tuned use of
+the CA library, and would be the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
+
+<span class="n">pvnamelist</span> <span class="o">=</span> <span class="n">read_list_pvs</span><span class="p">()</span>
+<span class="n">pv_vals</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">channels</span><span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">pvnamelist</span><span class="p">:</span>
+    <span class="n">chid</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">auto_cb</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="c"># note 1</span>
+    <span class="n">channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
+
+<span class="n">ca</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
+
+<span class="n">tmppdata</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+    <span class="n">name</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">element_count</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
+    <span class="n">ftype</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">field_type</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
+    <span class="n">pdat</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>  <span class="c"># note 2</span>
+    <span class="n">tmpdata</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ftype</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span>  <span class="n">pdat</span>
+
+<span class="n">ca</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>  <span class="c"># polls for *all* channels</span>
+
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">pvnames</span><span class="p">:</span>
+    <span class="n">ftype</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">pdat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="n">pv_vals</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">_unpack</span><span class="p">(</span><span class="n">pdat</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">,</span> <span class="n">ftype</span><span class="o">=</span><span class="n">ftype</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The code here probably needs detailed explanation.  The first thing to
+notice is that this is using the <cite>ca</cite> level, not <cite>PV</cite> objects.  Second
+(Note 1), the <cite>auto_cb=False</cite> option to <a class="reference internal" href="ca.html#ca.create_channel" title="ca.create_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></tt></a> which
+will turn off all connection callbacks -- normally this is not what you
+want, but we're aiming for maximum speed.  Next (Note 2), we get the
+<em>reference</em> to the value from <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a>, without unpacking it.  We
+also get the data type and count which we'll need to unpack the value
+later.  The main point of not having <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> unpack the data for
+each channel as we go is that unpacking the value requires a
+<a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a> to pause for network response.  As long as we don't unpack
+the values, we can get through the whole list without doing any calls to
+<a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a>.  Then we do call <a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a> once (not len(channels)
+times).  Finally, we use the <a class="reference internal" href="ca.html#ca._unpack" title="ca._unpack"><tt class="xref py py-meth docutils literal"><span class="pre">ca._unpack()</span></tt></a> method to convert the
+stored pointer to a python value.</p>
+<p>How much faster is the more explicit method?  In my tests, I used 20,000
+PVs, all scalar values, all actually connected, and all on the same subnet
+as the test client, though on a mixture of several vxWorks and linux IOCs.
+I found that the simplest, obvious approach as above took around 12 seconds
+to read all 20,000 PVs.  Using the <cite>ca</cite> layer with connection callbacks and
+a normal call to <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> also took about 12 seconds.  The method
+without connection callbacks and with delayed unpacking above took about 2
+seconds to read all 20,000 PVs.</p>
+<p>Is that performance boost from 12 to 2 seconds significant?  If you're
+writing a script that is intended to run once, fetch a large number of PVs
+and get their values (say, an auto-save script that runs on demand), then
+the boost is definitely significant.  On the other hand, if you're writing
+a long running process or a process that will retain the PV connections and
+get their values multiple times, the difference in startup speed is less
+significant.  For a long running auto-save script that periodically writes
+out all the PV values, the &quot;obvious&quot; way using automatically monitored PVs
+may be much <em>better</em>, as the time for the initial connection is small, and
+the use of event callbacks will reduce network traffic for PVs that don't
+change between writes.</p>
+<p>Note that the tests also show that, with the simplest approach, 1,000 PVs
+should connect and receive values in under 1 second.  Any application that
+is sure it needs to connect to PVs faster than that rate will want to do
+careful timing tests.  Finally, note also that the issues are not really a
+classic <em>python is slow compared to C</em> issue, but rather a matter of how
+much pausing with <a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a> one does to make sure values are
+immediately useful.</p>
 </div>
 <div class="section" id="time-sleep-or-epics-poll">
 <span id="advanced-sleep-label"></span><h2>time.sleep() or epics.poll()?<a class="headerlink" href="#time-sleep-or-epics-poll" title="Permalink to this headline">¶</a></h2>

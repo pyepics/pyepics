@@ -494,35 +494,21 @@ PyEpics3 does work with both Python 2.* and 3.*.</p>
 </div>
 <div class="section" id="status-and-to-do-list">
 <h2>Status and To-Do List<a class="headerlink" href="#status-and-to-do-list" title="Permalink to this headline">¶</a></h2>
-<p>The Epics3 package is under active development.   The current status is that
-most features are working well, and it is starting to be used in production
-code, but more testing and better tests are needed.</p>
+<p>The Pyepics package is under active development.  The current status is
+that most features are working well, and it is starting to be used in
+production code, but more testing and better tests are needed.</p>
 <p>The package is targeted and tested to work with Python 2.5, 2.6, 2.7, and
 3.1 simultaneously (that is, the same code is meant to support all
 versions).  Currently, the package works with Python 3.1, but is not
 extremely well-tested.</p>
 <p>There are several desired features are left undone or unfinished:</p>
 <blockquote>
-<div><ul>
-<li><p class="first">port CaChannel interface, ca_util, epicsPV (and other interfaces??) to use epics.ca</p>
-</li>
-<li><p class="first">add more &quot;devices&quot;, including low-level epics records.</p>
-</li>
-<li><p class="first">further testing for Python 3.1</p>
-</li>
-<li><p class="first">further testing for threading and contexts.</p>
-</li>
-<li><dl class="first docutils">
-<dt>build and distribute example Epics applications, such as:</dt>
-<dd><ul class="first last simple">
-<li>PV stripcharter</li>
-<li>Probe replacement</li>
-<li>application to manage saved &quot;positions&quot; of multiple PVs in an
-&quot;instrument&quot;.</li>
-</ul>
-</dd>
-</dl>
-</li>
+<div><ul class="simple">
+<li>port CaChannel interface, ca_util, epicsPV (and other interfaces??) to use epics.ca</li>
+<li>add more &quot;devices&quot;, including low-level epics records.</li>
+<li>incorporate some or all of theChannel Access Server from <a class="reference external" href="http://code.google.com/p/pcaspy/">pcaspy</a></li>
+<li>further testing for threading and contexts.</li>
+<li>build and improve applications.</li>
 </ul>
 </div></blockquote>
 </div>
