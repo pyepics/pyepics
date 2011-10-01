@@ -326,12 +326,12 @@ to <tt class="xref py py-func docutils literal"><span class="pre">sys.stderr.wri
 
 <dl class="function">
 <dt id="ca.pend_event">
-<tt class="descclassname">ca.</tt><tt class="descname">pend_event</tt><big>(</big><span class="optional">[</span><em>t=1.e-4</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.pend_event" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ca.</tt><tt class="descname">pend_event</tt><big>(</big><span class="optional">[</span><em>t=1.e-5</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.pend_event" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="ca.poll">
-<tt class="descclassname">ca.</tt><tt class="descname">poll</tt><big>(</big><span class="optional">[</span><em>evt=1.e-4</em><span class="optional">[</span>, <em>iot=1.0</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.poll" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ca.</tt><tt class="descname">poll</tt><big>(</big><span class="optional">[</span><em>evt=1.e-5</em><span class="optional">[</span>, <em>iot=1.0</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.poll" title="Permalink to this definition">¶</a></dt>
 <dd><p>a convenience function which is equivalent to:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">pend_event</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
 <span class="n">pend_io_</span><span class="p">(</span><span class="n">iot</span><span class="p">)</span>
@@ -348,7 +348,7 @@ memory address of the C representation of the channel, but it is probably
 a good idea to treat these as object instances.</p>
 <dl class="function">
 <dt id="ca.create_channel">
-<tt class="descclassname">ca.</tt><tt class="descname">create_channel</tt><big>(</big><em>pvname</em><span class="optional">[</span>, <em>connect=False</em><span class="optional">[</span>, <em>userfcn=None</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.create_channel" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ca.</tt><tt class="descname">create_channel</tt><big>(</big><em>pvname, [connect=False, [callback=None, auto_cb=True]]]</em><big>)</big><a class="headerlink" href="#ca.create_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates a channel, returning the Channel ID <tt class="docutils literal"><span class="pre">chid</span></tt> used by other
 functions to identify this channel.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -358,14 +358,15 @@ functions to identify this channel.</p>
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>pvname</strong> -- the name of the PV to create.</li>
 <li><strong>connect</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to (try to) connect to PV as soon as possible.</li>
-<li><strong>userfcn</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or callable.) -- user-defined Python function to be called when the connection state changes.</li>
+<li><strong>callback</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or callable.) -- user-defined Python function to be called when the connection state changes.</li>
+<li><strong>auto_cb</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to automatically use an internal callback.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="docutils">
-<dt>The user-defined function should be  prepared to accept keyword arguments of</dt>
+<dt>The user-defined callback function should be  prepared to accept keyword arguments of</dt>
 <dd><ul class="first last simple">
 <li><cite>pvname</cite>  name of PV</li>
 <li><cite>chid</cite>    <tt class="docutils literal"><span class="pre">chid</span></tt> Channel ID</li>
@@ -373,9 +374,9 @@ functions to identify this channel.</p>
 </ul>
 </dd>
 </dl>
-<p>Internally, a connection callback is used so that you should
-not need to explicitly connect to a channel, unless you are having
-difficulty with dropped connections.</p>
+<p>If <cite>auto_cb</cite> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, an internal connection callback is used so
+that you should not need to explicitly connect to a channel, unless you
+are having difficulty with dropped connections.</p>
 </dd></dl>
 
 <dl class="function">
@@ -513,7 +514,7 @@ allocated space for the data.  In python none of these is needed, and
 keyword arguments can be used to specify such options.</p>
 <dl class="method">
 <dt id="ca.get">
-<tt class="descclassname">ca.</tt><tt class="descname">get</tt><big>(</big><em>chid</em><span class="optional">[</span>, <em>ftype=None</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.get" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ca.</tt><tt class="descname">get</tt><big>(</big><em>chid</em><span class="optional">[</span>, <em>ftype=None</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>as_numpy=True</em>, <em>unpack=True</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the current value for a Channel. Note that there is not a separate form for array data.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -525,6 +526,7 @@ keyword arguments can be used to specify such options.</p>
 <li><strong>count</strong> (<em>integer</em>) -- maximum element count to return (full data returned by default)</li>
 <li><strong>as_string</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the string representation of the value.  See notes below.</li>
 <li><strong>as_numpy</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the Numerical Python representation  for array / waveform data.</li>
+<li><strong>unpack</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the unpacked data or just the internal pointer value</li>
 </ul>
 </td>
 </tr>
@@ -545,6 +547,11 @@ types the result will from Python's <tt class="xref py py-func docutils literal"
 array.  This is only applied if numpy can be imported.  See
 <a class="reference internal" href="advanced.html#advanced-large-arrays-label"><em>Strategies for working with large arrays</em></a> for a discussion of strategies for how
 to best deal with very large arrays.</p>
+<p>The <em>unpack</em> option will not return the value, but the underlying reference
+(C pointer) to the value.  The returned value would then need to be
+explicitly unpacked with the <a class="reference internal" href="#ca._unpack" title="ca._unpack"><tt class="xref py py-func docutils literal"><span class="pre">_unpack()</span></tt></a> function.  This explicit
+approach can be useful in some circumstances.  See
+<a class="reference internal" href="advanced.html#advanced-connecting-many-label"><em>Strategies for connecting to a large number of PVs</em></a> for a discussion.</p>
 <dl class="method">
 <dt id="ca.put">
 <tt class="descclassname">ca.</tt><tt class="descname">put</tt><big>(</big><em>chid</em>, <em>value</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=20</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>callback_data=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.put" title="Permalink to this definition">¶</a></dt>
@@ -576,7 +583,7 @@ callback function will be called with keyword arguments</p>
 
 <dl class="method">
 <dt id="ca.create_subscription">
-<tt class="descclassname">ca.</tt><tt class="descname">create_subscription</tt><big>(</big><em>chid</em><span class="optional">[</span>, <em>use_time=False</em><span class="optional">[</span>, <em>use_ctrl=False</em><span class="optional">[</span>, <em>mask=None</em><span class="optional">[</span>, <em>userfcn=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.create_subscription" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ca.</tt><tt class="descname">create_subscription</tt><big>(</big><em>chid</em><span class="optional">[</span>, <em>use_time=False</em><span class="optional">[</span>, <em>use_ctrl=False</em><span class="optional">[</span>, <em>mask=None</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.create_subscription" title="Permalink to this definition">¶</a></dt>
 <dd><p>create a <em>subscription to changes</em>, The user-supplied callback function
 will be called on any changes to the PV.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -587,7 +594,7 @@ will be called on any changes to the PV.</p>
 <li><strong>use_time</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to use the TIME variant for the PV type</li>
 <li><strong>use_ctrl</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to use the CTRL variant for the PV type</li>
 <li><strong>mask</strong> (<em>integer</em>) -- bitmask (of dbr.DBE_ALARM, dbr.DBE_LOG, dbr.DBE_VALUE) to control which changes result in a callback. Defaults to <a class="reference internal" href="#ca.DEFAULT_SUBSCRIPTION_MASK" title="ca.DEFAULT_SUBSCRIPTION_MASK"><tt class="xref py py-data docutils literal"><span class="pre">DEFAULT_SUBSCRIPTION_MASK</span></tt></a>.</li>
-<li><strong>userfcn</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or callable) -- user-supplied callback function</li>
+<li><strong>callback</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or callable) -- user-supplied callback function</li>
 </ul>
 </td>
 </tr>
@@ -1261,8 +1268,8 @@ standard output:</p>
 <span class="n">mypv</span> <span class="o">=</span> <span class="s">&#39;XXX.VAL&#39;</span>
 <span class="n">chid</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">mypv</span><span class="p">)</span>
 
-<span class="c"># subscribe to events, giving &#39;userfcn&#39; as the callback function</span>
-<span class="n">eventID</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_subscription</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="n">userfcn</span><span class="o">=</span><span class="n">onChanges</span><span class="p">)</span>
+<span class="c"># subscribe to events giving a callback function</span>
+<span class="n">eventID</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_subscription</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onChanges</span><span class="p">)</span>
 
 <span class="c"># now we simply wait for changes</span>
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -1288,7 +1295,7 @@ initial connection:</p>
 
 <span class="c"># create channel, provide connection callback</span>
 <span class="n">motor1</span> <span class="o">=</span> <span class="s">&#39;13IDC:m1&#39;</span>
-<span class="n">chid</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">motor1</span><span class="p">,</span> <span class="n">userfcn</span><span class="o">=</span><span class="n">onConnectionChange</span><span class="p">)</span>
+<span class="n">chid</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">motor1</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onConnectionChange</span><span class="p">)</span>
 
 <span class="k">print</span> <span class="s">&#39;Now waiting, watching values and connection changes:&#39;</span>
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>

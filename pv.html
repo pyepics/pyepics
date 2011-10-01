@@ -127,7 +127,7 @@ attributes for accessing it's properties.</p>
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>pvname</strong> -- name of Epics Process Variable</li>
-<li><strong>callback</strong> (<em>callable or None</em>) -- user-defined callback function on changes to PV value or state.</li>
+<li><strong>callback</strong> (<em>callable, tuple, list or None</em>) -- user-defined callback function on changes to PV value or state.</li>
 <li><strong>form</strong> (<em>string, one of ('native','ctrl', or 'time')</em>) -- which epics <em>data type</em> to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.</li>
 <li><strong>auto_monitor</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt>, <tt class="xref docutils literal"><span class="pre">True</span></tt>, <tt class="xref docutils literal"><span class="pre">False</span></tt>, or bitmask (see <a class="reference internal" href="#pv-automonitor-label"><em>Automatic Monitoring of a PV</em></a>)) -- whether to automatically monitor the PV for changes.</li>
 <li><strong>connection_callback</strong> (<em>callable or None</em>) -- user-defined function called on changes to PV connection status.</li>
@@ -149,8 +149,8 @@ connect and be ready to use.</p>
 </pre></div>
 </div>
 <p>The <em>pvname</em> is required, and is the name of an existing Process Variable.</p>
-<p>The <em>callback</em> parameter  specifies a python method to be called on changes,
-as discussed in more detail at <a class="reference internal" href="#pv-callbacks-label"><em>User-supplied Callback functions</em></a></p>
+<p>The <em>callback</em> parameter specifies one or more python methods to be called
+on changes, as discussed in more detail at <a class="reference internal" href="#pv-callbacks-label"><em>User-supplied Callback functions</em></a></p>
 <p>The <em>connection_callback</em> parameter specifies a python method to be called
 on changes to the connection status of the PV (that is, when it connects or
 disconnects).  This is discussed in more detail at <a class="reference internal" href="#pv-connection-callbacks-label"><em>User-supplied Connection Callback functions</em></a></p>
@@ -351,6 +351,14 @@ only defined callback.</p>
 <tt class="descclassname">pv.</tt><tt class="descname">run_callbacks</tt><big>(</big><big>)</big><a class="headerlink" href="#pv.run_callbacks" title="Permalink to this definition">¶</a></dt>
 <dd><p>execute all user-defined callbacks right now, even if the PV has not
 changed.  Useful for debugging!</p>
+<p>See also: <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><tt class="xref py py-attr docutils literal"><span class="pre">callbacks</span></tt></a>  attribute, <a class="reference internal" href="#pv-callbacks-label"><em>User-supplied Callback functions</em></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pv.run_callback">
+<tt class="descclassname">pv.</tt><tt class="descname">run_callback</tt><big>(</big><em>index</em><big>)</big><a class="headerlink" href="#pv.run_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>execute a particularl user-defined callback right now, even if the PV
+has not changed.  Useful for debugging!</p>
 <p>See also: <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><tt class="xref py py-attr docutils literal"><span class="pre">callbacks</span></tt></a>  attribute, <a class="reference internal" href="#pv-callbacks-label"><em>User-supplied Callback functions</em></a></p>
 </dd></dl>
 
@@ -698,18 +706,26 @@ you to be notified of changes without having to continually ask for a PVs
 current value.  Much of this information is similar to that in
 <a class="reference internal" href="ca.html#ca-callbacks-label"><em>User-supplied Callback functions</em></a> for the <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module, though there are some
 important enhancements to callbacks on <cite>PV</cite> objects.</p>
-<p>When defining a callback function to be run on changes to a PV, as set from
-<a class="reference internal" href="#pv.add_callback" title="pv.add_callback"><tt class="xref py py-meth docutils literal"><span class="pre">add_callback()</span></tt></a>, it is important to know two things:</p>
+<p>You can define more than one callback function per PV to be run on value
+changes.  These functions can be specified when creating a PV, with the
+<em>callback</em> argument which can take either a single callback function or a
+list or tuple of callback functions.  After a PV has been created, you can
+add calllback functions with <a class="reference internal" href="#pv.add_callback" title="pv.add_callback"><tt class="xref py py-meth docutils literal"><span class="pre">add_callback()</span></tt></a>, remove them with
+<a class="reference internal" href="#pv.remove_callback" title="pv.remove_callback"><tt class="xref py py-meth docutils literal"><span class="pre">remove_callback()</span></tt></a>, and explicitly run them with <a class="reference internal" href="#pv.run_callback" title="pv.run_callback"><tt class="xref py py-meth docutils literal"><span class="pre">run_callback()</span></tt></a>.
+Each callback has an internal unique <em>index</em> (a small integer number) that
+can be used for specifying which one to add, remove, and run.</p>
+<p>When defining a callback function to be run on changes to a PV, it is
+important to know two things:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li>how your function will be called.</li>
 <li>what is permissible to do inside your callback function.</li>
 </ol>
 </div></blockquote>
-<p>Callback functions will be called with several keyword arguments.  You should be
-prepared to have them passed to your function, and should always include
-<cite>**kw</cite>  to catch all arguments.  Your callback will be sent the following
-keyword parameters:</p>
+<p>Callback functions will be called with several keyword arguments.  You
+should be prepared to have them passed to your function, and should always
+include <cite>**kw</cite> to catch all arguments.  Your callback will be sent the
+following keyword parameters:</p>
 <blockquote>
 <div><ul>
 <li><p class="first"><cite>pvname</cite>: the name of the pv</p>
@@ -773,14 +789,15 @@ keyword parameters:</p>
 <p>Some of these may not be directly applicable to all PV data types, and some
 values may be None if the control parameters have not yet been fetched with
 <a class="reference internal" href="#pv.get_ctrlvars" title="pv.get_ctrlvars"><tt class="xref py py-meth docutils literal"><span class="pre">get_ctrlvars()</span></tt></a>.</p>
-<p>Note that a the user-supplied callback will be run <em>inside</em> a CA function,
-and cannot reliably make any other CA calls.  It is helpful to think &quot;this
-all happens inside of a <tt class="xref py py-func docutils literal"><span class="pre">pend_event()</span></tt> call&quot;, and in an epics thread
-that may or may not be the main thread of your program.  It is advisable to
-keep the callback functions short and not resource-intensive.  Consider
-strategies which use the callback only to record that a change has occurred
-and then act on that change later -- perhaps in a separate thread, perhaps
-after <tt class="xref py py-func docutils literal"><span class="pre">pend_event()</span></tt> has completed.</p>
+<p>It is important to keep in mind that the callback function will be run
+<em>inside</em> a CA function, and cannot reliably make any other CA calls.  It is
+helpful to think &quot;this all happens inside of a <tt class="xref py py-func docutils literal"><span class="pre">pend_event()</span></tt> call&quot;,
+and in an epics thread that may or may not be the main thread of your
+program.  It is advisable to keep the callback functions short and not
+resource-intensive.  Consider strategies which use the callback only to
+record that a change has occurred and then act on that change later --
+perhaps in a separate thread, perhaps after <tt class="xref py py-func docutils literal"><span class="pre">pend_event()</span></tt> has
+completed.</p>
 <p>The <cite>cb_info</cite> parameter supplied to the callback needs special attention,
 as it is the only non-Epics information passed.   The <cite>cb_info</cite> parameter
 will be a tuple containing (<tt class="xref py py-attr docutils literal"><span class="pre">index</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">self</span></tt>) where
