@@ -143,10 +143,10 @@ class Device(object):
         thispv.wait_for_connection()
         return thispv.put(value, wait=wait, timeout=timeout)
         
-    def get(self, attr, as_string=False):
+    def get(self, attr, as_string=False, count=None):
         """get an attribute value, 
         option as_string returns a string representation"""
-        return self.PV(attr).get(as_string=as_string)
+        return self.PV(attr).get(as_string=as_string, count=count)
     
     def save_state(self):
         """return a dictionary of the values of all
