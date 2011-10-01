@@ -227,7 +227,7 @@ class PV_Tests(unittest.TestCase):
         cdict  = pv.get_ctrlvars()
         write( 'Testing CTRL Values for a Double (%s)\n'   % (pvn))
         self.failUnless('severity' in cdict)
-        self.failUnless(pv.host.startswith(pvnames.double_pv_host))
+        self.failUnless(len(pv.host) > 1)
         self.assertEqual(pv.count,1)
         self.assertEqual(pv.precision, pvnames.double_pv_prec)
         self.assertEqual(pv.units, pvnames.double_pv_units)
