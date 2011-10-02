@@ -64,4 +64,6 @@ if  [ $? -ne 0 ]  ; then
   exit 
 fi
 
-tar xvf ../pyepics_docs.tar.gz .
+tar xzf ../pyepics_docs.tar.gz .
+
+
