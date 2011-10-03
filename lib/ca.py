@@ -948,7 +948,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     """
     ftype = field_type(chid)
     count = element_count(chid)
-    if count > 1:
+    if count > 1 and not (ftype == dbr.CHAR and isinstance(value, str)):
         count = min(len(value), count)
 
     data  = (count*dbr.Map[ftype])()
@@ -975,8 +975,9 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],
         #                  dtype=numpy.uint8)
         if ftype == dbr.CHAR and isinstance(value, str):
-            pad = '\x00'*(1+count-len(value))
-            value = [ord(i) for i in ("%s%s" % (value, pad))[:count]]
+            fcount = element_count(chid)
+            pad = '\x00'*(1+fcount-len(value))
+            value = [ord(i) for i in ("%s%s" % (value, pad))[:fcount]]
         try:
             ndata, nuser = len(data), len(value)
             if nuser > ndata:
