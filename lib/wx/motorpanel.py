@@ -23,13 +23,13 @@ from epics.wx.utils import LCEN, RCEN, CEN, LTEXT, RIGHT, pack, add_button
 class MotorPanel(wx.Panel):
     """ MotorPanel  a simple wx windows panel for controlling an Epics Motor
 
-    use full=False for a minimal window (no tweak values, stop, or more)
+    use psize='full' (defaiult) for full capabilities, or
+              'medium' or 'small' for minimal version
     """
     __motor_fields = ('SET', 'disabled', 'LLM', 'HLM',  'LVIO', 'TWV',
                       'HLS', 'LLS', 'SPMG', 'DESC')
 
-
-    def __init__(self, parent,  motor=None,  full=True, midsize=False,
+    def __init__(self, parent,  motor=None,  psize='full',
                  messenger=None, prec=None, **kw):
 
         wx.Panel.__init__(self, parent, style=wx.TAB_TRAVERSAL)
@@ -43,10 +43,9 @@ class MotorPanel(wx.Panel):
             self.format = "%%.%if" % prec
 
         self.motor = None
-        self.is_full = full
         self._size = 'full'
-        if midsize:
-            self._size = 'med'
+        if psize in ('medium', 'small'):
+            self._size = psize
         self.__sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.CreatePanel()
 
@@ -86,7 +85,7 @@ class MotorPanel(wx.Panel):
             self.motor.get_pv(attr).add_callback(self.OnMotorEvent,
                                                  wid=self.GetId(),
                                                  field=attr)
-        if self.is_full:
+        if self._size == 'full':
             self.SetTweak(self.format % self.motor.TWV)
 
     @EpicsFunction
@@ -104,7 +103,7 @@ class MotorPanel(wx.Panel):
 
         descpv = self.motor.PV('DESC').get()
         self.desc.Wrap(45)
-        if self.is_full:
+        if self._size == 'full':
             self.twf.SetPV(self.motor.PV('TWF'))
             self.twr.SetPV(self.motor.PV('TWR'))
         elif len(descpv) > 20:
@@ -121,10 +120,10 @@ class MotorPanel(wx.Panel):
     def CreatePanel(self):
         " build (but do not fill in) panel components"
         wdesc, wrbv, winfo, wdrv = 200, 105, 90, 120
-        if self._size == 'med':
+        if self._size == 'medium':
             wdesc, wrbv, winfo, wdrv = 140, 85, 80, 100
-        if not self.is_full:
-            wdesc, wrbv, winfo, wdrv = 95, 80, 80, 80
+        elif self._size == 'small':
+            wdesc, wrbv, winfo, wdrv = 45, 70, 40, 80
 
         self.desc = PVText(self, size=(wdesc, 25), style=LTEXT)
         self.desc.SetForegroundColour("Blue")
@@ -141,7 +140,14 @@ class MotorPanel(wx.Panel):
         except PyDeadObjectError:
             return
 
-        if self.is_full:
+        spacer = wx.StaticText(self, label=' ', size=(5, 5), style=RIGHT)
+        self.__sizer.AddMany([(spacer,      0, CEN),
+                              (self.desc,   1, LCEN),
+                              (self.info,   1, CEN),
+                              (self.rbv,    0, CEN),
+                              (self.drive,  0, CEN)])
+
+        if self._size == 'full':
             self.twk_list = ['','']
             self.__twkbox = wx.ComboBox(self, value='', size=(100, -1),
                                         choices=self.twk_list,
@@ -155,13 +161,6 @@ class MotorPanel(wx.Panel):
             self.stopbtn = add_button(self, label=' Stop ', action=self.OnStopButton)
             self.morebtn = add_button(self, label=' More ', action=self.OnMoreButton)
 
-        spacer = wx.StaticText(self, label=' ', size=(5, 5), style=RIGHT)
-        self.__sizer.AddMany([(spacer,      1, CEN),
-                              (self.desc,   1, LCEN),
-                              (self.info,   1, CEN),
-                              (self.rbv,    0, CEN),
-                              (self.drive,  0, CEN)])
-        if self.is_full:
             self.__sizer.AddMany([(self.twr,      0, CEN),
                                   (self.__twkbox, 0, CEN),
                                   (self.twf,      0, CEN),
@@ -181,7 +180,7 @@ class MotorPanel(wx.Panel):
             self.drive.Update()
             self.desc.Update()
             self.rbv.Update()
-            if self.is_full:
+            if self._size == 'full':
                 self.twk_list = self.make_step_list()
                 self.UpdateStepList()
         except PyDeadObjectError:
@@ -255,10 +254,10 @@ class MotorPanel(wx.Panel):
                 font.PointSize -= 1
             self.desc.SetFont(font)
 
-        elif field == 'TWV' and self.is_full:
+        elif field == 'TWV' and self._size == 'full':
             self.SetTweak(field_str)
 
-        elif field == 'SPMG' and self.is_full:
+        elif field == 'SPMG' and self._size == 'full':
             label, info, color = 'Stop', '', 'White'
             if field_val == 0:
                 label, info, color = ' Go ', 'Stopped', 'Yellow'
