@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 import sys
 import time
 import copy
@@ -96,7 +96,7 @@ class Struck(epics.Device):
         for nmca in mcas:
             if self.scaler is not None:
                 scaler_name = self.scaler.get('NM%i' % nmca)
-                if len(scaler_name) > 0:
+                if scaler_name is not None and len(scaler_name) > 0:
                     if (ignore_prefix is not None and
                         scaler_name.startswith(ignore_prefix)):
                         continue
