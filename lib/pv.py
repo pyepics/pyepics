@@ -129,7 +129,7 @@ class PV(object):
             if self._monref is None and self.auto_monitor:
                 # you can explicitly request a subscription mask
                 # (ie dbr.DBE_ALARM|dbr.DBE_LOG) by passing it as the
-                # auto_monitor arg, otherwise if you specify 'True' you'll 
+                # auto_monitor arg, otherwise if you specify 'True' you'll
                 # just get the default set in ca.DEFAULT_SUBSCRIPTION_MASK
                 mask = self.auto_monitor if type(self.auto_monitor) is int else None
                 self._monref = ca.create_subscription(self.chid,
@@ -191,7 +191,7 @@ class PV(object):
         "poll for changes"
         ca.poll(evt=evt, iot=iot)
 
-    def get(self, count=None, as_string=False, as_numpy=True):
+    def get(self, count=None, as_string=False, as_numpy=True, timeout=None):
         """returns current value of PV.  Use the options:
          as_string to return string representation
          as_numpy  to (try to) return a numpy array
@@ -208,6 +208,7 @@ class PV(object):
             (count is not None and len(self._args['value']) > 1)):
             self._args['value'] = ca.get(self.chid,
                                          count=count,
+                                         timeout=timeout,
                                          ftype=self.ftype,
                                          as_numpy=as_numpy)
 
@@ -342,7 +343,7 @@ class PV(object):
             self.run_callback(index)
 
     def run_callback(self, index):
-        """run a specific user-defined callback, specified by index, 
+        """run a specific user-defined callback, specified by index,
         with the current data
         Note that callback functions are called with keyword/val
         arguments including:

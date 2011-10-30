@@ -19,6 +19,7 @@ import os
 import sys
 import time
 import copy
+from  math import log10
 import atexit
 import warnings
 from threading import Thread
@@ -876,12 +877,14 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID
-def get(chid, ftype=None, unpack=True,
+def get(chid, ftype=None, unpack=True, timeout=None,
         as_string=False, count=None, as_numpy=True):
     """return the current value for a Channel.  Options are
        ftype       field type to use (native type is default)
        unpack      whether to retun value (default) or pointer to value
                    that must be later converted with ca._unpack()
+       timeout     time to wait (and sent to pend_io()) before unpacking
+                   value (default =  0.5 + log10(count) )
        as_string   flag(True/False) to get a string representation
                    of the value returned.  This is not nearly as
                    featured as for a PV -- see pv.py for more details.
@@ -903,10 +906,9 @@ def get(chid, ftype=None, unpack=True,
     if not unpack:
         return pdat
 
-    poll()
-    if count > 2:
-        tcount = min(count, 1000)
-        poll(evt=tcount*1.e-5, iot=tcount*0.01)
+    if timeout is None:
+        timeout = 0.5 + log10(count)
+    poll(evt=timeout*1.e-4, iot=timeout)
 
     val = _unpack(pdat, count=count, ftype=ftype, as_numpy=as_numpy)
     if as_string:
