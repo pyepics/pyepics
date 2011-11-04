@@ -944,7 +944,9 @@ def get_cached_value(chid, ftype=None, count=None, timeout=None,
 
        Note: this function can be called only once, as on success, the cached value
        will be set back to None.
+
        Options are as for get (but without unpack, which is always True here):
+
        ftype       field type to use (native type is default)
        count       explicitly limit count
        as_string   flag(True/False) to get a string representation
@@ -952,7 +954,8 @@ def get_cached_value(chid, ftype=None, count=None, timeout=None,
                    featured as for a PV -- see pv.py for more details.
        as_numpy    flag(True/False) to use numpy array as the
                    return type for array data.
-       timeout
+       timeout     time to wait for value to be set before unpacking
+                   (default = 0.5 + log10(count) seconds)
     """
     if ftype is None:
         ftype = field_type(chid)
@@ -967,7 +970,7 @@ def get_cached_value(chid, ftype=None, count=None, timeout=None,
 
     t0 = time.time()
     if timeout is None:
-        timeout = 1.0 + log10(count)
+        timeout = 0.5 + log10(count)
 
     while not ncache['value']: # see implementation note: False implies "waiting for callback"
         pend_event(1.e-5)
