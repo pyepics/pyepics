@@ -889,10 +889,11 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID
-def get(chid, ftype=None, unpack=True, timeout=None,
-        as_string=False, count=None, as_numpy=True):
+def get(chid, ftype=None, count=None, unpack=True, timeout=None,
+        as_string=False, as_numpy=True):
     """return the current value for a Channel.  Options are
        ftype       field type to use (native type is default)
+       count       explicitly limit count
        unpack      flag(True/False) to wait to return value (default) or
                    return None immediately, with value to be fetched later
                    by ca.get_cached_value(chid, ...)
@@ -919,7 +920,10 @@ def get(chid, ftype=None, unpack=True, timeout=None,
         count = min(count, element_count(chid))
 
     ncache = _cache[current_context()][name(chid)]
-    ncache['value'] = None
+    # implementation note:
+    #  the cached value = None   implies no value, no expected callback
+    #  the cached value = False  implies no value yet, callback expected.
+    ncache['value'] = False
 
     uarg = ctypes.py_object(ctypes.POINTER(dbr.Map[ftype]))
     ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, uarg)
@@ -928,41 +932,30 @@ def get(chid, ftype=None, unpack=True, timeout=None,
     if not unpack:
         return None
 
-    t0 = time.time()
-    if timeout is None:
-        timeout = 1.0 + log10(count)
-
-    while ncache['value'] is None:
-        pend_event(1.e-5)
-        if time.time()-t0 > timeout:
-            msg = "ca.get('%s') timed out after %.2f seconds."
-            warnings.warn(msg % (name(chid), timeout))
-            return None
-
-    return get_cached_value(chid, count=count, ftype=ftype,
+    return get_cached_value(chid, count=count, ftype=ftype, timeout=timeout,
                             as_string=as_string, as_numpy=as_numpy)
 
 @withConnectedCHID
-def get_cached_value(chid, ftype=None, as_string=False, count=None, as_numpy=True):
+def get_cached_value(chid, ftype=None, count=None, timeout=None,
+                     as_string=False,  as_numpy=True):
     """returns the cached value for a channel.   This assumes that a call to
        get(chid, ....)  either used 'unpack=True' or timed out, and that the data
        has actually arrived by the time this function is called.
 
        Note: this function can be called only once, as on success, the cached value
        will be set back to None.
-
-       Options are as for get:
+       Options are as for get (but without unpack, which is always True here):
        ftype       field type to use (native type is default)
+       count       explicitly limit count
        as_string   flag(True/False) to get a string representation
                    of the value returned.  This is not nearly as
                    featured as for a PV -- see pv.py for more details.
        as_numpy    flag(True/False) to use numpy array as the
                    return type for array data.
+       timeout
     """
     if ftype is None:
         ftype = field_type(chid)
-    if ftype in (None, -1):
-        return None
     if count is None:
         count = element_count(chid)
     else:
@@ -970,14 +963,23 @@ def get_cached_value(chid, ftype=None, as_string=False, count=None, as_numpy=Tru
 
     ncache = _cache[current_context()][name(chid)]
     if ncache['value'] is None:
-        poll()
-        if ncache['value'] is None:
+        return None
+
+    t0 = time.time()
+    if timeout is None:
+        timeout = 1.0 + log10(count)
+
+    while not ncache['value']: # see implementation note: False implies "waiting for callback"
+        pend_event(1.e-5)
+        if time.time()-t0 > timeout:
+            msg = "ca.get('%s') timed out after %.2f seconds."
+            warnings.warn(msg % (name(chid), timeout))
             return None
 
     val = _unpack(ncache['value'], count=count, ftype=ftype, as_numpy=as_numpy)
     if as_string:
         val = _as_string(val, chid, count, ftype)
-    #  print 'get_Cache , have value, clear '
+    # value retrieved, clear cached value
     ncache['value'] = None
     return val
 
