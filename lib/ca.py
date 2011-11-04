@@ -416,16 +416,15 @@ def withSEVCHK(fcn):
     return wrapper
 
 ##
-## Event Handlers for get() event callbacks
-def _onGetEvent(args):
-    """Internal Event Handler for get events: not intended for use"""
+## Event Handler for monitor event callbacks
+def _onMonitorEvent(args):
+    """Event Handler for monitor events: not intended for use"""
     value = dbr.cast_args(args).contents
-    # chid = dbr.chid_t(args.chid)
     pvname = name(args.chid)
     kwds = {'ftype':args.type, 'count':args.count,
            'chid':args.chid, 'pvname': pvname,
            'status':args.status}
-    # print("_onGetEvent ", pvname, current_context())
+
     # add kwds arguments for CTRL and TIME variants
     if args.type >= dbr.CTRL_STRING:
         tmpv = value[0]
@@ -473,7 +472,7 @@ def _onConnectionEvent(args):
 
     if not pv_found:
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
-                               'ts':0, 'failures':0,
+                               'ts':0, 'failures':0, 'value': None,
                                'callbacks': []}
 
     # set connection time, run connection callbacks
@@ -497,6 +496,17 @@ def _onConnectionEvent(args):
                         callback(pvname=pvname, chid=chid, conn=conn)
     return
 
+## get event handler:
+def _onGetEvent(args, **kwds):
+    """get_callback event: simply store data contents which
+    will need conversion to python data with _unpack()."""
+    global _cache
+    if args.status != dbr.ECA_NORMAL:
+        return
+    ctx = current_context()
+    pvname = name(args.chid)
+    _cache[ctx][pvname]['value'] = dbr.cast_args(args).contents
+
 ## put event handler:
 def _onPutEvent(args, **kwds):
     """set put-has-completed for this channel,
@@ -512,10 +522,11 @@ def _onPutEvent(args, **kwds):
             kwds['data'] = data
         fcn(pvname=pvname, **kwds)
 
-# create global reference to these two callbacks
+# create global reference to these callbacks
 _CB_CONNECT = ctypes.CFUNCTYPE(None, dbr.connection_args)(_onConnectionEvent)
 _CB_PUTWAIT = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)
-_CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onGetEvent)
+_CB_GET     = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onGetEvent)
+_CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onMonitorEvent)
 
 ###
 #
@@ -668,7 +679,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         _cache[ctx] = {}
     if pvname not in _cache[ctx]: # new PV for this context
         entry = {'conn':False,  'chid': None,
-                 'ts': 0,  'failures':0,
+                 'ts': 0,  'failures':0, 'value': None,
                  'callbacks': [ callback ]}
         _cache[ctx][pvname] = entry
     else:
@@ -812,6 +823,7 @@ def native_type(ftype):
 def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     """unpack raw data returned from an array get or
     subscription callback"""
+
     def unpack_simple(data, count, ntype, use_numpy):
         "simple, native data type"
         if count == 1 and ntype != dbr.STRING:
@@ -881,10 +893,66 @@ def get(chid, ftype=None, unpack=True, timeout=None,
         as_string=False, count=None, as_numpy=True):
     """return the current value for a Channel.  Options are
        ftype       field type to use (native type is default)
-       unpack      whether to retun value (default) or pointer to value
-                   that must be later converted with ca._unpack()
+       unpack      flag(True/False) to wait to return value (default) or
+                   return None immediately, with value to be fetched later
+                   by ca.get_cached_value(chid, ...)
        timeout     time to wait (and sent to pend_io()) before unpacking
                    value (default =  0.5 + log10(count) )
+       as_string   flag(True/False) to get a string representation
+                   of the value returned.  This is not nearly as
+                   featured as for a PV -- see pv.py for more details.
+       as_numpy    flag(True/False) to use numpy array as the
+                   return type for array data.
+
+       get will return None under one of the following conditions:
+         * Channel not connected
+         * unpack=True passed in
+         * data is not available within timeout.
+    """
+    if ftype is None:
+        ftype = field_type(chid)
+    if ftype in (None, -1):
+        return None
+    if count is None:
+        count = element_count(chid)
+    else:
+        count = min(count, element_count(chid))
+
+    ncache = _cache[current_context()][name(chid)]
+    ncache['value'] = None
+
+    uarg = ctypes.py_object(ctypes.POINTER(dbr.Map[ftype]))
+    ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, uarg)
+
+    PySEVCHK('get', ret)
+    if not unpack:
+        return None
+
+    t0 = time.time()
+    if timeout is None:
+        timeout = 1.0 + log10(count)
+
+    while ncache['value'] is None:
+        pend_event(1.e-5)
+        if time.time()-t0 > timeout:
+            msg = "ca.get('%s') timed out after %.2f seconds."
+            warnings.warn(msg % (name(chid), timeout))
+            return None
+
+    return get_cached_value(chid, count=count, ftype=ftype,
+                            as_string=as_string, as_numpy=as_numpy)
+
+@withConnectedCHID
+def get_cached_value(chid, ftype=None, as_string=False, count=None, as_numpy=True):
+    """returns the cached value for a channel.   This assumes that a call to
+       get(chid, ....)  either used 'unpack=True' or timed out, and that the data
+       has actually arrived by the time this function is called.
+
+       Note: this function can be called only once, as on success, the cached value
+       will be set back to None.
+
+       Options are as for get:
+       ftype       field type to use (native type is default)
        as_string   flag(True/False) to get a string representation
                    of the value returned.  This is not nearly as
                    featured as for a PV -- see pv.py for more details.
@@ -894,25 +962,23 @@ def get(chid, ftype=None, unpack=True, timeout=None,
     if ftype is None:
         ftype = field_type(chid)
     if ftype in (None, -1):
-        return
+        return None
     if count is None:
         count = element_count(chid)
     else:
         count = min(count, element_count(chid))
 
-    pdat = (count*dbr.Map[ftype])()
-    ret = libca.ca_array_get(ftype, count, chid, pdat)
-    PySEVCHK('get', ret)
-    if not unpack:
-        return pdat
+    ncache = _cache[current_context()][name(chid)]
+    if ncache['value'] is None:
+        poll()
+        if ncache['value'] is None:
+            return None
 
-    if timeout is None:
-        timeout = 0.5 + log10(count)
-    poll(evt=timeout*1.e-4, iot=timeout)
-
-    val = _unpack(pdat, count=count, ftype=ftype, as_numpy=as_numpy)
+    val = _unpack(ncache['value'], count=count, ftype=ftype, as_numpy=as_numpy)
     if as_string:
         val = _as_string(val, chid, count, ftype)
+    #  print 'get_Cache , have value, clear '
+    ncache['value'] = None
     return val
 
 def _as_string(val, chid, count, ftype):

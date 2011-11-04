@@ -206,11 +206,17 @@ class PV(object):
 
         if ((not self.auto_monitor or self._args['value'] is None) or
             (count is not None and len(self._args['value']) > 1)):
-            self._args['value'] = ca.get(self.chid,
-                                         count=count,
-                                         timeout=timeout,
-                                         ftype=self.ftype,
-                                         as_numpy=as_numpy)
+            ctx = ca.current_context()
+            if ca._cache[ctx][self.pvname]['value'] is not None:
+                ca.poll(evt=1.e-3, iot=1.0)
+                self._args['value'] = ca.get_cached_value(self.chid, count=count,
+                                                          ftype=self.ftype,
+                                                          as_numpy=as_numpy)
+
+            else:
+                self._args['value'] = ca.get(self.chid, count=count,
+                                             timeout=timeout, ftype=self.ftype,
+                                             as_numpy=as_numpy)
 
         if as_string:
             self._set_charval(self._args['value'])
