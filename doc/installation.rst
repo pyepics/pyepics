@@ -23,6 +23,11 @@ to use the modules.  For Unix-like systems, these are assumed to be
 available (and findable by Python at runtime) on the system. This may mean
 setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 
+.. _numpy module:   http://numpy.scipy.org/
+
+The Python `numpy module`_ is not required, but will be used to convert
+EPICS waveforms values into numerical array data if available, and is strongly encouraged.
+
 Downloads
 ~~~~~~~~~~~~~
 

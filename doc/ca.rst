@@ -236,8 +236,8 @@ a good idea to treat these as object instances.
 
    explicitly connect to a channel (usually not needed, as implicit
    connection will be done when needed), waiting up to timeout for a
-   channel to connect.  It returns the connection state,
-   ``True`` or ``False``.
+   channel to connect.  It returns the connection state, ``True`` or
+   ``False``.
 
    :param chid:     ``chid`` Channel ID
    :param timeout:  maximum time to wait for connection.
@@ -396,7 +396,7 @@ approach can be useful in some circumstances.  See
 
    :meth:`put` returns 1 on success and -1 on timed-out
 
-   Specifying a callback will override setting *wait=True*.  This
+   Specifying a callback will override setting `wait=True`.  This
    callback function will be called with keyword arguments
 
        pvname=pvname, data=callback_data
@@ -446,8 +446,8 @@ approach can be useful in some circumstances.  See
 .. data:: DEFAULT_SUBSCRIPTION_MASK
 
 	This value is the default subscription type used when calling
-	:meth:`create_subscription` with mask=None. It is also used by default when creating a
-	:class:`PV` object with auto_monitor is set to True.
+	:meth:`create_subscription` with `mask=None`. It is also used by default when creating a
+	:class:`PV` object with auto_monitor is set to ``True``.
 
 	The initial default value is *dbr.DBE_ALARM|dbr.DBE_VALUE* (ie update
 	on alarm changes or value changes which exceeds the monitor deadband.) The other possible flag
@@ -735,7 +735,7 @@ function.
    :param count:   number of elements to fetch (defaults to element count of chid  or 1)
    :param ftype:   data type of channel (defaults to native type of chid)
    :param as_numpy:  whether to convert to numpy array.
-   :type as_numpy:  ``True`` or ``False``
+   :type as_numpy:  ``True``/``False``
 
 ..  _ca-callbacks-label:
 
@@ -959,5 +959,5 @@ This will run the supplied callback soon after the channel has been
 created, when a successful connection has been made.  Note that the
 callback should be prepared to accept keyword arguments of `pvname`,
 `chid`, and `conn` for the PV name, channel ID, and connection state
-(`True` or `False`).
+(``True`` or ``False``).
 
