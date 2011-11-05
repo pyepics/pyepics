@@ -143,7 +143,7 @@ quite good.
 :func:`caget`
 ~~~~~~~~~~~~~
 
-..  function:: caget(pvname[, as_string=False[, count=None[, as_numpy=True])
+..  function:: caget(pvname[, as_string=False[, count=None[, as_numpy=True[, timeout=None]]]])
 
   retrieves and returns the value of the named PV.
 
@@ -152,15 +152,25 @@ quite good.
   :type as_string:  ``True``/``False``
 
   :param count:  number of elements to return for array data.
-  :type count:  integer
+  :type count:  integer or ``None``
 
-   :param as_numpy:  whether to return the Numerical Python representation for array data.
-   :type as_numpy:  ``True``/``False``
+  :param as_numpy:  whether to return the Numerical Python representation for array data.
+  :type as_numpy:  ``True``/``False``
+
+  :param timeout:  maximum time to wait (in seconds) for value before returning None.
+  :type count:  float or ``None``
 
 
 The *count* and *as_numpy* options apply only to array or waveform
 data. The default behavior is to return the full data array and convert to
-a numpy array if available.
+a numpy array if available.  The *count* option can be used to explicitly
+limit the number of array elements returned, and *as_numpy* can turn on or
+off conversion to a numpy array.
+
+The *timeout* argument sets the maximum time to wait for a value to be
+fetched over the network.  If the timeout is exceeded, :func:`caget` will
+return ``None``.  This might imply that the PV is not actually available,
+but it might also mean that the data is large or network slow enough
 
 The *as_string* argument tells the function to return the **string
 representation** of the value.  The details of the string representation

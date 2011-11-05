@@ -504,8 +504,7 @@ def _onGetEvent(args, **kwds):
     if args.status != dbr.ECA_NORMAL:
         return
     ctx = current_context()
-    pvname = name(args.chid)
-    _cache[ctx][pvname]['value'] = dbr.cast_args(args).contents
+    _cache[ctx][name(args.chid)]['value'] = dbr.cast_args(args).contents
 
 ## put event handler:
 def _onPutEvent(args, **kwds):

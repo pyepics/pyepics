@@ -13,9 +13,9 @@ was not tested as of this writing.
 In addition, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
 libCom.so and libca.so (or Com.dll and ca.dll on Windows) from *Epics Base*
-are required to use this module.  Using a patched version of 3.14.12 is
+are required to use this module.  Using version 3.14.12 or higher is
 recommended -- some of the features for 'subarray records' will only work
-with this latest version.
+with this 3.14.12 and higher.
 
 For 32-bit Windows, pre-built DLLs from 3.14.12 (patched as of March, 2011)
 are included and installed so that no other Epics installation is required
@@ -26,14 +26,14 @@ setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 Downloads
 ~~~~~~~~~~~~~
 
-The latest stable version of the E pics Python Package is 3.1.3.  There are
-a few ways to get the Epics Python Package:
+The latest stable version of the PyEpics Package is 3.1.4.  There are
+a few ways to get the PyEpics Package:
 
-.. _pyepics-3.1.3.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.tar.gz
-.. _pyepics-3.1.3.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.3.tar.gz
-.. _pyepics-3.1.3.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.win32-py2.6.exe
-.. _pyepics-3.1.3.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.win32-py2.7.exe
-.. _pyepics-3.1.3.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.win32-py3.1.exe
+.. _pyepics-3.1.4.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.tar.gz
+.. _pyepics-3.1.4.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.4.tar.gz
+.. _pyepics-3.1.4.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py2.6.exe
+.. _pyepics-3.1.4.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py2.7.exe
+.. _pyepics-3.1.4.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py3.1.exe
 .. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
 .. _PyPi Epics Entry:             http://pypi.python.org/pypi/pyepics/
@@ -42,17 +42,17 @@ a few ways to get the Epics Python Package:
 +---------------------------+------------------------------------------+
 |  Download Option          |  Location                                |
 +===========================+==========================================+
-|  Source Kit               |  `pyepics-3.1.3.tar.gz (CARS)`_  or      |
-|                           |  `pyepics-3.1.3.tar.gz (PyPI)`_          |
+|  Source Kit               |  `pyepics-3.1.4.tar.gz (CARS)`_  or      |
+|                           |  `pyepics-3.1.4.tar.gz (PyPI)`_          |
 +---------------------------+------------------------------------------+
-|  Windows Installers       |  `pyepics-3.1.3.win32-py2.6.exe`_  or    |
-|                           |  `pyepics-3.1.3.win32-py2.7.exe`_  or    |
-|                           |  `pyepics-3.1.3.win32-py3.1.exe`_        |
+|  Windows Installers       |  `pyepics-3.1.4.win32-py2.6.exe`_  or    |
+|                           |  `pyepics-3.1.4.win32-py2.7.exe`_  or    |
+|                           |  `pyepics-3.1.4.win32-py3.1.exe`_        |
 +---------------------------+------------------------------------------+
 |  Development Version      |  use `pyepics github repository`_        |
 +---------------------------+------------------------------------------+
 
-if you have `Python Setup Tools`_  installed, you can download and install
+If you have `Python Setup Tools`_  installed, you can download and install
 the PyEpics Package simply with::
 
    easy_install -U pyepics
@@ -62,7 +62,7 @@ Testing
 ~~~~~~~~~~~~~
 
 Some automated unit-testing is done, using the tests folder from the source
-distribution kit.  The following systems were tested for 3.1.3, all with
+distribution kit.  The following systems were tested for 3.1.4, all with
 Epics base 3.14.12.1.  Except as noted, all tests pass.  Those tests that
 fail are generally well-understood.
 
@@ -105,7 +105,7 @@ Testing Notes:
 Development Version
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The PyEpics module is still under active development, and enhancements and
+The PyEpics module is still under active development, with enhancements and
 bug-fixes are being added frequently.  All development is done through the
 `pyepics github repository`_.  To get a read-only copy of the latest
 version, use::
@@ -135,7 +135,6 @@ install the PyEpics Package with::
    easy_install -U pyepics
 
 
-
 Getting Started, Setting up the Epics Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -143,7 +142,6 @@ In order for Epics Channel Access to work correctly, you must be able to
 
    1. Find the CA library: *libca.so* on Unix, *libca.dylib* on Mac OS X,  or *ca.dll* on Windows.
    2. Connect to Epics Process Variables served by Epics IOCs on you network.
-
 
 In order for PyEpics to work at all, it must be able to find and load the
 Channel Access dynamic library (*libca.so*, *libca.dylib*, or *ca.dll*

@@ -40,17 +40,17 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
         eventID = epics.ca.create_subscription(chid, callback=onChanges)
         chids.append((chid, eventID))
         epics.poll(evt=0.025, iot=5.0)
-    epics.poll(evt=0.05, iot=10.0)
+    epics.poll(evt=0.025, iot=10.0)
 
-    for (chid,eventID) in chids:
+    for (chid, eventID) in chids:
         write('=== %s   chid=%s\n' % (epics.ca.name(chid), repr(chid)))
-        time.sleep(0.01)
+        time.sleep(0.005)
         ntype = epics.ca.promote_type(chid, use_ctrl=use_ctrl,
                                       use_time=use_time)
         val  = epics.ca.get(chid, ftype=ntype)
         cval = epics.ca.get(chid, as_string=True)    
-        if epics.ca.element_count(chid) > 1:
-            val = val[:12]
+        if epics.ca.element_count(chid) > 10:
+            val = val[:10]
         write("%i %s  %s %s \n" % (ntype, epics.dbr.Name(ntype).lower(), repr(val), cval))
     write('----- finalizing CA\n')
     epics.ca.finalize_libca()

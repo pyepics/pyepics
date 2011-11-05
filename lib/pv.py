@@ -87,8 +87,9 @@ class PV(object):
             ca.use_initial_context()
         self.context = ca.current_context()
 
-        self._args['chid'] = self.chid = ca.create_channel(self.pvname,
-                                                           callback=self.__on_connect)
+        self._args['chid'] = ca.create_channel(self.pvname,
+                                               callback=self.__on_connect)
+        self.chid = self._args['chid']
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
@@ -208,14 +209,15 @@ class PV(object):
             (count is not None and len(self._args['value']) > 1)):
             ctx = ca.current_context()
             if ca._cache[ctx][self.pvname]['value'] is not None:
-                ca.poll(evt=1.e-3, iot=1.0)
-                self._args['value'] = ca.get_cached_value(self.chid, count=count,
+                self._args['value'] = ca.get_cached_value(self.chid,
+                                                          count=count,
+                                                          timeout=timeout,
                                                           ftype=self.ftype,
                                                           as_numpy=as_numpy)
-
             else:
                 self._args['value'] = ca.get(self.chid, count=count,
-                                             timeout=timeout, ftype=self.ftype,
+                                             timeout=timeout,
+                                             ftype=self.ftype,
                                              as_numpy=as_numpy)
 
         if as_string:
