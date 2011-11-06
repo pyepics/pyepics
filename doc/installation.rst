@@ -23,10 +23,9 @@ to use the modules.  For Unix-like systems, these are assumed to be
 available (and findable by Python at runtime) on the system. This may mean
 setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 
-.. _numpy module:   http://numpy.scipy.org/
-
-The Python `numpy module`_ is not required, but will be used to convert
-EPICS waveforms values into numerical array data if available, and is strongly encouraged.
+The Python `numpy module <http://numpy.scipy.org/>`_ is not required, but
+will be used to convert EPICS waveforms values into numerical array data if
+available, and its use is encouraged.
 
 Downloads
 ~~~~~~~~~~~~~
@@ -143,12 +142,7 @@ install the PyEpics Package with::
 Getting Started, Setting up the Epics Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order for Epics Channel Access to work correctly, you must be able to
-
-   1. Find the CA library: *libca.so* on Unix, *libca.dylib* on Mac OS X,  or *ca.dll* on Windows.
-   2. Connect to Epics Process Variables served by Epics IOCs on you network.
-
-In order for PyEpics to work at all, it must be able to find and load the
+In order for PyEpics to work at correctly, it must be able to find and load the
 Channel Access dynamic library (*libca.so*, *libca.dylib*, or *ca.dll*
 depending on the system).  This dynamic library needs to found at runtime.
 
@@ -172,7 +166,7 @@ Note, that For Windows users, the DLLs (ca.dll and Com.dll) are included in the
 installation kit, and automaically installed to where they can be found at
 runtime (following rule 3 above).
 
-With the Epics library loaded, it will be necessary to connect to Epics
+With the Epics library loaded, it will need to be able to connect to Epics
 Process Variables. Generally, these variables are provided by Epics I/O
 controllers (IOCs) that are processes running on some device on the
 network.   If you're connecting to PVs provided by IOCs on your local

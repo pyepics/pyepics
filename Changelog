@@ -62,15 +62,12 @@
 	- ca.find_libca() added PYEPICS_LIBCA as preferred way to
 	explicitly set where libca.so is found
 
-
 	- Added ca.DEFAULT_SUBSCRIPTION_MASK for subscriptions, which is
 	set to    DBE_VALUE | DBE_ALARM    (not DBE_LOG)
+	- ca.create_subscription() now has a mask argument.
 
-	ca.create_subscription() now has a mask argument.
-
-	For PVs, the auto_monitor argument can be set to the subscription
+	- For PVs, the auto_monitor argument can be set to the subscription
 	mask, or True, or False, or None.
-	constructor argument
 
 	- put() (ca.py and PV) for waveform now puts only the array size
 	of the data passed in, so that the '.NORD' field is kept as the
@@ -204,10 +201,10 @@
 2010-10-02  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.9:
- 	- many fixes to ca.py to avoid errors on 64-bit linux (no other 
+ 	- many fixes to ca.py to avoid errors on 64-bit linux (no other
 	64-bit systems available for testing at this time).  Two separat
 	errors were found:
-	-- incorrect mapping of "DBR_LONG" (should be	ctypes.c_int) 
+	-- incorrect mapping of "DBR_LONG" (should be	ctypes.c_int)
 	-- use of args.chid as a Channel ID in 'connection' and 'get'
 	callbacks:  The issue is that the Python callback receives
 	args.chid as a Python int, and this must be cast to a
@@ -219,8 +216,8 @@
 	really forced a connection, just retried).
 
 	- fixed bug that prevented getting array data on systems without
-	numpy installed. 
-	
+	numpy installed.
+
 	- added tests, tested on more systems with more variations.
 
 
@@ -230,18 +227,18 @@
  	- fixed fetching of ctrl and time variants of array data, due
 	to a patch from Glen Wright (<Glen.Wright@lightsource.ca>)!
 
-	- improvement for connections on slow networks: 
+	- improvement for connections on slow networks:
 	moved setting of monitor reference to pv.on_connect, and
 	postponing setting self.connection until pv.on_connect is
 	complete.  This prevents a main thread from seeing
 	self.connected = True and plowing ahead while the connection
 	callback is still being run.  Connections are now much
-	more reliable over slow networks (say, over a VPN and DSL 
+	more reliable over slow networks (say, over a VPN and DSL
 	line from home -- it works!)
 
 	- set EPICS_CA_MAX_ARRAY_BYTES to 2**24 if not already set.
-	
-	- many fixes to wx.MotorPanel and related GUI components, so 
+
+	- many fixes to wx.MotorPanel and related GUI components, so
 	that scripts/wx_motor.py now works much better.
 
 	- small improvements to motor device.
@@ -265,13 +262,13 @@
 	as to avoid unnecessary crashes.
 
 	- added several tests.
-	
+
 	- documentation improvements
-	
+
 2010-06-10  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.6:
-	- added working connection callbacks for PVs: users supply 
+	- added working connection callbacks for PVs: users supply
 	a function that is called on changes to connection status.
 
 2010-05-25  Matt Newville  <newville@cars.uchicago.edu>
@@ -302,7 +299,7 @@
 	* Version 3.0.4:
 	fixed some performance bottlenecks for large arrays, as from
 	areaDetector.
-	
+
 2010-05-02  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.3:
@@ -318,19 +315,19 @@
 	successful, the enviroment variables PATH and LD_LIBRARY_PATH (and
 	DYLD_LIBRARY_PATH on Mac OSX) will be searched for the appropriate
 	DLL.
-		
+
 	- improved functionality for Python Threads.   The _cache data in
 	ca.py now stores Channel IDs with CA "context", so that use of
 	Python threads (as from threading.Thread) work, allowing, gets(),
 	puts(), and callbacks in separately running threads.
-			
+
 
 2010-04-08  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.0.1:
-	inital release of version 3.0.1 
+	inital release of version 3.0.1
 
 	This is a dramatic change from the 2.1 series.  Please consult
 	documentation.
-	
-	
+
+

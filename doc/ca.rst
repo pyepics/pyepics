@@ -336,8 +336,7 @@ requiring the user to supply DBR TYPE and count as well as ``chid`` and
 allocated space for the data.  In python none of these is needed, and
 keyword arguments can be used to specify such options.
 
-.. method:: get(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=True, unpack=True]]]])
-
+.. method:: get(chid[, ftype=None[, timeout=None[, count=None[, as_string=False[, as_numpy=True, unpack=True]]]]])
 
    return the current value for a Channel. Note that there is not a separate form for array data.
 
@@ -345,6 +344,8 @@ keyword arguments can be used to specify such options.
    :type  chid:  ctypes.c_long
    :param ftype:  field type to use (native type is default)
    :type ftype:  integer
+   :param timeout:  maximum time to wait for data before returning None.
+   :type timeout:  float or ``None``
    :param count:  maximum element count to return (full data returned by default)
    :type count:  integer
    :param as_string:  whether to return the string representation of the value.  See notes below.
@@ -354,10 +355,16 @@ keyword arguments can be used to specify such options.
    :param unpack:  whether to return the unpacked data or just the internal pointer value
    :type unpack:  ``True``/``False``
 
-
 For a listing of values of *ftype*, see :ref:`Table of DBR Types
 <dbrtype_table>`.    The optional *count* can be used to limit the amount of
 data returned for array data from waveform records.
+
+The *timeout* option sets the maximum time to wait before returning
+``None``.  Such a timeout could imply that the channel is disconnected
+or that the data size is larger or network slower than normal.
+See
+:ref:`advanced-get-timeouts-label` for further discussion of this and
+the associated :func:`get_cached_value`.
 
 The *as_string* option warrants special attention: The feature is not as
 complete as as the *as_string* argument for :meth:`PV.get`.  Here, a string
@@ -372,13 +379,39 @@ array.  This is only applied if numpy can be imported.  See
 :ref:`advanced-large-arrays-label` for a discussion of strategies for how
 to best deal with very large arrays.
 
-The *unpack* option will not return the value, but the underlying reference
-(C pointer) to the value.  The returned value would then need to be
-explicitly unpacked with the :func:`_unpack` function.  This explicit
-approach can be useful in some circumstances.  See
+The *unpack* option will not return the value, but the underlying
+reference (C pointer) to the value.  The returned value would then need
+to be explicitly unpacked with the :func:`get_cached_value`. function.
+This explicit approach can be useful in some circumstances.  See
 :ref:`advanced-connecting-many-label` for a discussion.
 
-.. method::  put(chid, value, [wait=False, [timeout=20, [callback=None, [callback_data=None]]]])
+
+.. method:: get_cached_value(chid[, ftype=None[, timeout=None[, count=None[, as_string=False[, as_numpy=True]]]])
+
+   return the current value for a Channel, completing an earlier
+   :func:`get` that returned ``None``, either because `unpack=True` was
+   used or because the data transfer did not complete before the
+   timeout.
+
+   :param chid:  ``chid`` Channel ID
+   :type  chid:  ctypes.c_long
+   :param ftype:  field type to use (native type is default)
+   :type ftype:  integer
+   :param timeout:  maximum time to wait for data before returning None.
+   :type timeout:  float or ``None``
+   :param count:  maximum element count to return (full data returned by default)
+   :type count:  integer
+   :param as_string:  whether to return the string representation of the value.  See notes below.
+   :type as_string:  ``True``/``False``
+   :param as_numpy:  whether to return the Numerical Python representation  for array / waveform data.
+   :type as_numpy:  ``True``/``False``
+
+
+   This function will return ``None`` if the previous :func:`get`
+   actually succeeded, or if even this data transfer times out.  See
+   :ref:`advanced-get-timeouts-label` for further discussion.
+
+.. method::  put(chid, value[, wait=False[, timeout=30[, callback=None[, callback_data=None]]]])
 
    sets the Channel to a value, with options to either wait (block) for the
    process to complete, or to execute a supplied callback function when the
@@ -403,7 +436,7 @@ approach can be useful in some circumstances.  See
 
    For more on this *put callback*, see :ref:`ca-callbacks-label` below.
 
-.. method::  create_subscription(chid, [use_time=False, [use_ctrl=False, [mask=None, [callback=None]]]])
+.. method::  create_subscription(chid[, use_time=False[, use_ctrl=False[, mask=None[, callback=None]]]])
 
    create a *subscription to changes*, The user-supplied callback function
    will be called on any changes to the PV.
@@ -412,7 +445,7 @@ approach can be useful in some circumstances.  See
    :type use_time:  ``True``/``False``
    :param use_ctrl: whether to use the CTRL variant for the PV type
    :type use_ctrl:  ``True``/``False``
-   :param  mask:    bitmask (of dbr.DBE_ALARM, dbr.DBE_LOG, dbr.DBE_VALUE) to control which changes result in a callback. Defaults to :data:`DEFAULT_SUBSCRIPTION_MASK`.
+   :param  mask:    bitmask (combination of dbr.DBE_ALARM, dbr.DBE_LOG, dbr.DBE_VALUE) to control which changes result in a callback. Defaults to :data:`DEFAULT_SUBSCRIPTION_MASK`.
    :type mask:      integer
    :param callback:  user-supplied callback function
    :type callback:   ``None`` or callable
@@ -445,17 +478,19 @@ approach can be useful in some circumstances.  See
 
 .. data:: DEFAULT_SUBSCRIPTION_MASK
 
-	This value is the default subscription type used when calling
-	:meth:`create_subscription` with `mask=None`. It is also used by default when creating a
-	:class:`PV` object with auto_monitor is set to ``True``.
+   This value is the default subscription type used when calling
+   :meth:`create_subscription` with `mask=None`. It is also used by
+   default when creating a :class:`PV` object with auto_monitor is set
+   to ``True``.
 
-	The initial default value is *dbr.DBE_ALARM|dbr.DBE_VALUE* (ie update
-	on alarm changes or value changes which exceeds the monitor deadband.) The other possible flag
-	in the bitmask is *dbr.DBE_LOG* for archive-deadband changes.
+   The initial default value is *dbr.DBE_ALARM|dbr.DBE_VALUE*
+   (i.e. update on alarm changes or value changes which exceeds the
+   monitor deadband.)  The other possible flag in the bitmask is
+   *dbr.DBE_LOG* for archive-deadband changes.
 
-	If this value is changed, it will change the default for all subsequent calls to
-	:meth:`create_subscription`, but it will not change any existing subscriptions.
-
+   If this value is changed, it will change the default for all
+   subsequent calls to :meth:`create_subscription`, but it will not
+   change any existing subscriptions.
 
 .. method:: clear_subscription(event_id)
 

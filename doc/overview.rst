@@ -421,16 +421,12 @@ The package is targeted and tested to work with Python 2.5, 2.6, 2.7, and
 versions).  Currently, the package works with Python 3.1, but is not
 extremely well-tested.
 
-.. _pcaspy:   http://code.google.com/p/pcaspy/
-
 There are several desired features are left undone or unfinished:
 
  * port CaChannel interface, ca_util, epicsPV (and other interfaces??) to use epics.ca
 
  * add more "devices", including low-level epics records.
 
- * incorporate some or all of theChannel Access Server from `pcaspy`_
-
- * further testing for threading and contexts.
+ * incorporate some or all of theChannel Access Server from `pcaspy <http://code.google.com/p/pcaspy/>`_
 
  * build and improve applications.
