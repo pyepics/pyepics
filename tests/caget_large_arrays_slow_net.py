@@ -22,10 +22,13 @@ for name in pvnames:
     t0 = time.time()
     value = epics.caget(name, timeout=TIMEOUT)
     dt = time.time()-t0
-    print "%s: npts=%i, sum=%i, max=%i, time=%.3fs" % (name,
-                                                       len(value),
-                                                       value.sum(),
-                                                       value.max(), dt)
+    if value is None:
+        print 'cannot get value for ', name
+    else:
+        print "%s: npts=%i, sum=%i, max=%i, time=%.3fs" % (name,
+                                                           len(value),
+                                                           value.sum(),
+                                                           value.max(), dt)
 
 print 'done.'
 

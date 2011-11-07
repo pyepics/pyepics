@@ -9,7 +9,7 @@ values = []
 pvlist = []
 data   = {}
 
-MAX_PVS = 10000
+MAX_PVS = 20000
 for line  in open('fastconn_pvlist.txt','r').readlines():
     pvnames.append(line[:-1])
 
@@ -34,7 +34,7 @@ for chid in pvlist:
     name  = ca.name(chid)
     count = ca.element_count(chid)
     ftype = ca.field_type(chid)
-    ca.get(chid, unpack=False)
+    ca.get(chid, wait=False)
     data[name] = chid, ftype, count
 
 dt.add("did ca.get() for value references")
@@ -43,7 +43,7 @@ ca.pend_event(1.e-2)
 dt.add("pend complete")
 for name in pvnames:
     chid, ftype, count = data[name]
-    val = ca.get_cached_value(chid, count=count, ftype=ftype)
+    val = ca.get_complete(chid, count=count, ftype=ftype)
     values.append(val)
 dt.add("unpacked PV values")
 
