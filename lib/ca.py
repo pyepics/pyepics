@@ -927,6 +927,7 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     #   None        implies no value, no expected callback
     #   GET_PENDING implies no value yet, callback expected.
     ncache['value'] = GET_PENDING
+
     uarg = ctypes.py_object(ctypes.POINTER(dbr.Map[ftype]))
     ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, uarg)
 
@@ -975,8 +976,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
     t0 = time.time()
     if timeout is None:
         timeout = 0.5 + log10(count)
-
-    while ncache['value'] is not GET_PENDING:
+    while ncache['value'] is GET_PENDING:
         pend_event(1.e-5)
         if time.time()-t0 > timeout:
             msg = "ca.get('%s') timed out after %.2f seconds."
