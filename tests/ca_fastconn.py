@@ -1,7 +1,10 @@
 from epics import ca, dbr
 import time
 import debugtime
-from epics.wx.ordereddict import OrderedDict
+try:
+    from collections import OrderedDict
+except:
+    from ordereddict import OrderedDict
 dt = debugtime.debugtime()
 dt.add('test of fast connection to many PVs')
 pvnames = []

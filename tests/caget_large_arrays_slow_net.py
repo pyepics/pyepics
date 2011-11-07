@@ -13,7 +13,7 @@ import epics
 import time
 pvnames = ('13GEXMAP:mca1',
            'GSE-PIL1:image1:ArrayData',
-           '13MARCCD1:image1:ArrayData',
+           '13MARCCD2:image1:ArrayData',
            )
 
 TIMEOUT = 15.0  # Timeout in seconds
@@ -23,13 +23,13 @@ for name in pvnames:
     value = epics.caget(name, timeout=TIMEOUT)
     dt = time.time()-t0
     if value is None:
-        print 'cannot get value for ', name
+        print( 'cannot get value for ', name)
     else:
-        print "%s: npts=%i, sum=%i, max=%i, time=%.3fs" % (name,
+        print( "%s: npts=%i, sum=%i, max=%i, time=%.3fs" % (name,
                                                            len(value),
                                                            value.sum(),
-                                                           value.max(), dt)
+                                                           value.max(), dt))
 
-print 'done.'
+print( 'done.')
 
 
