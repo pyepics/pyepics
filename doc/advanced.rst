@@ -307,6 +307,55 @@ thread has completed!
 The wait and timeout options for get(), ca.get_complete()
 ==============================================================
 
+The *get* functions, :func:`epics.caget`, :func:`pv.get` and :func:`ca.get`
+all ask for data to be transferred over the network.  For large data arrays
+or slow networks, this can can take a noticeable amount of time.  For PVs
+that have been disconnected, the *get* call will fail to return a value at
+all.  For this reason, these functions all take a `timeout` keyword option.
+The lowest level :func:`ca.get` also has a `wait` option, and a companion
+function :func:`ca.get_complete`.  This section describes the details of
+these.
+
+If you're using :func:`epics.caget` or :func:`pv.get` you can supply a
+timeout value.  If the value returned is ``None``, then either the PV has
+truly disconnected or the timeout passed before receiving the value.  If
+the *get* is incomplete in this way, a subsequent :func:`epics.caget` or
+:func:`pv.get` may actually complete and receive the value.
+
+At the lowest level (which :func:`pv.get` and :func:`epics.caget` use),
+:func:`ca.get` issues a get-request with an internal callback function
+(that is, it calls :func:`libca.ca_array_get_callback` with a pre-defined
+callback function).  With `wait=True` (the default), :func:`ca.get` then
+waits up to the timeout or until the CA library calls the specified
+callback function.  If the callback has been called, the value can then be
+converted and returned.
+
+If the callback is not called in time or if `wait=False` is used but the PV
+is connected, the callback will be called eventually, and simply waiting
+(or using :func:`ca.pend_event` if :data:`ca.PREEMPTIVE_CALLBACK` is
+``False``) may be sufficient for the data to arrive.  Under this condition, 
+you can call :func:`ca.get_complete`, which will NOT issue a new request
+for data to be sent, but wait (for up to a timeout time) for the previous
+get request to complete.
+
+:func:`ca.get_complete` will return ``None`` if the timeout is exceeded or
+if there is not an "incomplete get" that it can wait to complete.  Thus,
+you should use the return value from :func:`ca.get_complete` with care. 
+
+Note that :func:`pv.get` (and so :func:`epics.caget`) will normally rely on
+the PV value to be filled in automatically by monitor callbacks.  If
+monitor callbacks are disabled (as is done for large arrays and can be
+turned off) or if the monitor hasn't been called yet, :func:`pv.get` will
+check whether it should can :func:`ca.get` or :func:`ca.get_complete`.
+
+
+If not specified, the timeout for :func:`ca.get_complete` (and all other
+get functions) will be set to::
+
+   timeout = 0.5 + log10(count)
+
+Again, that's the maximum time that will be waited, and if the data is
+received faster than that, the *get* will return as soon as it can.
 
 .. _advanced-connecting-many-label:
 
@@ -333,13 +382,13 @@ The cause for the penalty, and its remedy, are two-fold.  First, a `PV`
 object automatically use connection and event callbacks.  Normally, these
 are advantages, as you don't need to explicitly deal with them.  But,
 internally, they do pause for network responses using :meth:`ca.pend_event`
-and :meth:`ca.pend_io`, and these pauses can add up.  Second, the
-:meth:`ca.get` also pauses for network response, so that the returned value
-actually containes the latest data right away.
+and these pauses can add up.  Second, the :meth:`ca.get` also pauses for
+network response, so that the returned value actually containes the latest
+data right away, as discussed in the previous section.
 
 The remedies are to
    1. not use connection or event callbacks.
-   2. not explicitly pause for values to be returned for each :meth:`get`.
+   2. not explicitly wait for values to be returned for each :meth:`get`.
 
 A more complicated but faster approach relies on a carefully-tuned use of
 the CA library, and would be the following::
@@ -347,43 +396,40 @@ the CA library, and would be the following::
     from epics import ca
 
     pvnamelist = read_list_pvs()
-    pv_vals = {}
 
-    channels= []
+    pvdata = {}
     for name in pvnamelist:
-        chid = ca.create_channel(name, auto_cb=False) # note 1
-        channels.append(chid)
+        chid = ca.create_channel(name, connect=False) # note 1
+	pvdata[name] = (chid, None)
 
+    for name, data in pvdata.items():
+        ca.connect_channel(data[0])
     ca.poll()
+    for name, data in pvdata.items():
+        ca.get(data[0], wait=False)  # note 2
 
-    tmppdata = {}
-    for chid in channels:
-        name  = ca.name(chid)
-        count = ca.element_count(chid)
-        ftype = ca.field_type(chid)
-        pdat = ca.get(chid, unpack=False)  # note 2
-        tmpdata[name] = ftype, count,  pdat
+    ca.poll() 
+    for name, data in pvdata.items():
+        val = ca.get_complete(data[0])
+        pvdata[name][1] = val
 
-    ca.poll()  # polls for *all* channels
-
-    for name in pvnames:
-        ftype, count, pdat = data[name]
-        pv_vals[name] = ca._unpack(pdat, count=count, ftype=ftype)
+    for name, data in pvdata.items():
+        print name, data[1]
 
 The code here probably needs detailed explanation.  The first thing to
 notice is that this is using the `ca` level, not `PV` objects.  Second
-(Note 1), the `auto_cb=False` option to :meth:`ca.create_channel` which
-will turn off all connection callbacks -- normally this is not what you
-want, but we're aiming for maximum speed.  Next (Note 2), we get the
-*reference* to the value from :meth:`ca.get`, without unpacking it.  We
-also get the data type and count which we'll need to unpack the value
-later.  The main point of not having :meth:`ca.get` unpack the data for
-each channel as we go is that unpacking the value requires a
-:meth:`ca.poll` to pause for network response.  As long as we don't unpack
-the values, we can get through the whole list without doing any calls to
-:meth:`ca.poll`.  Then we do call :meth:`ca.poll` once (not len(channels)
-times).  Finally, we use the :meth:`ca._unpack` method to convert the
-stored pointer to a python value.
+(Note 1), the `connect=False` option to :meth:`ca.create_channel` which
+will not wait for connection to be established -- normally this is not what
+you want, but we're aiming for maximum speed.  We then explicitly call
+:meth:`ca.connect_channel` for all the channels.  Next (Note 2), we tell the
+CA library to request the data for the channel without waiting around to
+receive it.  The main point of not having :meth:`ca.get` wait for the data
+for each channel as we go is that each data transfer takes time.  Instead
+we request data to be sent in a separate thread for all channels without
+waiting.  Then we do wait by calling :meth:`ca.poll` once and only once,
+(not len(channels) times!).  Finally, we use the :meth:`ca.get_complete`
+method to convert the data that has now been received by the companion
+thread to a python value.
 
 How much faster is the more explicit method?  In my tests, I used 20,000
 PVs, all scalar values, all actually connected, and all on the same subnet
