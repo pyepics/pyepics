@@ -123,6 +123,11 @@ _cache  = {}
 ## Cache of pvs waiting for put to be done.
 _put_done =  {}
 
+# get a unique python value that cannot be a value held by an
+# actual PV to signal "Get is incomplete, awaiting callback"
+class Empty: pass
+GET_PENDING = Empty()
+
 class ChannelAccessException(Exception):
     """Channel Access Exception: General Errors"""
     def __init__(self, *args):
@@ -883,19 +888,18 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         ftype = dbr.INT
 
     ntype = native_type(ftype)
-    use_numpy = (count > 1 and HAS_NUMPY and as_numpy and
-                 ntype != dbr.STRING)
+    use_numpy = (count > 1 and HAS_NUMPY and as_numpy and ntype != dbr.STRING)
     return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID
-def get(chid, ftype=None, count=None, unpack=True, timeout=None,
+def get(chid, ftype=None, count=None, wait=True, timeout=None,
         as_string=False, as_numpy=True):
     """return the current value for a Channel.  Options are
        ftype       field type to use (native type is default)
        count       explicitly limit count
-       unpack      flag(True/False) to wait to return value (default) or
+       wait       flag(True/False) to wait to return value (default) or
                    return None immediately, with value to be fetched later
-                   by ca.get_cached_value(chid, ...)
+                   by ca.get_complete(chid, ...)
        timeout     time to wait (and sent to pend_io()) before unpacking
                    value (default =  0.5 + log10(count) )
        as_string   flag(True/False) to get a string representation
@@ -906,7 +910,7 @@ def get(chid, ftype=None, count=None, unpack=True, timeout=None,
 
        get will return None under one of the following conditions:
          * Channel not connected
-         * unpack=True passed in
+         * wait=False passed in
          * data is not available within timeout.
     """
     if ftype is None:
@@ -919,32 +923,33 @@ def get(chid, ftype=None, count=None, unpack=True, timeout=None,
         count = min(count, element_count(chid))
 
     ncache = _cache[current_context()][name(chid)]
-    # implementation note:
-    #  the cached value = None   implies no value, no expected callback
-    #  the cached value = False  implies no value yet, callback expected.
-    ncache['value'] = False
-
+    # implementation note: cached value of
+    #   None        implies no value, no expected callback
+    #   GET_PENDING implies no value yet, callback expected.
+    ncache['value'] = GET_PENDING
     uarg = ctypes.py_object(ctypes.POINTER(dbr.Map[ftype]))
     ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, uarg)
 
     PySEVCHK('get', ret)
-    if not unpack:
+    if not wait:
         return None
 
-    return get_cached_value(chid, count=count, ftype=ftype, timeout=timeout,
-                            as_string=as_string, as_numpy=as_numpy)
+    return get_complete(chid, count=count, ftype=ftype, timeout=timeout,
+                        as_string=as_string, as_numpy=as_numpy)
 
 @withConnectedCHID
-def get_cached_value(chid, ftype=None, count=None, timeout=None,
-                     as_string=False,  as_numpy=True):
-    """returns the cached value for a channel.   This assumes that a call to
-       get(chid, ....)  either used 'unpack=True' or timed out, and that the data
-       has actually arrived by the time this function is called.
+def get_complete(chid, ftype=None, count=None, timeout=None,
+                 as_string=False,  as_numpy=True):
 
-       Note: this function can be called only once, as on success, the cached value
-       will be set back to None.
+    """returns the value for a channel, completing a previous 'inomplete get' on
+    the channel. This assumes that the previous call to get(chid, ....)  either
+    used 'wait=False' or timed out, and that the data has actually arrived by the
+    time this function is called.
 
-       Options are as for get (but without unpack, which is always True here):
+    Important Note: this function can be called only once, as on success, the
+    cached value will be set back to None.
+
+    Options are as for get (but without unpack, which is always True here):
 
        ftype       field type to use (native type is default)
        count       explicitly limit count
@@ -953,9 +958,9 @@ def get_cached_value(chid, ftype=None, count=None, timeout=None,
                    featured as for a PV -- see pv.py for more details.
        as_numpy    flag(True/False) to use numpy array as the
                    return type for array data.
-       timeout     time to wait for value to be set before unpacking
+       timeout     time to wait for value to be received
                    (default = 0.5 + log10(count) seconds)
-    """
+   """
     if ftype is None:
         ftype = field_type(chid)
     if count is None:
@@ -971,7 +976,7 @@ def get_cached_value(chid, ftype=None, count=None, timeout=None,
     if timeout is None:
         timeout = 0.5 + log10(count)
 
-    while not ncache['value']: # see implementation note: False implies "waiting for callback"
+    while ncache['value'] is not GET_PENDING:
         pend_event(1.e-5)
         if time.time()-t0 > timeout:
             msg = "ca.get('%s') timed out after %.2f seconds."

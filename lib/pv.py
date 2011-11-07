@@ -194,12 +194,17 @@ class PV(object):
 
     def get(self, count=None, as_string=False, as_numpy=True, timeout=None):
         """returns current value of PV.  Use the options:
-         as_string to return string representation
-         as_numpy  to (try to) return a numpy array
+        count       explicitly limit count for array data
+        as_string   flag(True/False) to get a string representation
+                    of the value.
+        as_numpy    flag(True/False) to use numpy array as the
+                    return type for array data.
+        timeout     maximum time to wait for value to be received.
+                    (default = 0.5 + log10(count) seconds)
 
         >>> p.get('13BMD:m1.DIR')
         0
-        >>> p.get('13BMD:m1.DIR',as_string=True)
+        >>> p.get('13BMD:m1.DIR', as_string=True)
         'Pos'
         """
         if not self.wait_for_connection():
@@ -207,19 +212,13 @@ class PV(object):
 
         if ((not self.auto_monitor or self._args['value'] is None) or
             (count is not None and len(self._args['value']) > 1)):
+            ca_get = ca.get
             ctx = ca.current_context()
             if ca._cache[ctx][self.pvname]['value'] is not None:
-                self._args['value'] = ca.get_cached_value(self.chid,
-                                                          count=count,
-                                                          timeout=timeout,
-                                                          ftype=self.ftype,
-                                                          as_numpy=as_numpy)
-            else:
-                self._args['value'] = ca.get(self.chid, count=count,
-                                             timeout=timeout,
-                                             ftype=self.ftype,
-                                             as_numpy=as_numpy)
-
+                ca_get = ca.get_complete
+            self._args['value'] = ca_get(self.chid, ftype=self.ftype,
+                                         count=count, timeout=timeout,
+                                         as_numpy=as_numpy)
         if as_string:
             self._set_charval(self._args['value'])
             return self._args['char_value']
