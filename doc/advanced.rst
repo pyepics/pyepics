@@ -2,11 +2,14 @@
 Advanced Topic with Python Channel Access
 ===============================================
 
+This chapter contains a variety of "usage notes" and
+implementation details that may help in getting the best perfomance from
+the pyepics module.
+
 .. _advanced-large-arrays-label:
 
 Strategies for working with large arrays
 ============================================
-
 
 EPICS Channels / Process Variables usually have values that can be stored
 with a small number of bytes.  This means that their storage and transfer
@@ -297,6 +300,12 @@ Note also that the callbacks for the PVs created in each thread are
 
 Without this, the callbacks for thread *A*  will persist even after the
 thread has completed!
+
+.. _advanced-get-timeouts-label:
+
+
+The wait and timeout options for get(), ca.get_complete()
+==============================================================
 
 
 .. _advanced-connecting-many-label:

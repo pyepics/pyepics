@@ -75,7 +75,7 @@ methods
 A `PV` has several methods for getting and setting its value and defining
 callbacks to be executed when the PV changes.
 
-.. method:: get([, count=None[, as_string=False[, as_numpy=True]]])
+.. method:: get([, count=None[, as_string=False[, as_numpy=True[, timeout=None]]]])
 
    get and return the current value of the PV
 
@@ -85,6 +85,9 @@ callbacks to be executed when the PV changes.
    :type as_string: ``True``/``False``
    :param as_numpy:  whether to try to return a numpy array where appropriate.
    :type as_string: ``True``/``False``
+   :param timeout:  maximum time to wait for data before returning ``None``.
+   :type  timeout:  float or ``None``
+
 
    see :ref:`pv-as-string-label` for details on how the string
    representation is determined.
@@ -103,7 +106,7 @@ callbacks to be executed when the PV changes.
    :param wait:  whether to wait for processing to complete (or time-out) before returning.
    :type  wait:  ``True``/``False``
    :param timeout:  maximum time to wait for processing to complete before returning anyway.
-   :type  timeout:  double
+   :type  timeout:  float
    :param use_complete:  whether to use a builtin callback to set :attr:`put_complete`.
    :type  use_complete:  ``True``/``False``
    :param callback: user-supplied function to run when processing has completed.
@@ -113,7 +116,6 @@ callbacks to be executed when the PV changes.
 The `wait` and `callback` arguments, as well as the 'use_complete' / :attr:`put_complete`
 attribute give a few options for knowing that a :meth:`put` has
 completed.   See :ref:`pv-putwait-label` for more details.
-
 
 ..  _pv-get-ctrlvars-label:
 
@@ -128,9 +130,9 @@ completed.   See :ref:`pv-putwait-label` for more details.
    poll for changes.  This simply calls :meth:`ca.poll`
 
    :param evt:  time to pass to :meth:`ca.pend_event`
-   :type  evt:  double
+   :type  evt:  float
    :param iot:  time to pass to :meth:`ca.pend_io`
-   :type  iot:  double
+   :type  iot:  float
 
 .. method:: connect([timeout=None])
 
@@ -139,7 +141,7 @@ completed.   See :ref:`pv-putwait-label` for more details.
    should happen automatically. See :meth:`wait_for_connection`.
 
    :param timeout:  maximum connection time, passed to :meth:`ca.connect_channel`
-   :type  timeout:  double
+   :type  timeout:  float
    :rtype:    ``True``/``False``
 
    if timeout is ``None``, the PVs connection_timeout parameter will be used. If that is also ``None``,
@@ -151,7 +153,7 @@ completed.   See :ref:`pv-putwait-label` for more details.
    connection.  Returns  whether the connection has occurred.
 
    :param timeout:  maximum connection time.
-   :type  timeout:  double
+   :type  timeout:  float
    :rtype:    ``True``/``False``
 
    if timeout is ``None``, the PVs connection_timeout parameter will be used. If that is also ``None``,

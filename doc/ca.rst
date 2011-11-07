@@ -241,7 +241,7 @@ a good idea to treat these as object instances.
 
    :param chid:     ``chid`` Channel ID
    :param timeout:  maximum time to wait for connection.
-   :type  timeout:  ``None`` or double.
+   :type  timeout:  float or ``None``.
    :param verbose:  whether to print out debugging information
 
    if *timeout* is ``None``, the value of  :data:`DEFAULT_CONNECTION_TIMEOUT`
@@ -336,79 +336,89 @@ requiring the user to supply DBR TYPE and count as well as ``chid`` and
 allocated space for the data.  In python none of these is needed, and
 keyword arguments can be used to specify such options.
 
-.. method:: get(chid[, ftype=None[, timeout=None[, count=None[, as_string=False[, as_numpy=True, unpack=True]]]]])
+.. method:: get(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=True[, wait=True[, timeout=None]]]]]])
 
    return the current value for a Channel. Note that there is not a separate form for array data.
 
    :param chid:  ``chid`` Channel ID
    :type  chid:  ctypes.c_long
    :param ftype:  field type to use (native type is default)
-   :type ftype:  integer
-   :param timeout:  maximum time to wait for data before returning None.
-   :type timeout:  float or ``None``
+   :type ftype:  integer or ``None``
    :param count:  maximum element count to return (full data returned by default)
-   :type count:  integer
+   :type count:  integer or ``None``
    :param as_string:  whether to return the string representation of the value.  See notes below.
    :type as_string:  ``True``/``False``
    :param as_numpy:  whether to return the Numerical Python representation  for array / waveform data.
    :type as_numpy:  ``True``/``False``
-   :param unpack:  whether to return the unpacked data or just the internal pointer value
-   :type unpack:  ``True``/``False``
+   :param wait:  whether to wait for the data to be received, or return immediately.
+   :type wait:  ``True``/``False``
+   :param timeout:  maximum time to wait for data before returning ``None``.
+   :type timeout:  float or ``None``
 
-For a listing of values of *ftype*, see :ref:`Table of DBR Types
-<dbrtype_table>`.    The optional *count* can be used to limit the amount of
-data returned for array data from waveform records.
+   :func:`get` returns the value for the PV with channel ID *chid* or
+   ``None``, which indicates an *incomplete get*
 
-The *timeout* option sets the maximum time to wait before returning
-``None``.  Such a timeout could imply that the channel is disconnected
-or that the data size is larger or network slower than normal.
-See
-:ref:`advanced-get-timeouts-label` for further discussion of this and
-the associated :func:`get_cached_value`.
+   For a listing of values of *ftype*, see :ref:`Table of DBR Types
+   <dbrtype_table>`.  The optional *count* can be used to limit the
+   amount of data returned for array data from waveform records.
 
-The *as_string* option warrants special attention: The feature is not as
-complete as as the *as_string* argument for :meth:`PV.get`.  Here, a string
-representing the value will always be returned. For Enum types, the name of
-the Enum state will be returned.  For waveforms of type CHAR, the string
-representation will be returned.  For other waveforms (with *count* > 1), a
-string like `<array count=3, type=1>` will be returned.  For all other
-types the result will from Python's :func:`str` function.
+   The *as_string* option warrants special attention: The feature is not
+   as complete as as the *as_string* argument for :meth:`PV.get`.  Here,
+   a string representing the value will always be returned. For Enum
+   types, the name of the Enum state will be returned.  For waveforms of
+   type CHAR, the string representation will be returned.  For other
+   waveforms (with *count* > 1), a string like `<array count=3, type=1>`
+   will be returned.  For all other types the result will from Python's
+   :func:`str` function.
 
-The *as_numpy* option will cause an array value to be returned as a numpy
-array.  This is only applied if numpy can be imported.  See
-:ref:`advanced-large-arrays-label` for a discussion of strategies for how
-to best deal with very large arrays.
+   The *as_numpy* option will cause an array value to be returned as a
+   numpy array.  This is only applied if numpy can be imported.  See
+   :ref:`advanced-large-arrays-label` for a discussion of strategies for
+   how to best deal with very large arrays.
 
-The *unpack* option will not return the value, but the underlying
-reference (C pointer) to the value.  The returned value would then need
-to be explicitly unpacked with the :func:`get_cached_value`. function.
-This explicit approach can be useful in some circumstances.  See
-:ref:`advanced-connecting-many-label` for a discussion.
+   The *wait* option controls whether to wait for the data to be
+   received over the network and actually return the value, or to return
+   immediately after asking for it to be sent.  If `wait=False` (that
+   is, immediate return), the *get* operation is said to be
+   *incomplete*.  The data will be still be received (unless the channel
+   is disconnected) eventually but stored internally, and can be read
+   later with :func:`get_complete`.  Using `wait=False` can be useful in
+   some circumstances.  See :ref:`advanced-connecting-many-label` for a
+   discussion.
+
+   The *timeout* option sets the maximum time to wait for the data to be
+   received over the network before returning ``None``.  Such a timeout
+   could imply that the channel is disconnected or that the data size is
+   larger or network slower than normal.  In that case, the *get*
+   operation is said to be *incomplete*, and the data may become
+   available later with :func:`get_complete`.
+
+   See :ref:`advanced-get-timeouts-label` for further discussion of the
+   *wait* and *timeout* options and the associated :func:`get_complete`
+   function.
 
 
-.. method:: get_cached_value(chid[, ftype=None[, timeout=None[, count=None[, as_string=False[, as_numpy=True]]]])
+.. method:: get_complete(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=True[, timeout=None]]]]])
 
-   return the current value for a Channel, completing an earlier
-   :func:`get` that returned ``None``, either because `unpack=True` was
-   used or because the data transfer did not complete before the
-   timeout.
+   return the current value for a Channel, completing an earlier incomplete
+   :func:`get` that returned ``None``, either because `wait=False` was
+   used or because the data transfer did not complete before the timeout passed.
 
    :param chid:  ``chid`` Channel ID
    :type  chid:  ctypes.c_long
    :param ftype:  field type to use (native type is default)
    :type ftype:  integer
-   :param timeout:  maximum time to wait for data before returning None.
-   :type timeout:  float or ``None``
    :param count:  maximum element count to return (full data returned by default)
    :type count:  integer
    :param as_string:  whether to return the string representation of the value.  See notes below.
    :type as_string:  ``True``/``False``
    :param as_numpy:  whether to return the Numerical Python representation  for array / waveform data.
    :type as_numpy:  ``True``/``False``
-
+   :param timeout:  maximum time to wait for data before returning ``None``.
+   :type timeout:  float or ``None``
 
    This function will return ``None`` if the previous :func:`get`
-   actually succeeded, or if even this data transfer times out.  See
+   actually completed, or if this data transfer also times out.  See
    :ref:`advanced-get-timeouts-label` for further discussion.
 
 .. method::  put(chid, value[, wait=False[, timeout=30[, callback=None[, callback_data=None]]]])
@@ -422,7 +432,7 @@ This explicit approach can be useful in some circumstances.  See
    :param wait:  whether to wait for processing to complete (or time-out) before returning.
    :type  wait:  ``True``/``False``
    :param timeout:  maximum time to wait for processing to complete before returning anyway.
-   :type  timeout:  double
+   :type  timeout:  float or ``None``
    :param callback: user-supplied function to run when processing has completed.
    :type callback: ``None`` or callable
    :param callback_data: extra data to pass on to a user-supplied callback function.

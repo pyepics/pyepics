@@ -3,20 +3,18 @@
 Overview of EPICS Channel Access in Python
 ============================================
 
-The epics python package consists of several modules to interact with EPICS
-Channel Access.  The simplest approach uses the functions :func:`caget`,
-:func:`caput`, :func:`cainfo`, :func:`camonitor`, and
-:func:`camonitor_clear` within the top-level `epics` module.  These
-functions are similar to the Unix command line utilities and to the EZCA
-library interface, and described in more detail below.
+The python :mod:`epics` package consists of several function, modules, and
+classes to interact with EPICS Channel Access.  The simplest approach uses
+the functions :func:`caget`, :func:`caput`, :func:`cainfo`,
+:func:`camonitor`, and :func:`camonitor_clear` within the top-level `epics`
+module.  These functions are similar to the standard command line utilities
+and to the EZCA library interface, and are described in more detail below.
 
-
-The :mod:`epics` package consists of several functions, modules and classes
-that are imported with::
+To use the :mod:`epics` package, import it with::
 
      import epics
 
-These components includes
+The manin components of this module include
 
     * functions :func:`caget`, :func:`caput`, :func:`camonitor`,
       :func:`camonitor_clear`, and :func:`cainfo` as described below.
@@ -31,21 +29,23 @@ These components includes
     * an :mod:`epics.wx` module that provides wxPython classes designed for
       use with Epics PVs.
 
-If you're looking to write quick scripts, using the :func:`caget` and
-:func:`caput`  functions is probably how you want to start.
+If you're looking to write quick scripts or a simple introduction to using
+Channel Acces, the :func:`caget` and :func:`caput` functions are probably
+where you want to start.
 
-If you're building larger scripts and applications, using :class:`PV`
-objects provided by the :mod:`pv` module is recommended.  The :class:`PV`
-class provides a Process Variable object that has both methods (including
+If you're building larger scripts and programs, using :class:`PV` objects
+provided by the :mod:`pv` module is recommended.  The :class:`PV` class
+provides a Process Variable object that has both methods (including
 :meth:`get` and :meth:`put`) to read and change the PV, and attributes that
-are kept automatically synchronized with the remote channel.
+are kept automatically synchronized with the remote channel.  For larger
+applications, you may find the :class:`Device` class helpful.
 
-The lowest-level CA functionality is exposed in the :mod:`ca` and
-:mod:`dbr` module.  While not necessary recommended for most use cases,
-this module does provide a fairly complete wrapping of the basic EPICS CA
-library.  For people who have used CA from C or other languages, this
-module should be familiar and seem quite usable, if a little more verbose
-and C-like than using PV objects.
+The lowest-level CA functionality is exposed in the :mod:`ca` module, and
+companion :mod:`dbr` module.  While not necessary recommended for most use
+cases, this module does provide a fairly complete wrapping of the basic
+EPICS CA library.  For people who have used CA from C or other languages,
+this module should be familiar and seem quite usable, if a little more
+verbose and C-like than using PV objects.
 
 In addition, the `epics` package contains more specialized modules for
 alarms, Epics motors, and several other *devices* (collections of PVs), and
@@ -59,29 +59,29 @@ Linux and Mac OS X) and Windows with Python versions 2.5, 2.6, 2.7, and
 Quick Start
 =================
 
-If you're familiar with Epics Channel Access, you may be able to get
-started right away without reading the full documentation, and then use
-Python's introspection tools and built-in help system, referring to this
-documentation for further details.
-
+Whether you're familiar with Epics Channel Access or not, start here.
+You'll then be able to use Python's introspection tools and built-in help
+system, and the rest of this document as a reference and for detailed
+discussions.
 
 Functional Approach: caget(), caput()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To get values from PVs, you can simply use the :func:`caget` function:
+To get values from PVs, you can use the :func:`caget` function:
 
    >>> from epics import caget, caput
    >>> m1 = caget('XXX:m1.VAL')
    >>> print m1
    1.2001
 
-To set PV values, you can simply use the :func:`caput` function:
+To set PV values, you can use the :func:`caput` function:
 
    >>> caput('XXX:m1.VAL', 1.90)
    >>> print caget('XXX:m1.VAL')
    1.9000
 
-The simplicity and clarity of this approach makes it ideal for many cases.
+For many cases, this approach is ideal because of its simplicity and
+clarity.
 
 Object Oriented Approach: PV
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,16 +115,49 @@ or assign the :attr:`value` attribute
 
    >>> pv1.value = 1.9
 
+You can see a few of the most important properties of a PV by simply
+printing it:
 
-PV objects have several methods, especially related to monitoring external
-changes to the PVs and defining functions to be run automatically when the
-value changes.  There are also several attributes associated with a PV
-reflecting the ``Control Attributes``.  Further details are at
-:ref:`pv-label`
+   >>> print pv1
+   <PV 'XXX:m1.VAL', count=1, type=double, access=read/write>
+
+Even more complete information can be seen by printing the PVs :attr:`info`
+attribute::
+
+   >>> print pv1.info
+   == XXX:m1.VAL  (native_double) ==
+      value      = 1.9
+      char_value = '1.90000'
+      count      = 1
+      nelm       = 1
+      type       = double
+      units      = mm
+      precision  = 5
+      host       = somehost.cars.aps.anl.gov:5064
+      access     = read/write
+      status     = 0
+      severity   = 0
+      timestamp  = 1265996457.212 (2010-Feb-12 11:40:57.212)
+      upper_ctrl_limit    = 12.5
+      lower_ctrl_limit    = -12.3
+      upper_disp_limit    = 12.5
+      lower_disp_limit    = -12.3
+      upper_alarm_limit   = 0.0
+      lower_alarm_limit   = 0.0
+      upper_warning_limit = 0.0
+      lower_warning_limit = 0.0
+      PV is internally monitored, with 0 user-defined callbacks:
+   =============================
+
+PV objects have several additional methods, especially related to
+monitoring changes to the PVs and defining functions to be run when the
+value does change.  There are also attributes associated with a PVs
+*Control Attributes*, like those shown above in the :attr:`info` attribute.
+Further details are at :ref:`pv-label`.
 
 
 Functions defined in :mod:`epics`: caget(), caput(), etc.
-=========================================================================
+========================================================================
 
 .. module:: epics
    :synopsis: top-level epics module, and container for simplest CA functions
@@ -223,8 +256,9 @@ desired::
     >>> print caget('XXX:dir',as_string=True)
     'T:\\xas_user\\March2010\\Fastmap'
 
-Of course, character waveforms are not always used for long strings,  but  th
-hold byte array data,
+Of course,character waveforms are not always used for long strings,  but
+can also hold byte array data, such as comes from some detectors and
+devices.
 
 :func:`caput`
 ~~~~~~~~~~~~~~~~
@@ -313,7 +347,6 @@ has been exceeded.
   :type writer: ``None`` or a callable function that takes a string argument.
   :param callback:  user-supplied function to receive result
   :type callback: ``None`` or callable function
-
 
 One can specify any function that can take a string as *writer*, such as
 the :meth:`write` method of an open file that has been open for writing.

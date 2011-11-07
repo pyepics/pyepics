@@ -152,15 +152,17 @@ There are a few ways to specify how to find this library:
 
      > export PYEPICS_LIBCA=/usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so
 
- 2. set the environmental variables ``EPICS_BASE`` and  ``EPICS_HOST_ARCH`` to point to where the library was built.   For example::
+ 2. set the environmental variables ``EPICS_BASE`` and  ``EPICS_HOST_ARCH``
+    to point to where the library was built.   For example::
 
      > export EPICS_BASE=/usr/local/epics/base-3.14.12.1
      > export EPICS_HOST_ARCH=linux-x86
 
- will find the library at /usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so.
+    will find the library at /usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so.
 
- 3. Place the dynamic library somewhere in the Python path.  A convenient
-    place might be the same ``site-packages/pyepics library`` folder as the python package is installed.
+ 3. Put the dynamic library somewhere in the Python path.  A convenient
+    place might be the same ``site-packages/pyepics library`` folder as the
+    python package is installed.
 
 Note, that For Windows users, the DLLs (ca.dll and Com.dll) are included in the
 installation kit, and automaically installed to where they can be found at
@@ -207,7 +209,9 @@ In plain words, this means
 
   d. you cannot claim the copyright holders endorse your use of this software.
 
-  e. you cannot claim the copyright holders owe you anything if the software does not work as you expect it to, and
+  e. you cannot claim the copyright holders owe you anything if the software does not work as you expect, and
 
   f. if you are the US government, you can probably do whatever you want. ;)
+
+
 
