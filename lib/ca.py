@@ -710,8 +710,8 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
 
     if connect:
         connect_channel(chid)
-    if conncb != 0:
-        poll()
+        if conncb != 0:
+            poll()
     return chid
 
 @withCHID
