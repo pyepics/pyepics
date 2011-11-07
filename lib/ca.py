@@ -63,23 +63,31 @@ def get_strconvertors():
             'byte to string'
             if isinstance(st1, str):
                 return st1
-            return str(st1, EPICS_STR_ENCODING)
-        return s2b, b2s
-    return str, str
+            elif isinstance(st1, bytes):
+                return str(st1, EPICS_STR_ENCODING)
+            else:
+                return str(st1)                
+        return s2b, b2s, b'\x00'
+    return str, str, '\x00'
 
-STR2BYTES, BYTES2STR = get_strconvertors()
+NULLCHAR2 = '\x00'
+STR2BYTES, BYTES2STR, NULLCHAR = get_strconvertors()
 
 def strjoin(sep, seq):
     "join string sequence with a separator"
     if PY_VERSION < 3:
         return sep.join(seq)
-
     if isinstance(sep, bytes):
         sep = BYTES2STR(sep)
     if len(seq) == 0:
         seq = ''
     elif isinstance(seq[0], bytes):
-        seq = [BYTES2STR(i) for i in seq]
+        tmp =[]
+        for i in seq:
+            if i == NULLCHAR:
+                break
+            tmp.append(BYTES2STR(i))
+        seq = tmp
     return sep.join(seq)
 
 ## print to stdout
@@ -509,6 +517,7 @@ def _onGetEvent(args, **kwds):
     if args.status != dbr.ECA_NORMAL:
         return
     ctx = current_context()
+   
     _cache[ctx][name(args.chid)]['value'] = copy.copy(dbr.cast_args(args).contents)
 
 ## put event handler:
@@ -836,8 +845,8 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
             out = []
             for elem in range(min(count, len(data))):
                 this = strjoin('', data[elem]).rstrip()
-                if '\x00' in this:
-                    this = this[:this.index('\x00')]
+                if NULLCHAR2 in this:
+                    this = this[:this.index(NULLCHAR2)]
                 out.append(this)
 
             if len(out) == 1:
@@ -856,10 +865,12 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     def unpack_ctrltime(data, count, ntype, use_numpy):
         "ctrl and time data types"
         if count == 1 or ntype == dbr.STRING:
+            
             out = data[0].value
-            if ntype == dbr.STRING and '\x00' in out:
-                out = out[:out.index('\x00')]
+            if ntype == dbr.STRING and NULLCHAR in out:
+                out = out[:out.index(NULLCHAR)]
             return out
+
         # fix for CTRL / TIME array data:Thanks to Glen Wright !
         out = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
                                                   dbr.value_offset[ftype])
@@ -1049,11 +1060,11 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     else:
         # auto-convert strings to arrays for character waveforms
         # could consider using
-        # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],
+        # numpy.fromstring(("%s%s" % (s,NULLCHAR*maxlen))[:maxlen],
         #                  dtype=numpy.uint8)
         if ftype == dbr.CHAR and isinstance(value, str):
             fcount = element_count(chid)
-            pad = '\x00'*(1+fcount-len(value))
+            pad = NULLCHAR*(1+fcount-len(value))
             value = [ord(i) for i in ("%s%s" % (value, pad))[:fcount]]
         try:
             ndata, nuser = len(data), len(value)
@@ -1297,10 +1308,10 @@ def sg_put(gid, chid, value):
     else:
         # auto-convert strings to arrays for character waveforms
         # could consider using
-        # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],
+        # numpy.fromstring(("%s%s" % (s,NULLCHAR*maxlen))[:maxlen],
         #                  dtype=numpy.uint8)
         if ftype == dbr.CHAR and isinstance(value, str):
-            pad = '\x00'*(1+count-len(value))
+            pad = NULLCHAR*(1+count-len(value))
             value = [ord(i) for i in ("%s%s" % (value, pad))[:count]]
         try:
             ndata = len(data)
