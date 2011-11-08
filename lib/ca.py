@@ -18,7 +18,7 @@ import ctypes.util
 import os
 import sys
 import time
-import copy
+from copy import copy
 from  math import log10
 import atexit
 import warnings
@@ -38,58 +38,16 @@ except ImportError:
 
 from . import dbr
 
-EPICS_STR_ENCODING = 'ASCII'
-PY_VERSION = sys.version_info[0]
-def get_strconvertors():
-    """create string wrappers to pass to C functions for both
-    Python2 and Python3.  Note that the EPICS CA library uses
-    char* to represent strings.  In Python3, char* maps to a
-    sequence of bytes which must be explicitly converted to a
-    Python string by specifying the encoding.  That is, ASCII
-    encoding is not implicitly assumed.
+PY_MAJOR, PY_MINOR = sys.version_info[:2]
 
-    That is, for Python3 one sends and receives sequences of
-    bytes to libca. This function returns the translators
-    (STR2BYTES, BYTES2STR), assuming the encoding defined in
-    EPICS_STR_ENCODING (which is 'ASCII' by default).
-    """
-    if PY_VERSION >= 3:
-        def s2b(st1):
-            'string to byte'
-            if isinstance(st1, bytes):
-                return st1
-            return bytes(st1, EPICS_STR_ENCODING)
-        def b2s(st1):
-            'byte to string'
-            if isinstance(st1, str):
-                return st1
-            elif isinstance(st1, bytes):
-                return str(st1, EPICS_STR_ENCODING)
-            else:
-                return str(st1)                
-        return s2b, b2s, b'\x00'
-    return str, str, '\x00'
-
-NULLCHAR2 = '\x00'
-STR2BYTES, BYTES2STR, NULLCHAR = get_strconvertors()
-
-def strjoin(sep, seq):
-    "join string sequence with a separator"
-    if PY_VERSION < 3:
-        return sep.join(seq)
-    if isinstance(sep, bytes):
-        sep = BYTES2STR(sep)
-    if len(seq) == 0:
-        seq = ''
-    elif isinstance(seq[0], bytes):
-        tmp =[]
-        for i in seq:
-            if i == NULLCHAR:
-                break
-            tmp.append(BYTES2STR(i))
-        seq = tmp
-    return sep.join(seq)
-
+memcopy = copy
+if PY_MAJOR >= 3:
+    from .utils3 import STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2, strjoin
+else:
+    from .utils2 import STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2, strjoin
+    if PY_MINOR == 5:
+        def memcopy(a): return a
+        
 ## print to stdout
 def write(msg, newline=True, flush=True):
     """write message to stdout"""
@@ -105,7 +63,6 @@ initial_context = None
 
 ## PREEMPTIVE_CALLBACK determines the CA context
 PREEMPTIVE_CALLBACK = True
-
 
 AUTO_CLEANUP = True
 
@@ -517,8 +474,7 @@ def _onGetEvent(args, **kwds):
     if args.status != dbr.ECA_NORMAL:
         return
     ctx = current_context()
-   
-    _cache[ctx][name(args.chid)]['value'] = copy.copy(dbr.cast_args(args).contents)
+    _cache[ctx][name(args.chid)]['value'] = memcopy(dbr.cast_args(args).contents)
 
 ## put event handler:
 def _onPutEvent(args, **kwds):
@@ -719,8 +675,8 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
 
     if connect:
         connect_channel(chid)
-        if conncb != 0:
-            poll()
+    if conncb != 0:
+        poll()
     return chid
 
 @withCHID
@@ -839,14 +795,15 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
 
     def unpack_simple(data, count, ntype, use_numpy):
         "simple, native data type"
+
         if count == 1 and ntype != dbr.STRING:
             return data[0]
         if ntype == dbr.STRING:
             out = []
             for elem in range(min(count, len(data))):
                 this = strjoin('', data[elem]).rstrip()
-                if NULLCHAR2 in this:
-                    this = this[:this.index(NULLCHAR2)]
+                if NULLCHAR_2 in this:
+                    this = this[:this.index(NULLCHAR_2)]
                 out.append(this)
 
             if len(out) == 1:
@@ -857,9 +814,9 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         if ntype == dbr.CHAR:
             if use_numpy:
                 data = numpy.array(data)
-            return copy.copy(data[:])
+            return copy(data[:])
         elif use_numpy:
-            return copy.copy(numpy.ctypeslib.as_array(data))
+            return copy(numpy.ctypeslib.as_array(data))
         return list(data)
 
     def unpack_ctrltime(data, count, ntype, use_numpy):
@@ -880,7 +837,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
             if use_numpy:
                 out = numpy.array(out)
         if use_numpy:
-            return copy.copy(numpy.ctypeslib.as_array(out))
+            return copy(numpy.ctypeslib.as_array(out))
 
         return list(out)
 
@@ -945,7 +902,6 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     PySEVCHK('get', ret)
     if not wait:
         return None
-
     return get_complete(chid, count=count, ftype=ftype, timeout=timeout,
                         as_string=as_string, as_numpy=as_numpy)
 
