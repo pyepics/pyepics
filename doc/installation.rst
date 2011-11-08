@@ -37,7 +37,7 @@ a few ways to get the PyEpics Package:
 .. _pyepics-3.1.4.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.4.tar.gz
 .. _pyepics-3.1.4.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py2.6.exe
 .. _pyepics-3.1.4.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py2.7.exe
-.. _pyepics-3.1.4.win32-py3.1.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py3.1.exe
+.. _pyepics-3.1.4.win32-py3.2.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py3.2.exe
 .. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
 .. _PyPi Epics Entry:             http://pypi.python.org/pypi/pyepics/
@@ -51,7 +51,7 @@ a few ways to get the PyEpics Package:
 +---------------------------+------------------------------------------+
 |  Windows Installers       |  `pyepics-3.1.4.win32-py2.6.exe`_  or    |
 |                           |  `pyepics-3.1.4.win32-py2.7.exe`_  or    |
-|                           |  `pyepics-3.1.4.win32-py3.1.exe`_        |
+|                           |  `pyepics-3.1.4.win32-py3.2.exe`_        |
 +---------------------------+------------------------------------------+
 |  Development Version      |  use `pyepics github repository`_        |
 +---------------------------+------------------------------------------+
@@ -104,11 +104,11 @@ Testing Notes:
   3. The wx module is not automatically tested.
 
   4. CA is not yet working with 64-bit Python on 64-bit Windows. It *does*
-     work with 32-bit Python on 64-bit Linux, and CA works with 64-bit 
-     Windows.  I can get the 64-bit ca.dll to load with 64-bit Python, but
-     there seems to be some disagreement about the lengths of
-     basic C data types (for example, does a double take 8 or 16 bytes). 
-     This is being investigated....
+     work with 32-bit Python on 64-bit Linux, and Channel Access is known
+     to work with 64-bit  Windows.  The current status is: I can get the
+     64-bit ca.dll to load with 64-bit Python, but there seems to be some
+     disagreement about the lengths of basic C data types (for example,
+     does a double take 8 or 16 bytes).  This is being investigated....
 
 Development Version
 ~~~~~~~~~~~~~~~~~~~~~~~~

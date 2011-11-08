@@ -30,4 +30,6 @@ code for wxPython widgets.
    devices
    alarm
    wx
+   apps
+
 
