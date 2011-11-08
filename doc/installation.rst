@@ -5,10 +5,10 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-This package requires Python version 2.5, 2.6, 2.7, or 3.1.  I It is
+This package requires Python version 2.5, 2.6, 2.7, or 3.2.  I It is
 possible that Python 2.4 will work if the ctypes package is installed, but
-this has not been tested.  In addition, Python 3.2 should work as well, but
-was not tested as of this writing.
+this has not been tested.  It should work with Python 3.1, as well, but
+this is no longer being tested as of this writing.
 
 In addition, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
@@ -81,7 +81,7 @@ fail are generally well-understood.
 +-----------+-----------------+------------+-----------------------+
 | Linux     |  linux-x86_64   |  2.7       |   all pass            |
 +-----------+-----------------+------------+-----------------------+
-| Linux     |  linux-x86_64   |  3.1       |   autosave fails      |
+| Linux     |  linux-x86_64   |  3.2       |   autosave fails      |
 +-----------+-----------------+------------+-----------------------+
 | Mac OSX   |  darwin-x86     |  2.6.5     |   all pass            |
 +-----------+-----------------+------------+-----------------------+
@@ -89,7 +89,7 @@ fail are generally well-understood.
 +-----------+-----------------+------------+-----------------------+
 | Windows   |  win32-x86      |  2.7.1     |   all pass            |
 +-----------+-----------------+------------+-----------------------+
-| Windows   |  win32-x86      |  3.1.1     |   autosave fails      |
+| Windows   |  win32-x86      |  3.2.2     |   autosave fails      |
 +-----------+-----------------+------------+-----------------------+
 
 
@@ -98,13 +98,17 @@ Testing Notes:
   1. tests involving subarrays are known to fail with Epics base earlier
      than 3.14.11.
 
-  2. The autosave module relies on the 3rd part extension pyparsing, which seems to not work correctly for Python3.1.
+  2. The autosave module relies on the 3rd part extension pyparsing, which
+     seems to not work correctly for Python3.
 
   3. The wx module is not automatically tested.
 
-  4. CA is known to not work with 64-bit Python on 64-bit Windows. It *does*
-     work on 64-bit Linux, and CA  works with 32-bit Python on 64-bit
-     Windows. This is being investigated....
+  4. CA is not yet working with 64-bit Python on 64-bit Windows. It *does*
+     work with 32-bit Python on 64-bit Linux, and CA works with 64-bit 
+     Windows.  I can get the 64-bit ca.dll to load with 64-bit Python, but
+     there seems to be some disagreement about the lengths of
+     basic C data types (for example, does a double take 8 or 16 bytes). 
+     This is being investigated....
 
 Development Version
 ~~~~~~~~~~~~~~~~~~~~~~~~
