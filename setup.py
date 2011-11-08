@@ -3,7 +3,7 @@ from distutils.core import setup
 import os
 import sys
 import lib
-
+import shutil
 #
 no_libca="""*******************************************************
 *** WARNING - WARNING - WARNING - WARNING - WARNING ***
@@ -31,6 +31,11 @@ if os.name == 'nt':
     else:
         data_files = [('DLLs', ['dlls/win32/ca.dll','dlls/win32/Com.dll']),
                       ('', ['dlls/win32/carepeater.exe'])]
+
+PY_MAJOR, PY_MINOR = sys.version_info[:2]
+if PY_MAJOR == 2 and PY_MINOR < 6:
+    shutil.copy(os.path.join('lib', 'utils3.py'), os.path.join('lib', 'utils3_save_py.txt'))
+    shutil.copy(os.path.join('lib', 'utils2.py'), os.path.join('lib', 'utils3.py'))
 
 setup(name = 'pyepics',
       version = lib.__version__,
