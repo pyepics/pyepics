@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.3',
+        VERSION:     '3.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -98,26 +98,29 @@
 <h1>Downloading and Installation<a class="headerlink" href="#downloading-and-installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>This package requires Python version 2.5, 2.6, 2.7, or 3.1.  I It is
+<p>This package requires Python version 2.5, 2.6, 2.7, or 3.2.  I It is
 possible that Python 2.4 will work if the ctypes package is installed, but
-this has not been tested.  In addition, Python 3.2 should work as well, but
-was not tested as of this writing.</p>
+this has not been tested.  It should work with Python 3.1, as well, but
+this is no longer being tested as of this writing.</p>
 <p>In addition, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
 libCom.so and libca.so (or Com.dll and ca.dll on Windows) from <em>Epics Base</em>
-are required to use this module.  Using a patched version of 3.14.12 is
+are required to use this module.  Using version 3.14.12 or higher is
 recommended -- some of the features for 'subarray records' will only work
-with this latest version.</p>
+with this 3.14.12 and higher.</p>
 <p>For 32-bit Windows, pre-built DLLs from 3.14.12 (patched as of March, 2011)
 are included and installed so that no other Epics installation is required
 to use the modules.  For Unix-like systems, these are assumed to be
 available (and findable by Python at runtime) on the system. This may mean
 setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.</p>
+<p>The Python <a class="reference external" href="http://numpy.scipy.org/">numpy module</a> is not required, but
+will be used to convert EPICS waveforms values into numerical array data if
+available, and its use is encouraged.</p>
 </div>
 <div class="section" id="downloads">
 <h2>Downloads<a class="headerlink" href="#downloads" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the E pics Python Package is 3.1.3.  There are
-a few ways to get the Epics Python Package:</p>
+<p>The latest stable version of the PyEpics Package is 3.1.4.  There are
+a few ways to get the PyEpics Package:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="39%" />
@@ -130,20 +133,20 @@ a few ways to get the Epics Python Package:</p>
 </thead>
 <tbody valign="top">
 <tr><td>Source Kit</td>
-<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.tar.gz">pyepics-3.1.3.tar.gz (CARS)</a>  or
-<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.3.tar.gz">pyepics-3.1.3.tar.gz (PyPI)</a></td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.tar.gz">pyepics-3.1.4.tar.gz (CARS)</a>  or
+<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.4.tar.gz">pyepics-3.1.4.tar.gz (PyPI)</a></td>
 </tr>
 <tr><td>Windows Installers</td>
-<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.win32-py2.6.exe">pyepics-3.1.3.win32-py2.6.exe</a>  or
-<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.win32-py2.7.exe">pyepics-3.1.3.win32-py2.7.exe</a>  or
-<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.3.win32-py3.1.exe">pyepics-3.1.3.win32-py3.1.exe</a></td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py2.6.exe">pyepics-3.1.4.win32-py2.6.exe</a>  or
+<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py2.7.exe">pyepics-3.1.4.win32-py2.7.exe</a>  or
+<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py3.2.exe">pyepics-3.1.4.win32-py3.2.exe</a></td>
 </tr>
 <tr><td>Development Version</td>
 <td>use <a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github repository</a></td>
 </tr>
 </tbody>
 </table>
-<p>if you have <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Python Setup Tools</a>  installed, you can download and install
+<p>If you have <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Python Setup Tools</a>  installed, you can download and install
 the PyEpics Package simply with:</p>
 <div class="highlight-python"><pre>easy_install -U pyepics</pre>
 </div>
@@ -151,7 +154,7 @@ the PyEpics Package simply with:</p>
 <div class="section" id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
 <p>Some automated unit-testing is done, using the tests folder from the source
-distribution kit.  The following systems were tested for 3.1.3, all with
+distribution kit.  The following systems were tested for 3.1.4, all with
 Epics base 3.14.12.1.  Except as noted, all tests pass.  Those tests that
 fail are generally well-understood.</p>
 <table border="1" class="docutils">
@@ -191,7 +194,7 @@ fail are generally well-understood.</p>
 </tr>
 <tr><td>Linux</td>
 <td>linux-x86_64</td>
-<td>3.1</td>
+<td>3.2</td>
 <td>autosave fails</td>
 </tr>
 <tr><td>Mac OSX</td>
@@ -211,7 +214,7 @@ fail are generally well-understood.</p>
 </tr>
 <tr><td>Windows</td>
 <td>win32-x86</td>
-<td>3.1.1</td>
+<td>3.2.2</td>
 <td>autosave fails</td>
 </tr>
 </tbody>
@@ -221,17 +224,21 @@ fail are generally well-understood.</p>
 <div><ol class="arabic simple">
 <li>tests involving subarrays are known to fail with Epics base earlier
 than 3.14.11.</li>
-<li>The autosave module relies on the 3rd part extension pyparsing, which seems to not work correctly for Python3.1.</li>
+<li>The autosave module relies on the 3rd part extension pyparsing, which
+seems to not work correctly for Python3.</li>
 <li>The wx module is not automatically tested.</li>
-<li>CA is known to not work with 64-bit Python on 64-bit Windows. It <em>does</em>
-work on 64-bit Linux, and CA  works with 32-bit Python on 64-bit
-Windows. This is being investigated....</li>
+<li>CA is not yet working with 64-bit Python on 64-bit Windows. It <em>does</em>
+work with 32-bit Python on 64-bit Linux, and Channel Access is known
+to work with 64-bit  Windows.  The current status is: I can get the
+64-bit ca.dll to load with 64-bit Python, but there seems to be some
+disagreement about the lengths of basic C data types (for example,
+does a double take 8 or 16 bytes).  This is being investigated....</li>
 </ol>
 </div></blockquote>
 </div>
 <div class="section" id="development-version">
 <h2>Development Version<a class="headerlink" href="#development-version" title="Permalink to this headline">¶</a></h2>
-<p>The PyEpics module is still under active development, and enhancements and
+<p>The PyEpics module is still under active development, with enhancements and
 bug-fixes are being added frequently.  All development is done through the
 <a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github repository</a>.  To get a read-only copy of the latest
 version, use:</p>
@@ -257,14 +264,7 @@ install the PyEpics Package with:</p>
 </div>
 <div class="section" id="getting-started-setting-up-the-epics-environment">
 <h2>Getting Started, Setting up the Epics Environment<a class="headerlink" href="#getting-started-setting-up-the-epics-environment" title="Permalink to this headline">¶</a></h2>
-<p>In order for Epics Channel Access to work correctly, you must be able to</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li>Find the CA library: <em>libca.so</em> on Unix, <em>libca.dylib</em> on Mac OS X,  or <em>ca.dll</em> on Windows.</li>
-<li>Connect to Epics Process Variables served by Epics IOCs on you network.</li>
-</ol>
-</div></blockquote>
-<p>In order for PyEpics to work at all, it must be able to find and load the
+<p>In order for PyEpics to work at correctly, it must be able to find and load the
 Channel Access dynamic library (<em>libca.so</em>, <em>libca.dylib</em>, or <em>ca.dll</em>
 depending on the system).  This dynamic library needs to found at runtime.</p>
 <p>There are a few ways to specify how to find this library:</p>
@@ -274,22 +274,23 @@ depending on the system).  This dynamic library needs to found at runtime.</p>
 <div class="highlight-python"><pre>&gt; export PYEPICS_LIBCA=/usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so</pre>
 </div>
 </li>
-<li><p class="first">set the environmental variables <tt class="docutils literal"><span class="pre">EPICS_BASE</span></tt> and  <tt class="docutils literal"><span class="pre">EPICS_HOST_ARCH</span></tt> to point to where the library was built.   For example:</p>
+<li><p class="first">set the environmental variables <tt class="docutils literal"><span class="pre">EPICS_BASE</span></tt> and  <tt class="docutils literal"><span class="pre">EPICS_HOST_ARCH</span></tt>
+to point to where the library was built.   For example:</p>
 <div class="highlight-python"><pre>&gt; export EPICS_BASE=/usr/local/epics/base-3.14.12.1
 &gt; export EPICS_HOST_ARCH=linux-x86</pre>
 </div>
-</li>
-</ol>
 <p>will find the library at /usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so.</p>
-<ol class="arabic simple" start="3">
-<li>Place the dynamic library somewhere in the Python path.  A convenient
-place might be the same <tt class="docutils literal"><span class="pre">site-packages/pyepics</span> <span class="pre">library</span></tt> folder as the python package is installed.</li>
+</li>
+<li><p class="first">Put the dynamic library somewhere in the Python path.  A convenient
+place might be the same <tt class="docutils literal"><span class="pre">site-packages/pyepics</span> <span class="pre">library</span></tt> folder as the
+python package is installed.</p>
+</li>
 </ol>
 </div></blockquote>
 <p>Note, that For Windows users, the DLLs (ca.dll and Com.dll) are included in the
 installation kit, and automaically installed to where they can be found at
 runtime (following rule 3 above).</p>
-<p>With the Epics library loaded, it will be necessary to connect to Epics
+<p>With the Epics library loaded, it will need to be able to connect to Epics
 Process Variables. Generally, these variables are provided by Epics I/O
 controllers (IOCs) that are processes running on some device on the
 network.   If you're connecting to PVs provided by IOCs on your local
@@ -391,7 +392,7 @@ POSSIBILITY OF SUCH LOSS OR DAMAGES.</p>
 <li>you can modify and redistribute this software if you keep existing copyright notices intact.</li>
 <li>you cannot claim that you wrote this software or remove copyright notices.</li>
 <li>you cannot claim the copyright holders endorse your use of this software.</li>
-<li>you cannot claim the copyright holders owe you anything if the software does not work as you expect it to, and</li>
+<li>you cannot claim the copyright holders owe you anything if the software does not work as you expect, and</li>
 <li>if you are the US government, you can probably do whatever you want. ;)</li>
 </ol>
 </div></blockquote>

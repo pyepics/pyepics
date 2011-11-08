@@ -285,7 +285,7 @@ methods for :class:`epics.Motor`
    :param attr: attribute name
    :type attr: string (from table above)
    :param as_string:  whether to return string value.
-   :type as_string: ``True`` or ``False``
+   :type as_string: ``True``/ ``False``
 
 Note that :meth:`get` can return the string value, while fetching the
 attribute cannot do so::
@@ -304,7 +304,7 @@ attribute cannot do so::
    :type attr: string (from table above)
    :param value: value for attribute
    :param wait:  whether to wait for completion.
-   :type wait: ``True`` or ``False``
+   :type wait: ``True``/``False``
    :param timeout:  time (in seconds) to wait before giving up trying to connect.
    :type timeout: float
 
@@ -344,7 +344,7 @@ attribute cannot do so::
 
           None : unable to move, invalid value given
           -1   : target value outside limits -- no move attempted
-          -2   : with wait=True, wait time exceeded timeout
+          -2   : with `wait=True`, wait time exceeded timeout
           0    : move executed successfully
 
           will raise an exception if a motor limit is met.
@@ -356,7 +356,7 @@ attribute cannot do so::
    :param dir: direction of motion
    :type dir: string: 'forward' (default) or 'reverse'
    :param wait: whether to wait for completion
-   :type wait:  ``True`` or ``False``
+   :type wait:  ``True``/``False``
    :param timeout:  max time for move to complete (in seconds) [default=300]
    :type timeout: float
 

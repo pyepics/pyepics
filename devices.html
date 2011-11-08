@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.3',
+        VERSION:     '3.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -581,7 +581,7 @@ corresponding attribute name of the Motor Record field.</div></blockquote>
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>attr</strong> (<em>string (from table above)</em>) -- attribute name</li>
-<li><strong>as_string</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return string value.</li>
+<li><strong>as_string</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/ <tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return string value.</li>
 </ul>
 </td>
 </tr>
@@ -609,7 +609,7 @@ attribute cannot do so:</p>
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>attr</strong> (<em>string (from table above)</em>) -- attribute name</li>
 <li><strong>value</strong> -- value for attribute</li>
-<li><strong>wait</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to wait for completion.</li>
+<li><strong>wait</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to wait for completion.</li>
 <li><strong>timeout</strong> (<em>float</em>) -- time (in seconds) to wait before giving up trying to connect.</li>
 </ul>
 </td>
@@ -675,7 +675,7 @@ violation, and raises a MotorLimitException if it is.</p>
 <blockquote>
 <div><p>None : unable to move, invalid value given
 -1   : target value outside limits -- no move attempted
--2   : with wait=True, wait time exceeded timeout
+-2   : with <cite>wait=True</cite>, wait time exceeded timeout
 0    : move executed successfully</p>
 <p>will raise an exception if a motor limit is met.</p>
 </div></blockquote>
@@ -691,7 +691,7 @@ violation, and raises a MotorLimitException if it is.</p>
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>dir</strong> (<em>string: 'forward' (default) or 'reverse'</em>) -- direction of motion</li>
-<li><strong>wait</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to wait for completion</li>
+<li><strong>wait</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to wait for completion</li>
 <li><strong>timeout</strong> (<em>float</em>) -- max time for move to complete (in seconds) [default=300]</li>
 </ul>
 </td>

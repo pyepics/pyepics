@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.3',
+        VERSION:     '3.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -141,7 +141,7 @@ below.</p>
 <dl class="method">
 <dt id="wx.Update">
 <tt class="descclassname">wx.</tt><tt class="descname">Update</tt><big>(</big><em>value=None</em><big>)</big><a class="headerlink" href="#wx.Update" title="Permalink to this definition">¶</a></dt>
-<dd><p>set the widgets value from the PV's value.   If value=None, the current
+<dd><p>set the widgets value from the PV's value.   If value=``None``, the current
 value for the PV is used.</p>
 </dd></dl>
 
@@ -215,7 +215,7 @@ whose value is set to the string representation of the value for the
 corresponding PV.</p>
 <p>By default, the text colour will be overriden when the PV enters an
 alarm state. These colours can be modified (or disabled by being set
-to None) as part of the constructor.</p>
+to <tt class="xref docutils literal"><span class="pre">None</span></tt>) as part of the constructor.</p>
 <p>&quot;units&quot; specifies a unit suffix (like ' A' or ' mm') to put after the text
 value whenever it is displayed.</p>
 <p>Alternatively, &quot;auto_units&quot; means the control will automatically display
@@ -380,7 +380,7 @@ arguments supported by wx.CollapsiblePane.</p>
 <p>By default, the foreground colour of the pane button will be overriden
 when the PV enters an alarm state. On GTK, this means the colour of the
 triangular drop-down button but not the label text. These colours can
-be modified (or disabled by being set to None) as part of the
+be modified (or disabled by being set to <tt class="xref docutils literal"><span class="pre">None</span></tt>) as part of the
 constructor.</p>
 <p>Supports the .SetTranslation() method, whose argument is a dictionary
 mapping PV values to display labels. If the PV value is not found in

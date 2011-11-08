@@ -42,7 +42,7 @@ PVMixin
 
 .. method::   Update(value=None)
 
-   set the widgets value from the PV's value.   If value=None, the current
+   set the widgets value from the PV's value.   If value=``None``, the current
    value for the PV is used.
 
 .. method::   GetValue(as_string=True)
@@ -100,7 +100,7 @@ PVText
 
   By default, the text colour will be overriden when the PV enters an
   alarm state. These colours can be modified (or disabled by being set
-  to None) as part of the constructor.
+  to ``None``) as part of the constructor.
 
   "units" specifies a unit suffix (like ' A' or ' mm') to put after the text
   value whenever it is displayed.
@@ -259,7 +259,7 @@ PVCollapsiblePane
     By default, the foreground colour of the pane button will be overriden
     when the PV enters an alarm state. On GTK, this means the colour of the
     triangular drop-down button but not the label text. These colours can
-    be modified (or disabled by being set to None) as part of the
+    be modified (or disabled by being set to ``None``) as part of the
     constructor.
 
     Supports the .SetTranslation() method, whose argument is a dictionary

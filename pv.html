@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.3',
+        VERSION:     '3.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -130,8 +130,8 @@ attributes for accessing it's properties.</p>
 <li><strong>callback</strong> (<em>callable, tuple, list or None</em>) -- user-defined callback function on changes to PV value or state.</li>
 <li><strong>form</strong> (<em>string, one of ('native','ctrl', or 'time')</em>) -- which epics <em>data type</em> to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.</li>
 <li><strong>auto_monitor</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt>, <tt class="xref docutils literal"><span class="pre">True</span></tt>, <tt class="xref docutils literal"><span class="pre">False</span></tt>, or bitmask (see <a class="reference internal" href="#pv-automonitor-label"><em>Automatic Monitoring of a PV</em></a>)) -- whether to automatically monitor the PV for changes.</li>
-<li><strong>connection_callback</strong> (<em>callable or None</em>) -- user-defined function called on changes to PV connection status.</li>
-<li><strong>connection_timeout</strong> (<em>float or None</em>) -- time (in seconds) to wait for connection before giving up</li>
+<li><strong>connection_callback</strong> (callable or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- user-defined function called on changes to PV connection status.</li>
+<li><strong>connection_timeout</strong> (float or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- time (in seconds) to wait for connection before giving up</li>
 <li><strong>verbose</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to print out debugging messages</li>
 </ul>
 </td>
@@ -171,16 +171,17 @@ intended for debugging purposes.</p>
 callbacks to be executed when the PV changes.</p>
 <dl class="method">
 <dt id="pv.get">
-<tt class="descclassname">pv.</tt><tt class="descname">get</tt><big>(</big><span class="optional">[</span><em>count=None</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pv.get" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pv.</tt><tt class="descname">get</tt><big>(</big><span class="optional">[</span><em>count=None</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">[</span>, <em>timeout=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pv.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>get and return the current value of the PV</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>count</strong> (<em>integer or None</em>) -- maximum number of array elements to return</li>
+<li><strong>count</strong> (integer or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- maximum number of array elements to return</li>
 <li><strong>as_string</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the string representation of the  value.</li>
 <li><strong>as_numpy</strong> -- whether to try to return a numpy array where appropriate.</li>
+<li><strong>timeout</strong> (float or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- maximum time to wait for data before returning <tt class="xref docutils literal"><span class="pre">None</span></tt>.</li>
 </ul>
 </td>
 </tr>
@@ -206,7 +207,7 @@ completed, or setting the <a class="reference internal" href="#pv.put_complete" 
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>value</strong> -- value to set PV</li>
 <li><strong>wait</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to wait for processing to complete (or time-out) before returning.</li>
-<li><strong>timeout</strong> (<em>double</em>) -- maximum time to wait for processing to complete before returning anyway.</li>
+<li><strong>timeout</strong> (<em>float</em>) -- maximum time to wait for processing to complete before returning anyway.</li>
 <li><strong>use_complete</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to use a builtin callback to set <a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><tt class="xref py py-attr docutils literal"><span class="pre">put_complete</span></tt></a>.</li>
 <li><strong>callback</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or a valid python function) -- user-supplied function to run when processing has completed.</li>
 <li><strong>callback_data</strong> -- extra data to pass on to a user-supplied callback function.</li>
@@ -237,8 +238,8 @@ the <a class="reference internal" href="ca.html#ctrlvars-table"><em>Table of Con
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>evt</strong> (<em>double</em>) -- time to pass to <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a></li>
-<li><strong>iot</strong> (<em>double</em>) -- time to pass to <a class="reference internal" href="ca.html#ca.pend_io" title="ca.pend_io"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_io()</span></tt></a></li>
+<li><strong>evt</strong> (<em>float</em>) -- time to pass to <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a></li>
+<li><strong>iot</strong> (<em>float</em>) -- time to pass to <a class="reference internal" href="ca.html#ca.pend_io" title="ca.pend_io"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_io()</span></tt></a></li>
 </ul>
 </td>
 </tr>
@@ -256,13 +257,13 @@ should happen automatically. See <a class="reference internal" href="#pv.wait_fo
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>double</em>) -- maximum connection time, passed to <a class="reference internal" href="ca.html#ca.connect_channel" title="ca.connect_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></tt></a></td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>float</em>) -- maximum connection time, passed to <a class="reference internal" href="ca.html#ca.connect_channel" title="ca.connect_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></tt></a></td>
 </tr>
 <tr class="field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt></td>
 </tr>
 </tbody>
 </table>
-<p>if timeout is None, the PVs connection_timeout parameter will be used. If that is also None,
+<p>if timeout is <tt class="xref docutils literal"><span class="pre">None</span></tt>, the PVs connection_timeout parameter will be used. If that is also <tt class="xref docutils literal"><span class="pre">None</span></tt>,
 <a class="reference internal" href="ca.html#ca.DEFAULT_CONNECTION_TIMEOUT" title="ca.DEFAULT_CONNECTION_TIMEOUT"><tt class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_CONNECTION_TIMEOUT</span></tt></a>  will be used.</p>
 </dd></dl>
 
@@ -275,13 +276,13 @@ connection.  Returns  whether the connection has occurred.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>double</em>) -- maximum connection time.</td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>float</em>) -- maximum connection time.</td>
 </tr>
 <tr class="field"><th class="field-name">Return type:</th><td class="field-body"><tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt></td>
 </tr>
 </tbody>
 </table>
-<p>if timeout is None, the PVs connection_timeout parameter will be used. If that is also None,
+<p>if timeout is <tt class="xref docutils literal"><span class="pre">None</span></tt>, the PVs connection_timeout parameter will be used. If that is also <tt class="xref docutils literal"><span class="pre">None</span></tt>,
 <a class="reference internal" href="ca.html#ca.DEFAULT_CONNECTION_TIMEOUT" title="ca.DEFAULT_CONNECTION_TIMEOUT"><tt class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_CONNECTION_TIMEOUT</span></tt></a>  will be used.</p>
 </dd></dl>
 
@@ -301,8 +302,8 @@ this PV.  Returns the integer <em>index</em>  for the callback.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>callback</strong> (<em>None or callable</em>) -- user-supplied function to run when PV changes.</li>
-<li><strong>index</strong> (<em>None (integer will be produced) or immutable</em>) -- identifying key for this callback</li>
+<li><strong>callback</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or callable) -- user-supplied function to run when PV changes.</li>
+<li><strong>index</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> (integer will be produced) or immutable) -- identifying key for this callback</li>
 <li><strong>with_ctrlvars</strong> -- whether to (try to) make sure that accurate  <tt class="docutils literal"><span class="pre">control</span> <span class="pre">values</span></tt> will be sent to the callback.</li>
 <li><strong>kw</strong> -- additional keyword/value arguments to pass to each execution of the callback.</li>
 </ul>
@@ -328,7 +329,7 @@ sorting  the keys of the <a class="reference internal" href="#pv.callbacks" titl
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>None or integer</em>) -- index of user-supplied function, as returned by <a class="reference internal" href="#pv.add_callback" title="pv.add_callback"><tt class="xref py py-meth docutils literal"><span class="pre">add_callback()</span></tt></a>,
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or integer) -- index of user-supplied function, as returned by <a class="reference internal" href="#pv.add_callback" title="pv.add_callback"><tt class="xref py py-meth docutils literal"><span class="pre">add_callback()</span></tt></a>,
 and also to key for  this callback in the  <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><tt class="xref py py-attr docutils literal"><span class="pre">callbacks</span></tt></a> dictionary.</td>
 </tr>
 <tr class="field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
@@ -674,7 +675,7 @@ turn <em>auto_monitor</em> to <tt class="xref docutils literal"><span class="pre
 explicitly set it to <tt class="xref docutils literal"><span class="pre">True</span></tt> or an explicit mask.  See
 <a class="reference internal" href="advanced.html#advanced-large-arrays-label"><em>Strategies for working with large arrays</em></a> for more details.</dd>
 <dt><tt class="xref docutils literal"><span class="pre">True</span></tt></dt>
-<dd><p class="first">When <em>auto_monitor</em> is set to True, the value will be monitored using
+<dd><p class="first">When <em>auto_monitor</em> is set to <tt class="xref docutils literal"><span class="pre">True</span></tt>, the value will be monitored using
 the default subscription mask set at <a class="reference internal" href="ca.html#ca.DEFAULT_SUBSCRIPTION_MASK" title="ca.DEFAULT_SUBSCRIPTION_MASK"><tt class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_SUBSCRIPTION_MASK</span></tt></a>.</p>
 <p class="last">This mask determines which kinds of changes cause the PV to update. By
 default, the subscription updates when the PV value changes by more
@@ -750,9 +751,9 @@ following keyword parameters:</p>
 </li>
 <li><p class="first"><cite>timestamp</cite>: timestamp from CA server.</p>
 </li>
-<li><p class="first"><cite>read_access</cite>: read access (<cite>True</cite> or <cite>False</cite>)</p>
+<li><p class="first"><cite>read_access</cite>: read access (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>)</p>
 </li>
-<li><p class="first"><cite>write_access</cite>: write access (<cite>True</cite> or <cite>False</cite>)</p>
+<li><p class="first"><cite>write_access</cite>: write access (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>)</p>
 </li>
 <li><p class="first"><cite>access</cite>: string description of  read- and write-access</p>
 </li>
@@ -787,7 +788,7 @@ following keyword parameters:</p>
 </ul>
 </div></blockquote>
 <p>Some of these may not be directly applicable to all PV data types, and some
-values may be None if the control parameters have not yet been fetched with
+values may be <tt class="xref docutils literal"><span class="pre">None</span></tt> if the control parameters have not yet been fetched with
 <a class="reference internal" href="#pv.get_ctrlvars" title="pv.get_ctrlvars"><tt class="xref py py-meth docutils literal"><span class="pre">get_ctrlvars()</span></tt></a>.</p>
 <p>It is important to keep in mind that the callback function will be run
 <em>inside</em> a CA function, and cannot reliably make any other CA calls.  It is
@@ -822,7 +823,7 @@ callback defined, they will all be run when the connection state changes.</p>
 <li><cite>conn</cite>: the connection status</li>
 </ul>
 </div></blockquote>
-<p>where <em>conn</em> will be either <cite>True</cite> or <cite>False</cite>, specifying whether the PV is
+<p>where <em>conn</em> will be either <tt class="docutils literal"><span class="pre">True`</span> <span class="pre">or</span> <span class="pre">``False</span></tt>, specifying whether the PV is
 now connected.   A simple example is given below.</p>
 </div>
 <div class="section" id="put-with-wait-put-callbacks-and-put-complete">
@@ -847,7 +848,7 @@ before printing 'Done'.   You can also specify a maximum time to wait -- a
 not be used as an accurate clock -- the actual wait time may be slightly
 longer.</p>
 <p>A second method is to use the 'use_complete' option and watch for the
-<a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><tt class="xref py py-attr docutils literal"><span class="pre">put_complete</span></tt></a> attribute to become True after a <a class="reference internal" href="#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a>.  This is
+<a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><tt class="xref py py-attr docutils literal"><span class="pre">put_complete</span></tt></a> attribute to become <tt class="xref docutils literal"><span class="pre">True</span></tt> after a <a class="reference internal" href="#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a>.  This is
 somewhat more flexible than using <cite>wait=True</cite> as above, because you can more
 carefully control how often you look for a <a class="reference internal" href="#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a> to complete, and
 what to do in the interim.  A simple example would be:</p>
@@ -972,7 +973,7 @@ place should be described.  In addition, for ENUM PVs, it would be
 desire able to get at the name of the ENUM state, not just its integer
 value.</p>
 <p>To get the string representation of a PVs value, use either the
-<a class="reference internal" href="#pv.char_value" title="pv.char_value"><tt class="xref py py-attr docutils literal"><span class="pre">char_value</span></tt></a> attribute or the <em>as_string=True</em> argument to <a class="reference internal" href="#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a></p>
+<a class="reference internal" href="#pv.char_value" title="pv.char_value"><tt class="xref py py-attr docutils literal"><span class="pre">char_value</span></tt></a> attribute or the <cite>as_string=True</cite> argument to <a class="reference internal" href="#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a></p>
 </div>
 <div class="section" id="example-of-put">
 <h3>Example of <a class="reference internal" href="#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a><a class="headerlink" href="#example-of-put" title="Permalink to this headline">¶</a></h3>

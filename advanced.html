@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.3',
+        VERSION:     '3.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -61,6 +61,7 @@
 <li><a class="reference internal" href="#thread-examples">Thread Examples</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#the-wait-and-timeout-options-for-get-ca-get-complete">The wait and timeout options for get(), ca.get_complete()</a></li>
 <li><a class="reference internal" href="#strategies-for-connecting-to-a-large-number-of-pvs">Strategies for connecting to a large number of PVs</a></li>
 <li><a class="reference internal" href="#time-sleep-or-epics-poll">time.sleep() or epics.poll()?</a></li>
 </ul>
@@ -101,6 +102,9 @@
             
   <div class="section" id="advanced-topic-with-python-channel-access">
 <h1>Advanced Topic with Python Channel Access<a class="headerlink" href="#advanced-topic-with-python-channel-access" title="Permalink to this headline">¶</a></h1>
+<p>This chapter contains a variety of &quot;usage notes&quot; and
+implementation details that may help in getting the best perfomance from
+the pyepics module.</p>
 <div class="section" id="strategies-for-working-with-large-arrays">
 <span id="advanced-large-arrays-label"></span><h2>Strategies for working with large arrays<a class="headerlink" href="#strategies-for-working-with-large-arrays" title="Permalink to this headline">¶</a></h2>
 <p>EPICS Channels / Process Variables usually have values that can be stored
@@ -399,6 +403,51 @@ PV <cite>Py:ai1</cite> is generated in each thread.</p>
 thread has completed!</p>
 </div>
 </div>
+<div class="section" id="the-wait-and-timeout-options-for-get-ca-get-complete">
+<span id="advanced-get-timeouts-label"></span><h2>The wait and timeout options for get(), ca.get_complete()<a class="headerlink" href="#the-wait-and-timeout-options-for-get-ca-get-complete" title="Permalink to this headline">¶</a></h2>
+<p>The <em>get</em> functions, <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> and <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt></a>
+all ask for data to be transferred over the network.  For large data arrays
+or slow networks, this can can take a noticeable amount of time.  For PVs
+that have been disconnected, the <em>get</em> call will fail to return a value at
+all.  For this reason, these functions all take a <cite>timeout</cite> keyword option.
+The lowest level <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt></a> also has a <cite>wait</cite> option, and a companion
+function <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a>.  This section describes the details of
+these.</p>
+<p>If you're using <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a> or <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> you can supply a
+timeout value.  If the value returned is <tt class="xref docutils literal"><span class="pre">None</span></tt>, then either the PV has
+truly disconnected or the timeout passed before receiving the value.  If
+the <em>get</em> is incomplete in this way, a subsequent <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a> or
+<a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> may actually complete and receive the value.</p>
+<p>At the lowest level (which <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> and <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a> use),
+<a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt></a> issues a get-request with an internal callback function
+(that is, it calls <tt class="xref py py-func docutils literal"><span class="pre">libca.ca_array_get_callback()</span></tt> with a pre-defined
+callback function).  With <cite>wait=True</cite> (the default), <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt></a> then
+waits up to the timeout or until the CA library calls the specified
+callback function.  If the callback has been called, the value can then be
+converted and returned.</p>
+<p>If the callback is not called in time or if <cite>wait=False</cite> is used but the PV
+is connected, the callback will be called eventually, and simply waiting
+(or using <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-func docutils literal"><span class="pre">ca.pend_event()</span></tt></a> if <a class="reference internal" href="ca.html#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">ca.PREEMPTIVE_CALLBACK</span></tt></a> is
+<tt class="xref docutils literal"><span class="pre">False</span></tt>) may be sufficient for the data to arrive.  Under this condition,
+you can call <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a>, which will NOT issue a new request
+for data to be sent, but wait (for up to a timeout time) for the previous
+get request to complete.</p>
+<p><a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a> will return <tt class="xref docutils literal"><span class="pre">None</span></tt> if the timeout is exceeded or
+if there is not an &quot;incomplete get&quot; that it can wait to complete.  Thus,
+you should use the return value from <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a> with care.</p>
+<p>Note that <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> (and so <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a>) will normally rely on
+the PV value to be filled in automatically by monitor callbacks.  If
+monitor callbacks are disabled (as is done for large arrays and can be
+turned off) or if the monitor hasn't been called yet, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> will
+check whether it should can <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt></a> or <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a>.</p>
+<p>If not specified, the timeout for <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a> (and all other
+get functions) will be set to:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">timeout</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="n">log10</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Again, that's the maximum time that will be waited, and if the data is
+received faster than that, the <em>get</em> will return as soon as it can.</p>
+</div>
 <div class="section" id="strategies-for-connecting-to-a-large-number-of-pvs">
 <span id="advanced-connecting-many-label"></span><h2>Strategies for connecting to a large number of PVs<a class="headerlink" href="#strategies-for-connecting-to-a-large-number-of-pvs" title="Permalink to this headline">¶</a></h2>
 <p>Occassionally, you may find that you need to quickly connect to a large
@@ -420,14 +469,14 @@ you are connecting to a large number (say, more than 100) PVs at once.</p>
 object automatically use connection and event callbacks.  Normally, these
 are advantages, as you don't need to explicitly deal with them.  But,
 internally, they do pause for network responses using <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a>
-and <a class="reference internal" href="ca.html#ca.pend_io" title="ca.pend_io"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_io()</span></tt></a>, and these pauses can add up.  Second, the
-<a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> also pauses for network response, so that the returned value
-actually containes the latest data right away.</p>
+and these pauses can add up.  Second, the <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> also pauses for
+network response, so that the returned value actually containes the latest
+data right away, as discussed in the previous section.</p>
 <dl class="docutils">
 <dt>The remedies are to</dt>
 <dd><ol class="first last arabic simple">
 <li>not use connection or event callbacks.</li>
-<li>not explicitly pause for values to be returned for each <tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt>.</li>
+<li>not explicitly wait for values to be returned for each <tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt>.</li>
 </ol>
 </dd>
 </dl>
@@ -436,44 +485,41 @@ the CA library, and would be the following:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
 
 <span class="n">pvnamelist</span> <span class="o">=</span> <span class="n">read_list_pvs</span><span class="p">()</span>
-<span class="n">pv_vals</span> <span class="o">=</span> <span class="p">{}</span>
 
-<span class="n">channels</span><span class="o">=</span> <span class="p">[]</span>
+<span class="n">pvdata</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">pvnamelist</span><span class="p">:</span>
-    <span class="n">chid</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">auto_cb</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="c"># note 1</span>
-    <span class="n">channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
+    <span class="n">chid</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">connect</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="c"># note 1</span>
+    <span class="n">pvdata</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">pvdata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">ca</span><span class="o">.</span><span class="n">connect_channel</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">ca</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">pvdata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">ca</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">wait</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>  <span class="c"># note 2</span>
 
 <span class="n">ca</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">pvdata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">get_complete</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">pvdata</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
 
-<span class="n">tmppdata</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
-    <span class="n">name</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
-    <span class="n">count</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">element_count</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
-    <span class="n">ftype</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">field_type</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
-    <span class="n">pdat</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>  <span class="c"># note 2</span>
-    <span class="n">tmpdata</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ftype</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span>  <span class="n">pdat</span>
-
-<span class="n">ca</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>  <span class="c"># polls for *all* channels</span>
-
-<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">pvnames</span><span class="p">:</span>
-    <span class="n">ftype</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">pdat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-    <span class="n">pv_vals</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">_unpack</span><span class="p">(</span><span class="n">pdat</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">,</span> <span class="n">ftype</span><span class="o">=</span><span class="n">ftype</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">pvdata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">print</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>The code here probably needs detailed explanation.  The first thing to
 notice is that this is using the <cite>ca</cite> level, not <cite>PV</cite> objects.  Second
-(Note 1), the <cite>auto_cb=False</cite> option to <a class="reference internal" href="ca.html#ca.create_channel" title="ca.create_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></tt></a> which
-will turn off all connection callbacks -- normally this is not what you
-want, but we're aiming for maximum speed.  Next (Note 2), we get the
-<em>reference</em> to the value from <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a>, without unpacking it.  We
-also get the data type and count which we'll need to unpack the value
-later.  The main point of not having <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> unpack the data for
-each channel as we go is that unpacking the value requires a
-<a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a> to pause for network response.  As long as we don't unpack
-the values, we can get through the whole list without doing any calls to
-<a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a>.  Then we do call <a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a> once (not len(channels)
-times).  Finally, we use the <a class="reference internal" href="ca.html#ca._unpack" title="ca._unpack"><tt class="xref py py-meth docutils literal"><span class="pre">ca._unpack()</span></tt></a> method to convert the
-stored pointer to a python value.</p>
+(Note 1), the <cite>connect=False</cite> option to <a class="reference internal" href="ca.html#ca.create_channel" title="ca.create_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></tt></a> which
+will not wait for connection to be established -- normally this is not what
+you want, but we're aiming for maximum speed.  We then explicitly call
+<a class="reference internal" href="ca.html#ca.connect_channel" title="ca.connect_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></tt></a> for all the channels.  Next (Note 2), we tell the
+CA library to request the data for the channel without waiting around to
+receive it.  The main point of not having <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> wait for the data
+for each channel as we go is that each data transfer takes time.  Instead
+we request data to be sent in a separate thread for all channels without
+waiting.  Then we do wait by calling <a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a> once and only once,
+(not len(channels) times!).  Finally, we use the <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get_complete()</span></tt></a>
+method to convert the data that has now been received by the companion
+thread to a python value.</p>
 <p>How much faster is the more explicit method?  In my tests, I used 20,000
 PVs, all scalar values, all actually connected, and all on the same subnet
 as the test client, though on a mixture of several vxWorks and linux IOCs.

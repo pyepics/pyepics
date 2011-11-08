@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.3',
+        VERSION:     '3.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -384,15 +384,15 @@ are having difficulty with dropped connections.</p>
 <tt class="descclassname">ca.</tt><tt class="descname">connect_channel</tt><big>(</big><em>chid</em><span class="optional">[</span>, <em>timeout=None</em><span class="optional">[</span>, <em>verbose=False</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.connect_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>explicitly connect to a channel (usually not needed, as implicit
 connection will be done when needed), waiting up to timeout for a
-channel to connect.  It returns the connection state,
-<tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+channel to connect.  It returns the connection state, <tt class="xref docutils literal"><span class="pre">True</span></tt> or
+<tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>chid</strong> -- <tt class="docutils literal"><span class="pre">chid</span></tt> Channel ID</li>
-<li><strong>timeout</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or double.) -- maximum time to wait for connection.</li>
+<li><strong>timeout</strong> (float or <tt class="xref docutils literal"><span class="pre">None</span></tt>.) -- maximum time to wait for connection.</li>
 <li><strong>verbose</strong> -- whether to print out debugging information</li>
 </ul>
 </td>
@@ -514,8 +514,67 @@ allocated space for the data.  In python none of these is needed, and
 keyword arguments can be used to specify such options.</p>
 <dl class="method">
 <dt id="ca.get">
-<tt class="descclassname">ca.</tt><tt class="descname">get</tt><big>(</big><em>chid</em><span class="optional">[</span>, <em>ftype=None</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>as_numpy=True</em>, <em>unpack=True</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.get" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ca.</tt><tt class="descname">get</tt><big>(</big><em>chid</em><span class="optional">[</span>, <em>ftype=None</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">[</span>, <em>wait=True</em><span class="optional">[</span>, <em>timeout=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the current value for a Channel. Note that there is not a separate form for array data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>chid</strong> (<em>ctypes.c_long</em>) -- <tt class="docutils literal"><span class="pre">chid</span></tt> Channel ID</li>
+<li><strong>ftype</strong> (integer or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- field type to use (native type is default)</li>
+<li><strong>count</strong> (integer or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- maximum element count to return (full data returned by default)</li>
+<li><strong>as_string</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the string representation of the value.  See notes below.</li>
+<li><strong>as_numpy</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the Numerical Python representation  for array / waveform data.</li>
+<li><strong>wait</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to wait for the data to be received, or return immediately.</li>
+<li><strong>timeout</strong> (float or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- maximum time to wait for data before returning <tt class="xref docutils literal"><span class="pre">None</span></tt>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">get()</span></tt></a> returns the value for the PV with channel ID <em>chid</em> or
+<tt class="xref docutils literal"><span class="pre">None</span></tt>, which indicates an <em>incomplete get</em></p>
+<p>For a listing of values of <em>ftype</em>, see <a class="reference internal" href="#dbrtype-table"><em>Table of DBR Types</em></a>.  The optional <em>count</em> can be used to limit the
+amount of data returned for array data from waveform records.</p>
+<p>The <em>as_string</em> option warrants special attention: The feature is not
+as complete as as the <em>as_string</em> argument for <tt class="xref py py-meth docutils literal"><span class="pre">PV.get()</span></tt>.  Here,
+a string representing the value will always be returned. For Enum
+types, the name of the Enum state will be returned.  For waveforms of
+type CHAR, the string representation will be returned.  For other
+waveforms (with <em>count</em> &gt; 1), a string like <cite>&lt;array count=3, type=1&gt;</cite>
+will be returned.  For all other types the result will from Python's
+<tt class="xref py py-func docutils literal"><span class="pre">str()</span></tt> function.</p>
+<p>The <em>as_numpy</em> option will cause an array value to be returned as a
+numpy array.  This is only applied if numpy can be imported.  See
+<a class="reference internal" href="advanced.html#advanced-large-arrays-label"><em>Strategies for working with large arrays</em></a> for a discussion of strategies for
+how to best deal with very large arrays.</p>
+<p>The <em>wait</em> option controls whether to wait for the data to be
+received over the network and actually return the value, or to return
+immediately after asking for it to be sent.  If <cite>wait=False</cite> (that
+is, immediate return), the <em>get</em> operation is said to be
+<em>incomplete</em>.  The data will be still be received (unless the channel
+is disconnected) eventually but stored internally, and can be read
+later with <a class="reference internal" href="#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">get_complete()</span></tt></a>.  Using <cite>wait=False</cite> can be useful in
+some circumstances.  See <a class="reference internal" href="advanced.html#advanced-connecting-many-label"><em>Strategies for connecting to a large number of PVs</em></a> for a
+discussion.</p>
+<p>The <em>timeout</em> option sets the maximum time to wait for the data to be
+received over the network before returning <tt class="xref docutils literal"><span class="pre">None</span></tt>.  Such a timeout
+could imply that the channel is disconnected or that the data size is
+larger or network slower than normal.  In that case, the <em>get</em>
+operation is said to be <em>incomplete</em>, and the data may become
+available later with <a class="reference internal" href="#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">get_complete()</span></tt></a>.</p>
+<p>See <a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><em>The wait and timeout options for get(), ca.get_complete()</em></a> for further discussion of the
+<em>wait</em> and <em>timeout</em> options and the associated <a class="reference internal" href="#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">get_complete()</span></tt></a>
+function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ca.get_complete">
+<tt class="descclassname">ca.</tt><tt class="descname">get_complete</tt><big>(</big><em>chid</em><span class="optional">[</span>, <em>ftype=None</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">[</span>, <em>timeout=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.get_complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the current value for a Channel, completing an earlier incomplete
+<a class="reference internal" href="#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">get()</span></tt></a> that returned <tt class="xref docutils literal"><span class="pre">None</span></tt>, either because <cite>wait=False</cite> was
+used or because the data transfer did not complete before the timeout passed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -526,35 +585,20 @@ keyword arguments can be used to specify such options.</p>
 <li><strong>count</strong> (<em>integer</em>) -- maximum element count to return (full data returned by default)</li>
 <li><strong>as_string</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the string representation of the value.  See notes below.</li>
 <li><strong>as_numpy</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the Numerical Python representation  for array / waveform data.</li>
-<li><strong>unpack</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the unpacked data or just the internal pointer value</li>
+<li><strong>timeout</strong> (float or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- maximum time to wait for data before returning <tt class="xref docutils literal"><span class="pre">None</span></tt>.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
+<p>This function will return <tt class="xref docutils literal"><span class="pre">None</span></tt> if the previous <a class="reference internal" href="#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">get()</span></tt></a>
+actually completed, or if this data transfer also times out.  See
+<a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><em>The wait and timeout options for get(), ca.get_complete()</em></a> for further discussion.</p>
 </dd></dl>
 
-<p>For a listing of values of <em>ftype</em>, see <a class="reference internal" href="#dbrtype-table"><em>Table of DBR Types</em></a>.    The optional <em>count</em> can be used to limit the amount of
-data returned for array data from waveform records.</p>
-<p>The <em>as_string</em> option warrants special attention: The feature is not as
-complete as as the <em>as_string</em> argument for <tt class="xref py py-meth docutils literal"><span class="pre">PV.get()</span></tt>.  Here, a string
-representing the value will always be returned. For Enum types, the name of
-the Enum state will be returned.  For waveforms of type CHAR, the string
-representation will be returned.  For other waveforms (with <em>count</em> &gt; 1), a
-string like <cite>&lt;array count=3, type=1&gt;</cite> will be returned.  For all other
-types the result will from Python's <tt class="xref py py-func docutils literal"><span class="pre">str()</span></tt> function.</p>
-<p>The <em>as_numpy</em> option will cause an array value to be returned as a numpy
-array.  This is only applied if numpy can be imported.  See
-<a class="reference internal" href="advanced.html#advanced-large-arrays-label"><em>Strategies for working with large arrays</em></a> for a discussion of strategies for how
-to best deal with very large arrays.</p>
-<p>The <em>unpack</em> option will not return the value, but the underlying reference
-(C pointer) to the value.  The returned value would then need to be
-explicitly unpacked with the <a class="reference internal" href="#ca._unpack" title="ca._unpack"><tt class="xref py py-func docutils literal"><span class="pre">_unpack()</span></tt></a> function.  This explicit
-approach can be useful in some circumstances.  See
-<a class="reference internal" href="advanced.html#advanced-connecting-many-label"><em>Strategies for connecting to a large number of PVs</em></a> for a discussion.</p>
 <dl class="method">
 <dt id="ca.put">
-<tt class="descclassname">ca.</tt><tt class="descname">put</tt><big>(</big><em>chid</em>, <em>value</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=20</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>callback_data=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.put" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">ca.</tt><tt class="descname">put</tt><big>(</big><em>chid</em>, <em>value</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=30</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>callback_data=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets the Channel to a value, with options to either wait (block) for the
 process to complete, or to execute a supplied callback function when the
 process has completed.  The chid and value are required.</p>
@@ -565,7 +609,7 @@ process has completed.  The chid and value are required.</p>
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>chid</strong> (<em>ctypes.c_long</em>) -- <tt class="docutils literal"><span class="pre">chid</span></tt> Channel ID</li>
 <li><strong>wait</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to wait for processing to complete (or time-out) before returning.</li>
-<li><strong>timeout</strong> (<em>double</em>) -- maximum time to wait for processing to complete before returning anyway.</li>
+<li><strong>timeout</strong> (float or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- maximum time to wait for processing to complete before returning anyway.</li>
 <li><strong>callback</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or callable) -- user-supplied function to run when processing has completed.</li>
 <li><strong>callback_data</strong> -- extra data to pass on to a user-supplied callback function.</li>
 </ul>
@@ -574,7 +618,7 @@ process has completed.  The chid and value are required.</p>
 </tbody>
 </table>
 <p><a class="reference internal" href="#ca.put" title="ca.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a> returns 1 on success and -1 on timed-out</p>
-<p>Specifying a callback will override setting <em>wait=True</em>.  This
+<p>Specifying a callback will override setting <cite>wait=True</cite>.  This
 callback function will be called with keyword arguments</p>
 <blockquote>
 <div>pvname=pvname, data=callback_data</div></blockquote>
@@ -593,7 +637,7 @@ will be called on any changes to the PV.</p>
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>use_time</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to use the TIME variant for the PV type</li>
 <li><strong>use_ctrl</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to use the CTRL variant for the PV type</li>
-<li><strong>mask</strong> (<em>integer</em>) -- bitmask (of dbr.DBE_ALARM, dbr.DBE_LOG, dbr.DBE_VALUE) to control which changes result in a callback. Defaults to <a class="reference internal" href="#ca.DEFAULT_SUBSCRIPTION_MASK" title="ca.DEFAULT_SUBSCRIPTION_MASK"><tt class="xref py py-data docutils literal"><span class="pre">DEFAULT_SUBSCRIPTION_MASK</span></tt></a>.</li>
+<li><strong>mask</strong> (<em>integer</em>) -- bitmask (combination of dbr.DBE_ALARM, dbr.DBE_LOG, dbr.DBE_VALUE) to control which changes result in a callback. Defaults to <a class="reference internal" href="#ca.DEFAULT_SUBSCRIPTION_MASK" title="ca.DEFAULT_SUBSCRIPTION_MASK"><tt class="xref py py-data docutils literal"><span class="pre">DEFAULT_SUBSCRIPTION_MASK</span></tt></a>.</li>
 <li><strong>callback</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or callable) -- user-supplied callback function</li>
 </ul>
 </td>
@@ -628,13 +672,16 @@ Abort (core dumped)</pre>
 <dt id="ca.DEFAULT_SUBSCRIPTION_MASK">
 <tt class="descclassname">ca.</tt><tt class="descname">DEFAULT_SUBSCRIPTION_MASK</tt><a class="headerlink" href="#ca.DEFAULT_SUBSCRIPTION_MASK" title="Permalink to this definition">¶</a></dt>
 <dd><p>This value is the default subscription type used when calling
-<a class="reference internal" href="#ca.create_subscription" title="ca.create_subscription"><tt class="xref py py-meth docutils literal"><span class="pre">create_subscription()</span></tt></a> with mask=None. It is also used by default when creating a
-<tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt> object with auto_monitor is set to True.</p>
-<p>The initial default value is <em>dbr.DBE_ALARM|dbr.DBE_VALUE</em> (ie update
-on alarm changes or value changes which exceeds the monitor deadband.) The other possible flag
-in the bitmask is <em>dbr.DBE_LOG</em> for archive-deadband changes.</p>
-<p>If this value is changed, it will change the default for all subsequent calls to
-<a class="reference internal" href="#ca.create_subscription" title="ca.create_subscription"><tt class="xref py py-meth docutils literal"><span class="pre">create_subscription()</span></tt></a>, but it will not change any existing subscriptions.</p>
+<a class="reference internal" href="#ca.create_subscription" title="ca.create_subscription"><tt class="xref py py-meth docutils literal"><span class="pre">create_subscription()</span></tt></a> with <cite>mask=None</cite>. It is also used by
+default when creating a <tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt> object with auto_monitor is set
+to <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+<p>The initial default value is <em>dbr.DBE_ALARM|dbr.DBE_VALUE</em>
+(i.e. update on alarm changes or value changes which exceeds the
+monitor deadband.)  The other possible flag in the bitmask is
+<em>dbr.DBE_LOG</em> for archive-deadband changes.</p>
+<p>If this value is changed, it will change the default for all
+subsequent calls to <a class="reference internal" href="#ca.create_subscription" title="ca.create_subscription"><tt class="xref py py-meth docutils literal"><span class="pre">create_subscription()</span></tt></a>, but it will not
+change any existing subscriptions.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1062,7 +1109,7 @@ function.</p>
 <li><strong>chid</strong> -- channel ID (optional: used for determining count and ftype)</li>
 <li><strong>count</strong> -- number of elements to fetch (defaults to element count of chid  or 1)</li>
 <li><strong>ftype</strong> -- data type of channel (defaults to native type of chid)</li>
-<li><strong>as_numpy</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to convert to numpy array.</li>
+<li><strong>as_numpy</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to convert to numpy array.</li>
 </ul>
 </td>
 </tr>
@@ -1307,7 +1354,7 @@ initial connection:</p>
 created, when a successful connection has been made.  Note that the
 callback should be prepared to accept keyword arguments of <cite>pvname</cite>,
 <cite>chid</cite>, and <cite>conn</cite> for the PV name, channel ID, and connection state
-(<cite>True</cite> or <cite>False</cite>).</p>
+(<tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>).</p>
 </div>
 </div>
 </div>
