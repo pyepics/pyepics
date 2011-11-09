@@ -23,7 +23,7 @@ The :class:`PV` class
 
    :param pvname: name of Epics Process Variable
    :param callback:  user-defined callback function on changes to PV value or state.
-   :type callback: callable or None
+   :type callback: callable, tuple, list or None
    :param form:  which epics *data type* to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.
    :type form: string, one of ('native','ctrl', or 'time')
    :param auto_monitor:  whether to automatically monitor the PV for changes.
@@ -46,8 +46,8 @@ connect and be ready to use.
 
 The *pvname* is required, and is the name of an existing Process Variable.
 
-The *callback* parameter  specifies a python method to be called on changes,
-as discussed in more detail at :ref:`pv-callbacks-label`
+The *callback* parameter specifies one or more python methods to be called
+on changes, as discussed in more detail at :ref:`pv-callbacks-label`
 
 The *connection_callback* parameter specifies a python method to be called
 on changes to the connection status of the PV (that is, when it connects or
@@ -204,6 +204,13 @@ completed.   See :ref:`pv-putwait-label` for more details.
 
    execute all user-defined callbacks right now, even if the PV has not
    changed.  Useful for debugging!
+
+   See also: :attr:`callbacks`  attribute, :ref:`pv-callbacks-label`
+
+.. method:: run_callback(index)
+
+   execute a particularl user-defined callback right now, even if the PV
+   has not changed.  Useful for debugging!
 
    See also: :attr:`callbacks`  attribute, :ref:`pv-callbacks-label`
 
@@ -465,16 +472,25 @@ current value.  Much of this information is similar to that in
 :ref:`ca-callbacks-label` for the :mod:`ca` module, though there are some
 important enhancements to callbacks on `PV` objects.
 
-When defining a callback function to be run on changes to a PV, as set from
-:meth:`add_callback`, it is important to know two things:
+You can define more than one callback function per PV to be run on value
+changes.  These functions can be specified when creating a PV, with the
+*callback* argument which can take either a single callback function or a
+list or tuple of callback functions.  After a PV has been created, you can
+add calllback functions with :meth:`add_callback`, remove them with
+:meth:`remove_callback`, and explicitly run them with :meth:`run_callback`.
+Each callback has an internal unique *index* (a small integer number) that
+can be used for specifying which one to add, remove, and run.
+
+When defining a callback function to be run on changes to a PV, it is
+important to know two things:
 
     1)  how your function will be called.
     2)  what is permissible to do inside your callback function.
 
-Callback functions will be called with several keyword arguments.  You should be
-prepared to have them passed to your function, and should always include
-`**kw`  to catch all arguments.  Your callback will be sent the following
-keyword parameters:
+Callback functions will be called with several keyword arguments.  You
+should be prepared to have them passed to your function, and should always
+include `**kw` to catch all arguments.  Your callback will be sent the
+following keyword parameters:
 
     * `pvname`: the name of the pv
     * `value`: the latest value
@@ -508,14 +524,15 @@ Some of these may not be directly applicable to all PV data types, and some
 values may be None if the control parameters have not yet been fetched with
 :meth:`get_ctrlvars`.
 
-Note that a the user-supplied callback will be run *inside* a CA function,
-and cannot reliably make any other CA calls.  It is helpful to think "this
-all happens inside of a :func:`pend_event` call", and in an epics thread
-that may or may not be the main thread of your program.  It is advisable to
-keep the callback functions short and not resource-intensive.  Consider
-strategies which use the callback only to record that a change has occurred
-and then act on that change later -- perhaps in a separate thread, perhaps
-after :func:`pend_event` has completed.
+It is important to keep in mind that the callback function will be run
+*inside* a CA function, and cannot reliably make any other CA calls.  It is
+helpful to think "this all happens inside of a :func:`pend_event` call",
+and in an epics thread that may or may not be the main thread of your
+program.  It is advisable to keep the callback functions short and not
+resource-intensive.  Consider strategies which use the callback only to
+record that a change has occurred and then act on that change later --
+perhaps in a separate thread, perhaps after :func:`pend_event` has
+completed.
 
 The `cb_info` parameter supplied to the callback needs special attention,
 as it is the only non-Epics information passed.   The `cb_info` parameter

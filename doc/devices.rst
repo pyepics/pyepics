@@ -414,9 +414,9 @@ may inspire you to build your own device classes.
 Device without a prefix
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a simple device, that does not even define a prefix.  Thus, all PVs
-in the device must be *fully qualified*, and need not share a prefix.::
-
+Here, we define a very simple device that does not even define a prefix.
+This is not much more than a collection of PVs, All PVs in the device must
+be *fully qualified*, as they need do not share a common prefix::
 
     from epics import Device
     dev = Device()
@@ -426,8 +426,11 @@ in the device must be *fully qualified*, and need not share a prefix.::
     dev.put('13IDC:m2.VAL', 3.0)
     print dev.PV('13IDC:m3.DIR').get(as_string=True)
 
-This demonstrates that a `Device` is simply a collection of  PVs, which
-can be accessed through :meth:`PV`.
+Note that this device cannot use the attributes based on field names.
+
+This may not look very interesting until you consider `Device` to be a
+starting point for building more complicated objects by adding specialized
+methods.
 
 
 Epics ai record as Device

@@ -2,7 +2,7 @@
 simple devices
 """
 from . import ai, ao, bi, bo
-from . import scaler, struck, mca, transform
+from . import scaler, struck, mca, transform, scan
 
 ai = ai.ai
 ao = ao.ao
@@ -12,5 +12,6 @@ Scaler = scaler.Scaler
 Struck = struck.Struck
 Mca = mca.Mca
 Transform  = transform.Transform
+
 
 

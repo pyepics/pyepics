@@ -42,7 +42,7 @@ class PV(object):
 """
 
     _fmtsca = "<PV '%(pvname)s', count=%(count)i, type=%(typefull)s, access=%(access)s>"
-    _fmtarr = "<PV '%(pvname)s', count=%(count)i/%(nelm)i, type=%(typefull)s, access=%(access)s>"    
+    _fmtarr = "<PV '%(pvname)s', count=%(count)i/%(nelm)i, type=%(typefull)s, access=%(access)s>"
     _fields = ('pvname',  'value',  'char_value',  'status',  'ftype',  'chid',
                'host', 'count', 'access', 'write_access', 'read_access',
                'severity', 'timestamp', 'precision', 'units', 'enum_strs',
@@ -65,7 +65,7 @@ class PV(object):
         self._args      = {}.fromkeys(self._fields)
         self._args['pvname'] = self.pvname
         self._args['count'] = -1
-        self._args['nelm']  = -1        
+        self._args['nelm']  = -1
         self._args['type'] = 'unknown'
         self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
@@ -75,25 +75,24 @@ class PV(object):
         self.callbacks  = {}
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
-        self._monitor_started = False
+        if isinstance(callback, (tuple, list)):
+            for i, thiscb in enumerate(callback):
+                if hasattr(thiscb, '__call__'):
+                    self.callbacks[i] = (thiscb, {})
+        elif hasattr(callback, '__call__'):
+            self.callbacks[0] = (callback, {})
+
         self.chid = None
-        
         if ca.current_context() is None:
-            ca.use_initial_context() 
+            ca.use_initial_context()
         self.context = ca.current_context()
 
         self._args['chid'] = self.chid = ca.create_channel(self.pvname,
                                                            callback=self.__on_connect)
-
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
-
         self._args['type'] = dbr.Name(self.ftype).lower()
-        
-
-        if callback is not None:
-            self.add_callback(callback)
 
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
@@ -128,9 +127,10 @@ class PV(object):
             if self.auto_monitor is None:
                 self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
             if self._monref is None and self.auto_monitor:
-                # you can explicitly request a subscription mask (ie dbr.DBE_ALARM|dbr.DBE_LOG) by
-                # passing it as the auto_monitor arg, otherwise if you specify 'True' you'll just
-                # get the default set in ca.DEFAULT_SUBSCRIPTION_MASK
+                # you can explicitly request a subscription mask
+                # (ie dbr.DBE_ALARM|dbr.DBE_LOG) by passing it as the
+                # auto_monitor arg, otherwise if you specify 'True' you'll 
+                # just get the default set in ca.DEFAULT_SUBSCRIPTION_MASK
                 mask = self.auto_monitor if type(self.auto_monitor) is int else None
                 self._monref = ca.create_subscription(self.chid,
                                          use_ctrl=(self.form == 'ctrl'),
@@ -185,7 +185,6 @@ class PV(object):
         self._monref = None
         self.connected = False
         self._conn_started = False
-        self._monitor_started = False
         return self.wait_for_connection()
 
     def poll(self, evt=1.e-4, iot=1.0):
@@ -205,7 +204,8 @@ class PV(object):
         if not self.wait_for_connection():
             return None
 
-        if not self.auto_monitor or self._args['value'] is None:
+        if ((not self.auto_monitor or self._args['value'] is None) or
+            (count is not None and len(self._args['value']) > 1)):
             self._args['value'] = ca.get(self.chid,
                                          count=count,
                                          ftype=self.ftype,
@@ -215,10 +215,8 @@ class PV(object):
             self._set_charval(self._args['value'])
             return self._args['char_value']
 
-        # this emulates asking for less data than actually exists in the
-        # cached value
-        if count is not None and len(self._args['value']) > 1:
-            count = max(0, min(count, len(self._args['value'])))
+        # allow asking for less data than actually exists in the cached value
+        if count is not None and count < len(self._args['value']):
             return self._args['value'][:count]
         return self._args['value']
 
@@ -237,9 +235,9 @@ class PV(object):
             if value in self._args['enum_strs']:
                 # tuple.index() not supported in python2.5
                 # value = self._args['enum_strs'].index(value)
-                for ieval, eval in enumerate(self._args['enum_strs']):
-                    if eval == value:
-                        value = ieval
+                for ival, val in enumerate(self._args['enum_strs']):
+                    if val == value:
+                        value = ival
                         break
         if use_complete and callback is None:
             callback = self.__putCallbackStub
@@ -321,7 +319,6 @@ class PV(object):
         To have user-defined code run when the PV value changes,
         use add_callback()
         """
-        self._monitor_started = True
         self._args.update(kwd)
         self._args['value']  = value
         self._args['timestamp'] = kwd.get('timestamp', time.time())
@@ -345,8 +342,8 @@ class PV(object):
             self.run_callback(index)
 
     def run_callback(self, index):
-        """run a specific user-defined callback, specified by index, with the current data
-
+        """run a specific user-defined callback, specified by index, 
+        with the current data
         Note that callback functions are called with keyword/val
         arguments including:
              self._args  (all PV data available, keys = __fields)
@@ -363,7 +360,7 @@ class PV(object):
         if hasattr(fcn, '__call__'):
             fcn(**kwd)
 
-    def add_callback(self, callback=None, index=None,
+    def add_callback(self, callback=None, index=None, run_now=False,
                      with_ctrlvars=True, **kw):
         """add a callback to a PV.  Optional keyword arguments
         set here will be preserved and passed on to the callback
@@ -372,18 +369,19 @@ class PV(object):
         Note that a PV may have multiple callbacks, so that each
         has a unique index (small integer) that is returned by
         add_callback.  This index is needed to remove a callback."""
-        if not self.wait_for_connection():
-            return None
-        if with_ctrlvars:
-            self.get_ctrlvars()
         if hasattr(callback, '__call__'):
             if index is None:
                 index = 1
                 if len(self.callbacks) > 0:
                     index = 1 + max(self.callbacks.keys())
             self.callbacks[index] = (callback, kw)
-        if self._monitor_started and index is not None:
-            # if create_subscription is already running, simulate the 'initial value' callback
+
+        if with_ctrlvars and self.connected:
+            self.get_ctrlvars()
+        if run_now:
+            if not self.connected:
+                self.wait_for_connection()
+        if run_now and self.connected:
             self.run_callback(index)
         return index
 
@@ -486,7 +484,7 @@ class PV(object):
     def status(self):
         "pv status"
         return self._getarg('status')
-    
+
     @property
     def type(self):
         "pv type"
@@ -510,8 +508,9 @@ class PV(object):
 
     @property
     def nelm(self):
-        """native count (number of elements). For array data this will return the
-        full array size (ie, the .NELM field).  See also 'count' property"""
+        """native count (number of elements).
+        For array data this will return the full array size (ie, the
+        .NELM field).  See also 'count' property"""
         if self._getarg('count') == 1:
             return 1
         return ca.element_count(self.chid)

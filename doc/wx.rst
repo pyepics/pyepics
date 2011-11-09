@@ -8,13 +8,17 @@ Overview
 .. module:: wx
    :synopsis: wxPython objects for epics
 
-This module provides a set of wxPython classes for epics PVs. Most of these are
-derived from wxPython widgets, with special support added for epics PVs,
-especially regarding when to automatically update the widget based on a
-changing value for a PV.
+This module provides a set of wxPython classes for epics PVs. Most of these
+are derived from wxPython widgets, with special support added for epics
+PVs, especially regarding when to automatically update the widget based on
+a changing value for a PV.
 
-Examples of some wx code is included in the *scripts* folder of the pyepics
-source distribution kit.
+.. _pyepics applications:    http://github.com/pyepics/epicsapps
+
+Some examples of code that uses pyepics and wxPython are included in the
+*scripts* folder of the pyepics source distribution kit.  In addition,
+there are a some full-fledged applications using Epics and wxPython at
+`pyepics applications`_.
 
 ..  _wx-functions-label:
 
@@ -33,7 +37,7 @@ PVMixin
    below.
 
 .. method::   SetPV(pv=None)
-   
+
    set the PV corresponding to the widget.
 
 .. method::   Update(value=None)
@@ -66,7 +70,7 @@ PVCtrlMixin
 
    This is a mixin class for wx Controls with epics PVs:  This sibclasses
    PVCtrlMixin and adds colour translations
-   PV, and manages callback events for the PV. 
+   PV, and manages callback events for the PV.
 
   :param parent: wx parent widget
   :param pv:     epics.PV
@@ -84,12 +88,11 @@ PVCtrlMixin
    the PV value.
 
 
-PVText       
-~~~~~~~~
+PVText
+~~~~~~~~~
 
-.. class:: PVText(parent, pv=None, font=None, fg=None, bg=None,
-                  minor_alarm="DARKRED", major_alarm="RED",
-                  invalid_alarm="ORANGERED", auto_units=False, units="", **kw)
+
+.. class:: PVText(parent, pv=None, font=None, fg=None, bg=None, minor_alarm="DARKRED", major_alarm="RED", invalid_alarm="ORANGERED", auto_units=False, units="", **kw)
 
   derived from wx.StaticText and PVCtrlMixin, this is a StaticText widget
   whose value is set to the string representation of the value for the
@@ -103,12 +106,12 @@ PVText
   value whenever it is displayed.
 
   Alternatively, "auto_units" means the control will automatically display
-  the "EGU" units value from the PV, whenever it updates. If this value is 
+  the "EGU" units value from the PV, whenever it updates. If this value is
   set, "units" is ignored. A space is inserted between the value and the
   unit.
 
 
-PVTextCtrl   
+PVTextCtrl
 ~~~~~~~~~~~
 
 .. class:: PVTextCtrl(parent, pv=None, font=None, fg=None, bg=None, **kw)
@@ -119,7 +122,7 @@ PVTextCtrl
     widget will set the PV value.
 
 
-PVFloatCtrl  
+PVFloatCtrl
 ~~~~~~~~~~~
 
 .. class:: PVFloatCtrl(parent, pv=None, font=None, fg=None, bg=None, **kw)
@@ -150,10 +153,10 @@ PVCheckBox
 ~~~~~~~~~~~
 
 .. class:: PVCheckBox(self, parent, pv=None, on_value=1, off_value=0, **kw)
-    Checkbox based on a binary PV value, both reads/writes the
-    PV on changes.
 
-    on_value and off_value are the specific values that are mapped to the checkbox.
+    Checkbox based on a binary PV value, both reads/writes the PV on
+    changes.  on_value and off_value are the specific values that are
+    mapped to the checkbox.
 
     There are multiple options for translating PV values to checkbox
     settings (from least to most complex):
@@ -168,31 +171,29 @@ PVCheckBox
 PVFloatSpin
 ~~~~~~~~~~~
 
-.. class:: PVFloatSpin(parent, pv=None, deadTime=500, min_val=None, 
-                       max_val=None, increment=1.0, digits=-1, **kw)
+.. class:: PVFloatSpin(parent, pv=None, deadTime=500, min_val=None, max_val=None, increment=1.0, digits=-1, **kw)
 
-    A FloatSpin is a floatin point spinctrl with buttons to increase
-	 and decrease the value by a particular increment. Arrow keys and
-	 page up/down can also be used (the latter changes the value by 10x
-	 the increment.)
+    A FloatSpin is a floating point spin control with buttons to increase
+    and decrease the value by a particular increment. Arrow keys and page
+    up/down can also be used (the latter changes the value by 10x the
+    increment.)
 
-	 PVFloatSpin is a special derivation that assigns a PV to the FloatSpin
-	 control. deadTime is the delay (in milliseconds) between when the user
-	 finishes typing a value and when the PV is set to it (to prevent
-	 half-typed numeric values being set.)
+    PVFloatSpin is a special derivation that assigns a PV to the FloatSpin
+    control. deadTime is the delay (in milliseconds) between when the user
+    finishes typing a value and when the PV is set to it (to prevent
+    half-typed numeric values being set.)
 
 
 PVButton
 ~~~~~~~~~~~
 
-.. class:: PVButton(parent, pv=None, pushValue=1, disablePV=None, 
+.. class:: PVButton(parent, pv=None, pushValue=1, disablePV=None,
                     disableValue=1, **kw)
 
-    A wx.Button linked to a PV. When the button is pressed, 'pushValue'
-	 is written to the PV (useful for momentary PVs with HIGH= set.)
-
-	 Setting disablePV and disableValue will automatically cause the
-	 button to disable when that PV has a certain value.
+    A wx.Button linked to a PV. When the button is pressed, 'pushValue' is
+    written to the PV (useful for momentary PVs with HIGH= set.)  Setting
+    disablePV and disableValue will automatically cause the button to
+    disable when that PV has a certain value.
 
 
 PVRadioButton
@@ -200,12 +201,11 @@ PVRadioButton
 
 .. class:: PVRadioButton(parent, pv=None, pvValue=None, **kw)
 
-    A PVRadioButton is a radio button associated with a particular PV 
-	 and one particular value.
-       
+    A PVRadioButton is a radio button associated with a particular PV and
+    one particular value.
+
     Suggested for use in a group where all radio buttons are
     PVRadioButtons, and they all have a discrete value set.
-
 
 
 PVComboBox
@@ -213,7 +213,8 @@ PVComboBox
 
 .. class:: PVComboBox(parent, pv=None, **kw)
 
-    A ComboBox linked to a PV. Both reads/writes the combo value on changes.
+    A ComboBox linked to a PV. Both reads/writes the combo value on
+    changes.
 
 
 
@@ -227,16 +228,16 @@ PVEnumButtons
    the current state of the PV
 
 
-PVEnumChoice 
+PVEnumChoice
 ~~~~~~~~~~~~~~~~~~
 
 .. class:: PVEnumChoice(parent, pv=None, font=None, fg=None, bg=None, **kw)
 
-   This will create a dropdown list (a wx.Choice) with a list of enumeration
-   states for an enum PV.  
+   This will create a dropdown list (a wx.Choice) with a list of
+   enumeration states for an enum PV.
 
 
-PVAlarm   
+PVAlarm
 ~~~~~~~~~~
 
 .. class:: PVAlarm(parent, pv=None, font=None, fg=None, bg=None, trip_point=None, **kw)
@@ -249,21 +250,21 @@ PVCollapsiblePane
 
 .. class:: PVCollapsiblePane(parent,  pv=None, minor_alarm="DARKRED", major_alarm="RED", invalid_alarm="ORANGERED", **kw)
 
-	This is equivalent to wx.CollapsiblePane, except the label shown
-	on the pane's "expansion button" comes from a PV.
+    This is equivalent to wx.CollapsiblePane, except the label shown
+    on the pane's "expansion button" comes from a PV.
 
-	The additional keyword arguments can be any of the other constructor arguments
-	supported by wx.CollapsiblePane.
+    The additional keyword arguments can be any of the other constructor
+    arguments supported by wx.CollapsiblePane.
 
-	By default, the foreground colour of the pane button will be
-  	overriden when the PV enters an alarm state. On GTK, this means
-  	the colour of the triangular drop-down button but not the label
-	text. These colours can be modified (or disabled by being set to
-	None) as part of the constructor.
+    By default, the foreground colour of the pane button will be overriden
+    when the PV enters an alarm state. On GTK, this means the colour of the
+    triangular drop-down button but not the label text. These colours can
+    be modified (or disabled by being set to None) as part of the
+    constructor.
 
-	Supports the .SetTranslation() method, whose argument is a dictionary
-	mapping PV values to display labels. If the PV value is not found
-	in the dictionary, it will displayed verbatim as the label.
+    Supports the .SetTranslation() method, whose argument is a dictionary
+    mapping PV values to display labels. If the PV value is not found in
+    the dictionary, it will displayed verbatim as the label.
 
 
 Decorators and other Utility Functions
@@ -282,7 +283,7 @@ closed window), and remove callbacks to them.
 decorator to wrap function in a wx.CallAfter() so that
 Epics calls can be made in a separate thread, and asynchronously.
 
-This decorator should be used for all code that mix calls to wx and epics    
+This decorator should be used for all code that mix calls to wx and epics
 
 ..  function::  finalize_epics
 
@@ -317,10 +318,10 @@ Which shows from right to left: the motor desription, an information
 message (blank most of the time), the readback value, the drive value,
 arrows to tweak the motor, and a drop-down combobox for tweak values, a
 "Stop" button and a "More" button.  The panel has the following features:
-	
+
    *  All controls are "live" and will respond to changes from other source.
    *  The values for the tweak values in the ComboBox are automatically
-      generated from the precision and travel range of the motor. 
+      generated from the precision and travel range of the motor.
    *  The entry box for the drive value will *only* accept numeric input,
       and will only set the drive value when hitting Enter or Return.
    *  The drive value  will change to Red text on a Yellow background when
@@ -351,11 +352,11 @@ OGL Classes
 ===========
 
 OGL is a graphics drawing library shipped with wxPython. Is it built around
-the concept of "shapes" which are added to "canvases" and can be moved, 
+the concept of "shapes" which are added to "canvases" and can be moved,
 scrolled, zoomed, animated, etc.
 
 There is a PVShapeMixin class which allows PV callback functionality to be
-added to any OGL Shape class, and there are also PVRectangle and PVCircle 
+added to any OGL Shape class, and there are also PVRectangle and PVCircle
 subclasses already created.
 
 A recommended way to use these OGL classes is to make a static bitmap
@@ -368,7 +369,7 @@ PVShapeMixin
 
 .. class:: PVShapeMixin(self, pv=None, pvname=None)
 
-  Similar to PVMixin, this mixin should be added to any 
+  Similar to PVMixin, this mixin should be added to any
   ogl.Shape subclass that needs PV callback support.
 
   The main method is PVChanged(self, raw_value), which should be

@@ -190,9 +190,9 @@ threading contexts are very close to the C library:
 
 .. function::  pend_io([t=1.0])
 
-.. function::  pend_event([t=1.e-4])
+.. function::  pend_event([t=1.e-5])
 
-.. function::  poll([evt=1.e-4, [iot=1.0]])
+.. function::  poll([evt=1.e-5, [iot=1.0]])
 
    a convenience function which is equivalent to::
 
@@ -209,7 +209,7 @@ These are simply :data:`ctypes.c_long` (C long integers) that hold the
 memory address of the C representation of the channel, but it is probably
 a good idea to treat these as object instances.
 
-.. function:: create_channel(pvname, [connect=False, [userfcn=None]])
+.. function:: create_channel(pvname, [connect=False, [callback=None, auto_cb=True]]])
 
    creates a channel, returning the Channel ID ``chid`` used by other
    functions to identify this channel.
@@ -217,17 +217,20 @@ a good idea to treat these as object instances.
    :param pvname:   the name of the PV to create.
    :param connect:  whether to (try to) connect to PV as soon as possible.
    :type  connect:  ``True``/``False``
-   :param userfcn:  user-defined Python function to be called when the connection state changes.
-   :type userfcn:  ``None`` or callable.
+   :param callback:  user-defined Python function to be called when the connection state changes.
+   :type callback:  ``None`` or callable.
+   :param auto_cb:  whether to automatically use an internal callback.
+   :type  auto_cb:  ``True``/``False``
 
-   The user-defined function should be  prepared to accept keyword arguments of
+   The user-defined callback function should be  prepared to accept keyword arguments of
          * `pvname`  name of PV
          * `chid`    ``chid`` Channel ID
          * `conn`    ``True``/``False``:  whether channel is connected.
 
-   Internally, a connection callback is used so that you should
-   not need to explicitly connect to a channel, unless you are having
-   difficulty with dropped connections.
+   If `auto_cb` is ``True``, an internal connection callback is used so
+   that you should not need to explicitly connect to a channel, unless you
+   are having difficulty with dropped connections.
+
 
 .. function:: connect_channel(chid, [timeout=None, [verbose=False]])
 
@@ -333,7 +336,7 @@ requiring the user to supply DBR TYPE and count as well as ``chid`` and
 allocated space for the data.  In python none of these is needed, and
 keyword arguments can be used to specify such options.
 
-.. method:: get(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=True]]]])
+.. method:: get(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=True, unpack=True]]]])
 
 
    return the current value for a Channel. Note that there is not a separate form for array data.
@@ -348,6 +351,8 @@ keyword arguments can be used to specify such options.
    :type as_string:  ``True``/``False``
    :param as_numpy:  whether to return the Numerical Python representation  for array / waveform data.
    :type as_numpy:  ``True``/``False``
+   :param unpack:  whether to return the unpacked data or just the internal pointer value
+   :type unpack:  ``True``/``False``
 
 
 For a listing of values of *ftype*, see :ref:`Table of DBR Types
@@ -367,6 +372,11 @@ array.  This is only applied if numpy can be imported.  See
 :ref:`advanced-large-arrays-label` for a discussion of strategies for how
 to best deal with very large arrays.
 
+The *unpack* option will not return the value, but the underlying reference
+(C pointer) to the value.  The returned value would then need to be
+explicitly unpacked with the :func:`_unpack` function.  This explicit
+approach can be useful in some circumstances.  See
+:ref:`advanced-connecting-many-label` for a discussion.
 
 .. method::  put(chid, value, [wait=False, [timeout=20, [callback=None, [callback_data=None]]]])
 
@@ -393,7 +403,7 @@ to best deal with very large arrays.
 
    For more on this *put callback*, see :ref:`ca-callbacks-label` below.
 
-.. method::   create_subscription(chid, [use_time=False, [use_ctrl=False, [mask=None, [userfcn=None]]]])
+.. method::  create_subscription(chid, [use_time=False, [use_ctrl=False, [mask=None, [callback=None]]]])
 
    create a *subscription to changes*, The user-supplied callback function
    will be called on any changes to the PV.
@@ -404,8 +414,8 @@ to best deal with very large arrays.
    :type use_ctrl:  ``True``/``False``
    :param  mask:    bitmask (of dbr.DBE_ALARM, dbr.DBE_LOG, dbr.DBE_VALUE) to control which changes result in a callback. Defaults to :data:`DEFAULT_SUBSCRIPTION_MASK`.
    :type mask:      integer
-   :param userfcn:  user-supplied callback function
-   :type userfcn:   ``None`` or callable
+   :param callback:  user-supplied callback function
+   :type callback:   ``None`` or callable
 
    :rtype: tuple containing *(callback_ref, user_arg_ref, event_id)*
 
@@ -910,8 +920,8 @@ standard output::
     mypv = 'XXX.VAL'
     chid = ca.create_channel(mypv)
 
-    # subscribe to events, giving 'userfcn' as the callback function
-    eventID = ca.create_subscription(chid, userfcn=onChanges)
+    # subscribe to events giving a callback function
+    eventID = ca.create_subscription(chid, callback=onChanges)
 
     # now we simply wait for changes
     t0 = time.time()
@@ -926,7 +936,6 @@ faults (on Windows) or seemingly inexplicable crashes later (on linux).
 Define a connection callback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 Here, we define a connection callback -- a function to be called when the
 connection status of the PV changes. Note that this will be called on
 initial connection::
@@ -939,7 +948,7 @@ initial connection::
 
     # create channel, provide connection callback
     motor1 = '13IDC:m1'
-    chid = epics.ca.create_channel(motor1, userfcn=onConnectionChange)
+    chid = epics.ca.create_channel(motor1, callback=onConnectionChange)
 
     print 'Now waiting, watching values and connection changes:'
     t0 = time.time()
