@@ -1,8 +1,8 @@
 """
    epics channel access python module
 
-   version    :  3.1.3
-   last update:  9-Aug-2011
+   version    :  3.1.4
+   last update:  8-Nov-2011
 
    Principle Authors:
       Matthew Newville <newville@cars.uchicago.edu>, CARS, University of Chicago
@@ -18,7 +18,7 @@
 
 """
 
-__version__ = '3.1.3'
+__version__ = '3.1.4'
 
 import time
 import sys
@@ -80,7 +80,7 @@ def caput(pvname, value, wait=False, timeout=60):
     if thispv is not None:
         return thispv.put(value, wait=wait, timeout=timeout)
 
-def caget(pvname, as_string=False, count=None, as_numpy=True):
+def caget(pvname, as_string=False, count=None, as_numpy=True, timeout=None):
     """caget(pvname, as_string=False)
     simple get of a pv's value..
        >>> x = caget('xx.VAL')
@@ -97,7 +97,7 @@ def caget(pvname, as_string=False, count=None, as_numpy=True):
     if thispv is not None:
         if as_string:
             thispv.get_ctrlvars()
-        val = thispv.get(count=count,
+        val = thispv.get(count=count, timeout=timeout,
                          as_string=as_string,
                          as_numpy=as_numpy)
         poll()

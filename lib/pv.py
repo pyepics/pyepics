@@ -87,8 +87,9 @@ class PV(object):
             ca.use_initial_context()
         self.context = ca.current_context()
 
-        self._args['chid'] = self.chid = ca.create_channel(self.pvname,
-                                                           callback=self.__on_connect)
+        self._args['chid'] = ca.create_channel(self.pvname,
+                                               callback=self.__on_connect)
+        self.chid = self._args['chid']
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
@@ -129,7 +130,7 @@ class PV(object):
             if self._monref is None and self.auto_monitor:
                 # you can explicitly request a subscription mask
                 # (ie dbr.DBE_ALARM|dbr.DBE_LOG) by passing it as the
-                # auto_monitor arg, otherwise if you specify 'True' you'll 
+                # auto_monitor arg, otherwise if you specify 'True' you'll
                 # just get the default set in ca.DEFAULT_SUBSCRIPTION_MASK
                 mask = self.auto_monitor if type(self.auto_monitor) is int else None
                 self._monref = ca.create_subscription(self.chid,
@@ -191,14 +192,19 @@ class PV(object):
         "poll for changes"
         ca.poll(evt=evt, iot=iot)
 
-    def get(self, count=None, as_string=False, as_numpy=True):
+    def get(self, count=None, as_string=False, as_numpy=True, timeout=None):
         """returns current value of PV.  Use the options:
-         as_string to return string representation
-         as_numpy  to (try to) return a numpy array
+        count       explicitly limit count for array data
+        as_string   flag(True/False) to get a string representation
+                    of the value.
+        as_numpy    flag(True/False) to use numpy array as the
+                    return type for array data.
+        timeout     maximum time to wait for value to be received.
+                    (default = 0.5 + log10(count) seconds)
 
         >>> p.get('13BMD:m1.DIR')
         0
-        >>> p.get('13BMD:m1.DIR',as_string=True)
+        >>> p.get('13BMD:m1.DIR', as_string=True)
         'Pos'
         """
         if not self.wait_for_connection():
@@ -206,11 +212,13 @@ class PV(object):
 
         if ((not self.auto_monitor or self._args['value'] is None) or
             (count is not None and len(self._args['value']) > 1)):
-            self._args['value'] = ca.get(self.chid,
-                                         count=count,
-                                         ftype=self.ftype,
+            ca_get = ca.get
+            ctx = ca.current_context()
+            if ca._cache[ctx][self.pvname]['value'] is not None:
+                ca_get = ca.get_complete
+            self._args['value'] = ca_get(self.chid, ftype=self.ftype,
+                                         count=count, timeout=timeout,
                                          as_numpy=as_numpy)
-
         if as_string:
             self._set_charval(self._args['value'])
             return self._args['char_value']
@@ -342,7 +350,7 @@ class PV(object):
             self.run_callback(index)
 
     def run_callback(self, index):
-        """run a specific user-defined callback, specified by index, 
+        """run a specific user-defined callback, specified by index,
         with the current data
         Note that callback functions are called with keyword/val
         arguments including:

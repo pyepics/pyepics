@@ -119,7 +119,7 @@ class CA_BasicTests(unittest.TestCase):
         self.failUnless('units' in cdict)
         self.failUnless('precision' in cdict)
         self.failUnless('severity' in cdict)
-       
+        
         hostname = ca.host_name(chid)
         self.failUnless(len(hostname) > 1)
 
@@ -132,7 +132,7 @@ class CA_BasicTests(unittest.TestCase):
         prec = ca.get_precision(chid)
         self.assertEqual(prec, pvnames.double_pv_prec)
 
-        units= ca.get_ctrlvars(chid)['units']
+        units= ca.BYTES2STR(ca.get_ctrlvars(chid)['units'])
         self.assertEqual(units, pvnames.double_pv_units)
 
         rwacc= ca.access(chid)

@@ -18,7 +18,8 @@ import ctypes.util
 import os
 import sys
 import time
-import copy
+from copy import copy
+from  math import log10
 import atexit
 import warnings
 from threading import Thread
@@ -43,50 +44,16 @@ except ImportError:
 
 from . import dbr
 
-EPICS_STR_ENCODING = 'ASCII'
-PY_VERSION = sys.version_info[0]
-def get_strconvertors():
-    """create string wrappers to pass to C functions for both
-    Python2 and Python3.  Note that the EPICS CA library uses
-    char* to represent strings.  In Python3, char* maps to a
-    sequence of bytes which must be explicitly converted to a
-    Python string by specifying the encoding.  That is, ASCII
-    encoding is not implicitly assumed.
+PY_MAJOR, PY_MINOR = sys.version_info[:2]
 
-    That is, for Python3 one sends and receives sequences of
-    bytes to libca. This function returns the translators
-    (STR2BYTES, BYTES2STR), assuming the encoding defined in
-    EPICS_STR_ENCODING (which is 'ASCII' by default).
-    """
-    if PY_VERSION >= 3:
-        def s2b(st1):
-            'string to byte'
-            if isinstance(st1, bytes):
-                return st1
-            return bytes(st1, EPICS_STR_ENCODING)
-        def b2s(st1):
-            'byte to string'
-            if isinstance(st1, str):
-                return st1
-            return str(st1, EPICS_STR_ENCODING)
-        return s2b, b2s
-    return str, str
-
-STR2BYTES, BYTES2STR = get_strconvertors()
-
-def strjoin(sep, seq):
-    "join string sequence with a separator"
-    if PY_VERSION < 3:
-        return sep.join(seq)
-
-    if isinstance(sep, bytes):
-        sep = BYTES2STR(sep)
-    if len(seq) == 0:
-        seq = ''
-    elif isinstance(seq[0], bytes):
-        seq = [BYTES2STR(i) for i in seq]
-    return sep.join(seq)
-
+memcopy = copy
+if PY_MAJOR >= 3:
+    from .utils3 import STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2, strjoin
+else:
+    from .utils2 import STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2, strjoin
+    if PY_MINOR == 5:
+        def memcopy(a): return a
+        
 ## print to stdout
 def write(msg, newline=True, flush=True):
     """write message to stdout"""
@@ -102,7 +69,6 @@ initial_context = None
 
 ## PREEMPTIVE_CALLBACK determines the CA context
 PREEMPTIVE_CALLBACK = True
-
 
 AUTO_CLEANUP = True
 
@@ -127,6 +93,11 @@ _cache  = {}
 
 ## Cache of pvs waiting for put to be done.
 _put_done =  {}
+
+# get a unique python value that cannot be a value held by an
+# actual PV to signal "Get is incomplete, awaiting callback"
+class Empty: pass
+GET_PENDING = Empty()
 
 class ChannelAccessException(Exception):
     """Channel Access Exception: General Errors"""
@@ -421,16 +392,15 @@ def withSEVCHK(fcn):
     return wrapper
 
 ##
-## Event Handlers for get() event callbacks
-def _onGetEvent(args):
-    """Internal Event Handler for get events: not intended for use"""
+## Event Handler for monitor event callbacks
+def _onMonitorEvent(args):
+    """Event Handler for monitor events: not intended for use"""
     value = dbr.cast_args(args).contents
-    # chid = dbr.chid_t(args.chid)
     pvname = name(args.chid)
     kwds = {'ftype':args.type, 'count':args.count,
            'chid':args.chid, 'pvname': pvname,
            'status':args.status}
-    # print("_onGetEvent ", pvname, current_context())
+
     # add kwds arguments for CTRL and TIME variants
     if args.type >= dbr.CTRL_STRING:
         tmpv = value[0]
@@ -478,7 +448,7 @@ def _onConnectionEvent(args):
 
     if not pv_found:
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
-                               'ts':0, 'failures':0,
+                               'ts':0, 'failures':0, 'value': None,
                                'callbacks': []}
 
     # set connection time, run connection callbacks
@@ -502,6 +472,16 @@ def _onConnectionEvent(args):
                         callback(pvname=pvname, chid=chid, conn=conn)
     return
 
+## get event handler:
+def _onGetEvent(args, **kwds):
+    """get_callback event: simply store data contents which
+    will need conversion to python data with _unpack()."""
+    global _cache
+    if args.status != dbr.ECA_NORMAL:
+        return
+    ctx = current_context()
+    _cache[ctx][name(args.chid)]['value'] = memcopy(dbr.cast_args(args).contents)
+
 ## put event handler:
 def _onPutEvent(args, **kwds):
     """set put-has-completed for this channel,
@@ -517,10 +497,11 @@ def _onPutEvent(args, **kwds):
             kwds['data'] = data
         fcn(pvname=pvname, **kwds)
 
-# create global reference to these two callbacks
+# create global reference to these callbacks
 _CB_CONNECT = ctypes.CFUNCTYPE(None, dbr.connection_args)(_onConnectionEvent)
 _CB_PUTWAIT = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)
-_CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onGetEvent)
+_CB_GET     = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onGetEvent)
+_CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onMonitorEvent)
 
 ###
 #
@@ -673,7 +654,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         _cache[ctx] = {}
     if pvname not in _cache[ctx]: # new PV for this context
         entry = {'conn':False,  'chid': None,
-                 'ts': 0,  'failures':0,
+                 'ts': 0,  'failures':0, 'value': None,
                  'callbacks': [ callback ]}
         _cache[ctx][pvname] = entry
     else:
@@ -817,16 +798,18 @@ def native_type(ftype):
 def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     """unpack raw data returned from an array get or
     subscription callback"""
+
     def unpack_simple(data, count, ntype, use_numpy):
         "simple, native data type"
+
         if count == 1 and ntype != dbr.STRING:
             return data[0]
         if ntype == dbr.STRING:
             out = []
             for elem in range(min(count, len(data))):
                 this = strjoin('', data[elem]).rstrip()
-                if '\x00' in this:
-                    this = this[:this.index('\x00')]
+                if NULLCHAR_2 in this:
+                    this = this[:this.index(NULLCHAR_2)]
                 out.append(this)
 
             if len(out) == 1:
@@ -837,18 +820,20 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         if ntype == dbr.CHAR:
             if use_numpy:
                 data = numpy.array(data)
-            return copy.copy(data[:])
+            return copy(data[:])
         elif use_numpy:
-            return copy.copy(numpy.ctypeslib.as_array(data))
+            return copy(numpy.ctypeslib.as_array(data))
         return list(data)
 
     def unpack_ctrltime(data, count, ntype, use_numpy):
         "ctrl and time data types"
         if count == 1 or ntype == dbr.STRING:
+            
             out = data[0].value
-            if ntype == dbr.STRING and '\x00' in out:
-                out = out[:out.index('\x00')]
+            if ntype == dbr.STRING and NULLCHAR in out:
+                out = out[:out.index(NULLCHAR)]
             return out
+
         # fix for CTRL / TIME array data:Thanks to Glen Wright !
         out = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
                                                   dbr.value_offset[ftype])
@@ -858,7 +843,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
             if use_numpy:
                 out = numpy.array(out)
         if use_numpy:
-            return copy.copy(numpy.ctypeslib.as_array(out))
+            return copy(numpy.ctypeslib.as_array(out))
 
         return list(out)
 
@@ -877,46 +862,105 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         ftype = dbr.INT
 
     ntype = native_type(ftype)
-    use_numpy = (count > 1 and HAS_NUMPY and as_numpy and
-                 ntype != dbr.STRING)
+    use_numpy = (count > 1 and HAS_NUMPY and as_numpy and ntype != dbr.STRING)
     return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID
-def get(chid, ftype=None, unpack=True,
-        as_string=False, count=None, as_numpy=True):
+def get(chid, ftype=None, count=None, wait=True, timeout=None,
+        as_string=False, as_numpy=True):
     """return the current value for a Channel.  Options are
        ftype       field type to use (native type is default)
-       unpack      whether to retun value (default) or pointer to value
-                   that must be later converted with ca._unpack()
+       count       explicitly limit count
+       wait       flag(True/False) to wait to return value (default) or
+                   return None immediately, with value to be fetched later
+                   by ca.get_complete(chid, ...)
+       timeout     time to wait (and sent to pend_io()) before unpacking
+                   value (default =  0.5 + log10(count) )
        as_string   flag(True/False) to get a string representation
                    of the value returned.  This is not nearly as
                    featured as for a PV -- see pv.py for more details.
        as_numpy    flag(True/False) to use numpy array as the
                    return type for array data.
+
+       get will return None under one of the following conditions:
+         * Channel not connected
+         * wait=False passed in
+         * data is not available within timeout.
     """
     if ftype is None:
         ftype = field_type(chid)
     if ftype in (None, -1):
-        return
+        return None
     if count is None:
         count = element_count(chid)
     else:
         count = min(count, element_count(chid))
 
-    pdat = (count*dbr.Map[ftype])()
-    ret = libca.ca_array_get(ftype, count, chid, pdat)
+    ncache = _cache[current_context()][name(chid)]
+    # implementation note: cached value of
+    #   None        implies no value, no expected callback
+    #   GET_PENDING implies no value yet, callback expected.
+    ncache['value'] = GET_PENDING
+
+    uarg = ctypes.py_object(ctypes.POINTER(dbr.Map[ftype]))
+    ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, uarg)
+
     PySEVCHK('get', ret)
-    if not unpack:
-        return pdat
+    if not wait:
+        return None
+    return get_complete(chid, count=count, ftype=ftype, timeout=timeout,
+                        as_string=as_string, as_numpy=as_numpy)
 
-    poll()
-    if count > 2:
-        tcount = min(count, 1000)
-        poll(evt=tcount*1.e-5, iot=tcount*0.01)
+@withConnectedCHID
+def get_complete(chid, ftype=None, count=None, timeout=None,
+                 as_string=False,  as_numpy=True):
 
-    val = _unpack(pdat, count=count, ftype=ftype, as_numpy=as_numpy)
+    """returns the value for a channel, completing a previous 'inomplete get' on
+    the channel. This assumes that the previous call to get(chid, ....)  either
+    used 'wait=False' or timed out, and that the data has actually arrived by the
+    time this function is called.
+
+    Important Note: this function can be called only once, as on success, the
+    cached value will be set back to None.
+
+    Options are as for get (but without unpack, which is always True here):
+
+       ftype       field type to use (native type is default)
+       count       explicitly limit count
+       as_string   flag(True/False) to get a string representation
+                   of the value returned.  This is not nearly as
+                   featured as for a PV -- see pv.py for more details.
+       as_numpy    flag(True/False) to use numpy array as the
+                   return type for array data.
+       timeout     time to wait for value to be received
+                   (default = 0.5 + log10(count) seconds)
+   """
+    if ftype is None:
+        ftype = field_type(chid)
+    if count is None:
+        count = element_count(chid)
+    else:
+        count = min(count, element_count(chid))
+
+    ncache = _cache[current_context()][name(chid)]
+    if ncache['value'] is None:
+        return None
+
+    t0 = time.time()
+    if timeout is None:
+        timeout = 0.5 + log10(count)
+    while ncache['value'] is GET_PENDING:
+        pend_event(1.e-5)
+        if time.time()-t0 > timeout:
+            msg = "ca.get('%s') timed out after %.2f seconds."
+            warnings.warn(msg % (name(chid), timeout))
+            return None
+
+    val = _unpack(ncache['value'], count=count, ftype=ftype, as_numpy=as_numpy)
     if as_string:
         val = _as_string(val, chid, count, ftype)
+    # value retrieved, clear cached value
+    ncache['value'] = None
     return val
 
 def _as_string(val, chid, count, ftype):
@@ -978,11 +1022,11 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     else:
         # auto-convert strings to arrays for character waveforms
         # could consider using
-        # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],
+        # numpy.fromstring(("%s%s" % (s,NULLCHAR*maxlen))[:maxlen],
         #                  dtype=numpy.uint8)
         if ftype == dbr.CHAR and isinstance(value, str):
             fcount = element_count(chid)
-            pad = '\x00'*(1+fcount-len(value))
+            pad = NULLCHAR*(1+fcount-len(value))
             value = [ord(i) for i in ("%s%s" % (value, pad))[:fcount]]
         try:
             ndata, nuser = len(data), len(value)
@@ -1226,10 +1270,10 @@ def sg_put(gid, chid, value):
     else:
         # auto-convert strings to arrays for character waveforms
         # could consider using
-        # numpy.fromstring(("%s%s" % (s,'\x00'*maxlen))[:maxlen],
+        # numpy.fromstring(("%s%s" % (s,NULLCHAR*maxlen))[:maxlen],
         #                  dtype=numpy.uint8)
         if ftype == dbr.CHAR and isinstance(value, str):
-            pad = '\x00'*(1+count-len(value))
+            pad = NULLCHAR*(1+count-len(value))
             value = [ord(i) for i in ("%s%s" % (value, pad))[:count]]
         try:
             ndata = len(data)

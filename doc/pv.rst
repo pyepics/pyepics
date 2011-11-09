@@ -29,9 +29,9 @@ The :class:`PV` class
    :param auto_monitor:  whether to automatically monitor the PV for changes.
    :type auto_monitor: ``None``, ``True``, ``False``, or bitmask (see :ref:`pv-automonitor-label`)
    :param connection_callback: user-defined function called on changes to PV connection status.
-   :type connection_callback:  callable or None
+   :type connection_callback:  callable or ``None``
    :param connection_timeout:  time (in seconds) to wait for connection before giving up
-   :type connection_timeout:  float or None
+   :type connection_timeout:  float or ``None``
    :param verbose:  whether to print out debugging messages
    :type verbose: ``True``/``False``
 
@@ -75,16 +75,19 @@ methods
 A `PV` has several methods for getting and setting its value and defining
 callbacks to be executed when the PV changes.
 
-.. method:: get([, count=None[, as_string=False[, as_numpy=True]]])
+.. method:: get([, count=None[, as_string=False[, as_numpy=True[, timeout=None]]]])
 
    get and return the current value of the PV
 
    :param count:  maximum number of array elements to return
-   :type count:  integer or None
+   :type count:  integer or ``None``
    :param as_string:  whether to return the string representation of the  value.
    :type as_string: ``True``/``False``
    :param as_numpy:  whether to try to return a numpy array where appropriate.
    :type as_string: ``True``/``False``
+   :param timeout:  maximum time to wait for data before returning ``None``.
+   :type  timeout:  float or ``None``
+
 
    see :ref:`pv-as-string-label` for details on how the string
    representation is determined.
@@ -103,7 +106,7 @@ callbacks to be executed when the PV changes.
    :param wait:  whether to wait for processing to complete (or time-out) before returning.
    :type  wait:  ``True``/``False``
    :param timeout:  maximum time to wait for processing to complete before returning anyway.
-   :type  timeout:  double
+   :type  timeout:  float
    :param use_complete:  whether to use a builtin callback to set :attr:`put_complete`.
    :type  use_complete:  ``True``/``False``
    :param callback: user-supplied function to run when processing has completed.
@@ -113,7 +116,6 @@ callbacks to be executed when the PV changes.
 The `wait` and `callback` arguments, as well as the 'use_complete' / :attr:`put_complete`
 attribute give a few options for knowing that a :meth:`put` has
 completed.   See :ref:`pv-putwait-label` for more details.
-
 
 ..  _pv-get-ctrlvars-label:
 
@@ -128,9 +130,9 @@ completed.   See :ref:`pv-putwait-label` for more details.
    poll for changes.  This simply calls :meth:`ca.poll`
 
    :param evt:  time to pass to :meth:`ca.pend_event`
-   :type  evt:  double
+   :type  evt:  float
    :param iot:  time to pass to :meth:`ca.pend_io`
-   :type  iot:  double
+   :type  iot:  float
 
 .. method:: connect([timeout=None])
 
@@ -139,10 +141,10 @@ completed.   See :ref:`pv-putwait-label` for more details.
    should happen automatically. See :meth:`wait_for_connection`.
 
    :param timeout:  maximum connection time, passed to :meth:`ca.connect_channel`
-   :type  timeout:  double
+   :type  timeout:  float
    :rtype:    ``True``/``False``
 
-   if timeout is None, the PVs connection_timeout parameter will be used. If that is also None,
+   if timeout is ``None``, the PVs connection_timeout parameter will be used. If that is also ``None``,
    :data:`ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
 
 .. method:: wait_for_connection([timeout=None])
@@ -151,10 +153,10 @@ completed.   See :ref:`pv-putwait-label` for more details.
    connection.  Returns  whether the connection has occurred.
 
    :param timeout:  maximum connection time.
-   :type  timeout:  double
+   :type  timeout:  float
    :rtype:    ``True``/``False``
 
-   if timeout is None, the PVs connection_timeout parameter will be used. If that is also None,
+   if timeout is ``None``, the PVs connection_timeout parameter will be used. If that is also ``None``,
    :data:`ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
 
 
@@ -168,10 +170,10 @@ completed.   See :ref:`pv-putwait-label` for more details.
    this PV.  Returns the integer *index*  for the callback.
 
    :param callback: user-supplied function to run when PV changes.
-   :type callback: None or callable
+   :type callback: ``None`` or callable
    :param index: identifying key for this callback
    :param with_ctrlvars:  whether to (try to) make sure that accurate  ``control values`` will be sent to the callback.
-   :type index: None (integer will be produced) or immutable
+   :type index: ``None`` (integer will be produced) or immutable
    :param kw: additional keyword/value arguments to pass to each execution of the callback.
    :rtype:  integer
 
@@ -188,7 +190,7 @@ completed.   See :ref:`pv-putwait-label` for more details.
 
    :param index: index of user-supplied function, as returned by :meth:`add_callback`,
         and also to key for  this callback in the  :attr:`callbacks` dictionary.
-   :type index: None or integer
+   :type index: ``None`` or integer
    :rtype:  integer
 
    If only one callback is defined an index=``None``, this will clear the
@@ -437,7 +439,7 @@ Possible values for :attr:`auto_monitor` are:
   :ref:`advanced-large-arrays-label` for more details.
 
 ``True``
-  When *auto_monitor* is set to True, the value will be monitored using
+  When *auto_monitor* is set to ``True``, the value will be monitored using
   the default subscription mask set at :data:`ca.DEFAULT_SUBSCRIPTION_MASK`.
 
   This mask determines which kinds of changes cause the PV to update. By
@@ -503,8 +505,8 @@ following keyword parameters:
     * `units`:  string for PV units
     * `severity`: PV severity
     * `timestamp`: timestamp from CA server.
-    * `read_access`: read access (`True` or `False`)
-    * `write_access`: write access (`True` or `False`)
+    * `read_access`: read access (``True``/``False``)
+    * `write_access`: write access (``True``/``False``)
     * `access`: string description of  read- and write-access
     * `host`: host machine and CA port serving PV
     * `enum_strs`: the list of enumeration strings
@@ -521,7 +523,7 @@ following keyword parameters:
                   and the PV object
 
 Some of these may not be directly applicable to all PV data types, and some
-values may be None if the control parameters have not yet been fetched with
+values may be ``None`` if the control parameters have not yet been fetched with
 :meth:`get_ctrlvars`.
 
 It is important to keep in mind that the callback function will be run
@@ -560,7 +562,7 @@ A connection callback should be prepared to receive the following keyword argume
     * `pvname`: the name of the pv
     * `conn`: the connection status
 
-where *conn* will be either `True` or `False`, specifying whether the PV is
+where *conn* will be either ``True` or ``False``, specifying whether the PV is
 now connected.   A simple example is given below.
 
 
@@ -590,7 +592,7 @@ not be used as an accurate clock -- the actual wait time may be slightly
 longer.
 
 A second method is to use the 'use_complete' option and watch for the
-:attr:`put_complete` attribute to become True after a :meth:`put`.  This is
+:attr:`put_complete` attribute to become ``True`` after a :meth:`put`.  This is
 somewhat more flexible than using `wait=True` as above, because you can more
 carefully control how often you look for a :meth:`put` to complete, and
 what to do in the interim.  A simple example would be::
@@ -725,7 +727,7 @@ desire able to get at the name of the ENUM state, not just its integer
 value.
 
 To get the string representation of a PVs value, use either the
-:attr:`char_value` attribute or the *as_string=True* argument to :meth:`get`
+:attr:`char_value` attribute or the `as_string=True` argument to :meth:`get`
 
 
 Example of :meth:`put`

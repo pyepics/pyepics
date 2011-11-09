@@ -137,6 +137,6 @@ while True:
         longs[0].put(lcount)
         print ' >> ', text[lcount]
         char_waves[1].put(text[lcount])
-
+        double_waves[2].put([random.random() for i in range(65536)])
 
 

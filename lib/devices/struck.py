@@ -112,9 +112,9 @@ class Struck(epics.Device):
             sdata = numpy.array(sdata)
             sdata = sdata.transpose()
         except:
-            print 'Struck Error: cannot reform array sdata?'
-            for idet in range(len(sdata)):
-                print ' Struck size array %i = %i ' % (idet, len(sdata[idet]))
+            # print 'Struck Error: cannot reform array sdata?'
+            #for idet in range(len(sdata)):
+            #    print ' Struck size array %i = %i ' % (idet, len(sdata[idet]))
 
             sdata = numpy.zeros(self.nchan*2048)
             sdata.shape = (self.nchan, 2048)
