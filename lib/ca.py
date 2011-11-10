@@ -866,7 +866,7 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     """return the current value for a Channel.  Options are
        ftype       field type to use (native type is default)
        count       explicitly limit count
-       wait       flag(True/False) to wait to return value (default) or
+       wait        flag(True/False) to wait to return value (default) or
                    return None immediately, with value to be fetched later
                    by ca.get_complete(chid, ...)
        timeout     time to wait (and sent to pend_io()) before unpacking

@@ -81,7 +81,7 @@ def caput(pvname, value, wait=False, timeout=60):
         return thispv.put(value, wait=wait, timeout=timeout)
 
 def caget(pvname, as_string=False, count=None, as_numpy=True,
-          force=True, timeout=None):
+          use_monitor=False, timeout=None):
     """caget(pvname, as_string=False)
     simple get of a pv's value..
        >>> x = caget('xx.VAL')
@@ -99,7 +99,8 @@ def caget(pvname, as_string=False, count=None, as_numpy=True,
         if as_string:
             thispv.get_ctrlvars()
         val = thispv.get(count=count, timeout=timeout,
-                         as_string=as_string, force=force, 
+                         use_monitor=use_monitor,
+                         as_string=as_string,
                          as_numpy=as_numpy)
         poll()
         return val
