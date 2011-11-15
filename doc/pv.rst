@@ -75,7 +75,7 @@ methods
 A `PV` has several methods for getting and setting its value and defining
 callbacks to be executed when the PV changes.
 
-.. method:: get([, count=None[, as_string=False[, as_numpy=True[, timeout=None]]]])
+.. method:: get([, count=None[, as_string=False[, as_numpy=True[, timeout=None[, use_monitor=True]]]]])
 
    get and return the current value of the PV
 
@@ -87,7 +87,8 @@ callbacks to be executed when the PV changes.
    :type as_string: ``True``/``False``
    :param timeout:  maximum time to wait for data before returning ``None``.
    :type  timeout:  float or ``None``
-
+   :param use_monitor:  whether to rely on monitor callbacks or explicitly get value now.
+   :type use_monitor: ``True``/``False``
 
    see :ref:`pv-as-string-label` for details on how the string
    representation is determined.
@@ -96,6 +97,23 @@ callbacks to be executed when the PV changes.
    more than one element) will be returned as a numpy array, provided the
    numpy module is available.  See :ref:`advanced-large-arrays-label` for a
    discussion of strategies for how to best deal with very large arrays.
+
+   The *use_monitor* option controls whether the most recent value from the automatic
+   monitoring will be used or whether the value will be explicitly asked
+   for right now.  Usually, you can rely on a PVs value being kept up to
+   date, and so the default here is ``True``.  But, since network traffic
+   is not instantaneous and hard to predict, the value returned with
+   `use_monitor=True` may be out-of-date.
+
+   The *timeout* sets how long (in seconds) to wait for the value to be
+   sent.  This only applies with `use_monitor=False`, or if the PV is not
+   automatically monitored.   Otherwise, the most recently received value
+   will be sent immediately.
+
+   See :ref:`pv-automonitor-label` for more on monitoring PVs and
+   :ref:`advanced-get-timeouts-label` for more details on what happens when
+   a :func:`pv.get` times out.
+
 
 .. method:: put(value[, wait=False[, timeout=30.0[, use_complete=False[, callback=None[, callback_data=None]]]]])
 

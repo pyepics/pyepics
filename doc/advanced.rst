@@ -333,14 +333,14 @@ converted and returned.
 If the callback is not called in time or if `wait=False` is used but the PV
 is connected, the callback will be called eventually, and simply waiting
 (or using :func:`ca.pend_event` if :data:`ca.PREEMPTIVE_CALLBACK` is
-``False``) may be sufficient for the data to arrive.  Under this condition, 
+``False``) may be sufficient for the data to arrive.  Under this condition,
 you can call :func:`ca.get_complete`, which will NOT issue a new request
 for data to be sent, but wait (for up to a timeout time) for the previous
 get request to complete.
 
 :func:`ca.get_complete` will return ``None`` if the timeout is exceeded or
 if there is not an "incomplete get" that it can wait to complete.  Thus,
-you should use the return value from :func:`ca.get_complete` with care. 
+you should use the return value from :func:`ca.get_complete` with care.
 
 Note that :func:`pv.get` (and so :func:`epics.caget`) will normally rely on
 the PV value to be filled in automatically by monitor callbacks.  If
@@ -408,7 +408,7 @@ the CA library, and would be the following::
     for name, data in pvdata.items():
         ca.get(data[0], wait=False)  # note 2
 
-    ca.poll() 
+    ca.poll()
     for name, data in pvdata.items():
         val = ca.get_complete(data[0])
         pvdata[name][1] = val
