@@ -1085,7 +1085,7 @@ def get_ctrlvars(chid):
                  'lower_warning_limit','lower_alarm_limit',
                  'upper_ctrl_limit', 'lower_ctrl_limit'):
         if hasattr(tmpv, attr):
-            out[attr] = getattr(tmpv, attr)
+            out[attr] = getattr(tmpv, attr, None)
     if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
         tmpv.no_str > 0):
         out['enum_strs'] = tuple([BYTES2STR(tmpv.strs[i].value)
