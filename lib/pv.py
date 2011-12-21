@@ -219,9 +219,10 @@ class PV(object):
         if ((not use_monitor) or
             (not self.auto_monitor) or
             (self._args['value'] is None) or
-            (count > len(self._args['value']))): 
+            (count is not None and count > len(self._args['value']))): 
             ca_get = ca.get
             ctx = ca.current_context()
+            # print(" Explicit Get ", count, len(self._args['value']), ca_get)
             if ca._cache[ctx][self.pvname]['value'] is not None:
                 ca_get = ca.get_complete
             self._args['value'] = ca_get(self.chid, ftype=self.ftype,
@@ -234,7 +235,7 @@ class PV(object):
         # allow asking for less data than actually exists in the cached value
         if count is not None and count < len(self._args['value']):
             out = self._args['value'][:count]
-            if CA.HAS_NUMPY:
+            if ca.HAS_NUMPY:
                 if as_numpy and not isinstance(out, ca.numpy.ndarray):
                     out = ca.nump.array(out)
                 if not as_numpy and isinstance(out, ca.numpy.ndarray):
