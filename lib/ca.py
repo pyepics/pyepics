@@ -47,7 +47,7 @@ else:
     from .utils2 import STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2, strjoin
     if PY_MINOR == 5:
         def memcopy(a): return a
-        
+
 ## print to stdout
 def write(msg, newline=True, flush=True):
     """write message to stdout"""
@@ -823,7 +823,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     def unpack_ctrltime(data, count, ntype, use_numpy):
         "ctrl and time data types"
         if count == 1 or ntype == dbr.STRING:
-            
+
             out = data[0].value
             if ntype == dbr.STRING and NULLCHAR in out:
                 out = out[:out.index(NULLCHAR)]
@@ -857,7 +857,8 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         ftype = dbr.INT
 
     ntype = native_type(ftype)
-    use_numpy = (count > 1 and HAS_NUMPY and as_numpy and ntype != dbr.STRING)
+    use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and
+                 count > 1 and count < AUTOMONITOR_MAXLENGTH)
     return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID
