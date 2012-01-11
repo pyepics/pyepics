@@ -124,7 +124,6 @@ class PV(object):
             self._args['type'] = _ftype_
             self._args['typefull'] = _ftype_
             self._args['ftype'] = dbr.Name(_ftype_, reverse=True)
-
             if self.auto_monitor is None:
                 self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
             if self._monref is None and self.auto_monitor:
@@ -193,7 +192,7 @@ class PV(object):
         ca.poll(evt=evt, iot=iot)
 
     def get(self, count=None, as_string=False, as_numpy=True,
-            timeout=None, use_monitor=True):
+            timeout=None, with_ctrlvars=False, use_monitor=True):
         """returns current value of PV.  Use the options:
         count       explicitly limit count for array data
         as_string   flag(True/False) to get a string representation
@@ -214,12 +213,16 @@ class PV(object):
         if not self.wait_for_connection():
             return None
 
+        if with_ctrlvars and getattr(self, 'units', None) is None:
+            self.get_ctrlvars()
+
         if ((not use_monitor) or
             (not self.auto_monitor) or
             (self._args['value'] is None) or
-            (count is not None and len(self._args['value']) > 1)):
+            (count is not None and count > len(self._args['value']))): 
             ca_get = ca.get
             ctx = ca.current_context()
+            # print(" Explicit Get ", count, len(self._args['value']), ca_get)
             if ca._cache[ctx][self.pvname]['value'] is not None:
                 ca_get = ca.get_complete
             self._args['value'] = ca_get(self.chid, ftype=self.ftype,
@@ -231,7 +234,13 @@ class PV(object):
 
         # allow asking for less data than actually exists in the cached value
         if count is not None and count < len(self._args['value']):
-            return self._args['value'][:count]
+            out = self._args['value'][:count]
+            if ca.HAS_NUMPY:
+                if as_numpy and not isinstance(out, ca.numpy.ndarray):
+                    out = ca.nump.array(out)
+                if not as_numpy and isinstance(out, ca.numpy.ndarray):
+                    out = list(out)
+            return out
         return self._args['value']
 
     def put(self, value, wait=False, timeout=30.0,
