@@ -905,7 +905,7 @@ class PVRadioButton(wx.RadioButton, PVCtrlMixin):
     def _SetValue(self, value):
         "set value"
         # uses raw PV val as is not string-converted
-        if self.pv.get() == self.pvValue:
+        if value == self.pvValue or self.pv.get() == self.pvValue:
             self.Value = True
 
 
