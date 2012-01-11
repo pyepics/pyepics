@@ -715,6 +715,7 @@ def connect_channel(chid, timeout=None, verbose=False):
 
         if timeout is None:
             timeout = DEFAULT_CONNECTION_TIMEOUT
+
         while (not conn and ((time.time()-start_time) < timeout)):
             poll()
             conn = (state(chid) == dbr.CS_CONN)
@@ -871,7 +872,7 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     """return the current value for a Channel.  Options are
        ftype       field type to use (native type is default)
        count       explicitly limit count
-       wait       flag(True/False) to wait to return value (default) or
+       wait        flag(True/False) to wait to return value (default) or
                    return None immediately, with value to be fetched later
                    by ca.get_complete(chid, ...)
        timeout     time to wait (and sent to pend_io()) before unpacking
@@ -948,7 +949,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
 
     t0 = time.time()
     if timeout is None:
-        timeout = 0.5 + log10(count)
+        timeout = 1.0 + log10(count)
     while ncache['value'] is GET_PENDING:
         pend_event(1.e-5)
         if time.time()-t0 > timeout:

@@ -192,7 +192,8 @@ class PV(object):
         "poll for changes"
         ca.poll(evt=evt, iot=iot)
 
-    def get(self, count=None, as_string=False, as_numpy=True, timeout=None):
+    def get(self, count=None, as_string=False, as_numpy=True,
+            timeout=None, use_monitor=True):
         """returns current value of PV.  Use the options:
         count       explicitly limit count for array data
         as_string   flag(True/False) to get a string representation
@@ -201,6 +202,9 @@ class PV(object):
                     return type for array data.
         timeout     maximum time to wait for value to be received.
                     (default = 0.5 + log10(count) seconds)
+        use_monitor flag(True/False) to use value from latest
+                    monitor callback (True, default) or to make an
+                    explicit CA call for the value.
 
         >>> p.get('13BMD:m1.DIR')
         0
@@ -210,7 +214,9 @@ class PV(object):
         if not self.wait_for_connection():
             return None
 
-        if ((not self.auto_monitor or self._args['value'] is None) or
+        if ((not use_monitor) or
+            (not self.auto_monitor) or
+            (self._args['value'] is None) or
             (count is not None and len(self._args['value']) > 1)):
             ca_get = ca.get
             ctx = ca.current_context()
@@ -236,6 +242,7 @@ class PV(object):
         """
         if not self.wait_for_connection():
             return None
+
         if (self.ftype in (dbr.ENUM, dbr.TIME_ENUM, dbr.CTRL_ENUM) and
             isinstance(value, str)):
             if self._args['enum_strs'] is None:

@@ -176,7 +176,7 @@ the functional approach can be quite good.
 :func:`caget`
 ~~~~~~~~~~~~~
 
-..  function:: caget(pvname[, as_string=False[, count=None[, as_numpy=True[, timeout=None]]]])
+..  function:: caget(pvname[, as_string=False[, count=None[, as_numpy=True[, timeout=None[, use_monitor=False]]]]])
 
   retrieves and returns the value of the named PV.
 
@@ -188,7 +188,9 @@ the functional approach can be quite good.
   :param as_numpy:  whether to return the Numerical Python representation for array data.
   :type as_numpy:  ``True``/``False``
   :param timeout:  maximum time to wait (in seconds) for value before returning None.
-  :type count:  float or ``None``
+  :type timeout:  float or ``None``
+  :param use_monitor:  whether to rely on monitor callbacks or explicitly get value now.
+  :type use_monitor: ``True``/``False``
 
 The *count* and *as_numpy* options apply only to array or waveform
 data. The default behavior is to return the full data array and convert to
@@ -201,6 +203,14 @@ fetched over the network.  If the timeout is exceeded, :func:`caget` will
 return ``None``.  This might imply that the PV is not actually available,
 but it might also mean that the data is large or network slow enough that
 the data just hasn't been received yet, but may show up later.
+
+The *use_monitor* argument sets whether to rely on the monitors from the
+underlying PV.  The default is ``False``, so that each :func:`caget` will
+explicitly ask the value to be sent instead of relying on the automatic
+monitoring normally used for persistant PVs.  If this makes no sense,
+leaving the default value of ``True`` is fine.  For more details on making
+:func:`caget` more efficient, see :ref:`pv-automonitor-label` and
+:ref:`advanced-get-timeouts-label`.
 
 The *as_string* argument tells the function to return the **string
 representation** of the value.  The details of the string representation
