@@ -24,12 +24,6 @@ import atexit
 import warnings
 from threading import Thread
 
-# create_subscription mask constants
-DBE_VALUE = 1
-DBE_LOG = 2
-DBE_ALARM = 4
-DBE_PROPERTY = 8
-
 # ignore warning about item size... for now??
 warnings.filterwarnings('ignore',
                         'Item size computed from the PEP 3118*',
