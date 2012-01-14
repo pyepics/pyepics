@@ -51,7 +51,7 @@ class PV(object):
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
     def __init__(self, pvname, callback=None, form='native',
-                 verbose=False, auto_monitor=None,
+                 verbose=False, auto_monitor=True,
                  connection_callback=None,
                  connection_timeout=None):
 
@@ -124,8 +124,12 @@ class PV(object):
             self._args['type'] = _ftype_
             self._args['typefull'] = _ftype_
             self._args['ftype'] = dbr.Name(_ftype_, reverse=True)
+
+            ctx = ca.current_context()
+            ca._cache[ctx][pvname]['unpack'] = count < ca.AUTOMONITOR_MAXLENGTH
             if self.auto_monitor is None:
-                self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
+                self.auto_monitor = True
+                # self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
             if self._monref is None and self.auto_monitor:
                 # you can explicitly request a subscription mask
                 # (ie dbr.DBE_ALARM|dbr.DBE_LOG) by passing it as the

@@ -416,7 +416,10 @@ def _onMonitorEvent(args):
     if args.type in (dbr.STRING, dbr.TIME_STRING, dbr.CTRL_STRING):
         nelem = dbr.MAX_STRING_SIZE
 
-    value = _unpack(value, count=nelem, ftype=args.type)
+    if _cache[current_context()][pvname].get('unpack', True):
+        value = _unpack(value, count=nelem, ftype=args.type)
+    else:
+        value = copy(value)
     if hasattr(args.usr, '__call__'):
         args.usr(value=value, **kwds)
 
@@ -443,8 +446,8 @@ def _onConnectionEvent(args):
     if not pv_found:
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
                                'ts':0, 'failures':0, 'value': None,
-                               'callbacks': []}
-
+                               'unpack': True,  'callbacks': []}
+        
     # set connection time, run connection callbacks
     # in all contexts
     for context, cvals in _cache.items():
@@ -457,9 +460,8 @@ def _onConnectionEvent(args):
             if int(ichid) == int(args.chid):
                 entry['conn'] = conn = (args.op == dbr.OP_CONN_UP)
                 entry['chid'] = chid = args.chid
-                entry['ts']   = time.time()
-                entry['failures'] = 0
-
+                entry.update({'ts': time.time(), 'failures': 0,
+                              'unpack': True})
                 for callback in entry.get('callbacks', []):
                     poll()
                     if hasattr(callback, '__call__'):
@@ -647,7 +649,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
     if ctx not in _cache:
         _cache[ctx] = {}
     if pvname not in _cache[ctx]: # new PV for this context
-        entry = {'conn':False,  'chid': None,
+        entry = {'conn':False,  'chid': None, 'unpack': True,
                  'ts': 0,  'failures':0, 'value': None,
                  'callbacks': [ callback ]}
         _cache[ctx][pvname] = entry
@@ -815,7 +817,6 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         if ntype == dbr.CHAR:
             if use_numpy:
                 data = numpy.array(data)
-            return copy(data[:])
         elif use_numpy:
             return copy(numpy.ctypeslib.as_array(data))
         return list(data)
@@ -857,8 +858,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
         ftype = dbr.INT
 
     ntype = native_type(ftype)
-    use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and
-                 count > 1 and count < AUTOMONITOR_MAXLENGTH)
+    use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and count > 1)
     return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID
