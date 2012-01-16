@@ -27,6 +27,12 @@
     <link rel="prev" title="epics.ca Low-Level Epics Interface" href="ca.html" /> 
   </head>
   <body>
+<div style="background-color: #E4EAED; text-align: left; padding: 10px 5px 15px 15px">
+  <font size=+3> <a href="index.html">
+    &nbsp; PyEpics: Epics Channel Access for Python</a>
+  </font>
+</div>
+
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -42,9 +48,18 @@
         <li class="right" >
           <a href="ca.html" title="epics.ca Low-Level Epics Interface"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Epics Channel Access for Python</a> &raquo;</li> 
+   <li><a href="installation.html">download</a>|&nbsp;</li>
+   <li><a href="overview.html">overview</a>|&nbsp;</li>
+   <li><a href="ca.html">ca module</a>|&nbsp;</li>
+   <li><a href="pv.html">PVs</a>|&nbsp;</li>
+   <li><a href="devices.html">Devices</a>|&nbsp;</li>
+   <li><a href="wx.html">wx Widgets</a>|&nbsp;</li>
+   <li><a href="Advanced.html">Advanced Topics</a>|&nbsp;</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+ 
       </ul>
     </div>
+
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
@@ -488,7 +503,7 @@ the CA library, and would be the following:</p>
 
 <span class="n">pvdata</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">pvnamelist</span><span class="p">:</span>
-    <span class="n">chid</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">connect</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="c"># note 1</span>
+    <span class="n">chid</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">connect</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">auto_cb</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="c"># note 1</span>
     <span class="n">pvdata</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">pvdata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -508,18 +523,22 @@ the CA library, and would be the following:</p>
 </div>
 <p>The code here probably needs detailed explanation.  The first thing to
 notice is that this is using the <cite>ca</cite> level, not <cite>PV</cite> objects.  Second
-(Note 1), the <cite>connect=False</cite> option to <a class="reference internal" href="ca.html#ca.create_channel" title="ca.create_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></tt></a> which
-will not wait for connection to be established -- normally this is not what
-you want, but we're aiming for maximum speed.  We then explicitly call
-<a class="reference internal" href="ca.html#ca.connect_channel" title="ca.connect_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></tt></a> for all the channels.  Next (Note 2), we tell the
-CA library to request the data for the channel without waiting around to
-receive it.  The main point of not having <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> wait for the data
-for each channel as we go is that each data transfer takes time.  Instead
-we request data to be sent in a separate thread for all channels without
-waiting.  Then we do wait by calling <a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a> once and only once,
-(not len(channels) times!).  Finally, we use the <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get_complete()</span></tt></a>
-method to convert the data that has now been received by the companion
-thread to a python value.</p>
+(Note 1), the <cite>connect=False</cite> and <cite>auto_cb=False</cite> options to
+<a class="reference internal" href="ca.html#ca.create_channel" title="ca.create_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></tt></a>.  These respectively tell
+<a class="reference internal" href="ca.html#ca.create_channel" title="ca.create_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></tt></a> to not wait for a connection before returning,
+and to not automatically assing a connection callback.  Normally, these are
+not what you want, as you want a connected channel and to know if the
+connection state changes.  But we're aiming for maximum speed here, so we
+avoid these.</p>
+<p>We then explicitly call <a class="reference internal" href="ca.html#ca.connect_channel" title="ca.connect_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></tt></a> for all the channels.
+Next (Note 2), we tell the CA library to request the data for the channel
+without waiting around to receive it.  The main point of not having
+<a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> wait for the data for each channel as we go is that each
+data transfer takes time.  Instead we request data to be sent in a separate
+thread for all channels without waiting.  Then we do wait by calling
+<a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a> once and only once, (not len(channels) times!).  Finally,
+we use the <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get_complete()</span></tt></a> method to convert the data that has now
+been received by the companion thread to a python value.</p>
 <p>How much faster is the more explicit method?  In my tests, I used 20,000
 PVs, all scalar values, all actually connected, and all on the same subnet
 as the test client, though on a mixture of several vxWorks and linux IOCs.
@@ -597,7 +616,15 @@ loop of:</p>
         <li class="right" >
           <a href="ca.html" title="epics.ca Low-Level Epics Interface"
              >previous</a> |</li>
-        <li><a href="index.html">Epics Channel Access for Python</a> &raquo;</li> 
+   <li><a href="installation.html">download</a>|&nbsp;</li>
+   <li><a href="overview.html">overview</a>|&nbsp;</li>
+   <li><a href="ca.html">ca module</a>|&nbsp;</li>
+   <li><a href="pv.html">PVs</a>|&nbsp;</li>
+   <li><a href="devices.html">Devices</a>|&nbsp;</li>
+   <li><a href="wx.html">wx Widgets</a>|&nbsp;</li>
+   <li><a href="Advanced.html">Advanced Topics</a>|&nbsp;</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+ 
       </ul>
     </div>
     <div class="footer">

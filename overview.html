@@ -27,6 +27,12 @@
     <link rel="prev" title="Downloading and Installation" href="installation.html" /> 
   </head>
   <body>
+<div style="background-color: #E4EAED; text-align: left; padding: 10px 5px 15px 15px">
+  <font size=+3> <a href="index.html">
+    &nbsp; PyEpics: Epics Channel Access for Python</a>
+  </font>
+</div>
+
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -42,9 +48,18 @@
         <li class="right" >
           <a href="installation.html" title="Downloading and Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Epics Channel Access for Python</a> &raquo;</li> 
+   <li><a href="installation.html">download</a>|&nbsp;</li>
+   <li><a href="#">overview</a>|&nbsp;</li>
+   <li><a href="ca.html">ca module</a>|&nbsp;</li>
+   <li><a href="pv.html">PVs</a>|&nbsp;</li>
+   <li><a href="devices.html">Devices</a>|&nbsp;</li>
+   <li><a href="wx.html">wx Widgets</a>|&nbsp;</li>
+   <li><a href="Advanced.html">Advanced Topics</a>|&nbsp;</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+ 
       </ul>
     </div>
+
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
@@ -263,7 +278,7 @@ the functional approach can be quite good.</p>
 <h3><a class="reference internal" href="#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">caget()</span></tt></a><a class="headerlink" href="#caget" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="epics.caget">
-<tt class="descclassname">epics.</tt><tt class="descname">caget</tt><big>(</big><em>pvname</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">[</span>, <em>timeout=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#epics.caget" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">epics.</tt><tt class="descname">caget</tt><big>(</big><em>pvname</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">[</span>, <em>timeout=None</em><span class="optional">[</span>, <em>use_monitor=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#epics.caget" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves and returns the value of the named PV.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -272,9 +287,10 @@ the functional approach can be quite good.</p>
 <tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>pvname</strong> -- name of Epics Process Variable</li>
 <li><strong>as_string</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return string representation of the PV value.</li>
-<li><strong>count</strong> (float or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- number of elements to return for array data.</li>
+<li><strong>count</strong> (integer or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- number of elements to return for array data.</li>
 <li><strong>as_numpy</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the Numerical Python representation for array data.</li>
-<li><strong>timeout</strong> -- maximum time to wait (in seconds) for value before returning None.</li>
+<li><strong>timeout</strong> (float or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- maximum time to wait (in seconds) for value before returning None.</li>
+<li><strong>use_monitor</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to rely on monitor callbacks or explicitly get value now.</li>
 </ul>
 </td>
 </tr>
@@ -292,6 +308,13 @@ fetched over the network.  If the timeout is exceeded, <a class="reference inter
 return <tt class="xref docutils literal"><span class="pre">None</span></tt>.  This might imply that the PV is not actually available,
 but it might also mean that the data is large or network slow enough that
 the data just hasn't been received yet, but may show up later.</p>
+<p>The <em>use_monitor</em> argument sets whether to rely on the monitors from the
+underlying PV.  The default is <tt class="xref docutils literal"><span class="pre">False</span></tt>, so that each <a class="reference internal" href="#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">caget()</span></tt></a> will
+explicitly ask the value to be sent instead of relying on the automatic
+monitoring normally used for persistant PVs.  If this makes no sense,
+leaving the default value of <tt class="xref docutils literal"><span class="pre">True</span></tt> is fine.  For more details on making
+<a class="reference internal" href="#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">caget()</span></tt></a> more efficient, see <a class="reference internal" href="pv.html#pv-automonitor-label"><em>Automatic Monitoring of a PV</em></a> and
+<a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><em>The wait and timeout options for get(), ca.get_complete()</em></a>.</p>
 <p>The <em>as_string</em> argument tells the function to return the <strong>string
 representation</strong> of the value.  The details of the string representation
 depends on the variable type of the PV.  For integer (short or long) and
@@ -582,7 +605,15 @@ extremely well-tested.</p>
         <li class="right" >
           <a href="installation.html" title="Downloading and Installation"
              >previous</a> |</li>
-        <li><a href="index.html">Epics Channel Access for Python</a> &raquo;</li> 
+   <li><a href="installation.html">download</a>|&nbsp;</li>
+   <li><a href="#">overview</a>|&nbsp;</li>
+   <li><a href="ca.html">ca module</a>|&nbsp;</li>
+   <li><a href="pv.html">PVs</a>|&nbsp;</li>
+   <li><a href="devices.html">Devices</a>|&nbsp;</li>
+   <li><a href="wx.html">wx Widgets</a>|&nbsp;</li>
+   <li><a href="Advanced.html">Advanced Topics</a>|&nbsp;</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+ 
       </ul>
     </div>
     <div class="footer">
