@@ -217,7 +217,7 @@ class PV(object):
         if with_ctrlvars and getattr(self, 'units', None) is None:
             self.get_ctrlvars()
 
-        print "PV Get", self.auto_monitor, self._args['value'] is None, count, as_numpy, as_string, ca.HAS_NUMPY
+        # print "PV Get", self.auto_monitor, self._args['value'] is None, count, as_numpy, as_string, ca.HAS_NUMPY
         if ((not use_monitor) or
             (not self.auto_monitor) or
             (self._args['value'] is None) or
@@ -233,14 +233,15 @@ class PV(object):
         if as_string:
             self._set_charval(val)
             return self._args['char_value']
-
+        if self.count <= 1:
+            return val
+        
         if count is None and val is not None:
             count = len(val)
         if as_numpy and count > 1 and ca.HAS_NUMPY and not isinstance(val, ca.numpy.ndarray):
             val = ca.numpy.array(val)
         elif not as_numpy and ca.HAS_NUMPY and isinstance(val, ca.numpy.ndarray):
             val = list(val)
-            
         
         # allow asking for less data than actually exists in the cached value
         #print "PV Get", self.auto_monitor, self._args['value'] is None, count

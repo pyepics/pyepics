@@ -797,7 +797,7 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     subscription callback"""
     
     def array_cast(data, count, ntype, use_numpy):
-        t0 = time.time()
+        "cast ctypes array to numpy array (if using numpy)"
         if use_numpy:
             dtype = dbr.NP_Map.get(ntype, None)
             if dtype is not None:
