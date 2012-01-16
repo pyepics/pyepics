@@ -250,6 +250,10 @@ def finalize_libca(maxtime=10.0):
     except StandardError:
         pass
 
+def get_cache(pvname):
+    "return cache dictionary for a given pvname in the current context"
+    return _cache[current_context()].get(pvname, None)
+
 def show_cache(print_out=True):
     """Show list of cached PVs"""
     out = []
@@ -416,10 +420,7 @@ def _onMonitorEvent(args):
     if args.type in (dbr.STRING, dbr.TIME_STRING, dbr.CTRL_STRING):
         nelem = dbr.MAX_STRING_SIZE
 
-    if _cache[current_context()][pvname].get('unpack', True):
-        value = _unpack(value, count=nelem, ftype=args.type)
-    else:
-        value = copy(value)
+    value = _unpack(value, count=nelem, ftype=args.type)
     if hasattr(args.usr, '__call__'):
         args.usr(value=value, **kwds)
 
@@ -446,7 +447,7 @@ def _onConnectionEvent(args):
     if not pv_found:
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
                                'ts':0, 'failures':0, 'value': None,
-                               'unpack': True,  'callbacks': []}
+                               'callbacks': []}
         
     # set connection time, run connection callbacks
     # in all contexts
@@ -458,10 +459,10 @@ def _onConnectionEvent(args):
                 ichid = entry['chid'].value
 
             if int(ichid) == int(args.chid):
-                entry['conn'] = conn = (args.op == dbr.OP_CONN_UP)
-                entry['chid'] = chid = args.chid
-                entry.update({'ts': time.time(), 'failures': 0,
-                              'unpack': True})
+                conn = (args.op == dbr.OP_CONN_UP)
+                chid = args.chid
+                entry.update({'chid': chid, 'conn': conn,
+                              'ts': time.time(), 'failures': 0})
                 for callback in entry.get('callbacks', []):
                     poll()
                     if hasattr(callback, '__call__'):
@@ -475,8 +476,7 @@ def _onGetEvent(args, **kwds):
     global _cache
     if args.status != dbr.ECA_NORMAL:
         return
-    ctx = current_context()
-    _cache[ctx][name(args.chid)]['value'] = memcopy(dbr.cast_args(args).contents)
+    get_cache(name(args.chid))['value'] = memcopy(dbr.cast_args(args).contents)
 
 ## put event handler:
 def _onPutEvent(args, **kwds):
@@ -649,7 +649,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
     if ctx not in _cache:
         _cache[ctx] = {}
     if pvname not in _cache[ctx]: # new PV for this context
-        entry = {'conn':False,  'chid': None, 'unpack': True,
+        entry = {'conn':False,  'chid': None, 
                  'ts': 0,  'failures':0, 'value': None,
                  'callbacks': [ callback ]}
         _cache[ctx][pvname] = entry
@@ -660,7 +660,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         elif (hasattr(callback, '__call__') and
               not callback in entry['callbacks']):
             entry['callbacks'].append(callback)
-            callback(chid=entry['chid'], conn=entry['conn'])
+            callback(chid=entry['chid'], pvname=pvname, conn=entry['conn'])
 
     conncb = 0
     if auto_cb:
@@ -671,7 +671,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
     else:
         chid = dbr.chid_t()
         ret = libca.ca_create_channel(pvn, conncb, 0, 0,
-                                  ctypes.byref(chid))
+                                      ctypes.byref(chid))
         PySEVCHK('create_channel', ret)
         entry['chid'] = chid
 
@@ -795,10 +795,22 @@ def native_type(ftype):
 def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
     """unpack raw data returned from an array get or
     subscription callback"""
+    
+    def array_cast(data, count, ntype, use_numpy):
+        t0 = time.time()
+        if use_numpy:
+            dtype = dbr.NP_Map.get(ntype, None)
+            if dtype is not None:
+                out = numpy.empty(shape=(count,), dtype=dbr.NP_Map[ntype])
+                ctypes.memmove(out.ctypes.data, data, out.nbytes)
+            else:
+                out = numpy.ctypeslib.as_array(copy(data))
+        else:
+            out = copy(data)
+        return out
 
     def unpack_simple(data, count, ntype, use_numpy):
         "simple, native data type"
-
         if count == 1 and ntype != dbr.STRING:
             return data[0]
         if ntype == dbr.STRING:
@@ -808,41 +820,26 @@ def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
                 if NULLCHAR_2 in this:
                     this = this[:this.index(NULLCHAR_2)]
                 out.append(this)
-
-            if len(out) == 1:
-                return out[0]
-            else:
-                return out
-        # waveform data:
-        if ntype == dbr.CHAR:
-            if use_numpy:
-                data = numpy.array(data)
-        elif use_numpy:
-            return copy(numpy.ctypeslib.as_array(data))
-        return list(data)
+            if len(out) == 1: out = out[0]
+            return out
+        if count > 1:
+            data = array_cast(data, count, ntype, use_numpy)
+        return data
 
     def unpack_ctrltime(data, count, ntype, use_numpy):
         "ctrl and time data types"
         if count == 1 or ntype == dbr.STRING:
-
-            out = data[0].value
-            if ntype == dbr.STRING and NULLCHAR in out:
-                out = out[:out.index(NULLCHAR)]
-            return out
-
+            data = data[0].value
+            if ntype == dbr.STRING and NULLCHAR in data:
+                data = data[:data.index(NULLCHAR)]
+            return data
         # fix for CTRL / TIME array data:Thanks to Glen Wright !
-        out = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
+        data = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
                                                   dbr.value_offset[ftype])
-
-        if ntype == dbr.CHAR:
-            out = [i for i in out]
-            if use_numpy:
-                out = numpy.array(out)
-        if use_numpy:
-            return copy(numpy.ctypeslib.as_array(out))
-
-        return list(out)
-
+        if count > 1:
+            data = array_cast(data, count, ntype, use_numpy)
+        return data
+    
     unpack = unpack_simple
     if ftype >= dbr.TIME_STRING:
         unpack = unpack_ctrltime
@@ -944,7 +941,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
 
     t0 = time.time()
     if timeout is None:
-        timeout = 1.0 + log10(count)
+        timeout = 1.0 + log10(max(1, count))
     while ncache['value'] is GET_PENDING:
         pend_event(1.e-5)
         if time.time()-t0 > timeout:
@@ -994,9 +991,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     """
     ftype = field_type(chid)
     count = element_count(chid)
-    if count > 1 and not (ftype == dbr.CHAR and isinstance(value, str)):
+    if count > 1: #  and not (ftype == dbr.CHAR and isinstance(value, str)):
         count = min(len(value), count)
-
     data  = (count*dbr.Map[ftype])()
 
     if ftype == dbr.STRING:
@@ -1016,14 +1012,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
             raise ChannelAccessException(errmsg % (repr(value), tname))
 
     else:
-        # auto-convert strings to arrays for character waveforms
-        # could consider using
-        # numpy.fromstring(("%s%s" % (s,NULLCHAR*maxlen))[:maxlen],
-        #                  dtype=numpy.uint8)
         if ftype == dbr.CHAR and isinstance(value, str):
-            fcount = element_count(chid)
-            pad = NULLCHAR*(1+fcount-len(value))
-            value = [ord(i) for i in ("%s%s" % (value, pad))[:fcount]]
+            value = [ord(i) for i in ("%s%s" % (value, NULLCHAR))]
         try:
             ndata, nuser = len(data), len(value)
             if nuser > ndata:
@@ -1043,19 +1033,17 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     pvname = name(chid)
     _put_done[pvname] = (False, callback, callback_data)
     start_time = time.time()
+    # print "Put:  ", ftype, count
     ret = libca.ca_array_put_callback(ftype, count, chid,
                                       data, _CB_PUTWAIT, 0)
     PySEVCHK('put', ret)
     poll(evt=1.e-4, iot=0.05)
     if wait:
-        finished = False
-        while not finished:
+        while not (_put_done[pvname][0] or
+                   (time.time()-start_time) > timeout):
             poll()
-            finished = (_put_done[pvname][0] or
-                        (time.time()-start_time) > timeout)
         if not _put_done[pvname][0]:
             ret = -ret
-
     return ret
 
 @withConnectedCHID

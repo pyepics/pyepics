@@ -30,42 +30,43 @@ def onChanges(pvname=None, value=None, **kw):
         
 
 def RunTest(pvlist, use_preempt=True, maxlen=16384, 
-            use_numpy=True, use_time=False, use_ctrl=False):
-    msg= ">>>Run Test: %i pvs, numpy=%s, time=%s, ctrl=%s, preempt=%s"
-    print( msg % (len(pvlist), use_numpy, use_time, use_ctrl, use_preempt))
+            use_numpy=True, form='native'):
+    msg= ">>>Run Test: %i pvs, numpy=%s, form=%s, preempt=%s"
+    print( msg % (len(pvlist), use_numpy, form, use_preempt))
 
     epics.ca.HAS_NUMPY = use_numpy and HAS_NUMPY
     epics.ca.PREEMPTIVE_CALLBACK = use_preempt
     epics.ca.AUTOMONITOR_MAXLENGTH = maxlen
     mypvs= []
     for pvname in pvlist:
-        pv = epics.PV(pvname, connection_callback=onConnect,
-                      callback=onChanges)
+        pv = epics.PV(pvname, form=form,
+                      # connection_callback=onConnect,
+                      # callback=onChanges
+                      )
         mypvs.append(pv)
     epics.poll(evt=0.10, iot=10.0)
 
     for pv in mypvs:
-        print('== ', pv.pvname, pv)
         # time.sleep(0.1)
         # epics.poll(evt=0.01, iot=1.0)
         val  = pv.get()
         cval = pv.get(as_string=True)    
         if pv.count > 1:
             val = val[:12]
-        print(pv.type, val, cval)
+        print '-> ', pv, cval
+        print '   ', type(val), val
     for pv in mypvs:
         pv.disconnect()
     time.sleep(0.01)
 
 
 for use_preempt in (True, False):
-    for use_numpy in (True, False):
-        for use_time, use_ctrl in ((False, False), (True, False), (False, True)):
+    for use_numpy in (False,):
+        for form in ('native', 'time', 'ctrl'):
             time.sleep(0.001)
             RunTest(pvlist,
                     use_preempt=use_preempt,
                     use_numpy=use_numpy,
-                    use_time=use_time,
-                    use_ctrl=use_ctrl)
+                    form=form)
         # sys.exit()
 

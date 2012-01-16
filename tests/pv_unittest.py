@@ -154,6 +154,7 @@ class PV_Tests(unittest.TestCase):
 
     def test_get_callback(self):
         write("Callback test:  changing PV must be updated\n")
+        print pvnames.updating_pv1
         global NEWVALS
         mypv = PV(pvnames.updating_pv1)
         NEWVALS = []
