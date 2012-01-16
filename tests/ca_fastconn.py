@@ -13,6 +13,7 @@ results = OrderedDict()
 
 MAX_PVS = 20000
 
+
 for line  in open('fastconn_pvlist.txt','r').readlines():
     pvnames.append(line[:-1])
 
@@ -24,7 +25,7 @@ dt.add('Read PV list:  Will connect to %i PVs' % len(pvnames))
 libca = ca.initialize_libca()
 
 for name in pvnames:
-    chid = ca.create_channel(name,  connect=False)
+    chid = ca.create_channel(name, connect=False, auto_cb=False)
     results[name] = {'chid': chid}
 
 time.sleep(0.001)

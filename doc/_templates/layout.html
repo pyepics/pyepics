@@ -1,0 +1,26 @@
+{% extends "!layout.html" %}
+
+{% block rootrellink %}
+   <li><a href="{{ pathto('installation') }}">download</a>|&nbsp;</li>
+   <li><a href="{{ pathto('overview') }}">overview</a>|&nbsp;</li>
+   <li><a href="{{ pathto('ca') }}">ca module</a>|&nbsp;</li>
+   <li><a href="{{ pathto('pv') }}">PVs</a>|&nbsp;</li>
+   <li><a href="{{ pathto('devices') }}">Devices</a>|&nbsp;</li>
+   <li><a href="{{ pathto('wx') }}">wx Widgets</a>|&nbsp;</li>
+   <li><a href="{{ pathto('Advanced') }}">Advanced Topics</a>|&nbsp;</li>
+   &nbsp;&nbsp;<li><a href="{{ pathto('search') }}">search</a>&nbsp;</li>
+{% endblock %}
+
+{% block relbar1 %}
+<div style="background-color: #E4EAED; text-align: left; padding: 10px 5px 15px 15px">
+  <font size=+3> <a href="{{ pathto('index') }}">
+    &nbsp; PyEpics: Epics Channel Access for Python</a>
+  </font>
+</div>
+{{ super() }}
+{% endblock %}
+
+{# put the sidebar before the body #}
+{% block sidebar1 %}{{ sidebar() }}{% endblock %}
+{% block sidebar2 %}{% endblock %}
+

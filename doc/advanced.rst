@@ -399,7 +399,7 @@ the CA library, and would be the following::
 
     pvdata = {}
     for name in pvnamelist:
-        chid = ca.create_channel(name, connect=False) # note 1
+        chid = ca.create_channel(name, connect=False, auto_cb=False) # note 1
 	pvdata[name] = (chid, None)
 
     for name, data in pvdata.items():
@@ -418,18 +418,23 @@ the CA library, and would be the following::
 
 The code here probably needs detailed explanation.  The first thing to
 notice is that this is using the `ca` level, not `PV` objects.  Second
-(Note 1), the `connect=False` option to :meth:`ca.create_channel` which
-will not wait for connection to be established -- normally this is not what
-you want, but we're aiming for maximum speed.  We then explicitly call
-:meth:`ca.connect_channel` for all the channels.  Next (Note 2), we tell the
-CA library to request the data for the channel without waiting around to
-receive it.  The main point of not having :meth:`ca.get` wait for the data
-for each channel as we go is that each data transfer takes time.  Instead
-we request data to be sent in a separate thread for all channels without
-waiting.  Then we do wait by calling :meth:`ca.poll` once and only once,
-(not len(channels) times!).  Finally, we use the :meth:`ca.get_complete`
-method to convert the data that has now been received by the companion
-thread to a python value.
+(Note 1), the `connect=False` and `auto_cb=False` options to
+:meth:`ca.create_channel`.  These respectively tell
+:meth:`ca.create_channel` to not wait for a connection before returning,
+and to not automatically assing a connection callback.  Normally, these are
+not what you want, as you want a connected channel and to know if the
+connection state changes.  But we're aiming for maximum speed here, so we
+avoid these.
+
+We then explicitly call :meth:`ca.connect_channel` for all the channels.
+Next (Note 2), we tell the CA library to request the data for the channel
+without waiting around to receive it.  The main point of not having
+:meth:`ca.get` wait for the data for each channel as we go is that each
+data transfer takes time.  Instead we request data to be sent in a separate
+thread for all channels without waiting.  Then we do wait by calling
+:meth:`ca.poll` once and only once, (not len(channels) times!).  Finally,
+we use the :meth:`ca.get_complete` method to convert the data that has now
+been received by the companion thread to a python value.
 
 How much faster is the more explicit method?  In my tests, I used 20,000
 PVs, all scalar values, all actually connected, and all on the same subnet
