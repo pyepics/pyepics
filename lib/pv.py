@@ -51,7 +51,7 @@ class PV(object):
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
     def __init__(self, pvname, callback=None, form='native',
-                 verbose=False, auto_monitor=None,
+                 verbose=False, auto_monitor=True,
                  connection_callback=None,
                  connection_timeout=None):
 
