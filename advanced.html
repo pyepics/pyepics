@@ -3,13 +3,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>Advanced Topic with Python Channel Access &mdash; Epics Channel Access for Python</title>
+    
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
@@ -23,8 +26,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Epics Channel Access for Python" href="index.html" />
-    <link rel="next" title="epics.autosave Auto-saving" href="autosave.html" />
-    <link rel="prev" title="epics.ca Low-Level Epics Interface" href="ca.html" /> 
+    <link rel="next" title="Auto-saving" href="autosave.html" />
+    <link rel="prev" title="Low-Level Epics Interface" href="ca.html" /> 
   </head>
   <body>
 <div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
@@ -41,13 +44,13 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="autosave.html" title="epics.autosave Auto-saving"
+          <a href="autosave.html" title="Auto-saving"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="ca.html" title="epics.ca Low-Level Epics Interface"
+          <a href="ca.html" title="Low-Level Epics Interface"
              accesskey="P">previous</a> |</li>
-   <li><a href="overview.html">getting started</a>|&nbsp;</li>
-   <li><a href="installation.html">download</a>|&nbsp;</li>
+   <li><a href="overview.html">Overview</a>|&nbsp;</li>
+   <li><a href="installation.html">Download</a>|&nbsp;</li>
    <li><a href="pv.html">PVs</a>|&nbsp;</li>
    <li><a href="devices.html">Devices</a>|&nbsp;</li>
    <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
@@ -82,10 +85,10 @@
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="ca.html"
-                        title="previous chapter"><tt class="docutils literal"><span class="pre">epics.ca</span></tt> Low-Level Epics Interface</a></p>
+                        title="previous chapter">Low-Level Epics Interface</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="autosave.html"
-                        title="next chapter"><tt class="docutils literal"><span class="pre">epics.autosave</span></tt>  Auto-saving</a></p>
+                        title="next chapter">Auto-saving</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/advanced.txt"
@@ -94,7 +97,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -114,9 +117,9 @@
             
   <div class="section" id="advanced-topic-with-python-channel-access">
 <h1>Advanced Topic with Python Channel Access<a class="headerlink" href="#advanced-topic-with-python-channel-access" title="Permalink to this headline">¶</a></h1>
-<p>This chapter contains a variety of &quot;usage notes&quot; and
-implementation details that may help in getting the best perfomance from
-the pyepics module.</p>
+<p>This chapter contains a variety of &quot;usage notes&quot; and implementation
+details that may help in getting the best performance from the
+pyepics module.</p>
 <div class="section" id="strategies-for-working-with-large-arrays">
 <span id="advanced-large-arrays-label"></span><h2>Strategies for working with large arrays<a class="headerlink" href="#strategies-for-working-with-large-arrays" title="Permalink to this headline">¶</a></h2>
 <p>EPICS Channels / Process Variables usually have values that can be stored
@@ -231,9 +234,9 @@ complication for using CA with Python threads.  The result is that some
 precautions may be in order when using PyEpics and threads.  This section
 discusses the strategies for using threads with PyEpics.</p>
 <p>First, to use threads with Channel Access, you must have
-<tt class="xref py py-data docutils literal"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></tt> = <tt class="xref docutils literal"><span class="pre">True</span></tt>.  This is the default
+<tt class="xref py py-data docutils literal"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></tt> = <tt class="docutils literal"><span class="pre">True</span></tt>.  This is the default
 value, but if <tt class="xref py py-data docutils literal"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></tt> has been set to
-<tt class="xref docutils literal"><span class="pre">False</span></tt>, threading will not work.</p>
+<tt class="docutils literal"><span class="pre">False</span></tt>, threading will not work.</p>
 <p>Second, if you are using <tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt> objects and not making heavy use of
 the <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module (that is, not making and passing around chids), then
 the complications below are mostly hidden from you.   If you're writing
@@ -426,7 +429,7 @@ The lowest level <a class="reference internal" href="ca.html#ca.get" title="ca.g
 function <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a>.  This section describes the details of
 these.</p>
 <p>If you're using <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a> or <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> you can supply a
-timeout value.  If the value returned is <tt class="xref docutils literal"><span class="pre">None</span></tt>, then either the PV has
+timeout value.  If the value returned is <tt class="docutils literal"><span class="pre">None</span></tt>, then either the PV has
 truly disconnected or the timeout passed before receiving the value.  If
 the <em>get</em> is incomplete in this way, a subsequent <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a> or
 <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> may actually complete and receive the value.</p>
@@ -440,11 +443,11 @@ converted and returned.</p>
 <p>If the callback is not called in time or if <cite>wait=False</cite> is used but the PV
 is connected, the callback will be called eventually, and simply waiting
 (or using <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-func docutils literal"><span class="pre">ca.pend_event()</span></tt></a> if <a class="reference internal" href="ca.html#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">ca.PREEMPTIVE_CALLBACK</span></tt></a> is
-<tt class="xref docutils literal"><span class="pre">False</span></tt>) may be sufficient for the data to arrive.  Under this condition,
+<tt class="docutils literal"><span class="pre">False</span></tt>) may be sufficient for the data to arrive.  Under this condition,
 you can call <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a>, which will NOT issue a new request
 for data to be sent, but wait (for up to a timeout time) for the previous
 get request to complete.</p>
-<p><a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a> will return <tt class="xref docutils literal"><span class="pre">None</span></tt> if the timeout is exceeded or
+<p><a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a> will return <tt class="docutils literal"><span class="pre">None</span></tt> if the timeout is exceeded or
 if there is not an &quot;incomplete get&quot; that it can wait to complete.  Thus,
 you should use the return value from <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a> with care.</p>
 <p>Note that <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> (and so <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a>) will normally rely on
@@ -462,7 +465,7 @@ received faster than that, the <em>get</em> will return as soon as it can.</p>
 </div>
 <div class="section" id="strategies-for-connecting-to-a-large-number-of-pvs">
 <span id="advanced-connecting-many-label"></span><h2>Strategies for connecting to a large number of PVs<a class="headerlink" href="#strategies-for-connecting-to-a-large-number-of-pvs" title="Permalink to this headline">¶</a></h2>
-<p>Occassionally, you may find that you need to quickly connect to a large
+<p>Occasionally, you may find that you need to quickly connect to a large
 number of PVs, say to write values to disk.  The most straightforward way
 to do this, say:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
@@ -482,7 +485,7 @@ object automatically use connection and event callbacks.  Normally, these
 are advantages, as you don't need to explicitly deal with them.  But,
 internally, they do pause for network responses using <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a>
 and these pauses can add up.  Second, the <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> also pauses for
-network response, so that the returned value actually containes the latest
+network response, so that the returned value actually contains the latest
 data right away, as discussed in the previous section.</p>
 <dl class="docutils">
 <dt>The remedies are to</dt>
@@ -523,7 +526,7 @@ notice is that this is using the <cite>ca</cite> level, not <cite>PV</cite> obje
 (Note 1), the <cite>connect=False</cite> and <cite>auto_cb=False</cite> options to
 <a class="reference internal" href="ca.html#ca.create_channel" title="ca.create_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></tt></a>.  These respectively tell
 <a class="reference internal" href="ca.html#ca.create_channel" title="ca.create_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></tt></a> to not wait for a connection before returning,
-and to not automatically assing a connection callback.  Normally, these are
+and to not automatically assign a connection callback.  Normally, these are
 not what you want, as you want a connected channel and to know if the
 connection state changes.  But we're aiming for maximum speed here, so we
 avoid these.</p>
@@ -549,7 +552,7 @@ writing a script that is intended to run once, fetch a large number of PVs
 and get their values (say, an auto-save script that runs on demand), then
 the boost is definitely significant.  On the other hand, if you're writing
 a long running process or a process that will retain the PV connections and
-get their values multiple times, the difference in startup speed is less
+get their values multiple times, the difference in start-up speed is less
 significant.  For a long running auto-save script that periodically writes
 out all the PV values, the &quot;obvious&quot; way using automatically monitored PVs
 may be much <em>better</em>, as the time for the initial connection is small, and
@@ -567,7 +570,7 @@ immediately useful.</p>
 <span id="advanced-sleep-label"></span><h2>time.sleep() or epics.poll()?<a class="headerlink" href="#time-sleep-or-epics-poll" title="Permalink to this headline">¶</a></h2>
 <p>In order for a program to communicate with Epics devices, it needs to allow
 some time for this communication to happen.   With
-<a class="reference internal" href="ca.html#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">ca.PREEMPTIVE_CALLBACK</span></tt></a> set to  <tt class="xref docutils literal"><span class="pre">True</span></tt>, this communication  will
+<a class="reference internal" href="ca.html#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">ca.PREEMPTIVE_CALLBACK</span></tt></a> set to  <tt class="docutils literal"><span class="pre">True</span></tt>, this communication  will
 be handled in a thread separate from the main Python thread.  This means
 that CA events can happen at any time, and <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a> does not
 need to be called to explicitly allow for event processing.</p>
@@ -608,13 +611,13 @@ loop of:</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="autosave.html" title="epics.autosave Auto-saving"
+          <a href="autosave.html" title="Auto-saving"
              >next</a> |</li>
         <li class="right" >
-          <a href="ca.html" title="epics.ca Low-Level Epics Interface"
+          <a href="ca.html" title="Low-Level Epics Interface"
              >previous</a> |</li>
-   <li><a href="overview.html">getting started</a>|&nbsp;</li>
-   <li><a href="installation.html">download</a>|&nbsp;</li>
+   <li><a href="overview.html">Overview</a>|&nbsp;</li>
+   <li><a href="installation.html">Download</a>|&nbsp;</li>
    <li><a href="pv.html">PVs</a>|&nbsp;</li>
    <li><a href="devices.html">Devices</a>|&nbsp;</li>
    <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
@@ -625,7 +628,7 @@ loop of:</p>
     </div>
     <div class="footer">
         &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>
