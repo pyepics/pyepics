@@ -3,19 +3,13 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>Epics Alarms &mdash; Epics Channel Access for Python</title>
-<<<<<<< ours
-=======
-    
->>>>>>> theirs
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
@@ -90,7 +84,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -125,23 +119,23 @@ condition and what to do when that condition is met.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">param pvname:</th><td class="field-body">name of Epics PV (string)</td>
+<tr class="field"><th class="field-name">param pvname:</th><td class="field-body">name of Epics PV (string)</td>
 </tr>
-<tr class="field-even field"><th class="field-name" colspan="2">param comparison:</th></tr>
-<tr class="field-even field"><td>&nbsp;</td><td class="field-body">operation used to compare PV value to trip_point.</td>
+<tr class="field"><th class="field-name" colspan="2">param comparison:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">operation used to compare PV value to trip_point.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name" colspan="2">type  comparison:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">string or callable.  Built in comparisons are listed in <a class="reference internal" href="#alarmops-table"><em>Table of Alarm Operators</em></a>.</td>
+<tr class="field"><th class="field-name" colspan="2">type  comparison:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">string or callable.  Built in comparisons are listed in <a class="reference internal" href="#alarmops-table"><em>Table of Alarm Operators</em></a>.</td>
 </tr>
-<tr class="field-even field"><th class="field-name" colspan="2">param trip_point:</th></tr>
-<tr class="field-even field"><td>&nbsp;</td><td class="field-body">value that will trigger the alarm</td>
+<tr class="field"><th class="field-name" colspan="2">param trip_point:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">value that will trigger the alarm</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">param callback:</th><td class="field-body">user-defined callback function to be run when the PVs value meets the alarm condition</td>
+<tr class="field"><th class="field-name">param callback:</th><td class="field-body">user-defined callback function to be run when the PVs value meets the alarm condition</td>
 </tr>
-<tr class="field-even field"><th class="field-name">type callback:</th><td class="field-body">callable or None</td>
+<tr class="field"><th class="field-name">type callback:</th><td class="field-body">callable or None</td>
 </tr>
-<tr class="field-odd field"><th class="field-name" colspan="2">param alert_delay:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">time (in seconds) to wait before executing another alarm callback.</td>
+<tr class="field"><th class="field-name" colspan="2">param alert_delay:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body">time (in seconds) to wait before executing another alarm callback.</td>
 </tr>
 </tbody>
 </table>
@@ -152,7 +146,7 @@ then the user-supplied callback function is run.  This callback could be
 set do send a message or to take some other course of action.</p>
 <p>The comparison supplied can either be a string as listed in <a class="reference internal" href="#alarmops-table"><em>Table of
 Alarm Operators</em></a> or a custom callable function which takes
-the two values (PV.value, trip_point) and returns <tt class="docutils literal"><span class="pre">True</span></tt> or <tt class="docutils literal"><span class="pre">False</span></tt>
+the two values (PV.value, trip_point) and returns <tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>
 based on those values.</p>
 <blockquote id="alarmops-table">
 <div><p>Table of built-in Operators for Alarms:</p>
@@ -163,27 +157,27 @@ based on those values.</p>
 <col width="67%" />
 </colgroup>
 <thead valign="bottom">
-<tr class="row-odd"><th class="head"><em>operator</em></th>
+<tr><th class="head"><em>operator</em></th>
 <th class="head">Python operator</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>'eq', '=='</td>
+<tr><td>'eq', '=='</td>
 <td>__eq__</td>
 </tr>
-<tr class="row-odd"><td>'ne', '!='</td>
+<tr><td>'ne', '!='</td>
 <td>__ne__</td>
 </tr>
-<tr class="row-even"><td>'le', '&lt;='</td>
+<tr><td>'le', '&lt;='</td>
 <td>__le__</td>
 </tr>
-<tr class="row-odd"><td>'lt', '&lt;'</td>
+<tr><td>'lt', '&lt;'</td>
 <td>__lt__</td>
 </tr>
-<tr class="row-even"><td>'ge', '&gt;='</td>
+<tr><td>'ge', '&gt;='</td>
 <td>__ge__</td>
 </tr>
-<tr class="row-odd"><td>'gt', '&gt;'</td>
+<tr><td>'gt', '&gt;'</td>
 <td>__gt__</td>
 </tr>
 </tbody>
@@ -253,7 +247,7 @@ message when a PV's value reaches a certain value:</p>
     </div>
     <div class="footer">
         &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>
