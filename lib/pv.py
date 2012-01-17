@@ -51,7 +51,7 @@ class PV(object):
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
     def __init__(self, pvname, callback=None, form='native',
-                 verbose=False, auto_monitor=None,
+                 verbose=False, auto_monitor=True,
                  connection_callback=None,
                  connection_timeout=None):
 
@@ -124,6 +124,7 @@ class PV(object):
             self._args['type'] = _ftype_
             self._args['typefull'] = _ftype_
             self._args['ftype'] = dbr.Name(_ftype_, reverse=True)
+
             if self.auto_monitor is None:
                 self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
             if self._monref is None and self.auto_monitor:
@@ -216,32 +217,37 @@ class PV(object):
         if with_ctrlvars and getattr(self, 'units', None) is None:
             self.get_ctrlvars()
 
+        # print "PV Get", self.auto_monitor, self._args['value'] is None, count, as_numpy, as_string, ca.HAS_NUMPY
         if ((not use_monitor) or
             (not self.auto_monitor) or
             (self._args['value'] is None) or
             (count is not None and count > len(self._args['value']))): 
             ca_get = ca.get
-            ctx = ca.current_context()
             # print(" Explicit Get ", count, len(self._args['value']), ca_get)
-            if ca._cache[ctx][self.pvname]['value'] is not None:
+            if ca.get_cache(self.pvname)['value'] is not None:
                 ca_get = ca.get_complete
             self._args['value'] = ca_get(self.chid, ftype=self.ftype,
                                          count=count, timeout=timeout,
                                          as_numpy=as_numpy)
+        val = self._args['value']
         if as_string:
-            self._set_charval(self._args['value'])
+            self._set_charval(val)
             return self._args['char_value']
-
+        if self.count <= 1:
+            return val
+        
+        if count is None and val is not None:
+            count = len(val)
+        if as_numpy and count > 1 and ca.HAS_NUMPY and not isinstance(val, ca.numpy.ndarray):
+            val = ca.numpy.array(val)
+        elif not as_numpy and ca.HAS_NUMPY and isinstance(val, ca.numpy.ndarray):
+            val = list(val)
+        
         # allow asking for less data than actually exists in the cached value
-        if count is not None and count < len(self._args['value']):
-            out = self._args['value'][:count]
-            if ca.HAS_NUMPY:
-                if as_numpy and not isinstance(out, ca.numpy.ndarray):
-                    out = ca.nump.array(out)
-                if not as_numpy and isinstance(out, ca.numpy.ndarray):
-                    out = list(out)
-            return out
-        return self._args['value']
+        #print "PV Get", self.auto_monitor, self._args['value'] is None, count
+        if count < len(val):
+            val = val[:count]
+        return val
 
     def put(self, value, wait=False, timeout=30.0,
             use_complete=False, callback=None, callback_data=None):
@@ -347,12 +353,11 @@ class PV(object):
         self._args['value']  = value
         self._args['timestamp'] = kwd.get('timestamp', time.time())
         self._set_charval(self._args['value'], call_ca=False)
-
+        # print(" on change ", self.pvname, type(value) )
         if self.verbose:
             now = fmt_time(self._args['timestamp'])
             ca.write('%s: %s (%s)'% (self.pvname,
-                                     self._args['char_value'],
-                                     now))
+                                     self._args['char_value'], now))
         self.run_callbacks()
 
     def run_callbacks(self):
