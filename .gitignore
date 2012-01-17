@@ -6,5 +6,5 @@ doc/*.pdf
 tests/.coverage*
 build
 dist
-junk
+NonGit
 
