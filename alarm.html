@@ -3,13 +3,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>epics.alarm Epics Alarm &mdash; Epics Channel Access for Python</title>
+    <title>Epics Alarms &mdash; Epics Channel Access for Python</title>
+    
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
@@ -23,14 +26,12 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Epics Channel Access for Python" href="index.html" />
-    <link rel="next" title="epics.wx wxPython Widgets for epics" href="wx.html" />
-    <link rel="prev" title="epics.devices Epics Devices" href="devices.html" /> 
+    <link rel="next" title="wxPython Widgets for Epics" href="wx.html" />
+    <link rel="prev" title="Epics Devices" href="devices.html" /> 
   </head>
   <body>
-<div style="background-color: #E4EAED; text-align: left; padding: 10px 5px 15px 15px">
-  <font size=+3> <a href="index.html">
-    &nbsp; PyEpics: Epics Channel Access for Python</a>
-  </font>
+<div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
+ <h1> <a href="index.html">PyEpics: Epics Channel Access for Python</a></h1>
 </div>
 
     <div class="related">
@@ -43,18 +44,17 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="wx.html" title="epics.wx wxPython Widgets for epics"
+          <a href="wx.html" title="wxPython Widgets for Epics"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="devices.html" title="epics.devices Epics Devices"
+          <a href="devices.html" title="Epics Devices"
              accesskey="P">previous</a> |</li>
+   <li><a href="overview.html">getting started</a>|&nbsp;</li>
    <li><a href="installation.html">download</a>|&nbsp;</li>
-   <li><a href="overview.html">overview</a>|&nbsp;</li>
-   <li><a href="ca.html">ca module</a>|&nbsp;</li>
    <li><a href="pv.html">PVs</a>|&nbsp;</li>
    <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wx Widgets</a>|&nbsp;</li>
-   <li><a href="Advanced.html">Advanced Topics</a>|&nbsp;</li>
+   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
+   <li><a href="more.html">More...</a>|&nbsp;</li>
    &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
  
       </ul>
@@ -64,7 +64,7 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">epics.alarm</span></tt>   Epics Alarm</a><ul>
+<li><a class="reference internal" href="#">Epics Alarms</a><ul>
 <li><a class="reference internal" href="#module-alarm">Overview</a><ul>
 <li><a class="reference internal" href="#alarm-example">Alarm Example</a></li>
 </ul>
@@ -75,10 +75,10 @@
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="devices.html"
-                        title="previous chapter"><tt class="docutils literal"><span class="pre">epics.devices</span></tt>   Epics Devices</a></p>
+                        title="previous chapter">Epics Devices</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="wx.html"
-                        title="next chapter"><tt class="docutils literal"><span class="pre">epics.wx</span></tt>   wxPython Widgets for epics</a></p>
+                        title="next chapter">wxPython Widgets for Epics</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/alarm.txt"
@@ -87,7 +87,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -105,11 +105,11 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="epics-alarm-epics-alarm">
-<h1><tt class="xref py py-mod docutils literal"><span class="pre">epics.alarm</span></tt>   Epics Alarm<a class="headerlink" href="#epics-alarm-epics-alarm" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="epics-alarms">
+<h1>Epics Alarms<a class="headerlink" href="#epics-alarms" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-alarm">
 <span id="overview"></span><h2>Overview<a class="headerlink" href="#module-alarm" title="Permalink to this headline">¶</a></h2>
-<p>The alarm module provides an Alarm object to specify an alarm
+<p>The <tt class="xref py py-mod docutils literal"><span class="pre">epics.alarm</span></tt> module provides an Alarm object to specify an alarm
 condition and what to do when that condition is met.</p>
 <dl class="class">
 <dt id="alarm.Alarm">
@@ -122,23 +122,23 @@ condition and what to do when that condition is met.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">param pvname:</th><td class="field-body">name of Epics PV (string)</td>
+<tr class="field-odd field"><th class="field-name">param pvname:</th><td class="field-body">name of Epics PV (string)</td>
 </tr>
-<tr class="field"><th class="field-name" colspan="2">param comparison:</th></tr>
-<tr><td>&nbsp;</td><td class="field-body">operation used to compare PV value to trip_point.</td>
+<tr class="field-even field"><th class="field-name" colspan="2">param comparison:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">operation used to compare PV value to trip_point.</td>
 </tr>
-<tr class="field"><th class="field-name" colspan="2">type  comparison:</th></tr>
-<tr><td>&nbsp;</td><td class="field-body">string or callable.  Built in comparisons are listed in <a class="reference internal" href="#alarmops-table"><em>Table of Alarm Operators</em></a>.</td>
+<tr class="field-odd field"><th class="field-name" colspan="2">type  comparison:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">string or callable.  Built in comparisons are listed in <a class="reference internal" href="#alarmops-table"><em>Table of Alarm Operators</em></a>.</td>
 </tr>
-<tr class="field"><th class="field-name" colspan="2">param trip_point:</th></tr>
-<tr><td>&nbsp;</td><td class="field-body">value that will trigger the alarm</td>
+<tr class="field-even field"><th class="field-name" colspan="2">param trip_point:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">value that will trigger the alarm</td>
 </tr>
-<tr class="field"><th class="field-name">param callback:</th><td class="field-body">user-defined callback function to be run when the PVs value meets the alarm condition</td>
+<tr class="field-odd field"><th class="field-name">param callback:</th><td class="field-body">user-defined callback function to be run when the PVs value meets the alarm condition</td>
 </tr>
-<tr class="field"><th class="field-name">type callback:</th><td class="field-body">callable or None</td>
+<tr class="field-even field"><th class="field-name">type callback:</th><td class="field-body">callable or None</td>
 </tr>
-<tr class="field"><th class="field-name" colspan="2">param alert_delay:</th></tr>
-<tr><td>&nbsp;</td><td class="field-body">time (in seconds) to wait before executing another alarm callback.</td>
+<tr class="field-odd field"><th class="field-name" colspan="2">param alert_delay:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">time (in seconds) to wait before executing another alarm callback.</td>
 </tr>
 </tbody>
 </table>
@@ -149,7 +149,7 @@ then the user-supplied callback function is run.  This callback could be
 set do send a message or to take some other course of action.</p>
 <p>The comparison supplied can either be a string as listed in <a class="reference internal" href="#alarmops-table"><em>Table of
 Alarm Operators</em></a> or a custom callable function which takes
-the two values (PV.value, trip_point) and returns <tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>
+the two values (PV.value, trip_point) and returns <tt class="docutils literal"><span class="pre">True</span></tt> or <tt class="docutils literal"><span class="pre">False</span></tt>
 based on those values.</p>
 <blockquote id="alarmops-table">
 <div><p>Table of built-in Operators for Alarms:</p>
@@ -160,27 +160,27 @@ based on those values.</p>
 <col width="67%" />
 </colgroup>
 <thead valign="bottom">
-<tr><th class="head"><em>operator</em></th>
+<tr class="row-odd"><th class="head"><em>operator</em></th>
 <th class="head">Python operator</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr><td>'eq', '=='</td>
+<tr class="row-even"><td>'eq', '=='</td>
 <td>__eq__</td>
 </tr>
-<tr><td>'ne', '!='</td>
+<tr class="row-odd"><td>'ne', '!='</td>
 <td>__ne__</td>
 </tr>
-<tr><td>'le', '&lt;='</td>
+<tr class="row-even"><td>'le', '&lt;='</td>
 <td>__le__</td>
 </tr>
-<tr><td>'lt', '&lt;'</td>
+<tr class="row-odd"><td>'lt', '&lt;'</td>
 <td>__lt__</td>
 </tr>
-<tr><td>'ge', '&gt;='</td>
+<tr class="row-even"><td>'ge', '&gt;='</td>
 <td>__ge__</td>
 </tr>
-<tr><td>'gt', '&gt;'</td>
+<tr class="row-odd"><td>'gt', '&gt;'</td>
 <td>__gt__</td>
 </tr>
 </tbody>
@@ -233,25 +233,24 @@ message when a PV's value reaches a certain value:</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="wx.html" title="epics.wx wxPython Widgets for epics"
+          <a href="wx.html" title="wxPython Widgets for Epics"
              >next</a> |</li>
         <li class="right" >
-          <a href="devices.html" title="epics.devices Epics Devices"
+          <a href="devices.html" title="Epics Devices"
              >previous</a> |</li>
+   <li><a href="overview.html">getting started</a>|&nbsp;</li>
    <li><a href="installation.html">download</a>|&nbsp;</li>
-   <li><a href="overview.html">overview</a>|&nbsp;</li>
-   <li><a href="ca.html">ca module</a>|&nbsp;</li>
    <li><a href="pv.html">PVs</a>|&nbsp;</li>
    <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wx Widgets</a>|&nbsp;</li>
-   <li><a href="Advanced.html">Advanced Topics</a>|&nbsp;</li>
+   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
+   <li><a href="more.html">More...</a>|&nbsp;</li>
    &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
  
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

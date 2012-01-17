@@ -1,5 +1,5 @@
 ====================================
-:mod:`epics.alarm`   Epics Alarm
+Epics Alarms
 ====================================
 
 Overview
@@ -8,16 +8,16 @@ Overview
 .. module:: alarm
    :synopsis: an alarm to run user-supplied code when a PV goes out of range
 
-The alarm module provides an Alarm object to specify an alarm
-condition and what to do when that condition is met. 
+The :mod:`epics.alarm` module provides an Alarm object to specify an alarm
+condition and what to do when that condition is met.
 
 .. class:: Alarm(pvname[, comparison=None[, trip_point=None[, callback=None[, alert_delay=10]]]])
 
 creates an alarm object.
 
    :param pvname:     name of Epics PV (string)
-   :param comparison:  operation used to compare PV value to trip_point. 
-   :type  comparison:  string or callable.  Built in comparisons are listed in :ref:`Table of Alarm Operators<alarmops_table>`. 
+   :param comparison:  operation used to compare PV value to trip_point.
+   :type  comparison:  string or callable.  Built in comparisons are listed in :ref:`Table of Alarm Operators<alarmops_table>`.
    :param trip_point: value that will trigger the alarm
 
    :param callback:   user-defined callback function to be run when the PVs value meets the alarm condition
@@ -34,12 +34,12 @@ Alarm Operators<alarmops_table>` or a custom callable function which takes
 the two values (PV.value, trip_point) and returns ``True`` or ``False``
 based on those values.
 
-.. _alarmops_table: 
+.. _alarmops_table:
 
    Table of built-in Operators for Alarms:
 
     =============== ==============================
-     *operator*       Python operator 
+     *operator*       Python operator
     =============== ==============================
       'eq', '=='        __eq__
       'ne', '!='        __ne__
@@ -47,7 +47,7 @@ based on those values.
       'lt', '<'         __lt__
       'ge', '>='        __ge__
       'gt', '>'         __gt__
-    =============== ==============================    
+    =============== ==============================
 
 
 The :attr:`alert_delay` prevents the alarm callback from being called too
@@ -82,4 +82,4 @@ message when a PV's value reaches a certain value::
 
 
 
- 
+

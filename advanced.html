@@ -3,13 +3,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>Advanced Topic with Python Channel Access &mdash; Epics Channel Access for Python</title>
+    
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
@@ -27,10 +30,8 @@
     <link rel="prev" title="epics.ca Low-Level Epics Interface" href="ca.html" /> 
   </head>
   <body>
-<div style="background-color: #E4EAED; text-align: left; padding: 10px 5px 15px 15px">
-  <font size=+3> <a href="index.html">
-    &nbsp; PyEpics: Epics Channel Access for Python</a>
-  </font>
+<div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
+ <h1> <a href="index.html">PyEpics: Epics Channel Access for Python</a></h1>
 </div>
 
     <div class="related">
@@ -48,13 +49,12 @@
         <li class="right" >
           <a href="ca.html" title="epics.ca Low-Level Epics Interface"
              accesskey="P">previous</a> |</li>
+   <li><a href="overview.html">getting started</a>|&nbsp;</li>
    <li><a href="installation.html">download</a>|&nbsp;</li>
-   <li><a href="overview.html">overview</a>|&nbsp;</li>
-   <li><a href="ca.html">ca module</a>|&nbsp;</li>
    <li><a href="pv.html">PVs</a>|&nbsp;</li>
    <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wx Widgets</a>|&nbsp;</li>
-   <li><a href="Advanced.html">Advanced Topics</a>|&nbsp;</li>
+   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
+   <li><a href="more.html">More...</a>|&nbsp;</li>
    &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
  
       </ul>
@@ -97,7 +97,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -234,9 +234,9 @@ complication for using CA with Python threads.  The result is that some
 precautions may be in order when using PyEpics and threads.  This section
 discusses the strategies for using threads with PyEpics.</p>
 <p>First, to use threads with Channel Access, you must have
-<tt class="xref py py-data docutils literal"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></tt> = <tt class="xref docutils literal"><span class="pre">True</span></tt>.  This is the default
+<tt class="xref py py-data docutils literal"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></tt> = <tt class="docutils literal"><span class="pre">True</span></tt>.  This is the default
 value, but if <tt class="xref py py-data docutils literal"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></tt> has been set to
-<tt class="xref docutils literal"><span class="pre">False</span></tt>, threading will not work.</p>
+<tt class="docutils literal"><span class="pre">False</span></tt>, threading will not work.</p>
 <p>Second, if you are using <tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt> objects and not making heavy use of
 the <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module (that is, not making and passing around chids), then
 the complications below are mostly hidden from you.   If you're writing
@@ -429,7 +429,7 @@ The lowest level <a class="reference internal" href="ca.html#ca.get" title="ca.g
 function <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a>.  This section describes the details of
 these.</p>
 <p>If you're using <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a> or <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> you can supply a
-timeout value.  If the value returned is <tt class="xref docutils literal"><span class="pre">None</span></tt>, then either the PV has
+timeout value.  If the value returned is <tt class="docutils literal"><span class="pre">None</span></tt>, then either the PV has
 truly disconnected or the timeout passed before receiving the value.  If
 the <em>get</em> is incomplete in this way, a subsequent <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a> or
 <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> may actually complete and receive the value.</p>
@@ -443,11 +443,11 @@ converted and returned.</p>
 <p>If the callback is not called in time or if <cite>wait=False</cite> is used but the PV
 is connected, the callback will be called eventually, and simply waiting
 (or using <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-func docutils literal"><span class="pre">ca.pend_event()</span></tt></a> if <a class="reference internal" href="ca.html#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">ca.PREEMPTIVE_CALLBACK</span></tt></a> is
-<tt class="xref docutils literal"><span class="pre">False</span></tt>) may be sufficient for the data to arrive.  Under this condition,
+<tt class="docutils literal"><span class="pre">False</span></tt>) may be sufficient for the data to arrive.  Under this condition,
 you can call <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a>, which will NOT issue a new request
 for data to be sent, but wait (for up to a timeout time) for the previous
 get request to complete.</p>
-<p><a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a> will return <tt class="xref docutils literal"><span class="pre">None</span></tt> if the timeout is exceeded or
+<p><a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a> will return <tt class="docutils literal"><span class="pre">None</span></tt> if the timeout is exceeded or
 if there is not an &quot;incomplete get&quot; that it can wait to complete.  Thus,
 you should use the return value from <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a> with care.</p>
 <p>Note that <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> (and so <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a>) will normally rely on
@@ -570,7 +570,7 @@ immediately useful.</p>
 <span id="advanced-sleep-label"></span><h2>time.sleep() or epics.poll()?<a class="headerlink" href="#time-sleep-or-epics-poll" title="Permalink to this headline">¶</a></h2>
 <p>In order for a program to communicate with Epics devices, it needs to allow
 some time for this communication to happen.   With
-<a class="reference internal" href="ca.html#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">ca.PREEMPTIVE_CALLBACK</span></tt></a> set to  <tt class="xref docutils literal"><span class="pre">True</span></tt>, this communication  will
+<a class="reference internal" href="ca.html#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">ca.PREEMPTIVE_CALLBACK</span></tt></a> set to  <tt class="docutils literal"><span class="pre">True</span></tt>, this communication  will
 be handled in a thread separate from the main Python thread.  This means
 that CA events can happen at any time, and <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a> does not
 need to be called to explicitly allow for event processing.</p>
@@ -616,20 +616,19 @@ loop of:</p>
         <li class="right" >
           <a href="ca.html" title="epics.ca Low-Level Epics Interface"
              >previous</a> |</li>
+   <li><a href="overview.html">getting started</a>|&nbsp;</li>
    <li><a href="installation.html">download</a>|&nbsp;</li>
-   <li><a href="overview.html">overview</a>|&nbsp;</li>
-   <li><a href="ca.html">ca module</a>|&nbsp;</li>
    <li><a href="pv.html">PVs</a>|&nbsp;</li>
    <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wx Widgets</a>|&nbsp;</li>
-   <li><a href="Advanced.html">Advanced Topics</a>|&nbsp;</li>
+   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
+   <li><a href="more.html">More...</a>|&nbsp;</li>
    &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
  
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

@@ -3,13 +3,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>Downloading and Installation &mdash; Epics Channel Access for Python</title>
+    
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
@@ -27,10 +30,8 @@
     <link rel="prev" title="Epics Channel Access for Python" href="index.html" /> 
   </head>
   <body>
-<div style="background-color: #E4EAED; text-align: left; padding: 10px 5px 15px 15px">
-  <font size=+3> <a href="index.html">
-    &nbsp; PyEpics: Epics Channel Access for Python</a>
-  </font>
+<div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
+ <h1> <a href="index.html">PyEpics: Epics Channel Access for Python</a></h1>
 </div>
 
     <div class="related">
@@ -48,13 +49,12 @@
         <li class="right" >
           <a href="index.html" title="Epics Channel Access for Python"
              accesskey="P">previous</a> |</li>
+   <li><a href="overview.html">getting started</a>|&nbsp;</li>
    <li><a href="#">download</a>|&nbsp;</li>
-   <li><a href="overview.html">overview</a>|&nbsp;</li>
-   <li><a href="ca.html">ca module</a>|&nbsp;</li>
    <li><a href="pv.html">PVs</a>|&nbsp;</li>
    <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wx Widgets</a>|&nbsp;</li>
-   <li><a href="Advanced.html">Advanced Topics</a>|&nbsp;</li>
+   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
+   <li><a href="more.html">More...</a>|&nbsp;</li>
    &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
  
       </ul>
@@ -91,7 +91,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -142,21 +142,21 @@ a few ways to get the PyEpics Package:</p>
 <col width="61%" />
 </colgroup>
 <thead valign="bottom">
-<tr><th class="head">Download Option</th>
+<tr class="row-odd"><th class="head">Download Option</th>
 <th class="head">Location</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr><td>Source Kit</td>
+<tr class="row-even"><td>Source Kit</td>
 <td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.tar.gz">pyepics-3.1.4.tar.gz (CARS)</a>  or
 <a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.4.tar.gz">pyepics-3.1.4.tar.gz (PyPI)</a></td>
 </tr>
-<tr><td>Windows Installers</td>
+<tr class="row-odd"><td>Windows Installers</td>
 <td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py2.6.exe">pyepics-3.1.4.win32-py2.6.exe</a>  or
 <a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py2.7.exe">pyepics-3.1.4.win32-py2.7.exe</a>  or
 <a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py3.2.exe">pyepics-3.1.4.win32-py3.2.exe</a></td>
 </tr>
-<tr><td>Development Version</td>
+<tr class="row-even"><td>Development Version</td>
 <td>use <a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github repository</a></td>
 </tr>
 </tbody>
@@ -180,54 +180,54 @@ fail are generally well-understood.</p>
 <col width="37%" />
 </colgroup>
 <thead valign="bottom">
-<tr><th class="head">Host OS</th>
+<tr class="row-odd"><th class="head">Host OS</th>
 <th class="head">Epics HOST ARCH</th>
 <th class="head">Python</th>
 <th class="head">Failures, Notes</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr><td>Linux</td>
+<tr class="row-even"><td>Linux</td>
 <td>linux-x86</td>
 <td>2.5.1</td>
 <td>all pass</td>
 </tr>
-<tr><td>Linux</td>
+<tr class="row-odd"><td>Linux</td>
 <td>linux-x86</td>
 <td>2.6</td>
 <td>all pass</td>
 </tr>
-<tr><td>Linux</td>
+<tr class="row-even"><td>Linux</td>
 <td>linux-x86</td>
 <td>2.6.6</td>
 <td>all pass</td>
 </tr>
-<tr><td>Linux</td>
+<tr class="row-odd"><td>Linux</td>
 <td>linux-x86_64</td>
 <td>2.7</td>
 <td>all pass</td>
 </tr>
-<tr><td>Linux</td>
+<tr class="row-even"><td>Linux</td>
 <td>linux-x86_64</td>
 <td>3.2</td>
 <td>autosave fails</td>
 </tr>
-<tr><td>Mac OSX</td>
+<tr class="row-odd"><td>Mac OSX</td>
 <td>darwin-x86</td>
 <td>2.6.5</td>
 <td>all pass</td>
 </tr>
-<tr><td>Windows</td>
+<tr class="row-even"><td>Windows</td>
 <td>win32-x86</td>
 <td>2.6.5</td>
 <td>all pass</td>
 </tr>
-<tr><td>Windows</td>
+<tr class="row-odd"><td>Windows</td>
 <td>win32-x86</td>
 <td>2.7.1</td>
 <td>all pass</td>
 </tr>
-<tr><td>Windows</td>
+<tr class="row-even"><td>Windows</td>
 <td>win32-x86</td>
 <td>3.2.2</td>
 <td>autosave fails</td>
@@ -435,20 +435,19 @@ POSSIBILITY OF SUCH LOSS OR DAMAGES.</p>
         <li class="right" >
           <a href="index.html" title="Epics Channel Access for Python"
              >previous</a> |</li>
+   <li><a href="overview.html">getting started</a>|&nbsp;</li>
    <li><a href="#">download</a>|&nbsp;</li>
-   <li><a href="overview.html">overview</a>|&nbsp;</li>
-   <li><a href="ca.html">ca module</a>|&nbsp;</li>
    <li><a href="pv.html">PVs</a>|&nbsp;</li>
    <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wx Widgets</a>|&nbsp;</li>
-   <li><a href="Advanced.html">Advanced Topics</a>|&nbsp;</li>
+   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
+   <li><a href="more.html">More...</a>|&nbsp;</li>
    &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
  
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>
