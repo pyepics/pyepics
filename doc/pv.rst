@@ -1,7 +1,7 @@
 ..  _pv-label:
 
 ==============================
-:mod:`epics.pv`  the PV object
+The Epics PV class
 ==============================
 
 Overview
@@ -10,9 +10,9 @@ Overview
 .. module:: pv
    :synopsis: PV objects for Epics Channel Access
 
-This module provides a higher-level class :class:`PV`, which creates a `PV`
-object for an EPICS Process Variable.  A `PV` object has both methods and
-attributes for accessing it's properties.
+The :mod:`epics.pv` module provides a higher-level class :class:`PV`, which
+creates a `PV` object for an EPICS Process Variable.  A `PV` object has
+both methods and attributes for accessing it's properties.
 
 
 The :class:`PV` class
@@ -765,7 +765,6 @@ Or (equivalently):
 >>> p.value = 1.0
 
 The :attr:`value` attribute is the only attribute that can be set.
-
 
 
 Example of simple callback
