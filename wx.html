@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>epics.wx wxPython Widgets for epics &mdash; Epics Channel Access for Python</title>
+    <title>wxPython Widgets for Epics &mdash; Epics Channel Access for Python</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -24,13 +24,11 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Epics Channel Access for Python" href="index.html" />
     <link rel="next" title="Applications built with PyEpics" href="apps.html" />
-    <link rel="prev" title="epics.alarm Epics Alarm" href="alarm.html" /> 
+    <link rel="prev" title="Epics Alarms" href="alarm.html" /> 
   </head>
   <body>
-<div style="background-color: #E4EAED; text-align: left; padding: 10px 5px 15px 15px">
-  <font size=+3> <a href="index.html">
-    &nbsp; PyEpics: Epics Channel Access for Python</a>
-  </font>
+<div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
+ <h1> <a href="index.html">PyEpics: Epics Channel Access for Python</a></h1>
 </div>
 
     <div class="related">
@@ -46,15 +44,14 @@
           <a href="apps.html" title="Applications built with PyEpics"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="alarm.html" title="epics.alarm Epics Alarm"
+          <a href="alarm.html" title="Epics Alarms"
              accesskey="P">previous</a> |</li>
+   <li><a href="overview.html">getting started</a>|&nbsp;</li>
    <li><a href="installation.html">download</a>|&nbsp;</li>
-   <li><a href="overview.html">overview</a>|&nbsp;</li>
-   <li><a href="ca.html">ca module</a>|&nbsp;</li>
    <li><a href="pv.html">PVs</a>|&nbsp;</li>
    <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="#">wx Widgets</a>|&nbsp;</li>
-   <li><a href="Advanced.html">Advanced Topics</a>|&nbsp;</li>
+   <li><a href="#">wxWidgets</a>|&nbsp;</li>
+   <li><a href="more.html">More...</a>|&nbsp;</li>
    &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
  
       </ul>
@@ -64,9 +61,8 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">epics.wx</span></tt>   wxPython Widgets for epics</a><ul>
-<li><a class="reference internal" href="#module-wx">Overview</a></li>
-<li><a class="reference internal" href="#wx-widgets-for-epics">wx Widgets for Epics</a><ul>
+<li><a class="reference internal" href="#">wxPython Widgets for Epics</a><ul>
+<li><a class="reference internal" href="#pv-aware-widgets">PV-aware Widgets</a><ul>
 <li><a class="reference internal" href="#pvmixin">PVMixin</a></li>
 <li><a class="reference internal" href="#pvctrlmixin">PVCtrlMixin</a></li>
 <li><a class="reference internal" href="#pvtext">PVText</a></li>
@@ -98,7 +94,7 @@
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="alarm.html"
-                        title="previous chapter"><tt class="docutils literal docutils literal docutils literal"><span class="pre">epics.alarm</span></tt>   Epics Alarm</a></p>
+                        title="previous chapter">Epics Alarms</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="apps.html"
                         title="next chapter">Applications built with PyEpics</a></p>
@@ -128,21 +124,23 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="epics-wx-wxpython-widgets-for-epics">
-<h1><tt class="xref py py-mod docutils literal"><span class="pre">epics.wx</span></tt>   wxPython Widgets for epics<a class="headerlink" href="#epics-wx-wxpython-widgets-for-epics" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-wx">
-<span id="overview"></span><h2>Overview<a class="headerlink" href="#module-wx" title="Permalink to this headline">¶</a></h2>
-<p>This module provides a set of wxPython classes for epics PVs. Most of these
-are derived from wxPython widgets, with special support added for epics
-PVs, especially regarding when to automatically update the widget based on
-a changing value for a PV.</p>
+  <div class="section" id="module-wx">
+<span id="wxpython-widgets-for-epics"></span><h1>wxPython Widgets for Epics<a class="headerlink" href="#module-wx" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="xref py py-mod docutils literal"><span class="pre">epics.wx</span></tt> module provides a set of wxPython classes for epics
+PVs. Most of these are derived from wxPython widgets, with special support
+added for epics PVs, especially regarding when to automatically update the
+widget based on a changing value for a PV.</p>
 <p>Some examples of code that uses pyepics and wxPython are included in the
 <em>scripts</em> folder of the pyepics source distribution kit.  In addition,
 there are a some full-fledged applications using Epics and wxPython at
 <a class="reference external" href="http://github.com/pyepics/epicsapps">pyepics applications</a>.</p>
-</div>
-<div class="section" id="wx-widgets-for-epics">
-<span id="wx-functions-label"></span><h2>wx Widgets for Epics<a class="headerlink" href="#wx-widgets-for-epics" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="pv-aware-widgets">
+<span id="wx-functions-label"></span><h2>PV-aware Widgets<a class="headerlink" href="#pv-aware-widgets" title="Permalink to this headline">¶</a></h2>
+<p>Several basic wxPython widgets have been extended so as to connect the
+widget with a corresponding <cite>PV</cite>.  For example, setting the text value of a
+<tt class="xref py py-mod docutils literal"><span class="pre">PVTextCtrl</span></tt> will forward that value to the epics <cite>PV</cite>, and if the
+<cite>PV</cite> is changed by externally, the value displayed in the widget will be
+automatically updated.</p>
 <div class="section" id="pvmixin">
 <h3>PVMixin<a class="headerlink" href="#pvmixin" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
@@ -447,7 +445,7 @@ self.onClose)</cite>, where the function might look like this:</p>
 </div>
 <div class="section" id="wxmotorpanel-widget">
 <h2>wxMotorPanel Widget<a class="headerlink" href="#wxmotorpanel-widget" title="Permalink to this headline">¶</a></h2>
-<p>A dedicated wx Widget for Epics Motors is included in the <a class="reference internal" href="#module-wx" title="wx: wxPython objects for epics"><tt class="xref py py-mod docutils literal"><span class="pre">wx</span></tt></a> module
+<p>A dedicated wx Widget for Epics Motors is included in the <a class="reference internal" href="#module-wx" title="wx: wxPython Widgets for Epics"><tt class="xref py py-mod docutils literal"><span class="pre">wx</span></tt></a> module
 that provides an easy-to-use Motor panel that is similar to the normal MEDM
 window, but with a few niceties from the more sophisticated wx
 toolkit. This widget can be used simply as:</p>
@@ -567,15 +565,14 @@ as it changes.</p>
           <a href="apps.html" title="Applications built with PyEpics"
              >next</a> |</li>
         <li class="right" >
-          <a href="alarm.html" title="epics.alarm Epics Alarm"
+          <a href="alarm.html" title="Epics Alarms"
              >previous</a> |</li>
+   <li><a href="overview.html">getting started</a>|&nbsp;</li>
    <li><a href="installation.html">download</a>|&nbsp;</li>
-   <li><a href="overview.html">overview</a>|&nbsp;</li>
-   <li><a href="ca.html">ca module</a>|&nbsp;</li>
    <li><a href="pv.html">PVs</a>|&nbsp;</li>
    <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="#">wx Widgets</a>|&nbsp;</li>
-   <li><a href="Advanced.html">Advanced Topics</a>|&nbsp;</li>
+   <li><a href="#">wxWidgets</a>|&nbsp;</li>
+   <li><a href="more.html">More...</a>|&nbsp;</li>
    &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
  
       </ul>

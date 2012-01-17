@@ -1,17 +1,15 @@
-============================================
-:mod:`epics.wx`   wxPython Widgets for epics
-============================================
+======================================================
+ wxPython Widgets for Epics
+======================================================
 
-Overview
-========
 
 .. module:: wx
-   :synopsis: wxPython objects for epics
+   :synopsis: wxPython Widgets for Epics
 
-This module provides a set of wxPython classes for epics PVs. Most of these
-are derived from wxPython widgets, with special support added for epics
-PVs, especially regarding when to automatically update the widget based on
-a changing value for a PV.
+The :mod:`epics.wx` module provides a set of wxPython classes for epics
+PVs. Most of these are derived from wxPython widgets, with special support
+added for epics PVs, especially regarding when to automatically update the
+widget based on a changing value for a PV.
 
 .. _pyepics applications:    http://github.com/pyepics/epicsapps
 
@@ -22,8 +20,15 @@ there are a some full-fledged applications using Epics and wxPython at
 
 ..  _wx-functions-label:
 
-wx Widgets for Epics
-=================================
+PV-aware Widgets
+=========================
+
+
+Several basic wxPython widgets have been extended so as to connect the
+widget with a corresponding `PV`.  For example, setting the text value of a
+:mod:`PVTextCtrl` will forward that value to the epics `PV`, and if the
+`PV` is changed by externally, the value displayed in the widget will be
+automatically updated.
 
 
 PVMixin
