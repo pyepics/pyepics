@@ -2,9 +2,9 @@
 Advanced Topic with Python Channel Access
 ===============================================
 
-This chapter contains a variety of "usage notes" and
-implementation details that may help in getting the best perfomance from
-the pyepics module.
+This chapter contains a variety of "usage notes" and implementation
+details that may help in getting the best performance from the
+pyepics module.
 
 .. _advanced-large-arrays-label:
 
@@ -362,7 +362,7 @@ received faster than that, the *get* will return as soon as it can.
 Strategies for connecting to a large number of PVs
 ====================================================
 
-Occassionally, you may find that you need to quickly connect to a large
+Occasionally, you may find that you need to quickly connect to a large
 number of PVs, say to write values to disk.  The most straightforward way
 to do this, say::
 
@@ -383,7 +383,7 @@ object automatically use connection and event callbacks.  Normally, these
 are advantages, as you don't need to explicitly deal with them.  But,
 internally, they do pause for network responses using :meth:`ca.pend_event`
 and these pauses can add up.  Second, the :meth:`ca.get` also pauses for
-network response, so that the returned value actually containes the latest
+network response, so that the returned value actually contains the latest
 data right away, as discussed in the previous section.
 
 The remedies are to
@@ -421,7 +421,7 @@ notice is that this is using the `ca` level, not `PV` objects.  Second
 (Note 1), the `connect=False` and `auto_cb=False` options to
 :meth:`ca.create_channel`.  These respectively tell
 :meth:`ca.create_channel` to not wait for a connection before returning,
-and to not automatically assing a connection callback.  Normally, these are
+and to not automatically assign a connection callback.  Normally, these are
 not what you want, as you want a connected channel and to know if the
 connection state changes.  But we're aiming for maximum speed here, so we
 avoid these.
@@ -450,7 +450,7 @@ writing a script that is intended to run once, fetch a large number of PVs
 and get their values (say, an auto-save script that runs on demand), then
 the boost is definitely significant.  On the other hand, if you're writing
 a long running process or a process that will retain the PV connections and
-get their values multiple times, the difference in startup speed is less
+get their values multiple times, the difference in start-up speed is less
 significant.  For a long running auto-save script that periodically writes
 out all the PV values, the "obvious" way using automatically monitored PVs
 may be much *better*, as the time for the initial connection is small, and

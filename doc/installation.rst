@@ -169,7 +169,7 @@ There are a few ways to specify how to find this library:
     python package is installed.
 
 Note, that For Windows users, the DLLs (ca.dll and Com.dll) are included in the
-installation kit, and automaically installed to where they can be found at
+installation kit, and automatically installed to where they can be found at
 runtime (following rule 3 above).
 
 With the Epics library loaded, it will need to be able to connect to Epics

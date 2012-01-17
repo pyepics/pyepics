@@ -2,7 +2,6 @@
  wxPython Widgets for Epics
 ======================================================
 
-
 .. module:: wx
    :synopsis: wxPython Widgets for Epics
 
@@ -73,7 +72,7 @@ PVCtrlMixin
 
 .. class:: PVCtrlMixin(parent, pv=None, font=None, fg=None, bg=None, **kw)
 
-   This is a mixin class for wx Controls with epics PVs:  This sibclasses
+   This is a mixin class for wx Controls with epics PVs:  This subclasses
    PVCtrlMixin and adds colour translations
    PV, and manages callback events for the PV.
 
@@ -103,7 +102,7 @@ PVText
   whose value is set to the string representation of the value for the
   corresponding PV.
 
-  By default, the text colour will be overriden when the PV enters an
+  By default, the text colour will be overridden when the PV enters an
   alarm state. These colours can be modified (or disabled by being set
   to ``None``) as part of the constructor.
 
@@ -261,7 +260,7 @@ PVCollapsiblePane
     The additional keyword arguments can be any of the other constructor
     arguments supported by wx.CollapsiblePane.
 
-    By default, the foreground colour of the pane button will be overriden
+    By default, the foreground colour of the pane button will be overridden
     when the PV enters an alarm state. On GTK, this means the colour of the
     triangular drop-down button but not the label text. These colours can
     be modified (or disabled by being set to ``None``) as part of the
@@ -319,7 +318,7 @@ A sample panel looks like this
 
 .. image:: wx_motor.png
 
-Which shows from right to left: the motor desription, an information
+Which shows from right to left: the motor description, an information
 message (blank most of the time), the readback value, the drive value,
 arrows to tweak the motor, and a drop-down combobox for tweak values, a
 "Stop" button and a "More" button.  The panel has the following features:
@@ -378,7 +377,7 @@ PVShapeMixin
   ogl.Shape subclass that needs PV callback support.
 
   The main method is PVChanged(self, raw_value), which should be
-  overriden in the subclass to provide specific processing based on
+  overridden in the subclass to provide specific processing based on
   the changed value.
 
   There are also some built-in pieces of functionality. These are

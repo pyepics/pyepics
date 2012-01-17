@@ -1,24 +1,29 @@
 =========================================
-:mod:`epics.ca` Low-Level Epics Interface
+Low-Level Epics Interface
 =========================================
+
+
+The :mod:`epics.ca` module provides a low-level wrapping of the EPICS
+Channel Access (CA) library, using ctypes.  Most users of the `epics`
+module will not need to be concerned with most of the details here, and
+will instead use the simple functional interface (:func:`epics.caget`,
+:func:`epics.caput` and so on), or use the :class:`epics.PV` class to
+create and use epics PV objects.
+
 
 General description, difference with C library
 =================================================
 
-This module provides a low-level wrapping of the EPICS Channel Access (CA)
-library, using ctypes.  Most users of the `epics` module will not need to
-be concerned with most of the details here, and will instead use the simple
-functional interface (:func:`epics.caget`, :func:`epics.caput` and so on),
-or use the :class:`epics.PV` class to create and use epics PV objects.
-
-The goal of this :mod:`ca` module is to stay fairly close to the C
-interface to the CA library while also providing a pleasant Python
-experience.  It is expected that anyone looking into the details of this
-module is somewhat familiar with Channel Access and knows where to consult
-the `Channel Access Reference Documentation
-<http://www.aps.anl.gov/epics/base/R3-14/11-docs/CAref.html>`_.  This
-document focuses on the differences with the C interface, assuming a
-general understanding of what the functions are meant to do.
+The goal of the :mod:`ca` module is to provide a fairly complete
+mapping of the C interface to the CA library while also providing a
+pleasant Python experience.  It is expected that anyone looking
+into the details of this module is somewhat familiar with Channel
+Access and knows where to consult the `Channel Access Reference
+Documentation
+<http://www.aps.anl.gov/epics/base/R3-14/11-docs/CAref.html>`_.
+This document focuses on the differences with the C interface,
+assuming a general understanding of what the functions are meant to
+do.
 
 
 Name Mangling

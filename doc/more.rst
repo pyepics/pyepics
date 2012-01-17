@@ -1,6 +1,6 @@
 
-More Topics
-===============
+More PyEpics Topics
+======================
 
 .. toctree::
    :maxdepth: 2

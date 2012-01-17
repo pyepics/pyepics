@@ -101,10 +101,6 @@ In general, PV names will be mapped as prefix+delim+attr.  See
    a dictionary of PVs making up the device.
 
 
-
-
-
-
 .. _device-motor-label:
 
 Epics Motor Device

@@ -11,6 +11,11 @@ expanding.  Many of these rely on wxPython and possibly other 3rd party
 modules.
 
 
+AreaDetector Display
+~~~~~~~~~~~~~~~~~~~~~~
+
+A simple, live display for an Epics Area Detector.
+
 Strip Chart
 ~~~~~~~~~~~~~~
 
