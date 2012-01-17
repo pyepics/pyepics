@@ -3,13 +3,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
     <title>epics.ca Low-Level Epics Interface &mdash; Epics Channel Access for Python</title>
+    
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
@@ -109,7 +112,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -203,7 +206,7 @@ initialization and finalization tasks are handled in the following way:</p>
 global reference to the CA shared object library (DLL).</li>
 <li>the function <a class="reference internal" href="#ca.initialize_libca" title="ca.initialize_libca"><tt class="xref py py-func docutils literal"><span class="pre">initialize_libca()</span></tt></a> is called to initialize libca.
 This function takes no arguments, but does use the global Boolean
-<a class="reference internal" href="#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></tt></a> (default value of <tt class="xref docutils literal"><span class="pre">True</span></tt>) to control
+<a class="reference internal" href="#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></tt></a> (default value of <tt class="docutils literal"><span class="pre">True</span></tt>) to control
 whether preemptive callbacks are used.</li>
 <li>the function <tt class="xref py py-func docutils literal"><span class="pre">finalize_libca()</span></tt> is used to finalize libca.
 Normally, this is function is registered to be called when a program
@@ -218,7 +221,7 @@ Channel Access server.</li>
 <dt id="ca.PREEMPTIVE_CALLBACK">
 <tt class="descclassname">ca.</tt><tt class="descname">PREEMPTIVE_CALLBACK</tt><a class="headerlink" href="#ca.PREEMPTIVE_CALLBACK" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets whether preemptive callbacks will be used.  The default value is
-<tt class="xref docutils literal"><span class="pre">True</span></tt>.  If you wish to run without preemptive callbacks this variable
+<tt class="docutils literal"><span class="pre">True</span></tt>.  If you wish to run without preemptive callbacks this variable
 <em>MUST</em> be set before any other use of the CA library.  With preemptive
 callbacks enabled, EPICS communication will not require client code to
 continually poll for changes.   With preemptive callback disables,  you
@@ -367,11 +370,11 @@ functions to identify this channel.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>pvname</strong> -- the name of the PV to create.</li>
-<li><strong>connect</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to (try to) connect to PV as soon as possible.</li>
-<li><strong>callback</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or callable.) -- user-defined Python function to be called when the connection state changes.</li>
-<li><strong>auto_cb</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to automatically use an internal callback.</li>
+<li><strong>connect</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to (try to) connect to PV as soon as possible.</li>
+<li><strong>callback</strong> (<tt class="docutils literal"><span class="pre">None</span></tt> or callable.) -- user-defined Python function to be called when the connection state changes.</li>
+<li><strong>auto_cb</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to automatically use an internal callback.</li>
 </ul>
 </td>
 </tr>
@@ -382,11 +385,11 @@ functions to identify this channel.</p>
 <dd><ul class="first last simple">
 <li><cite>pvname</cite>  name of PV</li>
 <li><cite>chid</cite>    <tt class="docutils literal"><span class="pre">chid</span></tt> Channel ID</li>
-<li><cite>conn</cite>    <tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>:  whether channel is connected.</li>
+<li><cite>conn</cite>    <tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>:  whether channel is connected.</li>
 </ul>
 </dd>
 </dl>
-<p>If <cite>auto_cb</cite> is <tt class="xref docutils literal"><span class="pre">True</span></tt>, an internal connection callback is used so
+<p>If <cite>auto_cb</cite> is <tt class="docutils literal"><span class="pre">True</span></tt>, an internal connection callback is used so
 that you should not need to explicitly connect to a channel, unless you
 are having difficulty with dropped connections.</p>
 </dd></dl>
@@ -396,22 +399,22 @@ are having difficulty with dropped connections.</p>
 <tt class="descclassname">ca.</tt><tt class="descname">connect_channel</tt><big>(</big><em>chid</em><span class="optional">[</span>, <em>timeout=None</em><span class="optional">[</span>, <em>verbose=False</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.connect_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>explicitly connect to a channel (usually not needed, as implicit
 connection will be done when needed), waiting up to timeout for a
-channel to connect.  It returns the connection state, <tt class="xref docutils literal"><span class="pre">True</span></tt> or
-<tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+channel to connect.  It returns the connection state, <tt class="docutils literal"><span class="pre">True</span></tt> or
+<tt class="docutils literal"><span class="pre">False</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>chid</strong> -- <tt class="docutils literal"><span class="pre">chid</span></tt> Channel ID</li>
-<li><strong>timeout</strong> (float or <tt class="xref docutils literal"><span class="pre">None</span></tt>.) -- maximum time to wait for connection.</li>
+<li><strong>timeout</strong> (float or <tt class="docutils literal"><span class="pre">None</span></tt>.) -- maximum time to wait for connection.</li>
 <li><strong>verbose</strong> -- whether to print out debugging information</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<p>if <em>timeout</em> is <tt class="xref docutils literal"><span class="pre">None</span></tt>, the value of  <a class="reference internal" href="#ca.DEFAULT_CONNECTION_TIMEOUT" title="ca.DEFAULT_CONNECTION_TIMEOUT"><tt class="xref py py-data docutils literal"><span class="pre">DEFAULT_CONNECTION_TIMEOUT</span></tt></a>
+<p>if <em>timeout</em> is <tt class="docutils literal"><span class="pre">None</span></tt>, the value of  <a class="reference internal" href="#ca.DEFAULT_CONNECTION_TIMEOUT" title="ca.DEFAULT_CONNECTION_TIMEOUT"><tt class="xref py py-data docutils literal"><span class="pre">DEFAULT_CONNECTION_TIMEOUT</span></tt></a>
 is used (usually 2.0 seconds).</p>
 <p>Normally, channels will connect in milliseconds, and the connection
 callback will succeed on the first attempt.</p>
@@ -445,13 +448,13 @@ library are:</p>
 <dl class="function">
 <dt id="ca.read_access">
 <tt class="descclassname">ca.</tt><tt class="descname">read_access</tt><big>(</big><em>chid</em><big>)</big><a class="headerlink" href="#ca.read_access" title="Permalink to this definition">¶</a></dt>
-<dd><p>return <em>read access</em> for a Channel: 1 for <tt class="xref docutils literal"><span class="pre">True</span></tt>, 0 for <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<dd><p>return <em>read access</em> for a Channel: 1 for <tt class="docutils literal"><span class="pre">True</span></tt>, 0 for <tt class="docutils literal"><span class="pre">False</span></tt>.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ca.write_access">
 <tt class="descclassname">ca.</tt><tt class="descname">write_access</tt><big>(</big><em>chid</em><big>)</big><a class="headerlink" href="#ca.write_access" title="Permalink to this definition">¶</a></dt>
-<dd><p>return <em>write access</em> for a channel: 1 for <tt class="xref docutils literal"><span class="pre">True</span></tt>, 0 for <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+<dd><p>return <em>write access</em> for a channel: 1 for <tt class="docutils literal"><span class="pre">True</span></tt>, 0 for <tt class="docutils literal"><span class="pre">False</span></tt>.</p>
 </dd></dl>
 
 <dl class="function">
@@ -477,8 +480,8 @@ library are:</p>
 <dl class="function">
 <dt id="ca.isConnected">
 <tt class="descclassname">ca.</tt><tt class="descname">isConnected</tt><big>(</big><em>chid</em><big>)</big><a class="headerlink" href="#ca.isConnected" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns <cite>dbr.CS_CONN==state(chid)</cite> ie <tt class="xref docutils literal"><span class="pre">True</span></tt> for a connected channel
-or <tt class="xref docutils literal"><span class="pre">False</span></tt> for an unconnected channel.</p>
+<dd><p>returns <cite>dbr.CS_CONN==state(chid)</cite> ie <tt class="docutils literal"><span class="pre">True</span></tt> for a connected channel
+or <tt class="docutils literal"><span class="pre">False</span></tt> for an unconnected channel.</p>
 </dd></dl>
 
 <dl class="function">
@@ -532,21 +535,21 @@ keyword arguments can be used to specify such options.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>chid</strong> (<em>ctypes.c_long</em>) -- <tt class="docutils literal"><span class="pre">chid</span></tt> Channel ID</li>
-<li><strong>ftype</strong> (integer or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- field type to use (native type is default)</li>
-<li><strong>count</strong> (integer or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- maximum element count to return (full data returned by default)</li>
-<li><strong>as_string</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the string representation of the value.  See notes below.</li>
-<li><strong>as_numpy</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the Numerical Python representation  for array / waveform data.</li>
-<li><strong>wait</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to wait for the data to be received, or return immediately.</li>
-<li><strong>timeout</strong> (float or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- maximum time to wait for data before returning <tt class="xref docutils literal"><span class="pre">None</span></tt>.</li>
+<li><strong>ftype</strong> (integer or <tt class="docutils literal"><span class="pre">None</span></tt>) -- field type to use (native type is default)</li>
+<li><strong>count</strong> (integer or <tt class="docutils literal"><span class="pre">None</span></tt>) -- maximum element count to return (full data returned by default)</li>
+<li><strong>as_string</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to return the string representation of the value.  See notes below.</li>
+<li><strong>as_numpy</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to return the Numerical Python representation  for array / waveform data.</li>
+<li><strong>wait</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to wait for the data to be received, or return immediately.</li>
+<li><strong>timeout</strong> (float or <tt class="docutils literal"><span class="pre">None</span></tt>) -- maximum time to wait for data before returning <tt class="docutils literal"><span class="pre">None</span></tt>.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <p><a class="reference internal" href="#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">get()</span></tt></a> returns the value for the PV with channel ID <em>chid</em> or
-<tt class="xref docutils literal"><span class="pre">None</span></tt>, which indicates an <em>incomplete get</em></p>
+<tt class="docutils literal"><span class="pre">None</span></tt>, which indicates an <em>incomplete get</em></p>
 <p>For a listing of values of <em>ftype</em>, see <a class="reference internal" href="#dbrtype-table"><em>Table of DBR Types</em></a>.  The optional <em>count</em> can be used to limit the
 amount of data returned for array data from waveform records.</p>
 <p>The <em>as_string</em> option warrants special attention: The feature is not
@@ -571,7 +574,7 @@ later with <a class="reference internal" href="#ca.get_complete" title="ca.get_c
 some circumstances.  See <a class="reference internal" href="advanced.html#advanced-connecting-many-label"><em>Strategies for connecting to a large number of PVs</em></a> for a
 discussion.</p>
 <p>The <em>timeout</em> option sets the maximum time to wait for the data to be
-received over the network before returning <tt class="xref docutils literal"><span class="pre">None</span></tt>.  Such a timeout
+received over the network before returning <tt class="docutils literal"><span class="pre">None</span></tt>.  Such a timeout
 could imply that the channel is disconnected or that the data size is
 larger or network slower than normal.  In that case, the <em>get</em>
 operation is said to be <em>incomplete</em>, and the data may become
@@ -585,25 +588,25 @@ function.</p>
 <dt id="ca.get_complete">
 <tt class="descclassname">ca.</tt><tt class="descname">get_complete</tt><big>(</big><em>chid</em><span class="optional">[</span>, <em>ftype=None</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">[</span>, <em>timeout=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ca.get_complete" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the current value for a Channel, completing an earlier incomplete
-<a class="reference internal" href="#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">get()</span></tt></a> that returned <tt class="xref docutils literal"><span class="pre">None</span></tt>, either because <cite>wait=False</cite> was
+<a class="reference internal" href="#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">get()</span></tt></a> that returned <tt class="docutils literal"><span class="pre">None</span></tt>, either because <cite>wait=False</cite> was
 used or because the data transfer did not complete before the timeout passed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>chid</strong> (<em>ctypes.c_long</em>) -- <tt class="docutils literal"><span class="pre">chid</span></tt> Channel ID</li>
 <li><strong>ftype</strong> (<em>integer</em>) -- field type to use (native type is default)</li>
 <li><strong>count</strong> (<em>integer</em>) -- maximum element count to return (full data returned by default)</li>
-<li><strong>as_string</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the string representation of the value.  See notes below.</li>
-<li><strong>as_numpy</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return the Numerical Python representation  for array / waveform data.</li>
-<li><strong>timeout</strong> (float or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- maximum time to wait for data before returning <tt class="xref docutils literal"><span class="pre">None</span></tt>.</li>
+<li><strong>as_string</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to return the string representation of the value.  See notes below.</li>
+<li><strong>as_numpy</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to return the Numerical Python representation  for array / waveform data.</li>
+<li><strong>timeout</strong> (float or <tt class="docutils literal"><span class="pre">None</span></tt>) -- maximum time to wait for data before returning <tt class="docutils literal"><span class="pre">None</span></tt>.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<p>This function will return <tt class="xref docutils literal"><span class="pre">None</span></tt> if the previous <a class="reference internal" href="#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">get()</span></tt></a>
+<p>This function will return <tt class="docutils literal"><span class="pre">None</span></tt> if the previous <a class="reference internal" href="#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">get()</span></tt></a>
 actually completed, or if this data transfer also times out.  See
 <a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><em>The wait and timeout options for get(), ca.get_complete()</em></a> for further discussion.</p>
 </dd></dl>
@@ -618,11 +621,11 @@ process has completed.  The chid and value are required.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>chid</strong> (<em>ctypes.c_long</em>) -- <tt class="docutils literal"><span class="pre">chid</span></tt> Channel ID</li>
-<li><strong>wait</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to wait for processing to complete (or time-out) before returning.</li>
-<li><strong>timeout</strong> (float or <tt class="xref docutils literal"><span class="pre">None</span></tt>) -- maximum time to wait for processing to complete before returning anyway.</li>
-<li><strong>callback</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or callable) -- user-supplied function to run when processing has completed.</li>
+<li><strong>wait</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to wait for processing to complete (or time-out) before returning.</li>
+<li><strong>timeout</strong> (float or <tt class="docutils literal"><span class="pre">None</span></tt>) -- maximum time to wait for processing to complete before returning anyway.</li>
+<li><strong>callback</strong> (<tt class="docutils literal"><span class="pre">None</span></tt> or callable) -- user-supplied function to run when processing has completed.</li>
 <li><strong>callback_data</strong> -- extra data to pass on to a user-supplied callback function.</li>
 </ul>
 </td>
@@ -646,15 +649,15 @@ will be called on any changes to the PV.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>use_time</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to use the TIME variant for the PV type</li>
-<li><strong>use_ctrl</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to use the CTRL variant for the PV type</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>use_time</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to use the TIME variant for the PV type</li>
+<li><strong>use_ctrl</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to use the CTRL variant for the PV type</li>
 <li><strong>mask</strong> (<em>integer</em>) -- bitmask (combination of dbr.DBE_ALARM, dbr.DBE_LOG, dbr.DBE_VALUE) to control which changes result in a callback. Defaults to <a class="reference internal" href="#ca.DEFAULT_SUBSCRIPTION_MASK" title="ca.DEFAULT_SUBSCRIPTION_MASK"><tt class="xref py py-data docutils literal"><span class="pre">DEFAULT_SUBSCRIPTION_MASK</span></tt></a>.</li>
-<li><strong>callback</strong> (<tt class="xref docutils literal"><span class="pre">None</span></tt> or callable) -- user-supplied callback function</li>
+<li><strong>callback</strong> (<tt class="docutils literal"><span class="pre">None</span></tt> or callable) -- user-supplied callback function</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple containing <em>(callback_ref, user_arg_ref, event_id)</em></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple containing <em>(callback_ref, user_arg_ref, event_id)</em></p>
 </td>
 </tr>
 </tbody>
@@ -686,7 +689,7 @@ Abort (core dumped)</pre>
 <dd><p>This value is the default subscription type used when calling
 <a class="reference internal" href="#ca.create_subscription" title="ca.create_subscription"><tt class="xref py py-meth docutils literal"><span class="pre">create_subscription()</span></tt></a> with <cite>mask=None</cite>. It is also used by
 default when creating a <tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt> object with auto_monitor is set
-to <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
+to <tt class="docutils literal"><span class="pre">True</span></tt>.</p>
 <p>The initial default value is <em>dbr.DBE_ALARM|dbr.DBE_VALUE</em>
 (i.e. update on alarm changes or value changes which exceeds the
 monitor deadband.)  The other possible flag in the bitmask is
@@ -725,7 +728,7 @@ than FLOAT or DOUBLE, this will be 0.</p>
 <dl class="function">
 <dt id="ca.get_enum_strings">
 <tt class="descclassname">ca.</tt><tt class="descname">get_enum_strings</tt><big>(</big><em>chid</em><big>)</big><a class="headerlink" href="#ca.get_enum_strings" title="Permalink to this definition">¶</a></dt>
-<dd><p>return the list of names for ENUM states of a Channel.  Returns  <tt class="xref docutils literal"><span class="pre">None</span></tt>
+<dd><p>return the list of names for ENUM states of a Channel.  Returns  <tt class="docutils literal"><span class="pre">None</span></tt>
 for non-ENUM Channels.</p>
 </dd></dl>
 
@@ -746,48 +749,48 @@ native data type, the keys in this dictionary may include
 <col width="60%" />
 </colgroup>
 <thead valign="bottom">
-<tr><th class="head"><em>attribute</em></th>
+<tr class="row-odd"><th class="head"><em>attribute</em></th>
 <th class="head"><em>data types</em></th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr><td>status</td>
+<tr class="row-even"><td>status</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>severity</td>
+<tr class="row-odd"><td>severity</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>precision</td>
+<tr class="row-even"><td>precision</td>
 <td>0 for all but double, float</td>
 </tr>
-<tr><td>units</td>
+<tr class="row-odd"><td>units</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>enum_strs</td>
+<tr class="row-even"><td>enum_strs</td>
 <td>enum only</td>
 </tr>
-<tr><td>upper_disp_limit</td>
+<tr class="row-odd"><td>upper_disp_limit</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>lower_disp_limit</td>
+<tr class="row-even"><td>lower_disp_limit</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>upper_alarm_limit</td>
+<tr class="row-odd"><td>upper_alarm_limit</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>lower_alarm_limit</td>
+<tr class="row-even"><td>lower_alarm_limit</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>upper_warning_limit</td>
+<tr class="row-odd"><td>upper_warning_limit</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>lower_warning_limit</td>
+<tr class="row-even"><td>lower_warning_limit</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>upper_ctrl_limit</td>
+<tr class="row-odd"><td>upper_ctrl_limit</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>lower_ctrl_limit</td>
+<tr class="row-even"><td>lower_ctrl_limit</td>
 <td>&nbsp;</td>
 </tr>
 </tbody>
@@ -926,105 +929,105 @@ those looking to translate lower-level C or Python code to this module.</p>
 <col width="42%" />
 </colgroup>
 <thead valign="bottom">
-<tr><th class="head"><em>CA type</em></th>
+<tr class="row-odd"><th class="head"><em>CA type</em></th>
 <th class="head"><em>integer ftype</em></th>
 <th class="head"><em>Python ctypes type</em></th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr><td>string</td>
+<tr class="row-even"><td>string</td>
 <td>0</td>
 <td>string</td>
 </tr>
-<tr><td>int</td>
+<tr class="row-odd"><td>int</td>
 <td>1</td>
 <td>integer</td>
 </tr>
-<tr><td>short</td>
+<tr class="row-even"><td>short</td>
 <td>1</td>
 <td>integer</td>
 </tr>
-<tr><td>float</td>
+<tr class="row-odd"><td>float</td>
 <td>2</td>
 <td>double</td>
 </tr>
-<tr><td>enum</td>
+<tr class="row-even"><td>enum</td>
 <td>3</td>
 <td>integer</td>
 </tr>
-<tr><td>char</td>
+<tr class="row-odd"><td>char</td>
 <td>4</td>
 <td>byte</td>
 </tr>
-<tr><td>long</td>
+<tr class="row-even"><td>long</td>
 <td>5</td>
 <td>integer</td>
 </tr>
-<tr><td>double</td>
+<tr class="row-odd"><td>double</td>
 <td>6</td>
 <td>double</td>
 </tr>
-<tr><td>time_string</td>
+<tr class="row-even"><td>time_string</td>
 <td>14</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>time_int</td>
+<tr class="row-odd"><td>time_int</td>
 <td>15</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>time_short</td>
+<tr class="row-even"><td>time_short</td>
 <td>15</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>time_float</td>
+<tr class="row-odd"><td>time_float</td>
 <td>16</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>time_enum</td>
+<tr class="row-even"><td>time_enum</td>
 <td>17</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>time_char</td>
+<tr class="row-odd"><td>time_char</td>
 <td>18</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>time_long</td>
+<tr class="row-even"><td>time_long</td>
 <td>19</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>time_double</td>
+<tr class="row-odd"><td>time_double</td>
 <td>20</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>ctrl_string</td>
+<tr class="row-even"><td>ctrl_string</td>
 <td>28</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>ctrl_int</td>
+<tr class="row-odd"><td>ctrl_int</td>
 <td>29</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>ctrl_short</td>
+<tr class="row-even"><td>ctrl_short</td>
 <td>29</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>ctrl_float</td>
+<tr class="row-odd"><td>ctrl_float</td>
 <td>30</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>ctrl_enum</td>
+<tr class="row-even"><td>ctrl_enum</td>
 <td>31</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>ctrl_char</td>
+<tr class="row-odd"><td>ctrl_char</td>
 <td>32</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>ctrl_long</td>
+<tr class="row-even"><td>ctrl_long</td>
 <td>33</td>
 <td>&nbsp;</td>
 </tr>
-<tr><td>ctrl_double</td>
+<tr class="row-odd"><td>ctrl_double</td>
 <td>34</td>
 <td>&nbsp;</td>
 </tr>
@@ -1116,12 +1119,12 @@ function.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>cdata</strong> -- cdata as returned by internal libca functions, and <a class="reference internal" href="#ca.sg_get" title="ca.sg_get"><tt class="xref py py-func docutils literal"><span class="pre">sg_get()</span></tt></a>.</li>
 <li><strong>chid</strong> -- channel ID (optional: used for determining count and ftype)</li>
 <li><strong>count</strong> -- number of elements to fetch (defaults to element count of chid  or 1)</li>
 <li><strong>ftype</strong> -- data type of channel (defaults to native type of chid)</li>
-<li><strong>as_numpy</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to convert to numpy array.</li>
+<li><strong>as_numpy</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to convert to numpy array.</li>
 </ul>
 </td>
 </tr>
@@ -1153,7 +1156,7 @@ sure of what will be sent.</p>
 <blockquote>
 <div><ul class="simple">
 <li><cite>pvname</cite> : the name of the pv</li>
-<li><cite>data</cite>:  the user-supplied callback_data (defaulting to <tt class="xref docutils literal"><span class="pre">None</span></tt>).</li>
+<li><cite>data</cite>:  the user-supplied callback_data (defaulting to <tt class="docutils literal"><span class="pre">None</span></tt>).</li>
 </ul>
 </div></blockquote>
 <p>For subscription callbacks, your function will be called with keyword/value
@@ -1366,7 +1369,7 @@ initial connection:</p>
 created, when a successful connection has been made.  Note that the
 callback should be prepared to accept keyword arguments of <cite>pvname</cite>,
 <cite>chid</cite>, and <cite>conn</cite> for the PV name, channel ID, and connection state
-(<tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt>).</p>
+(<tt class="docutils literal"><span class="pre">True</span></tt> or <tt class="docutils literal"><span class="pre">False</span></tt>).</p>
 </div>
 </div>
 </div>
@@ -1404,7 +1407,7 @@ callback should be prepared to accept keyword arguments of <cite>pvname</cite>,
     </div>
     <div class="footer">
         &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>

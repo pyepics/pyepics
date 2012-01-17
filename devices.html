@@ -3,6 +3,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -10,6 +11,7 @@
     <title>Epics Devices &mdash; Epics Channel Access for Python</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
@@ -92,7 +94,7 @@
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" size="18" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
@@ -213,7 +215,7 @@ may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 <dt id="device.read_state">
 <tt class="descclassname">device.</tt><tt class="descname">read_state</tt><big>(</big><em>fname</em><span class="optional">[</span>, <em>restore=False</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#device.read_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>reads a state from a file, as written with <a class="reference internal" href="#device.write_state" title="device.write_state"><tt class="xref py py-meth docutils literal"><span class="pre">write_state()</span></tt></a>, and returns it.
-If ''restore'' is <tt class="xref docutils literal"><span class="pre">True</span></tt>, the read state will be restored.</p>
+If ''restore'' is <tt class="docutils literal"><span class="pre">True</span></tt>, the read state will be restored.</p>
 </dd></dl>
 
 <dl class="data">
@@ -270,7 +272,7 @@ motor record.  Thus 'VAL' can be spelled 'drive' and 'DESC' can be
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>pvname</strong> (<em>string</em>) -- prefix name (no '.VAL' needed!) of Epics Process Variable  for a Motor</li>
 <li><strong>timeout</strong> (<em>float</em>) -- time (in seconds) to wait before giving up trying to connect.</li>
 </ul>
@@ -306,7 +308,7 @@ corresponding attribute name of the Motor Record field.</div></blockquote>
 <col width="27%" />
 </colgroup>
 <thead valign="bottom">
-<tr><th class="head"><strong>alias</strong></th>
+<tr class="row-odd"><th class="head"><strong>alias</strong></th>
 <th class="head"><em>Motor Record field</em></th>
 <th class="head">&nbsp;</th>
 <th class="head"><strong>alias</strong></th>
@@ -314,265 +316,265 @@ corresponding attribute name of the Motor Record field.</div></blockquote>
 </tr>
 </thead>
 <tbody valign="top">
-<tr><td>disabled</td>
+<tr class="row-even"><td>disabled</td>
 <td>_able.VAL</td>
 <td>&nbsp;</td>
 <td>moving</td>
 <td>MOVN</td>
 </tr>
-<tr><td>acceleration</td>
+<tr class="row-odd"><td>acceleration</td>
 <td>ACCL</td>
 <td>&nbsp;</td>
 <td>resolution</td>
 <td>MRES</td>
 </tr>
-<tr><td>back_accel</td>
+<tr class="row-even"><td>back_accel</td>
 <td>BACC</td>
 <td>&nbsp;</td>
 <td>motor_status</td>
 <td>MSTA</td>
 </tr>
-<tr><td>backlash</td>
+<tr class="row-odd"><td>backlash</td>
 <td>BDST</td>
 <td>&nbsp;</td>
 <td>offset</td>
 <td>OFF</td>
 </tr>
-<tr><td>back_speed</td>
+<tr class="row-even"><td>back_speed</td>
 <td>BVEL</td>
 <td>&nbsp;</td>
 <td>output_mode</td>
 <td>OMSL</td>
 </tr>
-<tr><td>card</td>
+<tr class="row-odd"><td>card</td>
 <td>CARD</td>
 <td>&nbsp;</td>
 <td>output</td>
 <td>OUT</td>
 </tr>
-<tr><td>dial_high_limit</td>
+<tr class="row-even"><td>dial_high_limit</td>
 <td>DHLM</td>
 <td>&nbsp;</td>
 <td>prop_gain</td>
 <td>PCOF</td>
 </tr>
-<tr><td>direction</td>
+<tr class="row-odd"><td>direction</td>
 <td>DIR</td>
 <td>&nbsp;</td>
 <td>precision</td>
 <td>PREC</td>
 </tr>
-<tr><td>dial_low_limit</td>
+<tr class="row-even"><td>dial_low_limit</td>
 <td>DLLM</td>
 <td>&nbsp;</td>
 <td>readback</td>
 <td>RBV</td>
 </tr>
-<tr><td>settle_time</td>
+<tr class="row-odd"><td>settle_time</td>
 <td>DLY</td>
 <td>&nbsp;</td>
 <td>retry_max</td>
 <td>RTRY</td>
 </tr>
-<tr><td>done_moving</td>
+<tr class="row-even"><td>done_moving</td>
 <td>DMOV</td>
 <td>&nbsp;</td>
 <td>retry_count</td>
 <td>RCNT</td>
 </tr>
-<tr><td>dial_readback</td>
+<tr class="row-odd"><td>dial_readback</td>
 <td>DRBV</td>
 <td>&nbsp;</td>
 <td>retry_deadband</td>
 <td>RDBD</td>
 </tr>
-<tr><td>description</td>
+<tr class="row-even"><td>description</td>
 <td>DESC</td>
 <td>&nbsp;</td>
 <td>dial_difference</td>
 <td>RDIF</td>
 </tr>
-<tr><td>dial_drive</td>
+<tr class="row-odd"><td>dial_drive</td>
 <td>DVAL</td>
 <td>&nbsp;</td>
 <td>raw_encoder_pos</td>
 <td>REP</td>
 </tr>
-<tr><td>units</td>
+<tr class="row-even"><td>units</td>
 <td>EGU</td>
 <td>&nbsp;</td>
 <td>raw_high_limit</td>
 <td>RHLS</td>
 </tr>
-<tr><td>encoder_step</td>
+<tr class="row-odd"><td>encoder_step</td>
 <td>ERES</td>
 <td>&nbsp;</td>
 <td>raw_low_limit</td>
 <td>RLLS</td>
 </tr>
-<tr><td>freeze_offset</td>
+<tr class="row-even"><td>freeze_offset</td>
 <td>FOFF</td>
 <td>&nbsp;</td>
 <td>relative_value</td>
 <td>RLV</td>
 </tr>
-<tr><td>move_fraction</td>
+<tr class="row-odd"><td>move_fraction</td>
 <td>FRAC</td>
 <td>&nbsp;</td>
 <td>raw_motor_pos</td>
 <td>RMP</td>
 </tr>
-<tr><td>hi_severity</td>
+<tr class="row-even"><td>hi_severity</td>
 <td>HHSV</td>
 <td>&nbsp;</td>
 <td>raw_readback</td>
 <td>RRBV</td>
 </tr>
-<tr><td>hi_alarm</td>
+<tr class="row-odd"><td>hi_alarm</td>
 <td>HIGH</td>
 <td>&nbsp;</td>
 <td>readback_res</td>
 <td>RRES</td>
 </tr>
-<tr><td>hihi_alarm</td>
+<tr class="row-even"><td>hihi_alarm</td>
 <td>HIHI</td>
 <td>&nbsp;</td>
 <td>raw_drive</td>
 <td>RVAL</td>
 </tr>
-<tr><td>high_limit</td>
+<tr class="row-odd"><td>high_limit</td>
 <td>HLM</td>
 <td>&nbsp;</td>
 <td>dial_speed</td>
 <td>RVEL</td>
 </tr>
-<tr><td>high_limit_set</td>
+<tr class="row-even"><td>high_limit_set</td>
 <td>HLS</td>
 <td>&nbsp;</td>
 <td>s_speed</td>
 <td>S</td>
 </tr>
-<tr><td>hw_limit</td>
+<tr class="row-odd"><td>hw_limit</td>
 <td>HLSV</td>
 <td>&nbsp;</td>
 <td>s_back_speed</td>
 <td>SBAK</td>
 </tr>
-<tr><td>home_forward</td>
+<tr class="row-even"><td>home_forward</td>
 <td>HOMF</td>
 <td>&nbsp;</td>
 <td>s_base_speed</td>
 <td>SBAS</td>
 </tr>
-<tr><td>home_reverse</td>
+<tr class="row-odd"><td>home_reverse</td>
 <td>HOMR</td>
 <td>&nbsp;</td>
 <td>s_max_speed</td>
 <td>SMAX</td>
 </tr>
-<tr><td>high_op_range</td>
+<tr class="row-even"><td>high_op_range</td>
 <td>HOPR</td>
 <td>&nbsp;</td>
 <td>set</td>
 <td>SET</td>
 </tr>
-<tr><td>high_severity</td>
+<tr class="row-odd"><td>high_severity</td>
 <td>HSV</td>
 <td>&nbsp;</td>
 <td>stop_go</td>
 <td>SPMG</td>
 </tr>
-<tr><td>integral_gain</td>
+<tr class="row-even"><td>integral_gain</td>
 <td>ICOF</td>
 <td>&nbsp;</td>
 <td>s_revolutions</td>
 <td>SREV</td>
 </tr>
-<tr><td>jog_accel</td>
+<tr class="row-odd"><td>jog_accel</td>
 <td>JAR</td>
 <td>&nbsp;</td>
 <td>stop</td>
 <td>STOP</td>
 </tr>
-<tr><td>jog_forward</td>
+<tr class="row-even"><td>jog_forward</td>
 <td>JOGF</td>
 <td>&nbsp;</td>
 <td>t_direction</td>
 <td>TDIR</td>
 </tr>
-<tr><td>jog_reverse</td>
+<tr class="row-odd"><td>jog_reverse</td>
 <td>JOGR</td>
 <td>&nbsp;</td>
 <td>tweak_forward</td>
 <td>TWF</td>
 </tr>
-<tr><td>jog_speed</td>
+<tr class="row-even"><td>jog_speed</td>
 <td>JVEL</td>
 <td>&nbsp;</td>
 <td>tweak_reverse</td>
 <td>TWR</td>
 </tr>
-<tr><td>last_dial_val</td>
+<tr class="row-odd"><td>last_dial_val</td>
 <td>LDVL</td>
 <td>&nbsp;</td>
 <td>tweak_val</td>
 <td>TWV</td>
 </tr>
-<tr><td>low_limit</td>
+<tr class="row-even"><td>low_limit</td>
 <td>LLM</td>
 <td>&nbsp;</td>
 <td>use_encoder</td>
 <td>UEIP</td>
 </tr>
-<tr><td>low_limit_set</td>
+<tr class="row-odd"><td>low_limit_set</td>
 <td>LLS</td>
 <td>&nbsp;</td>
 <td>u_revolutions</td>
 <td>UREV</td>
 </tr>
-<tr><td>lo_severity</td>
+<tr class="row-even"><td>lo_severity</td>
 <td>LLSV</td>
 <td>&nbsp;</td>
 <td>use_rdbl</td>
 <td>URIP</td>
 </tr>
-<tr><td>lolo_alarm</td>
+<tr class="row-odd"><td>lolo_alarm</td>
 <td>LOLO</td>
 <td>&nbsp;</td>
 <td>drive</td>
 <td>VAL</td>
 </tr>
-<tr><td>low_op_range</td>
+<tr class="row-even"><td>low_op_range</td>
 <td>LOPR</td>
 <td>&nbsp;</td>
 <td>base_speed</td>
 <td>VBAS</td>
 </tr>
-<tr><td>low_alarm</td>
+<tr class="row-odd"><td>low_alarm</td>
 <td>LOW</td>
 <td>&nbsp;</td>
 <td>slew_speed</td>
 <td>VELO</td>
 </tr>
-<tr><td>last_rel_val</td>
+<tr class="row-even"><td>last_rel_val</td>
 <td>LRLV</td>
 <td>&nbsp;</td>
 <td>version</td>
 <td>VERS</td>
 </tr>
-<tr><td>last_dial_drive</td>
+<tr class="row-odd"><td>last_dial_drive</td>
 <td>LRVL</td>
 <td>&nbsp;</td>
 <td>max_speed</td>
 <td>VMAX</td>
 </tr>
-<tr><td>last_SPMG</td>
+<tr class="row-even"><td>last_SPMG</td>
 <td>LSPG</td>
 <td>&nbsp;</td>
 <td>use_home</td>
 <td>ATHM</td>
 </tr>
-<tr><td>low_severity</td>
+<tr class="row-odd"><td>low_severity</td>
 <td>LSV</td>
 <td>&nbsp;</td>
 <td>deriv_gain</td>
@@ -591,9 +593,9 @@ corresponding attribute name of the Motor Record field.</div></blockquote>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>attr</strong> (<em>string (from table above)</em>) -- attribute name</li>
-<li><strong>as_string</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/ <tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to return string value.</li>
+<li><strong>as_string</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/ <tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to return string value.</li>
 </ul>
 </td>
 </tr>
@@ -618,10 +620,10 @@ attribute cannot do so:</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>attr</strong> (<em>string (from table above)</em>) -- attribute name</li>
 <li><strong>value</strong> -- value for attribute</li>
-<li><strong>wait</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to wait for completion.</li>
+<li><strong>wait</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to wait for completion.</li>
 <li><strong>timeout</strong> (<em>float</em>) -- time (in seconds) to wait before giving up trying to connect.</li>
 </ul>
 </td>
@@ -635,7 +637,7 @@ attribute cannot do so:</p>
 <tt class="descclassname">motor.</tt><tt class="descname">check_limits</tt><big>(</big><big>)</big><a class="headerlink" href="#motor.check_limits" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks whether the current motor position is causing a motor limit
 violation, and raises a MotorLimitException if it is.</p>
-<p>returns <tt class="xref docutils literal"><span class="pre">None</span></tt> if there is no limit violation.</p>
+<p>returns <tt class="docutils literal"><span class="pre">None</span></tt> if there is no limit violation.</p>
 </dd></dl>
 
 <dl class="method">
@@ -646,13 +648,13 @@ violation, and raises a MotorLimitException if it is.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>value</strong> -- target value</li>
 <li><strong>limits</strong> (<em>string</em>) -- one of 'user', 'dial', or 'raw' for which limits to consider</li>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt></p>
 </td>
 </tr>
 </tbody>
@@ -667,7 +669,7 @@ violation, and raises a MotorLimitException if it is.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>val</strong> -- value to move to (float) [Must be provided]</li>
 <li><strong>relative</strong> -- move relative to current position    (T/F) [F]</li>
 <li><strong>wait</strong> -- whether to wait for move to complete (T/F) [F]</li>
@@ -678,7 +680,7 @@ violation, and raises a MotorLimitException if it is.</p>
 </ul>
 </td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">see below</p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">see below</p>
 </td>
 </tr>
 </tbody>
@@ -701,9 +703,9 @@ violation, and raises a MotorLimitException if it is.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>dir</strong> (<em>string: 'forward' (default) or 'reverse'</em>) -- direction of motion</li>
-<li><strong>wait</strong> (<tt class="xref docutils literal"><span class="pre">True</span></tt>/<tt class="xref docutils literal"><span class="pre">False</span></tt>) -- whether to wait for completion</li>
+<li><strong>wait</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to wait for completion</li>
 <li><strong>timeout</strong> (<em>float</em>) -- max time for move to complete (in seconds) [default=300]</li>
 </ul>
 </td>
@@ -720,7 +722,7 @@ violation, and raises a MotorLimitException if it is.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>readback</strong> -- whether to return the readback position in the
 desired coordinate system.  The default is to return the
 drive position of the motor.</li>
@@ -745,7 +747,7 @@ The &quot;readback&quot; keyword can be used in user, dial or raw coordinates.</
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>position</strong> -- The new motor position</li>
 <li><strong>dial</strong> -- whether to set in dial coordinates. The default is user coordinates.</li>
 <li><strong>raw</strong> -- <p>whether to set in raw coordinates. The default is user  coordinates.</p>
@@ -969,7 +971,7 @@ directly invoking epics calls:</p>
     </div>
     <div class="footer">
         &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
     </div>
   </body>
 </html>
