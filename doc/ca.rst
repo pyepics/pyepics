@@ -1,9 +1,11 @@
-=========================================
-Low-Level Epics Interface
-=========================================
+=================================================
+ca: Low-level Channel Access module
+=================================================
 
+.. module:: ca
+   :synopsis: low-level Channel Access  module.
 
-The :mod:`epics.ca` module provides a low-level wrapping of the EPICS
+The :mod:`ca` module provides a low-level wrapping of the EPICS
 Channel Access (CA) library, using ctypes.  Most users of the `epics`
 module will not need to be concerned with most of the details here, and
 will instead use the simple functional interface (:func:`epics.caget`,
@@ -66,9 +68,6 @@ able to dynamically allocate memory, which is not necessary in Python.
 
 Initialization, Finalization, and Life-cycle
 ==============================================
-
-.. module:: ca
-   :synopsis: low-level Channel Access  module.
 
 The Channel Access library must be initialized before it can be used.
 There are 3 main reasons for this need:

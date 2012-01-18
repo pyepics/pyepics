@@ -1,15 +1,15 @@
 
-======================================
-Auto-saving
-======================================
+==========================================
+Auto-saving: simple save/restore of PVs
+==========================================
 
-.. module:: epics.autosave
+.. module:: autosave
    :synopsis: simple save/restore of PVs
 
 Overview
 ========
 
-The :mod:`epics.autosave` module provides simple save/restore
+The :mod:`autosave` module provides simple save/restore
 functionality for PVs, similar to the autosave module in synApps
 for IOCs but (obviously) via Channel Access.
 

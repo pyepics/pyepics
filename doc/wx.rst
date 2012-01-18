@@ -1,14 +1,14 @@
-======================================================
- wxPython Widgets for Epics
-======================================================
+=================================================
+wx: wxPython Widgets for Epics
+=================================================
 
-.. module:: epics.wx
+.. module:: wx
    :synopsis: wxPython Widgets for Epics
 
-The :mod:`epics.wx` module provides a set of wxPython classes for epics
-PVs. Most of these are derived from wxPython widgets, with special support
-added for epics PVs, especially regarding when to automatically update the
-widget based on a changing value for a PV.
+The :mod:`wx` module of :mod:`epics` (that is, **epics.wx**) provides a set
+of wxPython classes for epics PVs. Most of these are derived from wxPython
+widgets, with special support added for epics PVs, especially regarding
+when to automatically update the widget based on a changing value for a PV.
 
 .. _pyepics applications:    http://github.com/pyepics/epicsapps
 

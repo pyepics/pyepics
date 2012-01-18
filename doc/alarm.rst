@@ -1,12 +1,12 @@
-====================================
-Epics Alarms
-====================================
+================================================
+Alarms: respond when a PV goes out of range
+================================================
 
 Overview
 ===========
 
 .. module:: alarm
-   :synopsis: an alarm to run user-supplied code when a PV goes out of range
+   :synopsis: respond when a PV goes out of range by running user-supplied code
 
 The :mod:`alarm` module provides an Alarm object to specify an alarm
 condition and what to do when that condition is met.

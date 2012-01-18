@@ -260,8 +260,7 @@ desired::
     >>> print caget('XXX:dir')      # A CHAR waveform
     array([ 84,  58,  92, 120,  97, 115,  95, 117, 115,
        101, 114,  92,  77,  97, 114,  99, 104,  50,  48,
-        49,  48,  92,  70,  97, 115, 116,  77,  97, 112,
-         0,   0, ... 0])
+        49,  48,  92,  70,  97, 115, 116,  77,  97, 112])
 
     >>> print caget('XXX:dir',as_string=True)
     'T:\\xas_user\\March2010\\Fastmap'

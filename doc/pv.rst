@@ -1,7 +1,7 @@
 ..  _pv-label:
 
 ==============================
-The Epics PV class
+PV: Epics Process Variables
 ==============================
 
 
