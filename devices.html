@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Epics Devices &mdash; Epics Channel Access for Python</title>
+    <title>Devices: collections of PVs &mdash; Epics Channel Access for Python</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,8 +26,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Epics Channel Access for Python" href="index.html" />
-    <link rel="next" title="Epics Alarms" href="alarm.html" />
-    <link rel="prev" title="Auto-saving" href="autosave.html" /> 
+    <link rel="next" title="Alarms: respond when a PV goes out of range" href="alarm.html" />
+    <link rel="prev" title="ca: Low-level Channel Access module" href="ca.html" /> 
   </head>
   <body>
 <div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
@@ -44,27 +44,29 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="alarm.html" title="Epics Alarms"
+          <a href="alarm.html" title="Alarms: respond when a PV goes out of range"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="autosave.html" title="Auto-saving"
+          <a href="ca.html" title="ca: Low-level Channel Access module"
              accesskey="P">previous</a> |</li>
-   <li><a href="overview.html">Overview</a>|&nbsp;</li>
-   <li><a href="installation.html">Download</a>|&nbsp;</li>
-   <li><a href="pv.html">PVs</a>|&nbsp;</li>
-   <li><a href="#">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
-   <li><a href="more.html">More...</a>|&nbsp;</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+   <li><a href="overview.html">overview</a>|</li>
+   <li><a href="installation.html">download</a>|</li>
+   <li><a href="pv.html">pv</a>|</li>
+   <li><a href="ca.html">ca</a>|</li>
+   <li><a href="#">devices</a>|</li>
+   <li><a href="wx.html">wx</a>|</li>
+   <li><a href="advanced.html">advanced</a>|</li>
+   <li><a href="more.html">contents</a>|</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
-    </div>
+    </div> 
 
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Epics Devices</a><ul>
+<li><a class="reference internal" href="#">Devices: collections of PVs</a><ul>
 <li><a class="reference internal" href="#module-device">Overview</a></li>
 <li><a class="reference internal" href="#module-motor">Epics Motor Device</a><ul>
 <li><a class="reference internal" href="#the-epics-motor-class">The <tt class="docutils literal"><span class="pre">epics.Motor</span></tt> class</a></li>
@@ -82,11 +84,11 @@
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="autosave.html"
-                        title="previous chapter">Auto-saving</a></p>
+  <p class="topless"><a href="ca.html"
+                        title="previous chapter">ca: Low-level Channel Access module</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="alarm.html"
-                        title="next chapter">Epics Alarms</a></p>
+                        title="next chapter">Alarms: respond when a PV goes out of range</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/devices.txt"
@@ -113,18 +115,18 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="epics-devices">
-<h1>Epics Devices<a class="headerlink" href="#epics-devices" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="devices-collections-of-pvs">
+<h1>Devices: collections of PVs<a class="headerlink" href="#devices-collections-of-pvs" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-device">
 <span id="overview"></span><h2>Overview<a class="headerlink" href="#module-device" title="Permalink to this headline">¶</a></h2>
-<p>The <tt class="xref py py-mod docutils literal"><span class="pre">epics.devices</span></tt> module provides a simple interface to a collection
-of PVs.  Here a <strong>device*</strong> holds a set of PVs, all sharing a prefix, but
-having many <em>attributes</em>.  Many PVs will have names made up of
-<em>prefix+attribute</em>, with a common prefix for several related PVs.  This
-almost describes an Epics Record, but as it is concerned only with PV
-names, the mapping to an Epics Record is not exact.  On the other hand, the
-concept of a <em>device</em> is more flexible than a predefined Epics Record as it
-can actually hold PVs from several different records.:</p>
+<p>The <a class="reference internal" href="#module-device" title="device: collections of related PVs"><tt class="xref py py-mod docutils literal"><span class="pre">device</span></tt></a> module provides a simple interface to a collection of
+PVs.  Here an epics <a class="reference internal" href="#device.Device" title="device.Device"><tt class="xref py py-class docutils literal"><span class="pre">device.Device</span></tt></a> is an object holding a set of
+PVs, all sharing a prefix, but having many <em>attributes</em>.  Many PVs will
+have names made up of <em>prefix+attribute</em>, with a common prefix for several
+related PVs.  This almost describes an Epics Record, but as it is concerned
+only with PV names, the mapping to an Epics Record is not exact.  On the
+other hand, the concept of a <em>device</em> is more flexible than a predefined
+Epics Record as it can actually hold PVs from several different records.:</p>
 <div class="highlight-python"><pre>motor1 = epics.Device('XXX:motor1.', attr=('VAL', 'RBV', 'DESC', 'RVAL',
                                            'LVIO', 'HLS', 'LLS'))
 motor1.put('VAL', 1)
@@ -955,18 +957,20 @@ directly invoking epics calls:</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="alarm.html" title="Epics Alarms"
+          <a href="alarm.html" title="Alarms: respond when a PV goes out of range"
              >next</a> |</li>
         <li class="right" >
-          <a href="autosave.html" title="Auto-saving"
+          <a href="ca.html" title="ca: Low-level Channel Access module"
              >previous</a> |</li>
-   <li><a href="overview.html">Overview</a>|&nbsp;</li>
-   <li><a href="installation.html">Download</a>|&nbsp;</li>
-   <li><a href="pv.html">PVs</a>|&nbsp;</li>
-   <li><a href="#">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
-   <li><a href="more.html">More...</a>|&nbsp;</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+   <li><a href="overview.html">overview</a>|</li>
+   <li><a href="installation.html">download</a>|</li>
+   <li><a href="pv.html">pv</a>|</li>
+   <li><a href="ca.html">ca</a>|</li>
+   <li><a href="#">devices</a>|</li>
+   <li><a href="wx.html">wx</a>|</li>
+   <li><a href="advanced.html">advanced</a>|</li>
+   <li><a href="more.html">contents</a>|</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
     </div>

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Low-Level Epics Interface &mdash; Epics Channel Access for Python</title>
+    <title>ca: Low-level Channel Access module &mdash; Epics Channel Access for Python</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,8 +26,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Epics Channel Access for Python" href="index.html" />
-    <link rel="next" title="Advanced Topic with Python Channel Access" href="advanced.html" />
-    <link rel="prev" title="The Epics PV class" href="pv.html" /> 
+    <link rel="next" title="Devices: collections of PVs" href="devices.html" />
+    <link rel="prev" title="PV: Epics Process Variables" href="pv.html" /> 
   </head>
   <body>
 <div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
@@ -44,33 +44,35 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="advanced.html" title="Advanced Topic with Python Channel Access"
+          <a href="devices.html" title="Devices: collections of PVs"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="pv.html" title="The Epics PV class"
+          <a href="pv.html" title="PV: Epics Process Variables"
              accesskey="P">previous</a> |</li>
-   <li><a href="overview.html">Overview</a>|&nbsp;</li>
-   <li><a href="installation.html">Download</a>|&nbsp;</li>
-   <li><a href="pv.html">PVs</a>|&nbsp;</li>
-   <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
-   <li><a href="more.html">More...</a>|&nbsp;</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+   <li><a href="overview.html">overview</a>|</li>
+   <li><a href="installation.html">download</a>|</li>
+   <li><a href="pv.html">pv</a>|</li>
+   <li><a href="#">ca</a>|</li>
+   <li><a href="devices.html">devices</a>|</li>
+   <li><a href="wx.html">wx</a>|</li>
+   <li><a href="advanced.html">advanced</a>|</li>
+   <li><a href="more.html">contents</a>|</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
-    </div>
+    </div> 
 
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Low-Level Epics Interface</a><ul>
+<li><a class="reference internal" href="#">ca: Low-level Channel Access module</a><ul>
 <li><a class="reference internal" href="#general-description-difference-with-c-library">General description, difference with C library</a><ul>
 <li><a class="reference internal" href="#name-mangling">Name Mangling</a></li>
 <li><a class="reference internal" href="#other-changes-and-omissions">Other Changes and Omissions</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-ca">Initialization, Finalization, and Life-cycle</a></li>
+<li><a class="reference internal" href="#initialization-finalization-and-life-cycle">Initialization, Finalization, and Life-cycle</a></li>
 <li><a class="reference internal" href="#using-the-ca-module">Using the CA module</a><ul>
 <li><a class="reference internal" href="#creating-and-connecting-to-channels">Creating and Connecting to Channels</a></li>
 <li><a class="reference internal" href="#interacting-with-connected-channels">Interacting with Connected Channels</a></li>
@@ -100,10 +102,10 @@
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="pv.html"
-                        title="previous chapter">The Epics PV class</a></p>
+                        title="previous chapter">PV: Epics Process Variables</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="advanced.html"
-                        title="next chapter">Advanced Topic with Python Channel Access</a></p>
+  <p class="topless"><a href="devices.html"
+                        title="next chapter">Devices: collections of PVs</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/ca.txt"
@@ -130,9 +132,9 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="low-level-epics-interface">
-<h1>Low-Level Epics Interface<a class="headerlink" href="#low-level-epics-interface" title="Permalink to this headline">¶</a></h1>
-<p>The <tt class="xref py py-mod docutils literal"><span class="pre">epics.ca</span></tt> module provides a low-level wrapping of the EPICS
+  <div class="section" id="module-ca">
+<span id="ca-low-level-channel-access-module"></span><h1>ca: Low-level Channel Access module<a class="headerlink" href="#module-ca" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module provides a low-level wrapping of the EPICS
 Channel Access (CA) library, using ctypes.  Most users of the <cite>epics</cite>
 module will not need to be concerned with most of the details here, and
 will instead use the simple functional interface (<a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a>,
@@ -180,8 +182,8 @@ functions are also not supported, as they appear to be needed only to be
 able to dynamically allocate memory, which is not necessary in Python.</p>
 </div>
 </div>
-<div class="section" id="module-ca">
-<span id="initialization-finalization-and-life-cycle"></span><span id="ca-init-label"></span><h2>Initialization, Finalization, and Life-cycle<a class="headerlink" href="#module-ca" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="initialization-finalization-and-life-cycle">
+<span id="ca-init-label"></span><h2>Initialization, Finalization, and Life-cycle<a class="headerlink" href="#initialization-finalization-and-life-cycle" title="Permalink to this headline">¶</a></h2>
 <p>The Channel Access library must be initialized before it can be used.
 There are 3 main reasons for this need:</p>
 <blockquote>
@@ -1393,18 +1395,20 @@ callback should be prepared to accept keyword arguments of <cite>pvname</cite>,
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="advanced.html" title="Advanced Topic with Python Channel Access"
+          <a href="devices.html" title="Devices: collections of PVs"
              >next</a> |</li>
         <li class="right" >
-          <a href="pv.html" title="The Epics PV class"
+          <a href="pv.html" title="PV: Epics Process Variables"
              >previous</a> |</li>
-   <li><a href="overview.html">Overview</a>|&nbsp;</li>
-   <li><a href="installation.html">Download</a>|&nbsp;</li>
-   <li><a href="pv.html">PVs</a>|&nbsp;</li>
-   <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
-   <li><a href="more.html">More...</a>|&nbsp;</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+   <li><a href="overview.html">overview</a>|</li>
+   <li><a href="installation.html">download</a>|</li>
+   <li><a href="pv.html">pv</a>|</li>
+   <li><a href="#">ca</a>|</li>
+   <li><a href="devices.html">devices</a>|</li>
+   <li><a href="wx.html">wx</a>|</li>
+   <li><a href="advanced.html">advanced</a>|</li>
+   <li><a href="more.html">contents</a>|</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
     </div>

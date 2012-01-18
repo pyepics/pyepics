@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>wxPython Widgets for Epics &mdash; Epics Channel Access for Python</title>
+    <title>wx: wxPython Widgets for Epics &mdash; Epics Channel Access for Python</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,8 +26,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Epics Channel Access for Python" href="index.html" />
-    <link rel="next" title="Applications built with PyEpics" href="apps.html" />
-    <link rel="prev" title="Epics Alarms" href="alarm.html" /> 
+    <link rel="next" title="Advanced Topic with Python Channel Access" href="advanced.html" />
+    <link rel="prev" title="Auto-saving: simple save/restore of PVs" href="autosave.html" /> 
   </head>
   <body>
 <div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
@@ -44,27 +44,29 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="apps.html" title="Applications built with PyEpics"
+          <a href="advanced.html" title="Advanced Topic with Python Channel Access"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="alarm.html" title="Epics Alarms"
+          <a href="autosave.html" title="Auto-saving: simple save/restore of PVs"
              accesskey="P">previous</a> |</li>
-   <li><a href="overview.html">Overview</a>|&nbsp;</li>
-   <li><a href="installation.html">Download</a>|&nbsp;</li>
-   <li><a href="pv.html">PVs</a>|&nbsp;</li>
-   <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="#">wxWidgets</a>|&nbsp;</li>
-   <li><a href="more.html">More...</a>|&nbsp;</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+   <li><a href="overview.html">overview</a>|</li>
+   <li><a href="installation.html">download</a>|</li>
+   <li><a href="pv.html">pv</a>|</li>
+   <li><a href="ca.html">ca</a>|</li>
+   <li><a href="devices.html">devices</a>|</li>
+   <li><a href="#">wx</a>|</li>
+   <li><a href="advanced.html">advanced</a>|</li>
+   <li><a href="more.html">contents</a>|</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
-    </div>
+    </div> 
 
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">wxPython Widgets for Epics</a><ul>
+<li><a class="reference internal" href="#">wx: wxPython Widgets for Epics</a><ul>
 <li><a class="reference internal" href="#pv-aware-widgets">PV-aware Widgets</a><ul>
 <li><a class="reference internal" href="#pvmixin">PVMixin</a></li>
 <li><a class="reference internal" href="#pvctrlmixin">PVCtrlMixin</a></li>
@@ -96,11 +98,11 @@
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="alarm.html"
-                        title="previous chapter">Epics Alarms</a></p>
+  <p class="topless"><a href="autosave.html"
+                        title="previous chapter">Auto-saving: simple save/restore of PVs</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="apps.html"
-                        title="next chapter">Applications built with PyEpics</a></p>
+  <p class="topless"><a href="advanced.html"
+                        title="next chapter">Advanced Topic with Python Channel Access</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/wx.txt"
@@ -128,11 +130,11 @@
           <div class="body">
             
   <div class="section" id="module-wx">
-<span id="wxpython-widgets-for-epics"></span><h1>wxPython Widgets for Epics<a class="headerlink" href="#module-wx" title="Permalink to this headline">¶</a></h1>
-<p>The <tt class="xref py py-mod docutils literal"><span class="pre">epics.wx</span></tt> module provides a set of wxPython classes for epics
-PVs. Most of these are derived from wxPython widgets, with special support
-added for epics PVs, especially regarding when to automatically update the
-widget based on a changing value for a PV.</p>
+<span id="wx-wxpython-widgets-for-epics"></span><h1>wx: wxPython Widgets for Epics<a class="headerlink" href="#module-wx" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#module-wx" title="wx: wxPython Widgets for Epics"><tt class="xref py py-mod docutils literal"><span class="pre">wx</span></tt></a> module of <a class="reference internal" href="overview.html#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><tt class="xref py py-mod docutils literal"><span class="pre">epics</span></tt></a> (that is, <strong>epics.wx</strong>) provides a set
+of wxPython classes for epics PVs. Most of these are derived from wxPython
+widgets, with special support added for epics PVs, especially regarding
+when to automatically update the widget based on a changing value for a PV.</p>
 <p>Some examples of code that uses pyepics and wxPython are included in the
 <em>scripts</em> folder of the pyepics source distribution kit.  In addition,
 there are a some full-fledged applications using Epics and wxPython at
@@ -565,18 +567,20 @@ as it changes.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="apps.html" title="Applications built with PyEpics"
+          <a href="advanced.html" title="Advanced Topic with Python Channel Access"
              >next</a> |</li>
         <li class="right" >
-          <a href="alarm.html" title="Epics Alarms"
+          <a href="autosave.html" title="Auto-saving: simple save/restore of PVs"
              >previous</a> |</li>
-   <li><a href="overview.html">Overview</a>|&nbsp;</li>
-   <li><a href="installation.html">Download</a>|&nbsp;</li>
-   <li><a href="pv.html">PVs</a>|&nbsp;</li>
-   <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="#">wxWidgets</a>|&nbsp;</li>
-   <li><a href="more.html">More...</a>|&nbsp;</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+   <li><a href="overview.html">overview</a>|</li>
+   <li><a href="installation.html">download</a>|</li>
+   <li><a href="pv.html">pv</a>|</li>
+   <li><a href="ca.html">ca</a>|</li>
+   <li><a href="devices.html">devices</a>|</li>
+   <li><a href="#">wx</a>|</li>
+   <li><a href="advanced.html">advanced</a>|</li>
+   <li><a href="more.html">contents</a>|</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
     </div>

@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Epics Channel Access for Python" href="index.html" />
-    <link rel="next" title="The Epics PV class" href="pv.html" />
+    <link rel="next" title="PV: Epics Process Variables" href="pv.html" />
     <link rel="prev" title="Downloading and Installation" href="installation.html" /> 
   </head>
   <body>
@@ -44,21 +44,23 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="pv.html" title="The Epics PV class"
+          <a href="pv.html" title="PV: Epics Process Variables"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="installation.html" title="Downloading and Installation"
              accesskey="P">previous</a> |</li>
-   <li><a href="#">Overview</a>|&nbsp;</li>
-   <li><a href="installation.html">Download</a>|&nbsp;</li>
-   <li><a href="pv.html">PVs</a>|&nbsp;</li>
-   <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
-   <li><a href="more.html">More...</a>|&nbsp;</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+   <li><a href="#">overview</a>|</li>
+   <li><a href="installation.html">download</a>|</li>
+   <li><a href="pv.html">pv</a>|</li>
+   <li><a href="ca.html">ca</a>|</li>
+   <li><a href="devices.html">devices</a>|</li>
+   <li><a href="wx.html">wx</a>|</li>
+   <li><a href="advanced.html">advanced</a>|</li>
+   <li><a href="more.html">contents</a>|</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
-    </div>
+    </div> 
 
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
@@ -89,7 +91,7 @@
                         title="previous chapter">Downloading and Installation</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="pv.html"
-                        title="next chapter">The Epics PV class</a></p>
+                        title="next chapter">PV: Epics Process Variables</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/overview.txt"
@@ -259,7 +261,7 @@ attribute:</p>
 monitoring changes to the PVs and defining functions to be run when the
 value does change.  There are also attributes associated with a PVs
 <em>Control Attributes</em>, like those shown above in the <tt class="xref py py-attr docutils literal"><span class="pre">info</span></tt> attribute.
-Further details are at <a class="reference internal" href="pv.html#pv-label"><em>The Epics PV class</em></a>.</p>
+Further details are at <a class="reference internal" href="pv.html#pv-label"><em>PV: Epics Process Variables</em></a>.</p>
 </div>
 </div>
 <div class="section" id="module-epics">
@@ -362,8 +364,7 @@ desired:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:dir&#39;</span><span class="p">)</span>      <span class="c"># A CHAR waveform</span>
 <span class="go">array([ 84,  58,  92, 120,  97, 115,  95, 117, 115,</span>
 <span class="go">   101, 114,  92,  77,  97, 114,  99, 104,  50,  48,</span>
-<span class="go">    49,  48,  92,  70,  97, 115, 116,  77,  97, 112,</span>
-<span class="go">     0,   0, ... 0])</span>
+<span class="go">    49,  48,  92,  70,  97, 115, 116,  77,  97, 112])</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:dir&#39;</span><span class="p">,</span><span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">&#39;T:\\xas_user\\March2010\\Fastmap&#39;</span>
@@ -600,18 +601,20 @@ extremely well-tested.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="pv.html" title="The Epics PV class"
+          <a href="pv.html" title="PV: Epics Process Variables"
              >next</a> |</li>
         <li class="right" >
           <a href="installation.html" title="Downloading and Installation"
              >previous</a> |</li>
-   <li><a href="#">Overview</a>|&nbsp;</li>
-   <li><a href="installation.html">Download</a>|&nbsp;</li>
-   <li><a href="pv.html">PVs</a>|&nbsp;</li>
-   <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
-   <li><a href="more.html">More...</a>|&nbsp;</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+   <li><a href="#">overview</a>|</li>
+   <li><a href="installation.html">download</a>|</li>
+   <li><a href="pv.html">pv</a>|</li>
+   <li><a href="ca.html">ca</a>|</li>
+   <li><a href="devices.html">devices</a>|</li>
+   <li><a href="wx.html">wx</a>|</li>
+   <li><a href="advanced.html">advanced</a>|</li>
+   <li><a href="more.html">contents</a>|</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
     </div>

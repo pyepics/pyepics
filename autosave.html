@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Auto-saving &mdash; Epics Channel Access for Python</title>
+    <title>Auto-saving: simple save/restore of PVs &mdash; Epics Channel Access for Python</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,8 +26,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Epics Channel Access for Python" href="index.html" />
-    <link rel="next" title="Epics Devices" href="devices.html" />
-    <link rel="prev" title="Advanced Topic with Python Channel Access" href="advanced.html" /> 
+    <link rel="next" title="wxPython Widgets for Epics" href="wx.html" />
+    <link rel="prev" title="Alarms: respond when a PV goes out of range" href="alarm.html" /> 
   </head>
   <body>
 <div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
@@ -44,27 +44,29 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="devices.html" title="Epics Devices"
+          <a href="wx.html" title="wxPython Widgets for Epics"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="advanced.html" title="Advanced Topic with Python Channel Access"
+          <a href="alarm.html" title="Alarms: respond when a PV goes out of range"
              accesskey="P">previous</a> |</li>
-   <li><a href="overview.html">Overview</a>|&nbsp;</li>
-   <li><a href="installation.html">Download</a>|&nbsp;</li>
-   <li><a href="pv.html">PVs</a>|&nbsp;</li>
-   <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
-   <li><a href="more.html">More...</a>|&nbsp;</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+   <li><a href="overview.html">overview</a>|</li>
+   <li><a href="installation.html">download</a>|</li>
+   <li><a href="pv.html">pv</a>|</li>
+   <li><a href="ca.html">ca</a>|</li>
+   <li><a href="devices.html">devices</a>|</li>
+   <li><a href="wx.html">wx</a>|</li>
+   <li><a href="advanced.html">advanced</a>|</li>
+   <li><a href="more.html">contents</a>|</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
-    </div>
+    </div> 
 
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Auto-saving</a><ul>
+<li><a class="reference internal" href="#">Auto-saving: simple save/restore of PVs</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
@@ -72,11 +74,11 @@
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="advanced.html"
-                        title="previous chapter">Advanced Topic with Python Channel Access</a></p>
+  <p class="topless"><a href="alarm.html"
+                        title="previous chapter">Alarms: respond when a PV goes out of range</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="devices.html"
-                        title="next chapter">Epics Devices</a></p>
+  <p class="topless"><a href="wx.html"
+                        title="next chapter">wxPython Widgets for Epics</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/autosave.txt"
@@ -103,11 +105,11 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="auto-saving">
-<h1>Auto-saving<a class="headerlink" href="#auto-saving" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-autosave">
+<span id="auto-saving-simple-save-restore-of-pvs"></span><h1>Auto-saving: simple save/restore of PVs<a class="headerlink" href="#module-autosave" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>The <tt class="xref py py-mod docutils literal"><span class="pre">epics.autosave</span></tt> module provides simple save/restore
+<p>The <a class="reference internal" href="#module-autosave" title="autosave: simple save/restore of PVs"><tt class="xref py py-mod docutils literal"><span class="pre">autosave</span></tt></a> module provides simple save/restore
 functionality for PVs, similar to the autosave module in synApps
 for IOCs but (obviously) via Channel Access.</p>
 <p>Request and Save file formats are designed to be compatible with
@@ -150,18 +152,20 @@ The web site is <a class="reference external" href="http://pyparsing.wikispaces.
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="devices.html" title="Epics Devices"
+          <a href="wx.html" title="wxPython Widgets for Epics"
              >next</a> |</li>
         <li class="right" >
-          <a href="advanced.html" title="Advanced Topic with Python Channel Access"
+          <a href="alarm.html" title="Alarms: respond when a PV goes out of range"
              >previous</a> |</li>
-   <li><a href="overview.html">Overview</a>|&nbsp;</li>
-   <li><a href="installation.html">Download</a>|&nbsp;</li>
-   <li><a href="pv.html">PVs</a>|&nbsp;</li>
-   <li><a href="devices.html">Devices</a>|&nbsp;</li>
-   <li><a href="wx.html">wxWidgets</a>|&nbsp;</li>
-   <li><a href="more.html">More...</a>|&nbsp;</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a>&nbsp;</li>
+   <li><a href="overview.html">overview</a>|</li>
+   <li><a href="installation.html">download</a>|</li>
+   <li><a href="pv.html">pv</a>|</li>
+   <li><a href="ca.html">ca</a>|</li>
+   <li><a href="devices.html">devices</a>|</li>
+   <li><a href="wx.html">wx</a>|</li>
+   <li><a href="advanced.html">advanced</a>|</li>
+   <li><a href="more.html">contents</a>|</li>
+   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
     </div>
