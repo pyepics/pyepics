@@ -24,9 +24,16 @@ programming support to Epics.  These include groups of related PVs in
 :mod:`autosave` module.  Finally, there is support for conveniently
 tying epics PVs to wxPython widgets in the :mod:`wx` module.
 
+-----------
 
-Contents
-================
+In addition to the Pyepics library described here, several applications
+built with pyepics are available at `http://github.com/pyepics/epicsapps/
+<http://github.com/pyepics/epicsapps/>`_.  
+See
+`http://pyepics.github.com/epicsapps/
+<http://pyepics.github.com/epicsapps/>`_ for further details.
+
+-----------
    
 .. toctree::
    :maxdepth: 1
@@ -41,13 +48,3 @@ Contents
    wx
    advanced
 
-
-Applications built with PyEpics
-====================================
-
-In addition to the Pyepics library described here, several applications
-built with pyepics are available at `http://github.com/pyepics/epicsapps/
-<http://github.com/pyepics/epicsapps/>`_.  
-See
-`http://pyepics.github.com/epicsapps/
-<http://pyepics.github.com/epicsapps/>`_ for further details.
