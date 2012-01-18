@@ -3,6 +3,9 @@
 Auto-saving
 ======================================
 
+.. module:: epics.autosave
+   :synopsis: simple save/restore of PVs
+
 Overview
 ========
 

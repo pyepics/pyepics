@@ -8,7 +8,7 @@ The Epics PV class
 .. module:: pv
    :synopsis: PV objects for Epics Channel Access
 
-The :mod:`epics.pv` module provides a higher-level class :class:`PV`, which
+The :mod:`pv` module provides a higher-level class :class:`pv.PV`, which
 creates a `PV` object for an EPICS Process Variable.  A `PV` object has
 both methods and attributes for accessing it's properties.
 

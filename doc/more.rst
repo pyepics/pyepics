@@ -1,14 +1,19 @@
 
-More PyEpics Topics
-======================
+
+PyEpics Table of Contents
+============================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
+   installation
+   overview
+   pv
    ca
-   advanced
+   devices
    alarm
    autosave
+   wx
+   advanced
    apps
-
 

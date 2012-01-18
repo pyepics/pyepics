@@ -116,12 +116,9 @@ Development Version
 The PyEpics module is still under active development, with enhancements and
 bug-fixes are being added frequently.  All development is done through the
 `pyepics github repository`_.  To get a read-only copy of the latest
-version, use::
+version, use one of::
 
    git clone http://github.com/pyepics/pyepics.git
-
-or::
-
    git clone git@github.com/pyepics/pyepics.git
 
 Current and older source source kits, and Windows Installers can also be found
@@ -202,20 +199,6 @@ with it are distributed under the Epics Open License:
 
 .. include:: ../license.txt
 
-
-In plain words, this means
-
-  a. you can use this software for any purpose.
-
-  b. you can modify and redistribute this software if you keep existing copyright notices intact.
-
-  c. you cannot claim that you wrote this software or remove copyright notices.
-
-  d. you cannot claim the copyright holders endorse your use of this software.
-
-  e. you cannot claim the copyright holders owe you anything if the software does not work as you expect, and
-
-  f. if you are the US government, you can probably do whatever you want. ;)
 
 
 

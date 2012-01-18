@@ -2,7 +2,7 @@
  wxPython Widgets for Epics
 ======================================================
 
-.. module:: wx
+.. module:: epics.wx
    :synopsis: wxPython Widgets for Epics
 
 The :mod:`epics.wx` module provides a set of wxPython classes for epics

@@ -8,7 +8,7 @@ Overview
 .. module:: alarm
    :synopsis: an alarm to run user-supplied code when a PV goes out of range
 
-The :mod:`epics.alarm` module provides an Alarm object to specify an alarm
+The :mod:`alarm` module provides an Alarm object to specify an alarm
 condition and what to do when that condition is met.
 
 .. class:: Alarm(pvname[, comparison=None[, trip_point=None[, callback=None[, alert_delay=10]]]])
@@ -60,9 +60,8 @@ called when the alarm condition is met **and** the callback was not called
 within the time specified by  :attr:`alert_delay`.
 
 
-
 Alarm Example
-~~~~~~~~~~~~~~~~~~~~~~~~~
+===============
 
 An epics Alarm is very easy to use.  Here is an alarm set to print a
 message when a PV's value reaches a certain value::
