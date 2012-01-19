@@ -795,7 +795,7 @@ def native_type(ftype):
 def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     """unpack raw data returned from an array get or
     subscription callback"""
-    
+
     def array_cast(data, count, ntype, use_numpy):
         "cast ctypes array to numpy array (if using numpy)"
         if use_numpy:
@@ -853,7 +853,6 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
         ftype = field_type(chid)
     if ftype is None:
         ftype = dbr.INT
-
     ntype = native_type(ftype)
     use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and count > 1)
     return unpack(data, count, ntype, use_numpy)
@@ -953,6 +952,9 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
                   ftype=ftype, as_numpy=as_numpy)
     if as_string:
         val = _as_string(val, chid, count, ftype)
+    elif isinstance(val, ctypes.Array) and HAS_NUMPY and as_numpy:
+        val = numpy.array(val)
+        
     # value retrieved, clear cached value
     ncache['value'] = None
     return val
