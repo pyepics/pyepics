@@ -446,12 +446,12 @@ Possible values for :attr:`auto_monitor` are:
 
 ``None``
   The default value for *auto_monitor* is ``None``, and is set to
-  ``True`` if the element count for the PV is smaller than 16384 (The
-  value is set as :data:`ca.AUTOMONITOR_MAXLENGTH`).  To suppress
+  ``True`` if the element count for the PV is smaller than 
+  :data:`ca.AUTOMONITOR_MAXLENGTH` (default of 65536).  To suppress
   monitoring of PVs with fewer array values, you will have to explicitly
-  turn *auto_monitor* to ``False``. For waveform arrays larger than
-  16384 items, automatic monitoring will be ``False`` unless you
-  explicitly set it to ``True`` or an explicit mask.  See
+  turn *auto_monitor* to ``False``. For waveform arrays with more elements,
+  automatic monitoring will not be done unless you explicitly set
+  *auto_monitor=True*, or to an explicit mask.  See 
   :ref:`advanced-large-arrays-label` for more details.
 
 ``True``

@@ -129,11 +129,11 @@ initialization and finalization tasks are handled in the following way:
 
    sets the default array length (ie, how many elements an array has) above
    which automatic conversion to numpy arrays *and* automatic monitoring
-   for PV variables is suppressed.  The default value is 16384.  To be
+   for PV variables is suppressed.  The default value is 65536.  To be
    clear: waveforms with fewer elements than this value will be
    automatically monitored changes, and will be converted to numpy arrays
-   (if numpy is installed).  Larger waveforms will not be monitored.
-
+   (if numpy is installed).  Larger waveforms will not be automatically
+   monitored. 
 
    :ref:`advanced-large-arrays-label` for more details.
 

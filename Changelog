@@ -11,7 +11,7 @@
 
 	- ca.AUTOMONITOR_LENGTH is increased to 65536
 
-	- pv.get(as_numpy=True/False) fixed.
+	- pv.get(as_numpy=True/False) now works better.
 	
 
 2011-11-08  Matt Newville  <newville@cars.uchicago.edu>
