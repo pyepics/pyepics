@@ -420,7 +420,7 @@ def _onMonitorEvent(args):
     if args.type in (dbr.STRING, dbr.TIME_STRING, dbr.CTRL_STRING):
         nelem = dbr.MAX_STRING_SIZE
 
-    value = _unpack(value, count=nelem, ftype=args.type)
+    value = _unpack(args.chid, value, count=nelem, ftype=args.type)
     if hasattr(args.usr, '__call__'):
         args.usr(value=value, **kwds)
 
@@ -508,7 +508,7 @@ _CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onMonitorEvent)
 # contexts
 @withCA
 @withSEVCHK
-def context_create(context=None):
+def context_create():
     "create a context -- argument ignored in favor of PREEMPTIVE_CALLBACK"
     ctx = {False:0, True:1}[PREEMPTIVE_CALLBACK]
     return libca.ca_context_create(ctx)
@@ -792,7 +792,7 @@ def native_type(ftype):
         ntype -= dbr.TIME_STRING
     return ntype
 
-def _unpack(data, count=None, chid=None, ftype=None, as_numpy=True):
+def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     """unpack raw data returned from an array get or
     subscription callback"""
     
@@ -949,7 +949,8 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
             warnings.warn(msg % (name(chid), timeout))
             return None
 
-    val = _unpack(ncache['value'], count=count, ftype=ftype, as_numpy=as_numpy)
+    val = _unpack(chid, ncache['value'], count=count,
+                  ftype=ftype, as_numpy=as_numpy)
     if as_string:
         val = _as_string(val, chid, count, ftype)
     # value retrieved, clear cached value
@@ -1221,7 +1222,7 @@ def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
     PySEVCHK('sg_get', ret)
     poll()
 
-    val = _unpack(data, count=count, ftype=ftype, as_numpy=as_numpy)
+    val = _unpack(chid, data, count=count, ftype=ftype, as_numpy=as_numpy)
     if as_string:
         val = _as_string(val, chid, count, ftype)
     return val
