@@ -217,13 +217,11 @@ class PV(object):
         if with_ctrlvars and getattr(self, 'units', None) is None:
             self.get_ctrlvars()
 
-        # print "PV Get", self.auto_monitor, self._args['value'] is None, count, as_numpy, as_string, ca.HAS_NUMPY
         if ((not use_monitor) or
             (not self.auto_monitor) or
             (self._args['value'] is None) or
             (count is not None and count > len(self._args['value']))): 
             ca_get = ca.get
-            # print(" Explicit Get ", count, len(self._args['value']), ca_get)
             if ca.get_cache(self.pvname)['value'] is not None:
                 ca_get = ca.get_complete
             self._args['value'] = ca_get(self.chid, ftype=self.ftype,

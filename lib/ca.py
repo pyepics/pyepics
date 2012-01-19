@@ -69,7 +69,7 @@ AUTO_CLEANUP = True
 ##
 # maximum element count for auto-monitoring of PVs in epics.pv
 # and for automatic conversion of numerical array data to numpy arrays
-AUTOMONITOR_MAXLENGTH = 16384
+AUTOMONITOR_MAXLENGTH = 65536 # 16384
 
 ## default timeout for connection
 #   This should be kept fairly short --

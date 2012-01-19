@@ -1,3 +1,19 @@
+2012-01-19  Matt Newville  <newville@cars.uchicago.edu>
+
+	* Version 3.2.0:
+
+	- improved support for get(), especially for large arrays.
+
+	Data for waveform arrays will normally be converted to
+	numpy arrays, which is now faster.  If numpy is not
+	available, the data will no longer be converted to a list
+	(which is very, very slow), but left as raw ctypes Array.
+
+	- ca.AUTOMONITOR_LENGTH is increased to 65536
+
+	- pv.get(as_numpy=True/False) fixed.
+	
+
 2011-11-08  Matt Newville  <newville@cars.uchicago.edu>
 
 	* Version 3.1.4:
