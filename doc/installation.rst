@@ -25,7 +25,7 @@ setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 
 The Python `numpy module <http://numpy.scipy.org/>`_ is not required, but
 will be used to convert EPICS waveforms values into numerical array data if
-available, and its use is encouraged.
+available, and its use is strongly encouraged.
 
 Downloads
 ~~~~~~~~~~~~~
