@@ -10,8 +10,8 @@ import time
 import copy
 from math import log10
 
-from . import ca
-from . import dbr
+import ca
+import dbr
 
 def fmt_time(tstamp=None):
     "simple formatter for time values"
@@ -51,7 +51,7 @@ class PV(object):
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
     def __init__(self, pvname, callback=None, form='native',
-                 verbose=False, auto_monitor=None, 
+                 verbose=False, auto_monitor=None,
                  connection_callback=None,
                  connection_timeout=None):
 
@@ -97,14 +97,14 @@ class PV(object):
 
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
-        # occassionally chid is still None (ie if a second PV is created while
-        # __on_connect is still pending for the first one.)
+        # occassionally chid is still None (ie if a second PV is created
+        # while __on_connect is still pending for the first one.)
         # Just return here, and connection will happen later
         if self.chid is None and chid is None:
             time.sleep(0.001)
             return
         if conn:
-            self.poll()
+            ca.poll()
             self.chid = self._args['chid'] = dbr.chid_t(chid)
             try:
                 count = ca.element_count(self.chid)
@@ -132,7 +132,9 @@ class PV(object):
                 # (ie dbr.DBE_ALARM|dbr.DBE_LOG) by passing it as the
                 # auto_monitor arg, otherwise if you specify 'True' you'll
                 # just get the default set in ca.DEFAULT_SUBSCRIPTION_MASK
-                mask = self.auto_monitor if type(self.auto_monitor) is int else None
+                mask = None
+                if isinstance(self.auto_monitor, int):
+                    mask = self.auto_monitor
                 self._monref = ca.create_subscription(self.chid,
                                          use_ctrl=(self.form == 'ctrl'),
                                          use_time=(self.form == 'time'),
@@ -168,7 +170,7 @@ class PV(object):
             start_time = time.time()
             while (not self.connected and
                    time.time()-start_time < timeout):
-                self.poll()
+                ca.poll()
         return self.connected
 
     def connect(self, timeout=None):
@@ -220,7 +222,7 @@ class PV(object):
         if ((not use_monitor) or
             (not self.auto_monitor) or
             (self._args['value'] is None) or
-            (count is not None and count > len(self._args['value']))): 
+            (count is not None and count > len(self._args['value']))):
             ca_get = ca.get
             if ca.get_cache(self.pvname)['value'] is not None:
                 ca_get = ca.get_complete
@@ -233,14 +235,16 @@ class PV(object):
             return self._args['char_value']
         if self.count <= 1:
             return val
-        
+
         if count is None and val is not None:
             count = len(val)
-        if as_numpy and count > 1 and ca.HAS_NUMPY and not isinstance(val, ca.numpy.ndarray):
+        if (as_numpy and ca.HAS_NUMPY and count > 1 and
+            not isinstance(val, ca.numpy.ndarray)):
             val = ca.numpy.array(val)
-        elif not as_numpy and ca.HAS_NUMPY and isinstance(val, ca.numpy.ndarray):
+        elif (not as_numpy and ca.HAS_NUMPY and
+              isinstance(val, ca.numpy.ndarray)):
             val = list(val)
-        
+
         # allow asking for less data than actually exists in the cached value
         #print "PV Get", self.auto_monitor, self._args['value'] is None, count
         if count < len(val):
@@ -416,7 +420,7 @@ class PV(object):
         """remove a callback by index"""
         if index in self.callbacks:
             self.callbacks.pop(index)
-            self.poll()
+            ca.poll()
 
     def clear_callbacks(self):
         "clear all callbacks"

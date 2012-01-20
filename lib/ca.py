@@ -46,7 +46,8 @@ if PY_MAJOR >= 3:
 else:
     from .utils2 import STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2, strjoin
     if PY_MINOR == 5:
-        def memcopy(a): return a
+        def memcopy(a):
+            return a
 
 ## print to stdout
 def write(msg, newline=True, flush=True):
@@ -90,7 +91,10 @@ _put_done =  {}
 
 # get a unique python value that cannot be a value held by an
 # actual PV to signal "Get is incomplete, awaiting callback"
-class Empty: pass
+class Empty:
+    """used to create a unique python value that cannot be
+    held as an actual PV value"""
+    pass
 GET_PENDING = Empty()
 
 class ChannelAccessException(Exception):
@@ -448,7 +452,7 @@ def _onConnectionEvent(args):
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
                                'ts':0, 'failures':0, 'value': None,
                                'callbacks': []}
-        
+
     # set connection time, run connection callbacks
     # in all contexts
     for context, cvals in _cache.items():
@@ -470,7 +474,7 @@ def _onConnectionEvent(args):
     return
 
 ## get event handler:
-def _onGetEvent(args, **kwds):
+def _onGetEvent(args, **kws):
     """get_callback event: simply store data contents which
     will need conversion to python data with _unpack()."""
     global _cache
@@ -508,14 +512,15 @@ _CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onMonitorEvent)
 # contexts
 @withCA
 @withSEVCHK
-def context_create():
-    "create a context -- argument ignored in favor of PREEMPTIVE_CALLBACK"
-    ctx = {False:0, True:1}[PREEMPTIVE_CALLBACK]
+def context_create(ctx=None):
+    "create a context. if argument is None, use PREEMPTIVE_CALLBACK"
+    if ctx is None:
+        ctx = {False:0, True:1}[PREEMPTIVE_CALLBACK]
     return libca.ca_context_create(ctx)
 
-def create_context():
+def create_context(ctx):
     "create a context (fixed naming bug)"
-    context_create(context=None)
+    context_create(ctx=ctx)
 
 @withCA
 def context_destroy():
@@ -649,7 +654,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
     if ctx not in _cache:
         _cache[ctx] = {}
     if pvname not in _cache[ctx]: # new PV for this context
-        entry = {'conn':False,  'chid': None, 
+        entry = {'conn':False,  'chid': None,
                  'ts': 0,  'failures':0, 'value': None,
                  'callbacks': [ callback ]}
         _cache[ctx][pvname] = entry
@@ -820,7 +825,8 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
                 if NULLCHAR_2 in this:
                     this = this[:this.index(NULLCHAR_2)]
                 out.append(this)
-            if len(out) == 1: out = out[0]
+            if len(out) == 1:
+                out = out[0]
             return out
         if count > 1:
             data = array_cast(data, count, ntype, use_numpy)
@@ -839,7 +845,7 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
         if count > 1:
             data = array_cast(data, count, ntype, use_numpy)
         return data
-    
+
     unpack = unpack_simple
     if ftype >= dbr.TIME_STRING:
         unpack = unpack_ctrltime
@@ -954,7 +960,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
         val = _as_string(val, chid, count, ftype)
     elif isinstance(val, ctypes.Array) and HAS_NUMPY and as_numpy:
         val = numpy.array(val)
-        
+
     # value retrieved, clear cached value
     ncache['value'] = None
     return val
@@ -1126,10 +1132,10 @@ def get_enum_strings(chid):
     return None
 
 ##
-# Default mask for subscriptions (means update on value changes exceeding MDEL, and on
-# alarm level changes.) Other option is dbr.DBE_LOG for archive changes (ie exceeding ADEL)
+# Default mask for subscriptions (means update on value changes
+# exceeding MDEL, and on alarm level changes.) Other option is
+# dbr.DBE_LOG for archive changes (ie exceeding ADEL)
 DEFAULT_SUBSCRIPTION_MASK = dbr.DBE_VALUE|dbr.DBE_ALARM
-
 
 @withConnectedCHID
 def create_subscription(chid, use_time=False, use_ctrl=False,
