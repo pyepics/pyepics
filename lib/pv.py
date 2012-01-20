@@ -10,8 +10,8 @@ import time
 import copy
 from math import log10
 
-import ca
-import dbr
+from . import ca
+from . import dbr
 
 def fmt_time(tstamp=None):
     "simple formatter for time values"
