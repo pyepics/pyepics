@@ -34,26 +34,34 @@ a few ways to get the PyEpics Package:
 
 .. _pyepics-3.2.0.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.tar.gz
 .. _pyepics-3.2.0.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.tar.gz
-.. _pyepics-3.2.0.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py2.6.exe
-.. _pyepics-3.2.0.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py2.7.exe
-.. _pyepics-3.2.0.win32-py3.2.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py3.2.exe
+.. _pyepics-3.2.0.win32-py2.6.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py2.6.exe
+.. _pyepics-3.2.0.win32-py2.7.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py2.7.exe
+.. _pyepics-3.2.0.win32-py3.2.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py3.2.exe
+.. _pyepics-3.2.0.win32-py2.6.exe (PyPI): http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.win32-py2.6.exe
+.. _pyepics-3.2.0.win32-py2.7.exe (PyPI): http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.win32-py2.7.exe
+.. _pyepics-3.2.0.win32-py3.2.exe (PyPI): http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.win32-py3.2.exe
 .. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
 .. _PyPi Epics Entry:             http://pypi.python.org/pypi/pyepics/
 .. _Python Setup Tools:           http://pypi.python.org/pypi/setuptools
 
-+---------------------------+------------------------------------------+
-|  Download Option          |  Location                                |
-+===========================+==========================================+
-|  Source Kit               |  `pyepics-3.2.0.tar.gz (CARS)`_  or      |
-|                           |  `pyepics-3.2.0.tar.gz (PyPI)`_          |
-+---------------------------+------------------------------------------+
-|  Windows Installers       |  `pyepics-3.2.0.win32-py2.6.exe`_  or    |
-|                           |  `pyepics-3.2.0.win32-py2.7.exe`_  or    |
-|                           |  `pyepics-3.2.0.win32-py3.2.exe`_        |
-+---------------------------+------------------------------------------+
-|  Development Version      |  use `pyepics github repository`_        |
-+---------------------------+------------------------------------------+
++-----------------+------------+----------------------------------------------+
+|  Download Type  | Py Version |   Location                                   |
++=================+============+==============================================+
+| Source tarball  | All        | `pyepics-3.2.0.tar.gz (CARS)`_  or           |
+|                 |            | `pyepics-3.2.0.tar.gz (PyPI)`_               |
++-----------------+------------+----------------------------------------------+
+| Win32 Installer | 2.6        |  `pyepics-3.2.0.win32-py2.6.exe (CARS)`_  or |
+|                 |            |  `pyepics-3.2.0.win32-py2.6.exe (PyPI)`_  or |
++-----------------+------------+----------------------------------------------+
+| Win32 Installer | 2.7        |  `pyepics-3.2.0.win32-py2.7.exe (CARS)`_  or |
+|                 |            |  `pyepics-3.2.0.win32-py2.7.exe (PyPI)`_  or |
++-----------------+------------+----------------------------------------------+
+| Win32 Installer | 3.2        |  `pyepics-3.2.0.win32-py3.2.exe (CARS)`_  or |
+|                 |            |  `pyepics-3.2.0.win32-py3.2.exe (PyPI)`_  or |
++-----------------+------------+----------------------------------------------+
+|  Development    | All        |  `pyepics github repository`_                |
++-----------------+------------+----------------------------------------------+
 
 If you have `Python Setup Tools`_  installed, you can download and install
 the PyEpics Package simply with::
@@ -72,7 +80,7 @@ Those tests that fail are generally well-understood.
 +-----------+-----------------+------------+-----------------------+
 |  Host OS  | Epics HOST ARCH |  Python    |  Failures, Notes      |
 +===========+=================+============+=======================+
-| Linux     |  linux-x86      |  2.5.1     |   all pass            |?
+| Linux     |  linux-x86      |  2.5.1     |   all pass            |
 +-----------+-----------------+------------+-----------------------+
 | Linux     |  linux-x86      |  2.6       |   all pass            |
 +-----------+-----------------+------------+-----------------------+
