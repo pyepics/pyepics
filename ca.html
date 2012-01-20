@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.4',
+        VERSION:     '3.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -246,11 +246,13 @@ func:<cite>pend_event</cite>.</p>
 <tt class="descclassname">ca.</tt><tt class="descname">AUTOMONITOR_MAXLENGTH</tt><a class="headerlink" href="#ca.AUTOMONITOR_MAXLENGTH" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets the default array length (ie, how many elements an array has) above
 which automatic conversion to numpy arrays <em>and</em> automatic monitoring
-for PV variables is suppressed.  The default value is 16384.  To be
+for PV variables is suppressed.  The default value is 65536.  To be
 clear: waveforms with fewer elements than this value will be
 automatically monitored changes, and will be converted to numpy arrays
-(if numpy is installed).  Larger waveforms will not be monitored.</p>
-<p><a class="reference internal" href="advanced.html#advanced-large-arrays-label"><em>Strategies for working with large arrays</em></a> for more details.</p>
+(if numpy is installed).  Larger waveforms will not be automatically
+monitored.</p>
+<p><em class="xref std std-ref">advanced-arrays-label</em> and <a class="reference internal" href="advanced.html#advanced-large-arrays-label"><em>Strategies for working with large arrays</em></a> for
+more details.</p>
 </dd></dl>
 
 </div>
@@ -274,10 +276,11 @@ decorator, so you should never need to call this in a real program.</p>
 <dl class="function">
 <dt id="ca.create_context">
 <tt class="descclassname">ca.</tt><tt class="descname">create_context</tt><big>(</big><big>)</big><a class="headerlink" href="#ca.create_context" title="Permalink to this definition">¶</a></dt>
-<dd><p>This will create a new context, using the value of <a class="reference internal" href="#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></tt></a> to set
-the context type. Note that CA library function has the irritating name of
-<em>context_create</em>.  Both that and <em>create_context</em> (which is more consistent with the
-Verb_Object of the rest of the CA library) are allowed.</p>
+<dd><p>This will create a new context, using the value of
+<a class="reference internal" href="#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></tt></a> to set the context type. Note that CA
+library function has the irritating name of <em>context_create</em>.  Both that
+and <em>create_context</em> (which is more consistent with the Verb_Object of
+the rest of the CA library) are allowed.</p>
 </dd></dl>
 
 <dl class="function">
@@ -320,12 +323,22 @@ using CA.  See <a class="reference internal" href="advanced.html#advanced-thread
 <dl class="function">
 <dt id="ca.client_status">
 <tt class="descclassname">ca.</tt><tt class="descname">client_status</tt><big>(</big><em>context</em>, <em>level</em><big>)</big><a class="headerlink" href="#ca.client_status" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Print (to stderr) information about Channel Access status, including
+status for each channel, and search and connection statistics.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ca.version">
+<tt class="descclassname">ca.</tt><tt class="descname">version</tt><big>(</big><big>)</big><a class="headerlink" href="#ca.version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print Channel Access version string.  Currently, this should report
+'4.13'</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ca.message">
 <tt class="descclassname">ca.</tt><tt class="descname">message</tt><big>(</big><em>status</em><big>)</big><a class="headerlink" href="#ca.message" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Print a message corresponding to a Channel Access status return value.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ca.flush_io">
@@ -907,7 +920,6 @@ completion.</p>
 
 <span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">chids</span><span class="p">:</span>
     <span class="n">ca</span><span class="o">.</span><span class="n">sg_put</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span> <span class="n">chid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
 
 <span class="k">print</span> <span class="s">&#39;sg_put done, but not blocked / committed. Sleep for 5 seconds &#39;</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>

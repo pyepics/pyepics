@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.4',
+        VERSION:     '3.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -694,12 +694,12 @@ your PVs with <em>auto_monitor=False</em>.  When you do this, you will need to
 make calls to <a class="reference internal" href="#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> to explicitly get the latest value.</dd>
 <dt><tt class="docutils literal"><span class="pre">None</span></tt></dt>
 <dd>The default value for <em>auto_monitor</em> is <tt class="docutils literal"><span class="pre">None</span></tt>, and is set to
-<tt class="docutils literal"><span class="pre">True</span></tt> if the element count for the PV is smaller than 16384 (The
-value is set as <a class="reference internal" href="ca.html#ca.AUTOMONITOR_MAXLENGTH" title="ca.AUTOMONITOR_MAXLENGTH"><tt class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></tt></a>).  To suppress
+<tt class="docutils literal"><span class="pre">True</span></tt> if the element count for the PV is smaller than
+<a class="reference internal" href="ca.html#ca.AUTOMONITOR_MAXLENGTH" title="ca.AUTOMONITOR_MAXLENGTH"><tt class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></tt></a> (default of 65536).  To suppress
 monitoring of PVs with fewer array values, you will have to explicitly
-turn <em>auto_monitor</em> to <tt class="docutils literal"><span class="pre">False</span></tt>. For waveform arrays larger than
-16384 items, automatic monitoring will be <tt class="docutils literal"><span class="pre">False</span></tt> unless you
-explicitly set it to <tt class="docutils literal"><span class="pre">True</span></tt> or an explicit mask.  See
+turn <em>auto_monitor</em> to <tt class="docutils literal"><span class="pre">False</span></tt>. For waveform arrays with more elements,
+automatic monitoring will not be done unless you explicitly set
+<em>auto_monitor=True</em>, or to an explicit mask.  See
 <a class="reference internal" href="advanced.html#advanced-large-arrays-label"><em>Strategies for working with large arrays</em></a> for more details.</dd>
 <dt><tt class="docutils literal"><span class="pre">True</span></tt></dt>
 <dd><p class="first">When <em>auto_monitor</em> is set to <tt class="docutils literal"><span class="pre">True</span></tt>, the value will be monitored using

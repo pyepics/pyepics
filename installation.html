@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.1.4',
+        VERSION:     '3.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -115,10 +115,9 @@
 <h1>Downloading and Installation<a class="headerlink" href="#downloading-and-installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>This package requires Python version 2.5, 2.6, 2.7, or 3.2.  I It is
-possible that Python 2.4 will work if the ctypes package is installed, but
-this has not been tested.  It should work with Python 3.1, as well, but
-this is no longer being tested as of this writing.</p>
+<p>This package requires Python version 2.5, 2.6, 2.7, or 3.2.  It should work
+with Python 3.1, as well, but this is no longer being tested as of this
+writing.</p>
 <p>In addition, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
 libCom.so and libca.so (or Com.dll and ca.dll on Windows) from <em>Epics Base</em>
@@ -130,36 +129,50 @@ are included and installed so that no other Epics installation is required
 to use the modules.  For Unix-like systems, these are assumed to be
 available (and findable by Python at runtime) on the system. This may mean
 setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.</p>
-<p>The Python <a class="reference external" href="http://numpy.scipy.org/">numpy module</a> is not required, but
-will be used to convert EPICS waveforms values into numerical array data if
-available, and its use is encouraged.</p>
+<p>The Python <a class="reference external" href="http://numpy.scipy.org/">numpy module</a> is not strictly
+required, but will be used to convert EPICS waveforms values into numerical
+array data if available, and its use is strongly encouraged.</p>
 </div>
 <div class="section" id="downloads">
 <h2>Downloads<a class="headerlink" href="#downloads" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the PyEpics Package is 3.1.4.  There are
+<p>The latest stable version of the PyEpics Package is 3.2.0.  There are
 a few ways to get the PyEpics Package:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="39%" />
+<col width="23%" />
+<col width="16%" />
 <col width="61%" />
 </colgroup>
 <thead valign="bottom">
-<tr class="row-odd"><th class="head">Download Option</th>
+<tr class="row-odd"><th class="head">Download Type</th>
+<th class="head">Py Version</th>
 <th class="head">Location</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>Source Kit</td>
-<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.tar.gz">pyepics-3.1.4.tar.gz (CARS)</a>  or
-<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.4.tar.gz">pyepics-3.1.4.tar.gz (PyPI)</a></td>
+<tr class="row-even"><td>Source tarball</td>
+<td>All</td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.tar.gz">pyepics-3.2.0.tar.gz (CARS)</a>  or
+<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.tar.gz">pyepics-3.2.0.tar.gz (PyPI)</a></td>
 </tr>
-<tr class="row-odd"><td>Windows Installers</td>
-<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py2.6.exe">pyepics-3.1.4.win32-py2.6.exe</a>  or
-<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py2.7.exe">pyepics-3.1.4.win32-py2.7.exe</a>  or
-<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py3.2.exe">pyepics-3.1.4.win32-py3.2.exe</a></td>
+<tr class="row-odd"><td>Win32 Installer</td>
+<td>2.6</td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py2.6.exe">pyepics-3.2.0.win32-py2.6.exe (CARS)</a>  or
+<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.win32-py2.6.exe">pyepics-3.2.0.win32-py2.6.exe (PyPI)</a>  or</td>
 </tr>
-<tr class="row-even"><td>Development Version</td>
-<td>use <a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github repository</a></td>
+<tr class="row-even"><td>Win32 Installer</td>
+<td>2.7</td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py2.7.exe">pyepics-3.2.0.win32-py2.7.exe (CARS)</a>  or
+<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.win32-py2.7.exe">pyepics-3.2.0.win32-py2.7.exe (PyPI)</a>  or</td>
+</tr>
+<tr class="row-odd"><td>Win32 Installer</td>
+<td>3.2</td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py3.2.exe">pyepics-3.2.0.win32-py3.2.exe (CARS)</a>  or
+<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.win32-py3.2.exe">pyepics-3.2.0.win32-py3.2.exe (PyPI)</a>  or</td>
+</tr>
+<tr class="row-even"><td>Development</td>
+<td>All</td>
+<td><a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github repository</a></td>
 </tr>
 </tbody>
 </table>
@@ -171,9 +184,9 @@ the PyEpics Package simply with:</p>
 <div class="section" id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
 <p>Some automated unit-testing is done, using the tests folder from the source
-distribution kit.  The following systems were tested for 3.1.4, all with
-Epics base 3.14.12.1.  Except as noted, all tests pass.  Those tests that
-fail are generally well-understood.</p>
+distribution kit.  The following systems were tested for 3.2.0, all with
+Epics base 3.14.12.1 or bas 3.14.12.2.  Except as noted, all tests pass.
+Those tests that fail are generally well-understood.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="17%" />
@@ -201,12 +214,12 @@ fail are generally well-understood.</p>
 </tr>
 <tr class="row-even"><td>Linux</td>
 <td>linux-x86</td>
-<td>2.6.6</td>
+<td>2.7.1</td>
 <td>all pass</td>
 </tr>
 <tr class="row-odd"><td>Linux</td>
 <td>linux-x86_64</td>
-<td>2.7</td>
+<td>2.7.1</td>
 <td>all pass</td>
 </tr>
 <tr class="row-even"><td>Linux</td>
@@ -221,12 +234,12 @@ fail are generally well-understood.</p>
 </tr>
 <tr class="row-even"><td>Windows</td>
 <td>win32-x86</td>
-<td>2.6.5</td>
+<td>2.6.6</td>
 <td>all pass</td>
 </tr>
 <tr class="row-odd"><td>Windows</td>
 <td>win32-x86</td>
-<td>2.7.1</td>
+<td>2.7.2</td>
 <td>all pass</td>
 </tr>
 <tr class="row-even"><td>Windows</td>
