@@ -53,8 +53,8 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
         cval = pv.get(as_string=True)    
         if pv.count > 1:
             val = val[:12]
-        print '-> ', pv, cval
-        print '   ', type(val), val
+        print( '-> ', pv, cval)
+        print( '   ', type(val), val)
     for pv in mypvs:
         pv.disconnect()
     time.sleep(0.01)
