@@ -215,7 +215,7 @@ class PV(object):
         """
         if not self.wait_for_connection():
             return None
-
+        # print 'PV Get ', use_monitor, self.auto_monitor, self._args['value'] is None, count, self._args['count']
         if with_ctrlvars and getattr(self, 'units', None) is None:
             self.get_ctrlvars()
 
@@ -231,12 +231,11 @@ class PV(object):
                                          as_numpy=as_numpy)
         val = self._args['value']
         if as_string:
-            self._set_charval(val)
-            return self._args['char_value']
-        if self.count <= 1:
+            return self._set_charval(val)
+        if self.count <= 1 or val is None:
             return val
 
-        if count is None and val is not None:
+        if count is None:
             count = len(val)
         if (as_numpy and ca.HAS_NUMPY and count > 1 and
             not isinstance(val, ca.numpy.ndarray)):
@@ -244,7 +243,6 @@ class PV(object):
         elif (not as_numpy and ca.HAS_NUMPY and
               isinstance(val, ca.numpy.ndarray)):
             val = list(val)
-
         # allow asking for less data than actually exists in the cached value
         #print "PV Get", self.auto_monitor, self._args['value'] is None, count
         if count < len(val):
@@ -285,6 +283,9 @@ class PV(object):
     def _set_charval(self, val, call_ca=True):
         """ sets the character representation of the value.
         intended only for internal use"""
+        if val is None:
+            self._args['char_value'] = 'None'
+            return 'None'
         ftype = self._args['ftype']
         ntype = ca.native_type(ftype)
         if ntype == dbr.STRING:
@@ -493,6 +494,7 @@ class PV(object):
     def _getarg(self, arg):
         "wrapper for property retrieval"
         if self._args['value'] is None:
+            print '_getArg  ', arg, '  but value is None'
             self.get()
         return self._args.get(arg, None)
 
@@ -535,7 +537,10 @@ class PV(object):
     def count(self):
         """count (number of elements). For array data and later EPICS versions,
         this is equivalent to the .NORD field.  See also 'nelm' property"""
-        return self._getarg('count')
+        if self._args['count'] >=0:
+            return self._args['count']
+        else:
+            return self._getarg('count')
 
     @property
     def nelm(self):
