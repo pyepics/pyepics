@@ -449,7 +449,10 @@ class PV(object):
         else:
             ext  = {True:'...', False:''}[self.count > 10]
             elems = range(min(5, self.count))
-            aval = [fmt % self._args['value'][i] for i in elems]
+            try:
+                aval = [fmt % self._args['value'][i] for i in elems]
+            except TypeError:
+                aval = ('unknown',)
             out.append("   value      = array  [%s%s]" % (",".join(aval), ext))
         for nam in ('char_value', 'count', 'nelm', 'type', 'units',
                     'precision', 'host', 'access',
