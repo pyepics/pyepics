@@ -215,7 +215,6 @@ class PV(object):
         """
         if not self.wait_for_connection():
             return None
-        # print 'PV Get ', use_monitor, self.auto_monitor, self._args['value'] is None, count, self._args['count']
         if with_ctrlvars and getattr(self, 'units', None) is None:
             self.get_ctrlvars()
 
@@ -244,7 +243,6 @@ class PV(object):
               isinstance(val, ca.numpy.ndarray)):
             val = list(val)
         # allow asking for less data than actually exists in the cached value
-        #print "PV Get", self.auto_monitor, self._args['value'] is None, count
         if count < len(val):
             val = val[:count]
         return val
@@ -356,7 +354,6 @@ class PV(object):
         self._args['value']  = value
         self._args['timestamp'] = kwd.get('timestamp', time.time())
         self._set_charval(self._args['value'], call_ca=False)
-        # print(" on change ", self.pvname, type(value) )
         if self.verbose:
             now = fmt_time(self._args['timestamp'])
             ca.write('%s: %s (%s)'% (self.pvname,
@@ -494,7 +491,6 @@ class PV(object):
     def _getarg(self, arg):
         "wrapper for property retrieval"
         if self._args['value'] is None:
-            print '_getArg  ', arg, '  but value is None'
             self.get()
         return self._args.get(arg, None)
 
