@@ -207,11 +207,7 @@ the data just hasn't been received yet, but may show up later.
 The *use_monitor* argument sets whether to rely on the monitors from the
 underlying PV.  The default is ``False``, so that each :func:`caget` will
 explicitly ask the value to be sent instead of relying on the automatic
-<<<<<<< HEAD
-monitoring normally used for persistant PVs.  If this makes no sense,
-=======
 monitoring normally used for persistent PVs.  If this makes no sense,
->>>>>>> bec7205136ee3901483b8e02164131be29a6e615
 leaving the default value of ``True`` is fine.  For more details on making
 :func:`caget` more efficient, see :ref:`pv-automonitor-label` and
 :ref:`advanced-get-timeouts-label`.

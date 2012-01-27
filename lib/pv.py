@@ -221,11 +221,7 @@ class PV(object):
         if ((not use_monitor) or
             (not self.auto_monitor) or
             (self._args['value'] is None) or
-<<<<<<< HEAD
-            (count is not None and len(self._args['value']) > 1)):
-=======
             (count is not None and count > len(self._args['value']))):
->>>>>>> bec7205136ee3901483b8e02164131be29a6e615
             ca_get = ca.get
             if ca.get_cache(self.pvname)['value'] is not None:
                 ca_get = ca.get_complete
