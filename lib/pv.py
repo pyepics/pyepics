@@ -289,21 +289,23 @@ class PV(object):
         if ntype == dbr.STRING:
             self._args['char_value'] = val
             return val
+        # char waveform as string
+        if ntype == dbr.CHAR and self.count < ca.AUTOMONITOR_MAXLENGTH:
+            val = list(val)
+            if 0 in val:
+                firstnull  = val.index(0)
+            else:
+                firstnull = len(val)
+            try:
+                cval = ''.join([chr(i) for i in val[:firstnull]]).rstrip()
+            except ValueError:
+                cval = ''
+            return cval
+        
         cval  = repr(val)
         if self.count > 1:
-            if ntype == dbr.CHAR and self.count < ca.AUTOMONITOR_MAXLENGTH:
-                val = list(val)
-                if 0 in val:
-                    firstnull  = val.index(0)
-                else:
-                    firstnull = len(val)
-                try:
-                    cval = ''.join([chr(i) for i in val[:firstnull]]).rstrip()
-                except ValueError:
-                    pass
-            else:
-                cval = '<array size=%d, type=%s>' % (len(val),
-                                                     dbr.Name(ftype).lower())
+            cval = '<array size=%d, type=%s>' % (len(val),
+                                                 dbr.Name(ftype).lower())
         elif ntype in (dbr.FLOAT, dbr.DOUBLE):
             if call_ca and self._args['precision'] is None:
                 self.get_ctrlvars()
@@ -314,16 +316,15 @@ class PV(object):
                     fmt = "%%.%ig"
                 cval = (fmt %  prec) % val
             except (ValueError, TypeError, ArithmeticError):
-                self._args['char_value'] = str(val)
-                return self._args['char_value']
-
+                cval = str(val)
         elif ntype == dbr.ENUM:
             if call_ca and self._args['enum_strs'] in ([], None):
                 self.get_ctrlvars()
             try:
                 cval = self._args['enum_strs'][val]
             except (TypeError, KeyError,  IndexError):
-                pass
+                cval = str(val)
+
         self._args['char_value'] = cval
         return cval
 
