@@ -1,0 +1,21 @@
+{% extends "!layout.html" %}
+{% block rootrellink %}
+   <li><a href="{{ pathto('overview') }}">overview</a>|</li>
+   <li><a href="{{ pathto('installation') }}">download</a>|</li>
+   <li><a href="{{ pathto('pv') }}">pv</a>|</li>
+   <li><a href="{{ pathto('ca') }}">ca</a>|</li>
+   <li><a href="{{ pathto('devices') }}">devices</a>|</li>
+   <li><a href="{{ pathto('wx') }}">wx</a>|</li>
+   <li><a href="{{ pathto('advanced') }}">advanced</a>|</li>
+   <li><a href="{{ pathto('more') }}">contents</a>|</li>
+   &nbsp;&nbsp;<li><a href="{{ pathto('search') }}">search</a></li>
+{% endblock %}
+{% block relbar1 %}
+<div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
+ <h1> <a href="{{ pathto('index') }}">PyEpics: Epics Channel Access for Python</a></h1>
+</div>
+{{ super() }} 
+{% endblock %}
+{# put the sidebar before the body #}
+{% block sidebar1 %}{{ sidebar() }}{% endblock %}
+{% block sidebar2 %}{% endblock %}

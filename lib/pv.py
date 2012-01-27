@@ -97,14 +97,14 @@ class PV(object):
 
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
-        # occassionally chid is still None (ie if a second PV is created while
-        # __on_connect is still pending for the first one.)
+        # occassionally chid is still None (ie if a second PV is created
+        # while __on_connect is still pending for the first one.)
         # Just return here, and connection will happen later
         if self.chid is None and chid is None:
             time.sleep(0.001)
             return
         if conn:
-            self.poll()
+            ca.poll()
             self.chid = self._args['chid'] = dbr.chid_t(chid)
             try:
                 count = ca.element_count(self.chid)
@@ -132,7 +132,9 @@ class PV(object):
                 # (ie dbr.DBE_ALARM|dbr.DBE_LOG) by passing it as the
                 # auto_monitor arg, otherwise if you specify 'True' you'll
                 # just get the default set in ca.DEFAULT_SUBSCRIPTION_MASK
-                mask = self.auto_monitor if type(self.auto_monitor) is int else None
+                mask = None
+                if isinstance(self.auto_monitor, int):
+                    mask = self.auto_monitor
                 self._monref = ca.create_subscription(self.chid,
                                          use_ctrl=(self.form == 'ctrl'),
                                          use_time=(self.form == 'time'),
@@ -168,7 +170,7 @@ class PV(object):
             start_time = time.time()
             while (not self.connected and
                    time.time()-start_time < timeout):
-                self.poll()
+                ca.poll()
         return self.connected
 
     def connect(self, timeout=None):
@@ -193,7 +195,7 @@ class PV(object):
         ca.poll(evt=evt, iot=iot)
 
     def get(self, count=None, as_string=False, as_numpy=True,
-            timeout=None, use_monitor=True):
+            timeout=None, with_ctrlvars=False, use_monitor=True):
         """returns current value of PV.  Use the options:
         count       explicitly limit count for array data
         as_string   flag(True/False) to get a string representation
@@ -213,26 +215,41 @@ class PV(object):
         """
         if not self.wait_for_connection():
             return None
+        if with_ctrlvars and getattr(self, 'units', None) is None:
+            self.get_ctrlvars()
 
         if ((not use_monitor) or
             (not self.auto_monitor) or
             (self._args['value'] is None) or
+<<<<<<< HEAD
             (count is not None and len(self._args['value']) > 1)):
+=======
+            (count is not None and count > len(self._args['value']))):
+>>>>>>> bec7205136ee3901483b8e02164131be29a6e615
             ca_get = ca.get
-            ctx = ca.current_context()
-            if ca._cache[ctx][self.pvname]['value'] is not None:
+            if ca.get_cache(self.pvname)['value'] is not None:
                 ca_get = ca.get_complete
             self._args['value'] = ca_get(self.chid, ftype=self.ftype,
                                          count=count, timeout=timeout,
                                          as_numpy=as_numpy)
+        val = self._args['value']
         if as_string:
-            self._set_charval(self._args['value'])
-            return self._args['char_value']
+            return self._set_charval(val)
+        if self.count <= 1 or val is None:
+            return val
 
+        if count is None:
+            count = len(val)
+        if (as_numpy and ca.HAS_NUMPY and count > 1 and
+            not isinstance(val, ca.numpy.ndarray)):
+            val = ca.numpy.array(val)
+        elif (not as_numpy and ca.HAS_NUMPY and
+              isinstance(val, ca.numpy.ndarray)):
+            val = list(val)
         # allow asking for less data than actually exists in the cached value
-        if count is not None and count < len(self._args['value']):
-            return self._args['value'][:count]
-        return self._args['value']
+        if count < len(val):
+            val = val[:count]
+        return val
 
     def put(self, value, wait=False, timeout=30.0,
             use_complete=False, callback=None, callback_data=None):
@@ -268,6 +285,9 @@ class PV(object):
     def _set_charval(self, val, call_ca=True):
         """ sets the character representation of the value.
         intended only for internal use"""
+        if val is None:
+            self._args['char_value'] = 'None'
+            return 'None'
         ftype = self._args['ftype']
         ntype = ca.native_type(ftype)
         if ntype == dbr.STRING:
@@ -338,12 +358,10 @@ class PV(object):
         self._args['value']  = value
         self._args['timestamp'] = kwd.get('timestamp', time.time())
         self._set_charval(self._args['value'], call_ca=False)
-
         if self.verbose:
             now = fmt_time(self._args['timestamp'])
             ca.write('%s: %s (%s)'% (self.pvname,
-                                     self._args['char_value'],
-                                     now))
+                                     self._args['char_value'], now))
         self.run_callbacks()
 
     def run_callbacks(self):
@@ -404,7 +422,7 @@ class PV(object):
         """remove a callback by index"""
         if index in self.callbacks:
             self.callbacks.pop(index)
-            self.poll()
+            ca.poll()
 
     def clear_callbacks(self):
         "clear all callbacks"
@@ -435,7 +453,10 @@ class PV(object):
         else:
             ext  = {True:'...', False:''}[self.count > 10]
             elems = range(min(5, self.count))
-            aval = [fmt % self._args['value'][i] for i in elems]
+            try:
+                aval = [fmt % self._args['value'][i] for i in elems]
+            except TypeError:
+                aval = ('unknown',)
             out.append("   value      = array  [%s%s]" % (",".join(aval), ext))
         for nam in ('char_value', 'count', 'nelm', 'type', 'units',
                     'precision', 'host', 'access',
@@ -519,7 +540,10 @@ class PV(object):
     def count(self):
         """count (number of elements). For array data and later EPICS versions,
         this is equivalent to the .NORD field.  See also 'nelm' property"""
-        return self._getarg('count')
+        if self._args['count'] >=0:
+            return self._args['count']
+        else:
+            return self._getarg('count')
 
     @property
     def nelm(self):

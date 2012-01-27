@@ -14,7 +14,7 @@ To use the :mod:`epics` package, import it with::
 
      import epics
 
-The manin components of this module include
+The main components of this module include
 
     * functions :func:`caget`, :func:`caput`, :func:`camonitor`,
       :func:`camonitor_clear`, and :func:`cainfo` as described below.
@@ -30,7 +30,7 @@ The manin components of this module include
       use with Epics PVs.
 
 If you're looking to write quick scripts or a simple introduction to using
-Channel Acces, the :func:`caget` and :func:`caput` functions are probably
+Channel Access, the :func:`caget` and :func:`caput` functions are probably
 where you want to start.
 
 If you're building larger scripts and programs, using :class:`PV` objects
@@ -207,7 +207,11 @@ the data just hasn't been received yet, but may show up later.
 The *use_monitor* argument sets whether to rely on the monitors from the
 underlying PV.  The default is ``False``, so that each :func:`caget` will
 explicitly ask the value to be sent instead of relying on the automatic
+<<<<<<< HEAD
 monitoring normally used for persistant PVs.  If this makes no sense,
+=======
+monitoring normally used for persistent PVs.  If this makes no sense,
+>>>>>>> bec7205136ee3901483b8e02164131be29a6e615
 leaving the default value of ``True`` is fine.  For more details on making
 :func:`caget` more efficient, see :ref:`pv-automonitor-label` and
 :ref:`advanced-get-timeouts-label`.
@@ -260,8 +264,7 @@ desired::
     >>> print caget('XXX:dir')      # A CHAR waveform
     array([ 84,  58,  92, 120,  97, 115,  95, 117, 115,
        101, 114,  92,  77,  97, 114,  99, 104,  50,  48,
-        49,  48,  92,  70,  97, 115, 116,  77,  97, 112,
-         0,   0, ... 0])
+        49,  48,  92,  70,  97, 115, 116,  77,  97, 112])
 
     >>> print caget('XXX:dir',as_string=True)
     'T:\\xas_user\\March2010\\Fastmap'
@@ -361,7 +364,7 @@ has been exceeded.
 One can specify any function that can take a string as *writer*, such as
 the :meth:`write` method of an open file that has been open for writing.
 If left as ``None``, messages of changes will be sent to
-:func:`sy0.stdout.write`. For more complete control, one can specify a
+:func:`sys.stdout.write`. For more complete control, one can specify a
 *callback* function to be called on each change event.  This callback
 should take keyword arguments for *pvname*, *value*, and *char_value*.  See
 :ref:`pv-callbacks-label` for information on writing callback functions for
@@ -455,7 +458,7 @@ PyEpics3 does work with both Python 2.* and 3.*.
 Status and To-Do List
 =======================
 
-The Pyepics package is under active development.  The current status is
+The PyEpics package is under active development.  The current status is
 that most features are working well, and it is starting to be used in
 production code, but more testing and better tests are needed.
 
@@ -470,6 +473,6 @@ There are several desired features are left undone or unfinished:
 
  * add more "devices", including low-level epics records.
 
- * incorporate some or all of theChannel Access Server from `pcaspy <http://code.google.com/p/pcaspy/>`_
+ * incorporate some or all of the Channel Access Server from `pcaspy <http://code.google.com/p/pcaspy/>`_
 
  * build and improve applications.

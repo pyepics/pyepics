@@ -1,6 +1,6 @@
-====================================
-:mod:`epics.devices`   Epics Devices
-====================================
+================================
+Devices: collections of PVs
+================================
 
 Overview
 ===========
@@ -8,14 +8,14 @@ Overview
 .. module:: device
    :synopsis: collections of related PVs
 
-This module provides a simple interface to a collection of PVs.  Here a
-*device* holds a set of PVs, all sharing a prefix, but having many
-*attributes*.  Many PVs will have names made up of *prefix+attribute*, with
-a common prefix for several related PVs.  This almost describes an Epics
-Record, but as it is concerned only with PV names, the mapping to an Epics
-Record is not exact.  On the other hand, the concept of a *device* is more
-flexible than a predefined Epics Record as it can actually hold PVs from
-several different records.::
+The :mod:`device` module provides a simple interface to a collection of
+PVs.  Here an epics :class:`device.Device` is an object holding a set of
+PVs, all sharing a prefix, but having many *attributes*.  Many PVs will
+have names made up of *prefix+attribute*, with a common prefix for several
+related PVs.  This almost describes an Epics Record, but as it is concerned
+only with PV names, the mapping to an Epics Record is not exact.  On the
+other hand, the concept of a *device* is more flexible than a predefined
+Epics Record as it can actually hold PVs from several different records.::
 
     motor1 = epics.Device('XXX:motor1.', attr=('VAL', 'RBV', 'DESC', 'RVAL',
                                                'LVIO', 'HLS', 'LLS'))
@@ -99,10 +99,6 @@ In general, PV names will be mapped as prefix+delim+attr.  See
 .. data:: _pvs
 
    a dictionary of PVs making up the device.
-
-
-
-
 
 
 .. _device-motor-label:

@@ -1,18 +1,16 @@
 ..  _pv-label:
 
 ==============================
-:mod:`epics.pv`  the PV object
+PV: Epics Process Variables
 ==============================
 
-Overview
-========
 
 .. module:: pv
    :synopsis: PV objects for Epics Channel Access
 
-This module provides a higher-level class :class:`PV`, which creates a `PV`
-object for an EPICS Process Variable.  A `PV` object has both methods and
-attributes for accessing it's properties.
+The :mod:`pv` module provides a higher-level class :class:`pv.PV`, which
+creates a `PV` object for an EPICS Process Variable.  A `PV` object has
+both methods and attributes for accessing it's properties.
 
 
 The :class:`PV` class
@@ -125,7 +123,7 @@ callbacks to be executed when the PV changes.
    :type  wait:  ``True``/``False``
    :param timeout:  maximum time to wait for processing to complete before returning anyway.
    :type  timeout:  float
-   :param use_complete:  whether to use a builtin callback to set :attr:`put_complete`.
+   :param use_complete:  whether to use a built-in callback to set :attr:`put_complete`.
    :type  use_complete:  ``True``/``False``
    :param callback: user-supplied function to run when processing has completed.
    :type callback: ``None`` or a valid python function
@@ -229,7 +227,7 @@ completed.   See :ref:`pv-putwait-label` for more details.
 
 .. method:: run_callback(index)
 
-   execute a particularl user-defined callback right now, even if the PV
+   execute a particular user-defined callback right now, even if the PV
    has not changed.  Useful for debugging!
 
    See also: :attr:`callbacks`  attribute, :ref:`pv-callbacks-label`
@@ -360,7 +358,7 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
 .. attribute:: put_complete
 
-   a boolean (``True``/``False``) value for whether the most recent
+   a Boolean (``True``/``False``) value for whether the most recent
    :meth:`put`  has completed.
 
 .. attribute:: callbacks
@@ -448,12 +446,12 @@ Possible values for :attr:`auto_monitor` are:
 
 ``None``
   The default value for *auto_monitor* is ``None``, and is set to
-  ``True`` if the element count for the PV is smaller than 16384 (The
-  value is set as :data:`ca.AUTOMONITOR_MAXLENGTH`).  To suppress
+  ``True`` if the element count for the PV is smaller than 
+  :data:`ca.AUTOMONITOR_MAXLENGTH` (default of 65536).  To suppress
   monitoring of PVs with fewer array values, you will have to explicitly
-  turn *auto_monitor* to ``False``. For waveform arrays larger than
-  16384 items, automatic monitoring will be ``False`` unless you
-  explicitly set it to ``True`` or an explicit mask.  See
+  turn *auto_monitor* to ``False``. For waveform arrays with more elements,
+  automatic monitoring will not be done unless you explicitly set
+  *auto_monitor=True*, or to an explicit mask.  See 
   :ref:`advanced-large-arrays-label` for more details.
 
 ``True``
@@ -463,7 +461,7 @@ Possible values for :attr:`auto_monitor` are:
   This mask determines which kinds of changes cause the PV to update. By
   default, the subscription updates when the PV value changes by more
   than the monitor deadband, or when the PV alarm status changes. This
-  behaviour is the same as the default in EPICS' *camonitor* tool.
+  behavior is the same as the default in EPICS' *camonitor* tool.
 
 *Mask*
   It is also possible to request an explicit type of CA subscription by
@@ -496,7 +494,7 @@ You can define more than one callback function per PV to be run on value
 changes.  These functions can be specified when creating a PV, with the
 *callback* argument which can take either a single callback function or a
 list or tuple of callback functions.  After a PV has been created, you can
-add calllback functions with :meth:`add_callback`, remove them with
+add callback functions with :meth:`add_callback`, remove them with
 :meth:`remove_callback`, and explicitly run them with :meth:`run_callback`.
 Each callback has an internal unique *index* (a small integer number) that
 can be used for specifying which one to add, remove, and run.
@@ -622,7 +620,7 @@ what to do in the interim.  A simple example would be::
         waiting = not p.put_complete
 
 An additional advantage of this approach is that you can easily wait for
-multiple PVs to complete with python's builtin *all* function, as with::
+multiple PVs to complete with python's built-in *all* function, as with::
 
     pvgroup = (epics.PV('XXX'), epics.PV('YYY'), epics.PV('ZZZ'))
     newvals = (1.0, 2.0,  3.0)
@@ -765,7 +763,6 @@ Or (equivalently):
 >>> p.value = 1.0
 
 The :attr:`value` attribute is the only attribute that can be set.
-
 
 
 Example of simple callback

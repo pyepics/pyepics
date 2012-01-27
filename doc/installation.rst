@@ -5,10 +5,9 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-This package requires Python version 2.5, 2.6, 2.7, or 3.2.  I It is
-possible that Python 2.4 will work if the ctypes package is installed, but
-this has not been tested.  It should work with Python 3.1, as well, but
-this is no longer being tested as of this writing.
+This package requires Python version 2.5, 2.6, 2.7, or 3.2.  It should work
+with Python 3.1, as well, but this is no longer being tested as of this
+writing.
 
 In addition, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
@@ -23,38 +22,46 @@ to use the modules.  For Unix-like systems, these are assumed to be
 available (and findable by Python at runtime) on the system. This may mean
 setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 
-The Python `numpy module <http://numpy.scipy.org/>`_ is not required, but
-will be used to convert EPICS waveforms values into numerical array data if
-available, and its use is encouraged.
+The Python `numpy module <http://numpy.scipy.org/>`_ is not strictly
+required, but will be used to convert EPICS waveforms values into numerical
+array data if available, and its use is strongly encouraged. 
 
 Downloads
 ~~~~~~~~~~~~~
 
-The latest stable version of the PyEpics Package is 3.1.4.  There are
+The latest stable version of the PyEpics Package is 3.2.0.  There are
 a few ways to get the PyEpics Package:
 
-.. _pyepics-3.1.4.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.tar.gz
-.. _pyepics-3.1.4.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.1.4.tar.gz
-.. _pyepics-3.1.4.win32-py2.6.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py2.6.exe
-.. _pyepics-3.1.4.win32-py2.7.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py2.7.exe
-.. _pyepics-3.1.4.win32-py3.2.exe: http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.1.4.win32-py3.2.exe
+.. _pyepics-3.2.0.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.tar.gz
+.. _pyepics-3.2.0.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.tar.gz
+.. _pyepics-3.2.0.win32-py2.6.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py2.6.exe
+.. _pyepics-3.2.0.win32-py2.7.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py2.7.exe
+.. _pyepics-3.2.0.win32-py3.2.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py3.2.exe
+.. _pyepics-3.2.0.win32-py2.6.exe (PyPI): http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.win32-py2.6.exe
+.. _pyepics-3.2.0.win32-py2.7.exe (PyPI): http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.win32-py2.7.exe
+.. _pyepics-3.2.0.win32-py3.2.exe (PyPI): http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.win32-py3.2.exe
 .. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
 .. _PyPi Epics Entry:             http://pypi.python.org/pypi/pyepics/
 .. _Python Setup Tools:           http://pypi.python.org/pypi/setuptools
 
-+---------------------------+------------------------------------------+
-|  Download Option          |  Location                                |
-+===========================+==========================================+
-|  Source Kit               |  `pyepics-3.1.4.tar.gz (CARS)`_  or      |
-|                           |  `pyepics-3.1.4.tar.gz (PyPI)`_          |
-+---------------------------+------------------------------------------+
-|  Windows Installers       |  `pyepics-3.1.4.win32-py2.6.exe`_  or    |
-|                           |  `pyepics-3.1.4.win32-py2.7.exe`_  or    |
-|                           |  `pyepics-3.1.4.win32-py3.2.exe`_        |
-+---------------------------+------------------------------------------+
-|  Development Version      |  use `pyepics github repository`_        |
-+---------------------------+------------------------------------------+
++-----------------+------------+----------------------------------------------+
+|  Download Type  | Py Version |   Location                                   |
++=================+============+==============================================+
+| Source tarball  | All        | `pyepics-3.2.0.tar.gz (CARS)`_  or           |
+|                 |            | `pyepics-3.2.0.tar.gz (PyPI)`_               |
++-----------------+------------+----------------------------------------------+
+| Win32 Installer | 2.6        |  `pyepics-3.2.0.win32-py2.6.exe (CARS)`_  or |
+|                 |            |  `pyepics-3.2.0.win32-py2.6.exe (PyPI)`_  or |
++-----------------+------------+----------------------------------------------+
+| Win32 Installer | 2.7        |  `pyepics-3.2.0.win32-py2.7.exe (CARS)`_  or |
+|                 |            |  `pyepics-3.2.0.win32-py2.7.exe (PyPI)`_  or |
++-----------------+------------+----------------------------------------------+
+| Win32 Installer | 3.2        |  `pyepics-3.2.0.win32-py3.2.exe (CARS)`_  or |
+|                 |            |  `pyepics-3.2.0.win32-py3.2.exe (PyPI)`_  or |
++-----------------+------------+----------------------------------------------+
+|  Development    | All        |  `pyepics github repository`_                |
++-----------------+------------+----------------------------------------------+
 
 If you have `Python Setup Tools`_  installed, you can download and install
 the PyEpics Package simply with::
@@ -66,9 +73,9 @@ Testing
 ~~~~~~~~~~~~~
 
 Some automated unit-testing is done, using the tests folder from the source
-distribution kit.  The following systems were tested for 3.1.4, all with
-Epics base 3.14.12.1.  Except as noted, all tests pass.  Those tests that
-fail are generally well-understood.
+distribution kit.  The following systems were tested for 3.2.0, all with
+Epics base 3.14.12.1 or bas 3.14.12.2.  Except as noted, all tests pass.
+Those tests that fail are generally well-understood.
 
 +-----------+-----------------+------------+-----------------------+
 |  Host OS  | Epics HOST ARCH |  Python    |  Failures, Notes      |
@@ -77,17 +84,17 @@ fail are generally well-understood.
 +-----------+-----------------+------------+-----------------------+
 | Linux     |  linux-x86      |  2.6       |   all pass            |
 +-----------+-----------------+------------+-----------------------+
-| Linux     |  linux-x86      |  2.6.6     |   all pass            |
+| Linux     |  linux-x86      |  2.7.1     |   all pass            |
 +-----------+-----------------+------------+-----------------------+
-| Linux     |  linux-x86_64   |  2.7       |   all pass            |
+| Linux     |  linux-x86_64   |  2.7.1     |   all pass            |
 +-----------+-----------------+------------+-----------------------+
 | Linux     |  linux-x86_64   |  3.2       |   autosave fails      |
 +-----------+-----------------+------------+-----------------------+
 | Mac OSX   |  darwin-x86     |  2.6.5     |   all pass            |
 +-----------+-----------------+------------+-----------------------+
-| Windows   |  win32-x86      |  2.6.5     |   all pass            |
+| Windows   |  win32-x86      |  2.6.6     |   all pass            |
 +-----------+-----------------+------------+-----------------------+
-| Windows   |  win32-x86      |  2.7.1     |   all pass            |
+| Windows   |  win32-x86      |  2.7.2     |   all pass            |
 +-----------+-----------------+------------+-----------------------+
 | Windows   |  win32-x86      |  3.2.2     |   autosave fails      |
 +-----------+-----------------+------------+-----------------------+
@@ -116,12 +123,9 @@ Development Version
 The PyEpics module is still under active development, with enhancements and
 bug-fixes are being added frequently.  All development is done through the
 `pyepics github repository`_.  To get a read-only copy of the latest
-version, use::
+version, use one of::
 
    git clone http://github.com/pyepics/pyepics.git
-
-or::
-
    git clone git@github.com/pyepics/pyepics.git
 
 Current and older source source kits, and Windows Installers can also be found
@@ -169,7 +173,7 @@ There are a few ways to specify how to find this library:
     python package is installed.
 
 Note, that For Windows users, the DLLs (ca.dll and Com.dll) are included in the
-installation kit, and automaically installed to where they can be found at
+installation kit, and automatically installed to where they can be found at
 runtime (following rule 3 above).
 
 With the Epics library loaded, it will need to be able to connect to Epics
@@ -202,20 +206,6 @@ with it are distributed under the Epics Open License:
 
 .. include:: ../license.txt
 
-
-In plain words, this means
-
-  a. you can use this software for any purpose.
-
-  b. you can modify and redistribute this software if you keep existing copyright notices intact.
-
-  c. you cannot claim that you wrote this software or remove copyright notices.
-
-  d. you cannot claim the copyright holders endorse your use of this software.
-
-  e. you cannot claim the copyright holders owe you anything if the software does not work as you expect, and
-
-  f. if you are the US government, you can probably do whatever you want. ;)
 
 
 

@@ -119,7 +119,6 @@ class PVMixin(object):
         epics.poll()
         self.pv.connection_callbacks.append(self.OnEpicsConnect)
 
-        # self.pv.wait_for_connection()
         self.pv.get_ctrlvars()
 
         self.OnPVChange(self.pv.get(as_string=True))
@@ -489,19 +488,34 @@ class PVEnumButtons(wx.Panel, PVCtrlMixin):
     def __init__(self, parent, pv=None,
                  orientation=wx.HORIZONTAL,  **kw):
 
+        self.orientation = orientation
         wx.Panel.__init__(self, parent, wx.ID_ANY, **kw)
         PVCtrlMixin.__init__(self, pv=pv)
 
-        pv.wait_for_connection()
+    @EpicsFunction
+    def SetPV(self, pv=None):
+        "set pv, either an epics.PV object or a pvname"
+        if pv is None:
+            return
+        if isinstance(pv, epics.PV):
+            self.pv = pv
+        elif isinstance(pv, (str, unicode)):
+            self.pv = epics.PV(pv)
+            self.pv.connect()
+
+        epics.poll()
+        self.pv.connection_callbacks.append(self.OnEpicsConnect)
+
+        self.pv.get_ctrlvars()
+
+        self.OnPVChange(self.pv.get(as_string=True))
+        self.pv.add_callback(self._pvEvent, wid=self.GetId() )
+
+        
         pv_value = pv.get(as_string=True)
         enum_strings = pv.enum_strs
 
-
-        if enum_strings is None:
-            self._warn('pvEnumButtons needs an enum PV')
-            return
-
-        sizer = wx.BoxSizer(orientation)
+        sizer = wx.BoxSizer(self.orientation)
         self.buttons = []
         if enum_strings is not None:
             for i, label in enumerate(enum_strings):
@@ -514,6 +528,8 @@ class PVEnumButtons(wx.Panel, PVCtrlMixin):
         self.SetAutoLayout(True)
         self.SetSizer(sizer)
         sizer.Fit(self)
+
+
 
     @EpicsFunction
     def _onButton(self, event=None, index=None, **kw):
@@ -541,28 +557,42 @@ class PVEnumChoice(wx.Choice, PVCtrlMixin):
         wx.Choice.__init__(self, parent, wx.ID_ANY, **kw)
         PVCtrlMixin.__init__(self, pv=pv)
 
-        pv.wait_for_connection()
+    @EpicsFunction
+    def SetPV(self, pv=None):
+        "set pv, either an epics.PV object or a pvname"
+        if pv is None:
+            return
+        if isinstance(pv, epics.PV):
+            self.pv = pv
+        elif isinstance(pv, (str, unicode)):
+            self.pv = epics.PV(pv)
+            self.pv.connect()
+
+        epics.poll()
+        self.pv.connection_callbacks.append(self.OnEpicsConnect)
+
+        self.pv.get_ctrlvars()
+
+        self.OnPVChange(self.pv.get(as_string=True))
+        self.pv.add_callback(self._pvEvent, wid=self.GetId() )
+
+        self.Bind(wx.EVT_CHOICE, self._onChoice)
+        
         pv_value = pv.get(as_string=True)
         enum_strings = pv.enum_strs
-        self.pv = pv
-
-        if enum_strings is None:
-            self._warn('pvEnumChoice needs an enum PV')
-            return
-
+            
         self.Clear()
         self.AppendItems(enum_strings)
         self.SetStringSelection(pv_value)
-        self.Bind(wx.EVT_CHOICE, self.OnChoice)
 
-    def OnChoice(self, event=None, **kws):
+    def _onChoice(self, event=None, **kws):
         "choice event handler"
         if self.pv is not None:
             index = self.pv.enum_strs.index(event.GetString())
             self.pv.put(index)
 
     @DelayedEpicsCallback
-    def _pvEvent(self, value=None, **kw):
+    def _pvEvent(self, pvname=None, value=None, **kw):
         "pv event handler"
         if value is not None:
             self.SetSelection(value)

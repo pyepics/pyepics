@@ -9,6 +9,8 @@ mypv = epics.PV(pvname)
 
 write = sys.stdout.write
 
+mypv.get_ctrlvars()
+
 write('Created PV = %s\n' % mypv)
 def onChanges(pvname=None, value=None, char_value=None, **kw):
     write( 'PV %s %s, %s Changed!\n' % (pvname, repr(value), char_value))

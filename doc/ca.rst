@@ -1,24 +1,31 @@
-=========================================
-:mod:`epics.ca` Low-Level Epics Interface
-=========================================
+=================================================
+ca: Low-level Channel Access module
+=================================================
+
+.. module:: ca
+   :synopsis: low-level Channel Access  module.
+
+The :mod:`ca` module provides a low-level wrapping of the EPICS
+Channel Access (CA) library, using ctypes.  Most users of the `epics`
+module will not need to be concerned with most of the details here, and
+will instead use the simple functional interface (:func:`epics.caget`,
+:func:`epics.caput` and so on), or use the :class:`epics.PV` class to
+create and use epics PV objects.
+
 
 General description, difference with C library
 =================================================
 
-This module provides a low-level wrapping of the EPICS Channel Access (CA)
-library, using ctypes.  Most users of the `epics` module will not need to
-be concerned with most of the details here, and will instead use the simple
-functional interface (:func:`epics.caget`, :func:`epics.caput` and so on),
-or use the :class:`epics.PV` class to create and use epics PV objects.
-
-The goal of this :mod:`ca` module is to stay fairly close to the C
-interface to the CA library while also providing a pleasant Python
-experience.  It is expected that anyone looking into the details of this
-module is somewhat familiar with Channel Access and knows where to consult
-the `Channel Access Reference Documentation
-<http://www.aps.anl.gov/epics/base/R3-14/11-docs/CAref.html>`_.  This
-document focuses on the differences with the C interface, assuming a
-general understanding of what the functions are meant to do.
+The goal of the :mod:`ca` module is to provide a fairly complete
+mapping of the C interface to the CA library while also providing a
+pleasant Python experience.  It is expected that anyone looking
+into the details of this module is somewhat familiar with Channel
+Access and knows where to consult the `Channel Access Reference
+Documentation
+<http://www.aps.anl.gov/epics/base/R3-14/11-docs/CAref.html>`_.
+This document focuses on the differences with the C interface,
+assuming a general understanding of what the functions are meant to
+do.
 
 
 Name Mangling
@@ -61,9 +68,6 @@ able to dynamically allocate memory, which is not necessary in Python.
 
 Initialization, Finalization, and Life-cycle
 ==============================================
-
-.. module:: ca
-   :synopsis: low-level Channel Access  module.
 
 The Channel Access library must be initialized before it can be used.
 There are 3 main reasons for this need:
@@ -125,13 +129,14 @@ initialization and finalization tasks are handled in the following way:
 
    sets the default array length (ie, how many elements an array has) above
    which automatic conversion to numpy arrays *and* automatic monitoring
-   for PV variables is suppressed.  The default value is 16384.  To be
+   for PV variables is suppressed.  The default value is 65536.  To be
    clear: waveforms with fewer elements than this value will be
    automatically monitored changes, and will be converted to numpy arrays
-   (if numpy is installed).  Larger waveforms will not be monitored.
+   (if numpy is installed).  Larger waveforms will not be automatically
+   monitored. 
 
-
-   :ref:`advanced-large-arrays-label` for more details.
+   :ref:`advanced-arrays-label` and :ref:`advanced-large-arrays-label` for
+   more details. 
 
 Using the CA module
 ====================
@@ -148,10 +153,11 @@ threading contexts are very close to the C library:
 .. function::  context_create()
 .. function::  create_context()
 
-   This will create a new context, using the value of :data:`PREEMPTIVE_CALLBACK` to set
-   the context type. Note that CA library function has the irritating name of
-   *context_create*.  Both that and *create_context* (which is more consistent with the
-   Verb_Object of the rest of the CA library) are allowed.
+   This will create a new context, using the value of
+   :data:`PREEMPTIVE_CALLBACK` to set the context type. Note that CA
+   library function has the irritating name of *context_create*.  Both that
+   and *create_context* (which is more consistent with the Verb_Object of
+   the rest of the CA library) are allowed.
 
 
 .. function::  context_destroy()
@@ -178,8 +184,18 @@ threading contexts are very close to the C library:
    using CA.  See :ref:`advanced-threads-label` for further discussion.
 
 .. function::  client_status(context, level)
+   
+   Print (to stderr) information about Channel Access status, including
+   status for each channel, and search and connection statistics.
+
+.. function::  version()
+
+   Print Channel Access version string.  Currently, this should report
+   '4.13' 
 
 .. function::  message(status)
+
+   Print a message corresponding to a Channel Access status return value. 
 
 .. function::  flush_io()
 
@@ -653,12 +669,10 @@ An example use of a synchronous group::
     for chid in chids:
         ca.sg_put(sg, chid, 0)
 
-
     print 'sg_put done, but not blocked / committed. Sleep for 5 seconds '
     time.sleep(5.0)
     ca.sg_block(sg)
     print 'done.'
-
 
 ..  _ca-implementation-label:
 

@@ -12,6 +12,13 @@ This is mostly copied from CA header files
 import ctypes
 import time
 
+HAS_NUMPY = False
+try:
+    import numpy
+    HAS_NUMPY = True
+except ImportError:
+    pass
+
 # EPICS Constants
 ECA_NORMAL = 1
 ECA_TIMEOUT = 80
@@ -182,6 +189,17 @@ class ctrl_double(ctypes.Structure):
     _fields_.extend( _gen_ctrl_lims(t=double_t) )
     _fields_.extend([('value',       double_t)])
     
+    
+NP_Map = {}
+if HAS_NUMPY:
+    NP_Map = {INT:    numpy.int16,
+              FLOAT:  numpy.float32,
+              ENUM:   numpy.uint16,
+              CHAR:   numpy.uint8,
+              LONG:   numpy.int32,
+              DOUBLE: numpy.float64}
+    
+
 # map of Epics DBR types to ctypes types
 Map = {STRING: string_t,
        INT:    short_t,

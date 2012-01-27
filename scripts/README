@@ -1,5 +1,7 @@
-These programs demonstrate some uses of the epics module, especially when 
-coupled with wxWidget displays.
+These programs demonstrate some simple uses of the epics module.  For more
+complex examples, including GUI applications built with wxWidget displays, 
+see the pyepics/epicsapp repository at
+      https://github.com/pyepics/epicsapps
 
 == Motor_Display.py:
 This provides a simple GUI interface to Epics Motors. Multiple motors can
@@ -12,19 +14,10 @@ window with more details of the Motor Record.
 
 This program requires the wxPython package.
 
-== AreaDetector_Display.py
-This will connect to and display the image from an Epics Area Detector.
-The display will be live, responding to changes in the Epics record.
-
-   ~> python AreaDetector_Display.py XXXAD1:image1:
-
-This program requires the wxPython package and the Python Imaging Library
-
 == caget.py
 This is a simple emulation of the the caget command.
    
    ~> python caget.py  XXX.VAL
-
 
 == save_restore.py
 This is a simple commandline tool for saving/restoring PV values

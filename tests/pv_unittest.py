@@ -21,7 +21,7 @@ def onConnect(pvname=None, conn=None, chid=None,  **kws):
     write('  :Connection status changed:  %s  connected=%s\n' % (pvname, conn))
     global CONN_DAT
     CONN_DAT[pvname] = conn
-    
+
 def onChanges(pvname=None, value=None, **kws):
     write( '/// New Value: %s  value=%s, kw=%s\n' %( pvname, str(value), repr(kws)))
     global CHANGE_DAT
@@ -44,11 +44,11 @@ class PV_Tests(unittest.TestCase):
         pv = PV(pvnames.int_pv,
                 connection_callback=onConnect)
         val = pv.get()
-        
+
         global CONN_DAT
         conn = CONN_DAT.get(pvnames.int_pv, None)
         self.assertEqual(conn, True)
-        
+
     def test_caget(self):
         write('Simple Test of caget() function\n')
         pvs = (pvnames.double_pv, pvnames.enum_pv, pvnames.str_pv)
@@ -56,8 +56,8 @@ class PV_Tests(unittest.TestCase):
             val = caget(p)
             self.assertNotEqual(val, None)
         sval = caget(pvnames.str_pv)
-        self.assertEqual(sval, 'ao')        
-        
+        self.assertEqual(sval, 'ao')
+
     def test_get1(self):
         write('Simple Test: test value and char_value on an integer\n')
         pause_updating()
@@ -68,7 +68,7 @@ class PV_Tests(unittest.TestCase):
         self.failUnless(int(cval)== val)
         resume_updating()
 
-        
+
     def test_stringarray(self):
         write('String Array: \n')
         pause_updating()
@@ -88,7 +88,7 @@ class PV_Tests(unittest.TestCase):
         see_complete = []
         for v in vals:
             t0 = time.time()
-            p.put(v, use_complete=True) 
+            p.put(v, use_complete=True)
             count = 0
             for i in range(100000):
                 time.sleep(0.001)
@@ -98,7 +98,7 @@ class PV_Tests(unittest.TestCase):
                     break
                 # print( 'made it to value= %.3f, elapsed time= %.4f sec (count=%i)' % (v, time.time()-t0, count))
         self.failUnless(len(see_complete) > (len(vals) - 5))
-        
+
     def test_putwait(self):
         write('Put with wait (using real motor!) \n')
         pv = PV(pvnames.motor1)
@@ -147,9 +147,9 @@ class PV_Tests(unittest.TestCase):
                 break
             count = count + 1
             time.sleep(0.02)
-        write('    put_complete=%s (should be True), and count=%i (should be>3)\n' % 
+        write('    put_complete=%s (should be True), and count=%i (should be>3)\n' %
               (pv.put_complete, count))
-        self.failUnless(pv.put_complete)            
+        self.failUnless(pv.put_complete)
         self.failUnless(count > 3)
 
     def test_get_callback(self):
@@ -163,18 +163,21 @@ class PV_Tests(unittest.TestCase):
 
         mypv.add_callback(onChanges)
         write('Added a callback.  Now wait for changes...\n')
-        
+
         t0 = time.time()
         while time.time() - t0 < 3:
             time.sleep(1.e-4)
         write('   saw %i changes.\n' % len(NEWVALS))
-        self.failUnless(len(NEWVALS) > 3)            
+        self.failUnless(len(NEWVALS) > 3)
         mypv.clear_callbacks()
-        
-        
+
+
     def test_subarrays(self):
         write("Subarray test:  dynamic length arrays\n")
         driver = PV(pvnames.subarr_driver)
+        subarr1 = PV(pvnames.subarr1)
+        subarr1.connect()
+
         len_full = 64
         len_sub1 = 16
         full_data = numpy.arange(len_full)/1.0
@@ -182,9 +185,9 @@ class PV_Tests(unittest.TestCase):
         caput("%s.NELM" % pvnames.subarr1, len_sub1)
         caput("%s.INDX" % pvnames.subarr1, 0)
 
-        subarr1 = PV(pvnames.subarr1)
 
-        driver.put(full_data) ;   time.sleep(0.1)
+        driver.put(full_data) ;
+        time.sleep(0.1)
         subval = subarr1.get()
 
         self.assertEqual(len(subval), len_sub1)
@@ -234,11 +237,11 @@ class PV_Tests(unittest.TestCase):
         self.assertEqual(units, pvnames.double_pv_units)
         self.failUnless(pv.access.startswith('read'))
 
-        
+
     def test_type_converions_2(self):
         write("CA type conversions arrays\n")
         pvlist = (pvnames.char_arr_pv,
-                  pvnames.long_arr_pv,       
+                  pvnames.long_arr_pv,
                   pvnames.double_arr_pv)
         pause_updating()
         chids = []
@@ -254,7 +257,7 @@ class PV_Tests(unittest.TestCase):
             values[name] = ca.get(chid)
         for promotion in ('ctrl', 'time'):
             for chid, pvname in chids:
-                write('=== %s  chid=%s as %s\n' % (ca.name(chid), 
+                write('=== %s  chid=%s as %s\n' % (ca.name(chid),
                                                    repr(chid), promotion))
                 time.sleep(0.01)
                 if promotion == 'ctrl':
@@ -263,7 +266,7 @@ class PV_Tests(unittest.TestCase):
                     ntype = ca.promote_type(chid, use_time=True)
 
                 val  = ca.get(chid, ftype=ntype)
-                cval = ca.get(chid, as_string=True)    
+                cval = ca.get(chid, as_string=True)
                 for a, b in zip(val, values[pvname]):
                     self.assertEqual(a, b)
 
@@ -276,6 +279,6 @@ if __name__ == '__main__':
 
 #     chid = ca.create_channel(pvnames.int_pv,
 #                              callback=onConnect)
-#     
+#
 #     time.sleep(0.1)
 

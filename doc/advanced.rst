@@ -2,9 +2,106 @@
 Advanced Topic with Python Channel Access
 ===============================================
 
-This chapter contains a variety of "usage notes" and
-implementation details that may help in getting the best perfomance from
-the pyepics module.
+This chapter contains a variety of "usage notes" and implementation
+details that may help in getting the best performance from the
+pyepics module.
+
+.. _advanced--arrays-label:
+
+Working with waveform / array data
+============================================
+
+Though most EPICS Process Variables hold single values, PVs can hold array
+data from EPICS waveform records.  These are always data of homogenous data
+type, and have a fixed maximum element count (defined when the waveform is
+created from the host EPICS process).  These waveforms are most naturally
+mapped to Arrays from the `numpy module <http://numpy.scipy.org/>`_, and
+this is strongly encouraged.   
+
+Arrays without Numpy
+~~~~~~~~~~~~~~~~~~~~~~~~
+If you have numpy installed, and use the default *as_numpy=True* in
+:meth:`ca.get`, :meth:`pv.get` or :meth:`epics.caget`, you will get a
+numpy array for the value of a waveform PV.  If you do *not* have numpy
+installed, or explicitly use *as_numpy=False* in a get request, you will
+get the raw C-like array reference from the Python 
+`ctypes module <http://docs.python.org/library/ctypes.html#arrays>`_.
+These objects are not normally meant for casual use, but are not too
+difficult to work with either.  They can be easily converted to a simple
+Python list with something like::
+
+    >>> import epics
+    >>> epics.ca.HAS_NUMPY = False # turn numpy off for session
+    >>> p = epics.PV('XX:scan1.P1PA')
+    >>> p.get()
+    <lib.dbr.c_double_Array_500 object at 0x853980c>
+    >>> ldat = list(p.get())
+  
+Note that this conversion to a list can be very slow for large arrays.
+
+Variable Length Arrays
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+While the maximum length of an array is fixed, the length of data you get
+back from a monitor, :meth:`ca.get`, :meth:`pv.get`, or :meth:`epics.caget`
+may be shorter than the maximumn length, reflecting the most recent data
+put to that PV.  That is, if some process puts a smaller array to a PV than
+its maximum length, monitors on that PV may receive only the changed data.
+For example::
+ 
+    >>> import epics
+    >>> p = epics.PV('Py:double2k')
+    >>> print p
+    <PV 'Py:double2k', count=2048/2048, type=double, access=read/write>
+    >>> import numpy
+    >>> p.put(numpy.arange(10)/5.0)
+    >>> print p.get()
+    array([ 0. ,  0.2,  0.4,  0.6,  0.8,  1. ,  1.2,  1.4,  1.6,  1.8])
+
+To be clear, the :meth:`pv.put` above could be done in a separate process
+-- the :meth:`pv.get` is not using a value cached from the :meth:`pv.put`.
+
+This feature seems to depend on the record definition, and requires version
+3.14.12.1 of Epics base or higher, and can be checked by comparing
+:meth:`ca.version` with the string '4.13'.
+
+Character Arrays
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+As noted in other sections, character waveforms can be used to hold strings
+longer than 40 characters, which a fundamental limit for native Epics
+strings.    Character waveforms shorter than
+:data:`ca.AUTOMONITOR_MAXLENGTH` can be turned into strings with an optional
+*as_string=True*  to :meth:`ca.get`, :meth:`pv.get` , or
+:meth:`epics.caget`.   If you've defined a Epics waveform record as::
+
+
+    record(waveform,"$(P):filename")  {
+              field(DTYP,"Soft Channel")
+              field(DESC,"file name")
+              field(NELM,"128")
+              field(FTVL,"CHAR")
+     }
+
+Then you can use this record with:
+
+    >>> import epics
+    >>> pvname = 'PREFIX:filename.VAL'
+    >>> pv  = epics.PV(pvname)
+    >>> print pv.info
+    ....
+    >>> plain_val = pv.get()
+    >>> print plain_val
+    array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 101, 114,  92,  77,
+         97, 114,  99, 104,  50,  48,  49,  48,  92,  70,  97, 115, 116,
+         77,  97, 112])
+    >>> char_val = pv.get(as_string=True)
+    >>> print char_val
+    'T:\\xas_user\\March2010\\FastMap'
+
+This example uses :meth:`pv.get` but :meth:`ca.get` is essentially
+equivalent, as its *as_string* parameter works exactly the same way.
+
 
 .. _advanced-large-arrays-label:
 
@@ -19,7 +116,7 @@ megabytes) which means that some of the assumptions about dealing with
 Channels / PVs may need reconsideration.
 
 When using PVs with large array sizes (here, I'll assert that *large* means
-more than 1000 or so elements), it is necessary to make sure that the
+more than a few thousand elements), it is necessary to make sure that the
 environmental variable ``EPICS_CA_MAX_ARRAY_BYTES`` is suitably set.
 Unfortunately, this represents a pretty crude approach to memory management
 within Epics for handling array data as it is used not only sets how large
@@ -43,10 +140,10 @@ assured that the latest value is always available.  As arrays get larger
 automatic monitoring is desirable.
 
 The Python :mod:`epics.ca` module defines a variable
-:data:`AUTOMONITOR_MAXLENGTH` which controls whether array PVs are
-automatically monitored.  The default value for this variable is 16384, but
+:data:`ca.AUTOMONITOR_MAXLENGTH` which controls whether array PVs are
+automatically monitored.  The default value for this variable is 65536, but
 can be changed at runtime.  Arrays with fewer elements than
-:data:`AUTOMONITOR_MAXLENGTH` will be automatically monitored, unless
+:data:`ca.AUTOMONITOR_MAXLENGTH` will be automatically monitored, unless
 explicitly set, and arrays larger than :data:`AUTOMONITOR_MAXLENGTH` will
 not be automatically monitored unless explicitly set. Auto-monitoring of
 PVs can be be explicitly set with
@@ -65,68 +162,27 @@ were an image from a digital camera.  This uses the `Python Imaging Library
 processing:
 
 
->>> import epics
->>> import Image
->>> pvname = '13IDCPS1:image1:ArrayData'
->>> img_pv  = epics.PV(pvname)
->>>
->>> raw_image = img_pv.get(as_numpy=False)
->>> im_mode = 'RGB'
->>> im_size = (1360, 1024)
->>> img = Image.frombuffer(im_mode, im_size, raw_image, 'raw', im_mode, 0, 1)
->>> img.show()
+    >>> import epics
+    >>> import Image
+    >>> pvname = '13IDCPS1:image1:ArrayData'
+    >>> img_pv  = epics.PV(pvname)
+    >>>
+    >>> raw_image = img_pv.get()
+    >>> im_mode = 'RGB'
+    >>> im_size = (1360, 1024)
+    >>> img = Image.frombuffer(im_mode, im_size, raw_image, 
+                                'raw', im_mode, 0, 1)
+    >>> img.show()
 
 The result looks like this (taken with a Prosilica GigE camera):
-
 
 .. image:: AreaDetector1.png
 
 
-Example using Character Waveforms as Long Strings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A more complete application for reading and displaying image from Epics
+Area Detectors is included  at `http://github.com/pyepics/epicsapps/
+<http://github.com/pyepics/epicsapps/>`_.  
 
-As EPICS strings can be only 40 characters long, Character Waveforms are
-sometimes used to allow Long Strings.  While this can be a common usage for
-character waveforms, this module resists the temptation to implicitly
-convert such byte arrays to strings using ``as_string=True``.
-
-As an example, let's say you've created a character waveform PV, as with
-this EPICS database::
-
-    record(waveform,"$(P):filename")  {
-              field(DTYP,"Soft Channel")
-              field(DESC,"file name")
-              field(NELM,"128")
-              field(FTVL,"CHAR")
-     }
-
-You can then use this with:
-
-   >>> import epics
-   >>> pvname = 'PREFIX:filename.VAL'
-   >>> pv  = epics.PV(pvname)
-   >>> print pv.info
-   ....
-   >>> plain_val = pv.get()
-   >>> print plain_val
-   array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 101, 114,  92,  77,
-        97, 114,  99, 104,  50,  48,  49,  48,  92,  70,  97, 115, 116,
-        77,  97, 112,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-         0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0])
-   >>> char_val = pv.get(as_string=True)
-   >>> print char_val
-   'T:\\xas_user\\March2010\\FastMap'
-
-
-This uses the :class:`PV` class, but the :meth:`get` method of :mod:`ca` is
-essentially equivalent, as its *as_string* parameter works exactly the same
-way.
 
 .. _advanced-threads-label:
 
@@ -362,7 +418,7 @@ received faster than that, the *get* will return as soon as it can.
 Strategies for connecting to a large number of PVs
 ====================================================
 
-Occassionally, you may find that you need to quickly connect to a large
+Occasionally, you may find that you need to quickly connect to a large
 number of PVs, say to write values to disk.  The most straightforward way
 to do this, say::
 
@@ -383,7 +439,7 @@ object automatically use connection and event callbacks.  Normally, these
 are advantages, as you don't need to explicitly deal with them.  But,
 internally, they do pause for network responses using :meth:`ca.pend_event`
 and these pauses can add up.  Second, the :meth:`ca.get` also pauses for
-network response, so that the returned value actually containes the latest
+network response, so that the returned value actually contains the latest
 data right away, as discussed in the previous section.
 
 The remedies are to
@@ -399,7 +455,7 @@ the CA library, and would be the following::
 
     pvdata = {}
     for name in pvnamelist:
-        chid = ca.create_channel(name, connect=False) # note 1
+        chid = ca.create_channel(name, connect=False, auto_cb=False) # note 1
 	pvdata[name] = (chid, None)
 
     for name, data in pvdata.items():
@@ -418,18 +474,23 @@ the CA library, and would be the following::
 
 The code here probably needs detailed explanation.  The first thing to
 notice is that this is using the `ca` level, not `PV` objects.  Second
-(Note 1), the `connect=False` option to :meth:`ca.create_channel` which
-will not wait for connection to be established -- normally this is not what
-you want, but we're aiming for maximum speed.  We then explicitly call
-:meth:`ca.connect_channel` for all the channels.  Next (Note 2), we tell the
-CA library to request the data for the channel without waiting around to
-receive it.  The main point of not having :meth:`ca.get` wait for the data
-for each channel as we go is that each data transfer takes time.  Instead
-we request data to be sent in a separate thread for all channels without
-waiting.  Then we do wait by calling :meth:`ca.poll` once and only once,
-(not len(channels) times!).  Finally, we use the :meth:`ca.get_complete`
-method to convert the data that has now been received by the companion
-thread to a python value.
+(Note 1), the `connect=False` and `auto_cb=False` options to
+:meth:`ca.create_channel`.  These respectively tell
+:meth:`ca.create_channel` to not wait for a connection before returning,
+and to not automatically assign a connection callback.  Normally, these are
+not what you want, as you want a connected channel and to know if the
+connection state changes.  But we're aiming for maximum speed here, so we
+avoid these.
+
+We then explicitly call :meth:`ca.connect_channel` for all the channels.
+Next (Note 2), we tell the CA library to request the data for the channel
+without waiting around to receive it.  The main point of not having
+:meth:`ca.get` wait for the data for each channel as we go is that each
+data transfer takes time.  Instead we request data to be sent in a separate
+thread for all channels without waiting.  Then we do wait by calling
+:meth:`ca.poll` once and only once, (not len(channels) times!).  Finally,
+we use the :meth:`ca.get_complete` method to convert the data that has now
+been received by the companion thread to a python value.
 
 How much faster is the more explicit method?  In my tests, I used 20,000
 PVs, all scalar values, all actually connected, and all on the same subnet
@@ -445,7 +506,7 @@ writing a script that is intended to run once, fetch a large number of PVs
 and get their values (say, an auto-save script that runs on demand), then
 the boost is definitely significant.  On the other hand, if you're writing
 a long running process or a process that will retain the PV connections and
-get their values multiple times, the difference in startup speed is less
+get their values multiple times, the difference in start-up speed is less
 significant.  For a long running auto-save script that periodically writes
 out all the PV values, the "obvious" way using automatically monitored PVs
 may be much *better*, as the time for the initial connection is small, and
