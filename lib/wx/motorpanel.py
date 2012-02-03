@@ -123,10 +123,13 @@ class MotorPanel(wx.Panel):
         if self._size == 'medium':
             wdesc, wrbv, winfo, wdrv = 140, 85, 80, 100
         elif self._size == 'small':
-            wdesc, wrbv, winfo, wdrv = 45, 70, 40, 80
+            wdesc, wrbv, winfo, wdrv = 70, 60, 30, 80
 
         self.desc = PVText(self, size=(wdesc, 25), style=LTEXT)
         self.desc.SetForegroundColour("Blue")
+        font = self.desc.GetFont()
+        font.PointSize -= 1
+        self.desc.SetFont(font)
 
         self.rbv  = PVText(self, size=(wrbv, 25), fg='Blue', style=RCEN)
         self.info = wx.StaticText(self, label='',
@@ -143,7 +146,7 @@ class MotorPanel(wx.Panel):
         spacer = wx.StaticText(self, label=' ', size=(5, 5), style=RIGHT)
         self.__sizer.AddMany([(spacer,      0, CEN),
                               (self.desc,   1, LCEN),
-                              (self.info,   1, CEN),
+                              (self.info,   0, CEN),
                               (self.rbv,    0, CEN),
                               (self.drive,  0, CEN)])
 
@@ -191,15 +194,14 @@ class MotorPanel(wx.Panel):
         "stop button"
         if self.motor is None:
             return
+
         curstate = str(self.stopbtn.GetLabel()).lower().strip()
-
-        self.motor.StopNow()
-        epics.poll()
-        val = 3
         if curstate == 'stop':
-            val = 0
-        self.motor.put('SPMG', val)
-
+            self.motor.stop()
+            epics.poll()
+        else:
+            self.motor.SPMG = 3
+ 
     @EpicsFunction
     def OnMoreButton(self, event=None):
         "more button"
