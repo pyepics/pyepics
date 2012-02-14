@@ -208,7 +208,7 @@ class Motor(device.Device):
         'set':             'SET',
         'stop_go':         'SPMG',
         's_revolutions':   'SREV',
-        'stop':            'STOP',
+        'stop_command':    'STOP',
         't_direction':     'TDIR',
         'tweak_forward':   'TWF',
         'tweak_reverse':   'TWR',
@@ -509,11 +509,11 @@ class Motor(device.Device):
 
     def StopNow(self):
         "stop motor as soon as possible"
-        save_val = self.get('SPMG')
-        self.put('SPMG', 0)
-        time.sleep(0.10)
-        self.put('SPMG', save_val)
-        
+        self.stop()
+
+    def stop(self):
+        "stop motor as soon as possible"
+        self.STOP = 1
             
     def make_step_list(self, minstep=0.0, maxstep=None, decades=10):
         """ create a reasonable list of motor steps, as for a dropdown menu
