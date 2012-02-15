@@ -317,7 +317,7 @@ class Motor(device.Device):
             ll_name, hl_name = 'DLLM', 'DHLM'
         return (val <= self.get(hl_name) and val >= self.get(ll_name))
 
-    def move(self, val=None, relative=None, wait=False, timeout=300.0,
+    def move(self, val=None, relative=False, wait=False, timeout=300.0,
              dial=False, step=False, raw=False, ignore_limits=False):
         """ moves motor drive to position
 
@@ -344,26 +344,27 @@ class Motor(device.Device):
         except TypeError:
             return None
 
-        drv, rbv, lims = ('VAL', 'RBV', 'user')
+        drv, rbv = ('VAL', 'RBV')
         if dial:
-            drv, rbv, lims = ('DVAL', 'DRBV', 'dial')
+            drv, rbv = ('DVAL', 'DRBV')
         if step or raw:
-            drv, rbv, lims = ('RVAL', 'RRBV', None)
+            step = True
+            drv, rbv = ('RVAL', 'RRBV')
 
         if relative:
             val += self.get(rbv)
 
         # Check for limit violations
-        if lims is not None and not ignore_limits:
-            limits_ok = self.within_limits(val, lims)
-            if not limits_ok:
+        if not ignore_limits and not step:
+            if not self.within_limits(val, dial=dial):
                 return -1
+
         stat = self.put(drv, val, wait=wait, timeout=timeout)
         ret = stat
         if stat == 1:
             ret = 0
         if stat == -2:
-            ret = -1
+            ret = -2
         try:
             self.check_limits()
         except MotorLimitException:
