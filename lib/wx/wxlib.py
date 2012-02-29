@@ -105,6 +105,56 @@ class PVMixin(object):
         if pv is not None:
             self.SetPV(pv)
 
+        self._popupmenu = None
+        self.Bind(wx.EVT_RIGHT_DOWN, self._onRightDown)
+            
+    def _onRightDown(self, event=None):
+        """right button down: show pop-up"""
+        if event is None:
+            return
+        if self._popupmenu is None:
+            self.build_popupmenu()
+        wx.CallAfter(self.PopupMenu, self._popupmenu, event.GetPosition())
+        event.Skip()
+    
+    def build_popupmenu(self, event=None):
+        self._copy_name = wx.NewId()
+        self._copy_val  = wx.NewId()
+        self._show_info = wx.NewId()
+        self._popupmenu = wx.Menu()
+        self._popupmenu.Append(self._copy_name, 'Copy PV Name to Clipboard')
+        self._popupmenu.Append(self._copy_val,  'Copy PV Value to Clipboard')
+        self._popupmenu.AppendSeparator()
+        self._popupmenu.Append(self._show_info, 'Show PV Info')
+
+        self.Bind(wx.EVT_MENU, self.copy_name,  id=self._copy_name)
+        self.Bind(wx.EVT_MENU, self.copy_val,   id=self._copy_val)
+        self.Bind(wx.EVT_MENU, self.show_info,  id=self._show_info)
+        
+    @EpicsFunction
+    def copy_name(self, event=None):
+        dat = wx.TextDataObject()
+        dat.SetText(self.pv.pvname)
+        wx.TheClipboard.Open()
+        wx.TheClipboard.SetData(dat)
+        wx.TheClipboard.Close()
+        
+    @EpicsFunction
+    def copy_val(self, event=None):
+        dat = wx.TextDataObject()
+        dat.SetText(self.pv.get(as_string=True))
+        wx.TheClipboard.Open()
+        wx.TheClipboard.SetData(dat)
+        wx.TheClipboard.Close()
+
+    @EpicsFunction
+    def show_info(self, event=None):
+        dlg = wx.MessageDialog(self, self.pv.info,
+                               'Info for %s' % self.pv.pvname,
+                               wx.OK|wx.ICON_INFORMATION)
+        dlg.ShowModal()
+        dlg.Destroy()
+
     @EpicsFunction
     def SetPV(self, pv=None):
         "set pv, either an epics.PV object or a pvname"
@@ -522,13 +572,13 @@ class PVEnumButtons(wx.Panel, PVCtrlMixin):
                 b = buttons.GenToggleButton(self, -1, label)
                 self.buttons.append(b)
                 b.Bind(wx.EVT_BUTTON, Closure(self._onButton, index=i) )
+                b.Bind(wx.EVT_RIGHT_DOWN, self._onRightDown)
                 sizer.Add(b, flag = wx.ALL)
                 b.SetToggle(label==pv_value)
 
         self.SetAutoLayout(True)
         self.SetSizer(sizer)
         sizer.Fit(self)
-
 
 
     @EpicsFunction
