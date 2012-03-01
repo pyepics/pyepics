@@ -16,7 +16,7 @@ data from EPICS waveform records.  These are always data of homogenous data
 type, and have a fixed maximum element count (defined when the waveform is
 created from the host EPICS process).  These waveforms are most naturally
 mapped to Arrays from the `numpy module <http://numpy.scipy.org/>`_, and
-this is strongly encouraged.   
+this is strongly encouraged.
 
 Arrays without Numpy
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,7 +24,7 @@ If you have numpy installed, and use the default *as_numpy=True* in
 :meth:`ca.get`, :meth:`pv.get` or :meth:`epics.caget`, you will get a
 numpy array for the value of a waveform PV.  If you do *not* have numpy
 installed, or explicitly use *as_numpy=False* in a get request, you will
-get the raw C-like array reference from the Python 
+get the raw C-like array reference from the Python
 `ctypes module <http://docs.python.org/library/ctypes.html#arrays>`_.
 These objects are not normally meant for casual use, but are not too
 difficult to work with either.  They can be easily converted to a simple
@@ -36,7 +36,7 @@ Python list with something like::
     >>> p.get()
     <lib.dbr.c_double_Array_500 object at 0x853980c>
     >>> ldat = list(p.get())
-  
+
 Note that this conversion to a list can be very slow for large arrays.
 
 Variable Length Arrays
@@ -48,7 +48,7 @@ may be shorter than the maximumn length, reflecting the most recent data
 put to that PV.  That is, if some process puts a smaller array to a PV than
 its maximum length, monitors on that PV may receive only the changed data.
 For example::
- 
+
     >>> import epics
     >>> p = epics.PV('Py:double2k')
     >>> print p
@@ -170,7 +170,7 @@ processing:
     >>> raw_image = img_pv.get()
     >>> im_mode = 'RGB'
     >>> im_size = (1360, 1024)
-    >>> img = Image.frombuffer(im_mode, im_size, raw_image, 
+    >>> img = Image.frombuffer(im_mode, im_size, raw_image,
                                 'raw', im_mode, 0, 1)
     >>> img.show()
 
@@ -181,7 +181,7 @@ The result looks like this (taken with a Prosilica GigE camera):
 
 A more complete application for reading and displaying image from Epics
 Area Detectors is included  at `http://github.com/pyepics/epicsapps/
-<http://github.com/pyepics/epicsapps/>`_.  
+<http://github.com/pyepics/epicsapps/>`_.
 
 
 .. _advanced-threads-label:
@@ -375,16 +375,25 @@ these.
 If you're using :func:`epics.caget` or :func:`pv.get` you can supply a
 timeout value.  If the value returned is ``None``, then either the PV has
 truly disconnected or the timeout passed before receiving the value.  If
-the *get* is incomplete in this way, a subsequent :func:`epics.caget` or
-:func:`pv.get` may actually complete and receive the value.
+the *get* is incomplete, in that the PV is connected but the data has
+simply not been received yet, a subsequent :func:`epics.caget` or
+:func:`pv.get` will eventually complete and receive the value.  That is, if
+a PV for a large waveform record reports that it is connected, but a
+:func:`pv.get` returns None, simply trying again later will probably work::
+    >>> p = epics.PV('LargeWaveform')
+    >>> val = p.get()
+    >>> val
+    >>> time.sleep(10)
+    >>> val = p.get()
+
 
 At the lowest level (which :func:`pv.get` and :func:`epics.caget` use),
-:func:`ca.get` issues a get-request with an internal callback function
-(that is, it calls :func:`libca.ca_array_get_callback` with a pre-defined
-callback function).  With `wait=True` (the default), :func:`ca.get` then
-waits up to the timeout or until the CA library calls the specified
-callback function.  If the callback has been called, the value can then be
-converted and returned.
+:func:`ca.get` issues a get-request with an internal callback function.
+That is, it calls the CA library function
+:func:`libca.ca_array_get_callback` with a pre-defined callback function.
+With `wait=True` (the default), :func:`ca.get` then waits up to the timeout
+or until the CA library calls the specified callback function.  If the
+callback has been called, the value can then be converted and returned.
 
 If the callback is not called in time or if `wait=False` is used but the PV
 is connected, the callback will be called eventually, and simply waiting
@@ -403,7 +412,6 @@ the PV value to be filled in automatically by monitor callbacks.  If
 monitor callbacks are disabled (as is done for large arrays and can be
 turned off) or if the monitor hasn't been called yet, :func:`pv.get` will
 check whether it should can :func:`ca.get` or :func:`ca.get_complete`.
-
 
 If not specified, the timeout for :func:`ca.get_complete` (and all other
 get functions) will be set to::
