@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import epics  
+import epics
 
 class ao(epics.Device):
     "Simple analog output device"
@@ -9,9 +9,9 @@ class ao(epics.Device):
                'PREC', 'NAME', 'DESC', 'DTYP', 'HIHI', 'LOLO', 'HIGH',
                'LOW', 'HHSV', 'LLSV', 'HSV', 'LSV', 'HYST', 'OMSL', 'DOL',
                'OIF', 'DRVH', 'DRVL', 'OROC', 'OVAL')
-    
-    def __init__(self, prefix):
+
+    def __init__(self, prefix, **kwargs):
         if prefix.endswith('.'):
             prefix = prefix[:-1]
         epics.Device.__init__(self, prefix, delim='.',
-                              attrs=self.attrs)
+                              attrs=self.attrs, **kwargs)

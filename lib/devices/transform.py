@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """Epics transform record"""
-import epics  
+import epics
 
 class Transform(epics.Device):
     "Epics transfrom record"
@@ -8,15 +8,15 @@ class Transform(epics.Device):
     attr_fmts = {'Value': '%s',
                  'Input': 'INP%s',
                  'Input_Valid': 'I%sV',
-                 'Expression': 'CLC%s', 
+                 'Expression': 'CLC%s',
                  'Output':  'OUT%s',
-                 'Output_Valid': 'O%sV', 
+                 'Output_Valid': 'O%sV',
                  'Comment': 'CMT%s',
                  'Expression_Valid': 'C%sV',
                  'Previous_Value': 'L%s'}
 
     rows = 'ABCDEFGHIJKLMNOP'
-    def __init__(self, prefix):
+    def __init__(self, prefix, **kwargs):
         if prefix.endswith('.'):
             prefix = prefix[:-1]
 
@@ -26,18 +26,19 @@ class Transform(epics.Device):
                 self.attrs.append(fmt %  let)
 
         epics.Device.__init__(self, prefix, delim='.',
-                              attrs=self.attrs)
+                              attrs=self.attrs,
+                              **kwargs)
 
     def __validrow(self, row):
         return (isinstance(row, (str, unicode)) and
                 len(row)==1 and row in self.rows)
-    
+
     def get_row(self, row='A'):
         """get full data for a calculation 'row' (or letter):
 
         returns dictionary with keywords (and PV suffix for row='B'):
-        
-        'Value':             B 
+
+        'Value':             B
         'Input':             INPB
         'Input_Valid':       IBV
         'Expression':        CLCB
@@ -46,7 +47,7 @@ class Transform(epics.Device):
         'Comment':           CMTB
         'Expression_Valid':  CBV
         'Previous_Value':    LB
-        
+
         """
         if not self.__validrow(row):
             return None
@@ -67,7 +68,7 @@ class Transform(epics.Device):
                 attr = self.attr_fmts[key] % row
                 if self._pvs[attr].write_access:
                     self._pvs[attr].put(value)
-                
+
     def set_calc(self, row='A', calc=''):
         """set calc for a 'row' (or letter):
         calc should be a string"""
@@ -88,5 +89,5 @@ class Transform(epics.Device):
         if not self.__validrow(row):
             return None
         self._pvs[self.attr_fmts['Input'] % row].put(calc)
-        
+
 

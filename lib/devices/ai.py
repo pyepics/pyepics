@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """Epics analog input record"""
-import epics  
+import epics
 
 class ai(epics.Device):
     "Simple analog input device"
@@ -10,8 +10,8 @@ class ai(epics.Device):
              'AOFF', 'ASLO', 'ESLO', 'EOFF', 'SMOO', 'HIHI', 'LOLO',
              'HIGH', 'LOW', 'HHSV', 'LLSV', 'HSV', 'LSV', 'HYST')
 
-    def __init__(self, prefix):
+    def __init__(self, prefix, **kwargs):
         if prefix.endswith('.'):
             prefix = prefix[:-1]
         epics.Device.__init__(self, prefix, delim='.',
-                              attrs=self.attrs)
+                              attrs=self.attrs, **kwargs)

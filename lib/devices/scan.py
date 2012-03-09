@@ -35,7 +35,7 @@ class Scan(epics.Device):
               'pause':       'PAUS',
               'current_point':  'CPT'}
 
-    def __init__(self, name):
+    def __init__(self, name, **kwargs):
         """
         Initialize the scan.
 
@@ -52,7 +52,7 @@ class Scan(epics.Device):
             attrs.append('D%2.2iPV' % i)
 
         self.waitSemaphore = threading.Semaphore(0)
-        epics.Device.__init__(self, name, delim='.', attrs=attrs)
+        epics.Device.__init__(self, name, delim='.', attrs=attrs, **kwargs)
         for attr, pv in Scan._alias.items():
             self.add_pv('%s.%s' % (name,pv), attr)
 

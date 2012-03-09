@@ -1,21 +1,22 @@
-#!/usr/bin/python 
+#!/usr/bin/python
 """Epics multichannel analyzer record"""
 import epics
 
 class Mca(epics.Device):
-    """ 
-    SynApps Mca Record.   
+    """
+    SynApps Mca Record.
     """
     attrs = ('CALO', 'CALS', 'CALQ', 'TTH', 'EGU' , 'PRTM', 'PLTM',
              'PCT', 'PCTL', 'PCTH', 'CHAS', 'DWEL', 'PSCL', 'ERTM', 'ELTM',
              'ACT' , 'RTIM', 'STIM',  'STRT', 'STOP', 'ERAS', 'ACQG', 'PROC',
              'ERST', 'NUSE', 'NMAX', 'VAL')
-    
-    def __init__(self, prefix):
+
+    def __init__(self, prefix, **kwargs):
         if prefix.endswith('.'):
             prefix = prefix[:-1]
         epics.Device.__init__(self, prefix, delim='.',
-                              attrs= self.attrs)
+                              attrs= self.attrs,
+                              **kwargs)
 
     def Read(self):
         "return value"
