@@ -83,6 +83,7 @@ class Device(object):
     _pvs = {}
     _init = False
     _nonpvs = ('_prefix', '_pvs', '_delim', '_init')
+
     def __init__(self, prefix='', attrs=None,
                  nonpvs=None, delim='', timeout=None):
         self._nonpvs = list(self._nonpvs)[:]
@@ -228,8 +229,8 @@ class Device(object):
 
 
     def __getattr__(self, attr):
-        if attr in self._pvs:
-            return self.get(attr)
+        if attr in self.__dict__['_pvs']:
+            return self.__dict__['_pvs'][attr]
         elif attr == '_Device__init':
             return False
         elif attr in self.__dict__:
