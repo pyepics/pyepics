@@ -1,4 +1,6 @@
-#!/usr/bin/python
+#!env python
+# -*- coding: utf-8 -*-
+# vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
 """
  This module provides support for the EPICS motor record.
 """
@@ -228,23 +230,19 @@ class Motor(device.Device):
         'record_type':     'RTYP',
         'status':          'STAT'}
 
-    _init_list   = ('VAL', 'DESC', 'RTYP', 'RBV', 'PREC', 'TWV', 'FOFF')
-    _nonpvs = ('_prefix', '_pvs', '_delim', '_init', '_init_list',
-               '_alias', '_extras')
-
     def __init__(self, name=None, timeout=3.0):
+        init_list = ('VAL', 'DESC', 'RTYP', 'RBV', 'PREC', 'TWV', 'FOFF')
+        super(Motor, self).__init__(name, delim='.',
+                               attrs=init_list,
+                               timeout=timeout)
+        map(self._nonpvs.add,
+            ('_prefix', '_pvs', '_delim', '_init', '_init_list',
+            '_alias', '_extras'))
+
         if name is None:
             raise MotorException("must supply motor name")
-
-        if name.endswith('.VAL'):
-            name = name[:-4]
-        if name.endswith('.'):
-            name = name[:-1]
-
+        name = name.strip('VAL').strip('.')
         self._prefix = name
-        device.Device.__init__(self, name, delim='.',
-                               attrs=self._init_list,
-                               timeout=timeout)
 
          # make sure this is really a motor!
         rectype = self.get('RTYP')
@@ -252,11 +250,9 @@ class Motor(device.Device):
             raise MotorException("%s is not an Epics Motor" % name)
 
         for key, val in self._extras.items():
-            pvname = "%s%s" % (name, val)
-            self.add_pv(pvname, attr=key)
+            self.add_pv(".".join((name, val)), attr=key)
 
-        # self.put('disabled', 0)
-        self._callbacks = {}
+        self.__dict__['_callbacks'] = {}
 
     def __repr__(self):
         return "<epics.Motor: %s: '%s'>" % (self._prefix,  self.DESC)
@@ -264,39 +260,18 @@ class Motor(device.Device):
     def __str__(self):
         return self.__repr__()
 
+    def _name_lookup(self, attr):
+        try:
+            return Motor._alias[attr]
+        except KeyError:
+            return attr
+
     def __getattr__(self, attr):
         " internal method "
-        if attr in self.__dict__['_alias']:
-            attr = self.__dict__['_alias'][attr]
-        if attr in self.__dict__['_pvs']:
-            return self.get(attr)
-        if not attr.startswith('__'):
-            try:
-                self.PV(attr)
-                return self.get(attr)
-            except:
-                raise MotorException("EpicsMotor has no attribute %s" % attr)
-        else:
-            return self.__dict__['_pvs'][attr]
+        return super(Motor, self).__getattr__(self._name_lookup(attr))
 
     def __setattr__(self, attr, val):
-        # print 'SET ATTR ', attr, val
-        if attr in ('name', '_prefix', '_pvs', '_delim', '_init',
-                    '_alias', '_nonpvs', '_extra', '_callbacks'):
-            self.__dict__[attr] = val
-            return
-        if attr in self._alias:
-            attr = self._alias[attr]
-        if attr in self._pvs:
-            return self.put(attr, val)
-        elif attr in self.__dict__:
-            self.__dict__[attr] = val
-        elif self._init:
-            try:
-                self.PV(attr)
-                return self.put(attr, val)
-            except:
-                raise MotorException("EpicsMotor has no attribute %s" % attr)
+        super(Motor, self).__setattr__(self._name_lookup(attr), val)
 
     def check_limits(self):
         """ check motor limits:
