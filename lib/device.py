@@ -87,6 +87,20 @@ class Device(object):
     def __init__(self, prefix='', attrs=None,
                  nonpvs=None, delim='', timeout=None):
         nonpvs = ('_prefix', '_pvs', '_delim', '_init')
+        common_pvs = ('SCAN',
+            'PINI',
+            'PHAS',
+            'EVNT',
+            'PRIO',
+            'DISV',
+            'DISA',
+            'SDIS',
+            #'PROC',
+            'DISS',
+            'LSET',
+            #'LCNT',
+            #'PACT',
+            'FLNK')
 
         self.__dict__['_nonpvs'] = set(nonpvs)
         self.__dict__['_delim'] = delim
@@ -94,10 +108,10 @@ class Device(object):
         self.__dict__['_pvs'] = {}
         if nonpvs:
             map(self._nonpvs.add, nonpvs)
-        if attrs:
-            map(partial(self.PV, connect=False,
-                connection_timeout=timeout),
-                attrs)
+        attrs += common_pvs
+        map(partial(self.PV, connect=False,
+            connection_timeout=timeout),
+            attrs)
         ca.poll()
         self._init = True
 
