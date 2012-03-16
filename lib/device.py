@@ -82,25 +82,9 @@ class Device(object):
     you can all get
     """
 
-    _init = False
-
     def __init__(self, prefix='', attrs=None,
                  nonpvs=None, delim='', timeout=None):
         nonpvs = ('_prefix', '_pvs', '_delim', '_init')
-        common_pvs = ('SCAN',
-            'PINI',
-            'PHAS',
-            'EVNT',
-            'PRIO',
-            'DISV',
-            'DISA',
-            'SDIS',
-            #'PROC',
-            'DISS',
-            'LSET',
-            #'LCNT',
-            #'PACT',
-            'FLNK')
 
         self.__dict__['_nonpvs'] = set(nonpvs)
         self.__dict__['_delim'] = delim
@@ -108,19 +92,18 @@ class Device(object):
         self.__dict__['_pvs'] = {}
         if nonpvs:
             map(self._nonpvs.add, nonpvs)
-        attrs += common_pvs
-        map(partial(self.PV, connect=False,
-            connection_timeout=timeout),
-            attrs)
+        if attrs:
+            map(partial(self.PV, connect=False,
+                connection_timeout=timeout),
+                attrs)
         ca.poll()
-        self._init = True
+        self.__dict__['_init'] = True
 
     def PV(self, attr, connect=True, **kw):
         """return epics.PV for a device attribute"""
         if attr not in self._pvs:
             pvname = attr
-            if self._prefix is not None:
-                pvname = "%s%s" % (self._prefix, attr)
+            pvname = "".join((self._prefix or "", attr))
             self._pvs[attr] = pv.PV(pvname, **kw)
         if connect and not self._pvs[attr].connected:
             self._pvs[attr].wait_for_connection()
@@ -242,10 +225,13 @@ class Device(object):
 
 
     def __getattr__(self, attr):
+        val = None
         if attr in self.__dict__['_pvs']:
-            return self.get(attr)
+            val = self.get(attr)
         elif attr in self.__dict__:
-            return self.__dict__[attr]
+            val = self.__dict__[attr]
+        if val != None:
+            return val
         else:
             raise AttributeError("'{0}' object has no attribute '{1}'"
                 .format(self.__class__.__name__, attr))
@@ -255,7 +241,7 @@ class Device(object):
             self.__dict__[attr] = val
         elif attr in self.__dict__['_pvs']:
             self.put(attr, val)
-        elif self.__dict__['_init']:
+        elif '_init' in self.__dict__:
             try:
                 self.PV(attr)
                 return self.put(attr, val)
