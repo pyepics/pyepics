@@ -137,9 +137,15 @@ class Device(object):
         optionally wait for completion or
         up to a supplied timeout value"""
         thispv = self.PV(attr)
-        thispv.wait_for_connection()
-        return thispv.put(value, wait=wait, use_complete=use_complete,
-                          timeout=timeout)
+        if not thispv.wait_for_connection():
+            raise RuntimeError("'{0}' object could not connect to '{1}'"
+                .format(self.__class__.__name__, attr))
+        if thispv.thispv.put(value,
+            wait=wait,
+            use_complete=use_complete,
+            timeout=timeout):
+            raise RuntimeError("'{0}' object could not put '{1}'"
+                .format(self.__class__.__name__, attr))
 
     def get(self, attr, as_string=False, count=None):
         """get an attribute value,
@@ -233,8 +239,8 @@ class Device(object):
         if val != None:
             return val
         else:
-            raise AttributeError("'{0}' object has no attribute '{1}'"
-                .format(self.__class__.__name__, attr))
+            raise AttributeError("'{0}' Device has no attribute '{1}'"
+                .format(self._prefix.strip("."), attr))
 
     def __setattr__(self, attr, val):
         if attr in self.__dict__['_nonpvs']:
@@ -247,7 +253,8 @@ class Device(object):
                 return self.put(attr, val)
             except:
                 msg = "Device '%s' has no attribute '%s'"
-                raise AttributeError(msg % (self._prefix, attr))
+                raise AttributeError("'{0}' Device has no attribute '{1}'"
+                    .format(self._prefix.strip("."), attr))
         else:
             self.__dict__[attr] = val
 
