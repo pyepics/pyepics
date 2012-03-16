@@ -139,13 +139,13 @@ class Device(object):
         thispv = self.PV(attr)
         if not thispv.wait_for_connection():
             raise RuntimeError("'{0}' object could not connect to '{1}'"
-                .format(self.__class__.__name__, attr))
+                .format(self._prefix.strip("."), attr))
         if thispv.put(value,
             wait=wait,
             use_complete=use_complete,
             timeout=timeout) == -1:
             raise RuntimeError("'{0}' object could not put '{1}'"
-                .format(self.__class__.__name__, attr))
+                .format(self._prefix.strip("."), attr))
 
     def get(self, attr, as_string=False, count=None):
         """get an attribute value,
@@ -251,7 +251,7 @@ class Device(object):
             try:
                 self.PV(attr)
                 return self.put(attr, val)
-            except:
+            except RuntimeError:
                 msg = "Device '%s' has no attribute '%s'"
                 raise AttributeError("'{0}' Device has no attribute '{1}'"
                     .format(self._prefix.strip("."), attr))
@@ -260,10 +260,8 @@ class Device(object):
 
     def __repr__(self):
         "string representation"
-        pref = self._prefix
-        if pref.endswith('.'):
-            pref = pref[:-1]
-        return "<Device '%s' %i attributes>" % (pref, len(self._pvs))
+        return "<Device '{0}' {1} attributes>".format(self._prefix.strip("."),
+            len(self._pvs))
 
 
     def pv_property(attr, as_string=False, wait=False, timeout=10.0):
