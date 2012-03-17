@@ -81,30 +81,45 @@ class Device(object):
 
     you can all get
     """
+    def _get(self, pv):
+        val = pv.get()
+        if val == None:
+            raise AttributeError("'{0}' object could not get '{1}'"
+                                 .format(self._prefix.strip("."), pv.pvname))
+        return val
+
+    def _put(self, pv, value):
+        if not pv.wait_for_connection():
+            raise IOError("'{0}' object could not connect to '{1}'"
+                .format(self._prefix.strip("."), pv.pvname))
+        if pv.put(value, wait=True, use_complete=False, timeout=1) == -1:
+            raise IOError("'{0}' object could not put '{1}'"
+                          .format(self._prefix.strip("."), pv.pvname))
+
+    def __add_pv_property(self, pv):
+        p = property(lambda self: self._get(pv),
+                     lambda self, val: self._put(pv, val),
+                     None,
+                     "EPICS PV: '{0}'".format(self._get_pvname(pv.pvname)))
+        setattr(Device, pv.pvname.split(".")[-1].lower(), p)
 
     def __init__(self, prefix='', attrs=None,
                  nonpvs=None, delim='', timeout=None):
-        nonpvs = ('_prefix', '_pvs', '_delim', '_init')
+        self._pvs = {}
+        self._delim = delim
+        self._prefix = prefix + delim
 
-        self.__dict__['_nonpvs'] = set(nonpvs)
-        self.__dict__['_delim'] = delim
-        self.__dict__['_prefix'] = prefix + delim
-        self.__dict__['_pvs'] = {}
-        if nonpvs:
-            map(self._nonpvs.add, nonpvs)
         if attrs:
-            map(partial(self.PV, connect=False,
-                connection_timeout=timeout),
-                attrs)
+            map(self.__add_pv_property, map(partial(self.PV, connect=False), attrs))
         ca.poll()
-        self.__dict__['_init'] = True
+
+    def _get_pvname(self, attr):
+        return "".join((self._prefix or "", attr))
 
     def PV(self, attr, connect=True, **kw):
         """return epics.PV for a device attribute"""
         if attr not in self._pvs:
-            pvname = attr
-            pvname = "".join((self._prefix or "", attr))
-            self._pvs[attr] = pv.PV(pvname, **kw)
+            self._pvs[attr] = pv.PV(self._get_pvname(attr), **kw)
         if connect and not self._pvs[attr].connected:
             self._pvs[attr].wait_for_connection()
         return self._pvs[attr]
@@ -127,9 +142,12 @@ class Device(object):
 
         If attr is not specified, the full pvname will be used.
         """
+
         if attr is None:
             attr = pvname
-        self._pvs[attr] = pv.PV(pvname, **kw)
+        pv = self.PV(attr, **kw)
+        self.__add_pv_property(attr)
+
         return self._pvs[attr]
 
     def put(self, attr, value, wait=False, use_complete=False, timeout=10):
@@ -150,7 +168,11 @@ class Device(object):
     def get(self, attr, as_string=False, count=None):
         """get an attribute value,
         option as_string returns a string representation"""
-        return self.PV(attr).get(as_string=as_string, count=count)
+        val = self.PV(attr).get(as_string=as_string, count=count)
+        if val == None:
+            raise AttributeError("'{0}' could not get '{1}'"
+                                 .format(self._prefix.strip("."), attr))
+        return val
 
     def save_state(self):
         """return a dictionary of the values of all
@@ -228,35 +250,6 @@ class Device(object):
     def remove_callbacks(self, attr, index=None):
         """remove a callback function to an attribute PV"""
         self.PV(attr).remove_callback(index=index)
-
-
-    def __getattr__(self, attr):
-        val = None
-        if attr in self.__dict__['_pvs']:
-            val = self.get(attr)
-        elif attr in self.__dict__:
-            val = self.__dict__[attr]
-        if val != None:
-            return val
-        else:
-            raise AttributeError("'{0}' Device has no attribute '{1}'"
-                .format(self._prefix.strip("."), attr))
-
-    def __setattr__(self, attr, val):
-        if attr in self.__dict__['_nonpvs']:
-            self.__dict__[attr] = val
-        elif attr in self.__dict__['_pvs']:
-            self.put(attr, val)
-        elif '_init' in self.__dict__:
-            try:
-                self.PV(attr)
-                return self.put(attr, val)
-            except RuntimeError:
-                msg = "Device '%s' has no attribute '%s'"
-                raise AttributeError("'{0}' Device has no attribute '{1}'"
-                    .format(self._prefix.strip("."), attr))
-        else:
-            self.__dict__[attr] = val
 
     def __repr__(self):
         "string representation"
