@@ -232,30 +232,26 @@ class Motor(device.Device):
 
     def __init__(self, name=None, timeout=3.0):
         init_list = ('VAL', 'DESC', 'RTYP', 'RBV', 'PREC', 'TWV', 'FOFF')
-        super(Motor, self).__init__(name, delim='.',
-                               attrs=init_list,
-                               timeout=timeout)
-        map(self._nonpvs.add,
-            ('_prefix', '_pvs', '_delim', '_init', '_init_list',
-            '_alias', '_extras'))
-
+        super(Motor, self).__init__(name,
+                                    delim='.',
+                                    attrs=init_list,
+                                    alias=Motor._alias,
+                                    timeout=timeout)
+        self._alias = Motor._alias
         if name is None:
             raise MotorException("must supply motor name")
-        name = name.strip('VAL').strip('.')
-        self._prefix = name
 
          # make sure this is really a motor!
-        rectype = self.get('RTYP')
-        if rectype != 'motor':
+        if self.rtyp != 'motor':
             raise MotorException("%s is not an Epics Motor" % name)
 
         for key, val in self._extras.items():
             self.add_pv(".".join((name, val)), attr=key)
 
-        self.__dict__['_callbacks'] = {}
+        self._callbacks = {}
 
     def __repr__(self):
-        return "<epics.Motor: %s: '%s'>" % (self._prefix,  self.DESC)
+        return "<epics.Motor: {0}>".format(self._prefix.strip("."))
 
     def __str__(self):
         return self.__repr__()
@@ -265,13 +261,6 @@ class Motor(device.Device):
             return Motor._alias[attr]
         except KeyError:
             return attr
-
-    def __getattr__(self, attr):
-        " internal method "
-        return super(Motor, self).__getattr__(self._name_lookup(attr))
-
-    def __setattr__(self, attr, val):
-        super(Motor, self).__setattr__(self._name_lookup(attr), val)
 
     def check_limits(self):
         """ check motor limits:
@@ -454,10 +443,6 @@ class Motor(device.Device):
         # Put the motor back in "Use" mode
         self.put('SET', 0)
 
-    def get_pv(self, attr):
-        "return  PV for a field"
-        return self.PV(attr)
-
     def clear_callback(self, attr='drive'):
         "clears callback for attribute"
         try:
@@ -483,13 +468,9 @@ class Motor(device.Device):
         make sure all used attributes are up-to-date."""
         ca.poll()
 
-    def StopNow(self):
-        "stop motor as soon as possible"
-        self.stop()
-
     def stop(self):
         "stop motor as soon as possible"
-        self.STOP = 1
+        self.stop = 1
 
     def make_step_list(self, minstep=0.0, maxstep=None, decades=10):
         """ create a reasonable list of motor steps, as for a dropdown menu

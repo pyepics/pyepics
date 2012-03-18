@@ -99,16 +99,18 @@ class Device(object):
             raise IOError("'{0}' object could not put '{1}'"
                           .format(self._prefix.strip("."), _pv.pvname))
 
-    def __add_pv_property(self, _pv):
+    def __add_pv_property(self, _pv, name=None):
         "compose property"
-        setattr(Device, _pv.pvname.split(".")[-1].lower(),
+        name = name or _pv.pvname.split(".")[-1].lower()
+        setattr(Device,
+                name,
                 property(lambda self: self.__get(_pv),
                          lambda self, val: self.__put(_pv, val),
                          None,
                          "EPICS PV: '{0}'".format(
                              self.__get_full_pvname(_pv.pvname))))
 
-    def __init__(self, prefix='', attrs=None, delim='', timeout=None):
+    def __init__(self, prefix='', attrs=None, alias=None, delim='', timeout=None):
         self._pvs = {}
         self._delim = delim
         self._prefix = prefix + delim
@@ -117,6 +119,11 @@ class Device(object):
             map(self.__add_pv_property,
                 map(partial(self.get_pv, connect=False, timeout=timeout),
                     attrs))
+        if alias:
+            map(partial(self.__add_pv_property),
+                map(self.get_pv, alias.values()),
+                   alias.keys())
+
         ca.poll()
 
     def __get_full_pvname(self, attr):
