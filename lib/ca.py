@@ -902,8 +902,7 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     #   GET_PENDING implies no value yet, callback expected.
     ncache['value'] = GET_PENDING
 
-    uarg = ctypes.py_object(ctypes.POINTER(dbr.Map[ftype]))
-    ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, uarg)
+    ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, ctypes.py_object())
 
     PySEVCHK('get', ret)
     if not wait:
