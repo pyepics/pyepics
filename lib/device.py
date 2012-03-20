@@ -234,13 +234,9 @@ class Device(object):
             return False
         elif attr in self.__dict__:
             return self.__dict__[attr]
-        elif self.__dict__['_init'] and not attr.startswith('__'):
-            try:
-                self.PV(attr)
-                return self.get(attr)
-            except:
-                msg = "Device '%s' has no attribute '%s'"
-                raise AttributeError(msg % (self._prefix, attr))
+        else:
+            raise AttributeError("'{0}' object has no attribute '{1}'"
+                .format(self.__class__.__name__, attr))
 
     def __setattr__(self, attr, val):
         if attr in self.__dict__['_nonpvs']:
