@@ -1075,7 +1075,10 @@ def get_ctrlvars(chid):
 
     ret = libca.ca_array_get(ftype, 1, chid, dat)
     PySEVCHK('get_ctrlvars', ret)
-    poll()
+    ret = poll()
+    # as per documentation "the returned channel value cant be assumed to be stable in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io"
+    # (weird memory corruption issues may occur otherwise)
+    PySEVCHK('poll_after_get_ctrlvars', ret)
     out = {}
     tmpv = dat[0]
     for attr in ('precision', 'units', 'severity', 'status',
