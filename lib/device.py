@@ -1,6 +1,4 @@
-#!env python
-# -*- coding: utf-8 -*-
-# vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
+#!/usr/bin/python
 #  M Newville <newville@cars.uchicago.edu>
 #  The University of Chicago, 2010
 #  Epics Open License
@@ -10,8 +8,6 @@ basic device object defined
 from . import ca
 from . import pv
 import time
-from functools import partial
-
 class Device(object):
     """A simple collection of related PVs, sharing a common prefix
     string for their names, but having many 'attributes'.
@@ -82,22 +78,26 @@ class Device(object):
     you can all get
     """
 
+    _prefix = None
+    _delim = ''
+    _pvs = {}
     _init = False
-
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_init')
     def __init__(self, prefix='', attrs=None,
                  nonpvs=None, delim='', timeout=None):
-        nonpvs = ('_prefix', '_pvs', '_delim', '_init')
+        self._nonpvs = list(self._nonpvs)[:]
+        self._delim = delim
+        self._prefix = prefix + delim
+        self._pvs = {}
+        if nonpvs is not None:
+            for npv in nonpvs:
+                if npv not in self._nonpvs:
+                    self._nonpvs.append(npv)
 
-        self.__dict__['_nonpvs'] = set(nonpvs)
-        self.__dict__['_delim'] = delim
-        self.__dict__['_prefix'] = prefix + delim
-        self.__dict__['_pvs'] = {}
-        if nonpvs:
-            map(self._nonpvs.add, nonpvs)
-        if attrs:
-            map(partial(self.PV, connect=False,
-                connection_timeout=timeout),
-                attrs)
+        if attrs is not None:
+            for attr in attrs:
+                self.PV(attr, connect=False,
+                        connection_timeout=timeout)
         ca.poll()
         self._init = True
 
@@ -229,25 +229,24 @@ class Device(object):
 
     def __getattr__(self, attr):
         if attr in self.__dict__['_pvs']:
-            return self.get(attr)
+            return self.__dict__['_pvs'][attr] # self.get(attr)
         elif attr == '_Device__init':
             return False
         elif attr in self.__dict__:
             return self.__dict__[attr]
-        elif self.__dict__['_init'] and not attr.startswith('__'):
-            try:
-                self.PV(attr)
-                return self.get(attr)
-            except:
-                msg = "Device '%s' has no attribute '%s'"
+        elif self._init and not attr.startswith('__'):
+            pv = self.PV(attr, connect=True)
+            if not pv.connected:
+                msg = "%s '%s' has no attribute '%s'" % self.__class__.__name__
                 raise AttributeError(msg % (self._prefix, attr))
+            return pv.get()
 
     def __setattr__(self, attr, val):
-        if attr in self.__dict__['_nonpvs']:
+        if attr in self._nonpvs:
             self.__dict__[attr] = val
-        elif attr in self.__dict__['_pvs']:
+        elif attr in self._pvs:
             self.put(attr, val)
-        elif self.__dict__['_init']:
+        elif self._init:
             try:
                 self.PV(attr)
                 return self.put(attr, val)
