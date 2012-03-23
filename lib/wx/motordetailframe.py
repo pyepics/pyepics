@@ -103,7 +103,6 @@ class MotorDetailFrame(wx.Frame):
         wx.TheClipboard.Close()
          
 
-
 class MotorDetailPanel(ScrolledPanel):
     """ Detailed Motor Setup Panel"""
     __motor_fields = ('SET', 'LLM', 'HLM', 'LVIO', 'TWV', 'HLS', 'LLS')
@@ -112,6 +111,7 @@ class MotorDetailPanel(ScrolledPanel):
         ScrolledPanel.__init__(self, parent, size=MAINSIZE, name='',
                                style=wx.EXPAND|wx.GROW|wx.TAB_TRAVERSAL)
 
+        self.Freeze()
         self.motor = motor
         prec = motor.PREC
 
@@ -362,6 +362,7 @@ class MotorDetailPanel(ScrolledPanel):
 
         set_sizer(self, sizer, fit=True)
         self.SetupScrolling()
+        self.Thaw()
 
     @DelayedEpicsCallback
     def OnMotorEvent(self, pvname=None, field=None, **kws):

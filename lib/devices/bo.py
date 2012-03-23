@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import epics
 
 class bo(epics.Device):

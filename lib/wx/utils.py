@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # epics/wx/utils.py
 """
 This is a collection of general purpose utility functions and classes,
@@ -348,9 +348,7 @@ class FloatCtrl(wx.TextCtrl):
         # 4. allow digits, but not other characters
         if chr(key) in self.__digits:
             event.Skip()
-            return
-        # return without event.Skip() : do not propagate event
-        return
+        
         
     def OnText(self, event=None):
         "text event"
