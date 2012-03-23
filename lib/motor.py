@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """
  This module provides support for the EPICS motor record.
 """
