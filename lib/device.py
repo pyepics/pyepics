@@ -228,8 +228,8 @@ class Device(object):
 
 
     def __getattr__(self, attr):
-        if attr in self.__dict__['_pvs']:
-            return self.__dict__['_pvs'][attr] # self.get(attr)
+        if attr in self._pvs:
+            return self.get(attr)
         elif attr == '_Device__init':
             return False
         elif attr in self.__dict__:
