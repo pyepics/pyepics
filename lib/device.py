@@ -1,6 +1,4 @@
-#!env python
-# -*- coding: utf-8 -*-
-# vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
+#!/usr/bin/env python
 #  M Newville <newville@cars.uchicago.edu>
 #  The University of Chicago, 2010
 #  Epics Open License
@@ -8,11 +6,8 @@
 basic device object defined
 """
 from . import ca
-from .pv import PV
+from . import pv
 import time
-from functools import partial
-
-
 class Device(object):
     """A simple collection of related PVs, sharing a common prefix
     string for their names, but having many 'attributes'.
@@ -82,64 +77,42 @@ class Device(object):
 
     you can all get
     """
-    def __get(self, _pv):
-        "helper for getter (closure), return value"
-        val = _pv.get()
-        if val == None:
-            raise AttributeError("'{0}' object could not get '{1}'"
-                                 .format(self._prefix.strip("."), _pv.pvname))
-        return val
 
-    def __put(self, _pv, val):
-        "helper for setter (closure), put value"
-        if not _pv.wait_for_connection():
-            raise IOError("'{0}' object could not connect to '{1}'"
-                .format(self._prefix.strip("."), _pv.pvname))
-        if _pv.put(val, wait=True, use_complete=False, timeout=1) == -1:
-            raise IOError("'{0}' object could not put '{1}'"
-                          .format(self._prefix.strip("."), _pv.pvname))
-
-    def __add_pv_property(self, _pv, name=None):
-        "compose property"
-        name = name or _pv.pvname.split(".")[-1].lower()
-        setattr(Device,
-                name,
-                property(lambda self: self.__get(_pv),
-                         lambda self, val: self.__put(_pv, val),
-                         None,
-                         "EPICS PV: '{0}'".format(
-                             self.__get_full_pvname(_pv.pvname))))
-
-    def __init__(self, prefix='', attrs=None, alias=None, delim='', timeout=None):
-        self._pvs = {}
+    _prefix = None
+    _delim = ''
+    _pvs = {}
+    _init = False
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_init')
+    def __init__(self, prefix='', attrs=None,
+                 nonpvs=None, delim='', timeout=None):
+        self._nonpvs = list(self._nonpvs)[:]
         self._delim = delim
         self._prefix = prefix + delim
+        self._pvs = {}
+        if nonpvs is not None:
+            for npv in nonpvs:
+                if npv not in self._nonpvs:
+                    self._nonpvs.append(npv)
 
-        if attrs:
-            map(self.__add_pv_property,
-                map(partial(self.get_pv, connect=False, timeout=timeout),
-                    attrs))
-        if alias:
-            map(partial(self.__add_pv_property),
-                map(self.get_pv, alias.values()),
-                   alias.keys())
-
+        if attrs is not None:
+            for attr in attrs:
+                self.PV(attr, connect=False,
+                        connection_timeout=timeout)
         ca.poll()
+        self._init = True
 
-    def __get_full_pvname(self, attr):
-        "return full pvname (prefix + pvname)"
-        return "".join((self._prefix or "", attr))
-
-    def get_pv(self, attr, connect=True, timeout=None):
+    def PV(self, attr, connect=True, **kw):
         """return epics.PV for a device attribute"""
         if attr not in self._pvs:
-            self._pvs[attr] = PV(self.__get_full_pvname(attr),
-                                 connection_timeout=timeout)
+            pvname = attr
+            if self._prefix is not None:
+                pvname = "%s%s" % (self._prefix, attr)
+            self._pvs[attr] = pv.PV(pvname, **kw)
         if connect and not self._pvs[attr].connected:
             self._pvs[attr].wait_for_connection()
         return self._pvs[attr]
 
-    def add_pv(self, pvname, attr=None):
+    def add_pv(self, pvname, attr=None, **kw):
         """add a PV with an optional attribute name that may not exactly
         correspond to the mapping of Attribute -> Prefix + Delim + Attribute
         That is, with a device defined as
@@ -159,33 +132,22 @@ class Device(object):
         """
         if attr is None:
             attr = pvname
-        self.__add_pv_property(self.get_pv(attr))
-
+        self._pvs[attr] = pv.PV(pvname, **kw)
         return self._pvs[attr]
 
-    def put(self, attr, value, wait=False, use_complete=False, timeout=None):
+    def put(self, attr, value, wait=False, use_complete=False, timeout=10):
         """put an attribute value,
         optionally wait for completion or
         up to a supplied timeout value"""
-        thispv = self.get_pv(attr)
-        if not thispv.wait_for_connection():
-            raise RuntimeError("'{0}' object could not connect to '{1}'"
-                .format(self._prefix.strip("."), attr))
-        if thispv.put(value,
-            wait=wait,
-            use_complete=use_complete,
-            timeout=timeout) == -1:
-            raise RuntimeError("'{0}' object could not put '{1}'"
-                .format(self._prefix.strip("."), attr))
+        thispv = self.PV(attr)
+        thispv.wait_for_connection()
+        return thispv.put(value, wait=wait, use_complete=use_complete,
+                          timeout=timeout)
 
     def get(self, attr, as_string=False, count=None):
         """get an attribute value,
         option as_string returns a string representation"""
-        val = self.get_pv(attr).get(as_string=as_string, count=count)
-        if val == None:
-            raise AttributeError("'{0}' could not get '{1}'"
-                                 .format(self._prefix.strip("."), attr))
-        return val
+        return self.PV(attr).get(as_string=as_string, count=count)
 
     def save_state(self):
         """return a dictionary of the values of all
@@ -208,14 +170,11 @@ class Device(object):
         """write save state  to external file.
         If state is not provided, the current state is used
 
-        Note that this only writes data for PVs with write-access,
-        and count=1 (except CHAR """
+        Note that this only writes data for PVs with write-access, and count=1 (except CHAR """
         if state is None:
             state = self.save_state()
-        out = ["#Device Saved State for %s, prefx='%s': %s\n" %
-            (self.__class__.__name__,
-            self._prefix,
-            time.ctime())]
+        out = ["#Device Saved State for %s, prefx='%s': %s\n" % (self.__class__.__name__,
+                                                                 self._prefix, time.ctime())]
         for key in sorted(state.keys()):
             if (key in self._pvs and
                 'write' in self._pvs[key].access and
@@ -226,6 +185,7 @@ class Device(object):
         fout.writelines(out)
         fout.close()
 
+
     def read_state(self, fname, restore=False):
         """read state from file, optionally restore it"""
         finp = open(fname, 'r')
@@ -235,9 +195,10 @@ class Device(object):
         for line in textlines:
             if line.startswith('#'):
                 continue
-            key, strval = line[:-1].split(' ', 1)
+            key, strval =  line[:-1].split(' ', 1)
             if key in self._pvs:
                 dtype = self._pvs[key].type
+                count = self._pvs[key].count
                 val = strval
                 if dtype in ('double', 'float'):
                     val = float(val)
@@ -248,6 +209,7 @@ class Device(object):
             self.restore_state(state)
         return state
 
+
     def get_all(self):
         """return a dictionary of the values of all
         current attributes"""
@@ -257,23 +219,54 @@ class Device(object):
         """add a callback function to an attribute PV,
         so that the callback function will be run when
         the attribute's value changes"""
-        self.get_pv(attr).get()
-        return self.get_pv(attr).add_callback(callback, **kws)
+        self.PV(attr).get()
+        return self.PV(attr).add_callback(callback, **kws)
 
     def remove_callbacks(self, attr, index=None):
         """remove a callback function to an attribute PV"""
-        self.get_pv(attr).remove_callback(index=index)
+        self.PV(attr).remove_callback(index=index)
+
+
+    def __getattr__(self, attr):
+        if attr in self._pvs:
+            return self.get(attr)
+        elif attr == '_Device__init':
+            return False
+        elif attr in self.__dict__:
+            return self.__dict__[attr]
+        elif self._init and not attr.startswith('__'):
+            pv = self.PV(attr, connect=True)
+            if not pv.connected:
+                msg = "%s '%s' has no attribute '%s'" % self.__class__.__name__
+                raise AttributeError(msg % (self._prefix, attr))
+            return pv.get()
+
+    def __setattr__(self, attr, val):
+        if attr in self._nonpvs:
+            self.__dict__[attr] = val
+        elif attr in self._pvs:
+            self.put(attr, val)
+        elif self._init:
+            try:
+                self.PV(attr)
+                return self.put(attr, val)
+            except:
+                msg = "Device '%s' has no attribute '%s'"
+                raise AttributeError(msg % (self._prefix, attr))
+        else:
+            self.__dict__[attr] = val
 
     def __repr__(self):
         "string representation"
-        return "<Device '{0}' {1} attributes>".format(self._prefix.strip("."),
-            len(self._pvs))
+        pref = self._prefix
+        if pref.endswith('.'):
+            pref = pref[:-1]
+        return "<Device '%s' %i attributes>" % (pref, len(self._pvs))
 
-    @staticmethod
+
     def pv_property(attr, as_string=False, wait=False, timeout=10.0):
-        "return PV property"
-        return property(lambda self: \
+        return property(lambda self:     \
                         self.get(attr, as_string=as_string),
-                        lambda self, val: \
+                        lambda self,val: \
                         self.put(attr, val, wait=wait, timeout=timeout),
                         None, None)

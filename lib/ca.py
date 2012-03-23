@@ -352,7 +352,9 @@ def withConnectedCHID(fcn):
                                              (fcn.__name__))
             if not isConnected(chid):
                 timeout = kwds.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
-                connect_channel(chid, timeout=timeout)
+                if not connect_channel(chid, timeout=timeout):
+                    raise ChannelAccessException("%s: timed out waiting for chid to connect (%d seconds)" % (fcn.__name__, chid, timeout))
+
         return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
@@ -900,8 +902,7 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     #   GET_PENDING implies no value yet, callback expected.
     ncache['value'] = GET_PENDING
 
-    uarg = ctypes.py_object(ctypes.POINTER(dbr.Map[ftype]))
-    ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, uarg)
+    ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, ctypes.py_object())
 
     PySEVCHK('get', ret)
     if not wait:
@@ -1074,7 +1075,10 @@ def get_ctrlvars(chid):
 
     ret = libca.ca_array_get(ftype, 1, chid, dat)
     PySEVCHK('get_ctrlvars', ret)
-    poll()
+    ret = poll()
+    # as per documentation "the returned channel value cant be assumed to be stable in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io"
+    # (weird memory corruption issues may occur otherwise)
+    PySEVCHK('poll_after_get_ctrlvars', ret)
     out = {}
     tmpv = dat[0]
     for attr in ('precision', 'units', 'severity', 'status',

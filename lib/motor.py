@@ -1,10 +1,8 @@
-#!env python
-# -*- coding: utf-8 -*-
-# vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
+#!/usr/bin/env python
 """
  This module provides support for the EPICS motor record.
 """
-#
+# 
 # Author:         Mark Rivers / Matt Newville
 # Created:        Sept. 16, 2002
 # Modifications:
@@ -20,13 +18,13 @@
 #
 #   Jun 14, 2010  MN
 #       migrated more fully to pyepics3, using epics.Device
-#
+# 
 #   Jan 16, 2008  MN
 #       use new EpicsCA.PV put-with-user-wait
 #       wait() method no longer needed
 #       added MotorException and MotorLimitException
 #       many fixes to use newer python constructs
-#
+# 
 #   Aug 19, 2004  MN
 #                 1. improved setting/checking of monitors on motor attributes
 #                 2. add 'RTYP' and 'DTYP' to motor parameters.
@@ -72,7 +70,7 @@ class MotorException(Exception):
 
 class Motor(device.Device):
     """Epics Motor Class for pyepics3
-
+    
    This module provides a class library for the EPICS motor record.
 
    It uses the epics.Device and epics.PV classese
@@ -81,12 +79,12 @@ class Motor(device.Device):
       These attributes do not appear in the dictionary for this class, but
       are implemented with the __getattr__ and __setattr__ methods.  They
       simply get or putthe appropriate motor record fields.  All attributes
-      can be both read and written unless otherwise noted.
+      can be both read and written unless otherwise noted. 
 
       Attribute        Description                  Field
       ---------        -----------------------      -----
       drive            Motor Drive Value            .VAL
-      readback         Motor Readback Value         .RBV    (read-only)
+      readback         Motor Readback Value         .RBV    (read-only) 
       slew_speed       Slew speed or velocity       .VELO
       base_speed       Base or starting speed       .VBAS
       acceleration     Acceleration time (sec)      .ACCL
@@ -99,11 +97,11 @@ class Motor(device.Device):
       backlash         Backlash distance            .BDST
       offset           Offset from dial to user     .OFF
       done_moving      1=Done, 0=Moving, read-only  .DMOV
-
+ 
    Exceptions:
       The check_limits() method raises an 'MotorLimitException' if a soft limit
       or hard limit is detected.  The move() method calls
-      check_limits() unless they are called with the
+      check_limits() unless they are called with the 
       ignore_limits=True keyword set.
 
    Example use:
@@ -132,7 +130,7 @@ class Motor(device.Device):
     #
     _extras =  {
         'disabled':   '_able.VAL', }
-
+    
     _alias = {
         'acceleration':    'ACCL',
         'back_accel':      'BACC',
@@ -229,38 +227,76 @@ class Motor(device.Device):
         'device_type':     'DTYP',
         'record_type':     'RTYP',
         'status':          'STAT'}
-
+        
+    _init_list   = ('VAL', 'DESC', 'RTYP', 'RBV', 'PREC', 'TWV', 'FOFF')
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_init', '_init_list',
+               '_alias', '_extras')
+        
     def __init__(self, name=None, timeout=3.0):
-        init_list = ('VAL', 'DESC', 'RTYP', 'RBV', 'PREC', 'TWV', 'FOFF')
-        super(Motor, self).__init__(name,
-                                    delim='.',
-                                    attrs=init_list,
-                                    alias=Motor._alias,
-                                    timeout=timeout)
-        self._alias = Motor._alias
         if name is None:
             raise MotorException("must supply motor name")
 
+        if name.endswith('.VAL'):
+            name = name[:-4]
+        if name.endswith('.'):
+            name = name[:-1]
+
+        self._prefix = name
+        device.Device.__init__(self, name, delim='.', 
+                               attrs=self._init_list,
+                               timeout=timeout)
+
          # make sure this is really a motor!
-        if self.rtyp != 'motor':
+        rectype = self.get('RTYP')
+        if rectype != 'motor':
             raise MotorException("%s is not an Epics Motor" % name)
 
         for key, val in self._extras.items():
-            self.add_pv(".".join((name, val)), attr=key)
+            pvname = "%s%s" % (name, val)
+            self.add_pv(pvname, attr=key)
 
+        # self.put('disabled', 0)
         self._callbacks = {}
 
     def __repr__(self):
-        return "<epics.Motor: {0}>".format(self._prefix.strip("."))
+        return "<epics.Motor: %s: '%s'>" % (self._prefix,  self.DESC)
 
     def __str__(self):
         return self.__repr__()
 
-    def _name_lookup(self, attr):
-        try:
-            return Motor._alias[attr]
-        except KeyError:
-            return attr
+    def __getattr__(self, attr):
+        " internal method "
+        if attr in self._alias:
+            attr = self._alias[attr]
+        if attr in self._pvs:
+            return self.get(attr)
+        if not attr.startswith('__'):
+            pv = self.PV(attr, connect=True)
+            if not pv.connected:
+                raise MotorException("EpicsMotor has no attribute %s" % attr)
+            return self.get(attr)
+
+        else:
+            return self._pvs[attr]
+                
+    def __setattr__(self, attr, val):
+        # print 'SET ATTR ', attr, val
+        if attr in ('name', '_prefix', '_pvs', '_delim', '_init',
+                    '_alias', '_nonpvs', '_extra', '_callbacks'):
+            self.__dict__[attr] = val
+            return 
+        if attr in self._alias:
+            attr = self._alias[attr]
+        if attr in self._pvs:
+            return self.put(attr, val)
+        elif attr in self.__dict__: 
+            self.__dict__[attr] = val           
+        elif self._init:
+            try:
+                self.PV(attr)
+                return self.put(attr, val)
+            except:
+                raise MotorException("EpicsMotor has no attribute %s" % attr)
 
     def check_limits(self):
         """ check motor limits:
@@ -272,7 +308,7 @@ class Motor(device.Device):
             if self.get(field) != 0:
                 raise MotorLimitException(msg)
         return
-
+    
     def within_limits(self, val, dial=False):
         """ returns whether a value for a motor is within drive limits
         with dial=True   dial limits are used (default is user limits)"""
@@ -301,7 +337,7 @@ class Motor(device.Device):
           0    : move executed successfully
 
           will raise an exception if a motor limit is met.
-
+          
         """
         try:
             val = float(val)
@@ -339,26 +375,26 @@ class Motor(device.Device):
         """
         Returns the target or readback motor position in user, dial or step
         coordinates.
-
+      
       Keywords:
          readback:
             Set readback=True to return the readback position in the
             desired coordinate system.  The default is to return the
             drive position of the motor.
-
+            
          dial:
             Set dial=True to return the position in dial coordinates.
             The default is user coordinates.
-
+            
          raw (or step):
             Set raw=True to return the raw position in steps.
             The default is user coordinates.
 
          Notes:
             The "raw" or "step" and "dial" keywords are mutually exclusive.
-            The "readback" keyword can be used in user, dial or step
+            The "readback" keyword can be used in user, dial or step 
             coordinates.
-
+            
       Examples:
         m=epicsMotor('13BMD:m38')
         m.move(10)                   # Move to position 10 in user coordinates
@@ -373,21 +409,21 @@ class Motor(device.Device):
         if readback:
             pos = rbv
         return self.get(pos)
-
+        
     def tweak(self, direction='foreward', wait=False, timeout=300.0):
         """ move the motor by the tweak_val
-
+       
         takes optional args:
          direction    direction of motion (forward/reverse)  [forward]
                          must start with 'rev' or 'back' for a reverse tweak.
          wait         wait for move to complete before returning (T/F) [F]
          timeout      max time for move to complete (in seconds) [300]
         """
-
+        
         ifield = 'TWF'
         if direction.startswith('rev') or direction.startswith('back'):
             ifield = 'TWR'
-
+            
         stat = self.put(ifield, 1, wait=wait, timeout=timeout)
         ret = stat
         if stat == 1:
@@ -400,30 +436,30 @@ class Motor(device.Device):
             ret = -1
         return ret
 
-
+        
     def set_position(self, position, dial=False, step=False, raw=False):
         """
       Sets the motor position in user, dial or step coordinates.
-
+      
       Inputs:
          position:
             The new motor position
-
+            
       Keywords:
          dial:
             Set dial=True to set the position in dial coordinates.
             The default is user coordinates.
-
+            
          raw:
             Set raw=True to set the position in raw steps.
             The default is user coordinates.
-
+            
       Notes:
          The 'raw' and 'dial' keywords are mutually exclusive.
-
+         
       Examples:
          m=epicsMotor('13BMD:m38')
-         m.set_position(10, dial=True)   # Set the motor position to 10 in
+         m.set_position(10, dial=True)   # Set the motor position to 10 in 
                                       # dial coordinates
          m.set_position(1000, raw=True) # Set the motor position to 1000 steps
          """
@@ -439,9 +475,13 @@ class Motor(device.Device):
             drv = 'RVAL'
 
         self.put(drv, position)
-
+        
         # Put the motor back in "Use" mode
         self.put('SET', 0)
+      
+    def get_pv(self, attr):
+        "return  PV for a field"
+        return self.PV(attr)
 
     def clear_callback(self, attr='drive'):
         "clears callback for attribute"
@@ -468,10 +508,14 @@ class Motor(device.Device):
         make sure all used attributes are up-to-date."""
         ca.poll()
 
+    def StopNow(self):
+        "stop motor as soon as possible"
+        self.stop()
+
     def stop(self):
         "stop motor as soon as possible"
-        self.stop = 1
-
+        self.STOP = 1
+            
     def make_step_list(self, minstep=0.0, maxstep=None, decades=10):
         """ create a reasonable list of motor steps, as for a dropdown menu
         The list is based on motor range Mand precision"""
@@ -484,15 +528,15 @@ class Motor(device.Device):
                 if (step <= maxstep and step > 0.98*minstep):
                     steplist.append(step)
         return steplist
-
+        
     def get_info(self):
         "return information, current field values"
         out = {}
-        for attr in ('DESC', 'VAL', 'RBV', 'PREC', 'VELO', 'STAT',
+        for attr in ('DESC', 'VAL', 'RBV', 'PREC', 'VELO', 'STAT', 
                      'SET', 'TWV','LLM', 'HLM', 'SPMG'):
             out[attr] = self.get(attr, as_string=True)
         return out
-
+    
     def show_info(self):
         " show basic motor settings "
         ca.poll()
@@ -527,7 +571,7 @@ class Motor(device.Device):
             value = value + ' '*(18-min(18, len(value)))
             # print " %s  %s  %s" % (label, value, pvname)
             add(" %s  %s  %s" % (label, value, pvname))
-
+            
         ca.write("\n".join(out))
 
 if (__name__ == '__main__'):

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/ao python
 import epics
 
 class ao(epics.Device):

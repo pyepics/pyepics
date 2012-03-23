@@ -163,7 +163,8 @@ class PVMixin(object):
         if isinstance(pv, epics.PV):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
-            self.pv = epics.PV(pv)
+            form = "ctrl" if len(self._fg_colour_alarms) > 0 or len(self._bg_colour_alarms) > 0 else "native"
+            self.pv = epics.PV(pv, form=form)
             self.pv.connect()
 
         epics.poll()

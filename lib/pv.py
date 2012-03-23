@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #  M Newville <newville@cars.uchicago.edu>
 #  The University of Chicago, 2010
 #  Epics Open License
@@ -409,10 +409,9 @@ class PV(object):
         if with_ctrlvars and self.connected:
             self.get_ctrlvars()
         if run_now:
-            if not self.connected:
-                self.wait_for_connection()
-        if run_now and self.connected:
-            self.run_callback(index)
+            self.get(as_string=True)
+            if self.connected:
+                self.run_callback(index)
         return index
 
     def remove_callback(self, index=None):

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """Epics multichannel analyzer record"""
 import epics
 
