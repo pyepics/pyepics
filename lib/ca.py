@@ -480,7 +480,6 @@ def _onGetEvent(args, **kws):
     """get_callback event: simply store data contents which
     will need conversion to python data with _unpack()."""
     global _cache
-    print 'Get Event ', args.usr
     if args.status != dbr.ECA_NORMAL:
         return
     get_cache(name(args.chid))[args.usr] = memcopy(dbr.cast_args(args).contents)
@@ -1003,7 +1002,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     """
     ftype = field_type(chid)
     count = element_count(chid)
-    if count > 1 and not (ftype == dbr.CHAR and isinstance(value, str)):
+    if count > 1: # and not (ftype == dbr.CHAR and isinstance(value, str)):
         count = min(len(value), count)
     data  = (count*dbr.Map[ftype])()
 
