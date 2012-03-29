@@ -1057,7 +1057,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     return ret
 
 @withConnectedCHID
-def get_ctrlvars(chid, timeout=5.0):
+def get_ctrlvars(chid, timeout=5.0, warn=True):
     """return the CTRL fields for a Channel.  Depending on
     the native type, these fields may include
         status  severity precision  units  enum_strs
@@ -1087,8 +1087,9 @@ def get_ctrlvars(chid, timeout=5.0):
         pend_event(1.e-5)
         pend_io(0.1)
         if time.time()-t0 > timeout:
-            msg = "ca.get_ctrlvars('%s') timed out after %.2f seconds."
-            warnings.warn(msg % (name(chid), timeout))
+            if warn:
+                msg = "ca.get_ctrlvars('%s') timed out after %.2f seconds."
+                warnings.warn(msg % (name(chid), timeout))
             return {}
 
     out = {}
@@ -1108,7 +1109,7 @@ def get_ctrlvars(chid, timeout=5.0):
     return out
 
 @withConnectedCHID
-def get_timevars(chid, timeout=5.0):
+def get_timevars(chid, timeout=5.0, warn=True):
     """return the TIME fields for a Channel.  Depending on
     the native type, these fields may include
         status  severity timestamp
@@ -1127,13 +1128,13 @@ def get_timevars(chid, timeout=5.0):
         pend_event(1.e-5)
         pend_io(0.1)
         if time.time()-t0 > timeout:
-            msg = "ca.get_timevars('%s') timed out after %.2f seconds."
-            warnings.warn(msg % (name(chid), timeout))
+            if warn:
+                msg = "ca.get_timevars('%s') timed out after %.2f seconds."
+                warnings.warn(msg % (name(chid), timeout))
             return {}
 
     out = {}
     tmpv = ncache['value'][0]
-    print(' Get TIMEVARS ', dir(tmpv))
     for attr in ('status', 'severity'):
         if hasattr(tmpv, attr):
             out[attr] = getattr(tmpv, attr)

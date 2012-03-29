@@ -18,8 +18,9 @@ def fmt_time(tstamp=None):
     if tstamp is None:
         tstamp = time.time()
     tstamp, frac = divmod(tstamp, 1)
-    return "%s.%6.6i" % (time.strftime("%Y-%m-%d %H:%M:%S",
-                                       time.localtime(tstamp)), 1.e6*frac)
+    return "%s.%5.5i" % (time.strftime("%Y-%m-%d %H:%M:%S",
+                                       time.localtime(tstamp)),
+                         round(1.e5*frac))
 
 class PV(object):
     """Epics Process Variable
@@ -310,7 +311,7 @@ class PV(object):
             if call_ca and self._args['precision'] is None:
                 self.get_ctrlvars()
             try:
-                prec = getattr(self, 'precision')
+                prec = self._args['precision']
                 fmt  = "%%.%if"
                 if 4 < abs(int(log10(abs(val + 1.e-9)))):
                     fmt = "%%.%ig"
@@ -328,20 +329,19 @@ class PV(object):
         self._args['char_value'] = cval
         return cval
 
-    def get_ctrlvars(self):
+    def get_ctrlvars(self, timeout=5, warn=True):
         "get control values for variable"
-        return self._get_vars(ca.get_ctrlvars)
-
-    def get_timevars(self):
-        "get time values for variable"
-        return self._get_vars(ca.get_timevars)
-
-    def _get_vars(self, var_fn):
-        "internal, common functionality for retreiving control/times values"
         if not self.wait_for_connection():
             return None
-        kwds = var_fn(self.chid)
-        ca.poll()
+        kwds = ca.get_ctrlvars(self.chid, timeout=timeout, warn=warn)
+        self._args.update(kwds)
+        return kwds
+        
+    def get_timevars(self, timeout=5, warn=True):
+        "get time values for variable"
+        if not self.wait_for_connection():
+            return None
+        kwds = ca.get_timevars(self.chid, timeout=timeout, warn=warn)
         self._args.update(kwds)
         return kwds
 
@@ -353,7 +353,7 @@ class PV(object):
         """
         self._args.update(kwd)
         self._args['value']  = value
-        self._args['timestamp'] = kwd.get('timestamp', time.time())
+        self._args['timestamp'] = kwd.get('timestamp', None)
         self._set_charval(self._args['value'], call_ca=False)
         if self.verbose:
             now = fmt_time(self._args['timestamp'])
@@ -495,6 +495,11 @@ class PV(object):
         "wrapper for property retrieval"
         if self._args['value'] is None:
             self.get()
+        elif self._args[arg] is None:
+            if arg in ('status', 'severity', 'timestamp'):
+                self.get_timevars(timeout=1, warn=False)
+            else:
+                self.get_ctrlvars(timeout=1, warn=False)
         return self._args.get(arg, None)
 
     def __getval__(self):
