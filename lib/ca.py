@@ -1001,7 +1001,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     """
     ftype = field_type(chid)
     count = element_count(chid)
-    if count > 1 and not (ftype == dbr.CHAR and isinstance(value, str)):
+    if count > 1: # and not (ftype == dbr.CHAR and isinstance(value, str)):
         count = min(len(value), count)
     data  = (count*dbr.Map[ftype])()
 
