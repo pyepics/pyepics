@@ -73,7 +73,6 @@ DBE_LOG = 2
 DBE_ALARM = 4
 DBE_PROPERTY = 8
 
-
 chid_t   = ctypes.c_long
 
 short_t  = ctypes.c_short
@@ -98,10 +97,17 @@ value_offset = None
 class TimeStamp(ctypes.Structure):
     "emulate epics timestamp"
     _fields_ = [('secs', uint_t), ('nsec', uint_t)]
+
+    
 _STAT_SEV    = (('status', short_t), ('severity', short_t))
 _STAT_SEV_TS = (('status', short_t), ('severity', short_t),
                 ('stamp', TimeStamp))
 _UNITS       = ('units', char_t * MAX_UNITS_SIZE)
+
+def make_unixtime(stamp):
+    "UNIX timestamp (seconds) from Epics TimeStamp structure"
+    return (EPICS2UNIX_EPOCH + stamp.secs + 1.e-6*int(1.e-3*stamp.nsec))
+
 
 class time_string(ctypes.Structure):
     "dbr time string"
