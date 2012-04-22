@@ -5,6 +5,10 @@ ca: Low-level Channel Access module
 .. module:: ca
    :synopsis: low-level Channel Access  module.
 
+.. module:: epics.ca
+   :synopsis: low-level Channel Access  module.
+
+
 The :mod:`ca` module provides a low-level wrapping of the EPICS
 Channel Access (CA) library, using ctypes.  Most users of the `epics`
 module will not need to be concerned with most of the details here, and
@@ -133,10 +137,10 @@ initialization and finalization tasks are handled in the following way:
    clear: waveforms with fewer elements than this value will be
    automatically monitored changes, and will be converted to numpy arrays
    (if numpy is installed).  Larger waveforms will not be automatically
-   monitored. 
+   monitored.
 
    :ref:`advanced-arrays-label` and :ref:`advanced-large-arrays-label` for
-   more details. 
+   more details.
 
 Using the CA module
 ====================
@@ -144,76 +148,39 @@ Using the CA module
 Many general-purpose CA functions that deal with general communication and
 threading contexts are very close to the C library:
 
-.. function:: initialize_libca()
+.. autofunction:: initialize_libca
 
-   This initializes the CA library.  This must be called prior to any
-   actual use of the CA library, but it is called automatically by the  :func:`withCA`
-   decorator, so you should never need to call this in a real program.
+.. autofunction:: finalize_libca
 
 .. function::  context_create()
-.. function::  create_context()
-
-   This will create a new context, using the value of
-   :data:`PREEMPTIVE_CALLBACK` to set the context type. Note that CA
-   library function has the irritating name of *context_create*.  Both that
-   and *create_context* (which is more consistent with the Verb_Object of
-   the rest of the CA library) are allowed.
-
+.. autofunction:: create_context
 
 .. function::  context_destroy()
-.. function::  destroy_context()
+.. autofunction:: destroy_context
 
-   This will destroy the current context.
+.. autofunction:: current_context()
 
-.. function::  current_context()
+.. autofunction:: attach_context(context)
 
-   This returns an integer value for the current context.
+.. autofunction:: detach_context()
 
-.. function::  attach_context(context)
+.. autofunction:: use_initial_context()
 
-   This attaches to the context supplied.
+.. autofunction:: client_status(context, level)
 
-.. function::  detach_context()
+.. autofunction:: version()
 
-   This detaches from the current context.
+.. autofunction:: message(status)
 
-.. function::  use_initial_context()
+.. autofunction:: flush_io()
 
-   This attaches to the context created when libca is initialized.
-   Using this function is recommended when writing Threaded programs that
-   using CA.  See :ref:`advanced-threads-label` for further discussion.
+.. autofunction:: replace_printf_handler(fcn=None)
 
-.. function::  client_status(context, level)
-   
-   Print (to stderr) information about Channel Access status, including
-   status for each channel, and search and connection statistics.
+.. autofunction:: pend_io(timeout=1.0)
 
-.. function::  version()
+.. autofunction:: pend_event(timeout=1.e-5)
 
-   Print Channel Access version string.  Currently, this should report
-   '4.13' 
-
-.. function::  message(status)
-
-   Print a message corresponding to a Channel Access status return value. 
-
-.. function::  flush_io()
-
-.. function::  replace_printf_handler(fcn)
-
-   replace the :func:`printf` function with the supplied function (defaults
-   to :func:`sys.stderr.write` )
-
-.. function::  pend_io([t=1.0])
-
-.. function::  pend_event([t=1.e-5])
-
-.. function::  poll([evt=1.e-5, [iot=1.0]])
-
-   a convenience function which is equivalent to::
-
-       pend_event(evt)
-       pend_io_(iot)
+.. autofunction:: poll(evt=1.e-5[, iot=1.0])
 
 
 Creating and Connecting to Channels
@@ -275,68 +242,44 @@ Many other functions that require a valid Channel ID, but not necessarily a
 connected Channel.  These functions are essentially identical to the CA
 library are:
 
-.. function::   name(chid)
+.. autofunction:: name(chid)
 
-   return PV name for Channel.
+.. autofunction:: host_name(chid)
 
-.. function::   host_name(chid)
+.. autofunction:: element_count(chid)
 
-   return host name and port serving Channel.
+.. autofunction::   read_access(chid)
 
-.. function::   element_count(chid)
+.. autofunction::   write_access(chid)
 
-   return number of elements in Channel's data.
+.. autofunction::   field_type(chid)
 
-.. function::   read_access(chid)
+   See the *ftype* column from :ref:`Table of DBR Types <dbrtype_table>`.
 
-   return *read access* for a Channel: 1 for ``True``, 0 for ``False``.
+.. autofunction::   clear_channel(chid)
 
-.. function::   write_access(chid)
+.. autofunction::   state(chid)
 
-   return *write access* for a channel: 1 for ``True``, 0 for ``False``.
 
-.. function::   field_type(chid)
-
-   return the integer DBR field type. See the *ftype* column from
-   :ref:`Table of DBR Types <dbrtype_table>`.
-
-.. function::   clear_channel(chid)
-
-   clear the channel.
-
-.. function::   state(chid)
-
-   return the state of the channel.
 
 A few additional pythonic functions have been added:
 
-.. function::     isConnected(chid)
+.. autofunction:: isConnected(chid)
 
-   returns `dbr.CS_CONN==state(chid)` ie ``True`` for a connected channel
-   or ``False`` for an unconnected channel.
+.. autofunction:: access(chid)
 
-.. function:: access(chid)
+.. autofunction:: promote_type(chid, [use_time=False, [use_ctrl=False]])
 
-   returns a string describing read/write access: one of
-   `no access`, `read-only`, `write-only`, or `read/write`
+   See :ref:`Table of DBR Types <dbrtype_table>`.
 
-.. function::    promote_type(chid,[use_time=False, [use_ctrl=False]])
+.. data::  _cache
 
-  promotes the native field type of a ``chid`` to its TIME or CTRL
-  variant. See :ref:`Table of DBR Types <dbrtype_table>`.  Returns the
-  integer corresponding to the promoted field value.
+   The ca module keeps a global cache of Channels that holds connection
+   status and a bit of internal information for all known PVs.  This cache
+   is not intended for general use.
 
-..  data::  _cache
+.. autofunction:: show_cache(print_out=True)
 
-    The ca module keeps a global cache of Channels that holds connection
-    status and a bit of internal information for all known PVs.  This cache
-    is not intended for general use.
-
-.. function:: show_cache([print_out=True])
-
-   this function will print out a listing of PVs in the current session to
-   standard output.  Use the *print_out=False* option to be returned the
-   listing instead of having it printed.
 
 Interacting with Connected Channels
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -352,7 +295,7 @@ requiring the user to supply DBR TYPE and count as well as ``chid`` and
 allocated space for the data.  In python none of these is needed, and
 keyword arguments can be used to specify such options.
 
-.. method:: get(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=True[, wait=True[, timeout=None]]]]]])
+.. function:: get(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=True[, wait=True[, timeout=None]]]]]])
 
    return the current value for a Channel. Note that there is not a separate form for array data.
 
@@ -414,7 +357,7 @@ keyword arguments can be used to specify such options.
    function.
 
 
-.. method:: get_complete(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=True[, timeout=None]]]]])
+.. function:: get_complete(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=True[, timeout=None]]]]])
 
    return the current value for a Channel, completing an earlier incomplete
    :func:`get` that returned ``None``, either because `wait=False` was
@@ -437,7 +380,7 @@ keyword arguments can be used to specify such options.
    actually completed, or if this data transfer also times out.  See
    :ref:`advanced-get-timeouts-label` for further discussion.
 
-.. method::  put(chid, value[, wait=False[, timeout=30[, callback=None[, callback_data=None]]]])
+.. function::  put(chid, value[, wait=False[, timeout=30[, callback=None[, callback_data=None]]]])
 
    sets the Channel to a value, with options to either wait (block) for the
    process to complete, or to execute a supplied callback function when the
@@ -453,7 +396,7 @@ keyword arguments can be used to specify such options.
    :type callback: ``None`` or callable
    :param callback_data: extra data to pass on to a user-supplied callback function.
 
-   :meth:`put` returns 1 on success and -1 on timed-out
+   :func:`put` returns 1 on success and -1 on timed-out
 
    Specifying a callback will override setting `wait=True`.  This
    callback function will be called with keyword arguments
@@ -462,7 +405,7 @@ keyword arguments can be used to specify such options.
 
    For more on this *put callback*, see :ref:`ca-callbacks-label` below.
 
-.. method::  create_subscription(chid[, use_time=False[, use_ctrl=False[, mask=None[, callback=None]]]])
+.. function::  create_subscription(chid[, use_time=False[, use_ctrl=False[, mask=None[, callback=None]]]])
 
    create a *subscription to changes*, The user-supplied callback function
    will be called on any changes to the PV.
@@ -505,7 +448,7 @@ keyword arguments can be used to specify such options.
 .. data:: DEFAULT_SUBSCRIPTION_MASK
 
    This value is the default subscription type used when calling
-   :meth:`create_subscription` with `mask=None`. It is also used by
+   :func:`create_subscription` with `mask=None`. It is also used by
    default when creating a :class:`PV` object with auto_monitor is set
    to ``True``.
 
@@ -515,38 +458,24 @@ keyword arguments can be used to specify such options.
    *dbr.DBE_LOG* for archive-deadband changes.
 
    If this value is changed, it will change the default for all
-   subsequent calls to :meth:`create_subscription`, but it will not
+   subsequent calls to :func:`create_subscription`, but it will not
    change any existing subscriptions.
 
-.. method:: clear_subscription(event_id)
-
-   clears a subscription given its *event_id*.
+.. autofunction:: clear_subscription(event_id)
 
 Several other functions are provided:
 
-.. method::  get_timestamp(chid)
+.. autofunction::  get_timestamp(chid)
 
-   return the timestamp of a channel -- the time of last update.
+.. autofunction::  get_severity(chid)
 
-.. function::  get_severity(chid)
+.. autofunction::  get_precision(chid)
 
-   return the severity of a channel.
+.. autofunction:: get_enum_strings(chid)
 
-.. function::  get_precision(chid)
+.. autofunction:: get_ctrlvars(chid)
 
-   return the precision of a channel.  For channels with native type other
-   than FLOAT or DOUBLE, this will be 0.
-
-.. function:: get_enum_strings(chid)
-
-    return the list of names for ENUM states of a Channel.  Returns  ``None``
-    for non-ENUM Channels.
-
-.. function:: get_ctrlvars(chid)
-
-    returns a dictionary of CTRL fields for a Channel.  Depending on the
-    native data type, the keys in this dictionary may include
-    :ref:`Table of Control Attributes <ctrlvars_table>`
+    See :ref:`Table of Control Attributes <ctrlvars_table>`
 
 .. _ctrlvars_table:
 
@@ -573,10 +502,8 @@ Several other functions are provided:
 Note that *enum_strs* will be a tuple of strings for the names of ENUM
 states.
 
-.. function:: get_timevars(chid)
+.. autofunction:: get_timevars(chid)
 
-    returns a dictionary of TIME fields for a Channel.  This will contain a
-    *status*, *severity*, and *timestamp* key.
 
 ..  _ca-sg-label:
 
@@ -594,43 +521,21 @@ group as a unit.  It is important to *not* issue :func:`pend_io` during the
 building of a synchronous group, as this will cause pending :func:`sg_put`
 and :func:`sg_get` to execute.
 
-.. function::  sg_create()
+.. autofunction::  sg_create()
 
-   create synchronous group.  Returns a *group id*, `gid`, which is used to
-   identify this group and is passed to all other synchronous group commands.
+.. autofunction::  sg_delete(gid)
 
-.. function::  sg_delete(gid)
+.. autofunction::  sg_block(gid[, timeout=10.0])
 
-   delete a synchronous group
+.. autofunction::  sg_get(gid, chid[, ftype=None[, as_string=False[, as_numpy=True]]])
 
-.. function::  sg_block(gid[, t=10.0])
+   See further example below.
 
-   block for a synchronous group to complete processing
+.. autofunction::  sg_put(gid, chid, value)
 
-.. function::  sg_get(gid, chid[, ftype=None[, as_string=False[, as_numpy=True]]])
+.. autofunction::  sg_test(gid)
 
-   perform a `get` within a synchronous group.
-
-   This function will not immediately return the value, of course, but the
-   address of the underlying data.
-
-   After the :func:`sg_block` has completed, you must use :func:`_unpack`
-   to convert this data address to the actual value(s).
-
-   See example below.
-
-.. function::  sg_put(gid, chid, value)
-
-   perform a `put` within a synchronous group.  This `put` cannot wait for
-   completion.
-
-.. function::  sg_test(gid)
-
-  test whether a synchronous group has completed.
-
-.. function::  sg_reset(gid)
-
-   resets a synchronous group
+.. autofunction::  sg_reset(gid)
 
 An example use of a synchronous group::
 
@@ -801,14 +706,14 @@ function.
 User-supplied Callback functions
 ================================
 
-User-supplied callback functions can be provided for both :meth:`put` and
-:meth:`create_subscription`.  Note that callbacks for `PV` objects are
+User-supplied callback functions can be provided for both :func:`put` and
+:func:`create_subscription`.  Note that callbacks for `PV` objects are
 slightly different: see :ref:`pv-callbacks-label` in the :mod:`pv` module
 for details.
 
-When defining a callback function to be run either when a :meth:`put`
+When defining a callback function to be run either when a :func:`put`
 completes or on changes to the Channel, as set from
-:meth:`create_subscription`, it is important to know two things:
+:func:`create_subscription`, it is important to know two things:
 
     1)  how your function will be called.
     2)  what is permissible to do inside your callback function.
@@ -817,7 +722,7 @@ In both cases, callbacks will be called with keyword arguments.  You should be
 prepared to have them passed to your function.  Use `**kw` unless you are very
 sure of what will be sent.
 
-For callbacks sent when a :meth:`put` completes, your function will be passed these:
+For callbacks sent when a :func:`put` completes, your function will be passed these:
 
     * `pvname` : the name of the pv
     * `data`:  the user-supplied callback_data (defaulting to ``None``).
@@ -953,7 +858,7 @@ Here we set a PVs value, waiting for it to complete::
     chid  = ca.create_channel('XXX:m1.VAL')
     ca.put(chid,  1.0, wait=True)
 
-The  :meth:`put` method will wait to return until the processing is
+The  :func:`put` method will wait to return until the processing is
 complete.
 
 Define a callback to Subscribe to Changes
@@ -987,7 +892,7 @@ standard output::
     while time.time()-t0 < 10.0:
         time.sleep(0.001)
 
-It is **vital** that the return value from :meth:`create_subscription` is
+It is **vital** that the return value from :func:`create_subscription` is
 kept in a variable so that it cannot be garbage collected.  Failure to keep
 this value will cause trouble, including almost immediate segmentation
 faults (on Windows) or seemingly inexplicable crashes later (on linux).

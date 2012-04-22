@@ -10,12 +10,18 @@
    <li><a href="{{ pathto('more') }}">contents</a>|</li>
    &nbsp;&nbsp;<li><a href="{{ pathto('search') }}">search</a></li>
 {% endblock %}
+
 {% block relbar1 %}
-<div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
- <h1> <a href="{{ pathto('index') }}">PyEpics: Epics Channel Access for Python</a></h1>
+<div style="background-color: #E4EAED; text-align: left; padding: 8px 4px 8px 4px">
+  <font size=28px><a href="{{ pathto('index') }}">
+      <img src="{{pathto("_static/pyepics.png", 1) }}" height=55 border="0" alt="pyepics"/>
+    &nbsp; PyEpics: Epics Channel Access for Python</a>
+  </font>
 </div>
-{{ super() }} 
+{{ super() }}
 {% endblock %}
+
+
 {# put the sidebar before the body #}
 {% block sidebar1 %}{{ sidebar() }}{% endblock %}
 {% block sidebar2 %}{% endblock %}

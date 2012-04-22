@@ -176,15 +176,28 @@ def find_libca():
     raise ChannelAccessException('cannot find Epics CA DLL')
 
 def initialize_libca():
-    """ load DLL (shared object library) to establish Channel Access
-    Connection. The value of PREEMPTIVE_CALLBACK sets the pre-emptive
-    callback model:
-        False  no preemptive callbacks. pend_io/pend_event must be used.
-        True   preemptive callbaks will be done.
-    Returns libca where
-        libca = ca library object, used for all subsequent ca calls
+    """Initialize the Channel Access library.
 
- Note that this function must be called prior to any real ca calls.
+    This loads the shared object library (DLL) to establish Channel Access
+    Connection. The value of :data:`PREEMPTIVE_CALLBACK` sets the pre-emptive
+    callback model.
+
+   This **must** be called prior to any actual use of the CA library, but
+    will be called automatically by the the :func:`withCA` decorator, so
+    you should not need to call this directly from most real programs.
+
+    Returns
+    -------
+    libca : object
+        ca library object, used for all subsequent ca calls
+
+    See Also
+    --------
+    withCA :  decorator to ensure CA is initialized
+
+    Notes
+    -----
+    This function must be called prior to any real CA calls.
     """
     if 'EPICS_CA_MAX_ARRAY_BYTES' not in os.environ:
         os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = "%i" %  2**24
@@ -228,8 +241,15 @@ def initialize_libca():
 
 def finalize_libca(maxtime=10.0):
     """shutdown channel access:
-    run clear_channel(chid) for all chids in _cache
-    then flush_io() and poll() a few times.
+
+    run :func:`clear_channel` for all chids in :data:`_cache`,
+    then calls :func:`flush_io` and :func:`poll` a few times.
+
+    Parameters
+    ----------
+    maxtime : float
+        maximimum time (in seconds) to wait for :func:`flush_io` and :func:`poll` to complete.
+
     """
     global libca
     global _cache
@@ -259,7 +279,10 @@ def get_cache(pvname):
     return _cache[current_context()].get(pvname, None)
 
 def show_cache(print_out=True):
-    """Show list of cached PVs"""
+    """print out a listing of PVs in the current session to
+    standard output.  Use the *print_out=False* option to be
+    returned the listing instead of having it printed out.
+    """
     out = []
     out.append('#  PVName        ChannelID/Context Connected?')
     out.append('#--------------------------------------------')
@@ -520,8 +543,17 @@ def context_create(ctx=None):
         ctx = {False:0, True:1}[PREEMPTIVE_CALLBACK]
     return libca.ca_context_create(ctx)
 
-def create_context(ctx):
-    "create a context (fixed naming bug)"
+def create_context(ctx=None):
+    """Create a new context, using the value of :data:`PREEMPTIVE_CALLBACK`
+    to set the context type. Note that both *context_create* and
+    *create_context* (which is more consistent with the Verb_Object of
+    the rest of the CA library) are supported.
+
+    Parameters
+    ----------
+    ctx : 0 -- No preemptive callbacks, 1 -- use use preemptive callbacks,
+          None -- use value of :data:`PREEMPTIVE_CALLBACK`
+    """
     context_create(ctx=ctx)
 
 @withCA
@@ -537,19 +569,27 @@ def context_destroy():
     return ret
 
 def destroy_context():
-    "destroy current context (fixed naming bug)"
+    "destroy current context"
     return context_destroy()
 
 @withCA
 @withSEVCHK
 def attach_context(context):
-    "attach a context"
+    "attach to the supplied context"
     return libca.ca_attach_context(context)
 
 @withCA
 @withSEVCHK
 def use_initial_context():
-    "attach to the original context"
+    """Attaches to the context created when libca is initialized.
+    Using this function is recommended when writing threaded programs that
+    using CA.
+
+    See Also
+    --------
+    :ref:`advanced-threads-label` in doc for further discussion.
+
+    """
     global initial_context
     ret = dbr.ECA_NORMAL
     if initial_context != current_context():
@@ -558,12 +598,13 @@ def use_initial_context():
 
 @withCA
 def detach_context():
-    "detach a context"
+    "detach context"
     return libca.ca_detach_context()
 
 @withCA
 def replace_printf_handler(fcn=None):
-    "replace printf output handler -- test???"
+    """replace the normal printf() output handler
+    with the supplied function (defaults to :func:`sys.stderr.write`)"""
     if fcn is None:
         fcn = sys.stderr.write
     serr = ctypes.CFUNCTYPE(None, ctypes.c_char_p)(fcn)
@@ -571,7 +612,7 @@ def replace_printf_handler(fcn=None):
 
 @withCA
 def current_context():
-    "return this context"
+    "return the current context"
     ctx = libca.ca_current_context()
     try:
         ctx = int(ctx)
@@ -581,22 +622,25 @@ def current_context():
 
 @withCA
 def client_status(context, level):
-    "return status of client"
+    """print (to stderr) information about Channel Access status,
+    including status for each channel, and search and connection statistics."""
     return libca.ca_client_status(context, level)
 
 @withCA
 def flush_io():
-    "i/o flush"
+    "flush i/o"
     return libca.ca_flush_io()
 
 @withCA
 def message(status):
-    "write message"
+    """Print a message corresponding to a Channel Access status return value.
+    """
     return BYTES2STR(libca.ca_message(status))
 
 @withCA
 def version():
-    """return CA version"""
+    """   Print Channel Access version string.
+    Currently, this should report '4.13' """
     return BYTES2STR(libca.ca_version())
 
 @withCA
@@ -619,7 +663,11 @@ def pend_event(timeout=1.e-5):
 
 @withCA
 def poll(evt=1.e-5, iot=1.0):
-    """polls CA for events and i/o. """
+    """a convenience function which is equivalent to::
+       pend_event(evt)
+       pend_io_(iot)
+
+    """
     pend_event(evt)
     return pend_io(iot)
 
@@ -730,57 +778,66 @@ def connect_channel(chid, timeout=None, verbose=False):
 # functions with very light wrappings:
 @withCHID
 def name(chid):
-    "channel name"
+    "return PV name for channel name"
     return BYTES2STR(libca.ca_name(chid))
 
 @withCHID
 def host_name(chid):
-    "channel host name"
+    "return host name and port serving Channel"
     return BYTES2STR(libca.ca_host_name(chid))
 
 @withCHID
 def element_count(chid):
-    "channel data size -- element count"
+    """return number of elements in Channel's data.
+    1 for most Channels, > 1 for waveform Channels"""
+
     return libca.ca_element_count(chid)
 
 @withCHID
 def read_access(chid):
-    "read access for channel"
+    "return *read access* for a Channel: 1 for ``True``, 0 for ``False``."
     return libca.ca_read_access(chid)
 
 @withCHID
 def write_access(chid):
-    "write access for channel"
+    "return *write access* for a channel: 1 for ``True``, 0 for ``False``."
     return libca.ca_write_access(chid)
 
 @withCHID
 def field_type(chid):
-    "integer giving data type for channel"
+    "return the integer DBR field type."
     return libca.ca_field_type(chid)
 
 @withCHID
 def clear_channel(chid):
-    "clear channel"
+    "clear the channel"
     return libca.ca_clear_channel(chid)
 
 @withCHID
 def state(chid):
-    "read attachment state for channel"
+    "return state (that is, attachment state) for channel"
     return libca.ca_state(chid)
 
 def isConnected(chid):
-    "return whether channel is connected"
+    """return whether channel is connected:  `dbr.CS_CONN==state(chid)`
+
+    This is ``True`` for a connected channel, ``False`` for an unconnected channel.
+    """
+
     return dbr.CS_CONN == state(chid)
 
 def access(chid):
-    "string description of access"
+    """returns a string describing read/write access: one of
+    `no access`, `read-only`, `write-only`, or `read/write`
+    """
     acc = read_access(chid) + 2 * write_access(chid)
     return ('no access', 'read-only', 'write-only', 'read/write')[acc]
 
 def promote_type(chid, use_time=False, use_ctrl=False):
-    "promote native field type to TIME or CTRL variant"
+    """promotes the native field type of a ``chid`` to its TIME or CTRL variant.
+    Returns the integer corresponding to the promoted field value."""
     ftype = field_type(chid)
-    if   use_ctrl:
+    if use_ctrl:
         ftype += dbr.CTRL_STRING
     elif use_time:
         ftype += dbr.TIME_STRING
@@ -1058,16 +1115,17 @@ def put(chid, value, wait=False, timeout=30, callback=None,
 
 @withConnectedCHID
 def get_ctrlvars(chid):
-    """return the CTRL fields for a Channel.  Depending on
-    the native type, these fields may include
-        status  severity precision  units  enum_strs
-        upper_disp_limit     lower_disp_limit
-        upper_alarm_limit    lower_alarm_limit
-        upper_warning_limit  lower_warning_limit
-        upper_ctrl_limit    lower_ctrl_limit
+    """returns a dictionary of CTRL fields for a Channel.
 
-    note (difference with C lib): enum_strs will be a
-    list of strings for the names of ENUM states.
+    Depending on the native type, the keys may include
+        *status*, *severity*, *precision*, *units*, enum_strs*,
+        *upper_disp_limit*, *lower_disp_limit*, upper_alarm_limit*,
+        *lower_alarm_limit*, upper_warning_limit*, *lower_warning_limit*,
+        *upper_ctrl_limit*, *lower_ctrl_limit*
+
+    Notes
+    =====
+    enum_strs will be a list of strings for the names of ENUM states.
 
     """
     ftype = promote_type(chid, use_ctrl=True)
@@ -1096,9 +1154,8 @@ def get_ctrlvars(chid):
 
 @withConnectedCHID
 def get_timevars(chid):
-    """return the TIME fields for a Channel.  Depending on
-    the native type, these fields may include
-        status  severity timestamp
+    """returns a dictionary of TIME fields for a Channel.  This will contain
+    keys of  *status*, *severity*, and *timestamp*.
     """
     ftype = promote_type(chid, use_time=True)
     dat = (1*dbr.Map[ftype])()
@@ -1114,7 +1171,7 @@ def get_timevars(chid):
     return out
 
 def get_timestamp(chid):
-    """return the timestamp of a Channel."""
+    """return the timestamp of a Channel -- the time of last update."""
     return get_timevars(chid).get('timestamp', 0)
 
 def get_severity(chid):
@@ -1170,20 +1227,23 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
 
 @withCA
 @withSEVCHK
-def clear_subscription(evid):
-    "cancel subscription"
-    return libca.ca_clear_subscription(evid)
+def clear_subscription(event_id):
+    "cancel subscription given its *event_id*"
+    return libca.ca_clear_subscription(event_id)
 
 
 @withCA
 @withSEVCHK
 def sg_block(gid, timeout=10.0):
-    "sg block"
+    "block for a synchronous group to complete processing"
     return libca.ca_sg_block(gid, timeout)
 
 @withCA
 def sg_create():
-    "sg create"
+    """create synchronous group.
+    Returns a *group id*, `gid`, which is used to identify this group and
+    to be passed to all other synchronous group commands.
+    """
     gid  = ctypes.c_ulong()
     pgid = ctypes.pointer(gid)
     ret =  libca.ca_sg_create(pgid)
@@ -1193,27 +1253,33 @@ def sg_create():
 @withCA
 @withSEVCHK
 def sg_delete(gid):
-    "sg delete"
+    "delete a synchronous group"
     return libca.ca_sg_delete(gid)
 
 @withCA
 def sg_test(gid):
-    "sg test"
+    "test whether a synchronous group has completed."
     ret = libca.ca_sg_test(gid)
     return PySEVCHK('sg_test', ret, dbr.ECA_IODONE)
 
 @withCA
 @withSEVCHK
 def sg_reset(gid):
-    "sg reset"
+    "resets a synchronous group"
     return libca.ca_sg_reset(gid)
 
 def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
     """synchronous-group get of the current value for a Channel.
     same options as get()
 
-    Note that the returned tuple from a sg_get() will have to be
-    unpacked with the '_unpack' method:
+    This function will not immediately return the value, of course, but the
+    address of the underlying data.
+
+    After the :func:`sg_block` has completed, you must use :func:`_unpack`
+    to convert this data address to the actual value(s).
+
+    Examples
+    ========
 
     >>> chid = epics.ca.create_channel(PV_Name)
     >>> epics.ca.connect_channel(chid1)
@@ -1221,6 +1287,7 @@ def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
     >>> data = epics.ca.sg_get(sg, chid)
     >>> epics.ca.sg_block(sg)
     >>> print epics.ca._unpack(data, chid=chid)
+
     """
     if not isinstance(chid, dbr.chid_t):
         raise ChannelAccessException("not a valid chid!")
@@ -1240,7 +1307,10 @@ def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
     return val
 
 def sg_put(gid, chid, value):
-    "synchronous-group put: cannot wait or get callback!"
+    """perform a `put` within a synchronous group.
+
+    This `put` cannot wait for completion or for a a callback to complete.
+    """
     if not isinstance(chid, dbr.chid_t):
         raise ChannelAccessException("not a valid chid!")
 
