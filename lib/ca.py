@@ -1045,9 +1045,9 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     
     Notes
     -----
-    1.  returning ``None`` indicates an *incomplete get*
+    1. Returning ``None`` indicates an *incomplete get*
 
-    2.  The *as_string* option is not as complete as the *as_string*
+    2. The *as_string* option is not as complete as the *as_string*
     argument for :meth:`PV.get`.  For Enum types, the name of the Enum
     state will be returned.  For waveforms of type CHAR, the string
     representation will be returned.  For other waveforms (with *count* >
