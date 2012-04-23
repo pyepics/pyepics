@@ -32,7 +32,7 @@ OP_CONN_DOWN = 7
 CS_NEVER_SEARCH = 4
 #
 # Note that DBR_XXX should be replaced with dbr.XXX
-# 
+#
 STRING = 0
 INT    = 1
 SHORT  = 1
@@ -98,6 +98,7 @@ value_offset = None
 class TimeStamp(ctypes.Structure):
     "emulate epics timestamp"
     _fields_ = [('secs', uint_t), ('nsec', uint_t)]
+
 _STAT_SEV    = (('status', short_t), ('severity', short_t))
 _STAT_SEV_TS = (('status', short_t), ('severity', short_t),
                 ('stamp', TimeStamp))
@@ -107,7 +108,7 @@ class time_string(ctypes.Structure):
     "dbr time string"
     _fields_ = list(_STAT_SEV_TS) + [('value', MAX_STRING_SIZE*char_t)]
 
-    
+
 class time_short(ctypes.Structure):
     "dbr time short"
     _fields_ = list(_STAT_SEV_TS) + [('RISC_pad',  short_t),
@@ -131,14 +132,13 @@ class time_char(ctypes.Structure):
 class time_long(ctypes.Structure):
     "dbr time long"
     _fields_ = list(_STAT_SEV_TS) + [('value', int_t)]
-    
+
 
 class time_double(ctypes.Structure):
     "dbr time double"
     _fields_ = list(_STAT_SEV_TS) + [('RISC_pad', int_t),
-                                     ('value',    double_t)]    
-   
-    
+                                     ('value',    double_t)]
+
 # DBR types with full control and graphical fields
 # yes, this strange order is as in db_access.h!!!
 ctrl_limits = ('upper_disp_limit',   'lower_disp_limit',
@@ -152,7 +152,7 @@ def _gen_ctrl_lims(t=short_t):
 
 class ctrl_enum(ctypes.Structure):
     "dbr ctrl enum"
-    _fields_ = list(_STAT_SEV) 
+    _fields_ = list(_STAT_SEV)
     _fields_.extend([ ('no_str', short_t),
                       ('strs', (char_t * MAX_ENUM_STRING_SIZE) * MAX_ENUMS),
                       ('value',    ushort_t)])
@@ -161,19 +161,19 @@ class ctrl_short(ctypes.Structure):
     "dbr ctrl short"
     _fields_ = list(_STAT_SEV) + [_UNITS] +  _gen_ctrl_lims(t=short_t)
     _fields_.extend([('value', short_t )])
-    
+
 class ctrl_char(ctypes.Structure):
     "dbr ctrl long"
-    _fields_ = list(_STAT_SEV) +[_UNITS] +  _gen_ctrl_lims(t=byte_t)    
+    _fields_ = list(_STAT_SEV) +[_UNITS] +  _gen_ctrl_lims(t=byte_t)
     _fields_.extend([('RISC_pad', byte_t), ('value', ubyte_t)])
-    
+
 class ctrl_long(ctypes.Structure):
     "dbr ctrl long"
     _fields_ = list(_STAT_SEV) +[_UNITS] +  _gen_ctrl_lims(t=int_t)
     _fields_.extend([('value', int_t)])
-    
+
 class ctrl_float(ctypes.Structure):
-    "dbr ctrl float"    
+    "dbr ctrl float"
     _fields_ = list(_STAT_SEV)
     _fields_.extend([('precision',   short_t),
                      ('RISC_pad',    short_t)] + [_UNITS])
@@ -188,8 +188,8 @@ class ctrl_double(ctypes.Structure):
                      ('RISC_pad',    short_t)] + [_UNITS])
     _fields_.extend( _gen_ctrl_lims(t=double_t) )
     _fields_.extend([('value',       double_t)])
-    
-    
+
+
 NP_Map = {}
 if HAS_NUMPY:
     NP_Map = {INT:    numpy.int16,
@@ -198,7 +198,7 @@ if HAS_NUMPY:
               CHAR:   numpy.uint8,
               LONG:   numpy.int32,
               DOUBLE: numpy.float64}
-    
+
 
 # map of Epics DBR types to ctypes types
 Map = {STRING: string_t,
@@ -210,7 +210,7 @@ Map = {STRING: string_t,
        DOUBLE: double_t,
 
        TIME_STRING: time_string,
-       TIME_INT: time_short, 
+       TIME_INT: time_short,
        TIME_SHORT:  time_short,
        TIME_FLOAT: time_float,
        TIME_ENUM:  time_enum,
@@ -222,7 +222,7 @@ Map = {STRING: string_t,
        CTRL_SHORT: ctrl_short,
        CTRL_INT:   ctrl_short,
        CTRL_FLOAT: ctrl_float,
-       CTRL_ENUM:  ctrl_enum, 
+       CTRL_ENUM:  ctrl_enum,
        CTRL_CHAR:  ctrl_char,
        CTRL_LONG:  ctrl_long,
        CTRL_DOUBLE: ctrl_double
@@ -238,7 +238,7 @@ def Name(ftype, reverse=False):
          CHAR: 'CHAR',
          LONG: 'LONG',
          DOUBLE: 'DOUBLE',
-         
+
          TIME_STRING: 'TIME_STRING',
          TIME_SHORT: 'TIME_SHORT',
          TIME_FLOAT: 'TIME_FLOAT',
@@ -246,7 +246,7 @@ def Name(ftype, reverse=False):
          TIME_CHAR: 'TIME_CHAR',
          TIME_LONG: 'TIME_LONG',
          TIME_DOUBLE: 'TIME_DOUBLE',
-         
+
          CTRL_STRING: 'CTRL_STRING',
          CTRL_SHORT: 'CTRL_SHORT',
          CTRL_FLOAT: 'CTRL_FLOAT',
@@ -260,26 +260,22 @@ def Name(ftype, reverse=False):
         if name in list(m.values()):
             for key, val in m.items():
                 if name == val: return key
-                
-    return m.get(ftype,'unknown')
+    return m.get(ftype, 'unknown')
 
 def cast_args(args):
     """returns pointer to arg type for casting """
-    count, ftype = args.count, args.type
-    #if ftype == STRING:
-    #    print 'THIS IS CAST ARG for STRING '
-    #    count = MAX_STRING_SIZE
+    ftype = args.type
     if ftype not in Map:
         ftype = double_t
-    return ctypes.cast(args.raw_dbr, ctypes.POINTER(count*Map[ftype]))
+    return ctypes.cast(args.raw_dbr, ctypes.POINTER(args.count*Map[ftype]))
 
 class event_handler_args(ctypes.Structure):
     "event handler arguments"
     _fields_ = [('usr',     py_obj),
-                ('chid',    chid_t),   
-                ('type',    long_t),   
-                ('count',   long_t),      
-                ('raw_dbr', void_p),    
+                ('chid',    chid_t),
+                ('type',    long_t),
+                ('count',   long_t),
+                ('raw_dbr', void_p),
                 ('status',  int_t)]
 
 class connection_args(ctypes.Structure):
@@ -291,11 +287,11 @@ class exception_handler_args(ctypes.Structure):
     _fields_ = [('usr',   void_p),
                 ('chid',  chid_t),
                 ('type',  int_t),
-                ('count', int_t), 
+                ('count', int_t),
                 ('addr',  void_p),
                 ('stat',  int_t),
                 ('op',    int_t),
-                ('ctx',   char_p), 
-                ('pFile', char_p), 
-                ('lineNo', int_t)] 
+                ('ctx',   char_p),
+                ('pFile', char_p),
+                ('lineNo', int_t)]
 
