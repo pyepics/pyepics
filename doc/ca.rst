@@ -8,7 +8,6 @@ ca: Low-level Channel Access module
 .. module:: epics.ca
    :synopsis: low-level Channel Access  module.
 
-
 The :mod:`ca` module provides a low-level wrapping of the EPICS
 Channel Access (CA) library, using ctypes.  Most users of the `epics`
 module will not need to be concerned with most of the details here, and
@@ -152,10 +151,10 @@ threading contexts are very close to the C library:
 
 .. autofunction:: finalize_libca
 
-.. function::  context_create()
+.. function:: context_create()
 .. autofunction:: create_context
 
-.. function::  context_destroy()
+.. function:: context_destroy()
 .. autofunction:: destroy_context
 
 .. autofunction:: current_context()
@@ -405,26 +404,7 @@ keyword arguments can be used to specify such options.
 
    For more on this *put callback*, see :ref:`ca-callbacks-label` below.
 
-.. function::  create_subscription(chid[, use_time=False[, use_ctrl=False[, mask=None[, callback=None]]]])
-
-   create a *subscription to changes*, The user-supplied callback function
-   will be called on any changes to the PV.
-
-   :param use_time: whether to use the TIME variant for the PV type
-   :type use_time:  ``True``/``False``
-   :param use_ctrl: whether to use the CTRL variant for the PV type
-   :type use_ctrl:  ``True``/``False``
-   :param  mask:    bitmask (combination of dbr.DBE_ALARM, dbr.DBE_LOG, dbr.DBE_VALUE) to control which changes result in a callback. Defaults to :data:`DEFAULT_SUBSCRIPTION_MASK`.
-   :type mask:      integer
-   :param callback:  user-supplied callback function
-   :type callback:   ``None`` or callable
-
-   :rtype: tuple containing *(callback_ref, user_arg_ref, event_id)*
-
-   The returned tuple contains *callback_ref* an *user_arg_ref* which are
-   references that should be kept for as long as the subscription lives
-   (otherwise they may be garbage collected, causing no end of trouble).
-   *event_id* is the id for the event (useful for clearing a subscription).
+.. autofunction:: create_subscription(chid, use_time=False, use_ctrl=False, mask=None, callback=None)
 
    For more on writing the user-supplied callback, see :ref:`ca-callbacks-label` below.
 
@@ -633,20 +613,10 @@ DBR data types
    This exception is raised when the :mod:`ca` module experiences
    unexpected behavior and must raise an exception
 
-..  function:: PySEVCHK(func_name, status[, expected=dbr.ECA_NORMAL])
+.. autofunction:: PySEVCHK(func_name, status[, expected=dbr.ECA_NORMAL])
 
-    This checks the return *status* returned from a `libca.ca_***` and
-    raises a :exc:`ChannelAccessException` if the value does not match the
-    *expected* value.
+.. autofunction:: withSEVCHK(fcn)
 
-    The message from the exception will include the *func_name* (name of
-    the Python function) and the CA message from :mod:`message`.
-
-..  function:: withSEVCHK
-
-    this decorator handles the common case of running :func:`PySEVCHK` for
-    a function whose return value is from a `libca.ca_***` function and
-    whose return value should be ``dbr.ECA_NORMAL``.
 
 Function Decorators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -654,30 +624,15 @@ Function Decorators
 In addition to :func:`withSEVCHK`, several other decorator functions are
 used heavily inside of ca.py or are available for your convenience.
 
-.. function:: withCA
+.. autofunction:: withCA(fcn)
 
-   ensures that the CA library is initialized before many CA functions are
-   called.  This prevents, for example, one creating a channel ID before CA
-   has been initialized.
+.. autofunction:: withCHID(fcn)
 
-.. function:: withCHID
+.. autofunction:: withConnectedCHID(fcn)
 
-   ensures that CA functions which require a ``chid`` as the first argument
-   actually have a  ``chid`` as the first argument.  This is not a highly
-   robust test (it actually checks for a ctypes.c_long or int) but is
-   useful enough to catch most errors before they would cause a crash of
-   the CA library.
+.. autofunction:: withInitialContext(fcn)
 
-..  function:: withConnectedCHID
-
-    ensures that the first argument of a function is a connected ``chid``.
-    This test is (intended to be) robust, and will (try to) make sure a
-    ``chid`` is actually connected before calling the decorated function.
-
-..  function:: withInitialContext
-
-    ensures that the called function uses the threading context initially defined.
-    The See :ref:`advanced-threads-label` for further discussion.
+    See :ref:`advanced-threads-label` for further discussion.
 
 
 Unpacking Data from Callbacks
@@ -690,16 +645,7 @@ have to run this code, but there is one exception:  when using
 :func:`sg_get`, the values returned will have to be unpacked with this
 function.
 
-..  function:: _unpack(cdata, chid=None[, count=None[, ftype=None[, as_numpy=None]]])
-
-    This takes the ctypes data `cdata` and returns the Python data.
-
-   :param cdata:   cdata as returned by internal libca functions, and :func:`sg_get`.
-   :param chid:    channel ID (optional: used for determining count and ftype)
-   :param count:   number of elements to fetch (defaults to element count of chid  or 1)
-   :param ftype:   data type of channel (defaults to native type of chid)
-   :param as_numpy:  whether to convert to numpy array.
-   :type as_numpy:  ``True``/``False``
+.. autofunction:: _unpack(chid, data[, count=None[, ftype=None[, as_numpy=None]]])
 
 ..  _ca-callbacks-label:
 
@@ -764,7 +710,7 @@ Several parts of the CA library are not implemented in the Python module.
 These are currently seen as unneeded (with notes where appropriate for
 alternatives), though they could be added on request.
 
-.. function::  ca_add_exception_event
+.. function:: ca_add_exception_event
 
    *Not implemented*: Python exceptions are raised where appropriate and
    can be used in user code.
@@ -789,11 +735,12 @@ alternatives), though they could be added on request.
 
    *Not implemented*: it is easy to pass user-defined data to callbacks as needed.
 
-.. function::  ca_SEVCHK
+.. function:: ca_SEVCHK
 
    *Not implemented*: the Python function :func:`PySEVCHK` is
    approximately the same.
-.. function::  ca_signal
+
+.. function:: ca_signal
 
    *Not implemented*: the Python function :func:`PySEVCHK` is
    approximately the same.

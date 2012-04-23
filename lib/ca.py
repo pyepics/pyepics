@@ -315,7 +315,7 @@ def withCA(fcn):
     """decorator to ensure that libca and a context are created
     prior to function calls to the channel access library. This is
     intended for functions that need CA started to work, such as
-        create_channel
+    :func:`create_channel`.
 
     Note that CA functions that take a Channel ID (chid) as an
     argument are  NOT wrapped by this: to get a chid, the
@@ -332,14 +332,14 @@ def withCA(fcn):
     return wrapper
 
 def withCHID(fcn):
-    """decorator to ensure that first argument to a function
-    is a chid. This performs a very weak test, as any ctypes
-    long or python int will pass.
-
-    It may be worth making a chid class (which could hold connection
-    data of _cache) that could be tested here.  For now, that
-    seems slightly 'not low-level' for this module.
+    """decorator to ensure that first argument to a function is a Channel
+    ID, ``chid``.  The test performed is very weak, as any ctypes long or
+    python int will pass, but it is useful enough to catch most accidental
+    errors before they would cause a crash of the CA library.
     """
+    # It may be worth making a chid class (which could hold connection
+    # data of _cache) that could be tested here.  For now, that
+    # seems slightly 'not low-level' for this module.
     def wrapper(*args, **kwds):
         "withCHID wrapper"
         if len(args)>0:
@@ -358,11 +358,12 @@ def withCHID(fcn):
     wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
-
 def withConnectedCHID(fcn):
-    """decorator to ensure that first argument to a function is a
-    chid that is actually connected. This will attempt to connect
-    if needed."""
+    """decorator to ensure that the first argument of a function is a
+    fully connected Channel ID, ``chid``.  This test is (intended to be)
+    robust, and will try to make sure a ``chid`` is actually connected
+    before calling the decorated function.
+    """
     def wrapper(*args, **kwds):
         "withConnectedCHID wrapper"
         if len(args)>0:
@@ -375,8 +376,10 @@ def withConnectedCHID(fcn):
                                              (fcn.__name__))
             if not isConnected(chid):
                 timeout = kwds.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
+                fmt ="%s: timed out waiting for chid to connect (%d seconds)"
                 if not connect_channel(chid, timeout=timeout):
-                    raise ChannelAccessException("%s: timed out waiting for chid to connect (%d seconds)" % (fcn.__name__, chid, timeout))
+                    raise ChannelAccessException(fmt % (fcn.__name__,
+                                                        chid, timeout))
 
         return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
@@ -385,8 +388,8 @@ def withConnectedCHID(fcn):
     return wrapper
 
 def withInitialContext(fcn):
-    """decorator to ensure that a function uses the initial
-    threading context
+    """decorator to ensure that the wrapped function uses the
+    initial threading context created at initialization of CA
     """
     def wrapper(*args, **kwds):
         "withInitialContext wrapper"
@@ -398,8 +401,12 @@ def withInitialContext(fcn):
     return wrapper
 
 def PySEVCHK(func_name, status, expected=dbr.ECA_NORMAL):
-    """raise a ChannelAccessException if the wrapped
-    status != ECA_NORMAL
+    """This checks the return *status* returned from a `libca.ca_***` and
+    raises a :exc:`ChannelAccessException` if the value does not match the
+    *expected* value (which is nornmally ``dbr.ECA_NORMAL``.
+
+    The message from the exception will include the *func_name* (name of
+    the Python function) and the CA message from :func:`message`.
     """
     if status == expected:
         return status
@@ -407,7 +414,10 @@ def PySEVCHK(func_name, status, expected=dbr.ECA_NORMAL):
 
 def withSEVCHK(fcn):
     """decorator to raise a ChannelAccessException if the wrapped
-    ca function does not return status=ECA_NORMAL
+    ca function does not return status = dbr.ECA_NORMAL.  This
+    handles the common case of running :func:`PySEVCHK` for a
+    function whose return value is from a corresponding libca function
+    and whose return value should be ``dbr.ECA_NORMAL``.
     """
     def wrapper(*args, **kwds):
         "withSEVCHK wrapper"
@@ -551,8 +561,11 @@ def create_context(ctx=None):
 
     Parameters
     ----------
-    ctx : 0 -- No preemptive callbacks, 1 -- use use preemptive callbacks,
-          None -- use value of :data:`PREEMPTIVE_CALLBACK`
+    ctx : int
+       0 -- No preemptive callbacks,
+       1 -- use use preemptive callbacks,
+       None -- use value of :data:`PREEMPTIVE_CALLBACK`
+
     """
     context_create(ctx=ctx)
 
@@ -857,8 +870,28 @@ def native_type(ftype):
     return ntype
 
 def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
-    """unpack raw data returned from an array get or
-    subscription callback"""
+    """unpacks raw data for a Channel ID `chid` returned by libca functions
+    including `ca_get_array_callback` or subscription callback, and returns
+    the corresponding Python data
+
+    Normally, users are not expected to need to access this function, but
+    it will be necessary why using :func:`sg_get`.
+
+    Parameters
+    -----------
+    chid  :  int or ctypes.c_long or None,
+        channel ID (if not None, used for determining count and ftype)
+    data  :  object
+        raw data as returned by internal libca functions.
+    count :  integer
+        number of elements to fetch (defaults to element count of chid  or 1)
+    ftype :  integer
+        data type of channel (defaults to native type of chid)
+    as_numpy : bool
+        whether to convert to numpy array.
+
+
+    """
 
     def array_cast(data, count, ntype, use_numpy):
         "cast ctypes array to numpy array (if using numpy)"
@@ -1201,16 +1234,41 @@ DEFAULT_SUBSCRIPTION_MASK = dbr.DBE_VALUE|dbr.DBE_ALARM
 @withConnectedCHID
 def create_subscription(chid, use_time=False, use_ctrl=False,
                         mask=None, callback=None):
+    """create a *subscription to changes*. Sets up a user-supplied
+    callback function to be called on any changes to the channel.
+
+    Parameters
+    ----------
+    chid  : channel ID
+    use_time : bool
+        whether to use the TIME variant for the PV type
+    use_ctrl : bool
+        whether to use the CTRL variant for the PV type
+    mask : integer or None
+       bitmask combination of :data:`dbr.DBE_ALARM`, :data:`dbr.DBE_LOG`, and
+       :data:`dbr.DBE_VALUE`, to control which changes result in a callback.
+       If ``None``, defaults to :data:`DEFAULT_SUBSCRIPTION_MASK`.
+
+    callback : ``None`` or callable
+        user-supplied callback function to be called on changes
+
+    Returns
+    -------
+    (callback_ref, user_arg_ref, event_id)
+
+        The returned tuple contains *callback_ref* an *user_arg_ref* which
+        are references that should be kept for as long as the subscription
+        lives (otherwise they may be garbage collected, causing no end of
+        trouble).  *event_id* is the id for the event (useful for clearing
+        a subscription).
+
+    Notes
+    -----
+    Keep the returned tuple in named variable!! if the return argument
+    gets garbage collected, a coredump will occur.
+
     """
-    setup a callback function to be called when a PVs value or state changes.
 
-    mask is some combination of dbr.DBE_VALUE, dbr.DBE_ALARM, or default as set above.
-
-    Important Note:
-        KEEP The returned tuple in named variable: if the return argument
-        gets garbage collected, a coredump will occur.
-
-    """
     mask = mask or DEFAULT_SUBSCRIPTION_MASK
 
     ftype = promote_type(chid, use_ctrl=use_ctrl, use_time=use_time)
@@ -1230,7 +1288,6 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
 def clear_subscription(event_id):
     "cancel subscription given its *event_id*"
     return libca.ca_clear_subscription(event_id)
-
 
 @withCA
 @withSEVCHK
