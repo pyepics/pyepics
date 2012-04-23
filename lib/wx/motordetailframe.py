@@ -204,13 +204,13 @@ class MotorDetailPanel(ScrolledPanel):
         epv = self.motor.PV('disabled')
 
         able_btns = PVEnumButtons(dp, pv=epv, orientation = wx.VERTICAL,
-                                  size=(90, -1))
+                                  size=(80, 60))
 
         ds.Add(able_btns,   (nrow-1, 3), (2, 1), CEN, 5)
 
         stop_btns = PVEnumButtons(dp, pv=self.motor.PV('SPMG'),
                                   orientation = wx.VERTICAL,
-                                  size=(110,-1))
+                                  size=(100, 125))
 
         ds.Add(stop_btns,     (2, 4), (4, 1), wx.ALIGN_RIGHT, 5)
 
@@ -235,12 +235,12 @@ class MotorDetailPanel(ScrolledPanel):
 
         ds.Add(PVEnumButtons(dp, pv=self.motor.PV('SET'),
                              orientation = wx.HORIZONTAL,
-                             size=(-1, -1)), (0, 1), (1, 2), wx.ALIGN_LEFT)
+                             size=(175, 25)), (0, 1), (1, 2), wx.ALIGN_LEFT)
 
         ds.Add(xLabel(dp, 'Direction: '), (1, 0), (1, 1), LCEN, 5)
         ds.Add(PVEnumButtons(dp, pv=self.motor.PV('DIR'),
                              orientation=wx.HORIZONTAL,
-                             size=(-1, -1)), (1, 1), (1, 2), wx.ALIGN_LEFT)
+                             size=(175, 25)), (1, 1), (1, 2), wx.ALIGN_LEFT)
 
         ds.Add(xLabel(dp, 'Freeze Offset: '), (0, 4), (1, 1), LCEN, 5)
         ds.Add(PVEnumChoice(dp, pv=self.motor.PV('FOFF'),

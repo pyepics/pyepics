@@ -146,6 +146,17 @@ class CA_BasicTests(unittest.TestCase):
         self.assertEqual(conn,False)
 
 
+    def test_putwait(self):
+        'test put with wait'
+        pvn = pvnames.non_updating_pv
+        chid = ca.create_channel(pvn, connect=True)
+        o  = ca.put(chid, -1, wait=True)
+        val = ca.get(chid)
+        self.assertEqual(val, -1)
+        o  = ca.put(chid, 2, wait=True)
+        val = ca.get(chid)
+        self.assertEqual(val, 2)
+
     def test_promote_type(self):
         pvn = pvnames.double_pv
         chid = ca.create_channel(pvn,connect=True)

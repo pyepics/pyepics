@@ -453,8 +453,8 @@ def _onMonitorEvent(args):
         tmpv = value[0]
         kwds['status']    = tmpv.status
         kwds['severity']  = tmpv.severity
-        kwds['timestamp'] = (dbr.EPICS2UNIX_EPOCH + tmpv.stamp.secs +
-                            1.e-6*int(tmpv.stamp.nsec/1000.00))
+        kwds['timestamp'] = dbr.make_unixtime(tmpv.stamp)
+
     nelem = args.count
     if args.type in (dbr.STRING, dbr.TIME_STRING, dbr.CTRL_STRING):
         nelem = dbr.MAX_STRING_SIZE
@@ -515,7 +515,8 @@ def _onGetEvent(args, **kws):
     global _cache
     if args.status != dbr.ECA_NORMAL:
         return
-    get_cache(name(args.chid))['value'] = memcopy(dbr.cast_args(args).contents)
+    get_cache(name(args.chid))[args.usr] = memcopy(dbr.cast_args(args).contents)
+    
 
 ## put event handler:
 def _onPutEvent(args, **kwds):
@@ -990,15 +991,16 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     # implementation note: cached value of
     #   None        implies no value, no expected callback
     #   GET_PENDING implies no value yet, callback expected.
-    ncache['value'] = GET_PENDING
-
-    ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, ctypes.py_object())
-
-    PySEVCHK('get', ret)
-    if not wait:
-        return None
-    return get_complete(chid, count=count, ftype=ftype, timeout=timeout,
-                        as_string=as_string, as_numpy=as_numpy)
+    if ncache.get('value', None) is None:
+        ncache['value'] = GET_PENDING
+        ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, 
+                                          ctypes.py_object('value'))
+        PySEVCHK('get', ret)
+        
+    if wait:
+        return get_complete(chid, count=count, ftype=ftype,
+                            timeout=timeout,
+                            as_string=as_string, as_numpy=as_numpy)
 
 @withConnectedCHID
 def get_complete(chid, ftype=None, count=None, timeout=None,
@@ -1039,7 +1041,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
     if timeout is None:
         timeout = 1.0 + log10(max(1, count))
     while ncache['value'] is GET_PENDING:
-        pend_event(1.e-5)
+        poll()
         if time.time()-t0 > timeout:
             msg = "ca.get('%s') timed out after %.2f seconds."
             warnings.warn(msg % (name(chid), timeout))
@@ -1147,8 +1149,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     return ret
 
 @withConnectedCHID
-def get_ctrlvars(chid):
-    """returns a dictionary of CTRL fields for a Channel.
+def get_ctrlvars(chid, timeout=5.0, warn=True):
+    """return the CTRL fields for a Channel.
 
     Depending on the native type, the keys may include
         *status*, *severity*, *precision*, *units*, enum_strs*,
@@ -1162,16 +1164,27 @@ def get_ctrlvars(chid):
 
     """
     ftype = promote_type(chid, use_ctrl=True)
-    dat = (1*dbr.Map[ftype])()
+    ncache = _cache[current_context()][name(chid)]
+    if ncache.get('ctrl_value', None) is None:
+        ncache['ctrl_value'] = GET_PENDING
+        ret = libca.ca_array_get_callback(ftype, 1, chid, _CB_GET, 
+                                          ctypes.py_object('ctrl_value'))
 
-    ret = libca.ca_array_get(ftype, 1, chid, dat)
-    PySEVCHK('get_ctrlvars', ret)
-    ret = poll()
-    # as per documentation "the returned channel value cant be assumed to be stable in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io"
-    # (weird memory corruption issues may occur otherwise)
-    PySEVCHK('poll_after_get_ctrlvars', ret)
+        PySEVCHK('get_ctrlvars', ret)
     out = {}
-    tmpv = dat[0]
+    if ncache.get('ctrl_value', None) is None:
+        return out
+
+    t0 = time.time()
+    while ncache['ctrl_value'] is GET_PENDING:
+        poll()
+        if time.time()-t0 > timeout:
+            if warn:
+                msg = "ca.get_ctrlvars('%s') timed out after %.2f seconds."
+                warnings.warn(msg % (name(chid), timeout))
+            return {}
+
+    tmpv = ncache['ctrl_value'][0]
     for attr in ('precision', 'units', 'severity', 'status',
                  'upper_disp_limit', 'lower_disp_limit',
                  'upper_alarm_limit', 'upper_warning_limit',
@@ -1183,24 +1196,44 @@ def get_ctrlvars(chid):
         tmpv.no_str > 0):
         out['enum_strs'] = tuple([BYTES2STR(tmpv.strs[i].value)
                                   for i in range(tmpv.no_str)])
+    ncache['ctrl_value'] = None
     return out
 
 @withConnectedCHID
-def get_timevars(chid):
-    """returns a dictionary of TIME fields for a Channel.  This will contain
-    keys of  *status*, *severity*, and *timestamp*.
+def get_timevars(chid, timeout=5.0, warn=True):
+    """returns a dictionary of TIME fields for a Channel.
+    This will contain keys of  *status*, *severity*, and *timestamp*.
     """
     ftype = promote_type(chid, use_time=True)
-    dat = (1*dbr.Map[ftype])()
+    ncache = _cache[current_context()][name(chid)]
+    if ncache.get('time_value', None) is None:
+        ncache['time_value'] = GET_PENDING
+        ret = libca.ca_array_get_callback(ftype, 1, chid, _CB_GET, 
+                                          ctypes.py_object('time_value'))
+        
+        PySEVCHK('get_timevars', ret)
 
-    ret = libca.ca_array_get(ftype, 1, chid, dat)
-    PySEVCHK('get_timevars', ret)
-    poll()
     out = {}
-    val = dat[0]
-    for attr in ('status', 'severity', 'timestamp'):
-        if hasattr(val, attr):
-            out[attr] = getattr(val, attr)
+    if ncache.get('time_value', None) is None:
+        return out
+
+    t0 = time.time()
+    while ncache['time_value'] is GET_PENDING:
+        poll()
+        if time.time()-t0 > timeout:
+            if warn:
+                msg = "ca.get_timevars('%s') timed out after %.2f seconds."
+                warnings.warn(msg % (name(chid), timeout))
+            return {}
+
+    tmpv = ncache['time_value'][0]
+    for attr in ('status', 'severity'):
+        if hasattr(tmpv, attr):
+            out[attr] = getattr(tmpv, attr)
+    if hasattr(tmpv, 'stamp'):
+        out['timestamp'] = dbr.make_unixtime(tmpv.stamp)
+
+    ncache['time_value'] = None            
     return out
 
 def get_timestamp(chid):
