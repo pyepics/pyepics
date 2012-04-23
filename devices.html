@@ -30,8 +30,11 @@
     <link rel="prev" title="ca: Low-level Channel Access module" href="ca.html" /> 
   </head>
   <body>
-<div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
- <h1> <a href="index.html">PyEpics: Epics Channel Access for Python</a></h1>
+<div style="background-color: #E4EAED; text-align: left; padding: 8px 4px 8px 4px">
+  <font size=+3><a href="index.html">
+      <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
+    &nbsp; PyEpics: Epics Channel Access for Python</a>
+  </font>
 </div>
 
     <div class="related">
@@ -41,7 +44,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
+          <a href="np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="alarm.html" title="Alarms: respond when a PV goes out of range"
@@ -60,7 +63,7 @@
    &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
-    </div> 
+    </div>
 
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
@@ -817,9 +820,9 @@ methods.</p>
 <h3>Epics ai record as Device<a class="headerlink" href="#epics-ai-record-as-device" title="Permalink to this headline">¶</a></h3>
 <p>Here is a slightly more useful example: An Epics ai (analog input record)
 implemented as a Device.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
 <span class="sd">&quot;&quot;&quot;Epics analog input record&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">epics</span>  
+<span class="kn">import</span> <span class="nn">epics</span>
 
 <span class="k">class</span> <span class="nc">ai</span><span class="p">(</span><span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">):</span>
     <span class="s">&quot;Simple analog input device&quot;</span>
@@ -829,11 +832,11 @@ implemented as a Device.</p>
              <span class="s">&#39;AOFF&#39;</span><span class="p">,</span> <span class="s">&#39;ASLO&#39;</span><span class="p">,</span> <span class="s">&#39;ESLO&#39;</span><span class="p">,</span> <span class="s">&#39;EOFF&#39;</span><span class="p">,</span> <span class="s">&#39;SMOO&#39;</span><span class="p">,</span> <span class="s">&#39;HIHI&#39;</span><span class="p">,</span> <span class="s">&#39;LOLO&#39;</span><span class="p">,</span>
              <span class="s">&#39;HIGH&#39;</span><span class="p">,</span> <span class="s">&#39;LOW&#39;</span><span class="p">,</span> <span class="s">&#39;HHSV&#39;</span><span class="p">,</span> <span class="s">&#39;LLSV&#39;</span><span class="p">,</span> <span class="s">&#39;HSV&#39;</span><span class="p">,</span> <span class="s">&#39;LSV&#39;</span><span class="p">,</span> <span class="s">&#39;HYST&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">prefix</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
             <span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">,</span>
-                              <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+                              <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Note that we pre-define the fields that are the <em>suffixes</em> of an Epics ai
@@ -851,7 +854,7 @@ input record, and simply subclass <tt class="xref py py-class docutils literal">
 <p>And finally a slightly more complicated example: an incomplete, but very
 useful mapping of the Scaler Record from synApps, including methods for
 changing modes, and reading and writing data.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/python </span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python </span>
 <span class="sd">&quot;&quot;&quot;Epics Scaler&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">epics</span>
 
@@ -954,7 +957,7 @@ directly invoking epics calls:</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
+          <a href="np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="alarm.html" title="Alarms: respond when a PV goes out of range"
@@ -975,8 +978,8 @@ directly invoking epics calls:</p>
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+        &copy; Copyright 2012, Matthew Newville.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

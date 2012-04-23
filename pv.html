@@ -30,8 +30,11 @@
     <link rel="prev" title="Overview of EPICS Channel Access in Python" href="overview.html" /> 
   </head>
   <body>
-<div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
- <h1> <a href="index.html">PyEpics: Epics Channel Access for Python</a></h1>
+<div style="background-color: #E4EAED; text-align: left; padding: 8px 4px 8px 4px">
+  <font size=+3><a href="index.html">
+      <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
+    &nbsp; PyEpics: Epics Channel Access for Python</a>
+  </font>
 </div>
 
     <div class="related">
@@ -41,7 +44,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
+          <a href="np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="ca.html" title="ca: Low-level Channel Access module"
@@ -60,7 +63,7 @@
    &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
-    </div> 
+    </div>
 
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
@@ -259,14 +262,14 @@ the <a class="reference internal" href="ca.html#ctrlvars-table"><em>Table of Con
 <dl class="method">
 <dt id="pv.poll">
 <tt class="descclassname">pv.</tt><tt class="descname">poll</tt><big>(</big><span class="optional">[</span><em>evt=1.e-4</em><span class="optional">[</span>, <em>iot=1.0</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pv.poll" title="Permalink to this definition">¶</a></dt>
-<dd><p>poll for changes.  This simply calls <a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a></p>
+<dd><p>poll for changes.  This simply calls <tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>evt</strong> (<em>float</em>) -- time to pass to <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a></li>
-<li><strong>iot</strong> (<em>float</em>) -- time to pass to <a class="reference internal" href="ca.html#ca.pend_io" title="ca.pend_io"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_io()</span></tt></a></li>
+<li><strong>evt</strong> (<em>float</em>) -- time to pass to <tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></li>
+<li><strong>iot</strong> (<em>float</em>) -- time to pass to <tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_io()</span></tt></li>
 </ul>
 </td>
 </tr>
@@ -284,14 +287,14 @@ should happen automatically. See <a class="reference internal" href="#pv.wait_fo
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>float</em>) -- maximum connection time, passed to <a class="reference internal" href="ca.html#ca.connect_channel" title="ca.connect_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></tt></a></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>float</em>) -- maximum connection time, passed to <tt class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></tt></td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt></td>
 </tr>
 </tbody>
 </table>
 <p>if timeout is <tt class="docutils literal"><span class="pre">None</span></tt>, the PVs connection_timeout parameter will be used. If that is also <tt class="docutils literal"><span class="pre">None</span></tt>,
-<a class="reference internal" href="ca.html#ca.DEFAULT_CONNECTION_TIMEOUT" title="ca.DEFAULT_CONNECTION_TIMEOUT"><tt class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_CONNECTION_TIMEOUT</span></tt></a>  will be used.</p>
+<tt class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_CONNECTION_TIMEOUT</span></tt>  will be used.</p>
 </dd></dl>
 
 <dl class="method">
@@ -310,7 +313,7 @@ connection.  Returns  whether the connection has occurred.</p>
 </tbody>
 </table>
 <p>if timeout is <tt class="docutils literal"><span class="pre">None</span></tt>, the PVs connection_timeout parameter will be used. If that is also <tt class="docutils literal"><span class="pre">None</span></tt>,
-<a class="reference internal" href="ca.html#ca.DEFAULT_CONNECTION_TIMEOUT" title="ca.DEFAULT_CONNECTION_TIMEOUT"><tt class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_CONNECTION_TIMEOUT</span></tt></a>  will be used.</p>
+<tt class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_CONNECTION_TIMEOUT</span></tt>  will be used.</p>
 </dd></dl>
 
 <dl class="method">
@@ -603,7 +606,7 @@ connection status of the PV changes. See
 <div class="section" id="string-representation-for-a-pv">
 <span id="pv-as-string-label"></span><h2>String representation for a PV<a class="headerlink" href="#string-representation-for-a-pv" title="Permalink to this headline">¶</a></h2>
 <p>The string representation for a <cite>PV</cite>, as returned either with the
-<em>as_string</em> argument to <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> or from the <a class="reference internal" href="#pv.char_value" title="pv.char_value"><tt class="xref py py-attr docutils literal"><span class="pre">char_value</span></tt></a>
+<em>as_string</em> argument to <tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt> or from the <a class="reference internal" href="#pv.char_value" title="pv.char_value"><tt class="xref py py-attr docutils literal"><span class="pre">char_value</span></tt></a>
 attribute (they are equivalent) needs some further explanation.</p>
 <p>The value of the string representation (hereafter, the <a class="reference internal" href="#pv.char_value" title="pv.char_value"><tt class="xref py py-attr docutils literal"><span class="pre">char_value</span></tt></a>),
 will depend on the native type and count of a <cite>PV</cite>.
@@ -695,7 +698,7 @@ make calls to <a class="reference internal" href="#pv.get" title="pv.get"><tt cl
 <dt><tt class="docutils literal"><span class="pre">None</span></tt></dt>
 <dd>The default value for <em>auto_monitor</em> is <tt class="docutils literal"><span class="pre">None</span></tt>, and is set to
 <tt class="docutils literal"><span class="pre">True</span></tt> if the element count for the PV is smaller than
-<a class="reference internal" href="ca.html#ca.AUTOMONITOR_MAXLENGTH" title="ca.AUTOMONITOR_MAXLENGTH"><tt class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></tt></a> (default of 65536).  To suppress
+<tt class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></tt> (default of 65536).  To suppress
 monitoring of PVs with fewer array values, you will have to explicitly
 turn <em>auto_monitor</em> to <tt class="docutils literal"><span class="pre">False</span></tt>. For waveform arrays with more elements,
 automatic monitoring will not be done unless you explicitly set
@@ -703,7 +706,7 @@ automatic monitoring will not be done unless you explicitly set
 <a class="reference internal" href="advanced.html#advanced-large-arrays-label"><em>Strategies for working with large arrays</em></a> for more details.</dd>
 <dt><tt class="docutils literal"><span class="pre">True</span></tt></dt>
 <dd><p class="first">When <em>auto_monitor</em> is set to <tt class="docutils literal"><span class="pre">True</span></tt>, the value will be monitored using
-the default subscription mask set at <a class="reference internal" href="ca.html#ca.DEFAULT_SUBSCRIPTION_MASK" title="ca.DEFAULT_SUBSCRIPTION_MASK"><tt class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_SUBSCRIPTION_MASK</span></tt></a>.</p>
+the default subscription mask set at <tt class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_SUBSCRIPTION_MASK</span></tt>.</p>
 <p class="last">This mask determines which kinds of changes cause the PV to update. By
 default, the subscription updates when the PV value changes by more
 than the monitor deadband, or when the PV alarm status changes. This
@@ -713,7 +716,7 @@ behavior is the same as the default in EPICS' <em>camonitor</em> tool.</p>
 <dd><p class="first">It is also possible to request an explicit type of CA subscription by
 setting <em>auto_monitor</em> to a numeric subscription mask made up of
 dbr.DBE_ALARM, dbr.DBE_LOG and/or dbr.DBE_VALUE. This mask will be
-passed directly to <a class="reference internal" href="ca.html#ca.create_subscription" title="ca.create_subscription"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_subscription()</span></tt></a> An example would be:</p>
+passed directly to <tt class="xref py py-meth docutils literal"><span class="pre">ca.create_subscription()</span></tt> An example would be:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">pv1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;AAA&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="p">)</span>
 <span class="n">pv2</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;BBB&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_ALARM</span><span class="p">)</span>
 <span class="n">pv3</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;CCC&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_ALARM</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_LOG</span><span class="p">)</span>
@@ -1097,7 +1100,7 @@ See <a class="reference internal" href="#pv-callbacks-label"><em>User-supplied C
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
+          <a href="np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="ca.html" title="ca: Low-level Channel Access module"
@@ -1118,8 +1121,8 @@ See <a class="reference internal" href="#pv-callbacks-label"><em>User-supplied C
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+        &copy; Copyright 2012, Matthew Newville.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

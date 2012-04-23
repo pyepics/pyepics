@@ -29,8 +29,11 @@
     <link rel="prev" title="wx: wxPython Widgets for Epics" href="wx.html" /> 
   </head>
   <body>
-<div style="background-color: #E4EAED; text-align: left; padding: 0px 0px 15px 15px">
- <h1> <a href="index.html">PyEpics: Epics Channel Access for Python</a></h1>
+<div style="background-color: #E4EAED; text-align: left; padding: 8px 4px 8px 4px">
+  <font size=+3><a href="index.html">
+      <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
+    &nbsp; PyEpics: Epics Channel Access for Python</a>
+  </font>
 </div>
 
     <div class="related">
@@ -40,7 +43,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
+          <a href="np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="wx.html" title="wx: wxPython Widgets for Epics"
@@ -56,7 +59,7 @@
    &nbsp;&nbsp;<li><a href="search.html">search</a></li>
  
       </ul>
-    </div> 
+    </div>
 
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
@@ -131,7 +134,7 @@ this is strongly encouraged.</p>
 <div class="section" id="arrays-without-numpy">
 <h3>Arrays without Numpy<a class="headerlink" href="#arrays-without-numpy" title="Permalink to this headline">¶</a></h3>
 <p>If you have numpy installed, and use the default <em>as_numpy=True</em> in
-<a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></tt></a> or <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-meth docutils literal"><span class="pre">epics.caget()</span></tt></a>, you will get a
+<tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></tt></a> or <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-meth docutils literal"><span class="pre">epics.caget()</span></tt></a>, you will get a
 numpy array for the value of a waveform PV.  If you do <em>not</em> have numpy
 installed, or explicitly use <em>as_numpy=False</em> in a get request, you will
 get the raw C-like array reference from the Python
@@ -152,7 +155,7 @@ Python list with something like:</p>
 <div class="section" id="variable-length-arrays">
 <h3>Variable Length Arrays<a class="headerlink" href="#variable-length-arrays" title="Permalink to this headline">¶</a></h3>
 <p>While the maximum length of an array is fixed, the length of data you get
-back from a monitor, <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></tt></a>, or <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-meth docutils literal"><span class="pre">epics.caget()</span></tt></a>
+back from a monitor, <tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></tt></a>, or <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-meth docutils literal"><span class="pre">epics.caget()</span></tt></a>
 may be shorter than the maximumn length, reflecting the most recent data
 put to that PV.  That is, if some process puts a smaller array to a PV than
 its maximum length, monitors on that PV may receive only the changed data.
@@ -171,15 +174,15 @@ For example:</p>
 -- the <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></tt></a> is not using a value cached from the <a class="reference internal" href="pv.html#pv.put" title="pv.put"><tt class="xref py py-meth docutils literal"><span class="pre">pv.put()</span></tt></a>.</p>
 <p>This feature seems to depend on the record definition, and requires version
 3.14.12.1 of Epics base or higher, and can be checked by comparing
-<a class="reference internal" href="ca.html#ca.version" title="ca.version"><tt class="xref py py-meth docutils literal"><span class="pre">ca.version()</span></tt></a> with the string '4.13'.</p>
+<tt class="xref py py-meth docutils literal"><span class="pre">ca.version()</span></tt> with the string '4.13'.</p>
 </div>
 <div class="section" id="character-arrays">
 <h3>Character Arrays<a class="headerlink" href="#character-arrays" title="Permalink to this headline">¶</a></h3>
 <p>As noted in other sections, character waveforms can be used to hold strings
 longer than 40 characters, which a fundamental limit for native Epics
 strings.    Character waveforms shorter than
-<a class="reference internal" href="ca.html#ca.AUTOMONITOR_MAXLENGTH" title="ca.AUTOMONITOR_MAXLENGTH"><tt class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></tt></a> can be turned into strings with an optional
-<em>as_string=True</em>  to <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></tt></a> , or
+<tt class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></tt> can be turned into strings with an optional
+<em>as_string=True</em>  to <tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></tt></a> , or
 <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-meth docutils literal"><span class="pre">epics.caget()</span></tt></a>.   If you've defined a Epics waveform record as:</p>
 <div class="highlight-python"><pre>record(waveform,"$(P):filename")  {
           field(DTYP,"Soft Channel")
@@ -204,7 +207,7 @@ strings.    Character waveforms shorter than
 <span class="go">&#39;T:\\xas_user\\March2010\\FastMap&#39;</span>
 </pre></div>
 </div>
-<p>This example uses <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></tt></a> but <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> is essentially
+<p>This example uses <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></tt></a> but <tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt> is essentially
 equivalent, as its <em>as_string</em> parameter works exactly the same way.</p>
 </div>
 </div>
@@ -228,7 +231,7 @@ library -- it cannot be altered during the running of a CA program.</p>
 and it turns out that you cannot set it smaller than this value!).  As
 Python is used for clients, generally running on workstations or servers
 with sufficient memory, this default value is changed to 2**24, or 16Mb)
-when <tt class="xref py py-mod docutils literal"><span class="pre">epics.ca</span></tt> is initialized.  If the environmental variable
+when <a class="reference internal" href="ca.html#module-epics.ca" title="epics.ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">epics.ca</span></tt></a> is initialized.  If the environmental variable
 <tt class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_BYTES</span></tt> has not already been set.</p>
 <p>The other main issue for PVs holding large arrays is whether they should be
 automatically monitored.  For PVs holding scalar data or small arrays, any
@@ -237,11 +240,11 @@ network traffic every time a PV changes) is a small price to pay for being
 assured that the latest value is always available.  As arrays get larger
 (as for data streams from Area Detectors), it is less obvious that
 automatic monitoring is desirable.</p>
-<p>The Python <tt class="xref py py-mod docutils literal"><span class="pre">epics.ca</span></tt> module defines a variable
-<a class="reference internal" href="ca.html#ca.AUTOMONITOR_MAXLENGTH" title="ca.AUTOMONITOR_MAXLENGTH"><tt class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></tt></a> which controls whether array PVs are
+<p>The Python <a class="reference internal" href="ca.html#module-epics.ca" title="epics.ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">epics.ca</span></tt></a> module defines a variable
+<tt class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></tt> which controls whether array PVs are
 automatically monitored.  The default value for this variable is 65536, but
 can be changed at runtime.  Arrays with fewer elements than
-<a class="reference internal" href="ca.html#ca.AUTOMONITOR_MAXLENGTH" title="ca.AUTOMONITOR_MAXLENGTH"><tt class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></tt></a> will be automatically monitored, unless
+<tt class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></tt> will be automatically monitored, unless
 explicitly set, and arrays larger than <tt class="xref py py-data docutils literal"><span class="pre">AUTOMONITOR_MAXLENGTH</span></tt> will
 not be automatically monitored unless explicitly set. Auto-monitoring of
 PVs can be be explicitly set with</p>
@@ -283,8 +286,8 @@ complication for using CA with Python threads.  The result is that some
 precautions may be in order when using PyEpics and threads.  This section
 discusses the strategies for using threads with PyEpics.</p>
 <p>First, to use threads with Channel Access, you must have
-<tt class="xref py py-data docutils literal"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></tt> = <tt class="docutils literal"><span class="pre">True</span></tt>.  This is the default
-value, but if <tt class="xref py py-data docutils literal"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></tt> has been set to
+<a class="reference internal" href="ca.html#epics.ca.PREEMPTIVE_CALLBACK" title="epics.ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></tt></a> = <tt class="docutils literal"><span class="pre">True</span></tt>.  This is the default
+value, but if <a class="reference internal" href="ca.html#epics.ca.PREEMPTIVE_CALLBACK" title="epics.ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></tt></a> has been set to
 <tt class="docutils literal"><span class="pre">False</span></tt>, threading will not work.</p>
 <p>Second, if you are using <tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt> objects and not making heavy use of
 the <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module (that is, not making and passing around chids), then
@@ -297,24 +300,24 @@ what the issues are.</p>
 model, with contexts holding sets of threads as well as Channels and
 Process Variables.  For non-threaded work, a process will use a single
 context that is initialized prior doing any real CA work (done in
-<a class="reference internal" href="ca.html#ca.initialize_libca" title="ca.initialize_libca"><tt class="xref py py-meth docutils literal"><span class="pre">ca.initialize_libca()</span></tt></a>).  In a threaded application, each new thread
+<tt class="xref py py-meth docutils literal"><span class="pre">ca.initialize_libca()</span></tt>).  In a threaded application, each new thread
 begins with a new, uninitialized context that must be initialized or
 replaced.  Thus each new python thread that will interact with CA must
-either explicitly create its own context with <a class="reference internal" href="ca.html#ca.create_context" title="ca.create_context"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_context()</span></tt></a>
+either explicitly create its own context with <tt class="xref py py-meth docutils literal"><span class="pre">ca.create_context()</span></tt>
 (and then, being a good citizen, destroy this context as the thread ends
-with <a class="reference internal" href="ca.html#ca.destroy_context" title="ca.destroy_context"><tt class="xref py py-meth docutils literal"><span class="pre">ca.destroy_context()</span></tt></a>) or attach to an existing context.</p>
+with <tt class="xref py py-meth docutils literal"><span class="pre">ca.destroy_context()</span></tt>) or attach to an existing context.</p>
 <p>The generally recommended approach is to use a single CA context throughout
 an entire process and have each thread attach to the first context created
 (probably from the main thread).  This avoids many potential pitfalls (and
 crashes), and can be done fairly simply.  It is the default mode when using
 PV objects.</p>
-<p>The most explicit use of contexts is to put <tt class="xref py py-func docutils literal"><span class="pre">epics.ca.create_context()</span></tt>
+<p>The most explicit use of contexts is to put <a class="reference internal" href="ca.html#epics.ca.create_context" title="epics.ca.create_context"><tt class="xref py py-func docutils literal"><span class="pre">epics.ca.create_context()</span></tt></a>
 at the start of each function call as a thread target, and
-<tt class="xref py py-func docutils literal"><span class="pre">epics.ca.destroy_context()</span></tt> at the end of each thread.  This will
+<a class="reference internal" href="ca.html#epics.ca.destroy_context" title="epics.ca.destroy_context"><tt class="xref py py-func docutils literal"><span class="pre">epics.ca.destroy_context()</span></tt></a> at the end of each thread.  This will
 cause all the activity in that thread to be done in its own context.  This
 works, but means more care is needed, and so is not the recommended.</p>
 <p>The best way to attach to the initially created context is to call
-<tt class="xref py py-meth docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt> before any other CA calls in each
+<a class="reference internal" href="ca.html#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><tt class="xref py py-meth docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt></a> before any other CA calls in each
 function that will be called by <tt class="xref py py-meth docutils literal"><span class="pre">Thread.run()</span></tt>.  Equivalently, you can
 add a <tt class="xref py py-func docutils literal"><span class="pre">withInitialContext()</span></tt> decorator to the function.  Creating a PV
 object will implicitly do this for you, as long as it is your first CA
@@ -330,7 +333,7 @@ inside a child thread, it is recommended that you initialize CA in the main
 thread,</p>
 <p>As a convenience, the <tt class="xref py py-class docutils literal"><span class="pre">CAThread</span></tt> in the <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module is
 is a very thin wrapper around the standard <tt class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></tt> which
-adding a call of  <tt class="xref py py-meth docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt> just before your
+adding a call of  <a class="reference internal" href="ca.html#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><tt class="xref py py-meth docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt></a> just before your
 threaded function is run.  This allows your target functions to not
 explicitly set the context, but still ensures that the initial context is
 used in all functions.</p>
@@ -350,12 +353,12 @@ easily using the lower-level ca interface.  The options for using threads
 </ol>
 <p>2. use <tt class="xref py py-class docutils literal"><span class="pre">CAThread</span></tt> instead of <tt class="xref py py-class docutils literal"><span class="pre">Thread</span></tt> for threads that
 will use CA calls.</p>
-<p>3. put <tt class="xref py py-func docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt> at the top of all
+<p>3. put <a class="reference internal" href="ca.html#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><tt class="xref py py-func docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt></a> at the top of all
 functions that might be a Thread target function, or decorate them with
 <tt class="xref py py-func docutils literal"><span class="pre">withInitialContext()</span></tt> decorator, <em>&#64;withInitialContext</em>.</p>
-<p>4. use <tt class="xref py py-func docutils literal"><span class="pre">epics.ca.create_context()</span></tt> at the top of all functions
+<p>4. use <a class="reference internal" href="ca.html#epics.ca.create_context" title="epics.ca.create_context"><tt class="xref py py-func docutils literal"><span class="pre">epics.ca.create_context()</span></tt></a> at the top of all functions
 that are inside a new thread, and be sure to put
-<tt class="xref py py-func docutils literal"><span class="pre">epics.ca.destroy_context()</span></tt> at the end of the function.</p>
+<a class="reference internal" href="ca.html#epics.ca.destroy_context" title="epics.ca.destroy_context"><tt class="xref py py-func docutils literal"><span class="pre">epics.ca.destroy_context()</span></tt></a> at the end of the function.</p>
 <p>5. ignore this advise and hope for the best.  If you're not creating
 new PVs and only reading values of PVs created in the main thread
 inside a child thread, you may not see a problems, at least not until
@@ -419,12 +422,12 @@ other.</p>
 </div>
 <p>In light of the long discussion above, a few remarks are in order: This
 code uses the standard Thread library and explicitly calls
-<tt class="xref py py-func docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt> prior to any CA calls in the target
+<a class="reference internal" href="ca.html#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><tt class="xref py py-func docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt></a> prior to any CA calls in the target
 function.  Also note that the <tt class="xref py py-func docutils literal"><span class="pre">run_test()</span></tt> function is first called
 from the main thread, so that the initial CA context does belong to the
-main thread.  Finally, the <tt class="xref py py-func docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt> call in
+main thread.  Finally, the <a class="reference internal" href="ca.html#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><tt class="xref py py-func docutils literal"><span class="pre">epics.ca.use_initial_context()</span></tt></a> call in
 <tt class="xref py py-func docutils literal"><span class="pre">run_test()</span></tt> above could be replaced with
-<tt class="xref py py-func docutils literal"><span class="pre">epics.ca.create_context()</span></tt>, and run OK.</p>
+<a class="reference internal" href="ca.html#epics.ca.create_context" title="epics.ca.create_context"><tt class="xref py py-func docutils literal"><span class="pre">epics.ca.create_context()</span></tt></a>, and run OK.</p>
 <p>The output from this will look like:</p>
 <div class="highlight-python"><pre>First, create a PV in the main thread:
 Run 2 Background Threads simultaneously:
@@ -469,42 +472,52 @@ thread has completed!</p>
 </div>
 <div class="section" id="the-wait-and-timeout-options-for-get-ca-get-complete">
 <span id="advanced-get-timeouts-label"></span><h2>The wait and timeout options for get(), ca.get_complete()<a class="headerlink" href="#the-wait-and-timeout-options-for-get-ca-get-complete" title="Permalink to this headline">¶</a></h2>
-<p>The <em>get</em> functions, <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> and <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt></a>
+<p>The <em>get</em> functions, <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> and <tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt>
 all ask for data to be transferred over the network.  For large data arrays
 or slow networks, this can can take a noticeable amount of time.  For PVs
 that have been disconnected, the <em>get</em> call will fail to return a value at
 all.  For this reason, these functions all take a <cite>timeout</cite> keyword option.
-The lowest level <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt></a> also has a <cite>wait</cite> option, and a companion
-function <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a>.  This section describes the details of
+The lowest level <tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt> also has a <cite>wait</cite> option, and a companion
+function <tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt>.  This section describes the details of
 these.</p>
 <p>If you're using <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a> or <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> you can supply a
 timeout value.  If the value returned is <tt class="docutils literal"><span class="pre">None</span></tt>, then either the PV has
 truly disconnected or the timeout passed before receiving the value.  If
-the <em>get</em> is incomplete in this way, a subsequent <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a> or
-<a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> may actually complete and receive the value.</p>
+the <em>get</em> is incomplete, in that the PV is connected but the data has
+simply not been received yet, a subsequent <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a> or
+<a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> will eventually complete and receive the value.  That is, if
+a PV for a large waveform record reports that it is connected, but a
+<a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> returns None, simply trying again later will probably work:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;LargeWaveform&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">val</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">val</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">val</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
 <p>At the lowest level (which <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> and <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a> use),
-<a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt></a> issues a get-request with an internal callback function
-(that is, it calls <tt class="xref py py-func docutils literal"><span class="pre">libca.ca_array_get_callback()</span></tt> with a pre-defined
-callback function).  With <cite>wait=True</cite> (the default), <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt></a> then
-waits up to the timeout or until the CA library calls the specified
-callback function.  If the callback has been called, the value can then be
-converted and returned.</p>
+<tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt> issues a get-request with an internal callback function.
+That is, it calls the CA library function
+<tt class="xref py py-func docutils literal"><span class="pre">libca.ca_array_get_callback()</span></tt> with a pre-defined callback function.
+With <cite>wait=True</cite> (the default), <tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt> then waits up to the timeout
+or until the CA library calls the specified callback function.  If the
+callback has been called, the value can then be converted and returned.</p>
 <p>If the callback is not called in time or if <cite>wait=False</cite> is used but the PV
 is connected, the callback will be called eventually, and simply waiting
-(or using <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-func docutils literal"><span class="pre">ca.pend_event()</span></tt></a> if <a class="reference internal" href="ca.html#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">ca.PREEMPTIVE_CALLBACK</span></tt></a> is
+(or using <tt class="xref py py-func docutils literal"><span class="pre">ca.pend_event()</span></tt> if <tt class="xref py py-data docutils literal"><span class="pre">ca.PREEMPTIVE_CALLBACK</span></tt> is
 <tt class="docutils literal"><span class="pre">False</span></tt>) may be sufficient for the data to arrive.  Under this condition,
-you can call <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a>, which will NOT issue a new request
+you can call <tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt>, which will NOT issue a new request
 for data to be sent, but wait (for up to a timeout time) for the previous
 get request to complete.</p>
-<p><a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a> will return <tt class="docutils literal"><span class="pre">None</span></tt> if the timeout is exceeded or
+<p><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt> will return <tt class="docutils literal"><span class="pre">None</span></tt> if the timeout is exceeded or
 if there is not an &quot;incomplete get&quot; that it can wait to complete.  Thus,
-you should use the return value from <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a> with care.</p>
+you should use the return value from <tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt> with care.</p>
 <p>Note that <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> (and so <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a>) will normally rely on
 the PV value to be filled in automatically by monitor callbacks.  If
 monitor callbacks are disabled (as is done for large arrays and can be
 turned off) or if the monitor hasn't been called yet, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><tt class="xref py py-func docutils literal"><span class="pre">pv.get()</span></tt></a> will
-check whether it should can <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt></a> or <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a>.</p>
-<p>If not specified, the timeout for <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt></a> (and all other
+check whether it should can <tt class="xref py py-func docutils literal"><span class="pre">ca.get()</span></tt> or <tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt>.</p>
+<p>If not specified, the timeout for <tt class="xref py py-func docutils literal"><span class="pre">ca.get_complete()</span></tt> (and all other
 get functions) will be set to:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">timeout</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="n">log10</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
 </pre></div>
@@ -532,8 +545,8 @@ you are connecting to a large number (say, more than 100) PVs at once.</p>
 <p>The cause for the penalty, and its remedy, are two-fold.  First, a <cite>PV</cite>
 object automatically use connection and event callbacks.  Normally, these
 are advantages, as you don't need to explicitly deal with them.  But,
-internally, they do pause for network responses using <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a>
-and these pauses can add up.  Second, the <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> also pauses for
+internally, they do pause for network responses using <tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt>
+and these pauses can add up.  Second, the <tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt> also pauses for
 network response, so that the returned value actually contains the latest
 data right away, as discussed in the previous section.</p>
 <dl class="docutils">
@@ -573,27 +586,27 @@ the CA library, and would be the following:</p>
 <p>The code here probably needs detailed explanation.  The first thing to
 notice is that this is using the <cite>ca</cite> level, not <cite>PV</cite> objects.  Second
 (Note 1), the <cite>connect=False</cite> and <cite>auto_cb=False</cite> options to
-<a class="reference internal" href="ca.html#ca.create_channel" title="ca.create_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></tt></a>.  These respectively tell
-<a class="reference internal" href="ca.html#ca.create_channel" title="ca.create_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></tt></a> to not wait for a connection before returning,
+<tt class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></tt>.  These respectively tell
+<tt class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></tt> to not wait for a connection before returning,
 and to not automatically assign a connection callback.  Normally, these are
 not what you want, as you want a connected channel and to know if the
 connection state changes.  But we're aiming for maximum speed here, so we
 avoid these.</p>
-<p>We then explicitly call <a class="reference internal" href="ca.html#ca.connect_channel" title="ca.connect_channel"><tt class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></tt></a> for all the channels.
+<p>We then explicitly call <tt class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></tt> for all the channels.
 Next (Note 2), we tell the CA library to request the data for the channel
 without waiting around to receive it.  The main point of not having
-<a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> wait for the data for each channel as we go is that each
+<tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt> wait for the data for each channel as we go is that each
 data transfer takes time.  Instead we request data to be sent in a separate
 thread for all channels without waiting.  Then we do wait by calling
-<a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a> once and only once, (not len(channels) times!).  Finally,
-we use the <a class="reference internal" href="ca.html#ca.get_complete" title="ca.get_complete"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get_complete()</span></tt></a> method to convert the data that has now
+<tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt> once and only once, (not len(channels) times!).  Finally,
+we use the <tt class="xref py py-meth docutils literal"><span class="pre">ca.get_complete()</span></tt> method to convert the data that has now
 been received by the companion thread to a python value.</p>
 <p>How much faster is the more explicit method?  In my tests, I used 20,000
 PVs, all scalar values, all actually connected, and all on the same subnet
 as the test client, though on a mixture of several vxWorks and linux IOCs.
 I found that the simplest, obvious approach as above took around 12 seconds
 to read all 20,000 PVs.  Using the <cite>ca</cite> layer with connection callbacks and
-a normal call to <a class="reference internal" href="ca.html#ca.get" title="ca.get"><tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt></a> also took about 12 seconds.  The method
+a normal call to <tt class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></tt> also took about 12 seconds.  The method
 without connection callbacks and with delayed unpacking above took about 2
 seconds to read all 20,000 PVs.</p>
 <p>Is that performance boost from 12 to 2 seconds significant?  If you're
@@ -612,16 +625,16 @@ should connect and receive values in under 1 second.  Any application that
 is sure it needs to connect to PVs faster than that rate will want to do
 careful timing tests.  Finally, note also that the issues are not really a
 classic <em>python is slow compared to C</em> issue, but rather a matter of how
-much pausing with <a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a> one does to make sure values are
+much pausing with <tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt> one does to make sure values are
 immediately useful.</p>
 </div>
 <div class="section" id="time-sleep-or-epics-poll">
 <span id="advanced-sleep-label"></span><h2>time.sleep() or epics.poll()?<a class="headerlink" href="#time-sleep-or-epics-poll" title="Permalink to this headline">¶</a></h2>
 <p>In order for a program to communicate with Epics devices, it needs to allow
 some time for this communication to happen.   With
-<a class="reference internal" href="ca.html#ca.PREEMPTIVE_CALLBACK" title="ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">ca.PREEMPTIVE_CALLBACK</span></tt></a> set to  <tt class="docutils literal"><span class="pre">True</span></tt>, this communication  will
+<tt class="xref py py-data docutils literal"><span class="pre">ca.PREEMPTIVE_CALLBACK</span></tt> set to  <tt class="docutils literal"><span class="pre">True</span></tt>, this communication  will
 be handled in a thread separate from the main Python thread.  This means
-that CA events can happen at any time, and <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a> does not
+that CA events can happen at any time, and <tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt> does not
 need to be called to explicitly allow for event processing.</p>
 <p>Still, some time must be released from the main Python thread on occasion
 in order for events to be processed.  The simplest way to do this is with
@@ -633,8 +646,8 @@ in order for events to be processed.  The simplest way to do this is with
 <p>Unfortunately, the <tt class="xref py py-meth docutils literal"><span class="pre">time.sleep()</span></tt> method is not a very high-resolution
 clock, with typical resolutions of 1 to 10 ms, depending on the system.
 Thus, even though events will be asynchronously generated and epics with
-pre-emptive callbacks does not <em>require</em> <a class="reference internal" href="ca.html#ca.pend_event" title="ca.pend_event"><tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt></a> or
-<a class="reference internal" href="ca.html#ca.poll" title="ca.poll"><tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt></a> to be run, better performance may be achieved with an event
+pre-emptive callbacks does not <em>require</em> <tt class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></tt> or
+<tt class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></tt> to be run, better performance may be achieved with an event
 loop of:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">epics</span><span class="o">.</span><span class="n">poll</span><span class="p">(</span><span class="n">evt</span><span class="o">=</span><span class="mf">1.e-5</span><span class="p">,</span> <span class="n">iot</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
@@ -657,7 +670,7 @@ loop of:</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
+          <a href="np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
           <a href="wx.html" title="wx: wxPython Widgets for Epics"
@@ -675,8 +688,8 @@ loop of:</p>
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2010, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+        &copy; Copyright 2012, Matthew Newville.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>
