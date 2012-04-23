@@ -198,6 +198,7 @@ def initialize_libca():
     Notes
     -----
     This function must be called prior to any real CA calls.
+    
     """
     if 'EPICS_CA_MAX_ARRAY_BYTES' not in os.environ:
         os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = "%i" %  2**24
@@ -694,18 +695,50 @@ def test_io():
 @withCA
 def create_channel(pvname, connect=False, auto_cb=True, callback=None):
     """ create a Channel for a given pvname
+    
+    creates a channel, returning the Channel ID ``chid`` used by other
+    functions to identify this channel.
+    
+    Parameters
+    ----------
+    pvname :  string
+        the name of the PV for which a channel should be created.
+    connect : bool
+        whether to (try to) connect to PV as soon as possible.
+    auto_cb : bool
+        whether to automatically use an internal connection callback.
+    callback : callable or ``None``
+        user-defined Python function to be called when the connection
+        state change s.
 
-    connect:  try to wait until connection is complete before returning
-    auto_cb:  use the automatic connection callback
-    callback: a user-supplied callback function (callback) can be provided
-       as a connection callback. This function will be called when the
-       connection state changes, and will be passed these keyword args:
-          pvname   name of PV
-          chid     channel ID
-          conn     connection state (True/False)
+    Returns
+    -------
+    chid : ctypes.c_long
+        channel ID.
 
-    If the channel is already connected for the PV name, the callback
+
+    Notes
+    -----        
+    1. The user-defined connection callback function should be prepared to accept
+    keyword arguments of
+
+         ===========  =============================
+         keyword      meaning
+         ===========  =============================
+          `pvname`    name of PV
+          `chid`      Channel ID
+          `conn`      whether channel is connected
+         ===========  =============================
+
+
+    2. If `auto_cb` is ``True``, an internal connection callback is used so
+    that you should not need to explicitly connect to a channel, unless you
+    are having difficulty with dropped connections.
+
+    3. If the channel is already connected for the PV name, the callback
     will be called immediately.
+
+    
     """
     #
     # Note that _CB_CONNECT (defined above) is a global variable, holding
@@ -752,17 +785,39 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
 
 @withCHID
 def connect_channel(chid, timeout=None, verbose=False):
-    """ wait (up to timeout) until a chid is connected
+    """connect to a channel, waiting up to timeout for a
+    channel to connect.  It returns the connection state,
+    ``True`` or ``False``.
 
-    Normally, channels will connect very fast, and the
-    connection callback will succeed the first time.
+    This is usually not needed, as implicit connection will be done
+    when needed in most cases.
 
-    For un-connected Channels (that are nevertheless queried),
-    the 'ts' (timestamp of last connecion attempt) and
-    'failures' (number of failed connection attempts) from
-    the _cache will be used to prevent spending too much time
-    waiting for a connection that may never happen.
+    Parameters
+    ----------
+    chid : ctypes.c_long
+        Channel ID
+    timeout : float
+        maximum time to wait for connection.
+    verbose : bool
+        whether to print out debugging information
 
+    Returns
+    -------
+    connection_state : bool
+         that is, whether the Channel is connected
+
+    Notes
+    -----
+    1. If *timeout* is ``None``, the value of :data:`DEFAULT_CONNECTION_TIMEOUT` is used (defaults to 2.0 seconds).
+
+    2. Normally, channels will connect in milliseconds, and the connection
+    callback will succeed on the first attempt.
+
+    3. For un-connected Channels (that are nevertheless queried), the 'ts'
+    (timestamp of last connection attempt) and 'failures' (number of failed
+    connection attempts) from the :data:`_cache` will be used to prevent
+    spending too much time waiting for a connection that may never happen.
+    
     """
     if verbose:
         write(' connect channel -> %s %s %s ' %
@@ -879,8 +934,8 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     it will be necessary why using :func:`sg_get`.
 
     Parameters
-    -----------
-    chid  :  int or ctypes.c_long or None,
+    ------------
+    chid  :  ctypes.c_long or ``None``
         channel ID (if not None, used for determining count and ftype)
     data  :  object
         raw data as returned by internal libca functions.
@@ -959,24 +1014,64 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
 @withConnectedCHID
 def get(chid, ftype=None, count=None, wait=True, timeout=None,
         as_string=False, as_numpy=True):
-    """return the current value for a Channel.  Options are
-       ftype       field type to use (native type is default)
-       count       explicitly limit count
-       wait        flag(True/False) to wait to return value (default) or
-                   return None immediately, with value to be fetched later
-                   by ca.get_complete(chid, ...)
-       timeout     time to wait (and sent to pend_io()) before unpacking
-                   value (default =  0.5 + log10(count) )
-       as_string   flag(True/False) to get a string representation
-                   of the value returned.  This is not nearly as
-                   featured as for a PV -- see pv.py for more details.
-       as_numpy    flag(True/False) to use numpy array as the
-                   return type for array data.
+    """return the current value for a Channel.
+    Note that there is not a separate form for array data.
+    
+    Parameters
+    ----------
+    chid :  ctypes.c_long
+       Channel ID
+    ftype : int
+       field type to use (native type is default)
+    count : int
+       maximum element count to return (full data returned by default)
+    as_string : bool
+       whether to return the string representation of the value.
+       See notes below.
+    as_numpy : bool
+       whether to return the Numerical Python representation
+       for array / waveform data.
+    wait : bool
+        whether to wait for the data to be received, or return immediately.
+    timeout : float
+        maximum time to wait for data before returning ``None``.
 
-       get will return None under one of the following conditions:
-         * Channel not connected
-         * wait=False passed in
-         * data is not available within timeout.
+    Returns
+    -------
+    data : object
+       Normally, the value of the data.  Will return ``None`` if the
+       channel is not connected, `wait=False` was used, or the data
+       transfer timed out.   
+    
+    Notes
+    -----
+    1.  returning ``None`` indicates an *incomplete get*
+
+    2.  The *as_string* option is not as complete as the *as_string*
+    argument for :meth:`PV.get`.  For Enum types, the name of the Enum
+    state will be returned.  For waveforms of type CHAR, the string
+    representation will be returned.  For other waveforms (with *count* >
+    1), a string like `<array count=3, type=1>` will be returned.
+
+    3. The *as_numpy* option will convert waveform data to be returned as a
+    numpy array.  This is only applied if numpy can be imported.
+
+    4. The *wait* option controls whether to wait for the data to be
+    received over the network and actually return the value, or to return
+    immediately after asking for it to be sent.  If `wait=False` (that is,
+    immediate return), the *get* operation is said to be *incomplete*.  The
+    data will be still be received (unless the channel is disconnected)
+    eventually but stored internally, and can be read later with
+    :func:`get_complete`.  Using `wait=False` can be useful in some
+    circumstances.
+
+    5. The *timeout* option sets the maximum time to wait for the data to
+    be received over the network before returning ``None``.  Such a timeout
+    could imply that the channel is disconnected or that the data size is
+    larger or network slower than normal.  In that case, the *get*
+    operation is said to be *incomplete*, and the data may become available
+    later with :func:`get_complete`.
+
     """
     if ftype is None:
         ftype = field_type(chid)
@@ -1005,27 +1100,42 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
 @withConnectedCHID
 def get_complete(chid, ftype=None, count=None, timeout=None,
                  as_string=False,  as_numpy=True):
+    """returns the current value for a Channel, completing an
+    earlier incomplete :func:`get` that returned ``None``, either
+    because `wait=False` was used or because the data transfer
+    did not complete before the timeout passed.
+    
+    Parameters
+    ----------
+    chid : ctypes.c_long
+        Channel ID
+    ftype :  int
+        field type to use (native type is default)
+    count : int
+        maximum element count to return (full data returned by default)
+    as_string : bool
+        whether to return the string representation of the value.
+    as_numpy :  bool
+        whether to return the Numerical Python representation
+        for array / waveform data.
+    timeout : float
+        maximum time to wait for data before returning ``None``.
 
-    """returns the value for a channel, completing a previous 'inomplete get' on
-    the channel. This assumes that the previous call to get(chid, ....)  either
-    used 'wait=False' or timed out, and that the data has actually arrived by the
-    time this function is called.
+    Returns
+    -------
+    data : object
+       This function will return ``None`` if the previous :func:`get`
+       actually completed, or if this data transfer also times out.  
 
-    Important Note: this function can be called only once, as on success, the
-    cached value will be set back to None.
 
-    Options are as for get (but without unpack, which is always True here):
+    Notes
+    -----
+    1. The default timeout is dependent on the element count::
+    default_timout = 1.0 + log10(count)  (in seconds)
 
-       ftype       field type to use (native type is default)
-       count       explicitly limit count
-       as_string   flag(True/False) to get a string representation
-                   of the value returned.  This is not nearly as
-                   featured as for a PV -- see pv.py for more details.
-       as_numpy    flag(True/False) to use numpy array as the
-                   return type for array data.
-       timeout     time to wait for value to be received
-                   (default = 0.5 + log10(count) seconds)
-   """
+    2. Consult the doc for :func:`get` for more information.
+
+    """
     if ftype is None:
         ftype = field_type(chid)
     if count is None:
@@ -1076,20 +1186,37 @@ def _as_string(val, chid, count, ftype):
 @withConnectedCHID
 def put(chid, value, wait=False, timeout=30, callback=None,
         callback_data=None):
-    """put value to a Channel, with optional wait and
-    user-defined callback.  Arguments:
-       chid      channel id (required)
-       value     value to put to Channel (required)
-       wait      Flag for whether to block here while put
-                 is processing.  Default = False
-       timeout   maximum time to wait for a blocking put.
-       callback  user-defined to be called when put has
-                 finished processing.
-       callback_data  data passed on to user-defined callback
+    """sets the Channel to a value, with options to either wait
+    (block) for the processing to complete, or to execute a
+    supplied callback function when the process has completed.
+    
+    
+    Parameters
+    ----------
+    chid :  ctypes.c_long
+        Channel ID
+    wait : bool
+        whether to wait for processing to complete (or time-out)
+        before returning.
+    timeout : float
+        maximum time to wait for processing to complete before returning anyway.
+    callback : ``None`` of callable
+        user-supplied function to run when processing has completed.
+    callback_data :  object
+        extra data to pass on to a user-supplied callback function.
+    
+    Returns
+    -------
+    status : int
+         1  for success, -1 on time-out
+         
+    Notes
+    -----
+    1. Specifying a callback will override setting `wait=True`.
 
-    Specifying a callback does NOT require a blocking put().
+    2. A put-callback function will be called with keyword arguments
+        pvname=pvname, data=callback_data
 
-    returns 1 on sucess and -1 on timed-out
     """
     ftype = field_type(chid)
     count = element_count(chid)
@@ -1159,7 +1286,7 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
         *upper_ctrl_limit*, *lower_ctrl_limit*
 
     Notes
-    =====
+    -----
     enum_strs will be a list of strings for the names of ENUM states.
 
     """
@@ -1270,9 +1397,10 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     """create a *subscription to changes*. Sets up a user-supplied
     callback function to be called on any changes to the channel.
 
-    Parameters
-    ----------
-    chid  : channel ID
+    Parameters 
+    -----------
+    chid  : ctypes.c_long
+        channel ID
     use_time : bool
         whether to use the TIME variant for the PV type
     use_ctrl : bool

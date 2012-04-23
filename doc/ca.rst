@@ -191,55 +191,14 @@ These are simply :data:`ctypes.c_long` (C long integers) that hold the
 memory address of the C representation of the channel, but it is probably
 a good idea to treat these as object instances.
 
-.. function:: create_channel(pvname, [connect=False, [callback=None, auto_cb=True]]])
+.. autofunction:: create_channel(pvname, connect=False, callback=None, auto_cb=True)
 
-   creates a channel, returning the Channel ID ``chid`` used by other
-   functions to identify this channel.
-
-   :param pvname:   the name of the PV to create.
-   :param connect:  whether to (try to) connect to PV as soon as possible.
-   :type  connect:  ``True``/``False``
-   :param callback:  user-defined Python function to be called when the connection state changes.
-   :type callback:  ``None`` or callable.
-   :param auto_cb:  whether to automatically use an internal callback.
-   :type  auto_cb:  ``True``/``False``
-
-   The user-defined callback function should be  prepared to accept keyword arguments of
-         * `pvname`  name of PV
-         * `chid`    ``chid`` Channel ID
-         * `conn`    ``True``/``False``:  whether channel is connected.
-
-   If `auto_cb` is ``True``, an internal connection callback is used so
-   that you should not need to explicitly connect to a channel, unless you
-   are having difficulty with dropped connections.
+.. autofunction:: connect_channel(chid, timeout=None, verbose=False)
 
 
-.. function:: connect_channel(chid, [timeout=None, [verbose=False]])
-
-   explicitly connect to a channel (usually not needed, as implicit
-   connection will be done when needed), waiting up to timeout for a
-   channel to connect.  It returns the connection state, ``True`` or
-   ``False``.
-
-   :param chid:     ``chid`` Channel ID
-   :param timeout:  maximum time to wait for connection.
-   :type  timeout:  float or ``None``.
-   :param verbose:  whether to print out debugging information
-
-   if *timeout* is ``None``, the value of  :data:`DEFAULT_CONNECTION_TIMEOUT`
-   is used (usually 2.0 seconds).
-
-   Normally, channels will connect in milliseconds, and the connection
-   callback will succeed on the first attempt.
-
-   For un-connected Channels (that are nevertheless queried), the 'ts'
-   (timestamp of last connection attempt) and 'failures' (number of failed
-   connection attempts) from the :data:`_cache` will be used to prevent
-   spending too much time waiting for a connection that may never happen.
-
-Many other functions that require a valid Channel ID, but not necessarily a
+Many other functions require a valid Channel ID, but not necessarily a
 connected Channel.  These functions are essentially identical to the CA
-library are:
+library versions, and include:
 
 .. autofunction:: name(chid)
 
@@ -258,7 +217,6 @@ library are:
 .. autofunction::   clear_channel(chid)
 
 .. autofunction::   state(chid)
-
 
 
 A few additional pythonic functions have been added:
@@ -294,113 +252,30 @@ requiring the user to supply DBR TYPE and count as well as ``chid`` and
 allocated space for the data.  In python none of these is needed, and
 keyword arguments can be used to specify such options.
 
-.. function:: get(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=True[, wait=True[, timeout=None]]]]]])
+.. autofunction:: get(chid, ftype=None, count=None, as_string=False, as_numpy=True, wait=True, timeout=None)
 
-   return the current value for a Channel. Note that there is not a separate form for array data.
+   
+   See :ref:`Table of DBR Types <dbrtype_table>` for a listing of values of
+   *ftype*,
 
-   :param chid:  ``chid`` Channel ID
-   :type  chid:  ctypes.c_long
-   :param ftype:  field type to use (native type is default)
-   :type ftype:  integer or ``None``
-   :param count:  maximum element count to return (full data returned by default)
-   :type count:  integer or ``None``
-   :param as_string:  whether to return the string representation of the value.  See notes below.
-   :type as_string:  ``True``/``False``
-   :param as_numpy:  whether to return the Numerical Python representation  for array / waveform data.
-   :type as_numpy:  ``True``/``False``
-   :param wait:  whether to wait for the data to be received, or return immediately.
-   :type wait:  ``True``/``False``
-   :param timeout:  maximum time to wait for data before returning ``None``.
-   :type timeout:  float or ``None``
 
-   :func:`get` returns the value for the PV with channel ID *chid* or
-   ``None``, which indicates an *incomplete get*
+   See :ref:`advanced-large-arrays-label` for a discussion of strategies
+   for how to best deal with very large arrays.
 
-   For a listing of values of *ftype*, see :ref:`Table of DBR Types
-   <dbrtype_table>`.  The optional *count* can be used to limit the
-   amount of data returned for array data from waveform records.
 
-   The *as_string* option warrants special attention: The feature is not
-   as complete as as the *as_string* argument for :meth:`PV.get`.  Here,
-   a string representing the value will always be returned. For Enum
-   types, the name of the Enum state will be returned.  For waveforms of
-   type CHAR, the string representation will be returned.  For other
-   waveforms (with *count* > 1), a string like `<array count=3, type=1>`
-   will be returned.  For all other types the result will from Python's
-   :func:`str` function.
-
-   The *as_numpy* option will cause an array value to be returned as a
-   numpy array.  This is only applied if numpy can be imported.  See
-   :ref:`advanced-large-arrays-label` for a discussion of strategies for
-   how to best deal with very large arrays.
-
-   The *wait* option controls whether to wait for the data to be
-   received over the network and actually return the value, or to return
-   immediately after asking for it to be sent.  If `wait=False` (that
-   is, immediate return), the *get* operation is said to be
-   *incomplete*.  The data will be still be received (unless the channel
-   is disconnected) eventually but stored internally, and can be read
-   later with :func:`get_complete`.  Using `wait=False` can be useful in
-   some circumstances.  See :ref:`advanced-connecting-many-label` for a
-   discussion.
-
-   The *timeout* option sets the maximum time to wait for the data to be
-   received over the network before returning ``None``.  Such a timeout
-   could imply that the channel is disconnected or that the data size is
-   larger or network slower than normal.  In that case, the *get*
-   operation is said to be *incomplete*, and the data may become
-   available later with :func:`get_complete`.
+   See :ref:`advanced-connecting-many-label` for a discussion of when using
+   `wait=False` can give a large performance boost.
 
    See :ref:`advanced-get-timeouts-label` for further discussion of the
    *wait* and *timeout* options and the associated :func:`get_complete`
    function.
 
 
-.. function:: get_complete(chid[, ftype=None[, count=None[, as_string=False[, as_numpy=True[, timeout=None]]]]])
+.. autofunction:: get_complete(chid, ftype=None, count=None, as_string=False, as_numpy=True, timeout=None)
 
-   return the current value for a Channel, completing an earlier incomplete
-   :func:`get` that returned ``None``, either because `wait=False` was
-   used or because the data transfer did not complete before the timeout passed.
+   See :ref:`advanced-get-timeouts-label` for further discussion.
 
-   :param chid:  ``chid`` Channel ID
-   :type  chid:  ctypes.c_long
-   :param ftype:  field type to use (native type is default)
-   :type ftype:  integer
-   :param count:  maximum element count to return (full data returned by default)
-   :type count:  integer
-   :param as_string:  whether to return the string representation of the value.  See notes below.
-   :type as_string:  ``True``/``False``
-   :param as_numpy:  whether to return the Numerical Python representation  for array / waveform data.
-   :type as_numpy:  ``True``/``False``
-   :param timeout:  maximum time to wait for data before returning ``None``.
-   :type timeout:  float or ``None``
-
-   This function will return ``None`` if the previous :func:`get`
-   actually completed, or if this data transfer also times out.  See
-   :ref:`advanced-get-timeouts-label` for further discussion.
-
-.. function::  put(chid, value[, wait=False[, timeout=30[, callback=None[, callback_data=None]]]])
-
-   sets the Channel to a value, with options to either wait (block) for the
-   process to complete, or to execute a supplied callback function when the
-   process has completed.  The chid and value are required.
-
-   :param chid:  ``chid`` Channel ID
-   :type  chid:  ctypes.c_long
-   :param wait:  whether to wait for processing to complete (or time-out) before returning.
-   :type  wait:  ``True``/``False``
-   :param timeout:  maximum time to wait for processing to complete before returning anyway.
-   :type  timeout:  float or ``None``
-   :param callback: user-supplied function to run when processing has completed.
-   :type callback: ``None`` or callable
-   :param callback_data: extra data to pass on to a user-supplied callback function.
-
-   :func:`put` returns 1 on success and -1 on timed-out
-
-   Specifying a callback will override setting `wait=True`.  This
-   callback function will be called with keyword arguments
-
-       pvname=pvname, data=callback_data
+.. autofunction::  put(chid, value, wait=False, timeout=30, callback=None, callback_data=None)
 
    For more on this *put callback*, see :ref:`ca-callbacks-label` below.
 
