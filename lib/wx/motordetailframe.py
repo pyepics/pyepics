@@ -268,7 +268,7 @@ class MotorDetailPanel(ScrolledPanel):
         ####
         nrow += 1
         ds.Add(xLabel(dp, "Max Speed"),      (nrow, 0), (1, 1), LCEN, 5)
-        ds.Add(self.MotorCtrl(dp, 'SMAX'),  (nrow, 1), (1, 1), CEN)
+        ds.Add(self.MotorCtrl(dp, 'VMAX'),  (nrow, 1), (1, 1), CEN)
 
         nrow += 1
         ds.Add(xLabel(dp, "Speed"),           (nrow, 0), (1, 1), LCEN, 5)
