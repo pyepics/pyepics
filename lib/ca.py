@@ -1220,10 +1220,10 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     """
     ftype = field_type(chid)
     count = element_count(chid)
-    if count > 1: # and not (ftype == dbr.CHAR and isinstance(value, str)):
+    if count > 1:
         count = min(len(value), count)
-    data  = (count*dbr.Map[ftype])()
 
+    data  = (count*dbr.Map[ftype])()
     if ftype == dbr.STRING:
         if count == 1:
             data[0].value = value
@@ -1231,14 +1231,19 @@ def put(chid, value, wait=False, timeout=30, callback=None,
             for elem in range(min(count, len(value))):
                 data[elem].value = value[elem]
     elif count == 1:
-        try:
-            data[0] = value
-        except TypeError:
-            data[0] = type(data[0])(value)
-        except:
-            errmsg = "cannot put value '%s' to PV of type '%s'"
-            tname  = dbr.Name(ftype).lower()
-            raise ChannelAccessException(errmsg % (repr(value), tname))
+        if ftype == dbr.CHAR:
+            if isinstance(value, str):
+                value = [ord(value)]
+            data[:] = value
+        else:
+            try:
+                data[0] = value
+            except TypeError:
+                data[0] = type(data[0])(value)
+            except:
+                errmsg = "cannot put value '%s' to PV of type '%s'"
+                tname  = dbr.Name(ftype).lower()
+                raise ChannelAccessException(errmsg % (repr(value), tname))
 
     else:
         if ftype == dbr.CHAR and isinstance(value, str):
