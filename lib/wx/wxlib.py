@@ -169,6 +169,8 @@ class PVMixin(object):
 
         epics.poll()
         self.pv.connection_callbacks.append(self.OnEpicsConnect)
+        if self.pv.connected:
+            self.OnEpicsConnect(pvname=self.pv.pvname, conn=True, pv=self.pv)
 
         self.pv.get_ctrlvars()
 
