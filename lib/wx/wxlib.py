@@ -442,7 +442,10 @@ class PVCtrlMixin(PVMixin):
             elif self.pv.severity in self._bg_colour_alarms:
                 colour = self._bg_colour_alarms[self.pv.severity]
             self.OverrideBackgroundColour(colour)
-            self._SetValue(self._translations.get(raw_value, raw_value))
+            try:
+                self._SetValue(self._translations.get(raw_value, raw_value))
+            except TypeError:
+                pass
         except PyDeadObjectError:
             pass
 
