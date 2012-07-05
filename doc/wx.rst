@@ -118,12 +118,16 @@ PVText
 PVTextCtrl
 ~~~~~~~~~~~
 
-.. class:: PVTextCtrl(parent, pv=None, font=None, fg=None, bg=None, **kw)
+.. class:: PVTextCtrl(parent, pv=None, font=None, fg=None, bg=None, dirty_timeout=2500, **kw)
 
     derived from wx.TextCtrl and PVCtrlMixin, this is a TextCtrl widget
     whose value is set to the string representation of the value for the
-    corresponding PV.  Setting the value (hitting Return or Enter) of the
-    widget will set the PV value.
+    corresponding PV.
+
+	 Setting the value (hitting Return or Enter) or changing focus away
+	 from the widget will set the PV value immediately. Otherwise, the
+	 widget will wait for 'dirty_timeout' milliseconds after the last
+	 keypress and then set the PV value to whatever is written in the field.
 
 
 PVFloatCtrl

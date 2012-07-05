@@ -457,7 +457,7 @@ class PVTextCtrl(wx.TextCtrl, PVCtrlMixin):
     back on input
     """
     def __init__(self, parent,  pv=None,
-                 font=None, fg=None, bg=None, **kws):
+                 font=None, fg=None, bg=None, dirty_timeout=2500, **kws):
 
         if 'style' not in kws:
             kws['style'] = wx.TE_PROCESS_ENTER
@@ -467,16 +467,12 @@ class PVTextCtrl(wx.TextCtrl, PVCtrlMixin):
         wx.TextCtrl.__init__(self, parent, wx.ID_ANY, value='', **kws)
         PVCtrlMixin.__init__(self, pv=pv, font=font, fg=fg, bg=bg)
         self.Bind(wx.EVT_CHAR, self.OnChar)
+        self.dirty_timeout = dirty_timeout
+        self.dirty_writeback_timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.OnWriteback)
+        self.Bind(wx.EVT_KILL_FOCUS, self.OnWriteback)
+        self.Bind(wx.EVT_CHAR, self.OnChar)
 
-    def OnChar(self, event):
-        "char event handler"
-        key   = event.GetKeyCode()
-        entry = str(wx.TextCtrl.GetValue(self).strip())
-        pos   = wx.TextCtrl.GetSelection(self)
-        if key == wx.WXK_RETURN:
-            self.SetValue(entry)
-        else:
-            event.Skip()
 
     @EpicsFunction
     def _caput(self, value):
@@ -490,6 +486,21 @@ class PVTextCtrl(wx.TextCtrl, PVCtrlMixin):
     def _SetValue(self, value):
         "set widget value"
         wx.TextCtrl.SetValue(self, value)
+
+    def OnChar(self, event):
+        "char event handler"
+        if event.KeyCode == wx.WXK_RETURN:
+            self.OnWriteback()
+        else:
+            if self.dirty_timeout is not None:
+                self.dirty_writeback_timer.Start(self.dirty_timeout)
+            event.Skip()
+
+    def OnWriteback(self, event=None):
+        """ writeback the currently displayed value to the PV """
+        self.dirty_writeback_timer.Stop()
+        entry = str(self.GetValue().strip())
+        self.SetValue(entry)
 
 class PVText(wx.StaticText, PVCtrlMixin):
     """ Static text for displaying a PV value,
