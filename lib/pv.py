@@ -498,7 +498,7 @@ class PV(object):
         "wrapper for property retrieval"
         if self._args['value'] is None:
             self.get()
-        elif self._args[arg] is None:
+        if self._args[arg] is None:
             if arg in ('status', 'severity', 'timestamp'):
                 self.get_timevars(timeout=1, warn=False)
             else:
