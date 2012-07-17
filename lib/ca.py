@@ -456,11 +456,7 @@ def _onMonitorEvent(args):
         kwds['severity']  = tmpv.severity
         kwds['timestamp'] = dbr.make_unixtime(tmpv.stamp)
 
-    nelem = args.count
-    if args.type in (dbr.STRING, dbr.TIME_STRING, dbr.CTRL_STRING):
-        nelem = dbr.MAX_STRING_SIZE
-
-    value = _unpack(args.chid, value, count=nelem, ftype=args.type)
+    value = _unpack(args.chid, value, count=args.count, ftype=args.type)
     if hasattr(args.usr, '__call__'):
         args.usr(value=value, **kwds)
 
@@ -949,6 +945,18 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
 
     """
 
+    def scan_string(data, count):
+        """ Scan a string, or an array of strings as a list, depending on content """
+        out = []
+        for elem in range(min(count, len(data))):
+            this = strjoin('', data[elem]).rstrip()
+            if NULLCHAR_2 in this:
+                this = this[:this.index(NULLCHAR_2)]
+            out.append(this)
+        if len(out) == 1:
+            out = out[0]
+        return out
+
     def array_cast(data, count, ntype, use_numpy):
         "cast ctypes array to numpy array (if using numpy)"
         if use_numpy:
@@ -967,32 +975,22 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
         if count == 1 and ntype != dbr.STRING:
             return data[0]
         if ntype == dbr.STRING:
-            out = []
-            for elem in range(min(count, len(data))):
-                this = strjoin('', data[elem]).rstrip()
-                if NULLCHAR_2 in this:
-                    this = this[:this.index(NULLCHAR_2)]
-                out.append(this)
-            if len(out) == 1:
-                out = out[0]
-            return out
+            return scan_string(data, count)
         if count > 1:
             data = array_cast(data, count, ntype, use_numpy)
         return data
 
     def unpack_ctrltime(data, count, ntype, use_numpy):
         "ctrl and time data types"
-        if count == 1 or ntype == dbr.STRING:
-            data = data[0].value
-            if ntype == dbr.STRING and NULLCHAR in data:
-                data = data[:data.index(NULLCHAR)]
-            return data
         # fix for CTRL / TIME array data:Thanks to Glen Wright !
         data = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
                                                   dbr.value_offset[ftype])
-        if count > 1:
-            data = array_cast(data, count, ntype, use_numpy)
-        return data
+        if ntype == dbr.STRING:
+            return scan_string(data, count)
+        if count == 1:
+            return data[0]
+        else:
+            return array_cast(data, count, ntype, use_numpy)
 
     unpack = unpack_simple
     if ftype >= dbr.TIME_STRING:
