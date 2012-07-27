@@ -1025,6 +1025,22 @@ class PVComboBox(wx.ComboBox, PVCtrlMixin):
         "text event"
         self.pv.put(self.Value)
 
+class PVEnumComboBox(PVComboBox):
+    """ A dropdown ComboBox linked to an enum PV, allows setting of enum values.
+    Both reads/writes the combo value on changes
+    """
+    def __init__(self, parent, pv=None, **kw):
+        PVComboBox.__init__(self, parent, pv, style=wx.CB_DROPDOWN|wx.CB_READONLY, **kw)
+
+    @DelayedEpicsCallback
+    def OnEpicsConnect(self, pvname=None, conn=None, pv=None):
+        PVComboBox.OnEpicsConnect(self, pvname, conn, pv)
+        if conn:
+            self.Clear()
+            for enum in self.pv.enum_strs:
+                self.Append(enum)
+            self.Value = self.pv.get(as_string=True)
+
 class PVToggleButton(wx.ToggleButton, PVCtrlMixin):
     """A ToggleButton that can be attached to a bi or bo Epics record."""
 

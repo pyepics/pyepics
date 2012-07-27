@@ -22,6 +22,7 @@ PVFloatSpin   = pvFloatSpin   = wxlib.PVFloatSpin
 PVButton      = pvButton      = wxlib.PVButton
 PVRadioButton = pvRadioButton = wxlib.PVRadioButton
 PVComboBox    = pvComboBox    = wxlib.PVComboBox
+PVEnumComboBox = pvEnumComboBox = wxlib.PVEnumComboBox
 PVCollapsiblePane = pvCollapsiblePane = wxlib.PVCollapsiblePane
 
 # OGL shapes

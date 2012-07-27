@@ -225,6 +225,17 @@ PVComboBox
     changes.
 
 
+PVEnumComboBox
+~~~~~~~~~~~
+
+.. class:: PVEnumComboBox(parent, pv=None, **kw)
+
+    A ComboBox linked to an "enum" type PV (such as bi,bo,mbbi,mbbo.) The ComboBox
+	 is automatically populated with a non-editable list of the PV enum values, allowing
+	 the user to select them from the dropdown.
+
+	 Both reads/writes the combo value on changes.
+
 
 PVEnumButtons
 ~~~~~~~~~~~~~~~~~~
