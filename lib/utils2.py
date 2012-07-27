@@ -14,3 +14,12 @@ BYTES2STR = str
 def strjoin(sep, seq):
     "join string sequence with a separator"
     return sep.join(seq)
+
+def is_string(s):
+    return isinstance(s, basestring)
+
+def ascii_string(s):
+    if isinstance(s, unicode):
+        return str(s)
+    else:
+        return s

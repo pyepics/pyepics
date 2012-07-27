@@ -12,6 +12,7 @@ from math import log10
 
 from . import ca
 from . import dbr
+from .utils import *
 
 def fmt_time(tstamp=None):
     "simple formatter for time values"
@@ -258,7 +259,7 @@ class PV(object):
             return None
 
         if (self.ftype in (dbr.ENUM, dbr.TIME_ENUM, dbr.CTRL_ENUM) and
-            isinstance(value, basestring)):
+            is_string(value)):
             if self._args['enum_strs'] is None:
                 self.get_ctrlvars()
             if value in self._args['enum_strs']:

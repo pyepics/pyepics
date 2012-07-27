@@ -23,6 +23,7 @@ from  math import log10
 import atexit
 import warnings
 from threading import Thread
+from .utils import *
 
 # ignore warning about item size... for now??
 warnings.filterwarnings('ignore',
@@ -37,17 +38,6 @@ except ImportError:
     pass
 
 from . import dbr
-
-PY_MAJOR, PY_MINOR = sys.version_info[:2]
-
-memcopy = copy
-if PY_MAJOR >= 3:
-    from .utils3 import STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2, strjoin
-else:
-    from .utils2 import STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2, strjoin
-    if PY_MINOR == 5:
-        def memcopy(a):
-            return a
 
 ## print to stdout
 def write(msg, newline=True, flush=True):
@@ -513,7 +503,7 @@ def _onGetEvent(args, **kws):
     if args.status != dbr.ECA_NORMAL:
         return
     get_cache(name(args.chid))[args.usr] = memcopy(dbr.cast_args(args).contents)
-    
+
 
 ## put event handler:
 def _onPutEvent(args, **kwds):
@@ -1221,8 +1211,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     if count > 1:
         count = min(len(value), count)
 
-    if isinstance(value, unicode):
-        value = str(value) # will only work for unicode strings mappable to ASCI
+    if is_string(value):
+        value = ascii_string(value)
 
     data  = (count*dbr.Map[ftype])()
     if ftype == dbr.STRING:

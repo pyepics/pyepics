@@ -18,12 +18,12 @@ def s2b(st1):
 
 def b2s(st1):
     'byte to string conversion'
-    if isinstance(st1, basestring):
+    if isinstance(st1, str):
         return st1
     elif isinstance(st1, bytes):
         return str(st1, EPICS_STR_ENCODING)
     else:
-        return str(st1)                
+        return str(st1)
 
 STR2BYTES, BYTES2STR = s2b, b2s
 
@@ -41,3 +41,9 @@ def strjoin(sep, seq):
             tmp.append(BYTES2STR(i))
         seq = tmp
     return sep.join(seq)
+
+def is_string(s):
+    return isinstance(s, str)
+
+def ascii_string(s):
+    return str(bytes(s, EPICS_STR_ENCODING), EPICS_STR_ENCODING)
