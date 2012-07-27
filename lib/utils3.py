@@ -18,7 +18,7 @@ def s2b(st1):
 
 def b2s(st1):
     'byte to string conversion'
-    if isinstance(st1, str):
+    if isinstance(st1, basestring):
         return st1
     elif isinstance(st1, bytes):
         return str(st1, EPICS_STR_ENCODING)

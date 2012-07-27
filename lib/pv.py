@@ -258,7 +258,7 @@ class PV(object):
             return None
 
         if (self.ftype in (dbr.ENUM, dbr.TIME_ENUM, dbr.CTRL_ENUM) and
-            isinstance(value, str)):
+            isinstance(value, basestring)):
             if self._args['enum_strs'] is None:
                 self.get_ctrlvars()
             if value in self._args['enum_strs']:

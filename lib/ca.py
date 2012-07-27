@@ -1221,6 +1221,9 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     if count > 1:
         count = min(len(value), count)
 
+    if isinstance(value, unicode):
+        value = str(value) # will only work for unicode strings mappable to ASCI
+
     data  = (count*dbr.Map[ftype])()
     if ftype == dbr.STRING:
         if count == 1:

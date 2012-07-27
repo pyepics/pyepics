@@ -87,7 +87,7 @@ class Alarm(object):
 
         if isinstance(pvname, pv.PV):
             self.pv = pvname
-        elif isinstance(pvname, str):
+        elif isinstance(pvname, basestring):
             self.pv = pv.PV(pvname)
             self.pv.connect()
         
