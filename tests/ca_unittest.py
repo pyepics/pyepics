@@ -364,7 +364,7 @@ class CA_BasicTests(unittest.TestCase):
 
         out = ca.get(chid, count=0)
         self.assertTrue(isinstance(out, numpy.ndarray))
-        self.assertTrue(len(out) == npts)
+        self.assertEqual(len(out), npts)
 
     def test_xArray3(self):
         write('Array Test: get char array as string')
@@ -374,7 +374,7 @@ class CA_BasicTests(unittest.TestCase):
         char_val = ca.get(chid, as_string=True)
         self.assertTrue(isinstance(char_val, str))
         conv = ''.join([chr(i) for i in val])
-        self.assertTrue(conv == char_val)
+        self.assertEqual(conv, char_val)
 
 
 if __name__ == '__main__':
