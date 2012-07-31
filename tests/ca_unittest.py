@@ -45,6 +45,12 @@ def resume_updating():
     caput(pvnames.pause_pv, 0)
 
 class CA_BasicTests(unittest.TestCase):
+
+    def setUp(self):
+        write('Starting %s...' % self.id().split(".")[-1])
+    def tearDown(self):
+        write('Completed %s...\n' % self.id().split(".")[-1])
+
     def testA_CreateChid(self):
         write('Simple Test: create chid')
         chid = ca.create_channel(pvnames.double_pv)
