@@ -89,7 +89,7 @@ class Alarm(object):
         if isinstance(pvname, pv.PV):
             self.pv = pvname
         elif is_string(pvname):
-            self.pv = pv.PV(ascii_string(pvname))
+            self.pv = pv.PV(pvname)
             self.pv.connect()
         
         if self.pv is None or comparison is None or trip_point is None:
