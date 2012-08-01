@@ -240,6 +240,56 @@ class CA_BasicTests(unittest.TestCase):
         self.assertNotEqual(val, None)
         time.sleep(0.2)
 
+
+    def _test_array_callback(self, arrayname, array_type, length, element_type):
+        """ Helper function to subscribe to a PV array and check it
+        receives at least one subscription callback w/ specified type,
+        length & uniform element type. Checks separately for normal,
+        TIME & CTRL subscription variants. Returns the array or fails
+        an assertion."""
+        results = {}
+        for form in [ 'normal', 'time', 'ctrl' ]:
+            chid = ca.create_channel(arrayname,connect=True)
+            cb, uarg, eventID = ca.create_subscription(chid, use_time=form=='time', use_ctrl=form=='ctrl', callback=onChanges)
+
+            CHANGE_DAT.pop(arrayname, None)
+            timeout=0
+            # wait up to 6 seconds, if no callback probably due to simulator.py
+            # not running...
+            while timeout<120 and not arrayname in CHANGE_DAT:
+                time.sleep(0.05)
+                timeout = timeout+1
+            val = CHANGE_DAT.get(arrayname, None)
+            ca.clear_subscription(eventID)
+            self.assertNotEqual(val, None)
+            self.assertEqual(type(val), array_type)
+            self.assertEqual(len(val), length)
+            self.assertEqual(type(val[0]), element_type)
+            self.assertTrue(all( type(e)==element_type for e in val))
+            results[form] = val
+        return results
+
+    def test_subscription_long_array(self):
+        """ Check that numeric arrays callbacks successfully send correct data """
+        self._test_array_callback(pvnames.long_arr_pv, numpy.ndarray, 2048, numpy.int32)
+
+    def test_subscription_double_array(self):
+        """ Check that double arrays callbacks successfully send correct data """
+        self._test_array_callback(pvnames.double_arr_pv, numpy.ndarray, 2048, numpy.float64)
+
+    def test_subscription_string_array(self):
+        """ Check that string array callbacks successfully send correct data """
+        results = self._test_array_callback(pvnames.string_arr_pv, list, 128, str)
+        self.assertTrue(len(results["normal"][0]) > 0)
+        self.assertTrue(len(results["time"][0]) > 0)
+        self.assertTrue(len(results["ctrl"][0]) > 0)
+
+    def test_subscription_char_array(self):
+        """ Check that uchar array callbacks successfully send correct data as arrays """
+        self._test_array_callback(pvnames.char_arr_pv, numpy.ndarray, 128, numpy.uint8)
+
+
+
     def test_Values(self):
         write( 'CA test Values (compare 5 values with caget)')
         os.system('rm ./caget.tst')
@@ -344,7 +394,7 @@ class CA_BasicTests(unittest.TestCase):
         self.assertTrue(isinstance(lval, list))
         self.assertTrue(len(lval) > 2)
         self.assertTrue(lval == list(aval))
-        
+
     def test_xArray1(self):
         write('Array Test: get(wait=False) / get_complete()')
         chid = ca.create_channel(pvnames.double_arrays[0])
