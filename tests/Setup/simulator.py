@@ -69,8 +69,8 @@ def initialize_data():
     epics.caput('Py:ao2.PREC', 3)
 
 
-    char_waves[0].put('a string')
-    
+        
+    char_waves[0].put([60+random.randrange(30) for i in range(128)])
     char_waves[1].put([random.randrange(256) for i in range(256)])
     char_waves[2].put([random.randrange(256) for i in range(2048)])
     char_waves[3].put([random.randrange(256) for i in range(65536)])
@@ -130,6 +130,11 @@ while True:
     analogs[2].put( 0.3*numpy.sin(time.time() / 2.302) + noise(scale=0.4)  )
     analogs[3].put( numpy.exp( (max(0.001,  noise(scale=0.03) + numpy.sqrt((count/16.0) % 87.)))))
 
+    long_waves[1].put([i+random.randrange(128) for i in range(2048)])
+    char_waves[0].put([45+random.randrange(64) for i in range(128)])
+
+    str_waves[0].put(["Str%i_%.3f" % (i+1, 100*random.random()) for i in range(128)])
+    
     if t0-long_update >= 1.0:
         long_update=t0
         lcount = (lcount + 1) % 10
