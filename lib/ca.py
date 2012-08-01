@@ -23,7 +23,9 @@ from  math import log10
 import atexit
 import warnings
 from threading import Thread
-from .utils import *
+
+from .utils import (STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2,
+                    strjoin, memcopy, is_string, ascii_string)
 
 # ignore warning about item size... for now??
 warnings.filterwarnings('ignore',

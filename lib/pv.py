@@ -12,7 +12,7 @@ from math import log10
 
 from . import ca
 from . import dbr
-from .utils import *
+from .utils import is_string
 
 def fmt_time(tstamp=None):
     "simple formatter for time values"

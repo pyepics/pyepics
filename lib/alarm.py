@@ -9,7 +9,7 @@ import sys
 import time
 import operator
 from . import pv
-from .utils import *
+from .utils import is_string
 
 class Alarm(object):
     """ alarm class for a PV:
