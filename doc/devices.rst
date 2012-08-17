@@ -22,7 +22,7 @@ Epics Record as it can actually hold PVs from several different records.::
     motor1.put('VAL', 1)
     print 'Motor %s = %f' % ( motor1.get('DESC'), motor1.get('RBV'))
 
-    motor1.VAL 0
+    motor1.VAL = 0
     print 'Motor %s = %f' % ( motor1.DESC, motor1.RBV )
 
 While useful on its own like this, the real point of a *device* is as a
@@ -322,28 +322,37 @@ attribute cannot do so::
    :rtype:    ``True``/``False``
 
 
-.. method:: move(val=None[, relative=None[, wait=False[, timeout=300.0[, dial=False[, raw=False[, ignore_limits=False]]]]]])
+.. method:: move(val=None[, relative=None[, wait=False[, timeout=300.0[, dial=False[, raw=False[, ignore_limits=False, [confirm_move=False]]]]]]])
 
-   moves motor drive to position
+   moves motor to specified drive position.
 
-   :param val:    value to move to (float) [Must be provided]
-   :param relative:   move relative to current position    (T/F) [F]
-   :param wait:           whether to wait for move to complete (T/F) [F]
-   :param dial:           use dial coordinates                 (T/F) [F]
-   :param raw:            use raw coordinates                  (T/F) [F]
-   :param ignore_limits:  try move without regard to limits    (T/F) [F]
-   :param timeout:        max time for move to complete (in seconds) [300]
+   :param val:           value to move to (float) [Must be provided]
+   :param relative:      move relative to current position    (T/F) [F]
+   :param wait:          whether to wait for move to complete (T/F) [F]
+   :param timeout:       max time for move to complete (in seconds) [300]
+   :param dial:          use dial coordinates                 (T/F) [F]
+   :param raw:           use raw coordinates                  (T/F) [F]
+   :param ignore_limits: try move without regard to limits    (T/F) [F]
+   :param confirm_move:  try to confirm that move begun (when wait=False) (T/F) [F]
    :rtype:  see below
 
+   Return values:
 
-   Return codes:
+      -13 : invalid value (cannot convert to float).  Move not attempted.
+      -12 : target value outside soft limits.         Move not attempted.
+      -11 : drive PV is not connected:                Move not attempted.
+       -8 : move started, but timed-out.
+       -7 : move started, timed-out, but appears done.
+       -5 : move started, unexpected return value from PV.put().
+       -4 : move-with-wait finished, soft limit violation seen.
+       -3 : move-with-wait finished, hard limit violation seen.
 
-          None : unable to move, invalid value given
-          -1   : target value outside limits -- no move attempted
-          -2   : with `wait=True`, wait time exceeded timeout
-          0    : move executed successfully
+        0 : move-with-wait finish OK.
 
-          will raise an exception if a motor limit is met.
+        1 : move-without-wait executed, not cpmfirmed.
+        2 : move-without-wait executed, move confirmed. 
+        3 : move-without-wait finished, hard limit violation seen.
+        4 : move-without-wait finished, soft limit violation seen.
 
 .. method:: tweak(dir='forward'[, wait=False[, timeout=300.]])
 
@@ -464,11 +473,7 @@ directly invoking epics calls::
    s1.setCalc(2, '(B-2000*A/10000000.)')
    s1.enableCalcs()
    s1.OneShotMode()
-   s1.Count(t=5.0)
+   s1.Count(t=5.0, wait=True)
    print 'Names:       ', s1.getNames()
-   print 'Raw  values: ', s1.Read(use_calcs=False)
-   print 'Calc values: ', s1.Read(use_calcs=True)
-
-
-
-
+   print 'Raw  values: ', s1.Read(use_calc=False)
+   print 'Calc values: ', s1.Read(use_calc=True)
