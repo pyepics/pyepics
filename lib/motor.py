@@ -318,10 +318,12 @@ class Motor(device.Device):
         return (val <= self.get(hl_name) and val >= self.get(ll_name))
 
     def move(self, val=None, relative=False, wait=False, timeout=300.0,
-             dial=False, step=False, raw=False, ignore_limits=False):
+             dial=False, step=False, raw=False,
+             ignore_limits=False, confirm_move=False):
         """ moves motor drive to position
 
         arguments:
+        ==========
          val            value to move to (float) [Must be provided]
          relative       move relative to current position    (T/F) [F]
          wait           whether to wait for move to complete (T/F) [F]
@@ -329,47 +331,87 @@ class Motor(device.Device):
          raw            use raw coordinates                  (T/F) [F]
          step           use raw coordinates (backward compat)(T/F) [F]
          ignore_limits  try move without regard to limits    (T/F) [F]
+         confirm_move   try to confirm that move has begun   (T/F) [F]
          timeout        max time for move to complete (in seconds) [300]
-        returns:
-          None : unable to move, invalid value given
-          -1   : target value outside limits -- no move attempted
-          -2   : with wait=True, wait time exceeded timeout
-          0    : move executed successfully
 
-          will raise an exception if a motor limit is met.
-          
+        return values:
+          -13 : invalid value (cannot convert to float).  Move not attempted.
+          -12 : target value outside soft limits.         Move not attempted.
+          -11 : drive PV is not connected:                Move not attempted.
+           -8 : move started, but timed-out.
+           -7 : move started, timed-out, but appears done.
+           -5 : move started, unexpected return value from PV.put()
+           -4 : move-with-wait finished, soft limit violation seen
+           -3 : move-with-wait finished, hard limit violation seen
+            0 : move-with-wait finish OK.
+            1 : move-without-wait executed, not cpmfirmed
+            2 : move-without-wait executed, move confirmed 
+            3 : move-without-wait finished, hard limit violation seen
+            4 : move-without-wait finished, soft limit violation seen
+
         """
+        step = step or raw
+
+        NONFLOAT, OUTSIDE_LIMITS, UNCONNECTED = -13, -12, -11
+        TIMEOUT, TIMEOUT_BUTDONE              =  -8,  -7
+        UNKNOWN_ERROR                         =  -5
+        DONEW_SOFTLIM, DONEW_HARDLIM          =  -4, -3
+        DONE_OK                               =   0
+        MOVE_BEGUN, MOVE_BEGUN_CONFIRMED      =   1, 2
+        NOWAIT_SOFTLIM, NOWAIT_HARDLIM        =   4, 3        
         try:
             val = float(val)
         except TypeError:
-            return None
+            return NONFLOAT
 
         drv, rbv = ('VAL', 'RBV')
         if dial:
             drv, rbv = ('DVAL', 'DRBV')
-        if step or raw:
-            step = True
+        elif step:
             drv, rbv = ('RVAL', 'RRBV')
 
         if relative:
-            val += self.get(rbv)
+            val += self.get(drv)
 
         # Check for limit violations
         if not ignore_limits and not step:
             if not self.within_limits(val, dial=dial):
-                return -1
+                return OUTSIDE_LIMITS
 
         stat = self.put(drv, val, wait=wait, timeout=timeout)
-        ret = stat
-        if stat == 1:
-            ret = 0
-        if stat == -2:
-            ret = -2
-        try:
-            self.check_limits()
-        except MotorLimitException:
-            ret = -1
-        return ret
+        if stat is None:
+            return UNCONNECTED
+        
+        if wait and stat == -1: # move started, exceeded timeout
+            if self.get('DMOV') == 0:
+                return TIMEOUT
+            return TIMEOUT_BUTDONE
+        if 1 == stat:
+            if wait:  # ... and finished OK
+                if 1 == self.get('LVIO'):
+                    return DONEW_SOFTLIM
+                elif 1 == self.get('HLS') or 1 == self.get('LLS'):
+                    return DONEW_HARDLIM
+                return DONE_OK
+            else:
+                if 1 == self.get('LVIO') or confirm_move:
+                    ca.poll(evt=1.e-2)
+                moving = False
+                if confirm_move:
+                    t0 = time.time()
+                    while self.get('MOVN')==0:
+                        ca.poll(evt=1.e-3)
+                        if time.time() - t0 > 0.25: break
+                if 1 == self.get('MOVN'):
+                    return MOVE_BEGUN_CONFIRMED
+                elif 1 == self.get('LVIO'):
+                    return NOWAIT_SOFTLIM
+                elif 1 == self.get('HLS') or 1 == self.get('LLS'):
+                    return NOWAIT_HARDLIM
+                else:
+                    return MOVE_BEGUN
+        return UNKNOWN_ERROR
+
 
     def get_position(self, dial=False, readback=False, step=False, raw=False):
         """
