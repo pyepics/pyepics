@@ -44,11 +44,11 @@ class Scaler(epics.Device):
         "set count time"
         self.put('TP', ctime)
         
-    def Count(self, ctime=None):
+    def Count(self, ctime=None, wait=False):
         "set count, with optional counttime"
         if ctime is not None:
             self.CountTime(ctime)
-        self.put('CNT', 1)
+        self.put('CNT', 1, wait=wait)
 
     def EnableCalcs(self):
         " enable calculations"
