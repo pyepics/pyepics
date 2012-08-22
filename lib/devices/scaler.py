@@ -49,6 +49,7 @@ class Scaler(epics.Device):
         if ctime is not None:
             self.CountTime(ctime)
         self.put('CNT', 1, wait=wait)
+        epics.ca.poll()
 
     def EnableCalcs(self):
         " enable calculations"
