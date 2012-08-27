@@ -344,8 +344,8 @@ class Motor(device.Device):
            -4 : move-with-wait finished, soft limit violation seen
            -3 : move-with-wait finished, hard limit violation seen
             0 : move-with-wait finish OK.
-            1 : move-without-wait executed, not cpmfirmed
-            2 : move-without-wait executed, move confirmed 
+            0 : move-without-wait executed, not cpmfirmed
+            1 : move-without-wait executed, move confirmed 
             3 : move-without-wait finished, hard limit violation seen
             4 : move-without-wait finished, soft limit violation seen
 
@@ -357,8 +357,8 @@ class Motor(device.Device):
         UNKNOWN_ERROR                         =  -5
         DONEW_SOFTLIM, DONEW_HARDLIM          =  -4, -3
         DONE_OK                               =   0
-        MOVE_BEGUN, MOVE_BEGUN_CONFIRMED      =   1, 2
-        NOWAIT_SOFTLIM, NOWAIT_HARDLIM        =   4, 3        
+        MOVE_BEGUN, MOVE_BEGUN_CONFIRMED      =   0, 1
+        NOWAIT_SOFTLIM, NOWAIT_HARDLIM        =   4, 3
         try:
             val = float(val)
         except TypeError:
