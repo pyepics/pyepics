@@ -334,25 +334,48 @@ attribute cannot do so::
    :param raw:           use raw coordinates                  (T/F) [F]
    :param ignore_limits: try move without regard to limits    (T/F) [F]
    :param confirm_move:  try to confirm that move begun (when wait=False) (T/F) [F]
-   :rtype:  see below
+   :rtype:  integer
 
-   Return values:
+   Returns an integer value, according the table below.  Note that a return value of 0 with
+   `wait=False` does not really guarantee a successful move, just that a move request was issued.
+   If you're interested in checking that a requested move really did start without waiting for the
+   move to complete, you may want to use the `confirm_move=True` option.
 
-      -13 : invalid value (cannot convert to float).  Move not attempted.
-      -12 : target value outside soft limits.         Move not attempted.
-      -11 : drive PV is not connected:                Move not attempted.
-       -8 : move started, but timed-out.
-       -7 : move started, timed-out, but appears done.
-       -5 : move started, unexpected return value from PV.put().
-       -4 : move-with-wait finished, soft limit violation seen.
-       -3 : move-with-wait finished, hard limit violation seen.
 
-        0 : move-with-wait finish OK.
+.. _motor_move_return_vals_table:
 
-        1 : move-without-wait executed, not cpmfirmed.
-        2 : move-without-wait executed, move confirmed. 
-        3 : move-without-wait finished, hard limit violation seen.
-        4 : move-without-wait finished, soft limit violation seen.
+   Table of return values from :func:`move`.
+
+   +---------------+----------------------------------------------------------------+
+   | return value  |  meaning                                                       |
+   +===============+================================================================+
+   |      -13      | invalid value (cannot convert to float).  Move not attempted.  |
+   +---------------+----------------------------------------------------------------+
+   |      -12      | target value outside soft limits.         Move not attempted.  |
+   +---------------+----------------------------------------------------------------+
+   |      -11      | drive PV is not connected:                Move not attempted.  |
+   +---------------+----------------------------------------------------------------+
+   |       -8      | move started, but timed-out.                                   |
+   +---------------+----------------------------------------------------------------+
+   |       -7      | move started, timed-out, but appears done.                     |
+   +---------------+----------------------------------------------------------------+
+   |       -5      | move started, unexpected return value from :func:`put`         |
+   +---------------+----------------------------------------------------------------+
+   |       -4      | move-with-wait finished, soft limit violation seen.            |
+   +---------------+----------------------------------------------------------------+
+   |       -3      | move-with-wait finished, hard limit violation seen.            |
+   +---------------+----------------------------------------------------------------+
+   |        0      | move-with-wait finish OK.                                      |
+   +---------------+----------------------------------------------------------------+
+   |        0      | move-without-wait executed, not cpmfirmed.                     |
+   +---------------+----------------------------------------------------------------+
+   |        1      | move-without-wait executed, move confirmed.                    |
+   +---------------+----------------------------------------------------------------+
+   |        3      | move-without-wait finished, hard limit violation seen.         |
+   +---------------+----------------------------------------------------------------+
+   |        4      | move-without-wait finished, soft limit violation seen.         |
+   +---------------+----------------------------------------------------------------+
+
 
 .. method:: tweak(dir='forward'[, wait=False[, timeout=300.]])
 

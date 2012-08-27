@@ -1,8 +1,8 @@
 """
    epics channel access python module
 
-   version    :  3.2.0
-   last update:  19-Jan-2012
+   version    :  3.2.1
+   last update:  26-Aug-2012
 
    Principle Authors:
       Matthew Newville <newville@cars.uchicago.edu>, CARS, University of Chicago
@@ -18,7 +18,7 @@
 
 """
 
-__version__ = '3.2.0'
+__version__ = '3.2.1'
 
 import time
 import sys
