@@ -1,4 +1,4 @@
-include README.txt INSTALL MANIFEST.in PKG-INFO Changelog license.txt setup.py publish.sh *.bat
+include README.txt INSTALL MANIFEST.in Changelog license.txt setup.py publish.sh *.bat
 exclude *.pyc core.* *~ *.pdf
 recursive-include lib *.py
 recursive-include scripts *
