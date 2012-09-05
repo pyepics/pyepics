@@ -37,9 +37,9 @@ a few ways to get the PyEpics Package:
 .. _pyepics-3.2.1.win32-py2.6.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.1.win32-py2.6.exe
 .. _pyepics-3.2.1.win32-py2.7.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.1.win32-py2.7.exe
 .. _pyepics-3.2.1.win32-py3.2.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.1.win32-py3.2.exe
-.. _pyepics-3.2.1.win32-py2.6.exe (PyPI): http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.1.win32-py2.6.exe
-.. _pyepics-3.2.1.win32-py2.7.exe (PyPI): http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.1.win32-py2.7.exe
-.. _pyepics-3.2.1.win32-py3.2.exe (PyPI): http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.1.win32-py3.2.exe
+.. _pyepics-3.2.1.win32-py2.6.exe (PyPI): http://pypi.python.org/packages/2.6/p/pyepics/pyepics-3.2.1.win32-py2.6.exe
+.. _pyepics-3.2.1.win32-py2.7.exe (PyPI): http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.1.win32-py2.7.exe
+.. _pyepics-3.2.1.win32-py3.2.exe (PyPI): http://pypi.python.org/packages/3.2/p/pyepics/pyepics-3.2.1.win32-py3.2.exe
 .. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
 .. _PyPi Epics Entry:             http://pypi.python.org/pypi/pyepics/
@@ -48,8 +48,8 @@ a few ways to get the PyEpics Package:
 +-----------------+------------+----------------------------------------------+
 |  Download Type  | Py Version |   Location                                   |
 +=================+============+==============================================+
-| Source tarball  | All        | `pyepics-3.2.1.tar.gz (CARS)`_  or           |
-|                 |            | `pyepics-3.2.1.tar.gz (PyPI)`_               |
+| Source tarball  | All        |  `pyepics-3.2.1.tar.gz (CARS)`_  or          |
+|                 |            |  `pyepics-3.2.1.tar.gz (PyPI)`_              |
 +-----------------+------------+----------------------------------------------+
 | Win32 Installer | 2.6        |  `pyepics-3.2.1.win32-py2.6.exe (CARS)`_  or |
 |                 |            |  `pyepics-3.2.1.win32-py2.6.exe (PyPI)`_  or |
@@ -73,34 +73,34 @@ Testing
 ~~~~~~~~~~~~~
 
 Some automated unit-testing is done, using the tests/ folder from the
-source distribution kit, and while the script tests/simulator.py is running
-(note that the Epics database in tests/pydebug.db must be loaded in a local
+source distribution kit, and while the script ``tests/simulator.py`` is running
+(note that the Epics database in ``tests/pydebug.db`` must be loaded in a local
 IOC for the simulator and most of these tests to run).  The following
-systems were tested for 3.2.1, all with Epics base 3.14.12.1 or bas
-3.14.12.2.  Except as noted, all tests pass.  Those tests that fail are
-generally well-understood.
+systems were tested for 3.2.1, all with Epics base 3.14.12.1 or base 
+3.14.12.2.  
 
 +-----------+-----------------+------------+---------------------------+
-|  Host OS  | Epics HOST ARCH |  Python    |  Failures, Notes          |
+| Host OS   | Epics HOST ARCH |  Python    |  Failures, Notes          |
 +===========+=================+============+===========================+
-| Linux     |  linux-x86      |  2.5.1     | not tested (3.2.0 passed) |
+| Linux     |  linux-x86      |  2.5.1     | not tested, 3.2.0 passed  |
 +-----------+-----------------+------------+---------------------------+
-| Linux     |  linux-x86      |  2.6       |   pass                    |
+| Linux     |  linux-x86      |  2.6       | pass                      |
 +-----------+-----------------+------------+---------------------------+
-| Linux     |  linux-x86      |  2.7.1     |   pass                    |
+| Linux     |  linux-x86      |  2.7.1     | pass                      |
 +-----------+-----------------+------------+---------------------------+
-| Linux     |  linux-x86_64   |  2.7.1     |   pass                    |
+| Linux     |  linux-x86_64   |  2.7.1     | pass                      |
 +-----------+-----------------+------------+---------------------------+
-| Linux     |  linux-x86_64   |  3.2.3     |   pass                    |
+| Linux     |  linux-x86_64   |  3.2.3     | pass                      |
 +-----------+-----------------+------------+---------------------------+
-| Mac OSX   |  darwin-x86     |  2.6.5     | not tested (3.2.0 passed) |
+| Mac OSX   |  darwin-x86     |  2.6.5     | not tested, 3.2.0 passed  |
 +-----------+-----------------+------------+---------------------------+
-| Windows   |  win32-x86      |  2.6.6     |   pass                    |
+| Windows   |  win32-x86      |  2.6.6     | pass                      |
 +-----------+-----------------+------------+---------------------------+
-| Windows   |  win32-x86      |  2.7.2     |   pass                    |
+| Windows   |  win32-x86      |  2.7.2     | pass                      |
 +-----------+-----------------+------------+---------------------------+
-| Windows   |  win32-x86      |  3.2.2     |   pass                    |
+| Windows   |  win32-x86      |  3.2.2     | pass                      |
 +-----------+-----------------+------------+---------------------------+
+
 
 
 Testing Notes:
@@ -121,7 +121,6 @@ Testing Notes:
      disagreement about the lengths of basic C data types (for example,
      does a double take 8 or 16 bytes).  This is being investigated....
 
-  5. By "all pass", the following tests 
 
 Development Version
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -211,6 +210,8 @@ The PyEpics source code, this documentation, and all material associated
 with it are distributed under the Epics Open License:
 
 .. include:: ../license.txt
+
+
 
 
 
