@@ -226,7 +226,7 @@ PVComboBox
 
 
 PVEnumComboBox
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. class:: PVEnumComboBox(parent, pv=None, **kw)
 
