@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.2.0',
+        VERSION:     '3.2.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -130,13 +130,14 @@ related PVs.  This almost describes an Epics Record, but as it is concerned
 only with PV names, the mapping to an Epics Record is not exact.  On the
 other hand, the concept of a <em>device</em> is more flexible than a predefined
 Epics Record as it can actually hold PVs from several different records.:</p>
-<div class="highlight-python"><pre>motor1 = epics.Device('XXX:motor1.', attr=('VAL', 'RBV', 'DESC', 'RVAL',
-                                           'LVIO', 'HLS', 'LLS'))
-motor1.put('VAL', 1)
-print 'Motor %s = %f' % ( motor1.get('DESC'), motor1.get('RBV'))
+<div class="highlight-python"><div class="highlight"><pre><span class="n">motor1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="s">&#39;XXX:motor1.&#39;</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;VAL&#39;</span><span class="p">,</span> <span class="s">&#39;RBV&#39;</span><span class="p">,</span> <span class="s">&#39;DESC&#39;</span><span class="p">,</span> <span class="s">&#39;RVAL&#39;</span><span class="p">,</span>
+                                           <span class="s">&#39;LVIO&#39;</span><span class="p">,</span> <span class="s">&#39;HLS&#39;</span><span class="p">,</span> <span class="s">&#39;LLS&#39;</span><span class="p">))</span>
+<span class="n">motor1</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;VAL&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Motor </span><span class="si">%s</span><span class="s"> = </span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">motor1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;DESC&#39;</span><span class="p">),</span> <span class="n">motor1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;RBV&#39;</span><span class="p">))</span>
 
-motor1.VAL 0
-print 'Motor %s = %f' % ( motor1.DESC, motor1.RBV )</pre>
+<span class="n">motor1</span><span class="o">.</span><span class="n">VAL</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">print</span> <span class="s">&#39;Motor </span><span class="si">%s</span><span class="s"> = </span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">motor1</span><span class="o">.</span><span class="n">DESC</span><span class="p">,</span> <span class="n">motor1</span><span class="o">.</span><span class="n">RBV</span> <span class="p">)</span>
+</pre></div>
 </div>
 <p>While useful on its own like this, the real point of a <em>device</em> is as a
 base class, to be inherited and extended.  In fact, there is a more
@@ -669,8 +670,8 @@ violation, and raises a MotorLimitException if it is.</p>
 
 <dl class="method">
 <dt id="motor.move">
-<tt class="descclassname">motor.</tt><tt class="descname">move</tt><big>(</big><em>val=None</em><span class="optional">[</span>, <em>relative=None</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=300.0</em><span class="optional">[</span>, <em>dial=False</em><span class="optional">[</span>, <em>raw=False</em><span class="optional">[</span>, <em>ignore_limits=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#motor.move" title="Permalink to this definition">¶</a></dt>
-<dd><p>moves motor drive to position</p>
+<tt class="descclassname">motor.</tt><tt class="descname">move</tt><big>(</big><em>val=None</em><span class="optional">[</span>, <em>relative=None</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=300.0</em><span class="optional">[</span>, <em>dial=False</em><span class="optional">[</span>, <em>raw=False</em><span class="optional">[</span>, <em>ignore_limits=False</em><span class="optional">[</span>, <em>confirm_move=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#motor.move" title="Permalink to this definition">¶</a></dt>
+<dd><p>moves motor to specified drive position.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -679,28 +680,80 @@ violation, and raises a MotorLimitException if it is.</p>
 <li><strong>val</strong> -- value to move to (float) [Must be provided]</li>
 <li><strong>relative</strong> -- move relative to current position    (T/F) [F]</li>
 <li><strong>wait</strong> -- whether to wait for move to complete (T/F) [F]</li>
+<li><strong>timeout</strong> -- max time for move to complete (in seconds) [300]</li>
 <li><strong>dial</strong> -- use dial coordinates                 (T/F) [F]</li>
 <li><strong>raw</strong> -- use raw coordinates                  (T/F) [F]</li>
 <li><strong>ignore_limits</strong> -- try move without regard to limits    (T/F) [F]</li>
-<li><strong>timeout</strong> -- max time for move to complete (in seconds) [300]</li>
+<li><strong>confirm_move</strong> -- try to confirm that move begun (when wait=False) (T/F) [F]</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">see below</p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">integer</p>
 </td>
 </tr>
 </tbody>
 </table>
-<p>Return codes:</p>
-<blockquote>
-<div><p>None : unable to move, invalid value given
--1   : target value outside limits -- no move attempted
--2   : with <cite>wait=True</cite>, wait time exceeded timeout
-0    : move executed successfully</p>
-<p>will raise an exception if a motor limit is met.</p>
-</div></blockquote>
+<p>Returns an integer value, according the table below.  Note that a return value of 0 with
+<cite>wait=False</cite> does not really guarantee a successful move, just that a move request was issued.
+If you're interested in checking that a requested move really did start without waiting for the
+move to complete, you may want to use the <cite>confirm_move=True</cite> option.</p>
 </dd></dl>
 
+<blockquote id="motor-move-return-vals-table">
+<div><p>Table of return values from <a class="reference internal" href="#motor.move" title="motor.move"><tt class="xref py py-func docutils literal"><span class="pre">move()</span></tt></a>.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">return value</th>
+<th class="head">meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>-13</td>
+<td>invalid value (cannot convert to float).  Move not attempted.</td>
+</tr>
+<tr class="row-odd"><td>-12</td>
+<td>target value outside soft limits.         Move not attempted.</td>
+</tr>
+<tr class="row-even"><td>-11</td>
+<td>drive PV is not connected:                Move not attempted.</td>
+</tr>
+<tr class="row-odd"><td>-8</td>
+<td>move started, but timed-out.</td>
+</tr>
+<tr class="row-even"><td>-7</td>
+<td>move started, timed-out, but appears done.</td>
+</tr>
+<tr class="row-odd"><td>-5</td>
+<td>move started, unexpected return value from <a class="reference internal" href="#motor.put" title="motor.put"><tt class="xref py py-func docutils literal"><span class="pre">put()</span></tt></a></td>
+</tr>
+<tr class="row-even"><td>-4</td>
+<td>move-with-wait finished, soft limit violation seen.</td>
+</tr>
+<tr class="row-odd"><td>-3</td>
+<td>move-with-wait finished, hard limit violation seen.</td>
+</tr>
+<tr class="row-even"><td>0</td>
+<td>move-with-wait finish OK.</td>
+</tr>
+<tr class="row-odd"><td>0</td>
+<td>move-without-wait executed, not cpmfirmed.</td>
+</tr>
+<tr class="row-even"><td>1</td>
+<td>move-without-wait executed, move confirmed.</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>move-without-wait finished, hard limit violation seen.</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>move-without-wait finished, soft limit violation seen.</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
 <dl class="method">
 <dt id="motor.tweak">
 <tt class="descclassname">motor.</tt><tt class="descname">tweak</tt><big>(</big><em>dir='forward'</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=300.</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#motor.tweak" title="Permalink to this definition">¶</a></dt>
@@ -900,11 +953,12 @@ changing modes, and reading and writing data.</p>
         <span class="s">&quot;set count time&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;TP&#39;</span><span class="p">,</span> <span class="n">ctime</span><span class="p">)</span>
         
-    <span class="k">def</span> <span class="nf">Count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctime</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">Count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctime</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="s">&quot;set count, with optional counttime&quot;</span>
         <span class="k">if</span> <span class="n">ctime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">CountTime</span><span class="p">(</span><span class="n">ctime</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;CNT&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;CNT&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="n">wait</span><span class="p">)</span>
+        <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">EnableCalcs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="s">&quot; enable calculations&quot;</span>
@@ -934,10 +988,10 @@ directly invoking epics calls:</p>
 <span class="n">s1</span><span class="o">.</span><span class="n">setCalc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&#39;(B-2000*A/10000000.)&#39;</span><span class="p">)</span>
 <span class="n">s1</span><span class="o">.</span><span class="n">enableCalcs</span><span class="p">()</span>
 <span class="n">s1</span><span class="o">.</span><span class="n">OneShotMode</span><span class="p">()</span>
-<span class="n">s1</span><span class="o">.</span><span class="n">Count</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mf">5.0</span><span class="p">)</span>
+<span class="n">s1</span><span class="o">.</span><span class="n">Count</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&#39;Names:       &#39;</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">getNames</span><span class="p">()</span>
-<span class="k">print</span> <span class="s">&#39;Raw  values: &#39;</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">use_calcs</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-<span class="k">print</span> <span class="s">&#39;Calc values: &#39;</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">use_calcs</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Raw  values: &#39;</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">use_calc</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Calc values: &#39;</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">use_calc</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

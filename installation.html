@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.2.0',
+        VERSION:     '3.2.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -138,7 +138,7 @@ array data if available, and its use is strongly encouraged.</p>
 </div>
 <div class="section" id="downloads">
 <h2>Downloads<a class="headerlink" href="#downloads" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the PyEpics Package is 3.2.0.  There are
+<p>The latest stable version of the PyEpics Package is 3.2.1.  There are
 a few ways to get the PyEpics Package:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -155,23 +155,23 @@ a few ways to get the PyEpics Package:</p>
 <tbody valign="top">
 <tr class="row-even"><td>Source tarball</td>
 <td>All</td>
-<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.tar.gz">pyepics-3.2.0.tar.gz (CARS)</a>  or
-<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.tar.gz">pyepics-3.2.0.tar.gz (PyPI)</a></td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.1.tar.gz">pyepics-3.2.1.tar.gz (CARS)</a>  or
+<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.1.tar.gz">pyepics-3.2.1.tar.gz (PyPI)</a></td>
 </tr>
 <tr class="row-odd"><td>Win32 Installer</td>
 <td>2.6</td>
-<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py2.6.exe">pyepics-3.2.0.win32-py2.6.exe (CARS)</a>  or
-<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.win32-py2.6.exe">pyepics-3.2.0.win32-py2.6.exe (PyPI)</a>  or</td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.1.win32-py2.6.exe">pyepics-3.2.1.win32-py2.6.exe (CARS)</a>  or
+<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.1.win32-py2.6.exe">pyepics-3.2.1.win32-py2.6.exe (PyPI)</a>  or</td>
 </tr>
 <tr class="row-even"><td>Win32 Installer</td>
 <td>2.7</td>
-<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py2.7.exe">pyepics-3.2.0.win32-py2.7.exe (CARS)</a>  or
-<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.win32-py2.7.exe">pyepics-3.2.0.win32-py2.7.exe (PyPI)</a>  or</td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.1.win32-py2.7.exe">pyepics-3.2.1.win32-py2.7.exe (CARS)</a>  or
+<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.1.win32-py2.7.exe">pyepics-3.2.1.win32-py2.7.exe (PyPI)</a>  or</td>
 </tr>
 <tr class="row-odd"><td>Win32 Installer</td>
 <td>3.2</td>
-<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.0.win32-py3.2.exe">pyepics-3.2.0.win32-py3.2.exe (CARS)</a>  or
-<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.0.win32-py3.2.exe">pyepics-3.2.0.win32-py3.2.exe (PyPI)</a>  or</td>
+<td><a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.1.win32-py3.2.exe">pyepics-3.2.1.win32-py3.2.exe (CARS)</a>  or
+<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.1.win32-py3.2.exe">pyepics-3.2.1.win32-py3.2.exe (PyPI)</a>  or</td>
 </tr>
 <tr class="row-even"><td>Development</td>
 <td>All</td>
@@ -186,16 +186,19 @@ the PyEpics Package simply with:</p>
 </div>
 <div class="section" id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
-<p>Some automated unit-testing is done, using the tests folder from the source
-distribution kit.  The following systems were tested for 3.2.0, all with
-Epics base 3.14.12.1 or bas 3.14.12.2.  Except as noted, all tests pass.
-Those tests that fail are generally well-understood.</p>
+<p>Some automated unit-testing is done, using the tests/ folder from the
+source distribution kit, and while the script tests/simulator.py is running
+(note that the Epics database in tests/pydebug.db must be loaded in a local
+IOC for the simulator and most of these tests to run).  The following
+systems were tested for 3.2.1, all with Epics base 3.14.12.1 or bas
+3.14.12.2.  Except as noted, all tests pass.  Those tests that fail are
+generally well-understood.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="17%" />
-<col width="27%" />
-<col width="19%" />
-<col width="37%" />
+<col width="16%" />
+<col width="25%" />
+<col width="18%" />
+<col width="40%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Host OS</th>
@@ -208,47 +211,47 @@ Those tests that fail are generally well-understood.</p>
 <tr class="row-even"><td>Linux</td>
 <td>linux-x86</td>
 <td>2.5.1</td>
-<td>all pass</td>
+<td>not tested (3.2.0 passed)</td>
 </tr>
 <tr class="row-odd"><td>Linux</td>
 <td>linux-x86</td>
 <td>2.6</td>
-<td>all pass</td>
+<td>pass</td>
 </tr>
 <tr class="row-even"><td>Linux</td>
 <td>linux-x86</td>
 <td>2.7.1</td>
-<td>all pass</td>
+<td>pass</td>
 </tr>
 <tr class="row-odd"><td>Linux</td>
 <td>linux-x86_64</td>
 <td>2.7.1</td>
-<td>all pass</td>
+<td>pass</td>
 </tr>
 <tr class="row-even"><td>Linux</td>
 <td>linux-x86_64</td>
-<td>3.2</td>
-<td>autosave fails</td>
+<td>3.2.3</td>
+<td>pass</td>
 </tr>
 <tr class="row-odd"><td>Mac OSX</td>
 <td>darwin-x86</td>
 <td>2.6.5</td>
-<td>all pass</td>
+<td>not tested (3.2.0 passed)</td>
 </tr>
 <tr class="row-even"><td>Windows</td>
 <td>win32-x86</td>
 <td>2.6.6</td>
-<td>all pass</td>
+<td>pass</td>
 </tr>
 <tr class="row-odd"><td>Windows</td>
 <td>win32-x86</td>
 <td>2.7.2</td>
-<td>all pass</td>
+<td>pass</td>
 </tr>
 <tr class="row-even"><td>Windows</td>
 <td>win32-x86</td>
 <td>3.2.2</td>
-<td>autosave fails</td>
+<td>pass</td>
 </tr>
 </tbody>
 </table>
@@ -258,7 +261,8 @@ Those tests that fail are generally well-understood.</p>
 <li>tests involving subarrays are known to fail with Epics base earlier
 than 3.14.11.</li>
 <li>The autosave module relies on the 3rd part extension pyparsing, which
-seems to not work correctly for Python3.</li>
+seems to not work correctly for Python3, and has not been included in
+these tests.</li>
 <li>The wx module is not automatically tested.</li>
 <li>CA is not yet working with 64-bit Python on 64-bit Windows. It <em>does</em>
 work with 32-bit Python on 64-bit Linux, and Channel Access is known
@@ -266,6 +270,7 @@ to work with 64-bit  Windows.  The current status is: I can get the
 64-bit ca.dll to load with 64-bit Python, but there seems to be some
 disagreement about the lengths of basic C data types (for example,
 does a double take 8 or 16 bytes).  This is being investigated....</li>
+<li>By &quot;all pass&quot;, the following tests</li>
 </ol>
 </div></blockquote>
 </div>
