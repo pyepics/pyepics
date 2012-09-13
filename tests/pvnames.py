@@ -26,6 +26,8 @@ float_pv = 'Py:ao3'
 enum_pv  = 'Py:mbbo1'
 enum_pv_strs = ['Stop', 'Start', 'Pause', 'Resume']
 
+proc_pv = 'Py:ao1.PROC'
+
 ## Here are some waveform / array data PVs
 long_arr_pv   = 'Py:long2k'
 double_arr_pv = 'Py:double2k'
