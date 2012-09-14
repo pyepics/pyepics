@@ -176,12 +176,13 @@ class CA_BasicTests(unittest.TestCase):
         pvn  = pvnames.enum_pv
         chid = ca.create_channel(pvn, connect=True)
         write( 'CA test put to PROC Field (%s)' % (pvn))
-        ret = None
-        try:
-            ret = ca.put(chid, 1)
-        except:
-            pass
-        self.assertNotEqual(ret, None)
+        for input in (1, '1', 2, '2', 0, '0', 50, 1):
+            ret = None
+            try:
+                ret = ca.put(chid, 1)
+            except:
+                pass
+            self.assertNotEqual(ret, None)
 
     def test_subscription_double(self):
         pvn = pvnames.updating_pv1
