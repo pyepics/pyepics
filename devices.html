@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '3.2.1',
+        VERSION:     '3.2.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -130,7 +130,7 @@ related PVs.  This almost describes an Epics Record, but as it is concerned
 only with PV names, the mapping to an Epics Record is not exact.  On the
 other hand, the concept of a <em>device</em> is more flexible than a predefined
 Epics Record as it can actually hold PVs from several different records.:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">motor1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="s">&#39;XXX:motor1.&#39;</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;VAL&#39;</span><span class="p">,</span> <span class="s">&#39;RBV&#39;</span><span class="p">,</span> <span class="s">&#39;DESC&#39;</span><span class="p">,</span> <span class="s">&#39;RVAL&#39;</span><span class="p">,</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">motor1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="s">&#39;XXX:motor1.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;VAL&#39;</span><span class="p">,</span> <span class="s">&#39;RBV&#39;</span><span class="p">,</span> <span class="s">&#39;DESC&#39;</span><span class="p">,</span> <span class="s">&#39;RVAL&#39;</span><span class="p">,</span>
                                            <span class="s">&#39;LVIO&#39;</span><span class="p">,</span> <span class="s">&#39;HLS&#39;</span><span class="p">,</span> <span class="s">&#39;LLS&#39;</span><span class="p">))</span>
 <span class="n">motor1</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;VAL&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&#39;Motor </span><span class="si">%s</span><span class="s"> = </span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">motor1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;DESC&#39;</span><span class="p">),</span> <span class="n">motor1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;RBV&#39;</span><span class="p">))</span>
