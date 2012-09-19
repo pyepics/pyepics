@@ -22,7 +22,6 @@ there are a some full-fledged applications using Epics and wxPython at
 PV-aware Widgets
 =========================
 
-
 Several basic wxPython widgets have been extended so as to connect the
 widget with a corresponding `PV`.  For example, setting the text value of a
 :mod:`PVTextCtrl` will forward that value to the epics `PV`, and if the
@@ -306,14 +305,13 @@ This decorator should be used for all code that mix calls to wx and epics
 
 ..  function::  finalize_epics
 
-This function will finalize epics by calling
-:meth:`epics.ca.finalize_libca`.  It is recommended that this be added to
-any "close GUI" code, such as a method bound to `wx.EVT_CLOSE(self,
-self.onClose)`, where the function might look like this::
+This function will finalize epics, and close all Channel Access
+communication, by calling :meth:`epics.ca.finalize_libca`.  This may be
+useful when closing an application, as in a method bound to `wx.EVT_CLOSE`
+event from a top-level application window.  Be careful to **not** call this
+function when closing a Window if your application is not closing, and if
+you are still doing any Channel Access work in the other windows.
 
-    def onClose(self, event):
-        finalize_epics()
-        self.Destroy()
 
 
 wxMotorPanel Widget
