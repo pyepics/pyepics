@@ -103,7 +103,7 @@ def popup(parent, message, title, style=None):
     dlg = wx.MessageDialog(parent, message, title, style)
     ret = dlg.ShowModal()
     dlg.Destroy()
-    return ret    
+    return ret
 
 def empty_bitmap(width, height, value=255):
     """return empty wx.BitMap"""
@@ -158,7 +158,7 @@ def FileSave(parent, message, default_file=None,
 
     if default_dir is None:
         default_dir = os.getcwd()
-        
+
     dlg = wx.FileDialog(parent, message=message,
                         defaultFile=default_file,
                         wildcard=wildcard,
@@ -173,7 +173,7 @@ def SelectWorkdir(parent,  message='Select Working Folder...'):
     "prompt for and change into a working directory "
     dlg = wx.DirDialog(parent, message,
                        style=wx.DD_DEFAULT_STYLE|wx.DD_CHANGE_DIR)
-    
+
     path = os.path.abspath(os.curdir)
     dlg.SetPath(path)
     if  dlg.ShowModal() == wx.ID_CANCEL:
@@ -181,7 +181,7 @@ def SelectWorkdir(parent,  message='Select Working Folder...'):
     path = os.path.abspath(dlg.GetPath())
     dlg.Destroy()
     os.chdir(path)
-    return path                        
+    return path
 
 class Closure:
     """A very simple callback class to emulate a closure (reference to
@@ -220,12 +220,13 @@ class FloatCtrl(wx.TextCtrl):
     a wx.TextCtrl that allows only numerical input, can take a precision argument
     and optional upper / lower bounds
     Options:
-      
+
     """
-    def __init__(self, parent, value='', minval=None, maxval=None, 
+    def __init__(self, parent, value='', minval=None, maxval=None,
                  precision=3, bell_on_invalid = True,
+                 act_on_losefocus=False,
                  action=None, action_kw=None, **kws):
-        
+
         self.__digits = '0123456789.-'
         self.__prec   = precision
         if precision is None:
@@ -238,13 +239,14 @@ class FloatCtrl(wx.TextCtrl):
         self.__bound_val = None
         self.__mark = None
         self.__action = None
-        
+
         self.fgcol_valid   = "Black"
         self.bgcol_valid   = "White"
         self.fgcol_invalid = "Red"
         self.bgcol_invalid = (254, 254, 80)
         self.bell_on_invalid = bell_on_invalid
-        
+        self.act_on_losefocus = act_on_losefocus
+
         # set up action
         if action_kw is None:
             action_kw = {}
@@ -254,12 +256,12 @@ class FloatCtrl(wx.TextCtrl):
         if 'style' in kws:
             this_sty = this_sty | kws['style']
         kws['style'] = this_sty
-            
+
         wx.TextCtrl.__init__(self, parent, wx.ID_ANY, **kws)
 
         self.__CheckValid(self.__val)
         self.SetValue(self.__val)
-              
+
         self.Bind(wx.EVT_CHAR, self.OnChar)
         self.Bind(wx.EVT_TEXT, self.OnText)
 
@@ -270,13 +272,13 @@ class FloatCtrl(wx.TextCtrl):
     def SetAction(self, action, **kws):
         "set callback action"
         if hasattr(action,'__call__'):
-            self.__action = Closure(action, **kws)  
-        
+            self.__action = Closure(action, **kws)
+
     def SetPrecision(self, prec=0):
         "set precision"
         self.__prec = prec
         self.format = '%%.%if' % prec
-        
+
     def __GetMark(self):
         " keep track of cursor position within text"
         try:
@@ -306,17 +308,19 @@ class FloatCtrl(wx.TextCtrl):
             wx.Bell()
 
         self.__SetMark()
-        
+
     def OnKillFocus(self, event):
         "focus lost"
         self.__GetMark()
+        if self.act_on_losefocus and hasattr(self.__action, '__call__'):
+            self.__action(value=self.__val)
         event.Skip()
-        
+
     def OnSetFocus(self, event):
-        "focus gained - resume editing from last mark point"        
+        "focus gained - resume editing from last mark point"
         self.__SetMark()
         event.Skip()
-      
+
     def OnChar(self, event):
         """ on Character event"""
         key   = event.GetKeyCode()
@@ -335,10 +339,10 @@ class FloatCtrl(wx.TextCtrl):
         if (key < wx.WXK_SPACE or key == wx.WXK_DELETE or key > 255):
             event.Skip()
             return
-        
+
         # 3. check for multiple '.' and out of place '-' signs and ignore these
         #    note that chr(key) will now work due to return at #2
-        
+
         has_minus = '-' in entry
         ckey = chr(key)
         if ((ckey == '.' and (self.__prec == 0 or '.' in entry) ) or
@@ -348,8 +352,8 @@ class FloatCtrl(wx.TextCtrl):
         # 4. allow digits, but not other characters
         if chr(key) in self.__digits:
             event.Skip()
-        
-        
+
+
     def OnText(self, event=None):
         "text event"
         try:
@@ -378,9 +382,9 @@ class FloatCtrl(wx.TextCtrl):
         self.__min = set_float(val)
 
     def SetMax(self, val):
-        "set max value"        
+        "set max value"
         self.__max = set_float(val)
-            
+
     def __CheckValid(self, value):
         "check for validity of value"
         val = self.__val
@@ -417,7 +421,7 @@ class NumericCombo(wx.ComboBox):
         schoices = [self.fmt % i for i in self.choices]
         wx.ComboBox.__init__(self, parent, -1, '', (-1, -1), (width, -1),
                              schoices, wx.CB_DROPDOWN|wx.TE_PROCESS_ENTER)
-        
+
         init = min(init, len(self.choices))
         self.SetStringSelection(schoices[init])
         self.Bind(wx.EVT_TEXT_ENTER, self.OnEnter)
@@ -433,7 +437,7 @@ class NumericCombo(wx.ComboBox):
         self.Clear()
         self.AppendItems([self.fmt % i for i in self.choices])
         self.SetSelection(self.choices.index(thisval))
-    
+
 class SimpleText(wx.StaticText):
     "simple static text wrapper"
     def __init__(self, parent, label, minsize=None,
@@ -451,7 +455,7 @@ class SimpleText(wx.StaticText):
             self.SetForegroundColour(colour)
         if bgcolour is not None:
             self.SetBackgroundColour(colour)
-    
+
 class HyperText(wx.StaticText):
     """HyperText is a simple extension of wx.StaticText that
 
