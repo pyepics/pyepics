@@ -1226,8 +1226,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     elif count == 1:
         if ftype == dbr.CHAR:
             if isinstance(value, str):
-                value = [ord(value)]
-            data[:] = value
+                value = ord(value)
+            data[0] = value
         else:
             try:
                 data[0] = value

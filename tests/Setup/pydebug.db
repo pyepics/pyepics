@@ -194,11 +194,10 @@ record(bi,"$(P)bi1") {
 	field(VAL,  "1")
 }
 
-
 ## Subarrays Copied from a Tech-Talk conversation, March 2011
 
 record(subArray, "$(P)subArr1") {
-  field(DESC, "ayb array 1")
+  field(DESC, "sub array 1")
   field(NELM, "16")
   field(INP, "$(P)wave_test.VAL")
   field(INDX, "0")
@@ -207,7 +206,7 @@ record(subArray, "$(P)subArr1") {
 }
 
 record(subArray, "$(P)subArr2") {
-  field(DESC, "ayb array 2")
+  field(DESC, "sub array 2")
   field(NELM, "16")
   field(INP, "$(P)wave_test.VAL")
   field(INDX, "16")
@@ -216,7 +215,7 @@ record(subArray, "$(P)subArr2") {
 }
 
 record(subArray, "$(P)subArr3") {
-  field(DESC, "ayb array 3")
+  field(DESC, "sub array 3")
   field(NELM, "16")
   field(INP, "$(P)wave_test.VAL")
   field(INDX, "32")
@@ -225,7 +224,7 @@ record(subArray, "$(P)subArr3") {
 }
 
 record(subArray, "$(P)subArr4") {
-  field(DESC, "ayb array 4")
+  field(DESC, "sub array 4")
   field(NELM, "16")
   field(INP, "$(P)wave_test.VAL")
   field(INDX, "48")

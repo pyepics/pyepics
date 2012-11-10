@@ -17,7 +17,7 @@ only with PV names, the mapping to an Epics Record is not exact.  On the
 other hand, the concept of a *device* is more flexible than a predefined
 Epics Record as it can actually hold PVs from several different records.::
 
-    motor1 = epics.Device('XXX:motor1.', attr=('VAL', 'RBV', 'DESC', 'RVAL',
+    motor1 = epics.Device('XXX:motor1.', attrs=('VAL', 'RBV', 'DESC', 'RVAL',
                                                'LVIO', 'HLS', 'LLS'))
     motor1.put('VAL', 1)
     print 'Motor %s = %f' % ( motor1.get('DESC'), motor1.get('RBV'))

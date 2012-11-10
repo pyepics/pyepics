@@ -6,7 +6,7 @@ This chapter contains a variety of "usage notes" and implementation
 details that may help in getting the best performance from the
 pyepics module.
 
-.. _advanced--arrays-label:
+.. _advanced-arrays-label:
 
 Working with waveform / array data
 ============================================

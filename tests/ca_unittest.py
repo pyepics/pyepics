@@ -172,17 +172,17 @@ class CA_BasicTests(unittest.TestCase):
         self.assertEqual(f_t, ca.dbr.TIME_DOUBLE)
         self.assertEqual(f_c, ca.dbr.CTRL_DOUBLE)
 
-    def test_Enum(self):
+    def test_ProcPut(self):
         pvn  = pvnames.enum_pv
-        chid = ca.create_channel(pvn,connect=True)
-        write( 'CA test Enum (%s)' % (pvn))
-        enumstrs = ca.get_enum_strings(chid)
-        self.failUnless(len(enumstrs)>1)
-
-        self.failUnless(isinstance(enumstrs[0],str))
-        write( 'CA EnumStrings (%s) = %s' % (pvn,repr(enumstrs)))
-        self.failUnless(enumstrs,pvnames.enum_pv_strs)
-
+        chid = ca.create_channel(pvn, connect=True)
+        write( 'CA test put to PROC Field (%s)' % (pvn))
+        for input in (1, '1', 2, '2', 0, '0', 50, 1):
+            ret = None
+            try:
+                ret = ca.put(chid, 1)
+            except:
+                pass
+            self.assertNotEqual(ret, None)
 
     def test_subscription_double(self):
         pvn = pvnames.updating_pv1

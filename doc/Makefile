@@ -17,7 +17,7 @@ PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 .PHONY: help clean html dirhtml pickle json htmlhelp qthelp latex changes linkcheck doctest latexpdf
-.PHONY: all install
+.PHONY: all install pdf
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
@@ -29,11 +29,13 @@ epub:
 	@echo
 	@echo "Build finished. The EPUB pages are in $(BUILDDIR)/epub."
 
-pyepics.pdf: latex
-	cd $(BUILDDIR)/latex && make all-pdf
-	cp -pr $(BUILDDIR)/latex/epics.pdf ./pyepics.pdf
+pdf: latex
+	cd $(BUILDDIR)/latex && pdflatex epics.tex
+	cd $(BUILDDIR)/latex && makeindex -s python.ist epics.idx
+	cd $(BUILDDIR)/latex && pdflatex epics.tex
+	cp -pr $(BUILDDIR)/latex/epics.pdf $(BUILDDIR)/html/pyepics.pdf
 
-all: html pyepics.pdf
+all: html pdf
 
 install: all
 	cp -pr $(BUILDDIR)/latex/epics.pdf $(INSTALLDIR)/pyepics.pdf
