@@ -190,7 +190,7 @@ def initialize_libca():
     Notes
     -----
     This function must be called prior to any real CA calls.
-    
+
     """
     if 'EPICS_CA_MAX_ARRAY_BYTES' not in os.environ:
         os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = "%i" %  2**24
@@ -683,10 +683,10 @@ def test_io():
 @withCA
 def create_channel(pvname, connect=False, auto_cb=True, callback=None):
     """ create a Channel for a given pvname
-    
+
     creates a channel, returning the Channel ID ``chid`` used by other
     functions to identify this channel.
-    
+
     Parameters
     ----------
     pvname :  string
@@ -706,7 +706,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
 
 
     Notes
-    -----        
+    -----
     1. The user-defined connection callback function should be prepared to accept
     keyword arguments of
 
@@ -726,7 +726,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
     3. If the channel is already connected for the PV name, the callback
     will be called immediately.
 
-    
+
     """
     #
     # Note that _CB_CONNECT (defined above) is a global variable, holding
@@ -805,7 +805,7 @@ def connect_channel(chid, timeout=None, verbose=False):
     (timestamp of last connection attempt) and 'failures' (number of failed
     connection attempts) from the :data:`_cache` will be used to prevent
     spending too much time waiting for a connection that may never happen.
-    
+
     """
     if verbose:
         write(' connect channel -> %s %s %s ' %
@@ -1006,7 +1006,7 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
         as_string=False, as_numpy=True):
     """return the current value for a Channel.
     Note that there is not a separate form for array data.
-    
+
     Parameters
     ----------
     chid :  ctypes.c_long
@@ -1031,8 +1031,8 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     data : object
        Normally, the value of the data.  Will return ``None`` if the
        channel is not connected, `wait=False` was used, or the data
-       transfer timed out.   
-    
+       transfer timed out.
+
     Notes
     -----
     1. Returning ``None`` indicates an *incomplete get*
@@ -1078,10 +1078,10 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     #   GET_PENDING implies no value yet, callback expected.
     if ncache.get('value', None) is None:
         ncache['value'] = GET_PENDING
-        ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, 
+        ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET,
                                           ctypes.py_object('value'))
         PySEVCHK('get', ret)
-        
+
     if wait:
         return get_complete(chid, count=count, ftype=ftype,
                             timeout=timeout,
@@ -1094,7 +1094,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
     earlier incomplete :func:`get` that returned ``None``, either
     because `wait=False` was used or because the data transfer
     did not complete before the timeout passed.
-    
+
     Parameters
     ----------
     chid : ctypes.c_long
@@ -1115,7 +1115,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
     -------
     data : object
        This function will return ``None`` if the previous :func:`get`
-       actually completed, or if this data transfer also times out.  
+       actually completed, or if this data transfer also times out.
 
 
     Notes
@@ -1179,8 +1179,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     """sets the Channel to a value, with options to either wait
     (block) for the processing to complete, or to execute a
     supplied callback function when the process has completed.
-    
-    
+
+
     Parameters
     ----------
     chid :  ctypes.c_long
@@ -1194,12 +1194,12 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         user-supplied function to run when processing has completed.
     callback_data :  object
         extra data to pass on to a user-supplied callback function.
-    
+
     Returns
     -------
     status : int
          1  for success, -1 on time-out
-         
+
     Notes
     -----
     1. Specifying a callback will override setting `wait=True`.
@@ -1240,6 +1240,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
 
     else:
         if ftype == dbr.CHAR and isinstance(value, str):
+            count = min(len(value)+1, element_count(chid))
             value = [ord(i) for i in ("%s%s" % (value, NULLCHAR))]
         try:
             ndata, nuser = len(data), len(value)
@@ -1292,7 +1293,7 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
     ncache = _cache[current_context()][name(chid)]
     if ncache.get('ctrl_value', None) is None:
         ncache['ctrl_value'] = GET_PENDING
-        ret = libca.ca_array_get_callback(ftype, 1, chid, _CB_GET, 
+        ret = libca.ca_array_get_callback(ftype, 1, chid, _CB_GET,
                                           ctypes.py_object('ctrl_value'))
 
         PySEVCHK('get_ctrlvars', ret)
@@ -1333,9 +1334,9 @@ def get_timevars(chid, timeout=5.0, warn=True):
     ncache = _cache[current_context()][name(chid)]
     if ncache.get('time_value', None) is None:
         ncache['time_value'] = GET_PENDING
-        ret = libca.ca_array_get_callback(ftype, 1, chid, _CB_GET, 
+        ret = libca.ca_array_get_callback(ftype, 1, chid, _CB_GET,
                                           ctypes.py_object('time_value'))
-        
+
         PySEVCHK('get_timevars', ret)
 
     out = {}
@@ -1358,7 +1359,7 @@ def get_timevars(chid, timeout=5.0, warn=True):
     if hasattr(tmpv, 'stamp'):
         out['timestamp'] = dbr.make_unixtime(tmpv.stamp)
 
-    ncache['time_value'] = None            
+    ncache['time_value'] = None
     return out
 
 def get_timestamp(chid):
@@ -1395,7 +1396,7 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     """create a *subscription to changes*. Sets up a user-supplied
     callback function to be called on any changes to the channel.
 
-    Parameters 
+    Parameters
     -----------
     chid  : ctypes.c_long
         channel ID
