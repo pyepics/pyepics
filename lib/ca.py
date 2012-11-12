@@ -1212,8 +1212,11 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     count = element_count(chid)
     if count > 1:
         count = min(len(value), count)
+    if ftype == dbr.CHAR and isinstance(value, str):
+        count += 1
 
     if is_string(value):
+        if value == '': value = '\x00'
         value = ascii_string(value)
 
     data  = (count*dbr.Map[ftype])()
@@ -1226,8 +1229,9 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     elif count == 1:
         if ftype == dbr.CHAR:
             if isinstance(value, str):
-                value = ord(value)
-            data[0] = value
+                value = [ord(i) for i in ("%s%s" % (value, NULLCHAR))]
+            else:
+                data[0] = value
         else:
             try:
                 data[0] = value
@@ -1240,7 +1244,6 @@ def put(chid, value, wait=False, timeout=30, callback=None,
 
     else:
         if ftype == dbr.CHAR and isinstance(value, str):
-            count = min(len(value)+1, element_count(chid))
             value = [ord(i) for i in ("%s%s" % (value, NULLCHAR))]
         try:
             ndata, nuser = len(data), len(value)
@@ -1261,7 +1264,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     pvname = name(chid)
     _put_done[pvname] = (False, callback, callback_data)
     start_time = time.time()
-    # print "Put:  ", ftype, count
+
     ret = libca.ca_array_put_callback(ftype, count, chid,
                                       data, _CB_PUTWAIT, 0)
     PySEVCHK('put', ret)
