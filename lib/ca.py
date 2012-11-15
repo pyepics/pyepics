@@ -89,27 +89,28 @@ def _add_cache_callback(cache_entry, callback):
     - Bound methods are stored as a tuple of (weakref(self), unbound function)
       ... this is because bound methods otherwise hold a strong reference to 'self'
       which prevents them from ever being garbage collected (but they aren't referenced
-      by 'self' themselves, so you can't just wrap them in a weakreference either
+      by 'self' themselves, so you can't just wrap them directly in a weakreference
       or they are instantly garbage collected!)
     """
+    if not hasattr(callback, "__call__"):
+        raise ChannelAccessException("Callback arguments have to be callable")
     callbacks = cache_entry.get('callbacks', [])
-    # collect any stale weakreferences to bound methods where the target is gone
-    callbacks = filter(lambda cb: type(cb) != tuple or cb[0]() is not None, callbacks)
-    # wrap any bound method
-    if hasattr(callback, "__self__"):
+    # collect any stale weakreferences to bound methods
+    callbacks = [ cb for cb in callbacks if hasattr(cb, "__call__") or cb[0]() is not None ]
+    if hasattr(callback, "__self__"):  # create weakref to bound method
         callback = (weakref.ref(callback.__self__), callback.__func__)
-    # add callback
-    if not callback in callbacks:
-        callbacks.append(callback)
+    if not callback in callbacks: # add the new callback
+         callbacks.append(callback)
     cache_entry['callbacks'] = callbacks
 
 def _call_cache_callback(callback, **args):
     """
     Unwrap a wrapped cache callback and call it
     """
+    # a stored callback can only be either a callable object or a tuple of (weakref, unbound function)
     if hasattr(callback, "__call__"):
         return callback(**args)
-    elif type(callback) == tuple and len(callback) == 2:
+    else:
         ref_self = callback[0]()
         if ref_self:
             return callback[1](ref_self, **args)
