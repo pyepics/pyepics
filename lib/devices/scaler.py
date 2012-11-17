@@ -6,7 +6,7 @@ class Scaler(epics.Device):
     """ 
     Simple implementation of SynApps Scaler Record.   
     """
-    attrs = ('CNT', 'CONT', 'TP', 'T')
+    attrs = ('CNT', 'CONT', 'TP', 'T', 'VAL')
     attr_kws = {'calc_enable': '%s_calcEnable.VAL'}
     chan_attrs = ('NM%i', 'S%i')
     calc_attrs = {'calc%i': '%s_calc%i.VAL', 'expr%i': '%s_calc%i.CALC'}
