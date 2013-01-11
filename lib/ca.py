@@ -92,14 +92,17 @@ def _add_cache_callback(cache_entry, callback):
       by 'self' themselves, so you can't just wrap them directly in a weakreference
       or they are instantly garbage collected!)
     """
-    if not hasattr(callback, "__call__"):
+    if callback is not None and not hasattr(callback, "__call__"):
         raise ChannelAccessException("Callback arguments have to be callable")
-    callbacks = cache_entry.get('callbacks', [])
+    callbacks = []
     # collect any stale weakreferences to bound methods
-    callbacks = [ cb for cb in callbacks if hasattr(cb, "__call__") or cb[0]() is not None ]
+    for cb in cache_entry.get('callbacks', []):
+        if hasattr(cb, "__call__") or cb[0]() is not None:
+            callbacks.append(cb)
+
     if hasattr(callback, "__self__"):  # create weakref to bound method
         callback = (weakref.ref(callback.__self__), callback.__func__)
-    if not callback in callbacks: # add the new callback
+    if callback is not None and callback not in callbacks: # add the new callback
          callbacks.append(callback)
     cache_entry['callbacks'] = callbacks
 
@@ -110,7 +113,7 @@ def _call_cache_callback(callback, **args):
     # a stored callback can only be either a callable object or a tuple of (weakref, unbound function)
     if hasattr(callback, "__call__"):
         return callback(**args)
-    else:
+    elif callback is not None:
         ref_self = callback[0]()
         if ref_self:
             return callback[1](ref_self, **args)
@@ -525,7 +528,7 @@ def _onConnectionEvent(args):
                 chid = args.chid
                 entry.update({'chid': chid, 'conn': conn,
                               'ts': time.time(), 'failures': 0})
-                for callback in entry.get('callbacks', []):
+                for callback in entry.get('callbacks', [None]):
                     poll()
                     _call_cache_callback(callback, pvname=pvname, chid=chid, conn=conn)
     return
@@ -777,10 +780,11 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         _cache[ctx][pvname] = entry
     else:
         entry = _cache[ctx][pvname]
+    # print(" >>> ", pvn, ctx, entry, callback)
     _add_cache_callback(entry, callback)
     if entry['conn']:
         _call_cache_callback(callback, chid=entry['chid'], pvname=pvname,
-                            conn=entry['conn'])
+                             conn=entry['conn'])
 
     conncb = 0
     if auto_cb:
