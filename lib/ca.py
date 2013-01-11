@@ -23,7 +23,6 @@ from  math import log10
 import atexit
 import warnings
 from threading import Thread
-import weakref
 
 from .utils import (STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2,
                     strjoin, memcopy, is_string, ascii_string)
@@ -75,54 +74,12 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 #           'ts': ts_conn, 'callbacks': [ user_callback... ])
 #  isConnected   = True/False: if connected.
 #  ts_conn       = ts of last connection event or failed attempt.
-#  callbacks = one or more user functions to be called on
+#  user_callback = one or more user functions to be called on
 #                  change (accumulated in the cache)
 _cache  = {}
 
 ## Cache of pvs waiting for put to be done.
 _put_done =  {}
-
-def _add_cache_callback(cache_entry, callback):
-    """
-    Add a callback function to a cache entry for a pvname:
-    - Unbound methods are stored as-is
-    - Bound methods are stored as a tuple of (weakref(self), unbound function)
-      ... this is because bound methods otherwise hold a strong reference to 'self'
-      which prevents them from ever being garbage collected (but they aren't referenced
-      by 'self' themselves, so you can't just wrap them directly in a weakreference
-      or they are instantly garbage collected!)
-    """
-    if callback is not None and not hasattr(callback, "__call__"):
-        raise ChannelAccessException("Callback arguments have to be callable")
-    callbacks = cache_entry.get('callbacks', [])
-    # collect any stale weakreferences to bound methods
-    callbacks = [ cb for cb in callbacks if hasattr(cb, "__call__") or cb[0]() is not None ]
-    
-    #callbacks = []
-    ## collect any stale weakreferences to bound methods
-    #for cb in cache_entry.get('callbacks', []):
-    #    if hasattr(cb, "__call__") or cb[0]() is not None:
-    #        callbacks.append(cb)
-
-    if hasattr(callback, "__self__"):  # create weakref to bound method
-        callback = (weakref.ref(callback.__self__), callback.__func__)
-    if callback is not None and callback not in callbacks: # add the new callback
-         callbacks.append(callback)
-    cache_entry['callbacks'] = callbacks
-
-
-def _call_cache_callback(callback, **args):
-    """
-    Unwrap a wrapped cache callback and call it
-    """
-    # a stored callback can only be either a callable object or a tuple of (weakref, unbound function)
-    if hasattr(callback, "__call__"):
-        return callback(**args)
-    elif callback is not None:
-        ref_self = callback[0]()
-        if ref_self:
-            return callback[1](ref_self, **args)
-
 
 # get a unique python value that cannot be a value held by an
 # actual PV to signal "Get is incomplete, awaiting callback"
@@ -293,14 +250,12 @@ def finalize_libca(maxtime=10.0):
         return
     try:
         start_time = time.time()
-
         flush_io()
         poll()
         for ctx in _cache.values():
             for key in list(ctx.keys()):
                 ctx.pop(key)
         _cache.clear()
-        
         flush_count = 0
         while (flush_count < 5 and
                time.time()-start_time < maxtime):
@@ -519,7 +474,8 @@ def _onConnectionEvent(args):
 
     if not pv_found:
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
-                               'ts':0, 'failures':0, 'value': None}
+                               'ts':0, 'failures':0, 'value': None,
+                               'callbacks': []}
 
     # set connection time, run connection callbacks
     # in all contexts
@@ -535,9 +491,10 @@ def _onConnectionEvent(args):
                 chid = args.chid
                 entry.update({'chid': chid, 'conn': conn,
                               'ts': time.time(), 'failures': 0})
-                for callback in entry.get('callbacks', [None]):
+                for callback in entry.get('callbacks', []):
                     poll()
-                    _call_cache_callback(callback, pvname=pvname, chid=chid, conn=conn)
+                    if hasattr(callback, '__call__'):
+                        callback(pvname=pvname, chid=chid, conn=conn)
     return
 
 ## get event handler:
@@ -783,15 +740,17 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         _cache[ctx] = {}
     if pvname not in _cache[ctx]: # new PV for this context
         entry = {'conn':False,  'chid': None,
-                 'ts': 0,  'failures':0, 'value': None}
+                 'ts': 0,  'failures':0, 'value': None,
+                 'callbacks': [ callback ]}
         _cache[ctx][pvname] = entry
     else:
         entry = _cache[ctx][pvname]
-    # print(" >>> ", pvn, ctx, entry, callback)
-    _add_cache_callback(entry, callback)
-    if entry['conn']:
-        _call_cache_callback(callback, chid=entry['chid'], pvname=pvname,
-                             conn=entry['conn'])
+        if not entry['conn'] and callback is not None: # pending connection
+            _cache[ctx][pvname]['callbacks'].append(callback)
+        elif (hasattr(callback, '__call__') and
+              not callback in entry['callbacks']):
+            entry['callbacks'].append(callback)
+            callback(chid=entry['chid'], pvname=pvname, conn=entry['conn'])
 
     conncb = 0
     if auto_cb:
