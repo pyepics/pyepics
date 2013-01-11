@@ -94,17 +94,22 @@ def _add_cache_callback(cache_entry, callback):
     """
     if callback is not None and not hasattr(callback, "__call__"):
         raise ChannelAccessException("Callback arguments have to be callable")
-    callbacks = []
+    callbacks = cache_entry.get('callbacks', [])
     # collect any stale weakreferences to bound methods
-    for cb in cache_entry.get('callbacks', []):
-        if hasattr(cb, "__call__") or cb[0]() is not None:
-            callbacks.append(cb)
+    callbacks = [ cb for cb in callbacks if hasattr(cb, "__call__") or cb[0]() is not None ]
+    
+    #callbacks = []
+    ## collect any stale weakreferences to bound methods
+    #for cb in cache_entry.get('callbacks', []):
+    #    if hasattr(cb, "__call__") or cb[0]() is not None:
+    #        callbacks.append(cb)
 
     if hasattr(callback, "__self__"):  # create weakref to bound method
         callback = (weakref.ref(callback.__self__), callback.__func__)
     if callback is not None and callback not in callbacks: # add the new callback
          callbacks.append(callback)
     cache_entry['callbacks'] = callbacks
+
 
 def _call_cache_callback(callback, **args):
     """
@@ -288,12 +293,14 @@ def finalize_libca(maxtime=10.0):
         return
     try:
         start_time = time.time()
+
         flush_io()
         poll()
         for ctx in _cache.values():
             for key in list(ctx.keys()):
                 ctx.pop(key)
         _cache.clear()
+        
         flush_count = 0
         while (flush_count < 5 and
                time.time()-start_time < maxtime):
