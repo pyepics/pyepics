@@ -12,7 +12,11 @@ class Struck(epics.Device):
     """
     attrs = ('ChannelAdvance', 'Prescale', 'EraseStart',
              'EraseAll', 'StartAll', 'StopAll',
-             'PresetReal', 'Dwell', 'Acquiring')
+             'PresetReal', 'ElapsedReal',
+             'Dwell', 'Acquiring', 'NuseAll',
+             'CurrentChannel', 'InitialChannelAdvance',
+             'SoftwareChannelAdvance', 'Channel1Source',
+             'ReadAll', 'DoReadAll', 'Model', 'Firmware')
 
     _fields = ('_prefix', '_pvs', '_delim', '_nchan',
                'clockrate', 'scaler')
@@ -26,6 +30,11 @@ class Struck(epics.Device):
 
         if scaler is not None:
             self.scaler = epics.devices.Scaler(scaler, nchan=nchan)
+
+        self.mcas = []
+        for i in range(nchan):
+            self.mcas.append(epics.devices.Mca("%smca%i" % (prefix,i+1)))
+            
         epics.Device.__init__(self, prefix, delim='',
                               attrs=self.attrs)
 
@@ -80,9 +89,7 @@ class Struck(epics.Device):
 
     def readmca(self, nmca=1, count=None):
         "Read a Struck MCA"
-        data = self.get('mca%i' % nmca, count=count)
-        time.sleep(0.01)
-        return data
+        return self.get('mca%i' % nmca, count=count)
 
     def saveMCAdata(self, fname='Struck.dat', mcas=None,
                     ignore_prefix=None, npts=None):
@@ -93,6 +100,7 @@ class Struck(epics.Device):
         if mcas is None:
             mcas = list(range(1, self._nchan+1))
 
+        time.sleep(0.010)
         for nmca in mcas:
             if self.scaler is not None:
                 scaler_name = self.scaler.get('NM%i' % nmca)
@@ -112,10 +120,6 @@ class Struck(epics.Device):
             sdata = numpy.array(sdata)
             sdata = sdata.transpose()
         except:
-            # print 'Struck Error: cannot reform array sdata?'
-            #for idet in range(len(sdata)):
-            #    print ' Struck size array %i = %i ' % (idet, len(sdata[idet]))
-
             sdata = numpy.zeros(self.nchan*2048)
             sdata.shape = (self.nchan, 2048)
             sdata[0,:] = 1.0
