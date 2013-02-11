@@ -357,7 +357,7 @@ class PV(object):
         """
         self._args.update(kwd)
         self._args['value']  = value
-        self._args['timestamp'] = kwd.get('timestamp', None)
+        self._args['timestamp'] = kwd.get('timestamp', time.time())
         self._set_charval(self._args['value'], call_ca=False)
         if self.verbose:
             now = fmt_time(self._args['timestamp'])

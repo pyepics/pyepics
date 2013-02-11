@@ -15,7 +15,8 @@ MAX_PVS = 20000
 
 
 for line  in open('fastconn_pvlist.txt','r').readlines():
-    pvnames.append(line[:-1])
+    if not line.startswith('#'):
+        pvnames.append(line[:-1])
 
 if MAX_PVS is not None:
     pvnames = pvnames[:MAX_PVS]
