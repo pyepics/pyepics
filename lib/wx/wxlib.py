@@ -916,6 +916,51 @@ class PVFloatSpin(floatspin.FloatSpin, PVCtrlMixin):
             self.pv.put(value)
 
 
+class PVSpinCtrl(wx.SpinCtrl, PVCtrlMixin):
+    """
+    A SpinCtrl  linked to a PV,
+    both reads and writes the PV on changes.
+
+    """
+    def __init__(self, parent, pv=None, 
+                 min_val=None, max_val=None, **kws):
+        """
+        Most arguments are common with SpinCtrl
+
+        Additional Arguments:
+        pv = pv to set
+        deadTime = delay (ms) between user typing a value into the field,
+        and it being set to the PV
+
+        """
+        wx.SpinCtrl.__init__(self, parent, **kws)
+        PVCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
+        self.Bind(wx.EVT_SPINCTRL, self.OnSpin)
+
+    @EpicsFunction
+    def _SetValue(self, value):
+        "set value"
+        wx.SpinCtrl.SetValue(self, float(self.pv.get()))
+
+    @EpicsFunction
+    def OnSpin(self, event=None):
+        "spin event handler"
+        if self.pv is not None:
+            value = self.GetValue()
+            if self.pv.upper_ctrl_limit != 0 or self.pv.lower_ctrl_limit != 0:
+                # both zero -> not set
+                if value > self.pv.upper_ctrl_limit:
+                    value = self.pv.upper_ctrl_limit
+                if value < self.pv.lower_ctrl_limit:
+                    value = self.pv.lower_ctrl_limit
+                self.SetValue(value)
+
+    def SetValue(self, value):
+        wx.SpinCtrl.SetValue(self, value)
+        if hasattr(self, "pv"): # can be called before PV is assigned
+            self.pv.put(value)
+
+
 class PVButton(wx.Button, PVCtrlMixin):
     """ A Button linked to a PV. When the button is pressed, a certain value
         is written to the PV (useful for momentary PVs with HIGH= set.)

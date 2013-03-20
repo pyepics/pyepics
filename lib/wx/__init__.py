@@ -19,6 +19,7 @@ PVEnumChoice  = pvEnumChoice  = wxlib.PVEnumChoice
 PVBitmap      = pvBitmap      = wxlib.PVBitmap
 PVCheckBox    = pvCheckBox    = wxlib.PVCheckBox
 PVFloatSpin   = pvFloatSpin   = wxlib.PVFloatSpin
+PVSpinCtrl    = pvSpinCtrl    = wxlib.PVSpinCtrl
 PVButton      = pvButton      = wxlib.PVButton
 PVRadioButton = pvRadioButton = wxlib.PVRadioButton
 PVComboBox    = pvComboBox    = wxlib.PVComboBox
