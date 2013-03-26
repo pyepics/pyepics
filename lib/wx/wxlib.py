@@ -940,26 +940,14 @@ class PVSpinCtrl(wx.SpinCtrl, PVCtrlMixin):
     @EpicsFunction
     def _SetValue(self, value):
         "set value"
-        wx.SpinCtrl.SetValue(self, float(self.pv.get()))
+        wx.SpinCtrl.SetValue(self, self.pv.get())
+        if hasattr(self, "pv"): # can be called before PV is assigned
+            self.pv.put(value)
 
     @EpicsFunction
     def OnSpin(self, event=None):
         "spin event handler"
-        if self.pv is not None:
-            value = self.GetValue()
-            if self.pv.upper_ctrl_limit != 0 or self.pv.lower_ctrl_limit != 0:
-                # both zero -> not set
-                if value > self.pv.upper_ctrl_limit:
-                    value = self.pv.upper_ctrl_limit
-                if value < self.pv.lower_ctrl_limit:
-                    value = self.pv.lower_ctrl_limit
-                self.SetValue(value)
-
-    def SetValue(self, value):
-        wx.SpinCtrl.SetValue(self, value)
-        if hasattr(self, "pv"): # can be called before PV is assigned
-            self.pv.put(value)
-
+        self._SetValue(self.GetValue())
 
 class PVButton(wx.Button, PVCtrlMixin):
     """ A Button linked to a PV. When the button is pressed, a certain value
