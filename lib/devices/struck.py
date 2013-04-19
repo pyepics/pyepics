@@ -38,13 +38,24 @@ class Struck(epics.Device):
         epics.Device.__init__(self, prefix, delim='',
                               attrs=self.attrs)
 
-    def ExternalMode(self, prescale=None):
-        "put Struck in External Mode"
+    def ExternalMode(self, initialadvance=0, realtime=0, prescale=1):
+        """put Struck in External Mode, with the following options:
+        option            meaning                   default value
+        ----------------------------------------------------------
+        initialadvance  set Initial Channel Advance    0
+        reatime         set Preset Real Time           0
+        prescale        set Prescale value             1
+        """
         out = self.put('ChannelAdvance', 1)  # external
         if self.scaler is not None:
             self.scaler.OneShotMode()
+        if realtime is not None:
+            self.put('PresetReal', realtime)
         if prescale is not None:
             self.put('Prescale', prescale)
+        if initialadvance is not None:
+            self.put('InitialChannelAdvancel', initialadvance)
+
         return out
 
     def InternalMode(self, prescale=None):
