@@ -43,10 +43,10 @@ class Scan(epics.Device):
         """
         attrs = list(self.attrs)
         for i in range(1, NUM_POSITIONERS+1):
-            for a in posit_attrs:
+            for a in self.posit_attrs:
                 attrs.append('P%i%s' % (i, a))
         for i in range(1, NUM_TRIGGERS+1):
-            for a in trig_attrs:
+            for a in self.trig_attrs:
                 attrs.append('T%i%s' % (i, a))
         for i in range(1, NUM_DETECTORS+1):
             attrs.append('D%2.2iPV' % i)
