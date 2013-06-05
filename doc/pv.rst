@@ -446,12 +446,12 @@ Possible values for :attr:`auto_monitor` are:
 
 ``None``
   The default value for *auto_monitor* is ``None``, and is set to
-  ``True`` if the element count for the PV is smaller than 
+  ``True`` if the element count for the PV is smaller than
   :data:`ca.AUTOMONITOR_MAXLENGTH` (default of 65536).  To suppress
   monitoring of PVs with fewer array values, you will have to explicitly
   turn *auto_monitor* to ``False``. For waveform arrays with more elements,
   automatic monitoring will not be done unless you explicitly set
-  *auto_monitor=True*, or to an explicit mask.  See 
+  *auto_monitor=True*, or to an explicit mask.  See
   :ref:`advanced-large-arrays-label` for more details.
 
 ``True``
@@ -630,7 +630,7 @@ multiple PVs to complete with python's built-in *all* function, as with::
     waiting = True
     while waiting:
         time.sleep(0.001)
-        waiting = all(pv.put_complete for pv in pvgroup)
+        waiting = not all(pv.put_complete for pv in pvgroup)
     print 'All puts are done!'
 
 For maximum flexibility, one can all define a *put callback*, a function to
