@@ -15,7 +15,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
+        URL_ROOT:    '',
         VERSION:     '3.2.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -899,7 +899,7 @@ multiple PVs to complete with python's built-in <em>all</em> function, as with:<
 <span class="n">waiting</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="k">while</span> <span class="n">waiting</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
-    <span class="n">waiting</span> <span class="o">=</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">put_complete</span> <span class="k">for</span> <span class="n">pv</span> <span class="ow">in</span> <span class="n">pvgroup</span><span class="p">)</span>
+    <span class="n">waiting</span> <span class="o">=</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">pv</span><span class="o">.</span><span class="n">put_complete</span> <span class="k">for</span> <span class="n">pv</span> <span class="ow">in</span> <span class="n">pvgroup</span><span class="p">])</span>
 <span class="k">print</span> <span class="s">&#39;All puts are done!&#39;</span>
 </pre></div>
 </div>
@@ -1122,7 +1122,7 @@ See <a class="reference internal" href="#pv-callbacks-label"><em>User-supplied C
     </div>
     <div class="footer">
         &copy; Copyright 2012, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2pre.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>
