@@ -630,7 +630,7 @@ multiple PVs to complete with python's built-in *all* function, as with::
     waiting = True
     while waiting:
         time.sleep(0.001)
-        waiting = not all(pv.put_complete for pv in pvgroup)
+        waiting = not all([pv.put_complete for pv in pvgroup])
     print 'All puts are done!'
 
 For maximum flexibility, one can all define a *put callback*, a function to
