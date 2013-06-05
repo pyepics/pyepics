@@ -1211,7 +1211,12 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     ftype = field_type(chid)
     count = element_count(chid)
     if count > 1:
-        count = min(len(value), count)
+        # check that data for array PVS is a list, array, or string
+        try:
+            count = min(len(value), count)
+        except TypeError:
+            write('''PyEpics Warning:
+     value put() to array PV must be an array or sequence''')
     if ftype == dbr.CHAR and isinstance(value, str):
         count += 1
 
