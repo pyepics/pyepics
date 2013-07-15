@@ -730,7 +730,10 @@ class PVFloatCtrl(FloatCtrl, PVCtrlMixin):
         self.SetValue(self.pv.char_value, act=False)
 
         if self.pv.type in ('string', 'char'):
-            self._warn('pvFloatCtrl needs a double or float PV')
+            try:
+                x = float(self.pv.value)
+            except:
+                self._warn('pvFloatCtrl needs a double or float PV')
 
         llim = set_float(self.pv.lower_ctrl_limit)
         hlim = set_float(self.pv.upper_ctrl_limit)
