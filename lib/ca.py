@@ -53,6 +53,7 @@ def write(msg, newline=True, flush=True):
 ## holder for shared library
 libca = None
 initial_context = None
+error_message = ''
 
 ## PREEMPTIVE_CALLBACK determines the CA context
 PREEMPTIVE_CALLBACK = True
@@ -608,10 +609,11 @@ def detach_context():
 def replace_printf_handler(fcn=None):
     """replace the normal printf() output handler
     with the supplied function (defaults to :func:`sys.stderr.write`)"""
+    global error_message
     if fcn is None:
         fcn = sys.stderr.write
-    serr = ctypes.CFUNCTYPE(None, ctypes.c_char_p)(fcn)
-    return libca.ca_replace_printf_handler(serr)
+    error_message = ctypes.CFUNCTYPE(None, ctypes.c_char_p)(fcn)
+    return libca.ca_replace_printf_handler(error_message)
 
 @withCA
 def current_context():
