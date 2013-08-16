@@ -75,20 +75,44 @@ class Device(object):
       >>> x.put('13IDC:m3.VAL', 2)
       >>> print x.PV('13IDC:m3.DIR').get(as_string=True)
 
-    you can all get
+    Attribute aliases can also be used to be make the device
+    more user-friendly:
+
+      >>> dev = epics.Device('IOC:m1', delim='.',
+      ...                    aliases={'readback': 'RBV'})
+      >>> print 'rbv is', dev.RBV  # IOC:m1.RBV
+      >>> print 'readback is', dev.readback  # also IOC:m1.RBV
+
+    If you encounter issues with introspection (with IPython,
+    for example), and your device has a well-defined list of
+    attributes, consider clearing the `mutable` flag. Attributes
+    not already in the list will then be assumed to be invalid.
+    AttributeError is raised quickly without using channel access:
+
+      >>> dev = epics.Device('IOC:m1', delim='.', mutable=False,
+      ...                    aliases={'readback': 'RBV'})
+      >>> print dev.foobar
+      Traceback (most recent call last):
+          ...
+      AttributeError: Device has no attribute foobar
     """
 
     _prefix = None
     _delim = ''
     _pvs = {}
     _init = False
-    _nonpvs = ('_prefix', '_pvs', '_delim', '_init')
+    _aliases = {}
+    _mutable = True
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_init', '_aliases', '_mutable', '_nonpvs')
     def __init__(self, prefix='', attrs=None,
-                 nonpvs=None, delim='', timeout=None):
-        self._nonpvs = list(self._nonpvs)[:]
+                 nonpvs=None, delim='', timeout=None,
+                 mutable=True, aliases={}):
+        self._nonpvs = list(self._nonpvs)
         self._delim = delim
         self._prefix = prefix + delim
         self._pvs = {}
+        self._mutable = mutable
+        self._aliases = aliases
         if nonpvs is not None:
             for npv in nonpvs:
                 if npv not in self._nonpvs:
@@ -98,11 +122,21 @@ class Device(object):
             for attr in attrs:
                 self.PV(attr, connect=False,
                         connection_timeout=timeout)
+
+        if aliases:
+            for attr in aliases.values():
+                if attrs is None or attr not in attrs:
+                    self.PV(attr, connect=False,
+                            connection_timeout=timeout)
+
         ca.poll()
         self._init = True
 
     def PV(self, attr, connect=True, **kw):
         """return epics.PV for a device attribute"""
+        if attr in self._aliases:
+            attr = self._aliases[attr]
+
         if attr not in self._pvs:
             pvname = attr
             if self._prefix is not None:
@@ -228,33 +262,47 @@ class Device(object):
 
 
     def __getattr__(self, attr):
+        if attr in self._aliases:
+            attr = self._aliases[attr]
+
         if attr in self._pvs:
             return self.get(attr)
-        elif attr == '_Device__init':
-            return False
         elif attr in self.__dict__:
             return self.__dict__[attr]
-        elif self._init and not attr.startswith('__'):
+        elif self._init and self._mutable and not attr.startswith('__'):
             pv = self.PV(attr, connect=True)
-            if not pv.connected:
-                msg = "%s '%s' has no attribute '%s'" % self.__class__.__name__
-                raise AttributeError(msg % (self._prefix, attr))
-            return pv.get()
+            if pv.connected:
+                return pv.get()
+
+        raise AttributeError('%s has no attribute %s' % (self.__class__.__name__,
+                                                         attr))
 
     def __setattr__(self, attr, val):
+        if attr in self._aliases:
+            attr = self._aliases[attr]
+
         if attr in self._nonpvs:
             self.__dict__[attr] = val
         elif attr in self._pvs:
             self.put(attr, val)
-        elif self._init:
+        elif self._init and self._mutable and not attr.startswith('__'):
             try:
                 self.PV(attr)
-                return self.put(attr, val)
+                self.put(attr, val)
             except:
-                msg = "Device '%s' has no attribute '%s'"
-                raise AttributeError(msg % (self._prefix, attr))
-        else:
+                raise AttributeError('%s has no attribute %s' % (self.__class__.__name__,
+                                                                 attr))
+        elif attr in self.__dict__:
             self.__dict__[attr] = val
+        else:
+            raise AttributeError('%s has no attribute %s' % (self.__class__.__name__,
+                                                             attr))
+
+    def __dir__(self):
+        # there's no cleaner method to do this until Python 3.3
+        all_attrs = set(self._aliases.keys() + self._pvs.keys() +
+                        self.__dict__.keys() + dir(Device))
+        return list(sorted(all_attrs))
 
     def __repr__(self):
         "string representation"
