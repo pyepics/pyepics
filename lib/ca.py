@@ -433,21 +433,28 @@ def _onMonitorEvent(args):
            'status':args.status}
 
     # add kwds arguments for CTRL and TIME variants
+    # this is in a try/except clause to avoid problems
+    # caused by uninitialized waveform arrays
     if args.type >= dbr.CTRL_STRING:
-        tmpv = value[0]
-        for attr in dbr.ctrl_limits + ('precision', 'units', 'severity'):
-            if hasattr(tmpv, attr):
-                kwds[attr] = getattr(tmpv, attr)
-        if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
-            tmpv.no_str > 0):
-            kwds['enum_strs'] = tuple([tmpv.strs[i].value for
-                                      i in range(tmpv.no_str)])
-
+        try:
+            tmpv = value[0]
+            for attr in dbr.ctrl_limits + ('precision', 'units', 'severity'):
+                if hasattr(tmpv, attr):
+                    kwds[attr] = getattr(tmpv, attr)
+            if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
+                tmpv.no_str > 0):
+                kwds['enum_strs'] = tuple([tmpv.strs[i].value for
+                                           i in range(tmpv.no_str)])
+        except IndexError:
+            pass
     elif args.type >= dbr.TIME_STRING:
-        tmpv = value[0]
-        kwds['status']    = tmpv.status
-        kwds['severity']  = tmpv.severity
-        kwds['timestamp'] = dbr.make_unixtime(tmpv.stamp)
+        try:
+            tmpv = value[0]
+            kwds['status']    = tmpv.status
+            kwds['severity']  = tmpv.severity
+            kwds['timestamp'] = dbr.make_unixtime(tmpv.stamp)
+        except IndexError:
+            pass
 
     value = _unpack(args.chid, value, count=args.count, ftype=args.type)
     if hasattr(args.usr, '__call__'):
