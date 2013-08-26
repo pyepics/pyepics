@@ -18,8 +18,8 @@ class Struck(epics.Device):
              'SoftwareChannelAdvance', 'Channel1Source',
              'ReadAll', 'DoReadAll', 'Model', 'Firmware')
 
-    _fields = ('_prefix', '_pvs', '_delim', '_nchan',
-               'clockrate', 'scaler')
+    _nonpvs  = ('_prefix', '_pvs', '_delim', '_nchan',
+               'clockrate', 'scaler', 'mcas')
 
     def __init__(self, prefix, scaler=None, nchan=8, clockrate=50.0):
         if not prefix.endswith(':'):
@@ -33,10 +33,11 @@ class Struck(epics.Device):
 
         self.mcas = []
         for i in range(nchan):
-            self.mcas.append(epics.devices.Mca("%smca%i" % (prefix,i+1)))
+            mcaname = "%smca%i" % (prefix,i+1)
+            self.mcas.append(epics.devices.Mca(mcaname))
             
         epics.Device.__init__(self, prefix, delim='',
-                              attrs=self.attrs)
+                              attrs=self.attrs, mutable=False)
 
     def ExternalMode(self, initialadvance=0, realtime=0, prescale=1):
         """put Struck in External Mode, with the following options:

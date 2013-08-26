@@ -16,11 +16,11 @@ class SRS570(epics.Device):
              'offset_sign', 'offset_on' 'off_u_put', 'bias_put',
              'gain_mode', 'filter_type', 'invert_on', 'init.PROC')
     
-
-    _fields = ('_prefix', '_pvs', '_delim', '_nchan', '_chans')
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_nchan', '_chans')
     
     def __init__(self, prefix):
-        epics.Device.__init__(self, prefix, delim='', attrs=self.attrs)
+        epics.Device.__init__(self, prefix, delim='',
+                              attrs=self.attrs, mutable=False)
         self.initialize()
 
     def initialize(self, bias=0, gain_mode=0, filter_type=0,

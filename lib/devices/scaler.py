@@ -10,8 +10,7 @@ class Scaler(epics.Device):
     attr_kws = {'calc_enable': '%s_calcEnable.VAL'}
     chan_attrs = ('NM%i', 'S%i')
     calc_attrs = {'calc%i': '%s_calc%i.VAL', 'expr%i': '%s_calc%i.CALC'}
-    
-    _fields = ('_prefix', '_pvs', '_delim', '_nchan', '_chans')
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_nchan', '_chans')
     
     def __init__(self, prefix, nchan=8):
         self._nchan  = nchan
@@ -30,7 +29,7 @@ class Scaler(epics.Device):
         for i in self._chans:
             for key, val in self.calc_attrs.items():
                 self.add_pv(val % (prefix, i), attr = key % i)
-
+        self._mutable = False
         
     def AutoCountMode(self):
         "set to autocount mode"

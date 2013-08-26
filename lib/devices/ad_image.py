@@ -12,10 +12,11 @@ class AD_ImagePlugin(epics.Device):
              'ArraySize2', 'ArraySize2_RBV',
              'ColorMode', 'ColorMode_RBV')
 
-    _fields = ('_prefix', '_pvs', '_delim')
+    _nonpvs = ('_prefix', '_pvs', '_delim')
 
     def __init__(self, prefix):
-        epics.Device.__init__(self, prefix, delim='', attrs=self.attrs)
+        epics.Device.__init__(self, prefix, delim='', mutable=False,
+                              attrs=self.attrs)
 
     def ensure_value(self, attr, value, wait=False):
         """ensures that an attribute with an associated _RBV value is
