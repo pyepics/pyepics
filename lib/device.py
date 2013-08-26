@@ -103,10 +103,14 @@ class Device(object):
     _init = False
     _aliases = {}
     _mutable = True
-    _nonpvs = ('_prefix', '_pvs', '_delim', '_init', '_aliases', '_mutable', '_nonpvs')
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_init', '_aliases',
+               '_mutable', '_nonpvs')
     def __init__(self, prefix='', attrs=None,
                  nonpvs=None, delim='', timeout=None,
                  mutable=True, aliases={}):
+        if nonpvs is not None:
+            self._nonpvs =  nonpvs
+            
         self._nonpvs = list(self._nonpvs)
         self._delim = delim
         self._prefix = prefix + delim
@@ -294,7 +298,7 @@ class Device(object):
                                                                  attr))
         elif attr in self.__dict__:
             self.__dict__[attr] = val
-        else:
+        elif self._init:
             raise AttributeError('%s has no attribute %s' % (self.__class__.__name__,
                                                              attr))
 
