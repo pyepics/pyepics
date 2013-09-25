@@ -6,6 +6,14 @@ import numpy
 import epics
 import epics.devices
 
+HEADER = '''# Struck MCA data: %s 
+# Nchannels, Nmca = %i, %i
+# Time in microseconds
+#----------------------
+# %s
+# %s
+''' 
+
 class Struck(epics.Device):
     """
     Very simple implementation of Struck SIS MultiChannelScaler
@@ -103,56 +111,46 @@ class Struck(epics.Device):
         "Read a Struck MCA"
         return self.get('mca%i' % nmca, count=count)
 
+    def read_all_mcas(self):
+        return [self.readmca(nmca=i+1) for i in range(self._nchan)]
+
     def saveMCAdata(self, fname='Struck.dat', mcas=None,
                     ignore_prefix=None, npts=None):
         "save MCA spectra to ASCII file"
-        sdata = []
-        names = []
-        addrs = []
-        if mcas is None:
-            mcas = list(range(1, self._nchan+1))
-
-        time.sleep(0.010)
-        for nmca in mcas:
+        sdata, names, addrs = [], [], []
+        npts =  1.e99
+        time.sleep(0.005)
+        for nchan in range(self._nchan):
+            nmca  = nchan + 1
+            _name = 'MCA%i' % nmca
+            _addr = '%s.MCA%i' % (self._prefix, nmca) 
+            time.sleep(0.002)           
             if self.scaler is not None:
                 scaler_name = self.scaler.get('NM%i' % nmca)
-                if scaler_name is not None and len(scaler_name) > 0:
-                    if (ignore_prefix is not None and
-                        scaler_name.startswith(ignore_prefix)):
-                        continue
-                    sdata.append(self.readmca(nmca=nmca))
-                    names.append(scaler_name.replace(' ', '_'))
-                    addrs.append(self.scaler._prefix + 'S%i' % nmca)
-
-            else:
-                sdata.append(self.readmca(nmca=nmca))
-                names.append(' MCA%i ' % nmca)
-
-        try:
-            sdata = numpy.array(sdata)
-            sdata = sdata.transpose()
-        except:
-            sdata = numpy.zeros(self.nchan*2048)
-            sdata.shape = (self.nchan, 2048)
-            sdata[0,:] = 1.0
-            sdata = sdata.transpose()
-
-        # convert time to integer microseconds!
-        sdata[:,0] = sdata[:,0]/self.clockrate
+                if scaler_name is not None:
+                    _name = scaler_name.replace(' ', '_')
+                    _addr = self.scaler._prefix + 'S%i' % nmca
+            mcadat = self.readmca(nmca=nmca)
+            npts = min(npts, len(mcadat))
+            if len(_name) > 0 or sum(mcadat) > 0:
+                names.append(_name)
+                addrs.append(_addr)
+                sdata.append(mcadat)
+            
+        sdata = numpy.array([s[:npts] for s in sdata]).transpose()
+        sdata[:, 0] = sdata[:, 0]/self.clockrate
 
         nelem, nmca = sdata.shape
-        if npts is None:
-            npts = nelem
         npts = min(nelem, npts)
+        
+        addrs = ' | '.join(addrs)
+        names = ' | '.join(names)
+        formt = '%9i ' * nmca + '\n'
+
         fout = open(fname, 'w')
-        fout.write('# Struck MCA data: %s \n' % self._prefix)
-        fout.write('# Nchannels, Nmca = %i, %i\n' % (npts, nmca))
-        fout.write('# Time in microseconds\n')
-        fout.write('#----------------------\n')
-        fout.write('# %s\n' % (' | '.join(addrs)))
-        fout.write('# %s\n' % (' | '.join(names)))
-        fmt   =  '%9i ' * nmca + '\n'
-        [fout.write(fmt % tuple(sdata[i])) for i in range(npts)]
+        fout.write(HEADER % (self._prefix, npts, nmca, addrs, names))
+        for i in range(npts):
+            fout.write(formt % tuple(sdata[i]))
         fout.close()
 
 if __name__ == '__main__':
