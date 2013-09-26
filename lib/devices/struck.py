@@ -22,7 +22,7 @@ class Struck(epics.Device):
              'EraseAll', 'StartAll', 'StopAll',
              'PresetReal', 'ElapsedReal',
              'Dwell', 'Acquiring', 'NuseAll',
-             'CurrentChannel', 'InitialChannelAdvance',
+             'CurrentChannel', 'CountOnStart',   # InitialChannelAdvance',
              'SoftwareChannelAdvance', 'Channel1Source',
              'ReadAll', 'DoReadAll', 'Model', 'Firmware')
 
@@ -47,11 +47,13 @@ class Struck(epics.Device):
         epics.Device.__init__(self, prefix, delim='',
                               attrs=self.attrs, mutable=False)
 
-    def ExternalMode(self, initialadvance=0, realtime=0, prescale=1):
+    def ExternalMode(self, countonstart=0, initialadvance=None,
+                     realtime=0, prescale=1):
         """put Struck in External Mode, with the following options:
         option            meaning                   default value
         ----------------------------------------------------------
-        initialadvance  set Initial Channel Advance    0
+        countonstart    set Count on Start             0
+        initialadvance  set Initial Channel Advance    None
         reatime         set Preset Real Time           0
         prescale        set Prescale value             1
         """
@@ -62,6 +64,8 @@ class Struck(epics.Device):
             self.put('PresetReal', realtime)
         if prescale is not None:
             self.put('Prescale', prescale)
+        if countonstart is not None:
+            self.put('CountOnStart', countonstart)
         if initialadvance is not None:
             self.put('InitialChannelAdvancel', initialadvance)
 
