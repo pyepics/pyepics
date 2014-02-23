@@ -241,6 +241,9 @@ class PV(object):
         if (as_numpy and ca.HAS_NUMPY and count > 1 and
             not isinstance(val, ca.numpy.ndarray)):
             val = ca.numpy.array(val)
+        elif (as_numpy and ca.HAS_NUMPY and count == 1 and
+            not isinstance(val, ca.numpy.ndarray)):
+            val = ca.numpy.array([val])
         elif (not as_numpy and ca.HAS_NUMPY and
               isinstance(val, ca.numpy.ndarray)):
             val = list(val)
