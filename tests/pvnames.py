@@ -42,9 +42,11 @@ double_arrays   = ['Py:double128', 'Py:double2k', 'Py:double64k']
 ####
 # provide a single motor prefix (to which '.VAL' and '.RBV' etc will be added)
 
-motor1 = '13XRM:m1'
-motor2 = '13XRM:m3'
-motor_list = ['13XRM:m1', '13XRM:m2', '13XRM:m3', '13XRM:m4']
+motor_prefix = '13IDE:'
+motor_list = ['%sm%i' % (motor_prefix, i+1) for i in range(4)]
+motor1 = motor_list[0]
+motor2 = motor_list[1]
+
 ####
 #  Here, provide a PV that changes at least once very 10 seconds
 updating_pv1  = 'Py:ao1'

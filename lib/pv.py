@@ -238,8 +238,10 @@ class PV(object):
 
         if count is None:
             count = len(val)
-        if (as_numpy and ca.HAS_NUMPY and count > 1 and
+        if (as_numpy and ca.HAS_NUMPY and 
             not isinstance(val, ca.numpy.ndarray)):
+            if count == 1:
+                val = [val]
             val = ca.numpy.array(val)
         elif (not as_numpy and ca.HAS_NUMPY and
               isinstance(val, ca.numpy.ndarray)):

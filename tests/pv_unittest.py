@@ -272,6 +272,12 @@ class PV_Tests(unittest.TestCase):
 
         resume_updating()
 
+    def test_waveform_get_1elem(self):
+        pv = PV(pvnames.double_arr_pv)
+        val = pv.get(count=1, use_monitor=False)
+        self.failUnless(isinstance(val, numpy.ndarray))
+        self.failUnless(len(val), 1)
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase( PV_Tests)
     unittest.TextTestRunner(verbosity=1).run(suite)
