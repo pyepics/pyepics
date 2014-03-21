@@ -25,8 +25,11 @@ from pyparsing import Literal, Optional, Word, Combine, Regex, Group, \
     ZeroOrMore, OneOrMore, LineEnd, LineStart, StringEnd, \
     alphanums, alphas, nums
 
+import sys
+import os
+import datetime
+import json
 from epics.pv import PV
-import os, datetime
 
 def restore_pvs(filepath, debug=False):
     """ 
@@ -38,16 +41,33 @@ def restore_pvs(filepath, debug=False):
 
     """
     success = True
-    values = [ x for x in sav_file.parseFile(filepath).asList() if len(x) > 0 ]
-    print( "Restoring %d values..." % ( len(values) ))
-    for v in values:
+    fout = open(filepath, 'r')
+    lines = fout.readlines()
+    fout.close()
+    for line in lines:
+        if line.startswith('<END'):
+            break
+        if line.startswith('#'):
+            continue
+        pvname, value = [w.strip() for w in line[:-1].split(' ', 1)]
+        if value.startswith('<JSON>:'):
+            value = json.loads(value[7:])
         if debug:
-            print( "Setting %s to %s..." % (v[0], v[1]))
+            print( "Setting %s to %s..." % (pvname, value))
         try:
-            pv = PV(v[0])
-            pv.put(v[1]) # hopefully this is good enough as conversions go           
-        except Exception(e):
-            print( "Error restoring %s to %s : %s" % (v[0], v[1], e))
+            thispv = PV(pvname)
+            thispv.connect()
+            if not thispv.connected:
+                print("Cannot connect to %s" % (pvname))
+            elif not thispv.write_access:
+                print("No write access to %s" % (pvname))
+            else:
+                thispv.put(value, wait=False)
+
+        except:
+            exctype, excvalue, exctrace = sys.exc_info()
+            print("Error restoring %s to %s : %s" % (pvname, value,
+                                                     exctype, excvalue))
             success = False
     return success
     
@@ -61,7 +81,17 @@ def save_pvs(request_file, save_pvs, debug=False):
 
     """
     pvnames = _parse_request_file(request_file)
-    pv_vals = [ (pvname, PV(pvname).get()) for pvname in pvnames ]
+    pv_vals = []
+    for pvname in pvnames:
+        thispv = PV(pvname)
+        thispv.connect()
+        if thispv.count == 1:
+            value = str(thispv.get())
+        elif thispv.count > 1 and thispv.type == 'char':
+            value = thispv.get(as_string=True)
+        elif thispv.count > 1 and thispv.type != 'char':
+            value = '<JSON>: %s' % json.dumps(list(thispv.get()))
+        pv_vals.append((pvname, value))
     if debug:
         for (pv,val) in pv_vals:
             print( "PV %s = %s" % (pv, val))
@@ -138,7 +168,7 @@ def line(contents):
     return LineStart() + ZeroOrMore(Group(contents)) + LineEnd().suppress()
 
 req_line = line( file_include | comment.suppress() | pv_name )
-sav_line = line( comment.suppress() | Literal("<END>").suppress() | pv_assignment)
-
 req_file = OneOrMore(req_line) + StringEnd().suppress()
+
+sav_line = line( comment.suppress() | Literal("<END>").suppress() | pv_assignment)
 sav_file = OneOrMore(sav_line) + StringEnd().suppress()
