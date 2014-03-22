@@ -27,12 +27,16 @@ from . import pv
 from . import alarm
 from . import device
 from . import motor
+from . import multiproc
 
 PV    = pv.PV
 Alarm = alarm.Alarm
 Motor = motor.Motor
 Device = device.Device
 poll  = ca.poll
+
+CAProcess = multiproc.CAProcess
+CAPool = multiproc.CAPool
 
 # some constants
 NO_ALARM = 0
