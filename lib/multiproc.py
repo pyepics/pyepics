@@ -6,7 +6,7 @@ and CAPool, pool of CAProcesses
 use CAProcess in place of multiprocess.Process if your process will be calling
 Channel Access or using Epics process variables
 
-from epics import CAProcess
+   from epics import CAProcess
 
 """
 #
@@ -15,6 +15,7 @@ from epics import CAProcess
 # Modifications:  Matt Newville, changed to subclass multiprocess.Process
 
 import multiprocessing as mp
+from multiprocessing.pool import Pool
 import epics
 
 def clear_ca_cache():
@@ -44,14 +45,13 @@ class CAProcess(mp.Process):
     def __init__(self, **kws):
         mp.Process.__init__(self, **kws)
 
-    def run():
+    def run(self):
         clear_ca_cache()
-        mp.Process.run()
+        mp.Process.run(self)
 
 def CAPool(processes=None, initializer=None, initargs=(), maxtasksperchild=None):
     """
     Returns a pool of CAProcess objects
     """
-    from multiprocessing.pool import Pool
     Pool.Process = CAProcess
     return Pool(processes, initializer, initargs, maxtasksperchild)
