@@ -1,8 +1,8 @@
 """
    epics channel access python module
 
-   version    :  3.2.3rc
-   last update:  20-Aug-2013
+   version    :  3.2.3
+   last update:  24-Mar-2014
 
    Principle Authors:
       Matthew Newville <newville@cars.uchicago.edu>, CARS, University of Chicago
@@ -17,7 +17,7 @@
    Python Interface to the Epics Channel Access protocol of the Epics control system.
 
 """
-__version__ = '3.2.3rc'
+__version__ = '3.2.3'
 
 import time
 import sys

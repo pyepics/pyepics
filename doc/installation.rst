@@ -5,8 +5,8 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-This package requires Python version 2.5, 2.6, 2.7, or 3.2.  It should work
-with Python 3.1, as well, but this is no longer being tested as of this
+This package requires Python version 2.6, 2.7, or 3.2 or 3.3.  It should
+work with Python 2.5 or 3.1 but these are no longer being tested as of this
 writing.
 
 In addition, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
@@ -29,17 +29,17 @@ array data if available, and its use is strongly encouraged.
 Downloads
 ~~~~~~~~~~~~~
 
-The latest stable version of the PyEpics Package is 3.2.1.  There are
+The latest stable version of the PyEpics Package is 3.2.3.  There are
 a few ways to get the PyEpics Package:
 
-.. _pyepics-3.2.1.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.1.tar.gz
-.. _pyepics-3.2.1.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.1.tar.gz
-.. _pyepics-3.2.1.win32-py2.6.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.1.win32-py2.6.exe
-.. _pyepics-3.2.1.win32-py2.7.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.1.win32-py2.7.exe
-.. _pyepics-3.2.1.win32-py3.2.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.1.win32-py3.2.exe
-.. _pyepics-3.2.1.win32-py2.6.exe (PyPI): http://pypi.python.org/packages/2.6/p/pyepics/pyepics-3.2.1.win32-py2.6.exe
-.. _pyepics-3.2.1.win32-py2.7.exe (PyPI): http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.1.win32-py2.7.exe
-.. _pyepics-3.2.1.win32-py3.2.exe (PyPI): http://pypi.python.org/packages/3.2/p/pyepics/pyepics-3.2.1.win32-py3.2.exe
+.. _pyepics-3.2.3.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.3.tar.gz
+.. _pyepics-3.2.3.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.3.tar.gz
+.. _pyepics-3.2.3.win32-py2.6.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.3.win32-py2.6.exe
+.. _pyepics-3.2.3.win32-py2.7.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.3.win32-py2.7.exe
+.. _pyepics-3.2.3.win32-py3.2.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.3.win32-py3.2.exe
+.. _pyepics-3.2.3.win32-py2.6.exe (PyPI): http://pypi.python.org/packages/2.6/p/pyepics/pyepics-3.2.3.win32-py2.6.exe
+.. _pyepics-3.2.3.win32-py2.7.exe (PyPI): http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.3.win32-py2.7.exe
+.. _pyepics-3.2.3.win32-py3.2.exe (PyPI): http://pypi.python.org/packages/3.2/p/pyepics/pyepics-3.2.3.win32-py3.2.exe
 .. _pyepics github repository:    http://github.com/pyepics/pyepics
 .. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
 .. _PyPi Epics Entry:             http://pypi.python.org/pypi/pyepics/
@@ -48,17 +48,17 @@ a few ways to get the PyEpics Package:
 +-----------------+------------+----------------------------------------------+
 |  Download Type  | Py Version |   Location                                   |
 +=================+============+==============================================+
-| Source tarball  | All        |  `pyepics-3.2.1.tar.gz (CARS)`_  or          |
-|                 |            |  `pyepics-3.2.1.tar.gz (PyPI)`_              |
+| Source tarball  | All        |  `pyepics-3.2.3.tar.gz (CARS)`_  or          |
+|                 |            |  `pyepics-3.2.3.tar.gz (PyPI)`_              |
 +-----------------+------------+----------------------------------------------+
-| Win32 Installer | 2.6        |  `pyepics-3.2.1.win32-py2.6.exe (CARS)`_  or |
-|                 |            |  `pyepics-3.2.1.win32-py2.6.exe (PyPI)`_  or |
+| Win32 Installer | 2.6        |  `pyepics-3.2.3.win32-py2.6.exe (CARS)`_  or |
+|                 |            |  `pyepics-3.2.3.win32-py2.6.exe (PyPI)`_  or |
 +-----------------+------------+----------------------------------------------+
-| Win32 Installer | 2.7        |  `pyepics-3.2.1.win32-py2.7.exe (CARS)`_  or |
-|                 |            |  `pyepics-3.2.1.win32-py2.7.exe (PyPI)`_  or |
+| Win32 Installer | 2.7        |  `pyepics-3.2.3.win32-py2.7.exe (CARS)`_  or |
+|                 |            |  `pyepics-3.2.3.win32-py2.7.exe (PyPI)`_  or |
 +-----------------+------------+----------------------------------------------+
-| Win32 Installer | 3.2        |  `pyepics-3.2.1.win32-py3.2.exe (CARS)`_  or |
-|                 |            |  `pyepics-3.2.1.win32-py3.2.exe (PyPI)`_  or |
+| Win32 Installer | 3.2        |  `pyepics-3.2.3.win32-py3.2.exe (CARS)`_  or |
+|                 |            |  `pyepics-3.2.3.win32-py3.2.exe (PyPI)`_  or |
 +-----------------+------------+----------------------------------------------+
 |  Development    | All        |  `pyepics github repository`_                |
 +-----------------+------------+----------------------------------------------+
@@ -68,7 +68,6 @@ the PyEpics Package simply with::
 
    easy_install -U pyepics
 
-
 Testing
 ~~~~~~~~~~~~~
 
@@ -76,31 +75,30 @@ Some automated unit-testing is done, using the tests/ folder from the
 source distribution kit, and while the script ``tests/simulator.py`` is running
 (note that the Epics database in ``tests/pydebug.db`` must be loaded in a local
 IOC for the simulator and most of these tests to run).  The following
-systems were tested for 3.2.1, all with Epics base 3.14.12.1 or base 
+systems were tested for 3.2.3, all with Epics base 3.14.12.1 or base 
 3.14.12.2.  
 
 +-----------+-----------------+------------+---------------------------+
 | Host OS   | Epics HOST ARCH |  Python    |  Failures, Notes          |
 +===========+=================+============+===========================+
-| Linux     |  linux-x86      |  2.5.1     | not tested, 3.2.0 passed  |
+| Linux     |  linux-x86      |  2.6       | unknown                   |
 +-----------+-----------------+------------+---------------------------+
-| Linux     |  linux-x86      |  2.6       | pass                      |
+| Linux     |  linux-x86      |  2.7.1     | unknown                   |
 +-----------+-----------------+------------+---------------------------+
-| Linux     |  linux-x86      |  2.7.1     | pass                      |
+| Linux     |  linux-x86_64   |  2.7.1     | unknown                   |
 +-----------+-----------------+------------+---------------------------+
-| Linux     |  linux-x86_64   |  2.7.1     | pass                      |
+| Linux     |  linux-x86_64   |  3.2.3     | unknown                   |
 +-----------+-----------------+------------+---------------------------+
-| Linux     |  linux-x86_64   |  3.2.3     | pass                      |
+| Mac OSX   |  darwin-x86     |  2.6.5     | unknown                   |
 +-----------+-----------------+------------+---------------------------+
-| Mac OSX   |  darwin-x86     |  2.6.5     | not tested, 3.2.0 passed  |
+| Mac OSX   |  darwin-x86     |  2.6.5     | unknown                   |
 +-----------+-----------------+------------+---------------------------+
-| Windows   |  win32-x86      |  2.6.6     | pass                      |
+| Windows   |  win32-x86      |  2.6.6     | unknown                   |
 +-----------+-----------------+------------+---------------------------+
-| Windows   |  win32-x86      |  2.7.2     | pass                      |
+| Windows   |  win32-x86      |  2.7.2     | unknown                   |
 +-----------+-----------------+------------+---------------------------+
-| Windows   |  win32-x86      |  3.2.2     | pass                      |
+| Windows   |  win32-x86      |  3.2.2     | unknown                   |
 +-----------+-----------------+------------+---------------------------+
-
 
 
 Testing Notes:
