@@ -11,15 +11,71 @@ Overview
 
 The :mod:`autosave` module provides simple save/restore
 functionality for PVs, similar to the autosave module in synApps
-for IOCs but (obviously) via Channel Access.
-
-Request and Save file formats are designed to be compatible with
-synApps autosave.
+for IOCs but (of course) via Channel Access.
 
 Use of this module requires the pyparsing parser framework. 
 The Debian/Ubuntu package is "python-pyparsing"
 The web site is http://pyparsing.wikispaces.com/
 
+
+Request and Save file formats are designed to be compatible with synApps
+autosave.  Notably, the `file` command with macro substitutions are
+supported, so that one can have a Request like::
+
+   # My.req
+   file "SimpleMotor.req", P=IOC:, Q=m1
+
+with a  **SimpleMotor.req** file of::
+
+   # SimpleMotor.req
+   $(P)$(Q).VAL
+   $(P)$(Q).DIR
+   $(P)$(Q).FOFF
+
+which can then be used for many instances of a SimpleMotor. 
+
+With such a file, simply using::
+
+    import epics.autosave
+    epics.autosave.save_pvs("My.req", "my_values.sav")
+
+will save the current values for the PVs to the file **my_values.sav**.
+
+At a later time, these values can be restored with
+
+    import epics.autosave
+    epics.autosave.restore_pvs("my_values.sav")
+
+
+
+.. function:: save_pvs(request_file, save_file)
+
+   saves current value of PVs listed in *request_file* to the *save_file*
+
+   :param request_file: name of Request file to read PVs to save.
+   :param save_file: name of file to save values to write values to
+
+   As discussed above, the **request_file** follows the conventions of the
+   autosave module from synApps.
+ 
+.. function:: restore_pvs(save_file)
+
+   reads values from *save_file* and restores them for the corresponding PVs
+
+   :param save_file: name of file to save values to read data from.
+
+
+   Note that :func:`restore_pvs` will restore all the values it can, skipping
+   over any values that it cannot restore.
+
+
+Supported Data Types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All scalar PV values can be saved and restored with the :mod:`autosave`
+routines.  There is some support for waveform (array) data.  For example,
+character waveforms containing for long strings can be saved and restored.
+In addition, numerical arrays in waveform can be saved and restored.
 
 Examples
 ==========
@@ -29,7 +85,7 @@ A simple example usign the autosave module::
 
     import epics.autosave
     # save values
-    epics.autosave.save_pvs("/tmp/my_request_file.req", 
+    epics.autosave.save_pvs("my_request_file.req", 
                             "/tmp/my_recent_save.sav")
 
     # wait 30 seconds
