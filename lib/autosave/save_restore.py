@@ -27,6 +27,7 @@ from pyparsing import Literal, Optional, Word, Combine, Regex, Group, \
 
 import sys
 import os
+import time
 import datetime
 import json
 from epics.pv import PV
@@ -38,7 +39,6 @@ def restore_pvs(filepath, debug=False):
     debug - Set to True if you want a line printed for each value set
 
     Returns True if all pvs were restored successfully.
-
     """
     success = True
     fout = open(filepath, 'r')
@@ -49,9 +49,14 @@ def restore_pvs(filepath, debug=False):
             break
         if line.startswith('#'):
             continue
-        pvname, value = [w.strip() for w in line[:-1].split(' ', 1)]
-        if value.startswith('<JSON>:'):
-            value = json.loads(value[7:])
+        pvname, value = [w.strip() for w in line[:-1].split(' ', 1)]            
+        if value.startswith('<JSON>:'):  # for older version, could be deprecated
+            value = value.replace('<JSON>:', '@array@')
+        if value.startswith('@array@'):
+            value = value.replace('@array@', '').strip()
+            if value.startswith('{') and value.endswith('}'):
+                value = value[1:-1]
+            value = json.loads(value)            
         if debug:
             print( "Setting %s to %s..." % (pvname, value))
         try:
@@ -77,32 +82,37 @@ def save_pvs(request_file, save_pvs, debug=False):
 
     Set debug=True to print a line for each PV saved.
 
-    With throw an exception if any PV cannot be found.
-
+    Will print a warning if a PV cannot connect.
     """
-    pvnames = _parse_request_file(request_file)
     pv_vals = []
-    for pvname in pvnames:
-        thispv = PV(pvname)
+    pvobjs = [PV(pvn) for pvn in _parse_request_file(request_file)]
+    [pv.connect() for pv in pvobjs]
+    for thispv in pvobjs:
+        pvname = thispv.pvname
         thispv.connect()
+        if not thispv.connected:
+            print("Cannot connect to %s" % (pvname))
+            continue
         if thispv.count == 1:
             value = str(thispv.get())
         elif thispv.count > 1 and thispv.type == 'char':
             value = thispv.get(as_string=True)
         elif thispv.count > 1 and thispv.type != 'char':
-            value = '<JSON>: %s' % json.dumps(list(thispv.get()))
+            value = '@array@ %s' % json.dumps(thispv.get().tolist())
         pv_vals.append((pvname, value))
+
     if debug:
         for (pv,val) in pv_vals:
             print( "PV %s = %s" % (pv, val))
+
     f = open(save_pvs, "w")
-    f.write("# File saved automatically by save_restore.py on %s\n" % 
+    f.write("# File saved by pyepics autosave.save_pvs() on %s\n" % 
             datetime.datetime.now().isoformat())
     f.write("# Edit with extreme care.\n")
     f.writelines([ "%s %s\n" % v for v in pv_vals ])
     f.write("<END>\n")
     f.close()
-
+    
 def _parse_request_file(request_file, macro_values={}):
     """ 
     Internal function to parse a request file.
