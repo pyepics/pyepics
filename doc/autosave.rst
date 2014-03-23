@@ -20,7 +20,6 @@ common third-party python package, included in many package managers, or
 installed with tools such as *easy_install* or *pip*, or downloaded from 
 `PyPI <http://pypi.python.org/pypi/pyparsing>`_
 
-
 Request and Save file formats are designed to be compatible with synApps
 autosave.  Notably, the `file` command with macro substitutions are
 supported, so that one can have a Request like::
@@ -38,7 +37,6 @@ with a  **SimpleMotor.req** file of::
 which can then be used for many instances of a SimpleMotor.  There is,
 however, no mechanism for automatically finding request files.
 
-
 With such a file, simply using::
 
     import epics.autosave
@@ -52,10 +50,11 @@ a later time, these values can be restored with
 
 The saved file will be of nearly identical format as that of the autosave
 mechanism, and the :func:`restore_pvs` function can read and restore values
-using save files from autosave.  Note, however, that the purpose is quite
-different, and using the functions here will really do a :func:`caput` to
-the saved values, not set initial values for PVs at IOC startup: motors
-will move!
+using save files from autosave.  Note, however, that the purpose here is
+quite different from that of the standard autosave module (which is
+designed to save vales so that PVs can be **initialized** at IOC startup).
+Using the functions here will really do a :func:`caput` to the saved
+values.
 
 
 .. function:: save_pvs(request_file, save_file)
