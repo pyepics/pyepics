@@ -63,10 +63,16 @@ a few ways to get the PyEpics Package:
 |  Development    | All        |  `pyepics github repository`_                |
 +-----------------+------------+----------------------------------------------+
 
+
 If you have `Python Setup Tools`_  installed, you can download and install
 the PyEpics Package simply with::
 
    easy_install -U pyepics
+
+or::
+
+  pip install pyepics
+
 
 Testing
 ~~~~~~~~~~~~~
@@ -78,6 +84,7 @@ IOC for the simulator and most of these tests to run).  The following
 systems were tested for 3.2.3, all with Epics base 3.14.12.1 or base 
 3.14.12.2.  
 
+
 +-----------+-----------------+------------+---------------------------+
 | Host OS   | Epics HOST ARCH |  Python    |  Failures, Notes          |
 +===========+=================+============+===========================+
@@ -88,8 +95,6 @@ systems were tested for 3.2.3, all with Epics base 3.14.12.1 or base
 | Linux     |  linux-x86_64   |  2.7.1     | unknown                   |
 +-----------+-----------------+------------+---------------------------+
 | Linux     |  linux-x86_64   |  3.2.3     | unknown                   |
-+-----------+-----------------+------------+---------------------------+
-| Mac OSX   |  darwin-x86     |  2.6.5     | unknown                   |
 +-----------+-----------------+------------+---------------------------+
 | Mac OSX   |  darwin-x86     |  2.6.5     | unknown                   |
 +-----------+-----------------+------------+---------------------------+
@@ -208,7 +213,6 @@ The PyEpics source code, this documentation, and all material associated
 with it are distributed under the Epics Open License:
 
 .. include:: ../license.txt
-
 
 
 

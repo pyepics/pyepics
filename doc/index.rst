@@ -36,15 +36,15 @@ See
 -----------
    
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    installation
    overview
    pv
    ca
+   arrays
    devices
    alarm
    autosave
    wx
    advanced
-

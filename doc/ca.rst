@@ -138,8 +138,7 @@ initialization and finalization tasks are handled in the following way:
    (if numpy is installed).  Larger waveforms will not be automatically
    monitored.
 
-   :ref:`advanced-arrays-label` and :ref:`advanced-large-arrays-label` for
-   more details.
+   :ref:`arrays-label` and :ref:`arrays-large-label` for more details.
 
 Using the CA module
 ====================
@@ -259,7 +258,7 @@ keyword arguments can be used to specify such options.
    *ftype*,
 
 
-   See :ref:`advanced-large-arrays-label` for a discussion of strategies
+   See :ref:`arrays-large-label` for a discussion of strategies
    for how to best deal with very large arrays.
 
 

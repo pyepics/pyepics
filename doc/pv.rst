@@ -93,7 +93,7 @@ callbacks to be executed when the PV changes.
 
    With the *as_numpy* option, an array PV (that is, a PV whose value has
    more than one element) will be returned as a numpy array, provided the
-   numpy module is available.  See :ref:`advanced-large-arrays-label` for a
+   numpy module is available.  See :ref:`arrays-large-label` for a
    discussion of strategies for how to best deal with very large arrays.
 
    The *use_monitor* option controls whether the most recent value from the automatic
@@ -452,7 +452,7 @@ Possible values for :attr:`auto_monitor` are:
   turn *auto_monitor* to ``False``. For waveform arrays with more elements,
   automatic monitoring will not be done unless you explicitly set
   *auto_monitor=True*, or to an explicit mask.  See
-  :ref:`advanced-large-arrays-label` for more details.
+  :ref:`arrays-large-label` for more details.
 
 ``True``
   When *auto_monitor* is set to ``True``, the value will be monitored using
