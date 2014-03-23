@@ -357,6 +357,29 @@ Note also that the callbacks for the PVs created in each thread are
 Without this, the callbacks for thread *A*  will persist even after the
 thread has completed!
 
+
+.. _advanced-multiprocessing-label:
+
+
+Using Multiprocessing with PyEpics
+===========================================
+
+An alternative to Python threads that has some very intersting and
+important features is to use multiple *processes*, as with the standard
+Python :mod:`multiprocessing` module.  While using multiple processes has
+some advantages over threads, it also has important implications for use
+with PyEpics.  The basic issue is that multiple processes need to be fully
+separate, and do not share global state.  For epics Channel Access, this
+means that all those things like established communication channels,
+callbacks, and channel access **context** cannot easily be share between
+processes.
+
+The solution is to use a :class:`CAProcess`, which acts just like
+:class:`multiprocessing.Process`, but knows how to separate contexts
+between processes.  This means that you will have to create PV objects for
+each process (even if they point to the same PV).
+
+
 .. _advanced-get-timeouts-label:
 
 
