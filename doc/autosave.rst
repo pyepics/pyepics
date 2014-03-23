@@ -18,7 +18,7 @@ Use of this module requires the `pyparsing package
 <http://pyparsing.wikispaces.com/>`_ to be installed.  This is a fairly
 common third-party python package, included in many package managers, or
 installed with tools such as *easy_install* or *pip*, or downloaded from 
-`PyPI <http://pypi.python.org/pyparsing>`_
+`PyPI <http://pypi.python.org/pypi/pyparsing>`_
 
 
 Request and Save file formats are designed to be compatible with synApps
