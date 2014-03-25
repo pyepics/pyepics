@@ -4,7 +4,6 @@ class AD_FilePlugin(epics.Device):
     """
     AreaDetector File Plugin
     """
-
     attrs = ("AutoIncrement", "AutoIncrement_RBV",
              "AutoSave", "AutoSave_RBV",
              "Capture", "Capture_RBV",
@@ -38,4 +37,58 @@ class AD_FilePlugin(epics.Device):
 
         if  self._pvs[rbv_attr].get(as_string=True) != value:
             self._pvs[attr].put(value, wait=wait)
+
+
+    def setFileName(self,fname):
+        return self.put('FileName',fname)
+
+    def nextFileNumber(self):
+        self.setFileNumber(1+self.get('FileNumber'))
+
+    def setFileNumber(self, fnum=None):
+        if fnum is None:
+            self.put('AutoIncrement', 1)
+        else:
+            self.put('AutoIncrement', 0)
+            return self.put('FileNumber',fnum)
+
+    def setPath(self,pathname):
+        return self.put('FilePath', pathname)
+
+    def setTemplate(self, fmt):
+        return self.put('FileTemplate', fmt)
+
+    def setWriteMode(self, mode):
+        return self.put('FileWriteMode', mode)
+
+    def getLastFileName(self):
+        return self.get('FullFileName_RBV',as_string=True)
+
+    def CaptureOn(self):
+        return self.put('Capture', 1)
+
+    def CaptureOff(self):
+        return self.put('Capture', 0)
+
+    def setNumCapture(self,n):
+        return self.put('NumCapture', n)
+
+    def WriteComplete(self):
+        return (0==self.get('WriteFile_RBV') )
+
+    def getTemplate(self):
+        return self.get('FileTemplate_RBV',as_string=True)
+
+    def getName(self):
+        return self.get('FileName_RBV',as_string=True)
+
+    def getNumber(self):
+        return self.get('FileNumber_RBV')
+
+    def getPath(self):
+        return self.get('FilePath_RBV',as_string=True)
+
+    def getFileNameByIndex(self,index):
+        return self.getTemplate() % (self.getPath(), self.getName(), index)
+
 
