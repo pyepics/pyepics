@@ -1,22 +1,27 @@
 #!/usr/bin/env python
 """
-provides CAProcess, a multiprocess.Process that correctly handles Channel Access 
+Provides CAProcess, a multiprocessing.Process that correctly handles Channel Access
 and CAPool, pool of CAProcesses
 
-use CAProcess in place of multiprocess.Process if your process will be calling
+Use CAProcess in place of multiprocessing.Process if your process will be calling
 Channel Access or using Epics process variables
 
-   from epics import CAProcess
+   from epics import (CAProcess, CAPool)
 
 """
 #
 # Author:         Ken Lauer
 # Created:        Feb. 27, 2014
-# Modifications:  Matt Newville, changed to subclass multiprocess.Process
+# Modifications:  Matt Newville, changed to subclass multiprocessing.Process
+#                 3/28/2014  KL, added CAPool
 
 import multiprocessing as mp
 from multiprocessing.pool import Pool
 import epics
+
+
+__all__ = ['CAProcess', 'CAPool', 'clear_ca_cache']
+
 
 def clear_ca_cache():
     """
@@ -24,6 +29,7 @@ def clear_ca_cache():
     such that forked subprocesses created with multiprocessing
     can safely use pyepics.
     """
+
     # Clear global pyepics state variables
     epics._CACHE_.clear()
     epics._MONITORS_.clear()
@@ -35,11 +41,12 @@ def clear_ca_cache():
     epics.ca.detach_context()
     epics.ca.create_context()
 
+
 class CAProcess(mp.Process):
     """
-    A Channel-Access aware (and safe) sublcass of multiprocess.Process 
-    
-    use CAProcess in place of multiprocess.Process if your Process will
+    A Channel-Access aware (and safe) subclass of multiprocessing.Process
+
+    Use CAProcess in place of multiprocessing.Process if your Process will
     be doing CA calls!
     """
     def __init__(self, **kws):
@@ -49,9 +56,12 @@ class CAProcess(mp.Process):
         clear_ca_cache()
         mp.Process.run(self)
 
-def CAPool(processes=None, initializer=None, initargs=(), maxtasksperchild=None):
+
+class CAPool(Pool):
     """
-    Returns a pool of CAProcess objects
+    An EPICS-aware multiprocessing.Pool of CAProcesses.
     """
-    Pool.Process = CAProcess
-    return Pool(processes, initializer, initargs, maxtasksperchild)
+    def __init__(self, *args, **kwargs):
+        self.Process = CAProcess
+
+        Pool.__init__(self, *args, **kwargs)
