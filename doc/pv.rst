@@ -319,8 +319,12 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
 .. attribute:: timestamp
 
-   Unix (not Epics!!) timestamp of the last seen event for this PV.
-
+   Unix (not Epics!!) timestamp of the last seen event for this PV.  Note
+   that this is will contain the timestamp from the Epics record if the PV
+   object was created with the ``form='time'`` option.  Otherwise, the
+   timestamp will be the timestamp according to the client, indicating when
+   the data arrive from the server.
+ 
 .. attribute:: precision
 
    number of decimal places of precision to use for float and double PVs
