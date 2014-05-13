@@ -66,7 +66,8 @@ MAX_UNITS_SIZE       =  8
 MAX_ENUM_STRING_SIZE = 26
 MAX_ENUMS            = 16
 
-EPICS2UNIX_EPOCH = 631173600.0 - time.timezone
+#EPICS2UNIX_EPOCH = 631173600.0 - time.timezone
+EPICS2UNIX_EPOCH = 631152000.0
 
 # create_subscription mask constants
 DBE_VALUE = 1
