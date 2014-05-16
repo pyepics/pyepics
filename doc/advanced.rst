@@ -7,6 +7,8 @@ details that may help in getting the best performance from the
 pyepics module.
 
 
+.. _advanced-get-timeouts-label:
+
 
 The wait and timeout options for get(), ca.get_complete()
 ==============================================================
@@ -28,7 +30,6 @@ simply not been received yet, a subsequent :func:`epics.caget` or
 :func:`pv.get` will eventually complete and receive the value.  That is, if
 a PV for a large waveform record reports that it is connected, but a
 :func:`pv.get` returns None, simply trying again later will probably work::
-
     >>> p = epics.PV('LargeWaveform')
     >>> val = p.get()
     >>> val
@@ -71,236 +72,6 @@ Again, that's the maximum time that will be waited, and if the data is
 received faster than that, the *get* will return as soon as it can.
 
 
-
-.. _advanced-threads-label:
-
-
-Using Python Threads
-=========================
-
-An important feature of the PyEpics package is that it can be used with
-Python threads, as Epics 3.14 supports threads for client code.  Even in
-the best of cases, working with threads can be somewhat tricky and lead to
-unexpected behavior, and the Channel Access library adds a small level of
-complication for using CA with Python threads.  The result is that some
-precautions may be in order when using PyEpics and threads.  This section
-discusses the strategies for using threads with PyEpics.
-
-First, to use threads with Channel Access, you must have
-:data:`epics.ca.PREEMPTIVE_CALLBACK` = ``True``.  This is the default
-value, but if :data:`epics.ca.PREEMPTIVE_CALLBACK` has been set to
-``False``, threading will not work.
-
-Second, if you are using :class:`PV` objects and not making heavy use of
-the :mod:`ca` module (that is, not making and passing around chids), then
-the complications below are mostly hidden from you.   If you're writing
-threaded code, it's probably a good idea to read this just to understand
-what the issues are.
-
-Channel Access Contexts
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The Channel Access library uses a concept of *contexts* for its own thread
-model, with contexts holding sets of threads as well as Channels and
-Process Variables.  For non-threaded work, a process will use a single
-context that is initialized prior doing any real CA work (done in
-:meth:`ca.initialize_libca`).  In a threaded application, each new thread
-begins with a new, uninitialized context that must be initialized or
-replaced.  Thus each new python thread that will interact with CA must
-either explicitly create its own context with :meth:`ca.create_context`
-(and then, being a good citizen, destroy this context as the thread ends
-with :meth:`ca.destroy_context`) or attach to an existing context.
-
-The generally recommended approach is to use a single CA context throughout
-an entire process and have each thread attach to the first context created
-(probably from the main thread).  This avoids many potential pitfalls (and
-crashes), and can be done fairly simply.  It is the default mode when using
-PV objects.
-
-The most explicit use of contexts is to put :func:`epics.ca.create_context`
-at the start of each function call as a thread target, and
-:func:`epics.ca.destroy_context` at the end of each thread.  This will
-cause all the activity in that thread to be done in its own context.  This
-works, but means more care is needed, and so is not the recommended.
-
-
-The best way to attach to the initially created context is to call
-:meth:`epics.ca.use_initial_context` before any other CA calls in each
-function that will be called by :meth:`Thread.run`.  Equivalently, you can
-add a :func:`withInitialContext` decorator to the function.  Creating a PV
-object will implicitly do this for you, as long as it is your first CA
-action in the function.  Each time you do a :meth:`PV.get` or
-:meth:`PV.put` (or a few other methods), it will also check that the initial
-context is being used.
-
-Of course, this approach requires CA to be initialized already.  Doing that
-*in the main thread* is highly recommended.  If it happens in a child
-thread, that thread must exist for all CA work, so either the life of the
-process or with great care for processes that do only some CA calls.  If
-you are writing a threaded application in which the first real CA calls are
-inside a child thread, it is recommended that you initialize CA in the main
-thread,
-
-As a convenience, the :class:`CAThread` in the :mod:`ca` module is
-is a very thin wrapper around the standard :class:`threading.Thread` which
-adding a call of  :meth:`epics.ca.use_initial_context` just before your
-threaded function is run.  This allows your target functions to not
-explicitly set the context, but still ensures that the initial context is
-used in all functions.
-
-
-.. class:: CAThread(group=None, target=None, name=None, args=(), kwargs={})
-   
-    a subclass of :mod:`threading.Thread` that correctly sets 
-    :meth:`epics.ca.use_initial_context` before running your target.
-
-
-How to work with CA and Threads
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Summarizing the discussion above, to use threads you must use run in
-PREEMPTIVE_CALLBACK mode.  Furthermore, it is recommended that you use a
-single context, and that you initialize CA in the main program thread so
-that your single CA context belongs to the main thread.  Using PV objects
-exclusively makes this easy, but it can also be accomplished relatively
-easily using the lower-level ca interface.  The options for using threads
-(in approximate order of reliability) are then:
-
- 1. use PV objects for threading work.
-
- 2. use :class:`CAThread` instead of :class:`Thread` for threads that
- will use CA calls.
-
- 3. put :func:`epics.ca.use_initial_context` at the top of all
- functions that might be a Thread target function, or decorate them with
- :func:`withInitialContext` decorator, *@withInitialContext*.
-
- 4. use :func:`epics.ca.create_context` at the top of all functions
- that are inside a new thread, and be sure to put
- :func:`epics.ca.destroy_context` at the end of the function.
-
- 5. ignore this advise and hope for the best.  If you're not creating
- new PVs and only reading values of PVs created in the main thread
- inside a child thread, you may not see a problems, at least not until
- you try to do something fancier.
-
-
-Thread Examples
-~~~~~~~~~~~~~~~
-
-This is a simplified version of test code using Python threads.  It is
-based on code originally from Friedrich Schotte, NIH, and included as
-`thread_test.py` in the `tests` directory of the source distribution.
-
-In this example, we define a `run_test` procedure which will create PVs
-from a supplied list, and monitor these PVs, printing out the values when
-they change.  Two threads are created and run concurrently, with
-overlapping PV lists, though one thread is run for a shorter time than the
-other.
-
-.. literalinclude:: ../tests/thread_test.py
-
-In light of the long discussion above, a few remarks are in order: This
-code uses the standard Thread library and explicitly calls
-:func:`epics.ca.use_initial_context` prior to any CA calls in the target
-function.  Also note that the :func:`run_test` function is first called
-from the main thread, so that the initial CA context does belong to the
-main thread.  Finally, the :func:`epics.ca.use_initial_context` call in
-:func:`run_test` above could be replaced with
-:func:`epics.ca.create_context`, and run OK.
-
-The output from this will look like::
-
-    First, create a PV in the main thread:
-    Run 2 Background Threads simultaneously:
-    -> thread "A" will run for 3.000 sec, monitoring ['Py:ao1', 'Py:ai1', 'Py:long1']
-    -> thread "B" will run for 6.000 sec, monitoring ['Py:ai1', 'Py:long1', 'Py:ao2']
-       Py:ao1 = 8.3948 (A)
-       Py:ai1 = 3.14 (B)
-       Py:ai1 = 3.14 (A)
-       Py:ao1 = 0.7404 (A)
-       Py:ai1 = 4.07 (B)
-       Py:ai1 = 4.07 (A)
-       Py:long1 = 3 (B)
-       Py:long1 = 3 (A)
-       Py:ao1 = 13.0861 (A)
-       Py:ai1 = 8.49 (B)
-       Py:ai1 = 8.49 (A)
-       Py:ao2 = 30 (B)
-    Completed Thread  A
-       Py:ai1 = 9.42 (B)
-       Py:ao2 = 30 (B)
-       Py:long1 = 4 (B)
-       Py:ai1 = 3.35 (B)
-       Py:ao2 = 31 (B)
-       Py:ai1 = 4.27 (B)
-       Py:ao2 = 31 (B)
-       Py:long1 = 5 (B)
-       Py:ai1 = 8.20 (B)
-       Py:ao2 = 31 (B)
-    Completed Thread  B
-    Done
-
-Note that while both threads *A* and *B* are running, a callback for the
-PV `Py:ai1` is generated in each thread.
-
-Note also that the callbacks for the PVs created in each thread are
-**explicitly cleared**  with::
-
-    [p.clear_callbacks() for p in pvs]
-
-Without this, the callbacks for thread *A*  will persist even after the
-thread has completed!
-
-
-.. _advanced-multiprocessing-label:
-
-
-Using Multiprocessing with PyEpics
-===========================================
-
-An alternative to Python threads that has some very interesting and
-important features is to use multiple *processes*, as with the standard
-Python :mod:`multiprocessing` module.  While using multiple processes has
-some advantages over threads, it also has important implications for use
-with PyEpics.  The basic issue is that multiple processes need to be fully
-separate, and do not share global state.  For epics Channel Access, this
-means that all those things like established communication channels,
-callbacks, and Channel Access **context** cannot easily be share between
-processes.
-
-The solution is to use a :class:`CAProcess`, which acts just like
-:class:`multiprocessing.Process`, but knows how to separate contexts
-between processes.  This means that you will have to create PV objects for
-each process (even if they point to the same PV).
-
-.. class:: CAProcess(group=None, target=None, name=None, args=(), kwargs={})
-   
-    a subclass of :class:`multiprocessing.Process` that clears the global
-    Channel Access context before running you target function in its own
-    process.
-
-.. class:: CAPool(processes=None, initializer=None, initargs=(), maxtasksperchild=None)
-
-    a subclass of :class:`multiprocessing.pool.Pool`, creating a Pool of
-    :class:`CAProcess` instances.
-
-
-A simple example of using multiprocessing successfully is::
-
-
-.. literalinclude:: ../tests/test_multiprocessing.py
-
-here, the main process and the subprocess can each interact with the same
-PV, though they need to create a separate connection (here, using :class:`PV`)
-in each process.
-
-Note that different :class:`CAProcess` instances can communicate via
-standard :class:`multiprocessing.Queue`.   At this writing,  no testing has
-been done on using multiprocessing Managers.
-
-
-.. _advanced-get-timeouts-label:
 .. _advanced-connecting-many-label:
 
 Strategies for connecting to a large number of PVs
@@ -442,3 +213,224 @@ as the loop will be run more often than using :meth:`time.sleep`.
 
 
 
+.. _advanced-threads-label:
+
+
+Using Python Threads
+=========================
+
+An important feature of the PyEpics package is that it can be used with
+Python threads, as Epics 3.14 supports threads for client code.  Even in
+the best of cases, working with threads can be somewhat tricky and lead to
+unexpected behavior, and the Channel Access library adds a small level of
+complication for using CA with Python threads.  The result is that some
+precautions may be in order when using PyEpics and threads.  This section
+discusses the strategies for using threads with PyEpics.
+
+First, to use threads with Channel Access, you must have
+:data:`epics.ca.PREEMPTIVE_CALLBACK` = ``True``.  This is the default
+value, but if :data:`epics.ca.PREEMPTIVE_CALLBACK` has been set to
+``False``, threading will not work.
+
+Second, if you are using :class:`PV` objects and not making heavy use of
+the :mod:`ca` module (that is, not making and passing around chids), then
+the complications below are mostly hidden from you.   If you're writing
+threaded code, it's probably a good idea to read this just to understand
+what the issues are.
+
+Channel Access Contexts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Channel Access library uses a concept of *contexts* for its own thread
+model, with contexts holding sets of threads as well as Channels and
+Process Variables.  For non-threaded work, a process will use a single
+context that is initialized prior doing any real CA work (done in
+:meth:`ca.initialize_libca`).  In a threaded application, each new thread
+begins with a new, uninitialized context that must be initialized or
+replaced.  Thus each new python thread that will interact with CA must
+either explicitly create its own context with :meth:`ca.create_context`
+(and then, being a good citizen, destroy this context as the thread ends
+with :meth:`ca.destroy_context`) or attach to an existing context.
+
+The generally recommended approach is to use a single CA context throughout
+an entire process and have each thread attach to the first context created
+(probably from the main thread).  This avoids many potential pitfalls (and
+crashes), and can be done fairly simply.  It is the default mode when using
+PV objects.
+
+The most explicit use of contexts is to put :func:`epics.ca.create_context`
+at the start of each function call as a thread target, and
+:func:`epics.ca.destroy_context` at the end of each thread.  This will
+cause all the activity in that thread to be done in its own context.  This
+works, but means more care is needed, and so is not the recommended.
+
+
+The best way to attach to the initially created context is to call
+:meth:`epics.ca.use_initial_context` before any other CA calls in each
+function that will be called by :meth:`Thread.run`.  Equivalently, you can
+add a :func:`withInitialContext` decorator to the function.  Creating a PV
+object will implicitly do this for you, as long as it is your first CA
+action in the function.  Each time you do a :meth:`PV.get` or
+:meth:`PV.put` (or a few other methods), it will also check that the initial
+context is being used.
+
+Of course, this approach requires CA to be initialized already.  Doing that
+*in the main thread* is highly recommended.  If it happens in a child
+thread, that thread must exist for all CA work, so either the life of the
+process or with great care for processes that do only some CA calls.  If
+you are writing a threaded application in which the first real CA calls are
+inside a child thread, it is recommended that you initialize CA in the main
+thread,
+
+As a convenience, the :class:`CAThread` in the :mod:`ca` module is
+is a very thin wrapper around the standard :class:`threading.Thread` which
+adding a call of  :meth:`epics.ca.use_initial_context` just before your
+threaded function is run.  This allows your target functions to not
+explicitly set the context, but still ensures that the initial context is
+used in all functions.
+
+How to work with CA and Threads
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Summarizing the discussion above, to use threads you must use run in
+PREEMPTIVE_CALLBACK mode.  Furthermore, it is recommended that you use a
+single context, and that you initialize CA in the main program thread so
+that your single CA context belongs to the main thread.  Using PV objects
+exclusively makes this easy, but it can also be accomplished relatively
+easily using the lower-level ca interface.  The options for using threads
+(in approximate order of reliability) are then:
+
+ 1. use PV objects for threading work.  This ensures you're working in a
+ single CA context.
+
+ 2. use :class:`CAThread` instead of :class:`Thread` for threads that
+ will use CA calls.
+
+ 3. put :func:`epics.ca.use_initial_context` at the top of all
+ functions that might be a Thread target function, or decorate them with
+ :func:`withInitialContext` decorator, *@withInitialContext*.
+
+ 4. use :func:`epics.ca.create_context` at the top of all functions
+ that are inside a new thread, and be sure to put
+ :func:`epics.ca.destroy_context` at the end of the function.
+
+ 5. ignore this advise and hope for the best.  If you're not creating
+ new PVs and only reading values of PVs created in the main thread
+ inside a child thread, you may not see a problems, at least not until
+ you try to do something fancier.
+
+
+Thread Examples
+~~~~~~~~~~~~~~~
+
+This is a simplified version of test code using Python threads.  It is
+based on code originally from Friedrich Schotte, NIH, and included as
+`thread_test.py` in the `tests` directory of the source distribution.
+
+In this example, we define a `run_test` procedure which will create PVs
+from a supplied list, and monitor these PVs, printing out the values when
+they change.  Two threads are created and run concurrently, with
+overlapping PV lists, though one thread is run for a shorter time than the
+other.
+
+.. literalinclude:: ../tests/thread_test.py
+
+In light of the long discussion above, a few remarks are in order: This
+code uses the standard Thread library and explicitly calls
+:func:`epics.ca.use_initial_context` prior to any CA calls in the target
+function.  Also note that the :func:`run_test` function is first called
+from the main thread, so that the initial CA context does belong to the
+main thread.  Finally, the :func:`epics.ca.use_initial_context` call in
+:func:`run_test` above could be replaced with
+:func:`epics.ca.create_context`, and run OK.
+
+The output from this will look like::
+
+    First, create a PV in the main thread:
+    Run 2 Background Threads simultaneously:
+    -> thread "A" will run for 3.000 sec, monitoring ['Py:ao1', 'Py:ai1', 'Py:long1']
+    -> thread "B" will run for 6.000 sec, monitoring ['Py:ai1', 'Py:long1', 'Py:ao2']
+       Py:ao1 = 8.3948 (A)
+       Py:ai1 = 3.14 (B)
+       Py:ai1 = 3.14 (A)
+       Py:ao1 = 0.7404 (A)
+       Py:ai1 = 4.07 (B)
+       Py:ai1 = 4.07 (A)
+       Py:long1 = 3 (B)
+       Py:long1 = 3 (A)
+       Py:ao1 = 13.0861 (A)
+       Py:ai1 = 8.49 (B)
+       Py:ai1 = 8.49 (A)
+       Py:ao2 = 30 (B)
+    Completed Thread  A
+       Py:ai1 = 9.42 (B)
+       Py:ao2 = 30 (B)
+       Py:long1 = 4 (B)
+       Py:ai1 = 3.35 (B)
+       Py:ao2 = 31 (B)
+       Py:ai1 = 4.27 (B)
+       Py:ao2 = 31 (B)
+       Py:long1 = 5 (B)
+       Py:ai1 = 8.20 (B)
+       Py:ao2 = 31 (B)
+    Completed Thread  B
+    Done
+
+Note that while both threads *A* and *B* are running, a callback for the
+PV `Py:ai1` is generated in each thread.
+
+Note also that the callbacks for the PVs created in each thread are
+**explicitly cleared**  with::
+
+    [p.clear_callbacks() for p in pvs]
+
+Without this, the callbacks for thread *A*  will persist even after the
+thread has completed!
+
+
+.. _advanced-multiprocessing-label:
+
+
+Using Multiprocessing with PyEpics
+===========================================
+
+
+An alternative to Python threads that has some very interesting and
+important features is to use multiple *processes*, as with the standard
+Python :mod:`multiprocessing` module.  While using multiple processes has
+some advantages over threads, it also has important implications for use
+with PyEpics.  The basic issue is that multiple processes need to be fully
+separate, and do not share global state.  For epics Channel Access, this
+means that all those things like established communication channels,
+callbacks, and Channel Access **context** cannot easily be share between
+processes.
+
+The solution is to use a :class:`CAProcess`, which acts just like
+:class:`multiprocessing.Process`, but knows how to separate contexts
+between processes.  This means that you will have to create PV objects for
+each process (even if they point to the same PV).
+
+.. class:: CAProcess(group=None, target=None, name=None, args=(), kwargs={})
+
+    a subclass of :class:`multiprocessing.Process` that clears the global
+    Channel Access context before running you target function in its own
+    process.
+
+.. class:: CAPool(processes=None, initializer=None, initargs=(), maxtasksperchild=None)
+
+    a subclass of :class:`multiprocessing.pool.Pool`, creating a Pool of
+    :class:`CAProcess` instances.
+
+
+A simple example of using multiprocessing successfully is given:
+
+
+.. literalinclude:: ../tests/test_multiprocessing.py
+
+here, the main process and the subprocess can each interact with the same
+PV, though they need to create a separate connection (here, using :class:`PV`)
+in each process.
+
+Note that different :class:`CAProcess` instances can communicate via
+standard :class:`multiprocessing.Queue`.   At this writing,  no testing has
+been done on using multiprocessing Managers.
