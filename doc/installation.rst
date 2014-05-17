@@ -24,7 +24,7 @@ setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
 
 The Python `numpy module <http://numpy.scipy.org/>`_ is not strictly
 required, but will be used to convert EPICS waveforms values into numerical
-array data if available, and its use is strongly encouraged. 
+array data if available, and its use is strongly encouraged.
 
 Downloads
 ~~~~~~~~~~~~~
@@ -81,8 +81,8 @@ Some automated unit-testing is done, using the tests/ folder from the
 source distribution kit, and while the script ``tests/simulator.py`` is running
 (note that the Epics database in ``tests/pydebug.db`` must be loaded in a local
 IOC for the simulator and most of these tests to run).  The following
-systems were tested for 3.2.3, all with Epics base 3.14.12.1 or base 
-3.14.12.2.  
+systems were tested for 3.2.3, all with Epics base 3.14.12.1 or base
+3.14.12.2.
 
 
 +-----------+-----------------+------------+---------------------------+
@@ -213,6 +213,9 @@ The PyEpics source code, this documentation, and all material associated
 with it are distributed under the Epics Open License:
 
 .. include:: ../license.txt
+
+
+
 
 
 

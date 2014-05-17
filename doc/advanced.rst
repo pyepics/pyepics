@@ -30,6 +30,7 @@ simply not been received yet, a subsequent :func:`epics.caget` or
 :func:`pv.get` will eventually complete and receive the value.  That is, if
 a PV for a large waveform record reports that it is connected, but a
 :func:`pv.get` returns None, simply trying again later will probably work::
+
     >>> p = epics.PV('LargeWaveform')
     >>> val = p.get()
     >>> val

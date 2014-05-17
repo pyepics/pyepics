@@ -108,7 +108,7 @@ Python3)::
     >>> arr_string = str(arr_bytes, 'LATIN-1')
 
 
-.. _advanced-large-arrays-label:
+.. _arrays-large-label:
 
 Strategies for working with large arrays
 ============================================

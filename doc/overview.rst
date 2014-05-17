@@ -1,6 +1,6 @@
 
 ============================================
-Overview of EPICS Channel Access in Python
+PyEpics Overview
 ============================================
 
 The python :mod:`epics` package consists of several function, modules, and
