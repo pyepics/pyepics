@@ -1,18 +1,19 @@
 {% extends "!layout.html" %}
 {% block rootrellink %}
-   <li><a href="{{ pathto('main') }}">overview</a>|</li>
-   <li><a href="{{ pathto('installation') }}">download</a>|</li>
-   <li><a href="{{ pathto('pv') }}">pv</a>|</li>
-   <li><a href="{{ pathto('ca') }}">ca</a>|</li>
-   <li><a href="{{ pathto('devices') }}">devices</a>|</li>
-   <li><a href="{{ pathto('arrays') }}">arrays</a>|</li>
-   <li><a href="{{ pathto('advanced') }}">advanced</a>|</li>
-   <li><a href="{{ pathto('wx') }}">wx</a>|</li>
-   &nbsp;&nbsp;<li><a href="{{ pathto('search') }}">search</a></li>
+   <li>[<a href="{{ pathto('installation') }}">install</a></li>
+   <li>|<a href="{{ pathto('overview') }}">overview</a></li>
+   <li>|<a href="{{ pathto('pv') }}">pv</a></li>
+   <li>|<a href="{{ pathto('ca') }}">ca</a></li>
+   <li>|<a href="{{ pathto('arrays') }}">arrays</a></li>
+   <li>|<a href="{{ pathto('devices') }}">devices</a></li>
+   <li>|<a href="{{ pathto('alarm') }}">alarm</a></li>
+   <li>|<a href="{{ pathto('autosave') }}">autosave</a></li>
+   <li>|<a href="{{ pathto('wx') }}">wx</a></li>
+   <li>|<a href="{{ pathto('advanced') }}">advanced</a>]</li>
 {% endblock %}
 
 {% block relbar1 %}
-<div style="background-color: #E4EAED; text-align: left; padding: 8px 4px 8px 4px">
+<div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="{{ pathto('index') }}">
       <img src="{{pathto("_static/pyepics.png", 1) }}" height=50 border="0" alt="pyepics"/>
     &nbsp; PyEpics: Epics Channel Access for Python</a>

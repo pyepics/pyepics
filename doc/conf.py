@@ -22,7 +22,7 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo',
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.extlinks',
               'sphinx.ext.coverage', 'sphinx.ext.pngmath', 'numpydoc']
 
 # Add any paths that contain templates here, relative to this directory.
@@ -84,7 +84,7 @@ add_module_names = True
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
-#show_authors = False
+# show_authors = True
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -97,24 +97,11 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'sphinxdoc'
-#html_theme = 'default'
 
-#html_theme = 'nature'
-# html_theme = 'agogo'
-html_theme_options = {
-    # 'rightsidebar': True,
-    # 'stickysidebar': True,
-    # 'stickysidebar': True,
-    # 'sidebarbgcolor':'#008800',
-    #'documentwidth':'60em',
-    #'sidebarwidth': '25em',
-    #'headercolor1': '#000080',
-    #'headercolor2': '#0000A0',
-    }
-
-# Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+#####
+html_theme_path = ['sphinx/theme']
+html_theme = 'epicsdoc'
+#####
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -122,7 +109,7 @@ html_theme_options = {
 html_title = 'Epics Channel Access for Python'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-html_short_title = 'Epics Channel Access for Python'
+html_short_title = 'PyEpics'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -144,7 +131,7 @@ html_static_path = ['_static']
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
-html_use_smartypants = False # True
+html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
 html_sidebars = {'index': ['indexsidebar.html','searchbox.html']}
