@@ -213,7 +213,7 @@ loop of::
 as the loop will be run more often than using :meth:`time.sleep`.
 
 
-
+.. index:: Threads
 .. _advanced-threads-label:
 
 
@@ -389,12 +389,11 @@ Without this, the callbacks for thread *A*  will persist even after the
 thread has completed!
 
 
+.. index:: Multiprocessing
 .. _advanced-multiprocessing-label:
-
 
 Using Multiprocessing with PyEpics
 ===========================================
-
 
 An alternative to Python threads that has some very interesting and
 important features is to use multiple *processes*, as with the standard
