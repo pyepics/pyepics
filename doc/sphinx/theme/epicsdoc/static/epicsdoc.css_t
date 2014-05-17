@@ -136,7 +136,7 @@ div.sphinxsidebar ul ul {
 
 div.footer {
     background-color: #E5E9F0;
-    color: #333333;
+    color: #773;
     padding: 3px 8px 3px 0;
     clear: both;
     font-size: 0.8em;
@@ -144,7 +144,7 @@ div.footer {
 }
 
 div.footer a {
-    color: #86989B;
+    color: #D22;
     text-decoration: underline;
 }
 
