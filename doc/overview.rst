@@ -454,21 +454,26 @@ PyEpics3 does work with both Python 2.* and 3.*.
 Status and To-Do List
 =======================
 
-The PyEpics package is under active development.  The current status is
-that most features are working well, and it is starting to be used in
-production code, but more testing and better tests are needed.
+The PyEpics package is actively maintained, but the core library seems
+reasonably stable and ready to use in production code.  Features are being
+added slowly, and testing is integrated into development so that the
+changce of introducing bugs into existing codes is minimized.  The package
+is targeted and tested to work with Python 2.6, 2.7, 3.2 and 3.3
+simultaneously (that is, the same code is meant to support all these
+versions).
 
-The package is targeted and tested to work with Python 2.5, 2.6, 2.7, and
-3.1 simultaneously (that is, the same code is meant to support all
-versions).  Currently, the package works with Python 3.1, but is not
-extremely well-tested.
+There are several desired features are left unfinished:
 
-There are several desired features are left undone or unfinished:
+ * add more Epics Devices, including low-level epics records and more
+   suport for Area Detectors.
 
- * port CaChannel interface, ca_util, epicsPV (and other interfaces??) to use epics.ca
+ * incorporate some or all of the Channel Access Server from `pcaspy
+   <http://code.google.com/p/pcaspy/>`_
 
- * add more "devices", including low-level epics records.
+ * build and improve applications using PyEpics, especially for common data
+   acquistion needs.
 
- * incorporate some or all of the Channel Access Server from `pcaspy <http://code.google.com/p/pcaspy/>`_
+ * improve and extend the use of PyQt widgets with PyEpics.
 
- * build and improve applications.
+If you are interested in working on any of these or other topics, please
+contact the authors.

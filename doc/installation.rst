@@ -193,29 +193,54 @@ you may need to set the environmental variable ``EPICS_CA_ADDR_LIST`` to
 specify which networks to search for PVs.
 
 
-Acknowledgments
-~~~~~~~~~~~~~~~~~~~~~~
+Getting Help
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PyEpics was originally written and is maintained by Matt Newville
-<newville@cars.uchicago.ed>.  Important contributions to the library have
-come from Angus Gratton, at the Australian National University.  Several
-other people have provided valuable additions, suggestions, or bug reports,
-which has greatly improved the quality of the library: Michael Abbott,
-Marco Cammarata, Craig Haskins, Pete Jemian, Andrew Johnson, Janko Kolar,
-Irina Kosheleva, Tim Mooney, Eric Norum, Mark Rivers, Friedrich Schotte,
-Mark Vigder, Steve Wasserman, and Glen Wright.
+For questions, bug reports, feature request, please consider using the
+following methods:
+
+ 1.  Send email to the Epics Tech Talk mailing list.  You can also send
+     mail directly to Matt Newville <newville@cars.uchicago.ed>, but the
+     mailing list has many Epics experts reading it, so someone else
+     interested or knowledgeable about the topic might provide an
+     answer. Since the mailing list is archived and the main mailing list
+     for Epics work, a question to the mailing list has a better chance of
+     helping someone else.
+
+ 2.  Create an Issue on http://github.com/pyepics/pyepics.  Though the
+     github Issues seem to be intended for bug tracking, they are a fine
+     way to catalog various kinds of questions and feature requests.
+
+ 3.  If you're sure you've found a bug in existing code, or have some code
+     you think would be useful to add to PyEpics, and you're familiar with
+     git, make a Pull Request on http://github.com/pyepics/pyepics.
 
 
-Epics Open License
-~~~~~~~~~~~~~~~~~~~~~~
+License
+~~~~~~~~~~~~~~~~~~~
 
 The PyEpics source code, this documentation, and all material associated
 with it are distributed under the Epics Open License:
 
 .. include:: ../license.txt
 
+In plain English, this says that there is no warranty or gaurantee that the
+code will actually work, but you can do anything you like with this code
+except a) claim that you wrote it or b) claim that the people who did write
+it endorse your use of the code.  Unless you're the US government, in which
+case you can probably do whatever you want.
 
+Acknowledgments
+~~~~~~~~~~~~~~~~~~~~~~
 
+PyEpics was originally written and is maintained by Matt Newville
+<newville@cars.uchicago.ed>.  Many important contributions to the library
+have come from Angus Gratton while at the Australian National University.
+Several other people have provided valuable additions, suggestions, or bug
+reports, which has greatly improved the quality of the library: Michael
+Abbott, Marco Cammarata, Craig Haskins, Pete Jemian, Andrew Johnson, Janko
+Kolar, Irina Kosheleva, Tim Mooney, Eric Norum, Mark Rivers, Friedrich
+Schotte, Mark Vigder, Steve Wasserman, and Glen Wright.
 
 
 
