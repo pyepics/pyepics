@@ -1,17 +1,20 @@
 """
 simple devices
 """
-from . import ai, ao, bi, bo
-from . import scaler, struck, srs570
-from . import mca, transform, scan
+from .ai import ai
+from .ao import ao
+from .bi import bi
+from .bo import bo
 
-ai = ai.ai
-ao = ao.ao
-bi = bi.bi
-bo = bo.bo
-Scaler = scaler.Scaler
-Struck = struck.Struck
-Mca = mca.Mca
-Transform  = transform.Transform
-SRS570 = srs570.SRS570
+from .scaler import Scaler
+from .struck import Struck
+from .srs570 import SRS570
+from .mca import DXP, MCA, MultiXMAP
+from .scan import Scan
+from .transform import Transform
 
+from .ad_base import AD_Camera
+from .ad_fileplugin import AD_FilePlugin
+from .ad_image import AD_ImagePlugin
+from .ad_overlay import AD_OverlayPlugin
+from .ad_perkinelmer import AD_PerkinElmer
