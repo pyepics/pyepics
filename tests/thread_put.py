@@ -11,9 +11,9 @@ import sys
 import pvnames
 
 epics.caput(pvnames.motor1,   0.3)
-epics.caput(pvnames.motor2,  -20.0)
+epics.caput(pvnames.motor2,  -1.0)
 time.sleep(1.0)
-epics.caput(pvnames.motor2, -20.0, wait=True)
+epics.caput(pvnames.motor2, 1.0, wait=True)
 sys.stdout.write('done with initial moves.\n')
 
 def run_test(pvname,  target, run_name='thread c'):
@@ -31,7 +31,7 @@ epics.ca.show_cache()
 
 sys.stdout.write( "Run 2 Background Threads doing simultaneous put-with-waits:\n")
 th1 = Thread(target=run_test,args=(  pvnames.motor1,  0.5,  'A'))
-th2 = Thread(target=run_test,args=(  pvnames.motor2, 20.0,  'B'))
+th2 = Thread(target=run_test,args=(  pvnames.motor2,  .22,  'B'))
 th1.start()
 th2.start()
 

@@ -13,7 +13,7 @@ def threaded_pvput(pv, value):
    
 if __name__ == '__main__':
     pvname = pvnames.motor2
-    target = 10
+    target = 0.55
     
     pv = epics.PV(pvname)
     pv.put(-target, wait=True)

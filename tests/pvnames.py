@@ -42,7 +42,7 @@ double_arrays   = ['Py:double128', 'Py:double2k', 'Py:double64k']
 ####
 # provide a single motor prefix (to which '.VAL' and '.RBV' etc will be added)
 
-motor_prefix = '13IDE:'
+motor_prefix = '13XRM:'
 motor_list = ['%sm%i' % (motor_prefix, i+1) for i in range(4)]
 motor1 = motor_list[0]
 motor2 = motor_list[1]
