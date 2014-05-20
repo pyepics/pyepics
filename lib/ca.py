@@ -273,6 +273,7 @@ def finalize_libca(maxtime=10.0):
         libca = None
     except StandardError:
         pass
+    time.sleep(0.01)
 
 def get_cache(pvname):
     "return cache dictionary for a given pvname in the current context"

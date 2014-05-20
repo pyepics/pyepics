@@ -54,6 +54,7 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
         write("%i %s  %s %s \n" % (ntype, epics.dbr.Name(ntype).lower(), repr(val), cval))
     write('----- finalizing CA\n')
     epics.ca.finalize_libca()
+    time.sleep(0.01)
     
 for use_preempt in (True, False):
     for use_numpy in (True, False):
