@@ -130,7 +130,7 @@ A simple example use would be::
     m1.move(0.0, dial=True, wait=True)
 
     for i in range(10):
-        m1.tweak(dir='forward', wait=True)
+        m1.tweak(direction='forward', wait=True)
 	time.sleep(1.0)
         print 'Motor:  ', m1.DESC , ' Currently at ', m1.RBV
 
@@ -139,9 +139,11 @@ few features for Motor:
 
  1.  Motors can use English-name aliases for attributes for fields of the
  motor record.  Thus 'VAL' can be spelled 'drive' and 'DESC' can be
- 'description'.   The Table
+ 'description'.   The :ref:`Table of Motor Attributes <motorattr_table>`
+ give the list of names that can be used.
 
- 2.  The methods for setting positions can use the User, Dial, or Step coordinate system, and can wait for completion.
+ 2.  The methods for setting positions can use the User, Dial, or Step
+ coordinate system, and can wait for completion.
 
 
 The :class:`epics.Motor` class
@@ -333,12 +335,13 @@ attribute cannot do so::
    :param dial:          use dial coordinates                 (T/F) [F]
    :param raw:           use raw coordinates                  (T/F) [F]
    :param ignore_limits: try move without regard to limits    (T/F) [F]
-   :param confirm_move:  try to confirm that move begun (when wait=False) (T/F) [F]
+   :param confirm_move:  try to confirm that move has begun (when wait=False) (T/F) [F]
    :rtype:  integer
 
-   Returns an integer value, according the table below.  Note that a return value of 0 with
-   `wait=False` does not really guarantee a successful move, just that a move request was issued.
-   If you're interested in checking that a requested move really did start without waiting for the
+   Returns an integer value, according the table below.  Note that a return
+   value of 0 with `wait=False` does not really guarantee a successful
+   move, just that a move request was issued.  If you're interested in
+   checking that a requested move really did start without waiting for the
    move to complete, you may want to use the `confirm_move=True` option.
 
 
@@ -377,12 +380,12 @@ attribute cannot do so::
    +---------------+----------------------------------------------------------------+
 
 
-.. method:: tweak(dir='forward'[, wait=False[, timeout=300.]])
+.. method:: tweak(direction='forward'[, wait=False[, timeout=300.]])
 
    move the motor by the current *tweak value*
 
-   :param dir: direction of motion
-   :type dir: string: 'forward' (default) or 'reverse'
+   :param direction: direction of motion
+   :type direction: string: 'forward' (default) or 'reverse'
    :param wait: whether to wait for completion
    :type wait:  ``True``/``False``
    :param timeout:  max time for move to complete (in seconds) [default=300]
@@ -435,16 +438,17 @@ attribute cannot do so::
 Other Device Examples
 ===========================
 
-As defined here, an epics device provides a general way to group together a
-set of PVs.  The examples below show how to build on this generality, and
-may inspire you to build your own device classes.
+An epics Device provides a general way to group together a set of PVs.  The
+examples below show how to build on this generality, and may inspire you to
+build your own device classes.
 
-Device without a prefix
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A basic Device without a prefix
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here, we define a very simple device that does not even define a prefix.
-This is not much more than a collection of PVs, All PVs in the device must
-be *fully qualified*, as they need do not share a common prefix::
+This is not much more than a collection of PVs.  Since there is no prefix
+given, all PVs in the device must be *fully qualified*.  Note that there is
+no requirement to share a common prefix in such a collection of PVs::
 
     from epics import Device
     dev = Device()
@@ -456,35 +460,50 @@ be *fully qualified*, as they need do not share a common prefix::
 
 Note that this device cannot use the attributes based on field names.
 
-This may not look very interesting until you consider `Device` to be a
-starting point for building more complicated objects by adding specialized
-methods.
+This may not look very interesting -- why not just use a bunch of PVs?  If
+ou consider `Device` to be a starting point for building more complicated
+objects by subclassing `Device` and adding specialized methods, then it can
+start to get interesting.
 
 
 Epics ai record as Device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a slightly more useful example: An Epics ai (analog input record)
-implemented as a Device.
+For a slightly more useful and typical example, the pyepics distribution
+includes a Device for an Epics ai (analog input record).  The full
+implementation of this device is:
+
 
 .. literalinclude:: ../lib/devices/ai.py
 
-Note that we pre-define the fields that are the *suffixes* of an Epics ai
-input record, and simply subclass :class:`Device` with these fields.  This
-:class:`ai` class can then be used simply and cleanly as::
+The code simply pre-defines the fields that are the *suffixes* of an Epics ai
+input record, and subclasses :class:`Device` with these fields to create the
+corresponding PVs.  For most record suffixes, these will be available as
+attributes of the Device object.  For example, the :class:`ai` class above can
+be used simply and cleanly as::
 
+    from epics.devices import ai
     This_ai = ai('XXX.PRES')
     print 'Value: ', This_ai.VAL
     print 'Units: ', This_ai.EGU
 
-Several of the other standard Epics records can easily be exposed as Devices in this way.
+Of course, you can also use the :meth:`get`, :meth:`put` methods above for a
+basic :class:`Device`::
+
+    This_ai.put('DESC', 'My Pump')
+
+
+Several of the other standard Epics records can easily be exposed as Devices in
+this way, and the pyepics distribution includes such simple wrappings for the
+Epics ao, bi, and bo records, as well as several more complex records from
+synApps.
 
 Epics Scaler Record as Device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-And finally a slightly more complicated example: an incomplete, but very
-useful mapping of the Scaler Record from synApps, including methods for
-changing modes, and reading and writing data.
+For a slightly more complicated example: an incomplete, but very useful mapping
+of the Scaler Record from synApps, including methods for changing modes, and
+reading and writing data.
 
 .. literalinclude:: ../lib/devices/scaler.py
 
@@ -500,3 +519,62 @@ directly invoking epics calls::
    print 'Names:       ', s1.getNames()
    print 'Raw  values: ', s1.Read(use_calc=False)
    print 'Calc values: ', s1.Read(use_calc=True)
+
+
+Other Devices included in PyEpics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Several other Epics Records have been exposed as Devices, and included in
+PyEpics distribution.  These vary some in how complete and feature-rich they
+are, and are definitely skewed toward data collection at synchrotron beamlines.
+A table of current Devices are listed in the :ref:`Table of Included Epics
+Devices <devices_table>` table below.  For further details, consult the source
+code for these modules.
+
+.. _devices_table:
+
+   Table of Epics Devices Included in the PyEpics distribtion.  For those
+   described as "pretty basic", there are generally only PV suffixes to
+   attributes mapped.  Many of the others include one or more methods for
+   specific use of that Device.
+
+
++----------------+-----------------+------------------------------------------------+
+|   **module**   |  **class**      |    description                                 |
++================+=================+================================================+
+| ad_base        |  AD_Camera      | areaDetector Camera, pretty basic              |
++----------------+-----------------+------------------------------------------------+
+| ad_fileplugin  | AD_FilePlugin   | areaDetector File Plugin, many methods         |
++----------------+-----------------+------------------------------------------------+
+| ad_image       | AD_ImagePlugin  | areaDetector Image, with ArrayData attribute   |
++----------------+-----------------+------------------------------------------------+
+| ad_overlay     | AD_OverlayPlugin| areaDetector Overlay, pretty basic             |
++----------------+-----------------+------------------------------------------------+
+| ad_perkinelmer | AD_PerkinElmer  | PerkinElmer(xrd1600) detector, several methods |
++----------------+-----------------+------------------------------------------------+
+| ai             | ai              | analog input, pretty basic (as above)          |
++----------------+-----------------+------------------------------------------------+
+| ao             | ao              | analog output, pretty basic                    |
++----------------+-----------------+------------------------------------------------+
+| bi             | bi              | binary input, pretty basic                     |
++----------------+-----------------+------------------------------------------------+
+| bo             | bo              | binary output, pretty basic                    |
++----------------+-----------------+------------------------------------------------+
+| mca            | MCA             | epics DXP record, pretty basic                 |
++----------------+-----------------+------------------------------------------------+
+| mca            | DXP             | epics MCA record, get_rois()/get_calib()       |
++----------------+-----------------+------------------------------------------------+
+| mca            | MultiXMAP       | Multiple XIA XMaps, several methods            |
++----------------+-----------------+------------------------------------------------+
+| scaler         | Scaler          | epics Scaler record, many methods              |
++----------------+-----------------+------------------------------------------------+
+| scan           | Scan            | epics SScan record, some methods               |
++----------------+-----------------+------------------------------------------------+
+| srs570         | SRS570          | SRS570 Amplifier                               |
++----------------+-----------------+------------------------------------------------+
+| struck         | Struck          | SIS Multichannel Scaler, many methods          |
++----------------+-----------------+------------------------------------------------+
+| transform      | Transform       | epics userTransform record                     |
++----------------+-----------------+------------------------------------------------+
+
