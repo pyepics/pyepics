@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -10,13 +9,13 @@
     
     <title>Alarms: respond when a PV goes out of range &mdash; Epics Channel Access for Python</title>
     
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '3.2.2',
+        URL_ROOT:    './',
+        VERSION:     '3.2.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -30,7 +29,7 @@
     <link rel="prev" title="Devices: collections of PVs" href="devices.html" /> 
   </head>
   <body>
-<div style="background-color: #E4EAED; text-align: left; padding: 8px 4px 8px 4px">
+<div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
     &nbsp; PyEpics: Epics Channel Access for Python</a>
@@ -52,15 +51,16 @@
         <li class="right" >
           <a href="devices.html" title="Devices: collections of PVs"
              accesskey="P">previous</a> |</li>
-   <li><a href="overview.html">overview</a>|</li>
-   <li><a href="installation.html">download</a>|</li>
-   <li><a href="pv.html">pv</a>|</li>
-   <li><a href="ca.html">ca</a>|</li>
-   <li><a href="devices.html">devices</a>|</li>
-   <li><a href="wx.html">wx</a>|</li>
-   <li><a href="advanced.html">advanced</a>|</li>
-   <li><a href="more.html">contents</a>|</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
+   <li>[<a href="installation.html">install</a></li>
+   <li>|<a href="overview.html">overview</a></li>
+   <li>|<a href="pv.html">pv</a></li>
+   <li>|<a href="ca.html">ca</a></li>
+   <li>|<a href="arrays.html">arrays</a></li>
+   <li>|<a href="devices.html">devices</a></li>
+   <li>|<a href="#">alarm</a></li>
+   <li>|<a href="autosave.html">autosave</a></li>
+   <li>|<a href="wx.html">wx</a></li>
+   <li>|<a href="advanced.html">advanced</a>]</li>
  
       </ul>
     </div>
@@ -168,22 +168,22 @@ based on those values.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>'eq', '=='</td>
+<tr class="row-even"><td>&#8216;eq&#8217;, &#8216;==&#8217;</td>
 <td>__eq__</td>
 </tr>
-<tr class="row-odd"><td>'ne', '!='</td>
+<tr class="row-odd"><td>&#8216;ne&#8217;, &#8216;!=&#8217;</td>
 <td>__ne__</td>
 </tr>
-<tr class="row-even"><td>'le', '&lt;='</td>
+<tr class="row-even"><td>&#8216;le&#8217;, &#8216;&lt;=&#8217;</td>
 <td>__le__</td>
 </tr>
-<tr class="row-odd"><td>'lt', '&lt;'</td>
+<tr class="row-odd"><td>&#8216;lt&#8217;, &#8216;&lt;&#8217;</td>
 <td>__lt__</td>
 </tr>
-<tr class="row-even"><td>'ge', '&gt;='</td>
+<tr class="row-even"><td>&#8216;ge&#8217;, &#8216;&gt;=&#8217;</td>
 <td>__ge__</td>
 </tr>
-<tr class="row-odd"><td>'gt', '&gt;'</td>
+<tr class="row-odd"><td>&#8216;gt&#8217;, &#8216;&gt;&#8217;</td>
 <td>__gt__</td>
 </tr>
 </tbody>
@@ -202,7 +202,7 @@ within the time specified by  <tt class="xref py py-attr docutils literal"><span
 <div class="section" id="alarm-example">
 <h2>Alarm Example<a class="headerlink" href="#alarm-example" title="Permalink to this headline">¶</a></h2>
 <p>An epics Alarm is very easy to use.  Here is an alarm set to print a
-message when a PV's value reaches a certain value:</p>
+message when a PV&#8217;s value reaches a certain value:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">Alarm</span><span class="p">,</span> <span class="n">poll</span>
 
 <span class="k">def</span> <span class="nf">alertMe</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
@@ -241,21 +241,22 @@ message when a PV's value reaches a certain value:</p>
         <li class="right" >
           <a href="devices.html" title="Devices: collections of PVs"
              >previous</a> |</li>
-   <li><a href="overview.html">overview</a>|</li>
-   <li><a href="installation.html">download</a>|</li>
-   <li><a href="pv.html">pv</a>|</li>
-   <li><a href="ca.html">ca</a>|</li>
-   <li><a href="devices.html">devices</a>|</li>
-   <li><a href="wx.html">wx</a>|</li>
-   <li><a href="advanced.html">advanced</a>|</li>
-   <li><a href="more.html">contents</a>|</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
+   <li>[<a href="installation.html">install</a></li>
+   <li>|<a href="overview.html">overview</a></li>
+   <li>|<a href="pv.html">pv</a></li>
+   <li>|<a href="ca.html">ca</a></li>
+   <li>|<a href="arrays.html">arrays</a></li>
+   <li>|<a href="devices.html">devices</a></li>
+   <li>|<a href="#">alarm</a></li>
+   <li>|<a href="autosave.html">autosave</a></li>
+   <li>|<a href="wx.html">wx</a></li>
+   <li>|<a href="advanced.html">advanced</a>]</li>
  
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2014, Matthew Newville.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,15 +7,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Overview of EPICS Channel Access in Python &mdash; Epics Channel Access for Python</title>
+    <title>PyEpics Overview &mdash; Epics Channel Access for Python</title>
     
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '3.2.2',
+        URL_ROOT:    './',
+        VERSION:     '3.2.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -30,7 +29,7 @@
     <link rel="prev" title="Downloading and Installation" href="installation.html" /> 
   </head>
   <body>
-<div style="background-color: #E4EAED; text-align: left; padding: 8px 4px 8px 4px">
+<div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
     &nbsp; PyEpics: Epics Channel Access for Python</a>
@@ -52,15 +51,16 @@
         <li class="right" >
           <a href="installation.html" title="Downloading and Installation"
              accesskey="P">previous</a> |</li>
-   <li><a href="#">overview</a>|</li>
-   <li><a href="installation.html">download</a>|</li>
-   <li><a href="pv.html">pv</a>|</li>
-   <li><a href="ca.html">ca</a>|</li>
-   <li><a href="devices.html">devices</a>|</li>
-   <li><a href="wx.html">wx</a>|</li>
-   <li><a href="advanced.html">advanced</a>|</li>
-   <li><a href="more.html">contents</a>|</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
+   <li>[<a href="installation.html">install</a></li>
+   <li>|<a href="#">overview</a></li>
+   <li>|<a href="pv.html">pv</a></li>
+   <li>|<a href="ca.html">ca</a></li>
+   <li>|<a href="arrays.html">arrays</a></li>
+   <li>|<a href="devices.html">devices</a></li>
+   <li>|<a href="alarm.html">alarm</a></li>
+   <li>|<a href="autosave.html">autosave</a></li>
+   <li>|<a href="wx.html">wx</a></li>
+   <li>|<a href="advanced.html">advanced</a>]</li>
  
       </ul>
     </div>
@@ -69,7 +69,7 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Overview of EPICS Channel Access in Python</a><ul>
+<li><a class="reference internal" href="#">PyEpics Overview</a><ul>
 <li><a class="reference internal" href="#quick-start">Quick Start</a><ul>
 <li><a class="reference internal" href="#functional-approach-caget-caput">Functional Approach: caget(), caput()</a></li>
 <li><a class="reference internal" href="#object-oriented-approach-pv">Object Oriented Approach: PV</a></li>
@@ -121,8 +121,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="overview-of-epics-channel-access-in-python">
-<h1>Overview of EPICS Channel Access in Python<a class="headerlink" href="#overview-of-epics-channel-access-in-python" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pyepics-overview">
+<h1>PyEpics Overview<a class="headerlink" href="#pyepics-overview" title="Permalink to this headline">¶</a></h1>
 <p>The python <a class="reference internal" href="#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><tt class="xref py py-mod docutils literal"><span class="pre">epics</span></tt></a> package consists of several function, modules, and
 classes to interact with EPICS Channel Access.  The simplest approach uses
 the functions <tt class="xref py py-func docutils literal"><span class="pre">caget()</span></tt>, <tt class="xref py py-func docutils literal"><span class="pre">caput()</span></tt>, <tt class="xref py py-func docutils literal"><span class="pre">cainfo()</span></tt>,
@@ -145,15 +145,15 @@ Channel Access.</li>
 <li>a <tt class="xref py py-class docutils literal"><span class="pre">Device</span></tt> object:  a collection of related PVs</li>
 <li>a <tt class="xref py py-class docutils literal"><span class="pre">Motor</span></tt> object: a mapping of an Epics Motor</li>
 <li>an <tt class="xref py py-class docutils literal"><span class="pre">Alarm</span></tt> object, which can be used to set up notifications
-when a PV's values goes outside an acceptable bounds.</li>
+when a PV&#8217;s values goes outside an acceptable bounds.</li>
 <li>an <tt class="xref py py-mod docutils literal"><span class="pre">epics.wx</span></tt> module that provides wxPython classes designed for
 use with Epics PVs.</li>
 </ul>
 </div></blockquote>
-<p>If you're looking to write quick scripts or a simple introduction to using
+<p>If you&#8217;re looking to write quick scripts or a simple introduction to using
 Channel Access, the <tt class="xref py py-func docutils literal"><span class="pre">caget()</span></tt> and <tt class="xref py py-func docutils literal"><span class="pre">caput()</span></tt> functions are probably
 where you want to start.</p>
-<p>If you're building larger scripts and programs, using <tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt> objects
+<p>If you&#8217;re building larger scripts and programs, using <tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt> objects
 provided by the <a class="reference internal" href="pv.html#module-pv" title="pv: PV objects for Epics Channel Access"><tt class="xref py py-mod docutils literal"><span class="pre">pv</span></tt></a> module is recommended.  The <tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt> class
 provides a Process Variable object that has both methods (including
 <tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt> and <tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt>) to read and change the PV, and attributes that
@@ -173,8 +173,8 @@ Linux and Mac OS X) and Windows with Python versions 2.5, 2.6, 2.7, and
 3.1, and 3.2.</p>
 <div class="section" id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
-<p>Whether you're familiar with Epics Channel Access or not, start here.
-You'll then be able to use Python's introspection tools and built-in help
+<p>Whether you&#8217;re familiar with Epics Channel Access or not, start here.
+You&#8217;ll then be able to use Python&#8217;s introspection tools and built-in help
 system, and the rest of this document as a reference and for detailed
 discussions.</p>
 <div class="section" id="functional-approach-caget-caput">
@@ -198,14 +198,14 @@ clarity.</p>
 <div class="section" id="object-oriented-approach-pv">
 <h3>Object Oriented Approach: PV<a class="headerlink" href="#object-oriented-approach-pv" title="Permalink to this headline">¶</a></h3>
 <p>If you want to repeatedly access the same PV, you may find it more
-convenient to ''create a PV object'' and use it in a more object-oriented
+convenient to &#8216;&#8217;create a PV object&#8217;&#8217; and use it in a more object-oriented
 manner.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>PV objects have several methods and attributes.  The most important methods
-are  <tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt> and <tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt> to receive and send the PV's value, and
+are  <tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt> and <tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt> to receive and send the PV&#8217;s value, and
 the <tt class="xref py py-attr docutils literal"><span class="pre">value</span></tt> attribute which stores the current value.  In analogy to
 the <tt class="xref py py-func docutils literal"><span class="pre">caget()</span></tt> and <tt class="xref py py-func docutils literal"><span class="pre">caput()</span></tt> examples above, the value of a PV can
 be fetched either with</p>
@@ -218,7 +218,7 @@ be fetched either with</p>
 <span class="go">1.2001</span>
 </pre></div>
 </div>
-<p>To set a PV's value, you can either use</p>
+<p>To set a PV&#8217;s value, you can either use</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.9</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -290,12 +290,12 @@ the functional approach can be quite good.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pvname</strong> -- name of Epics Process Variable</li>
-<li><strong>as_string</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to return string representation of the PV value.</li>
-<li><strong>count</strong> (integer or <tt class="docutils literal"><span class="pre">None</span></tt>) -- number of elements to return for array data.</li>
-<li><strong>as_numpy</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to return the Numerical Python representation for array data.</li>
-<li><strong>timeout</strong> (float or <tt class="docutils literal"><span class="pre">None</span></tt>) -- maximum time to wait (in seconds) for value before returning None.</li>
-<li><strong>use_monitor</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to rely on monitor callbacks or explicitly get value now.</li>
+<li><strong>pvname</strong> &#8211; name of Epics Process Variable</li>
+<li><strong>as_string</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) &#8211; whether to return string representation of the PV value.</li>
+<li><strong>count</strong> (integer or <tt class="docutils literal"><span class="pre">None</span></tt>) &#8211; number of elements to return for array data.</li>
+<li><strong>as_numpy</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) &#8211; whether to return the Numerical Python representation for array data.</li>
+<li><strong>timeout</strong> (float or <tt class="docutils literal"><span class="pre">None</span></tt>) &#8211; maximum time to wait (in seconds) for value before returning None.</li>
+<li><strong>use_monitor</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) &#8211; whether to rely on monitor callbacks or explicitly get value now.</li>
 </ul>
 </td>
 </tr>
@@ -312,7 +312,7 @@ off conversion to a numpy array.</p>
 fetched over the network.  If the timeout is exceeded, <a class="reference internal" href="#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">caget()</span></tt></a> will
 return <tt class="docutils literal"><span class="pre">None</span></tt>.  This might imply that the PV is not actually available,
 but it might also mean that the data is large or network slow enough that
-the data just hasn't been received yet, but may show up later.</p>
+the data just hasn&#8217;t been received yet, but may show up later.</p>
 <p>The <em>use_monitor</em> argument sets whether to rely on the monitors from the
 underlying PV.  The default is <tt class="docutils literal"><span class="pre">False</span></tt>, so that each <a class="reference internal" href="#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">caget()</span></tt></a> will
 explicitly ask the value to be sent instead of relying on the automatic
@@ -323,7 +323,7 @@ leaving the default value of <tt class="docutils literal"><span class="pre">True
 <p>The <em>as_string</em> argument tells the function to return the <strong>string
 representation</strong> of the value.  The details of the string representation
 depends on the variable type of the PV.  For integer (short or long) and
-string PVs, the string representation is pretty easy: 0 will become '0',
+string PVs, the string representation is pretty easy: 0 will become &#8216;0&#8217;,
 for example.  For float and doubles, the internal precision of the PV is
 used to format the string value.  For enum types, the name of the enum
 state is returned:</p>
@@ -348,7 +348,7 @@ returned, with the conversion method depending on the data type:</p>
 </div>
 <p>For most array data from Epics waveform records, the regular value will be
 a numpy array (or a python list if numpy is not installed).  The string
-representation will be something like '&lt;array size=128, type=int&gt;'
+representation will be something like &#8216;&lt;array size=128, type=int&gt;&#8217;
 depending on the size and type of the waveform.  An array of doubles might
 be:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:scan1.P1PA&#39;</span><span class="p">)</span>  <span class="c"># A Double Waveform</span>
@@ -388,10 +388,10 @@ devices.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pvname</strong> -- name of Epics Process Variable</li>
-<li><strong>value</strong> -- value to send.</li>
-<li><strong>wait</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) -- whether to wait until the processing has completed.</li>
-<li><strong>timeout</strong> (<em>double</em>) -- how long to wait (in seconds) for put to complete before giving up.</li>
+<li><strong>pvname</strong> &#8211; name of Epics Process Variable</li>
+<li><strong>value</strong> &#8211; value to send.</li>
+<li><strong>wait</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) &#8211; whether to wait until the processing has completed.</li>
+<li><strong>timeout</strong> (<em>double</em>) &#8211; how long to wait (in seconds) for put to complete before giving up.</li>
 </ul>
 </td>
 </tr>
@@ -432,8 +432,8 @@ including Control Settings.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pvname</strong> -- name of Epics Process Variable</li>
-<li><strong>print_out</strong> -- whether to write results to standard output
+<li><strong>pvname</strong> &#8211; name of Epics Process Variable</li>
+<li><strong>print_out</strong> &#8211; whether to write results to standard output
 (otherwise the string is returned).</li>
 </ul>
 </td>
@@ -457,9 +457,9 @@ but the action that actually happens can be customized.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pvname</strong> -- name of Epics Process Variable</li>
-<li><strong>writer</strong> (<tt class="docutils literal"><span class="pre">None</span></tt> or a callable function that takes a string argument.) -- where to write results to standard output .</li>
-<li><strong>callback</strong> (<tt class="docutils literal"><span class="pre">None</span></tt> or callable function) -- user-supplied function to receive result</li>
+<li><strong>pvname</strong> &#8211; name of Epics Process Variable</li>
+<li><strong>writer</strong> (<tt class="docutils literal"><span class="pre">None</span></tt> or a callable function that takes a string argument.) &#8211; where to write results to standard output .</li>
+<li><strong>callback</strong> (<tt class="docutils literal"><span class="pre">None</span></tt> or callable function) &#8211; user-supplied function to receive result</li>
 </ul>
 </td>
 </tr>
@@ -494,7 +494,7 @@ should take keyword arguments for <em>pvname</em>, <em>value</em>, and <em>char_
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pvname</strong> -- name of Epics Process Variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pvname</strong> &#8211; name of Epics Process Variable</td>
 </tr>
 </tbody>
 </table>
@@ -534,7 +534,7 @@ Linux.</p>
 <p>There are a few other Python modules exposing Epics Channel Access
 available.  Most of these have a interface to the CA library that was both
 closer to the C library and lower-level than EpicsCA.  Most of these
-interfaces use specialized C-Python 'wrapper' code to provide the
+interfaces use specialized C-Python &#8216;wrapper&#8217; code to provide the
 interface.</p>
 <p>Because of this, an additional motivation for this package was to allow a
 more common interface to be used that built higher-level objects (as
@@ -549,14 +549,14 @@ objects) to the EPICS Channel Access protocol.</li>
 preemptive callbacks and thread support.</li>
 <li>easy support and distribution for Windows and Unix-like systems.</li>
 <li>being ready for porting to Python3.</li>
-<li>using Python's ctypes library.</li>
+<li>using Python&#8217;s ctypes library.</li>
 </ol>
 </div></blockquote>
 <p>The main implementation feature used here (and difference from EpicsCA) is
-using Python's ctypes library to handle the connection between Python and
+using Python&#8217;s ctypes library to handle the connection between Python and
 the CA C library.  Using ctypes has many advantages.  Principally, it fully
 eliminates the need to write (and maintain) wrapper code either with SWIG
-or directly with Python's C API.  Since the ctypes module allows access to
+or directly with Python&#8217;s C API.  Since the ctypes module allows access to
 C data and objects in pure Python, no compilation step is needed to build
 the module, making installation and support on multiple platforms much
 easier.  Since ctypes loads a shared object library at runtime, the
@@ -569,22 +569,26 @@ PyEpics3 does work with both Python 2.* and 3.*.</p>
 </div>
 <div class="section" id="status-and-to-do-list">
 <h2>Status and To-Do List<a class="headerlink" href="#status-and-to-do-list" title="Permalink to this headline">¶</a></h2>
-<p>The PyEpics package is under active development.  The current status is
-that most features are working well, and it is starting to be used in
-production code, but more testing and better tests are needed.</p>
-<p>The package is targeted and tested to work with Python 2.5, 2.6, 2.7, and
-3.1 simultaneously (that is, the same code is meant to support all
-versions).  Currently, the package works with Python 3.1, but is not
-extremely well-tested.</p>
-<p>There are several desired features are left undone or unfinished:</p>
+<p>The PyEpics package is actively maintained, but the core library seems
+reasonably stable and ready to use in production code.  Features are being
+added slowly, and testing is integrated into development so that the
+changce of introducing bugs into existing codes is minimized.  The package
+is targeted and tested to work with Python 2.6, 2.7, 3.2 and 3.3
+simultaneously (that is, the same code is meant to support all these
+versions).</p>
+<p>There are several desired features are left unfinished:</p>
 <blockquote>
 <div><ul class="simple">
-<li>port CaChannel interface, ca_util, epicsPV (and other interfaces??) to use epics.ca</li>
-<li>add more &quot;devices&quot;, including low-level epics records.</li>
+<li>add more Epics Devices, including low-level epics records and more
+suport for Area Detectors.</li>
 <li>incorporate some or all of the Channel Access Server from <a class="reference external" href="http://code.google.com/p/pcaspy/">pcaspy</a></li>
-<li>build and improve applications.</li>
+<li>build and improve applications using PyEpics, especially for common data
+acquistion needs.</li>
+<li>improve and extend the use of PyQt widgets with PyEpics.</li>
 </ul>
 </div></blockquote>
+<p>If you are interested in working on any of these or other topics, please
+contact the authors.</p>
 </div>
 </div>
 
@@ -609,21 +613,22 @@ extremely well-tested.</p>
         <li class="right" >
           <a href="installation.html" title="Downloading and Installation"
              >previous</a> |</li>
-   <li><a href="#">overview</a>|</li>
-   <li><a href="installation.html">download</a>|</li>
-   <li><a href="pv.html">pv</a>|</li>
-   <li><a href="ca.html">ca</a>|</li>
-   <li><a href="devices.html">devices</a>|</li>
-   <li><a href="wx.html">wx</a>|</li>
-   <li><a href="advanced.html">advanced</a>|</li>
-   <li><a href="more.html">contents</a>|</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
+   <li>[<a href="installation.html">install</a></li>
+   <li>|<a href="#">overview</a></li>
+   <li>|<a href="pv.html">pv</a></li>
+   <li>|<a href="ca.html">ca</a></li>
+   <li>|<a href="arrays.html">arrays</a></li>
+   <li>|<a href="devices.html">devices</a></li>
+   <li>|<a href="alarm.html">alarm</a></li>
+   <li>|<a href="autosave.html">autosave</a></li>
+   <li>|<a href="wx.html">wx</a></li>
+   <li>|<a href="advanced.html">advanced</a>]</li>
  
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2014, Matthew Newville.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

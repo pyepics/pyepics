@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -10,13 +9,13 @@
     
     <title>ca: Low-level Channel Access module &mdash; Epics Channel Access for Python</title>
     
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '3.2.2',
+        URL_ROOT:    './',
+        VERSION:     '3.2.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,11 +25,11 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Epics Channel Access for Python" href="index.html" />
-    <link rel="next" title="Devices: collections of PVs" href="devices.html" />
+    <link rel="next" title="Working with waveform / array data" href="arrays.html" />
     <link rel="prev" title="PV: Epics Process Variables" href="pv.html" /> 
   </head>
   <body>
-<div style="background-color: #E4EAED; text-align: left; padding: 8px 4px 8px 4px">
+<div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
     &nbsp; PyEpics: Epics Channel Access for Python</a>
@@ -47,20 +46,21 @@
           <a href="np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="devices.html" title="Devices: collections of PVs"
+          <a href="arrays.html" title="Working with waveform / array data"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="pv.html" title="PV: Epics Process Variables"
              accesskey="P">previous</a> |</li>
-   <li><a href="overview.html">overview</a>|</li>
-   <li><a href="installation.html">download</a>|</li>
-   <li><a href="pv.html">pv</a>|</li>
-   <li><a href="#">ca</a>|</li>
-   <li><a href="devices.html">devices</a>|</li>
-   <li><a href="wx.html">wx</a>|</li>
-   <li><a href="advanced.html">advanced</a>|</li>
-   <li><a href="more.html">contents</a>|</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
+   <li>[<a href="installation.html">install</a></li>
+   <li>|<a href="overview.html">overview</a></li>
+   <li>|<a href="pv.html">pv</a></li>
+   <li>|<a href="#">ca</a></li>
+   <li>|<a href="arrays.html">arrays</a></li>
+   <li>|<a href="devices.html">devices</a></li>
+   <li>|<a href="alarm.html">alarm</a></li>
+   <li>|<a href="autosave.html">autosave</a></li>
+   <li>|<a href="wx.html">wx</a></li>
+   <li>|<a href="advanced.html">advanced</a>]</li>
  
       </ul>
     </div>
@@ -107,8 +107,8 @@
   <p class="topless"><a href="pv.html"
                         title="previous chapter">PV: Epics Process Variables</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="devices.html"
-                        title="next chapter">Devices: collections of PVs</a></p>
+  <p class="topless"><a href="arrays.html"
+                        title="next chapter">Working with waveform / array data</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/ca.txt"
@@ -180,7 +180,7 @@ much trouble if needed. See <a class="reference internal" href="#ca-omissions-la
 all of these are supported in Python. Only native types and their DBR_TIME
 and DBR_CTRL variants are supported here.  The DBR_STS and DBR_GR variants
 are not, as they are subsets of the DBR_CTRL type, and space optimization
-is not something you'll be striving for with Python.  Several <cite>dbr_XXX</cite>
+is not something you&#8217;ll be striving for with Python.  Several <cite>dbr_XXX</cite>
 functions are also not supported, as they appear to be needed only to be
 able to dynamically allocate memory, which is not necessary in Python.</p>
 </div>
@@ -204,7 +204,7 @@ explicitly initializing a Channel Access session.  Instead, the library is
 initialized as soon as it is needed, and intervention is really only
 required to change default settings.  The <a class="reference internal" href="#module-ca" title="ca: low-level Channel Access  module."><tt class="xref py py-mod docutils literal"><span class="pre">ca</span></tt></a> module also handles
 finalizing the CA session, so that core-dumps and warning messages do not
-happen due to CA still being 'alive' as a program ends.</p>
+happen due to CA still being &#8216;alive&#8217; as a program ends.</p>
 <p>Because some users may wish to customize the initialization and
 finalization process, the detailed steps will be described here.  These
 initialization and finalization tasks are handled in the following way:</p>
@@ -254,8 +254,7 @@ clear: waveforms with fewer elements than this value will be
 automatically monitored changes, and will be converted to numpy arrays
 (if numpy is installed).  Larger waveforms will not be automatically
 monitored.</p>
-<p><a class="reference internal" href="advanced.html#advanced-arrays-label"><em>Working with waveform / array data</em></a> and <a class="reference internal" href="advanced.html#advanced-large-arrays-label"><em>Strategies for working with large arrays</em></a> for
-more details.</p>
+<p><a class="reference internal" href="arrays.html#arrays-label"><em>Working with waveform / array data</em></a> and <a class="reference internal" href="arrays.html#arrays-large-label"><em>Strategies for working with large arrays</em></a> for more details.</p>
 </dd></dl>
 
 </div>
@@ -280,7 +279,7 @@ you should not need to call this directly from most real programs.</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>libca</strong> : object</p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>libca</strong> : object</p>
 <blockquote class="last">
 <div><p>ca library object, used for all subsequent ca calls</p>
 </div></blockquote>
@@ -288,7 +287,7 @@ you should not need to call this directly from most real programs.</dd>
 </tr>
 </tbody>
 </table>
-<div class="admonition-see-also admonition seealso">
+<div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
 <dt><a class="reference internal" href="#epics.ca.withCA" title="epics.ca.withCA"><tt class="xref py py-obj docutils literal"><span class="pre">withCA</span></tt></a></dt>
@@ -309,7 +308,7 @@ then calls <a class="reference internal" href="#epics.ca.flush_io" title="epics.
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>maxtime</strong> : float</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>maxtime</strong> : float</p>
 <blockquote class="last">
 <div><p>maximimum time (in seconds) to wait for <a class="reference internal" href="#epics.ca.flush_io" title="epics.ca.flush_io"><tt class="xref py py-func docutils literal"><span class="pre">flush_io()</span></tt></a> and <a class="reference internal" href="#epics.ca.poll" title="epics.ca.poll"><tt class="xref py py-func docutils literal"><span class="pre">poll()</span></tt></a> to complete.</p>
 </div></blockquote>
@@ -335,11 +334,11 @@ the rest of the CA library) are supported.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>ctx</strong> : int</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ctx</strong> : int</p>
 <blockquote class="last">
-<div><p>0 -- No preemptive callbacks,
-1 -- use use preemptive callbacks,
-None -- use value of <a class="reference internal" href="#epics.ca.PREEMPTIVE_CALLBACK" title="epics.ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></tt></a></p>
+<div><p>0 &#8211; No preemptive callbacks,
+1 &#8211; use use preemptive callbacks,
+None &#8211; use value of <a class="reference internal" href="#epics.ca.PREEMPTIVE_CALLBACK" title="epics.ca.PREEMPTIVE_CALLBACK"><tt class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></tt></a></p>
 </div></blockquote>
 </td>
 </tr>
@@ -382,7 +381,7 @@ None -- use value of <a class="reference internal" href="#epics.ca.PREEMPTIVE_CA
 <dd><p>Attaches to the context created when libca is initialized.
 Using this function is recommended when writing threaded programs that
 using CA.</p>
-<div class="admonition-see-also admonition seealso">
+<div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="advanced.html#advanced-threads-label"><em>Using Python Threads</em></a></p>
 </div>
@@ -399,7 +398,7 @@ including status for each channel, and search and connection statistics.</p>
 <dt id="epics.ca.version">
 <tt class="descclassname">epics.ca.</tt><tt class="descname">version</tt><big>(</big><big>)</big><a class="headerlink" href="#epics.ca.version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print Channel Access version string.
-Currently, this should report '4.13'</p>
+Currently, this should report &#8216;4.13&#8217;</p>
 </dd></dl>
 
 <dl class="function">
@@ -458,7 +457,7 @@ functions to identify this channel.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>pvname</strong> :  string</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pvname</strong> :  string</p>
 <blockquote>
 <div><p>the name of the PV for which a channel should be created.</p>
 </div></blockquote>
@@ -477,7 +476,7 @@ state change s.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>chid</strong> : ctypes.c_long</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>chid</strong> : ctypes.c_long</p>
 <blockquote class="last">
 <div><p>channel ID.</p>
 </div></blockquote>
@@ -531,7 +530,7 @@ when needed in most cases.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>chid</strong> : ctypes.c_long</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>chid</strong> : ctypes.c_long</p>
 <blockquote>
 <div><p>Channel ID</p>
 </div></blockquote>
@@ -545,7 +544,7 @@ when needed in most cases.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>connection_state</strong> : bool</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>connection_state</strong> : bool</p>
 <blockquote class="last">
 <div><p>that is, whether the Channel is connected</p>
 </div></blockquote>
@@ -559,8 +558,8 @@ when needed in most cases.</p>
 </ol>
 <p>2. Normally, channels will connect in milliseconds, and the connection
 callback will succeed on the first attempt.</p>
-<p>3. For un-connected Channels (that are nevertheless queried), the 'ts'
-(timestamp of last connection attempt) and 'failures' (number of failed
+<p>3. For un-connected Channels (that are nevertheless queried), the &#8216;ts&#8217;
+(timestamp of last connection attempt) and &#8216;failures&#8217; (number of failed
 connection attempts) from the <a class="reference internal" href="#epics.ca._cache" title="epics.ca._cache"><tt class="xref py py-data docutils literal"><span class="pre">_cache</span></tt></a> will be used to prevent
 spending too much time waiting for a connection that may never happen.</p>
 </dd></dl>
@@ -583,7 +582,7 @@ library versions, and include:</p>
 <dl class="function">
 <dt id="epics.ca.element_count">
 <tt class="descclassname">epics.ca.</tt><tt class="descname">element_count</tt><big>(</big><em>chid</em><big>)</big><a class="headerlink" href="#epics.ca.element_count" title="Permalink to this definition">¶</a></dt>
-<dd><p>return number of elements in Channel's data.
+<dd><p>return number of elements in Channel&#8217;s data.
 1 for most Channels, &gt; 1 for waveform Channels</p>
 </dd></dl>
 
@@ -657,6 +656,15 @@ standard output.  Use the <em>print_out=False</em> option to be
 returned the listing instead of having it printed out.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="epics.ca.clear_cache">
+<tt class="descclassname">epics.ca.</tt><tt class="descname">clear_cache</tt><big>(</big><big>)</big><a class="headerlink" href="#epics.ca.clear_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears global caches of Epics CA connectsions, and fully
+detached from CA contex.  This is important when doing
+multiprocessing (and is done internally by CAProcess),
+but can be  useful to fully reset a Channel Access session.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="interacting-with-connected-channels">
 <h3>Interacting with Connected Channels<a class="headerlink" href="#interacting-with-connected-channels" title="Permalink to this headline">¶</a></h3>
@@ -678,7 +686,7 @@ Note that there is not a separate form for array data.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>chid</strong> :  ctypes.c_long</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>chid</strong> :  ctypes.c_long</p>
 <blockquote>
 <div><p>Channel ID</p>
 </div></blockquote>
@@ -710,7 +718,7 @@ for array / waveform data.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>data</strong> : object</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>data</strong> : object</p>
 <blockquote class="last">
 <div><p>Normally, the value of the data.  Will return <tt class="docutils literal"><span class="pre">None</span></tt> if the
 channel is not connected, <cite>wait=False</cite> was used, or the data
@@ -747,7 +755,7 @@ operation is said to be <em>incomplete</em>, and the data may become available
 later with <a class="reference internal" href="#epics.ca.get_complete" title="epics.ca.get_complete"><tt class="xref py py-func docutils literal"><span class="pre">get_complete()</span></tt></a>.</p>
 <p>See <a class="reference internal" href="#dbrtype-table"><em>Table of DBR Types</em></a> for a listing of values of
 <em>ftype</em>,</p>
-<p>See <a class="reference internal" href="advanced.html#advanced-large-arrays-label"><em>Strategies for working with large arrays</em></a> for a discussion of strategies
+<p>See <a class="reference internal" href="arrays.html#arrays-large-label"><em>Strategies for working with large arrays</em></a> for a discussion of strategies
 for how to best deal with very large arrays.</p>
 <p>See <a class="reference internal" href="advanced.html#advanced-connecting-many-label"><em>Strategies for connecting to a large number of PVs</em></a> for a discussion of when using
 <cite>wait=False</cite> can give a large performance boost.</p>
@@ -767,7 +775,7 @@ did not complete before the timeout passed.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>chid</strong> : ctypes.c_long</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>chid</strong> : ctypes.c_long</p>
 <blockquote>
 <div><p>Channel ID</p>
 </div></blockquote>
@@ -794,7 +802,7 @@ for array / waveform data.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>data</strong> : object</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>data</strong> : object</p>
 <blockquote class="last">
 <div><p>This function will return <tt class="docutils literal"><span class="pre">None</span></tt> if the previous <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><tt class="xref py py-func docutils literal"><span class="pre">get()</span></tt></a>
 actually completed, or if this data transfer also times out.</p>
@@ -822,7 +830,7 @@ supplied callback function when the process has completed.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>chid</strong> :  ctypes.c_long</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>chid</strong> :  ctypes.c_long</p>
 <blockquote>
 <div><p>Channel ID</p>
 </div></blockquote>
@@ -845,7 +853,7 @@ before returning.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>status</strong> : int</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>status</strong> : int</p>
 <blockquote class="last">
 <div><p>1  for success, -1 on time-out</p>
 </div></blockquote>
@@ -876,7 +884,7 @@ callback function to be called on any changes to the channel.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>chid</strong> : ctypes.c_long</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>chid</strong> : ctypes.c_long</p>
 <blockquote>
 <div><p>channel ID</p>
 </div></blockquote>
@@ -900,7 +908,7 @@ If <tt class="docutils literal"><span class="pre">None</span></tt>, defaults to 
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>(callback_ref, user_arg_ref, event_id)</strong> :</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>(callback_ref, user_arg_ref, event_id)</strong> :</p>
 <blockquote class="last">
 <div><p>The returned tuple contains <em>callback_ref</em> an <em>user_arg_ref</em> which
 are references that should be kept for as long as the subscription
@@ -927,8 +935,9 @@ If you do <em>not</em> keep this data, the return value will be garbage
 collected, the C-level reference to the callback will disappear, and you
 will see coredumps.</p>
 <p>On Linux, a message like:</p>
-<div class="highlight-python"><pre>python: Objects/funcobject.c:451: func_dealloc: Assertion 'g-&gt;gc.gc_refs != (-2)' failed.
-Abort (core dumped)</pre>
+<div class="highlight-python"><div class="highlight"><pre>python: Objects/funcobject.c:451: func_dealloc: Assertion &#39;g-&gt;gc.gc_refs != (-2)&#39; failed.
+Abort (core dumped)
+</pre></div>
 </div>
 <p class="last">is a hint that you have <em>not</em> kept this data.</p>
 </div>
@@ -958,7 +967,7 @@ change any existing subscriptions.</p>
 <dl class="function">
 <dt id="epics.ca.get_timestamp">
 <tt class="descclassname">epics.ca.</tt><tt class="descname">get_timestamp</tt><big>(</big><em>chid</em><big>)</big><a class="headerlink" href="#epics.ca.get_timestamp" title="Permalink to this definition">¶</a></dt>
-<dd><p>return the timestamp of a Channel -- the time of last update.</p>
+<dd><p>return the timestamp of a Channel &#8211; the time of last update.</p>
 </dd></dl>
 
 <dl class="function">
@@ -1396,7 +1405,7 @@ it will be necessary why using <a class="reference internal" href="#epics.ca.sg_
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>chid</strong> :  ctypes.c_long or <tt class="docutils literal"><span class="pre">None</span></tt></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>chid</strong> :  ctypes.c_long or <tt class="docutils literal"><span class="pre">None</span></tt></p>
 <blockquote>
 <div><p>channel ID (if not None, used for determining count and ftype)</p>
 </div></blockquote>
@@ -1473,12 +1482,12 @@ the callback function may also include some of these as keyword arguments:</p>
 </ul>
 </div></blockquote>
 <p>Note that a the user-supplied callback will be run <em>inside</em> a CA function,
-and cannot reliably make any other CA calls.  It is helpful to think &quot;this
-all happens inside of a <a class="reference internal" href="#epics.ca.pend_event" title="epics.ca.pend_event"><tt class="xref py py-func docutils literal"><span class="pre">pend_event()</span></tt></a> call&quot;, and in an epics thread
+and cannot reliably make any other CA calls.  It is helpful to think &#8220;this
+all happens inside of a <a class="reference internal" href="#epics.ca.pend_event" title="epics.ca.pend_event"><tt class="xref py py-func docutils literal"><span class="pre">pend_event()</span></tt></a> call&#8221;, and in an epics thread
 that may or may not be the main thread of your program.  It is advisable to
 keep the callback functions short and not resource-intensive.  Consider
 strategies which use the callback only to record that a change has occurred
-and then act on that change later -- perhaps in a separate thread, perhaps
+and then act on that change later &#8211; perhaps in a separate thread, perhaps
 after <a class="reference internal" href="#epics.ca.pend_event" title="epics.ca.pend_event"><tt class="xref py py-func docutils literal"><span class="pre">pend_event()</span></tt></a> has completed.</p>
 </div>
 <div class="section" id="omissions">
@@ -1636,7 +1645,7 @@ faults (on Windows) or seemingly inexplicable crashes later (on linux).</p>
 </div>
 <div class="section" id="define-a-connection-callback">
 <h3>Define a connection callback<a class="headerlink" href="#define-a-connection-callback" title="Permalink to this headline">¶</a></h3>
-<p>Here, we define a connection callback -- a function to be called when the
+<p>Here, we define a connection callback &#8211; a function to be called when the
 connection status of the PV changes. Note that this will be called on
 initial connection:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
@@ -1680,26 +1689,27 @@ callback should be prepared to accept keyword arguments of <cite>pvname</cite>,
           <a href="np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="devices.html" title="Devices: collections of PVs"
+          <a href="arrays.html" title="Working with waveform / array data"
              >next</a> |</li>
         <li class="right" >
           <a href="pv.html" title="PV: Epics Process Variables"
              >previous</a> |</li>
-   <li><a href="overview.html">overview</a>|</li>
-   <li><a href="installation.html">download</a>|</li>
-   <li><a href="pv.html">pv</a>|</li>
-   <li><a href="#">ca</a>|</li>
-   <li><a href="devices.html">devices</a>|</li>
-   <li><a href="wx.html">wx</a>|</li>
-   <li><a href="advanced.html">advanced</a>|</li>
-   <li><a href="more.html">contents</a>|</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
+   <li>[<a href="installation.html">install</a></li>
+   <li>|<a href="overview.html">overview</a></li>
+   <li>|<a href="pv.html">pv</a></li>
+   <li>|<a href="#">ca</a></li>
+   <li>|<a href="arrays.html">arrays</a></li>
+   <li>|<a href="devices.html">devices</a></li>
+   <li>|<a href="alarm.html">alarm</a></li>
+   <li>|<a href="autosave.html">autosave</a></li>
+   <li>|<a href="wx.html">wx</a></li>
+   <li>|<a href="advanced.html">advanced</a>]</li>
  
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2014, Matthew Newville.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>
