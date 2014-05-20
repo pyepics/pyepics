@@ -405,10 +405,10 @@ class CA_BasicTests(unittest.TestCase):
         self.assertTrue(all(val0 == val1))
 
     def test_xArray2(self):
-        write('Array Test: get fewer than max vals with ca.get(count=0)')
+        write('Array Test: get fewer than max vals using ca.get(count=0)')
         chid = ca.create_channel(pvnames.double_arrays[0])
         maxpts = ca.element_count(chid)
-        npts = max(2, maxpts/2 - 1)
+        npts = int(max(2, maxpts/2.3 - 1))
         dat = numpy.random.normal(size=npts)
         ca.put(chid, dat)
 
@@ -419,7 +419,7 @@ class CA_BasicTests(unittest.TestCase):
     def test_xArray3(self):
         write('Array Test: get char array as string')
         chid = ca.create_channel(pvnames.char_arrays[0])
-        val = ca.get(chid, count=0)
+        val = ca.get(chid)
         self.assertTrue(isinstance(val, numpy.ndarray))
         char_val = ca.get(chid, as_string=True)
         self.assertTrue(isinstance(char_val, str))
