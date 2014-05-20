@@ -17,30 +17,10 @@ Channel Access or using Epics process variables
 
 import multiprocessing as mp
 from multiprocessing.pool import Pool
-import epics
+from .ca import clear_cache
 
 
 __all__ = ['CAProcess', 'CAPool', 'clear_ca_cache']
-
-
-def clear_ca_cache():
-    """
-    Clears global pyepics state and fixes the CA context
-    such that forked subprocesses created with multiprocessing
-    can safely use pyepics.
-    """
-
-    # Clear global pyepics state variables
-    epics._CACHE_.clear()
-    epics._MONITORS_.clear()
-    epics.ca._cache.clear()
-    epics.ca._put_done.clear()
-
-    # The old context is copied directly from the old process
-    # in systems with proper fork() implementations
-    epics.ca.detach_context()
-    epics.ca.create_context()
-
 
 class CAProcess(mp.Process):
     """
@@ -53,7 +33,7 @@ class CAProcess(mp.Process):
         mp.Process.__init__(self, **kws)
 
     def run(self):
-        clear_ca_cache()
+        clear_cache()
         mp.Process.run(self)
 
 

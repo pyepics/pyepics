@@ -82,6 +82,12 @@ _cache  = {}
 ## Cache of pvs waiting for put to be done.
 _put_done =  {}
 
+
+## global set of PVs known to simple procedural interface
+## (caget/caput/camonitor)
+_PVCache = {}
+_PVMonitors = {}
+
 # get a unique python value that cannot be a value held by an
 # actual PV to signal "Get is incomplete, awaiting callback"
 class Empty:
@@ -293,6 +299,25 @@ def show_cache(print_out=True):
         write(out)
     else:
         return out
+
+def clear_cache():
+    """
+    Clears global pyepics state and fully detached from
+    CA context -- important when doign multiprocessing.
+    """
+
+    # Clear global pyepics state variables
+    _cache.clear()
+    _put_done.clear()
+    _PVCache.clear()
+    _PVMonitors.clear()
+
+
+    # The old context is copied directly from the old process
+    # in systems with proper fork() implementations
+    detach_context()
+    create_context()
+
 
 ## decorator functions for ca functionality:
 #  decorator name      ensures before running decorated function:
@@ -973,6 +998,7 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
 
     def unpack_simple(data, count, ntype, use_numpy):
         "simple, native data type"
+        if data is None: return None
         if count == 1 and ntype != dbr.STRING:
             return data[0]
         if ntype == dbr.STRING:
@@ -1314,9 +1340,10 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
                                           ctypes.py_object('ctrl_value'))
 
         PySEVCHK('get_ctrlvars', ret)
-    out = {}
+
+    # print(" GET Ctrlvars A", name(chid), ncache.get('ctrl_value', None))
     if ncache.get('ctrl_value', None) is None:
-        return out
+        return {}
 
     t0 = time.time()
     while ncache['ctrl_value'] is GET_PENDING:
@@ -1326,8 +1353,12 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
                 msg = "ca.get_ctrlvars('%s') timed out after %.2f seconds."
                 warnings.warn(msg % (name(chid), timeout))
             return {}
-
-    tmpv = ncache['ctrl_value'][0]
+    try:
+        tmpv = ncache['ctrl_value'][0]
+    except TypeError:
+        return {}
+    
+    out = {}
     for attr in ('precision', 'units', 'severity', 'status',
                  'upper_disp_limit', 'lower_disp_limit',
                  'upper_alarm_limit', 'upper_warning_limit',

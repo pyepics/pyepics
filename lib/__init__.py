@@ -2,19 +2,21 @@
    epics channel access python module
 
    version    :  3.2.3
-   last update:  24-Mar-2014
+   last update:  20-May-2014
 
    Principle Authors:
-      Matthew Newville <newville@cars.uchicago.edu>, CARS, University of Chicago
+      Matthew Newville <newville@cars.uchicago.edu> CARS, University of Chicago
       Angus Gratton <angus.gratton@anu.edu.au>, Australian National University
 
 == License:
+
    Except where explicitly noted, this file and all files in this
-   distribution are licensed under the Epics Open License
-   See license.txt in the top-level directory of this distribution.
+   distribution are licensed under the Epics Open License See license.txt in 
+   the top-level directory of this distribution.
 
 == Overview:
-   Python Interface to the Epics Channel Access protocol of the Epics control system.
+   Python Interface to the Epics Channel Access
+   protocol of the Epics control system.
 
 """
 __version__ = '3.2.3'
@@ -44,18 +46,10 @@ MINOR_ALARM = 1
 MAJOR_ALARM = 2
 INVALID_ALARM = 3
 
-# compatibility with other CA libraries
-# from  .compat import epicsPV
-
-# a local cache for PVs used in caget/caput/cainfo/camonitor functions
-_CACHE_ = {}
-# a local cache for Monitored PVs
-_MONITORS_ = {}
-
 def __create_pv(pvname, timeout=5.0):
     "create PV, wait for connection: "
-    if pvname in _CACHE_:
-        return _CACHE_[pvname]
+    if pvname in ca._PVCache:
+        return ca._PVCache[pvname]
 
     start_time = time.time()
     thispv = PV(pvname)
@@ -68,7 +62,7 @@ def __create_pv(pvname, timeout=5.0):
         ca.write('cannot connect to %s' % pvname)
         return None
     # save this one for next time
-    _CACHE_[pvname] = thispv
+    ca._PVCache[pvname] = thispv
     return thispv
 
 def caput(pvname, value, wait=False, timeout=60):
@@ -130,10 +124,10 @@ def cainfo(pvname, print_out=True):
 
 def camonitor_clear(pvname):
     """clear a monitor on a PV"""
-    if pvname in _MONITORS_:
-        if isinstance(_MONITORS_[pvname], PV):
-            _MONITORS_[pvname].clear_callbacks()
-        _MONITORS_.pop(pvname)
+    if pvname in ca._PVMonitors:
+        if isinstance(ca._PVMonitors[pvname], PV):
+            ca._PVMonitors[pvname].clear_callbacks()
+        ca._PVMonitors.pop(pvname)
 
 def camonitor(pvname, writer=None, callback=None):
     """ camonitor(pvname, writer=None, callback=None)
@@ -167,4 +161,4 @@ def camonitor(pvname, writer=None, callback=None):
     if thispv is not None:
         thispv.get()
         thispv.add_callback(callback, with_ctrlvars=True)
-        _MONITORS_[pvname] = thispv
+        ca._PVMonitors[pvname] = thispv
