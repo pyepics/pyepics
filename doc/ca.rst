@@ -237,6 +237,10 @@ A few additional pythonic functions have been added:
 .. autofunction:: show_cache(print_out=True)
 
 
+.. autofunction:: clear_cache()
+
+
+
 Interacting with Connected Channels
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -302,11 +302,13 @@ def show_cache(print_out=True):
 
 def clear_cache():
     """
-    Clears global pyepics state and fully detached from
-    CA context -- important when doign multiprocessing.
+    Clears global caches of Epics CA connectsions, and fully
+    detached from CA contex.  This is important when doing
+    multiprocessing (and is done internally by CAProcess),
+    but can be  useful to fully reset a Channel Access session.
     """
 
-    # Clear global pyepics state variables
+    # Clear global state variables
     _cache.clear()
     _put_done.clear()
     _PVCache.clear()
