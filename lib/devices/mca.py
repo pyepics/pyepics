@@ -160,7 +160,7 @@ class MultiXMAP(epics.Device):
             cur   = self.dxps[0].get('CurrentPixel')
         ok = cur >= pprun
         if not ok:
-            print 'XMAP needs to finish pixels ', cur, ' / ' , pprun
+            print('XMAP needs to finish pixels ', cur, ' / ' , pprun)
             for i in range(pprun-cur):
                 self.next_pixel()
                 time.sleep(0.10)

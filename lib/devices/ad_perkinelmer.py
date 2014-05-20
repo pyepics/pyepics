@@ -88,7 +88,6 @@ class AD_PerkinElmer(epics.Device):
         time.sleep(0.1)
 
         self.TriggerMode = trigger_mode
-        print 'PE Det MultiFrames trigger_mode = ', self.TriggerMode
         # number of images for collection and streaming
         self.NumImages  = n
         # set filesaver
@@ -121,7 +120,7 @@ class AD_PerkinElmer(epics.Device):
             time.sleep(0.05)
             capture_on = self.fileGet('Capture_RBV')
         if capture_on != 0:
-            print 'Forcing XRD Streaming to stop'
+            print( 'Forcing XRD Streaming to stop')
             self.filePut('Capture', 0)
             t0 = time.time()
             while capture_on==1 and time.time() - t0 < timeout:
