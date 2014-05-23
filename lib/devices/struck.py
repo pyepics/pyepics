@@ -42,7 +42,7 @@ class Struck(epics.Device):
         self.mcas = []
         for i in range(nchan):
             mcaname = "%smca%i" % (prefix,i+1)
-            self.mcas.append(epics.devices.Mca(mcaname))
+            self.mcas.append(epics.devices.MCA(mcaname))
             
         epics.Device.__init__(self, prefix, delim='',
                               attrs=self.attrs, mutable=False)
