@@ -5,7 +5,7 @@ import numpy
 import epics
 try:
     from collections impor OrderedDict
-else:
+except:
     from ordereddict import OrderedDict
 
 MAX_ROIS = 32
