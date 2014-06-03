@@ -3,7 +3,11 @@ import sys
 import time
 import numpy
 import epics
-from epics.wx.ordereddict import OrderedDict
+try:
+    from collections impor OrderedDict
+else:
+    from ordereddict import OrderedDict
+
 MAX_ROIS = 32
 class DXP(epics.Device):
     _attrs = ('PreampGain','MaxEnergy','ADCPercentRule','BaselineCutPercent',
