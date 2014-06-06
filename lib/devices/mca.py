@@ -4,7 +4,7 @@ import time
 import numpy
 import epics
 try:
-    from collections impor OrderedDict
+    from collections import OrderedDict
 except:
     from ordereddict import OrderedDict
 
