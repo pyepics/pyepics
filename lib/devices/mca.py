@@ -8,7 +8,7 @@ try:
 except:
     from ordereddict import OrderedDict
 
-MAX_ROIS = 32
+MAX_ROIS = 8
 class DXP(epics.Device):
     _attrs = ('PreampGain','MaxEnergy','ADCPercentRule','BaselineCutPercent',
               'BaselineThreshold','BaselineFilterLength','BaselineCutEnable',
@@ -29,10 +29,11 @@ class MCA(epics.Device):
              'DWEL', 'CHAS', 'PSCL', 'SEQ',
              'ERTM', 'ELTM', 'IDTIM')
 
-    def __init__(self,prefix,mca=1):
+    def __init__(self, prefix, mca=1, nrois=4):
         self._prefix = "%smca%i" % (prefix, mca)
+        if nrois is None: nrois = MAX_ROIS
         attrs = list(self._attrs)
-        for i in range(MAX_ROIS):
+        for i in range(nrois):
             attrs.extend(['R%i'%i, 'R%iN' %i, 'R%iNM' %i,
                           'R%iLO'%i,'R%iHI'%i, 'R%iBG'%i])
 
@@ -40,9 +41,11 @@ class MCA(epics.Device):
                               attrs= attrs)
         epics.poll()
 
-    def get_rois(self):
+    def get_rois(self, nrois=None):
         rois = OrderedDict()
-        for i in range(MAX_ROIS):
+        if nrois is None:
+            nrois = MAX_ROIS
+        for i in range(nrois):
             name = self.get('R%iNM'%i)
             if name is not None and len(name.strip()) > 0:
                 rois[name] = (self.get('R%iLO'%i),self.get('R%iHI'%i))
