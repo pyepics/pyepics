@@ -29,8 +29,10 @@ class MCA(epics.Device):
              'DWEL', 'CHAS', 'PSCL', 'SEQ',
              'ERTM', 'ELTM', 'IDTIM')
 
-    def __init__(self, prefix, mca=1, nrois=4):
-        self._prefix = "%smca%i" % (prefix, mca)
+    def __init__(self, prefix, mca=None, nrois=4):
+        self._prefix = prefix
+        if isinstance(mca, int):
+            self._prefix = "%smca%i" % (prefix, mca)
         if nrois is None: nrois = MAX_ROIS
         attrs = list(self._attrs)
         for i in range(nrois):
@@ -78,8 +80,8 @@ class MultiXMAP(epics.Device):
         self._prefix = prefix
         self.nmca   = nmca
 
-        self.dxps   = [DXP(prefix, i+1) for i in range(nmca)]
-        self.mcas   = [MCA(prefix, i+1) for i in range(nmca)]
+        self.dxps   = [DXP(prefix, nmca=i+1) for i in range(nmca)]
+        self.mcas   = [MCA(prefix, nmca=i+1) for i in range(nmca)]
 
         epics.Device.__init__(self, prefix, attrs=self.attrs,
                               delim='', mutable=True)
