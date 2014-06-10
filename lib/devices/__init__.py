@@ -18,3 +18,6 @@ from .ad_fileplugin import AD_FilePlugin
 from .ad_image import AD_ImagePlugin
 from .ad_overlay import AD_OverlayPlugin
 from .ad_perkinelmer import AD_PerkinElmer
+
+Mca = MCA
+
