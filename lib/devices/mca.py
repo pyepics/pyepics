@@ -8,7 +8,12 @@ try:
 except:
     from ordereddict import OrderedDict
 
-MAX_ROIS = 8
+if sys.version[0] == '2':
+    from ConfigParser import  ConfigParser
+elif sys.version[0] == '3':
+    from configparser import  ConfigParser
+
+MAX_ROIS = 32
 class DXP(epics.Device):
     _attrs = ('PreampGain','MaxEnergy','ADCPercentRule','BaselineCutPercent',
               'BaselineThreshold','BaselineFilterLength','BaselineCutEnable',
@@ -28,17 +33,17 @@ class MCA(epics.Device):
              'ACQG', 'NUSE','PCT', 'PTCL',
              'DWEL', 'CHAS', 'PSCL', 'SEQ',
              'ERTM', 'ELTM', 'IDTIM')
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_npts')
 
     def __init__(self, prefix, mca=None, nrois=4):
         self._prefix = prefix
+        self._npts = None
         if isinstance(mca, int):
             self._prefix = "%smca%i" % (prefix, mca)
         if nrois is None: nrois = MAX_ROIS
         attrs = list(self._attrs)
         for i in range(nrois):
-            attrs.extend(['R%i'%i, 'R%iN' %i, 'R%iNM' %i,
-                          'R%iLO'%i,'R%iHI'%i, 'R%iBG'%i])
-
+            attrs.extend(['R%iNM' %i, 'R%iLO'%i,'R%iHI'%i])
         epics.Device.__init__(self,self._prefix, delim='.',
                               attrs= attrs)
         epics.poll()
@@ -48,13 +53,75 @@ class MCA(epics.Device):
         if nrois is None:
             nrois = MAX_ROIS
         for i in range(nrois):
-            name = self.get('R%iNM'%i)
-            if name is not None and len(name.strip()) > 0:
-                rois[name] = (self.get('R%iLO'%i),self.get('R%iHI'%i))
+            name = self.get('R%iNM'%i).strip()
+            if name is  None or len(name.strip()) < 1:
+                break
+            rois[name] = (self.get('R%iLO'%i), self.get('R%iHI'%i))
         return rois
+
+    def sorted_rois(self, rois):
+        return sorted(rois.items(), cmp=lambda a,b: a[1][0] - b[1][0])
+
+    def del_roi(self, roiname):
+        rois = self.get_rois()
+        if roiname in rois:
+            rois.pop(roiname)
+            self.set_rois(rois)
+
+    def add_roi(self, roiname, lo=-1, hi=-1, calib=None):
+        if lo < 0 or hi <0:
+            return
+        rois = self.get_rois()
+        roiname = roiname.strip()
+        rois[roiname] = (lo, hi)
+        self.set_rois(rois, calib=calib)
+
+    def set_rois(self, rois, calib=None):
+        """set all rois, with optional calibration that those
+        ROIs correspond to (if they have a different energy 
+        calibration)
+
+        That is, ROIs can be copied by energy from one mca to 
+        another with:
+
+           rois  = mca1.get_rois()
+           calib = mca1.get_calib()
+           mca2.set_rois(rois, calib=calib)
+        """
+        
+        offset, scale = 0.0, 1.0
+        if calib is not None:
+            off, slope, quad = self.get_calib()
+            offset = calib[0] - off
+            scale  = calib[1] / slope
+
+        for iroi, data in enumerate(self.sorted_rois(rois)):
+            name, vals = data 
+            name = name.strip()
+            lo, hi = vals
+            self.put('R%iNM'%iroi, name) 
+            self.put('R%iLO'%iroi, round(offset + scale*lo))
+            self.put('R%iHI'%iroi, round(offset + scale*hi))
+
+    def clear_rois(self, nrois=None):
+        if nrois is None:
+            nrois = MAX_ROIS
+        for i in range(nrois):
+            self.put('R%iNM'%i, '')
+            self.put('R%iLO'%i, -1)
+            self.put('R%iHI'%i, -1)
 
     def get_calib(self):
         return [self.get(i) for i in ('CALO','CALS','CALQ')]
+
+    def get_energy(self):
+        if self._npts is None:
+            self._npts = len(self.get('VAL'))
+        
+        en = numpy.arange(self._npts, dtype='f8')
+        cal = self.get_calib()
+        return cal[0] + en*(cal[1] + en*cal[2])
+    
 
 class MultiXMAP(epics.Device):
     """
@@ -80,8 +147,8 @@ class MultiXMAP(epics.Device):
         self._prefix = prefix
         self.nmca   = nmca
 
-        self.dxps   = [DXP(prefix, nmca=i+1) for i in range(nmca)]
-        self.mcas   = [MCA(prefix, nmca=i+1) for i in range(nmca)]
+        self.dxps = [DXP(prefix, mca=i+1) for i in range(nmca)]
+        self.mcas = [MCA(prefix, mca=i+1) for i in range(nmca)]
 
         epics.Device.__init__(self, prefix, attrs=self.attrs,
                               delim='', mutable=True)
@@ -117,6 +184,21 @@ class MultiXMAP(epics.Device):
             add("%s = %s" % (a, ' '.join(vals)))
         return buff
 
+    def restore_rois(self, roifile):
+        """restore ROI setting from ROI.dat file"""
+        cp =  ConfigParser()
+        cp.read(roifile)
+        rois = {}
+        for a in cp.options('rois'):
+            if a.lower().startswith('roi'):
+                name, dat = cp.get('rois',a).split('|')
+                lims = [int(i) for i in dat.split()]
+                rois[name] = (lims[0], lims[1])
+        self.mcas[0].set_rois(rois)
+        cal0 = self.mcas[0].get_calib()
+        for mca in self.mcas[1:]:
+            mca.set_rois(rois, calib = cal0)
+    
     def Write_CurrentConfig(self, filename=None):
         buff = []
         add = buff.append
