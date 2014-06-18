@@ -1,9 +1,8 @@
 #!/usr/bin/python
 import sys
 import time
-import numpy as np
+import numpy
 import epics
-
 try:
     from collections import OrderedDict
 except:
@@ -28,173 +27,45 @@ class DXP(epics.Device):
         epics.Device.__init__(self, self._prefix, delim=':')
         epics.poll()
 
-
-class ROI(epics.Device):
-    """epics ROI device for MCA record
-    
-    >>> from epics.devices.mca import ROI, MCA
-    >>> r = ROI('PRE:mca1', roi=1)
-    >>> print r.name, r.left, r.right
-    
-    arguments
-    ---------
-    prefix     MCA record prefix 
-    roi        integer for ROI (0 through 31)
-    bgr_width  width in bins for calculating NET counts
-    data_pv    optional PV name to read counts from (not needed 
-               for most MCA records, but useful for some)
-
-    attribute (read/write)
-    ----------------------
-    LO, left    low bin for ROI
-    HI, right   high bin for ROI
-    NM, name    name 
-    
-    properties (read only)
-    -----------------------
-    center     roi center bin
-    width      roi width (in bins)
-    address    == prefix
-    total      sum counts in ROI
-    net        background-subtracted sum counts in ROI
-
-    methods
-    -------
-    clear     remove ROI
-    """
-    _nonpvs = ('_prefix', '_pvs', '_delim', '_aliases', 'attrs',
-               'width', 'center', 'bgr_width', 'address',
-               'net', 'total', '_dat_')
-
-    def __init__(self, prefix, roi=0, bgr_width=3, data_pv=None):
-        self.address = self._prefix = '%s.R%i' % (prefix, roi)
-        self.bgr_width = bgr_width
-        _attrs = ('NM', 'LO', 'HI', '', 'N')
-        _aliases = {'name': _attrs[0],
-                    'left': _attrs[1],
-                    'right': _attrs[2],
-                    '_sum_': _attrs[3],
-                    '_net_': _attrs[4]}
-
-        epics.Device.__init__(self,self._prefix, delim='',
-                              attrs=_attrs, aliases=_aliases)
-        self._pvs['_dat_'] = None
-        if data_pv is not None:
-            self._pvs['_dat_'] = data_pv
-        epics.poll()
-
-    def __eq__(self, other):
-        """used for comparisons"""
-        return (self.left == getattr(other, 'left', None) and
-                self.right == getattr(other, 'right', None) and
-                self.bgr_width == getattr(other, 'bgr_width', None) )
-
-    def __ne__(self, other): return not self.__eq__(other)
-    def __lt__(self, other): return self.left <  getattr(other, 'left', None)
-    def __le__(self, other): return self.left <= getattr(other, 'left', None)
-    def __gt__(self, other): return self.left >  getattr(other, 'left', None)
-    def __ge__(self, other): return self.left >= getattr(other, 'left', None)
-
-    @property
-    def total(self):
-        return self.get_counts(net=False)
-
-    @property
-    def net(self):
-        return self.get_counts(net=True)
-
-    @property
-    def center(self):
-        return round(self.right + self.left)/2.0
-
-    @property
-    def width(self):
-        return round(self.right - self.left)
-
-    def clear(self):
-        self.name = ''
-        self.left = -1
-        self.right = -1
-
-    def get_counts(self, data=None, net=False):
-        """
-        calculate total and net counts for a spectra
-
-        Parameters:
-        -----------
-        * data: numpy array of spectra or None to read from PV
-        * net:  bool to set net counts (default=False: total counts returned)
-        """
-        # implicitly read data from a PV
-        if data is None:
-            # for a normal MCA/ROI, read from 'RI' or RIN' property
-            if self._pvs['_dat_'] is None:
-                if net:
-                    return self._net_
-                return self._sum_
-            # for 'fake' MCA/ROI, need a data source
-            data = self._pvs['_dat_'].get()
-        if not isinstance(data, np.ndarray):
-            return 0
-
-        total = data[self.left:self.right+1].sum()
-        if not net:
-            return total
-        # calculate net counts
-        bgr_width = int(self.bgr_width)
-        ilmin = max((self.left - bgr_width), 0)
-        irmax = min((self.right + bgr_width), len(data)-1) + 1
-        bgr_counts = np.concatenate((data[ilmin:self.left],
-                                     data[self.right+1:irmax])).mean()
-
-        return (total - bgr_counts*(self.right-self.left))
-
 class MCA(epics.Device):
     _attrs =('CALO','CALS','CALQ','TTH', 'EGU', 'VAL',
              'PRTM', 'PLTM', 'ACT', 'RTIM', 'STIM',
              'ACQG', 'NUSE','PCT', 'PTCL',
              'DWEL', 'CHAS', 'PSCL', 'SEQ',
              'ERTM', 'ELTM', 'IDTIM')
-    _nonpvs = ('_prefix', '_pvs', '_delim', '_npts', 'rois', '_nrois')
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_npts')
 
-    def __init__(self, prefix, mca=None, nrois=None, data_pv=None):
+    def __init__(self, prefix, mca=None, nrois=4):
         self._prefix = prefix
         self._npts = None
-        self._nrois = nrois
-        if self_nrois is None:
-            self._nrois = MAX_ROIS
-        self.rois = []
         if isinstance(mca, int):
             self._prefix = "%smca%i" % (prefix, mca)
-        
+        if nrois is None: nrois = MAX_ROIS
         attrs = list(self._attrs)
-
+        for i in range(nrois):
+            attrs.extend(['R%iNM' %i, 'R%iLO'%i,'R%iHI'%i])
         epics.Device.__init__(self,self._prefix, delim='.',
                               attrs= attrs)
-        self._pvs['_dat_'] = None
-        if data_pv is not None:
-            self._pvs['_dat_'] = PV(data_pv)
         epics.poll()
-        self.get_rois()
 
     def get_rois(self, nrois=None):
-        rois = []
+        rois = OrderedDict()
         if nrois is None:
-            nrois = self._nrois
-
-        data_pv = self._pvs['_dat_']
+            nrois = MAX_ROIS
         for i in range(nrois):
-            roi = ROI(prefix=self._prefix, roi=i, data_pv=data_pv)
-            if roi.name > 0:
-                rois.append(roi)
-        self.rois = sorted(rois)
-        return self.rois
+            name = self.get('R%iNM'%i).strip()
+            if name is  None or len(name.strip()) < 1:
+                break
+            rois[name] = (self.get('R%iLO'%i), self.get('R%iHI'%i))
+        return rois
+
+    def sorted_rois(self, rois):
+        return sorted(rois.items(), cmp=lambda a,b: a[1][0] - b[1][0])
 
     def del_roi(self, roiname):
         rois = self.get_rois()
-        for roi in rois:
-            if roi.name == roiname:
-                roi.clear()
+        if roiname in rois:
+            rois.pop(roiname)
             self.set_rois(rois)
 
     def add_roi(self, roiname, lo=-1, hi=-1, calib=None):
@@ -247,7 +118,7 @@ class MCA(epics.Device):
         if self._npts is None:
             self._npts = len(self.get('VAL'))
         
-        en = np.arange(self._npts, dtype='f8')
+        en = numpy.arange(self._npts, dtype='f8')
         cal = self.get_calib()
         return cal[0] + en*(cal[1] + en*cal[2])
     
@@ -301,7 +172,7 @@ class MultiXMAP(epics.Device):
             rd = repr(s).replace('],', '').replace('[', '').replace(']','').replace(',','')
             add("ROI%2.2i = %s | %s" % (i,k,rd))
 
-        caldat = np.array(self.get_calib())
+        caldat = numpy.array(self.get_calib())
         add('[calibration]')
         add("OFFSET = %s " % (' '.join(["%.7g" % i for i in caldat[:, 0]])))
         add("SLOPE  = %s " % (' '.join(["%.7g" % i for i in caldat[:, 1]])))
