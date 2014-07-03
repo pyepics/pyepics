@@ -196,7 +196,7 @@ class MCA(epics.Device):
             if roi.left > 0:
                 self.rois.append(roi)
             if roi.right < 0:
-                return
+                break
         return self.rois
 
     def del_roi(self, roiname):
@@ -223,7 +223,10 @@ class MCA(epics.Device):
         if lo < 0 or hi <0:
             return
         rois = self.get_rois()
-        iroi = len(rois) 
+        try:
+            iroi = len(rois)
+        except:
+            iroi = 0
         if iroi >= MAX_ROIS:
             raise ValueError('too many ROIs - cannot add more')
         data_pv = self._pvs['_dat_']
