@@ -195,6 +195,8 @@ class MCA(epics.Device):
             roi = ROI(prefix=prefix, roi=i, data_pv=data_pv)
             if roi.left > 0:
                 self.rois.append(roi)
+            if roi.right < 0:
+                return
         return self.rois
 
     def del_roi(self, roiname):
