@@ -31,25 +31,25 @@ class DXP(epics.Device):
 
 class ROI(epics.Device):
     """epics ROI device for MCA record
-    
+
     >>> from epics.devices.mca import ROI, MCA
     >>> r = ROI('PRE:mca1', roi=1)
     >>> print r.name, r.left, r.right
-    
+
     arguments
     ---------
-    prefix     MCA record prefix 
+    prefix     MCA record prefix
     roi        integer for ROI (0 through 31)
     bgr_width  width in bins for calculating NET counts
-    data_pv    optional PV name to read counts from (not needed 
+    data_pv    optional PV name to read counts from (not needed
                for most MCA records, but useful for some)
 
     attribute (read/write)
     ----------------------
     LO, left    low bin for ROI
     HI, right   high bin for ROI
-    NM, name    name 
-    
+    NM, name    name
+
     properties (read only)
     -----------------------
     center     roi center bin
@@ -100,7 +100,7 @@ class ROI(epics.Device):
         pref = self._prefix
         if pref.endswith('.'):
             pref = pref[:-1]
-        return "<ROI '%s', name='%s', range=[%i:%i]>" % (pref, self.name, 
+        return "<ROI '%s', name='%s', range=[%i:%i]>" % (pref, self.name,
                                                    self.left, self.right)
 
     @property
@@ -175,7 +175,7 @@ class MCA(epics.Device):
         if isinstance(mca, int):
             self._prefix = "%smca%i" % (prefix, mca)
 
-        epics.Device.__init__(self,self._prefix, delim='.', 
+        epics.Device.__init__(self,self._prefix, delim='.',
                               attrs=self._attrs)
 
         self._pvs['_dat_'] = None
@@ -187,16 +187,23 @@ class MCA(epics.Device):
         self.rois = []
         data_pv = self._pvs['_dat_']
         prefix = self._prefix
-        if prefix.endswith('.'): 
+        if prefix.endswith('.'):
             prefix = prefix[:-1]
         if nrois is None:
             nrois = self._nrois
+        _pvdat = []
         for i in range(nrois):
-            roi = ROI(prefix=prefix, roi=i, data_pv=data_pv)
-            if roi.left > 0:
-                self.rois.append(roi)
-            if roi.right < 0:
+            root = "%s.R%d" % (prefix, i)
+            nm = epics.PV("%sNM" % root)
+            hi = epics.PV("%sHI" % root)
+            _pvdat.append((nm, hi))
+        time.sleep(0.001)
+        for i, roipvs in enumerate(_pvdat):
+            nm, hi = [p.get() for p in roipvs]
+            if len(nm) < 1 or hi < 0:
                 break
+            roi = ROI(prefix=prefix, roi=i, data_pv=data_pv)
+            self.rois.append(roi)
         return self.rois
 
     def del_roi(self, roiname):
@@ -211,8 +218,8 @@ class MCA(epics.Device):
         """add an roi, given name, lo, and hi channels, and
         an optional calibration other than that of this mca.
 
-        That is, specifying an ROI with all of lo, hi AND calib 
-        will set the ROI **by energy** so that it matches the 
+        That is, specifying an ROI with all of lo, hi AND calib
+        will set the ROI **by energy** so that it matches the
         provided calibration.  To add an ROI to several MCAs
         with differing calibration, use
 
@@ -249,11 +256,11 @@ class MCA(epics.Device):
 
     def set_rois(self, rois, calib=None):
         """set all rois, with optional calibration that those
-        ROIs correspond to (if they have a different energy 
+        ROIs correspond to (if they have a different energy
         calibration), and ensures they are ordered and contiguous.
 
-        A whole set of ROIs can be copied by energy from one mca 
-        to another with: 
+        A whole set of ROIs can be copied by energy from one mca
+        to another with:
 
            rois  = mca1.get_rois()
            calib = mca1.get_calib()
@@ -303,11 +310,11 @@ class MCA(epics.Device):
     def get_energy(self):
         if self._npts is None:
             self._npts = len(self.get('VAL'))
-        
+
         en = np.arange(self._npts, dtype='f8')
         cal = self.get_calib()
         return cal[0] + en*(cal[1] + en*cal[2])
-    
+
 
 class MultiXMAP(epics.Device):
     """
@@ -377,7 +384,7 @@ class MultiXMAP(epics.Device):
         rois = []
         self.mcas[0].clear_rois()
         prefix = self.mcas[0]._prefix
-        if prefix.endswith('.'): 
+        if prefix.endswith('.'):
             prefix = prefix[:-1]
         iroi = 0
         for a in cp.options('rois'):
@@ -397,7 +404,7 @@ class MultiXMAP(epics.Device):
         cal0 = self.mcas[0].get_calib()
         for mca in self.mcas[1:]:
             mca.set_rois(rois, calib=cal0)
-    
+
     def Write_CurrentConfig(self, filename=None):
         buff = []
         add = buff.append
