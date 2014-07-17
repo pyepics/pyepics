@@ -17,6 +17,7 @@ NULLCHAR = utils_mod.NULLCHAR
 NULLCHAR_2 = utils_mod.NULLCHAR_2
 strjoin = utils_mod.strjoin
 is_string = utils_mod.is_string
+is_string_or_bytes = utils_mod.is_string_or_bytes
 ascii_string = utils_mod.ascii_string
 
 memcopy = copy

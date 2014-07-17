@@ -24,7 +24,7 @@ def b2s(st1):
         return str(st1, EPICS_STR_ENCODING)
     else:
         return str(st1)
-
+ 
 STR2BYTES, BYTES2STR = s2b, b2s
 
 def strjoin(sep, seq):
@@ -45,5 +45,8 @@ def strjoin(sep, seq):
 def is_string(s):
     return isinstance(s, str)
 
+def is_string_or_bytes(s):
+    return isinstance(s, str) or isinstance(s, bytes) 
+
 def ascii_string(s):
-    return str(bytes(s, EPICS_STR_ENCODING), EPICS_STR_ENCODING)
+    return bytes(s, EPICS_STR_ENCODING)
