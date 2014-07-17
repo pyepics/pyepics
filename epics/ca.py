@@ -25,7 +25,8 @@ import warnings
 from threading import Thread
 
 from .utils import (STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2,
-                    strjoin, memcopy, is_string, ascii_string)
+                    strjoin, memcopy, is_string, is_string_or_bytes,
+                    asci_string)
 
 # ignore warning about item size... for now??
 warnings.filterwarnings('ignore',
@@ -472,7 +473,7 @@ def _onMonitorEvent(args):
                     kwds[attr] = getattr(tmpv, attr)
                     if attr == 'units':
                         kwds[attr] = BYTES2STR(getattr(tmpv, attr, None))
-                    
+
             if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
                 tmpv.no_str > 0):
                 kwds['enum_strs'] = tuple([tmpv.strs[i].value for
@@ -1283,14 +1284,17 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         except TypeError:
             write('''PyEpics Warning:
      value put() to array PV must be an array or sequence''')
-    if ftype == dbr.CHAR and nativecount > 1 and is_string(value):
+    if ftype == dbr.CHAR and nativecount > 1 and is_string_or_bytes(value):
         count += 1
 
+    print("CA.PUT ", ftype, dbr.CHAR, dbr.STRING, count, type(value))
     if is_string(value):
         if value == '': value = '\x00'
         value = ascii_string(value)
+        print(" CAPUT -- convert  ")
 
     data  = (count*dbr.Map[ftype])()
+
     if ftype == dbr.STRING:
         if count == 1:
             data[0].value = value
@@ -1299,7 +1303,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
                 data[elem].value = value[elem]
     elif nativecount == 1:
         if ftype == dbr.CHAR:
-            if is_string(value):
+            if is_string_or_bytes(value):
                 value = [ord(i) for i in ("%s%s" % (value, NULLCHAR))]
             else:
                 data[0] = value
@@ -1317,7 +1321,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
                 raise ChannelAccessException(errmsg % (repr(value), tname))
 
     else:
-        if ftype == dbr.CHAR and isinstance(value, str):
+        if ftype == dbr.CHAR and is_string_or_bytes(str):
             value = [ord(i) for i in ("%s%s" % (value, NULLCHAR))]
         try:
             ndata, nuser = len(data), len(value)
@@ -1404,7 +1408,7 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
             out[attr] = getattr(tmpv, attr, None)
             if attr == 'units':
                 out[attr] = BYTES2STR(getattr(tmpv, attr, None))
-                
+
     if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
         tmpv.no_str > 0):
         out['enum_strs'] = tuple([BYTES2STR(tmpv.strs[i].value)
@@ -1645,7 +1649,7 @@ def sg_put(gid, chid, value):
         # could consider using
         # numpy.fromstring(("%s%s" % (s,NULLCHAR*maxlen))[:maxlen],
         #                  dtype=numpy.uint8)
-        if ftype == dbr.CHAR and isinstance(value, str):
+        if ftype == dbr.CHAR and is_string_or_bytes(value):
             pad = NULLCHAR*(1+count-len(value))
             value = [ord(i) for i in ("%s%s" % (value, pad))[:count]]
         try:
