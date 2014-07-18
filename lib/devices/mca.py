@@ -158,7 +158,7 @@ class ROI(epics.Device):
         return (total - bgr_counts*(self.right-self.left))
 
 class MCA(epics.Device):
-    _attrs =('CALO','CALS','CALQ','TTH', 'EGU', 'VAL',
+    _attrs =('CALO','CALS','CALQ','TTH', 'EGU', 
              'PRTM', 'PLTM', 'ACT', 'RTIM', 'STIM',
              'ACQG', 'NUSE','PCT', 'PTCL',
              'DWEL', 'CHAS', 'PSCL', 'SEQ',
@@ -177,10 +177,11 @@ class MCA(epics.Device):
 
         epics.Device.__init__(self,self._prefix, delim='.',
                               attrs=self._attrs)
+        self._pvs['VAL'] = epics.PV("%s.VAL" % self._prefix, auto_monitor=False)
 
         self._pvs['_dat_'] = None
         if data_pv is not None:
-            self._pvs['_dat_'] = PV(data_pv)
+            self._pvs['_dat_'] = epics.PV(data_pv)
         epics.poll()
 
     def get_rois(self, nrois=None):
@@ -198,6 +199,7 @@ class MCA(epics.Device):
             hi = epics.PV("%sHI" % root)
             _pvdat.append((nm, hi))
         time.sleep(0.001)
+        
         for i, roipvs in enumerate(_pvdat):
             nm, hi = [p.get() for p in roipvs]
             if len(nm) < 1 or hi < 0:
