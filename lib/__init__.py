@@ -162,3 +162,18 @@ def camonitor(pvname, writer=None, callback=None):
         thispv.get()
         thispv.add_callback(callback, with_ctrlvars=True)
         ca._PVMonitors[pvname] = thispv
+
+def caget_many(pvlist):
+    """get values for a list of PVs
+    This does not maintain PV objects, and works as fast 
+    as possible to fetch many values.
+    """
+    chids, out = [], []
+    for name in pvlist: chids.append(ca.create_channel(name, 
+                                                       auto_cb=False,
+                                                       connect=False))
+    for chid in chids: ca.connect_channel(chid)
+    for chid in chids: ca.get(chid, wait=False)
+    for chid in chids: out.append(ca.get_complete(chid))
+    return out
+
