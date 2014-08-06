@@ -7,6 +7,7 @@
   Epics Process Variable
 """
 import time
+import ctypes
 import copy
 from math import log10
 
@@ -97,6 +98,13 @@ class PV(object):
                                       use_time= self.form == 'time')
         self._args['type'] = dbr.Name(self.ftype).lower()
 
+    def force_connect(self, pvname=None, chid=None, conn=True, **kws):
+        if chid is None: chid = self.chid
+        if isinstance(chid, ctypes.c_long):
+            chid = chid.value
+        self._args['chid'] = self.chid = chid
+        self.__on_connect(pvname=pvname, chid=chid, conn=conn, **kws)
+        
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
         # occassionally chid is still None (ie if a second PV is created
