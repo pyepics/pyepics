@@ -252,9 +252,8 @@ class MCA(epics.Device):
         data_pv = self._pvs['_dat_']
         prefix = self._prefix
         if prefix.endswith('.'): prefix = prefix[:-1]
-
         roi = ROI(prefix=prefix, roi=iroi, data_pv=self._pvs['_dat_'])
-        roi.name = roiname.strip()
+        roi.NM = roiname.strip()
 
         offset, scale = 0.0, 1.0
         if calib is not None:
