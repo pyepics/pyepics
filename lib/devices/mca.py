@@ -116,7 +116,7 @@ class ROI(epics.Device):
 
     @left.setter
     def left(self, val):  
-        self.LO = val
+        self.put('LO', val)
 
     @property
     def right(self):    
@@ -124,7 +124,7 @@ class ROI(epics.Device):
 
     @right.setter
     def right(self, val):  
-        self.HI = val
+        self.put('HI', val)
 
     @property
     def name(self):
@@ -132,7 +132,7 @@ class ROI(epics.Device):
 
     @name.setter
     def name(self, val):  
-        self.NM = val
+        self.put('NM', val)
 
     @property
     def width(self):
@@ -222,7 +222,7 @@ class MCA(epics.Device):
     def del_roi(self, roiname):
         self.get_rois()
         for roi in self.rois:
-            if roi.name.strip().lower() == roiname.strip().lower():
+            if roi.NM.strip().lower() == roiname.strip().lower():
                 roi.clear()
         epics.poll(0.010, 1.0)
         self.set_rois(self.rois)
@@ -293,7 +293,7 @@ class MCA(epics.Device):
         # available before trying to sort it!
         epics.poll(0.050, 1.0)
         [(r.get('NM'), r.get('LO')) for r in rois]
-        roidat = [(r.name, r.LO, r.HI) for r in sorted(rois)]
+        roidat = [(r.NM, r.LO, r.HI) for r in sorted(rois)]
 
         iroi = 0
         self.rois = []
@@ -301,7 +301,7 @@ class MCA(epics.Device):
             if len(name)<1 or lo<0 or hi<0:
                 continue
             roi = ROI(prefix=prefix, roi=iroi, data_pv=data_pv)
-            roi.name = name.strip()
+            roi.NM = name.strip()
             roi.LO = round(offset + scale*lo)
             roi.HI = round(offset + scale*hi)
             self.rois.append(roi)
@@ -372,7 +372,7 @@ class MultiXMAP(epics.Device):
         add = buff.append
         rois = self.get_rois()
         for iroi in range(len(rois[0])):
-            name = rois[0][iroi].name
+            name = rois[0][iroi].NM
             s = [[rois[m][iroi].LO, rois[m][iroi].HI] for m in range(self.nmca)]
             dat = repr(s).replace('],', '').replace('[', '').replace(']','').replace(',','')
             add("ROI%2.2i = %s | %s" % (iroi, name, dat))
@@ -407,7 +407,7 @@ class MultiXMAP(epics.Device):
                 roi = ROI(prefix=prefix, roi=iroi)
                 roi.LO = lo
                 roi.HI = hi
-                roi.name = name.strip()
+                roi.NM = name.strip()
                 rois.append(roi)
                 iroi += 1
 
