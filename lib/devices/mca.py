@@ -62,46 +62,41 @@ class ROI(epics.Device):
     -------
     clear     remove ROI
     """
-    _nonpvs = ('_prefix', '_pvs', '_delim', '_aliases', 'attrs',
-               'width', 'center', 'bgr_width', 'address',
-               'net', 'total', '_dat_')
+
+    _nonpvs = ('_prefix', '_pvs', '_delim', 'attrs',
+               'left', 'right', 'name', 'width', 'center',
+               'bgr_width', 'address', 'net', 'total', '_dat_')
 
     def __init__(self, prefix, roi=0, bgr_width=3, data_pv=None):
         self.address = self._prefix = '%s.R%i' % (prefix, roi)
         self.bgr_width = bgr_width
-        _attrs = ('NM', 'LO', 'HI', '', 'N')
-        _aliases = {'name': _attrs[0],
-                    'left': _attrs[1],
-                    'right': _attrs[2],
-                    '_sum_': _attrs[3],
-                    '_net_': _attrs[4]}
-
-        epics.Device.__init__(self,self._prefix, delim='',
-                              attrs=_attrs, aliases=_aliases)
-        self._pvs['_dat_'] = None
-        if data_pv is not None:
-            self._pvs['_dat_'] = data_pv
-        epics.poll()
+        _attrs = ('NM', 'LO', 'HI')
+        epics.Device.__init__(self,self._prefix, delim='', 
+                              attrs=_attrs, with_poll=False)
+        self._pvs['_dat_'] = data_pv
 
     def __eq__(self, other):
         """used for comparisons"""
-        return (self.left == getattr(other, 'left', None) and
-                self.right == getattr(other, 'right', None) and
+        return (self.LO == getattr(other, 'LO', None) and
+                self.HI == getattr(other, 'HI', None) and
                 self.bgr_width == getattr(other, 'bgr_width', None) )
 
     def __ne__(self, other): return not self.__eq__(other)
-    def __lt__(self, other): return self.left <  getattr(other, 'left', None)
-    def __le__(self, other): return self.left <= getattr(other, 'left', None)
-    def __gt__(self, other): return self.left >  getattr(other, 'left', None)
-    def __ge__(self, other): return self.left >= getattr(other, 'left', None)
+    def __lt__(self, other): return self.LO <  getattr(other, 'LO', None)
+    def __le__(self, other): return self.LO <= getattr(other, 'LO', None)
+    def __gt__(self, other): return self.LO >  getattr(other, 'LO', None)
+    def __ge__(self, other): return self.LO >= getattr(other, 'LO', None)
 
     def __repr__(self):
         "string representation"
         pref = self._prefix
         if pref.endswith('.'):
             pref = pref[:-1]
-        return "<ROI '%s', name='%s', range=[%i:%i]>" % (pref, self.name,
-                                                   self.left, self.right)
+        return "<ROI '%s', name='%s', range=[%s:%s]>" % (pref, self.NM,
+                                                         self.LO, self.HI)
+
+        #return "<ROI '%s', name='%s', range=[%i:%i]>" % (pref, self.NM,
+        #                                                 self.LO, self.HI)
 
     @property
     def total(self):
@@ -113,16 +108,40 @@ class ROI(epics.Device):
 
     @property
     def center(self):
-        return int(round(self.right + self.left)/2.0)
+        return int(round(self.HI + self.LO)/2.0)
+
+    @property
+    def left(self):    
+        return self.LO
+
+    @left.setter
+    def left(self, val):  
+        self.LO = val
+
+    @property
+    def right(self):    
+        return self.HI
+
+    @right.setter
+    def right(self, val):  
+        self.HI = val
+
+    @property
+    def name(self):
+        return self.NM
+
+    @name.setter
+    def name(self, val):  
+        self.NM = val
 
     @property
     def width(self):
-        return int(round(self.right - self.left))
+        return int(round(self.HI - self.LO))
 
     def clear(self):
-        self.name = ''
-        self.left = -1
-        self.right = -1
+        self.NM = ''
+        self.LO = -1
+        self.HI = -1
 
     def get_counts(self, data=None, net=False):
         """
@@ -145,23 +164,21 @@ class ROI(epics.Device):
         if not isinstance(data, np.ndarray):
             return 0
 
-        total = data[self.left:self.right+1].sum()
+        total = data[self.LO:self.HI+1].sum()
         if not net:
             return total
         # calculate net counts
         bgr_width = int(self.bgr_width)
-        ilmin = max((self.left - bgr_width), 0)
-        irmax = min((self.right + bgr_width), len(data)-1) + 1
-        bgr_counts = np.concatenate((data[ilmin:self.left],
-                                     data[self.right+1:irmax])).mean()
+        ilmin = max((self.LO - bgr_width), 0)
+        irmax = min((self.HI + bgr_width), len(data)-1) + 1
+        bgr_counts = np.concatenate((data[ilmin:self.LO],
+                                     data[self.HI+1:irmax])).mean()
 
-        return (total - bgr_counts*(self.right-self.left))
+        return (total - bgr_counts*(self.HI-self.LO))
 
 class MCA(epics.Device):
-    _attrs =('CALO','CALS','CALQ','TTH', 'EGU', 
-             'PRTM', 'PLTM', 'ACT', 'RTIM', 'STIM',
-             'ACQG', 'NUSE','PCT', 'PTCL',
-             'DWEL', 'CHAS', 'PSCL', 'SEQ',
+    _attrs =('CALO', 'CALS', 'CALQ', 'TTH', 'EGU', 
+             'PRTM', 'PLTM', 'ACQG', 'NUSE',  'DWEL', 
              'ERTM', 'ELTM', 'IDTIM')
     _nonpvs = ('_prefix', '_pvs', '_delim', '_npts', 'rois', '_nrois')
 
@@ -176,13 +193,14 @@ class MCA(epics.Device):
             self._prefix = "%smca%i" % (prefix, mca)
 
         epics.Device.__init__(self,self._prefix, delim='.',
-                              attrs=self._attrs)
-        self._pvs['VAL'] = epics.PV("%s.VAL" % self._prefix, auto_monitor=False)
+                              attrs=self._attrs, with_poll=False)
+        self._pvs['VAL'] = epics.PV("%sVAL" % self._prefix, auto_monitor=False)
 
         self._pvs['_dat_'] = None
         if data_pv is not None:
             self._pvs['_dat_'] = epics.PV(data_pv)
         epics.poll()
+
 
     def get_rois(self, nrois=None):
         self.rois = []
@@ -192,20 +210,13 @@ class MCA(epics.Device):
             prefix = prefix[:-1]
         if nrois is None:
             nrois = self._nrois
-        _pvdat = []
+        # 
         for i in range(nrois):
-            root = "%s.R%d" % (prefix, i)
-            nm = epics.PV("%sNM" % root)
-            hi = epics.PV("%sHI" % root)
-            _pvdat.append((nm, hi))
-        time.sleep(0.001)
-        
-        for i, roipvs in enumerate(_pvdat):
-            nm, hi = [p.get() for p in roipvs]
-            if len(nm) < 1 or hi < 0:
-                break
             roi = ROI(prefix=prefix, roi=i, data_pv=data_pv)
+            if roi.LO < 0 or len(roi.NM) < 1:
+                break
             self.rois.append(roi)
+        epics.poll()
         return self.rois
 
     def del_roi(self, roiname):
@@ -251,8 +262,8 @@ class MCA(epics.Device):
             offset = calib[0] - off
             scale  = calib[1] / slope
 
-        roi.left = round(offset + scale*lo)
-        roi.right = round(offset + scale*hi)
+        roi.LO = round(offset + scale*lo)
+        roi.HI = round(offset + scale*hi)
         rois.append(roi)
         self.set_rois(rois)
 
@@ -283,7 +294,7 @@ class MCA(epics.Device):
         # available before trying to sort it!
         epics.poll(0.050, 1.0)
         [(r.get('NM'), r.get('LO')) for r in rois]
-        roidat = [(r.name, r.left, r.right) for r in sorted(rois)]
+        roidat = [(r.name, r.LO, r.HI) for r in sorted(rois)]
 
         iroi = 0
         self.rois = []
@@ -292,8 +303,8 @@ class MCA(epics.Device):
                 continue
             roi = ROI(prefix=prefix, roi=iroi, data_pv=data_pv)
             roi.name = name.strip()
-            roi.left = round(offset + scale*lo)
-            roi.right = round(offset + scale*hi)
+            roi.LO = round(offset + scale*lo)
+            roi.HI = round(offset + scale*hi)
             self.rois.append(roi)
             iroi += 1
 
@@ -363,7 +374,7 @@ class MultiXMAP(epics.Device):
         rois = self.get_rois()
         for iroi in range(len(rois[0])):
             name = rois[0][iroi].name
-            s = [[rois[m][iroi].left, rois[m][iroi].right] for m in range(self.nmca)]
+            s = [[rois[m][iroi].LO, rois[m][iroi].HI] for m in range(self.nmca)]
             dat = repr(s).replace('],', '').replace('[', '').replace(']','').replace(',','')
             add("ROI%2.2i = %s | %s" % (iroi, name, dat))
 
@@ -395,8 +406,8 @@ class MultiXMAP(epics.Device):
                 lims = [int(i) for i in dat.split()]
                 lo, hi = lims[0], lims[1]
                 roi = ROI(prefix=prefix, roi=iroi)
-                roi.left = lo
-                roi.right = hi
+                roi.LO = lo
+                roi.HI = hi
                 roi.name = name.strip()
                 rois.append(roi)
                 iroi += 1
