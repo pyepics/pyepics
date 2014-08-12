@@ -107,7 +107,7 @@ class Device(object):
                '_mutable', '_nonpvs')
     def __init__(self, prefix='', attrs=None,
                  nonpvs=None, delim='', timeout=None,
-                 mutable=True, aliases={}):
+                 mutable=True, aliases={}, with_poll=True):
         if nonpvs is not None:
             self._nonpvs =  nonpvs
             
@@ -133,7 +133,8 @@ class Device(object):
                     self.PV(attr, connect=False,
                             connection_timeout=timeout)
 
-        ca.poll()
+        if with_poll:
+            ca.poll()
         self._init = True
 
     def PV(self, attr, connect=True, **kw):
