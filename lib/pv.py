@@ -104,7 +104,7 @@ class PV(object):
             chid = chid.value
         self._args['chid'] = self.chid = chid
         self.__on_connect(pvname=pvname, chid=chid, conn=conn, **kws)
-        
+
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
         # occassionally chid is still None (ie if a second PV is created
@@ -246,7 +246,7 @@ class PV(object):
 
         if count is None:
             count = len(val)
-        if (as_numpy and ca.HAS_NUMPY and 
+        if (as_numpy and ca.HAS_NUMPY and
             not isinstance(val, ca.numpy.ndarray)):
             if count == 1:
                 val = [val]
@@ -319,7 +319,7 @@ class PV(object):
                 cval = ''
             self._args['char_value'] = cval
             return cval
-        
+
         cval  = repr(val)
         if self.count > 1:
             cval = '<array size=%d, type=%s>' % (len(val),
@@ -353,7 +353,7 @@ class PV(object):
         kwds = ca.get_ctrlvars(self.chid, timeout=timeout, warn=warn)
         self._args.update(kwds)
         return kwds
-        
+
     def get_timevars(self, timeout=5, warn=True):
         "get time values for variable"
         if not self.wait_for_connection():
@@ -692,10 +692,15 @@ class PV(object):
             ctx = ca.current_context()
             if self.pvname in ca._cache[ctx]:
                 ca._cache[ctx].pop(self.pvname)
-
             del cback
             del uarg
             del evid
+            try:
+                self._monref = None
+                self._args   = {}.fromkeys(self._fields)
+            except:
+                pass
+
         ca.poll(evt=1.e-3, iot=1.0)
         self.callbacks = {}
 
