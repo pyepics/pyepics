@@ -10,6 +10,7 @@ import time
 import ctypes
 import copy
 from math import log10
+from threading import Thread
 
 from . import ca
 from . import dbr
@@ -58,6 +59,8 @@ class PV(object):
                  connection_callback=None,
                  connection_timeout=None):
 
+        chid_cache = ca.get_cache()
+
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
@@ -90,9 +93,26 @@ class PV(object):
             ca.use_initial_context()
         self.context = ca.current_context()
 
-        self._args['chid'] = ca.create_channel(self.pvname,
-                                               callback=self.__on_connect)
-        self.chid = self._args['chid']
+        chid_cache = ca.get_cache()
+        self._conn_thread = None
+        if self.context in ca._cache and pvname in chid_cache:
+            _pvdat = ca._cache[self.context][pvname]
+            chid = _pvdat['chid']
+            conn = ca.isConnected(chid)
+            if isinstance(chid, ctypes.c_long): chid = chid.value
+            self._args['chid'] = self.chid = chid
+            if not conn:
+                self._conn_thread = Thread(target=self.__on_connect,
+                                           args=(pvname, chid, conn))
+                self._conn_thread.start()
+            else:
+                _pvdat['callbacks'].append(self.__on_connect)
+        else:
+            self._args['chid'] = ca.create_channel(self.pvname,
+                                                   callback=self.__on_connect)
+            self.chid = self._args['chid']
+            
+
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
@@ -104,7 +124,7 @@ class PV(object):
             chid = chid.value
         self._args['chid'] = self.chid = chid
         self.__on_connect(pvname=pvname, chid=chid, conn=conn, **kws)
-
+        
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
         # occassionally chid is still None (ie if a second PV is created
@@ -246,7 +266,7 @@ class PV(object):
 
         if count is None:
             count = len(val)
-        if (as_numpy and ca.HAS_NUMPY and
+        if (as_numpy and ca.HAS_NUMPY and 
             not isinstance(val, ca.numpy.ndarray)):
             if count == 1:
                 val = [val]
@@ -319,7 +339,7 @@ class PV(object):
                 cval = ''
             self._args['char_value'] = cval
             return cval
-
+        
         cval  = repr(val)
         if self.count > 1:
             cval = '<array size=%d, type=%s>' % (len(val),
@@ -353,7 +373,7 @@ class PV(object):
         kwds = ca.get_ctrlvars(self.chid, timeout=timeout, warn=warn)
         self._args.update(kwds)
         return kwds
-
+        
     def get_timevars(self, timeout=5, warn=True):
         "get time values for variable"
         if not self.wait_for_connection():
