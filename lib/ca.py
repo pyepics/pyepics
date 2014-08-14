@@ -288,7 +288,7 @@ def get_cache():
         nx = len(_cache[_cache.keys()[0]])
     except:
         pass
-    return _cache[current_context()]
+    return _cache.get(current_context(), {})
 
 def show_cache(print_out=True):
     """print out a listing of PVs in the current session to
