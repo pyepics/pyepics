@@ -233,7 +233,7 @@ class PV(object):
             (self._args['value'] is None) or
             (count is not None and count > len(self._args['value']))):
             ca_get = ca.get
-            if ca.get_cache(self.pvname)['value'] is not None:
+            if ca.get_cachedpv(self.pvname)['value'] is not None:
                 ca_get = ca.get_complete
             self._args['value'] = ca_get(self.chid, ftype=self.ftype,
                                          count=count, timeout=timeout,

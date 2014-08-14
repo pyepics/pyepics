@@ -204,7 +204,7 @@ def initialize_libca():
 
     dllname = find_libca()
     load_dll = ctypes.cdll.LoadLibrary
-    global libca, initial_context
+    global libca, initial_context, _cache
     if os.name == 'nt':
         load_dll = ctypes.windll.LoadLibrary
     try:
@@ -234,7 +234,7 @@ def initialize_libca():
     # TIME and CTRL data as an array in dbr module
     dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
     initial_context = current_context()
-
+    _cache = {initial_context: {}}
     if AUTO_CLEANUP:
         atexit.register(finalize_libca)
     return libca
@@ -275,15 +275,27 @@ def finalize_libca(maxtime=10.0):
         pass
     time.sleep(0.01)
 
-def get_cache(pvname):
+def get_cachedpv(pvname):
     "return cache dictionary for a given pvname in the current context"
+    global _cache
     return _cache[current_context()].get(pvname, None)
+
+def get_cache():
+    "return ca cache for current context"
+    global _cache
+    nx = 0
+    try:
+        nx = len(_cache[_cache.keys()[0]])
+    except:
+        pass
+    return _cache[current_context()]
 
 def show_cache(print_out=True):
     """print out a listing of PVs in the current session to
     standard output.  Use the *print_out=False* option to be
     returned the listing instead of having it printed out.
     """
+    global _cache
     out = []
     out.append('#  PVName        ChannelID/Context Connected?')
     out.append('#--------------------------------------------')
@@ -310,6 +322,7 @@ def clear_cache():
     """
 
     # Clear global state variables
+    global _cache
     _cache.clear()
     _put_done.clear()
     _PVCache.clear()
@@ -540,7 +553,9 @@ def _onGetEvent(args, **kws):
     global _cache
     if args.status != dbr.ECA_NORMAL:
         return
-    get_cache(name(args.chid))[args.usr] = memcopy(dbr.cast_args(args).contents)
+    pvdat = get_cachedpv(name(args.chid))
+    if pvdat is not None:
+        pvdat[args.usr] = memcopy(dbr.cast_args(args).contents)
 
 
 ## put event handler:
@@ -654,10 +669,7 @@ def replace_printf_handler(fcn=None):
 def current_context():
     "return the current context"
     ctx = libca.ca_current_context()
-    try:
-        ctx = int(ctx)
-    except TypeError:
-        pass
+    if isinstance(ctx, ctypes.c_long): ctx = ctx.value
     return ctx
 
 @withCA
@@ -1101,6 +1113,8 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     later with :func:`get_complete`.
 
     """
+    global _cache
+
     if ftype is None:
         ftype = field_type(chid)
     if ftype in (None, -1):
@@ -1164,6 +1178,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
     2. Consult the doc for :func:`get` for more information.
 
     """
+    global _cache
     if ftype is None:
         ftype = field_type(chid)
     if count is None:
@@ -1335,6 +1350,8 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
     enum_strs will be a list of strings for the names of ENUM states.
 
     """
+    global _cache
+
     ftype = promote_type(chid, use_ctrl=True)
     ncache = _cache[current_context()][name(chid)]
     if ncache.get('ctrl_value', None) is None:
@@ -1381,6 +1398,8 @@ def get_timevars(chid, timeout=5.0, warn=True):
     """returns a dictionary of TIME fields for a Channel.
     This will contain keys of  *status*, *severity*, and *timestamp*.
     """
+    global _cache
+
     ftype = promote_type(chid, use_time=True)
     ncache = _cache[current_context()][name(chid)]
     if ncache.get('time_value', None) is None:
