@@ -18,6 +18,7 @@ import ctypes.util
 import os
 import sys
 import time
+import logging
 from copy import copy
 from  math import log10
 import atexit
@@ -78,7 +79,7 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 #  user_callback = one or more user functions to be called on
 #                  change (accumulated in the cache)
 _cache  = {}
-
+# logging.basicConfig(filename='ca.log',level=logging.DEBUG)
 ## Cache of pvs waiting for put to be done.
 _put_done =  {}
 
@@ -507,6 +508,7 @@ def _onConnectionEvent(args):
     connected. if provided, run a user-function"""
     ctx = current_context()
     pvname = name(args.chid)
+    conn = (args.op == dbr.OP_CONN_UP)    
     global _cache
 
     if ctx is None and len(_cache.keys()) > 0:
@@ -520,6 +522,8 @@ def _onConnectionEvent(args):
         if pvname in _cache[context]:
             pv_found = True
             break
+
+    # logging.debug("ConnectionEvent %s/%i/%i " % (pvname, args.chid, conn))
 
     if not pv_found:
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
@@ -536,7 +540,6 @@ def _onConnectionEvent(args):
                 ichid = entry['chid'].value
 
             if int(ichid) == int(args.chid):
-                conn = (args.op == dbr.OP_CONN_UP)
                 chid = args.chid
                 entry.update({'chid': chid, 'conn': conn,
                               'ts': time.time(), 'failures': 0})
@@ -791,6 +794,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         entry = {'conn':False,  'chid': None,
                  'ts': 0,  'failures':0, 'value': None,
                  'callbacks': [ callback ]}
+        # logging.debug("Create Channel %s " % pvname)        
         _cache[ctx][pvname] = entry
     else:
         entry = _cache[ctx][pvname]
