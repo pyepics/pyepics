@@ -53,7 +53,7 @@ def __create_pv(pvname, timeout=5.0):
 
     start_time = time.time()
     thispv = PV(pvname)
-    thispv.connect()
+    thispv.wait_for_connection()
     while not thispv.connected:
         poll()
         if time.time()-start_time > timeout:
