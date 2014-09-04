@@ -59,8 +59,6 @@ class PV(object):
                  connection_callback=None,
                  connection_timeout=None):
 
-        chid_cache = ca.get_cache()
-
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
@@ -92,10 +90,8 @@ class PV(object):
         if ca.current_context() is None:
             ca.use_initial_context()
         self.context = ca.current_context()
-
-        chid_cache = ca.get_cache()
         self._conn_thread = None
-        if self.context in ca._cache and pvname in chid_cache:
+        if self.context in ca._cache and pvname in ca._cache[self.context]:
             _pvdat = ca._cache[self.context][pvname]
             chid = _pvdat['chid']
             conn = ca.isConnected(chid)
@@ -117,6 +113,7 @@ class PV(object):
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
         self._args['type'] = dbr.Name(self.ftype).lower()
+        
 
     def force_connect(self, pvname=None, chid=None, conn=True, **kws):
         if chid is None: chid = self.chid
@@ -130,8 +127,9 @@ class PV(object):
         # occassionally chid is still None (ie if a second PV is created
         # while __on_connect is still pending for the first one.)
         # Just return here, and connection will happen later
+        t0 = time.time()
         if self.chid is None and chid is None:
-            time.sleep(0.001)
+            ca.poll(5.e-4)
             return
         if conn:
             ca.poll()
@@ -181,6 +179,7 @@ class PV(object):
         # threads from thinking a connection is complete when it is actually
         # still in progress.
         self.connected = conn
+        # logging.debug('PV on_connect %s took %.4f sec' % (self.pvname, time.time()-t0))
         return
 
     def wait_for_connection(self, timeout=None):
