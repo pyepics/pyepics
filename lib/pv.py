@@ -10,7 +10,6 @@ import time
 import ctypes
 import copy
 from math import log10
-from threading import Thread
 
 from . import ca
 from . import dbr
@@ -24,6 +23,8 @@ def fmt_time(tstamp=None):
     return "%s.%5.5i" % (time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime(tstamp)),
                          round(1.e5*frac))
+
+pv_cache = {}
 
 class PV(object):
     """Epics Process Variable
@@ -74,8 +75,10 @@ class PV(object):
         self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
         self.connection_callbacks = []
+
         if connection_callback is not None:
             self.connection_callbacks = [connection_callback]
+
         self.callbacks  = {}
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
@@ -90,19 +93,32 @@ class PV(object):
         if ca.current_context() is None:
             ca.use_initial_context()
         self.context = ca.current_context()
-        self._conn_thread = None
-        if self.context in ca._cache and pvname in ca._cache[self.context]:
-            _pvdat = ca._cache[self.context][pvname]
-            chid = _pvdat['chid']
-            conn = ca.isConnected(chid)
-            if isinstance(chid, ctypes.c_long): chid = chid.value
-            self._args['chid'] = self.chid = chid
-            if not conn:
-                self._conn_thread = Thread(target=self.__on_connect,
-                                           args=(pvname, chid, conn))
-                self._conn_thread.start()
-            else:
-                _pvdat['callbacks'].append(self.__on_connect)
+
+        global pv_cache
+        pvid = (self.pvname, self.form, self.context)
+        if (pvid in pv_cache and
+            self.context in ca._cache and pvname in ca._cache[self.context]):
+            self._args, conncb, conn = pv_cache[pvid]
+            self.chid = self._args['chid']
+            self.connection_callbacks = conncb
+            self.connected = conn
+            self.ftype  = ca.promote_type(self.chid,
+                                          use_ctrl= self.form == 'ctrl',
+                                          use_time= self.form == 'time')
+
+            count = self._args['count']
+            if self.auto_monitor is None:
+                self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
+            if self.auto_monitor:
+                mask = None
+                if isinstance(self.auto_monitor, int):
+                    mask = self.auto_monitor
+                self._monref = ca.create_subscription(self.chid,
+                                         use_ctrl=(self.form == 'ctrl'),
+                                         use_time=(self.form == 'time'),
+                                         callback=self.__on_changes,
+                                         mask=mask)
+
         else:
             self._args['chid'] = ca.create_channel(self.pvname,
                                                    callback=self.__on_connect)
@@ -178,8 +194,11 @@ class PV(object):
         # waiting until the very end until to set self.connected prevents
         # threads from thinking a connection is complete when it is actually
         # still in progress.
+        global pv_cache
+        pvid = (self.pvname, self.form, self.context)
+                
+        pv_cache[pvid] = (self._args, self.connection_callbacks, conn)
         self.connected = conn
-        # logging.debug('PV on_connect %s took %.4f sec' % (self.pvname, time.time()-t0))
         return
 
     def wait_for_connection(self, timeout=None):
@@ -191,6 +210,7 @@ class PV(object):
 
         if not self._conn_started:
             self.connect()
+
         if not self.connected:
             if timeout is None:
                 timeout = self.connection_timeout
@@ -252,7 +272,7 @@ class PV(object):
             (self._args['value'] is None) or
             (count is not None and count > len(self._args['value']))):
             ca_get = ca.get
-            if ca.get_cachedpv(self.pvname)['value'] is not None:
+            if ca.get_cache(self.pvname)['value'] is not None:
                 ca_get = ca.get_complete
             self._args['value'] = ca_get(self.chid, ftype=self.ftype,
                                          count=count, timeout=timeout,
