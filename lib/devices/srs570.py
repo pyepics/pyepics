@@ -45,7 +45,7 @@ class SRS570(epics.Device):
 
         self.put('sens_num', ival)
         self.put('sens_unit', uval)
-	if scale_offset:
+        if scale_offset:
             # scale offset to by 0.1 x sensitivity
             # i.e, a sensitivity of 200 nA/V should 
             # set set the input offset to 20 nA.
@@ -65,9 +65,9 @@ class SRS570(epics.Device):
 
     def increase_sensitivity(self):
         "increase sensitivity by 1 step"
-	snum  = self.get('sens_num')
-	sunit = self.get('sens_unit')
-	if snum == 0:
+        snum  = self.get('sens_num')
+        sunit = self.get('sens_unit')
+        if snum == 0:
             snum = 9
             sunit = sunit - 1
             if sunit < 0:
