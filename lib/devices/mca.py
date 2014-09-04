@@ -2,7 +2,7 @@
 import sys
 import time
 import numpy as np
-import epics
+from .. import Device, PV, poll
 
 try:
     from collections import OrderedDict
@@ -15,7 +15,7 @@ elif sys.version[0] == '3':
     from configparser import  ConfigParser
 
 MAX_ROIS = 32
-class DXP(epics.Device):
+class DXP(Device):
     _attrs = ('PreampGain','MaxEnergy','ADCPercentRule','BaselineCutPercent',
               'BaselineThreshold','BaselineFilterLength','BaselineCutEnable',
               'InputCountRate', 'OutputCountRate',
@@ -25,11 +25,11 @@ class DXP(epics.Device):
 
     def __init__(self,prefix,mca=1):
         self._prefix = "%sdxp%i" % (prefix, mca)
-        epics.Device.__init__(self, self._prefix, delim=':')
-        epics.poll()
+        Device.__init__(self, self._prefix, delim=':')
+        poll()
 
 
-class ROI(epics.Device):
+class ROI(Device):
     """epics ROI device for MCA record
 
     >>> from epics.devices.mca import ROI, MCA
@@ -71,8 +71,9 @@ class ROI(epics.Device):
         self.address = self._prefix = '%s.R%i' % (prefix, roi)
         self.bgr_width = bgr_width
         _attrs = ('NM', 'LO', 'HI')
-        epics.Device.__init__(self,self._prefix, delim='', 
+        Device.__init__(self,self._prefix, delim='', 
                               attrs=_attrs, with_poll=False)
+
         self._pvs['_dat_'] = data_pv
 
     def __eq__(self, other):
@@ -176,11 +177,12 @@ class ROI(epics.Device):
 
         return (total - bgr_counts*(self.HI-self.LO))
 
-class MCA(epics.Device):
+class MCA(Device):
     _attrs =('CALO', 'CALS', 'CALQ', 'TTH', 'EGU', 
              'PRTM', 'PLTM', 'ACQG', 'NUSE',  'DWEL', 
              'ERTM', 'ELTM', 'IDTIM')
-    _nonpvs = ('_prefix', '_pvs', '_delim', '_npts', 'rois', '_nrois')
+    _nonpvs = ('_prefix', '_pvs', '_delim',
+               '_npts', 'rois', '_nrois', 'rois')
 
     def __init__(self, prefix, mca=None, nrois=None, data_pv=None):
         self._prefix = prefix
@@ -192,14 +194,14 @@ class MCA(epics.Device):
         if isinstance(mca, int):
             self._prefix = "%smca%i" % (prefix, mca)
 
-        epics.Device.__init__(self,self._prefix, delim='.',
+        Device.__init__(self,self._prefix, delim='.',
                               attrs=self._attrs, with_poll=False)
-        self._pvs['VAL'] = epics.PV("%sVAL" % self._prefix, auto_monitor=False)
+        self._pvs['VAL'] = PV("%sVAL" % self._prefix, auto_monitor=False)
 
         self._pvs['_dat_'] = None
         if data_pv is not None:
-            self._pvs['_dat_'] = epics.PV(data_pv)
-        epics.poll()
+            self._pvs['_dat_'] = PV(data_pv)
+        poll()
 
 
     def get_rois(self, nrois=None):
@@ -210,13 +212,9 @@ class MCA(epics.Device):
             prefix = prefix[:-1]
         if nrois is None:
             nrois = self._nrois
-        # 
         for i in range(nrois):
-            roi = ROI(prefix=prefix, roi=i, data_pv=data_pv)
-            if roi.LO < 0 or len(roi.NM) < 1:
-                break
-            self.rois.append(roi)
-        epics.poll()
+            self.rois.append( ROI(prefix=prefix, roi=i, data_pv=data_pv))
+        poll()
         return self.rois
 
     def del_roi(self, roiname):
@@ -224,7 +222,7 @@ class MCA(epics.Device):
         for roi in self.rois:
             if roi.NM.strip().lower() == roiname.strip().lower():
                 roi.clear()
-        epics.poll(0.010, 1.0)
+        poll(0.010, 1.0)
         self.set_rois(self.rois)
 
     def add_roi(self, roiname, lo=-1, hi=-1, calib=None):
@@ -278,7 +276,7 @@ class MCA(epics.Device):
            calib = mca1.get_calib()
            mca2.set_rois(rois, calib=calib)
         """
-        epics.poll(0.050, 1.0)
+        poll(0.050, 1.0)
         data_pv = self._pvs['_dat_']
         prefix = self._prefix
         if prefix.endswith('.'): prefix = prefix[:-1]
@@ -291,7 +289,7 @@ class MCA(epics.Device):
 
         # do an explicit get here to make sure all data is
         # available before trying to sort it!
-        epics.poll(0.050, 1.0)
+        poll(0.050, 1.0)
         [(r.get('NM'), r.get('LO')) for r in rois]
         roidat = [(r.NM, r.LO, r.HI) for r in sorted(rois)]
 
@@ -328,7 +326,7 @@ class MCA(epics.Device):
         return cal[0] + en*(cal[1] + en*cal[2])
 
 
-class MultiXMAP(epics.Device):
+class MultiXMAP(Device):
     """
     multi-Channel XMAP DXP device
     """
@@ -355,7 +353,7 @@ class MultiXMAP(epics.Device):
         self.dxps = [DXP(prefix, mca=i+1) for i in range(nmca)]
         self.mcas = [MCA(prefix, mca=i+1) for i in range(nmca)]
 
-        epics.Device.__init__(self, prefix, attrs=self.attrs,
+        Device.__init__(self, prefix, attrs=self.attrs,
                               delim='', mutable=True)
         for p in self.pathattrs:
             pvname = '%s%s%s' % (prefix, filesaver, p)
@@ -411,7 +409,7 @@ class MultiXMAP(epics.Device):
                 rois.append(roi)
                 iroi += 1
 
-        epics.poll(0.050, 1.0)
+        poll(0.050, 1.0)
         self.mcas[0].set_rois(rois)
         cal0 = self.mcas[0].get_calib()
         for mca in self.mcas[1:]:
@@ -444,7 +442,7 @@ class MultiXMAP(epics.Device):
         self.EraseStart = 1
 
         if self.Acquiring == 0:
-            epics.poll()
+            poll()
             self.EraseStart = 1
         return self.EraseStart
 
