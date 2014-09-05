@@ -41,7 +41,7 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
         chids.append((chid, eventID))
         epics.poll(evt=0.025, iot=5.0)
     epics.poll(evt=0.025, iot=10.0)
-
+    time.sleep(0.05)
     for (chid, eventID) in chids:
         write('=== %s   chid=%s\n' % (epics.ca.name(chid), repr(chid)))
         time.sleep(0.005)
@@ -52,17 +52,23 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
         if epics.ca.element_count(chid) > 10:
             val = val[:10]
         write("%i %s  %s %s \n" % (ntype, epics.dbr.Name(ntype).lower(), repr(val), cval))
+        # write("%i %s  %s  \n" % (ntype, epics.dbr.Name(ntype).lower(), repr(val)))
+    time.sleep(0.5)        
     write('----- finalizing CA\n')
     epics.ca.finalize_libca()
-    time.sleep(0.01)
+    time.sleep(0.05)
     
 for use_preempt in (True, False):
-    for use_numpy in (True, False):
-        for use_time, use_ctrl in ((False, False), (True, False), (False, True)):
-                RunTest(pvlist,
-                        use_preempt=use_preempt,
-                        use_numpy=use_numpy,
-                        use_time=use_time,
-                        use_ctrl=use_ctrl)
+    for use_numpy in (True, False): #  False):
+        for use_time, use_ctrl in ((False, False),
+                                   (True, False),
+                                   (False, True),
+                                   ):
+            print("====\n====  NUMPY/TIME/CTRL ", use_numpy, use_time, use_ctrl)
+            RunTest(pvlist,
+                    use_preempt=use_preempt,
+                    use_numpy=use_numpy,
+                    use_time=use_time,
+                    use_ctrl=use_ctrl)
         # sys.exit()
-                
+            

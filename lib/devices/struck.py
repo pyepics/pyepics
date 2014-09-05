@@ -3,8 +3,9 @@ import sys
 import time
 import copy
 import numpy
-import epics
-import epics.devices
+from .. import Device
+from .scaler import Scaler
+from .mca import MCA
 
 HEADER = '''# Struck MCA data: %s 
 # Nchannels, Nmca = %i, %i
@@ -14,7 +15,7 @@ HEADER = '''# Struck MCA data: %s
 # %s
 ''' 
 
-class Struck(epics.Device):
+class Struck(Device):
     """
     Very simple implementation of Struck SIS MultiChannelScaler
     """
@@ -37,13 +38,13 @@ class Struck(epics.Device):
         self.clockrate = clockrate # clock rate in MHz
 
         if scaler is not None:
-            self.scaler = epics.devices.Scaler(scaler, nchan=nchan)
+            self.scaler = Scaler(scaler, nchan=nchan)
 
         self.mcas = []
         for i in range(nchan):
-            self.mcas.append(epics.devices.MCA(prefix, mca=i+1, nrois=2))
+            self.mcas.append(MCA(prefix, mca=i+1, nrois=2))
             
-        epics.Device.__init__(self, prefix, delim='',
+        Device.__init__(self, prefix, delim='',
                               attrs=self.attrs, mutable=False)
 
     def ExternalMode(self, countonstart=0, initialadvance=None,

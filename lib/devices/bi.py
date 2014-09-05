@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-import epics
+from .. import Device
 
-class bi(epics.Device):
+class bi(Device):
     """
     Simple binary input device
     """
@@ -12,8 +12,6 @@ class bi(epics.Device):
     def __init__(self, prefix, **kwargs):
         if prefix.endswith('.'):
             prefix = prefix[:-1]
-        epics.Device.__init__(self, prefix, delim='.',
-                              attrs=self.attrs,
-                              **kwargs)
+        Device.__init__(self, prefix, delim='.', attrs=self.attrs, **kwargs)
 
 

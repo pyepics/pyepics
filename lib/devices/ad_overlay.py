@@ -1,6 +1,6 @@
-import epics
+from .. import Device
 
-class AD_OverlayPlugin(epics.Device):
+class AD_OverlayPlugin(Device):
     """
     AreaDetector Overlay Plugin
     """
@@ -21,8 +21,8 @@ class AD_OverlayPlugin(epics.Device):
     _nonpvs = ('_prefix', '_pvs', '_delim')
 
     def __init__(self, prefix):
-        epics.Device.__init__(self, prefix, delim='', mutable=False,
-                              attrs=self.attrs)
+        Device.__init__(self, prefix, delim='', mutable=False,
+                        attrs=self.attrs)
 
     def ensure_value(self, attr, value, wait=False):
         """ensures that an attribute with an associated _RBV value is

@@ -2,12 +2,12 @@
 """Epics Support for
 Stanford Research Systems 570 current amplifier
 """
-import epics
+from .. import Device
 
 VALID_STEPS = [1, 2, 5, 10, 20, 50, 100, 200, 500]
 VALID_UNITS = ['pA/V', 'nA/V','uA/V', 'mA/V']
 
-class SRS570(epics.Device):
+class SRS570(Device):
     """ 
     SRS (Stanford Research Systems) 570 current amplifier
     """
@@ -19,8 +19,8 @@ class SRS570(epics.Device):
     _nonpvs = ('_prefix', '_pvs', '_delim', '_nchan', '_chans')
     
     def __init__(self, prefix):
-        epics.Device.__init__(self, prefix, delim='',
-                              attrs=self.attrs, mutable=False)
+        Device.__init__(self, prefix, delim='',
+                        attrs=self.attrs, mutable=False)
         self.initialize()
 
     def initialize(self, bias=0, gain_mode=0, filter_type=0,

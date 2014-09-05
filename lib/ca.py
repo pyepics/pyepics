@@ -1194,7 +1194,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
     if as_string:
         val = _as_string(val, chid, count, ftype)
     elif isinstance(val, ctypes.Array) and HAS_NUMPY and as_numpy:
-        val = numpy.array(val)
+        val = numpy.ctypeslib.as_array(copy(val))        
 
     # value retrieved, clear cached value
     ncache['value'] = None
