@@ -213,7 +213,7 @@ class MCA(Device):
         if nrois is None:
             nrois = self._nrois
         for i in range(nrois):
-            self.rois.append( ROI(prefix=prefix, roi=i, data_pv=data_pv))
+            self.rois.append(ROI(prefix=prefix, roi=i, data_pv=data_pv))
         poll()
         return self.rois
 

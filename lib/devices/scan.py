@@ -2,14 +2,14 @@
 """
 Epics scan record
 """
-import epics
+from .. import Device
 import threading
 
 NUM_POSITIONERS = 4
 NUM_TRIGGERS    = 4
 NUM_DETECTORS   = 70
 
-class Scan(epics.Device):
+class Scan(Device):
     """
     A Device representing an Epics sscan record.
 
@@ -52,7 +52,7 @@ class Scan(epics.Device):
             attrs.append('D%2.2iPV' % i)
 
         self.waitSemaphore = threading.Semaphore(0)
-        epics.Device.__init__(self, name, delim='.', attrs=attrs, **kwargs)
+        Device.__init__(self, name, delim='.', attrs=attrs, **kwargs)
         for attr, pv in Scan._alias.items():
             self.add_pv('%s.%s' % (name,pv), attr)
 

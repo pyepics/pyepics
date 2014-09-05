@@ -2,12 +2,12 @@
 """Epics Support for
 Stanford Research Systems 570 current amplifier
 """
-import epics
+from .. import Device
 
 VALID_STEPS = [1, 2, 5, 10, 20, 50, 100, 200, 500]
 VALID_UNITS = ['pA/V', 'nA/V','uA/V', 'mA/V']
 
-class SRS570(epics.Device):
+class SRS570(Device):
     """ 
     SRS (Stanford Research Systems) 570 current amplifier
     """
@@ -19,8 +19,8 @@ class SRS570(epics.Device):
     _nonpvs = ('_prefix', '_pvs', '_delim', '_nchan', '_chans')
     
     def __init__(self, prefix):
-        epics.Device.__init__(self, prefix, delim='',
-                              attrs=self.attrs, mutable=False)
+        Device.__init__(self, prefix, delim='',
+                        attrs=self.attrs, mutable=False)
         self.initialize()
 
     def initialize(self, bias=0, gain_mode=0, filter_type=0,
@@ -45,7 +45,7 @@ class SRS570(epics.Device):
 
         self.put('sens_num', ival)
         self.put('sens_unit', uval)
-	if scale_offset:
+        if scale_offset:
             # scale offset to by 0.1 x sensitivity
             # i.e, a sensitivity of 200 nA/V should 
             # set set the input offset to 20 nA.
@@ -65,9 +65,9 @@ class SRS570(epics.Device):
 
     def increase_sensitivity(self):
         "increase sensitivity by 1 step"
-	snum  = self.get('sens_num')
-	sunit = self.get('sens_unit')
-	if snum == 0:
+        snum  = self.get('sens_num')
+        sunit = self.get('sens_unit')
+        if snum == 0:
             snum = 9
             sunit = sunit - 1
             if sunit < 0:

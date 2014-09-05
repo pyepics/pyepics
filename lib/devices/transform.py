@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """Epics transform record"""
-import epics
+from .. import Device
 
-class Transform(epics.Device):
+class Transform(Device):
     "Epics transfrom record"
 
     attr_fmts = {'Value': '%s',
@@ -25,9 +25,8 @@ class Transform(epics.Device):
             for let in self.rows:
                 self.attrs.append(fmt %  let)
 
-        epics.Device.__init__(self, prefix, delim='.',
-                              attrs=self.attrs,
-                              **kwargs)
+        Device.__init__(self, prefix, delim='.',
+                        attrs=self.attrs, **kwargs)
 
     def __validrow(self, row):
         return (isinstance(row, (str, unicode)) and
