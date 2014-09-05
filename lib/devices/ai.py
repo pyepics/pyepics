@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """Epics analog input record"""
-import epics
+from .. import Device
 
-class ai(epics.Device):
+class ai(Device):
     "Simple analog input device"
 
     attrs = ('VAL', 'EGU', 'HOPR', 'LOPR', 'PREC', 'NAME', 'DESC',
@@ -13,5 +13,4 @@ class ai(epics.Device):
     def __init__(self, prefix, **kwargs):
         if prefix.endswith('.'):
             prefix = prefix[:-1]
-        epics.Device.__init__(self, prefix, delim='.',
-                              attrs=self.attrs, **kwargs)
+        Device.__init__(self, prefix, delim='.', attrs=self.attrs, **kwargs)

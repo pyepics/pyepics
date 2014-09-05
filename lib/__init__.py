@@ -1,8 +1,8 @@
 """
    epics channel access python module
 
-   version    :  3.2.3
-   last update:  20-May-2014
+   version    :  3.2.4
+   last update:  5-September-2014
 
    Principle Authors:
       Matthew Newville <newville@cars.uchicago.edu> CARS, University of Chicago
@@ -19,7 +19,7 @@
    protocol of the Epics control system.
 
 """
-__version__ = '3.2.3'
+__version__ = '3.2.4'
 
 import time
 import sys
@@ -53,7 +53,7 @@ def __create_pv(pvname, timeout=5.0):
 
     start_time = time.time()
     thispv = PV(pvname)
-    thispv.connect()
+    thispv.wait_for_connection()
     while not thispv.connected:
         poll()
         if time.time()-start_time > timeout:

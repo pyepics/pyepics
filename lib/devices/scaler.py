@@ -1,8 +1,8 @@
 #!/usr/bin/env python 
 """Epics Scaler"""
-import epics
+from .. import Device, poll
 
-class Scaler(epics.Device):
+class Scaler(Device):
     """ 
     Simple implementation of SynApps Scaler Record.   
     """
@@ -21,7 +21,7 @@ class Scaler(epics.Device):
             for att in self.chan_attrs:
                 attrs.append(att % i)
                 
-        epics.Device.__init__(self, prefix, delim='.', attrs=attrs)
+        Device.__init__(self, prefix, delim='.', attrs=attrs)
 
         for key, val in self.attr_kws.items():
             self.add_pv(val % prefix, attr= key)
@@ -48,7 +48,7 @@ class Scaler(epics.Device):
         if ctime is not None:
             self.CountTime(ctime)
         self.put('CNT', 1, wait=wait)
-        epics.ca.poll()
+        poll()
 
     def EnableCalcs(self):
         " enable calculations"

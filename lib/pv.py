@@ -24,6 +24,8 @@ def fmt_time(tstamp=None):
                                        time.localtime(tstamp)),
                          round(1.e5*frac))
 
+pv_cache = {}
+
 class PV(object):
     """Epics Process Variable
 
@@ -73,8 +75,10 @@ class PV(object):
         self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
         self.connection_callbacks = []
+
         if connection_callback is not None:
             self.connection_callbacks = [connection_callback]
+
         self.callbacks  = {}
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
@@ -90,13 +94,42 @@ class PV(object):
             ca.use_initial_context()
         self.context = ca.current_context()
 
-        self._args['chid'] = ca.create_channel(self.pvname,
-                                               callback=self.__on_connect)
-        self.chid = self._args['chid']
+        global pv_cache
+        pvid = (self.pvname, self.form, self.context)
+        if (pvid in pv_cache and
+            self.context in ca._cache and pvname in ca._cache[self.context]):
+            self._args, conncb, conn = pv_cache[pvid]
+            self.chid = self._args['chid']
+            self.connection_callbacks = conncb
+            self.connected = conn
+            self.ftype  = ca.promote_type(self.chid,
+                                          use_ctrl= self.form == 'ctrl',
+                                          use_time= self.form == 'time')
+
+            count = self._args['count']
+            if self.auto_monitor is None:
+                self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
+            if self.auto_monitor:
+                mask = None
+                if isinstance(self.auto_monitor, int):
+                    mask = self.auto_monitor
+                self._monref = ca.create_subscription(self.chid,
+                                         use_ctrl=(self.form == 'ctrl'),
+                                         use_time=(self.form == 'time'),
+                                         callback=self.__on_changes,
+                                         mask=mask)
+
+        else:
+            self._args['chid'] = ca.create_channel(self.pvname,
+                                                   callback=self.__on_connect)
+            self.chid = self._args['chid']
+            
+
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
         self._args['type'] = dbr.Name(self.ftype).lower()
+        
 
     def force_connect(self, pvname=None, chid=None, conn=True, **kws):
         if chid is None: chid = self.chid
@@ -104,14 +137,15 @@ class PV(object):
             chid = chid.value
         self._args['chid'] = self.chid = chid
         self.__on_connect(pvname=pvname, chid=chid, conn=conn, **kws)
-
+        
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
         # occassionally chid is still None (ie if a second PV is created
         # while __on_connect is still pending for the first one.)
         # Just return here, and connection will happen later
+        t0 = time.time()
         if self.chid is None and chid is None:
-            time.sleep(0.001)
+            ca.poll(5.e-4)
             return
         if conn:
             ca.poll()
@@ -160,6 +194,10 @@ class PV(object):
         # waiting until the very end until to set self.connected prevents
         # threads from thinking a connection is complete when it is actually
         # still in progress.
+        global pv_cache
+        pvid = (self.pvname, self.form, self.context)
+                
+        pv_cache[pvid] = (self._args, self.connection_callbacks, conn)
         self.connected = conn
         return
 
@@ -172,6 +210,7 @@ class PV(object):
 
         if not self._conn_started:
             self.connect()
+
         if not self.connected:
             if timeout is None:
                 timeout = self.connection_timeout
@@ -246,7 +285,7 @@ class PV(object):
 
         if count is None:
             count = len(val)
-        if (as_numpy and ca.HAS_NUMPY and
+        if (as_numpy and ca.HAS_NUMPY and 
             not isinstance(val, ca.numpy.ndarray)):
             if count == 1:
                 val = [val]
@@ -319,7 +358,7 @@ class PV(object):
                 cval = ''
             self._args['char_value'] = cval
             return cval
-
+        
         cval  = repr(val)
         if self.count > 1:
             cval = '<array size=%d, type=%s>' % (len(val),
@@ -353,7 +392,7 @@ class PV(object):
         kwds = ca.get_ctrlvars(self.chid, timeout=timeout, warn=warn)
         self._args.update(kwds)
         return kwds
-
+        
     def get_timevars(self, timeout=5, warn=True):
         "get time values for variable"
         if not self.wait_for_connection():

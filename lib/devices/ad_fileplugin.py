@@ -1,6 +1,6 @@
-import epics
+from .. import Device
 
-class AD_FilePlugin(epics.Device):
+class AD_FilePlugin(Device):
     """
     AreaDetector File Plugin
     """
@@ -24,7 +24,7 @@ class AD_FilePlugin(epics.Device):
     _nonpvs = ('_prefix', '_pvs', '_delim')
 
     def __init__(self, prefix):
-        epics.Device.__init__(self, prefix, delim='', mutable=False,
+        Device.__init__(self, prefix, delim='', mutable=False,
                               attrs=self.attrs)
 
     def ensure_value(self, attr, value, wait=False):

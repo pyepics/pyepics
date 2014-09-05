@@ -18,6 +18,7 @@ import ctypes.util
 import os
 import sys
 import time
+import logging
 from copy import copy
 from  math import log10
 import atexit
@@ -58,7 +59,7 @@ error_message = ''
 ## PREEMPTIVE_CALLBACK determines the CA context
 PREEMPTIVE_CALLBACK = True
 
-AUTO_CLEANUP = True
+AUTO_CLEANUP = (sys.version_info[0] == '2')
 
 ##
 # maximum element count for auto-monitoring of PVs in epics.pv
@@ -78,7 +79,7 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 #  user_callback = one or more user functions to be called on
 #                  change (accumulated in the cache)
 _cache  = {}
-
+# logging.basicConfig(filename='ca.log',level=logging.DEBUG)
 ## Cache of pvs waiting for put to be done.
 _put_done =  {}
 
@@ -204,7 +205,7 @@ def initialize_libca():
 
     dllname = find_libca()
     load_dll = ctypes.cdll.LoadLibrary
-    global libca, initial_context
+    global libca, initial_context, _cache
     if os.name == 'nt':
         load_dll = ctypes.windll.LoadLibrary
     try:
@@ -234,7 +235,6 @@ def initialize_libca():
     # TIME and CTRL data as an array in dbr module
     dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
     initial_context = current_context()
-
     if AUTO_CLEANUP:
         atexit.register(finalize_libca)
     return libca
@@ -284,6 +284,7 @@ def show_cache(print_out=True):
     standard output.  Use the *print_out=False* option to be
     returned the listing instead of having it printed out.
     """
+    global _cache
     out = []
     out.append('#  PVName        ChannelID/Context Connected?')
     out.append('#--------------------------------------------')
@@ -310,6 +311,7 @@ def clear_cache():
     """
 
     # Clear global state variables
+    global _cache
     _cache.clear()
     _put_done.clear()
     _PVCache.clear()
@@ -494,6 +496,7 @@ def _onConnectionEvent(args):
     connected. if provided, run a user-function"""
     ctx = current_context()
     pvname = name(args.chid)
+    conn = (args.op == dbr.OP_CONN_UP)    
     global _cache
 
     if ctx is None and len(_cache.keys()) > 0:
@@ -508,6 +511,7 @@ def _onConnectionEvent(args):
             pv_found = True
             break
 
+    # logging.debug("ConnectionEvent %s/%i/%i " % (pvname, args.chid, conn))
     if not pv_found:
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
                                'ts':0, 'failures':0, 'value': None,
@@ -523,7 +527,6 @@ def _onConnectionEvent(args):
                 ichid = entry['chid'].value
 
             if int(ichid) == int(args.chid):
-                conn = (args.op == dbr.OP_CONN_UP)
                 chid = args.chid
                 entry.update({'chid': chid, 'conn': conn,
                               'ts': time.time(), 'failures': 0})
@@ -654,10 +657,7 @@ def replace_printf_handler(fcn=None):
 def current_context():
     "return the current context"
     ctx = libca.ca_current_context()
-    try:
-        ctx = int(ctx)
-    except TypeError:
-        pass
+    if isinstance(ctx, ctypes.c_long): ctx = ctx.value
     return ctx
 
 @withCA
@@ -779,6 +779,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         entry = {'conn':False,  'chid': None,
                  'ts': 0,  'failures':0, 'value': None,
                  'callbacks': [ callback ]}
+        # logging.debug("Create Channel %s " % pvname)        
         _cache[ctx][pvname] = entry
     else:
         entry = _cache[ctx][pvname]
@@ -1101,6 +1102,8 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     later with :func:`get_complete`.
 
     """
+    global _cache
+
     if ftype is None:
         ftype = field_type(chid)
     if ftype in (None, -1):
@@ -1164,6 +1167,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
     2. Consult the doc for :func:`get` for more information.
 
     """
+    global _cache
     if ftype is None:
         ftype = field_type(chid)
     if count is None:
@@ -1190,7 +1194,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
     if as_string:
         val = _as_string(val, chid, count, ftype)
     elif isinstance(val, ctypes.Array) and HAS_NUMPY and as_numpy:
-        val = numpy.array(val)
+        val = numpy.ctypeslib.as_array(copy(val))        
 
     # value retrieved, clear cached value
     ncache['value'] = None
@@ -1335,6 +1339,8 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
     enum_strs will be a list of strings for the names of ENUM states.
 
     """
+    global _cache
+
     ftype = promote_type(chid, use_ctrl=True)
     ncache = _cache[current_context()][name(chid)]
     if ncache.get('ctrl_value', None) is None:
@@ -1381,6 +1387,8 @@ def get_timevars(chid, timeout=5.0, warn=True):
     """returns a dictionary of TIME fields for a Channel.
     This will contain keys of  *status*, *severity*, and *timestamp*.
     """
+    global _cache
+
     ftype = promote_type(chid, use_time=True)
     ncache = _cache[current_context()][name(chid)]
     if ncache.get('time_value', None) is None:
