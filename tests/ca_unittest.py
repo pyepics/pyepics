@@ -411,11 +411,14 @@ class CA_BasicTests(unittest.TestCase):
         npts = int(max(2, maxpts/2.3 - 1))
         dat = numpy.random.normal(size=npts)
         ca.put(chid, dat)
+        out1 = ca.get(chid)
+        self.assertTrue(isinstance(out1, numpy.ndarray))
+        self.assertEqual(len(out1), maxpts)
+        out2 = ca.get(chid, count=0)
+        self.assertTrue(isinstance(out2, numpy.ndarray))
+        self.assertEqual(len(out2), npts)
 
-        out = ca.get(chid, count=0)
-        self.assertTrue(isinstance(out, numpy.ndarray))
-        self.assertEqual(len(out), npts)
-
+        
     def test_xArray3(self):
         write('Array Test: get char array as string')
         chid = ca.create_channel(pvnames.char_arrays[0])
