@@ -108,9 +108,7 @@ class Device(object):
     def __init__(self, prefix='', attrs=None,
                  nonpvs=None, delim='', timeout=None,
                  mutable=True, aliases={}, with_poll=True):
-        if nonpvs is not None:
-            self._nonpvs =  nonpvs
-            
+
         self._nonpvs = list(self._nonpvs)
         self._delim = delim
         self._prefix = prefix + delim
