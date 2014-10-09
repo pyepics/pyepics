@@ -213,8 +213,12 @@ class MCA(Device):
         if nrois is None:
             nrois = self._nrois
         for i in range(nrois):
-            self.rois.append(ROI(prefix=prefix, roi=i, data_pv=data_pv))
+            roi = ROI(prefix=prefix, roi=i, data_pv=data_pv)
+            if len(roi.NM.strip()) <= 0 or roi.HI <= 0:
+                break
+            self.rois.append(roi)
         poll()
+        
         return self.rois
 
     def del_roi(self, roiname):
@@ -246,7 +250,7 @@ class MCA(Device):
         except:
             iroi = 0
         if iroi >= MAX_ROIS:
-            raise ValueError('too many ROIs - cannot add more')
+            raise ValueError('too many ROIs - cannot add more %i/%i' % (iroi, MAX_ROIS))
         data_pv = self._pvs['_dat_']
         prefix = self._prefix
         if prefix.endswith('.'): prefix = prefix[:-1]
