@@ -175,15 +175,15 @@ class PVMixin(object):
         self.pv.get_ctrlvars()
 
         self.OnPVChange(self.pv.get(as_string=True))
-        self.pv.add_callback(self._pvEvent, wid=self.GetId() )
-
+        ncback = len(self.pv.callbacks) + 1
+        self.pv.add_callback(self._pvEvent, wid=self.GetId(), cb_info=ncback)
+        # print " PVMixin add callback for ", self.pv, self.pv.chid, len(self.pv.callbacks)
 
     @DelayedEpicsCallback
     def OnEpicsConnect(self, pvname=None, conn=None, pv=None):
         """Connect Callback:
              Enable/Disable widget on change in connection status
         """
-        # print 'onEpics Connect: ', pvname, conn
         pass
 
     @DelayedEpicsCallback
@@ -532,7 +532,7 @@ class PVText(wx.StaticText, PVCtrlMixin):
 
         wx.StaticText.__init__(self, parent, wx.ID_ANY, label='',
                                style=wstyle, **kw)
-        PVCtrlMixin.__init__(self, pv=pv, font=font, fg=None, bg=None)
+        PVCtrlMixin.__init__(self, pv=pv, font=font, fg=fg, bg=bg)
 
         self.as_string = as_string
         self.auto_units = auto_units
@@ -549,6 +549,39 @@ class PVText(wx.StaticText, PVCtrlMixin):
             self.units = " " + self.pv.units
         if value is not None:
             self.SetLabel("%s%s" % (value, self.units))
+
+
+class PVStaticText(wx.StaticText, PVMixin):
+    """ Static text for displaying a PV value,
+        with callback for automatic updates
+
+        By default the text colour will change on alarm states.
+        This can be overriden or disabled as constructor
+        parameters
+        """
+    def __init__(self, parent, pv=None, style=None, **kw):
+        wstyle = wx.ALIGN_LEFT
+        if style is not None:
+            wstyle = style
+
+        wx.StaticText.__init__(self, parent, wx.ID_ANY, label='',
+                               style=wstyle, **kw)
+        PVMixin.__init__(self, pv=pv)
+
+    def _SetValue(self, value):
+        "set widget label"
+        if value is not None:
+            self.SetLabel("%s" % value)
+
+    @EpicsFunction
+    def OnPVChange(self, value):
+        "called by PV callback"
+        try:
+            if self.pv is None:
+                return
+            self.SetLabel(value)
+        except:
+            pass
 
 class PVEnumButtons(wx.Panel, PVCtrlMixin):
     """ a panel of buttons for Epics ENUM controls """
@@ -576,8 +609,8 @@ class PVEnumButtons(wx.Panel, PVCtrlMixin):
         self.pv.get_ctrlvars()
 
         self.OnPVChange(self.pv.get(as_string=True))
-        self.pv.add_callback(self._pvEvent, wid=self.GetId() )
-
+        ncback = len(self.pv.callbacks) + 1
+        self.pv.add_callback(self._pvEvent, wid=self.GetId(), cb_info=ncback)
         
         pv_value = pv.get(as_string=True)
         enum_strings = pv.enum_strs
@@ -641,7 +674,8 @@ class PVEnumChoice(wx.Choice, PVCtrlMixin):
         self.pv.get_ctrlvars()
 
         self.OnPVChange(self.pv.get(as_string=True))
-        self.pv.add_callback(self._pvEvent, wid=self.GetId() )
+        ncback = len(self.pv.callbacks) + 1
+        self.pv.add_callback(self._pvEvent, wid=self.GetId(), cb_info=ncback)
 
         self.Bind(wx.EVT_CHOICE, self._onChoice)
         
@@ -740,7 +774,8 @@ class PVFloatCtrl(FloatCtrl, PVCtrlMixin):
         if hlim is not None and llim is not None and hlim > llim:
             self.SetMax(hlim)
             self.SetMin(llim)
-        self.pv.add_callback(self._FloatpvEvent, wid=self.GetId())
+        ncback = len(self.pv.callbacks) + 1
+        self.pv.add_callback(self._pvEvent, wid=self.GetId(), cb_info=ncback)
         self.SetAction(self._onEnter)
 
     @DelayedEpicsCallback
@@ -976,7 +1011,9 @@ class PVButton(wx.Button, PVCtrlMixin):
         self.disablePV = disablePV
         self.disableValue = disableValue
         if disablePV is not None:
-            self.disablePV.add_callback(self._disableEvent, wid=self.GetId())
+            ncback = len(self.disablePV.callbacks) + 1
+            self.disablePV.add_callback(self._disableEvent, wid=self.GetId(), 
+                                        cb_info=ncback)
         self.maskedEnabled = True
 
     def Enable(self, value=None):
