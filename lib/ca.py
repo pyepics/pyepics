@@ -79,15 +79,10 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 #  user_callback = one or more user functions to be called on
 #                  change (accumulated in the cache)
 _cache  = {}
+
 # logging.basicConfig(filename='ca.log',level=logging.DEBUG)
 ## Cache of pvs waiting for put to be done.
 _put_done =  {}
-
-
-## global set of PVs known to simple procedural interface
-## (caget/caput/camonitor)
-_PVCache = {}
-_PVMonitors = {}
 
 # get a unique python value that cannot be a value held by an
 # actual PV to signal "Get is incomplete, awaiting callback"
@@ -314,9 +309,6 @@ def clear_cache():
     global _cache
     _cache.clear()
     _put_done.clear()
-    _PVCache.clear()
-    _PVMonitors.clear()
-
 
     # The old context is copied directly from the old process
     # in systems with proper fork() implementations
