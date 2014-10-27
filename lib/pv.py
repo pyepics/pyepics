@@ -15,6 +15,46 @@ from . import ca
 from . import dbr
 from .utils import is_string
 
+_PVcache_ = {}
+
+def get_pv(pvname, form='native',  connect=False,
+           context=None, timeout=5.0, **kws):
+    """get PV from PV cache or create one if needed.
+
+    Arguments
+    =========
+    form      PV form: one of 'native' (default), 'time', 'ctrl'
+    connect   whether to wait for connection (default False)
+    context   PV threading context (default None)
+    timeout   connection timeout, in seconds (default 5.0)
+    """
+    
+    if form not in ('native', 'time', 'ctrl'):
+        form = 'natiive'
+
+    thispv = None
+    if context is None:
+        context = ca.initial_context
+        if context is None:
+            context = ca.current_context()
+        if (pvname, form, context) in _PVcache_:
+            thispv = _PVcache_[(pvname, form, context)]
+    
+    start_time = time.time()
+    # not cached -- create pv (automaticall saved to cache)
+    if thispv is None:
+        thispv = PV(pvname, **kws)
+
+    if connect:
+        thispv.wait_for_connection()
+        while not thispv.connected:
+            poll()
+            if time.time()-start_time > timeout:
+                break
+        if not thispv.connected:
+            ca.write('cannot connect to %s' % pvname)
+    return thispv
+
 def fmt_time(tstamp=None):
     "simple formatter for time values"
     if tstamp is None:
@@ -24,7 +64,6 @@ def fmt_time(tstamp=None):
                                        time.localtime(tstamp)),
                          round(1.e5*frac))
 
-pv_cache = {}
 
 class PV(object):
     """Epics Process Variable
@@ -94,42 +133,17 @@ class PV(object):
             ca.use_initial_context()
         self.context = ca.current_context()
 
-        global pv_cache
-        pvid = (self.pvname, self.form, self.context)
-        if (pvid in pv_cache and
-            self.context in ca._cache and pvname in ca._cache[self.context]):
-            self._args, conncb, conn = pv_cache[pvid]
-            self.chid = self._args['chid']
-            self.connection_callbacks = conncb
-            self.connected = conn
-            self.ftype  = ca.promote_type(self.chid,
-                                          use_ctrl= self.form == 'ctrl',
-                                          use_time= self.form == 'time')
-
-            count = self._args['count']
-            if self.auto_monitor is None:
-                self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
-            if self.auto_monitor:
-                mask = None
-                if isinstance(self.auto_monitor, int):
-                    mask = self.auto_monitor
-                self._monref = ca.create_subscription(self.chid,
-                                         use_ctrl=(self.form == 'ctrl'),
-                                         use_time=(self.form == 'time'),
-                                         callback=self.__on_changes,
-                                         mask=mask)
-
-        else:
-            self._args['chid'] = ca.create_channel(self.pvname,
-                                                   callback=self.__on_connect)
-            self.chid = self._args['chid']
-            
-
+        self._args['chid'] = ca.create_channel(self.pvname,
+                                               callback=self.__on_connect)
+        self.chid = self._args['chid']
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
         self._args['type'] = dbr.Name(self.ftype).lower()
-        
+
+        pvid = (self.pvname, self.form, self.context)
+        if pvid not in _PVcache_:
+            _PVcache_[pvid] = self
 
     def force_connect(self, pvname=None, chid=None, conn=True, **kws):
         if chid is None: chid = self.chid
@@ -194,10 +208,6 @@ class PV(object):
         # waiting until the very end until to set self.connected prevents
         # threads from thinking a connection is complete when it is actually
         # still in progress.
-        global pv_cache
-        pvid = (self.pvname, self.form, self.context)
-                
-        pv_cache[pvid] = (self._args, self.connection_callbacks, conn)
         self.connected = conn
         return
 
@@ -725,6 +735,12 @@ class PV(object):
     def disconnect(self):
         "disconnect PV"
         self.connected = False
+
+        ctx = ca.current_context()
+        pvid = (self.pvname, self.form, ctx)
+        if pvid in _PVcache_:
+            _PVcache_.pop(pvid)
+
         if self._monref is not None:
             cback, uarg, evid = self._monref
             ca.clear_subscription(evid)

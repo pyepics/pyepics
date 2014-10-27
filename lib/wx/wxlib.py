@@ -164,7 +164,7 @@ class PVMixin(object):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
             form = "ctrl" if len(self._fg_colour_alarms) > 0 or len(self._bg_colour_alarms) > 0 else "native"
-            self.pv = epics.PV(pv, form=form)
+            self.pv = epics.get_pv(pv, form=form)
             self.pv.connect()
 
         epics.poll()
@@ -600,7 +600,7 @@ class PVEnumButtons(wx.Panel, PVCtrlMixin):
         if isinstance(pv, epics.PV):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
-            self.pv = epics.PV(pv)
+            self.pv = epics.get_pv(pv)
             self.pv.connect()
 
         epics.poll()
@@ -665,7 +665,7 @@ class PVEnumChoice(wx.Choice, PVCtrlMixin):
         if isinstance(pv, epics.PV):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
-            self.pv = epics.PV(pv)
+            self.pv = epics.get_pv(pv)
             self.pv.connect()
 
         epics.poll()
@@ -749,7 +749,7 @@ class PVFloatCtrl(FloatCtrl, PVCtrlMixin):
         if isinstance(pv, epics.PV):
             self.pv = pv
         elif isinstance(pv, (str, unicode)):
-            self.pv = epics.PV(pv)
+            self.pv = epics.get_pv(pv)
         if self.pv is None:
             return
         self.pv.connection_callbacks.append(self.OnEpicsConnect)
@@ -1006,7 +1006,7 @@ class PVButton(wx.Button, PVCtrlMixin):
         self.pushValue = pushValue
         self.Bind(wx.EVT_BUTTON, self.OnPress)
         if isinstance(disablePV, (str, unicode)):
-            disablePV = epics.PV(disablePV)
+            disablePV = epics.get_pv(disablePV)
             disablePV.connect()
         self.disablePV = disablePV
         self.disableValue = disableValue
