@@ -2,7 +2,7 @@
 import sys
 import time
 import numpy as np
-from .. import Device, PV, poll
+from .. import Device, get_pv, poll
 
 try:
     from collections import OrderedDict
@@ -196,11 +196,11 @@ class MCA(Device):
 
         Device.__init__(self,self._prefix, delim='.',
                               attrs=self._attrs, with_poll=False)
-        self._pvs['VAL'] = PV("%sVAL" % self._prefix, auto_monitor=False)
+        self._pvs['VAL'] = get_pv("%sVAL" % self._prefix, auto_monitor=False)
 
         self._pvs['_dat_'] = None
         if data_pv is not None:
-            self._pvs['_dat_'] = PV(data_pv)
+            self._pvs['_dat_'] = get_pv(data_pv)
         poll()
 
 

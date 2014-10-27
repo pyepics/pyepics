@@ -5,8 +5,8 @@
 """
 basic device object defined
 """
-from . import ca
-from . import pv
+from .ca import poll
+from .pv  import get_pv
 import time
 class Device(object):
     """A simple collection of related PVs, sharing a common prefix
@@ -132,7 +132,7 @@ class Device(object):
                             connection_timeout=timeout)
 
         if with_poll:
-            ca.poll()
+            poll()
         self._init = True
 
     def PV(self, attr, connect=True, **kw):
@@ -144,7 +144,7 @@ class Device(object):
             pvname = attr
             if self._prefix is not None:
                 pvname = "%s%s" % (self._prefix, attr)
-            self._pvs[attr] = pv.PV(pvname, **kw)
+            self._pvs[attr] = get_pv(pvname, **kw)
         if connect and not self._pvs[attr].connected:
             self._pvs[attr].wait_for_connection()
         return self._pvs[attr]
@@ -169,7 +169,7 @@ class Device(object):
         """
         if attr is None:
             attr = pvname
-        self._pvs[attr] = pv.PV(pvname, **kw)
+        self._pvs[attr] = get_pv(pvname, **kw)
         return self._pvs[attr]
 
     def put(self, attr, value, wait=False, use_complete=False, timeout=10):
