@@ -1,17 +1,17 @@
 """
    epics channel access python module
 
-   version    :  3.2.4
-   last update:  5-September-2014
+   version    :  3.2.4rc2
+   last update:  27-October-2014
 
-   Principle Authors:
+   Principal Authors:
       Matthew Newville <newville@cars.uchicago.edu> CARS, University of Chicago
       Angus Gratton <angus.gratton@anu.edu.au>, Australian National University
 
 == License:
 
    Except where explicitly noted, this file and all files in this
-   distribution are licensed under the Epics Open License See license.txt in 
+   distribution are licensed under the Epics Open License See license.txt in
    the top-level directory of this distribution.
 
 == Overview:
@@ -19,7 +19,7 @@
    protocol of the Epics control system.
 
 """
-__version__ = '3.2.4'
+__version__ = '3.2.4rc2'
 
 import time
 import sys
@@ -149,15 +149,14 @@ def camonitor(pvname, writer=None, callback=None):
 
 def caget_many(pvlist):
     """get values for a list of PVs
-    This does not maintain PV objects, and works as fast 
+    This does not maintain PV objects, and works as fast
     as possible to fetch many values.
     """
     chids, out = [], []
-    for name in pvlist: chids.append(ca.create_channel(name, 
+    for name in pvlist: chids.append(ca.create_channel(name,
                                                        auto_cb=False,
                                                        connect=False))
     for chid in chids: ca.connect_channel(chid)
     for chid in chids: ca.get(chid, wait=False)
     for chid in chids: out.append(ca.get_complete(chid))
     return out
-
