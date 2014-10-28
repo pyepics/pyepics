@@ -48,11 +48,11 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
         ntype = epics.ca.promote_type(chid, use_ctrl=use_ctrl,
                                       use_time=use_time)
         val  = epics.ca.get(chid, ftype=ntype)
+        time.sleep(0.002)
         cval = epics.ca.get(chid, as_string=True)    
         if epics.ca.element_count(chid) > 10:
             val = val[:10]
-        write("%i %s  %s %s \n" % (ntype, epics.dbr.Name(ntype).lower(), repr(val), cval))
-        # write("%i %s  %s  \n" % (ntype, epics.dbr.Name(ntype).lower(), repr(val)))
+        write("%i %s  %s \n" % (ntype, epics.dbr.Name(ntype).lower(), cval))
     time.sleep(0.5)        
     write('----- finalizing CA\n')
     epics.ca.finalize_libca()
