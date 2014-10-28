@@ -324,7 +324,7 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
    object was created with the ``form='time'`` option.  Otherwise, the
    timestamp will be the timestamp according to the client, indicating when
    the data arrive from the server.
- 
+
 .. attribute:: precision
 
    number of decimal places of precision to use for float and double PVs
@@ -649,6 +649,44 @@ data with the *callback_data* argument (which should be dict-like) to
 
     pv.put(1.0, callback=onPutComplete)
 
+..  _pv-cache-label:
+
+The :func:`get_pv` function and :attr:`_PVcache_` cache of PVs
+============================================================================
+
+As mentioned in the previous chapter, a cache of PVs is maintained for each
+process using pyepics.  When using :func:`epics.caget`, :func:`epics.caput`
+and so forth, or when creating a :class:`PV` directly, the corresponding PV
+is kept in a global cache, held in :attr:`pv._PVcache_`.
+
+The function :func:`get_pv` will retrieve the named PV from this cache, or
+create a new :class:`PV` if one is not found.  In long-running or complex
+processes, it is not unusual to access a particular PV many times, perhaps
+calling a function that creates a PV but only keeping that PV object for
+the life of the function.  Using :func:`get_pv` instead of creating a
+:class:`PV` can improve performance (the PV is already connected) and is
+highly recommended.
+
+..  function:: get_pv(pvname[, form='native'[, connect=False[, timeout=5[, context=None[, **kws]]]]])
+
+   retrieves a PV from :attr:`_PVcache` or creates and returns a new PV.
+
+   :param pvname: name of Epics Process Variable
+   :param form:  which epics *data type* to use:  the 'native' , or the 'ctrl' (Control) or 'time' variant.
+   :type form: string, one of ('native','ctrl', or 'time')
+   :param connect:  whether to wait for the PV to connect.
+   :type connect:  ``True``/``False``
+   :param timeout:  maximum time to wait (in seconds) for value before returning None.
+   :type timeout:  float or ``None``
+   :param context:  integer threading context.
+   :type context: integer or  ``None`` (default)
+
+
+   Additional keywords are passed directly to :class:`PV`.
+
+.. attribute:: _PVcache_
+
+   A cache of :class:`PV` objects for the process.
 
 ..  _pv-examples-label:
 
@@ -806,4 +844,3 @@ Example of connection callback
 A connection callback:
 
 .. literalinclude:: ../tests/pv_connection_callback.py
-
