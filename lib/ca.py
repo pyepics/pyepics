@@ -1243,11 +1243,13 @@ def put(chid, value, wait=False, timeout=30, callback=None,
 
     """
     ftype = field_type(chid)
-    count = element_count(chid)
+    count = nativecount = element_count(chid)
     if count > 1:
         # check that data for array PVS is a list, array, or string
         try:
             count = min(len(value), count)
+            if count == 0:
+                count = nativecount
         except TypeError:
             write('''PyEpics Warning:
      value put() to array PV must be an array or sequence''')
@@ -1265,7 +1267,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         else:
             for elem in range(min(count, len(value))):
                 data[elem].value = value[elem]
-    elif count == 1:
+    elif nativecount == 1:
         if ftype == dbr.CHAR:
             if isinstance(value, str):
                 value = [ord(i) for i in ("%s%s" % (value, NULLCHAR))]
@@ -1288,7 +1290,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
             ndata, nuser = len(data), len(value)
             if nuser > ndata:
                 value = value[:ndata]
-            data[:len(value)] = list(value)
+            data[:nuser] = list(value)
+
         except (ValueError, IndexError):
             errmsg = "cannot put array data to PV of type '%s'"
             raise ChannelAccessException(errmsg % (repr(value)))
