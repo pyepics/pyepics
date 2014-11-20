@@ -41,6 +41,7 @@ except ImportError:
     pass
 
 from . import dbr
+from .dbr import native_type
 
 ## print to stdout
 def write(msg, newline=True, flush=True):
@@ -488,7 +489,7 @@ def _onConnectionEvent(args):
     connected. if provided, run a user-function"""
     ctx = current_context()
     pvname = name(args.chid)
-    conn = (args.op == dbr.OP_CONN_UP)    
+    conn = (args.op == dbr.OP_CONN_UP)
     global _cache
 
     if ctx is None and len(_cache.keys()) > 0:
@@ -771,7 +772,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         entry = {'conn':False,  'chid': None,
                  'ts': 0,  'failures':0, 'value': None,
                  'callbacks': [ callback ]}
-        # logging.debug("Create Channel %s " % pvname)        
+        # logging.debug("Create Channel %s " % pvname)
         _cache[ctx][pvname] = entry
     else:
         entry = _cache[ctx][pvname]
@@ -931,17 +932,6 @@ def promote_type(chid, use_time=False, use_ctrl=False):
     if ftype == dbr.CTRL_STRING:
         ftype = dbr.TIME_STRING
     return ftype
-
-def native_type(ftype):
-    "return native field type from TIME or CTRL variant"
-    if ftype == dbr.CTRL_STRING:
-        ftype = dbr.TIME_STRING
-    ntype = ftype
-    if ftype > dbr.CTRL_STRING:
-        ntype -= dbr.CTRL_STRING
-    elif ftype >= dbr.TIME_STRING:
-        ntype -= dbr.TIME_STRING
-    return ntype
 
 def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     """unpacks raw data for a Channel ID `chid` returned by libca functions
@@ -1186,7 +1176,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
     if as_string:
         val = _as_string(val, chid, count, ftype)
     elif isinstance(val, ctypes.Array) and HAS_NUMPY and as_numpy:
-        val = numpy.ctypeslib.as_array(copy(val))        
+        val = numpy.ctypeslib.as_array(copy(val))
 
     # value retrieved, clear cached value
     ncache['value'] = None
@@ -1361,7 +1351,7 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
         tmpv = ncache['ctrl_value'][0]
     except TypeError:
         return {}
-    
+
     out = {}
     for attr in ('precision', 'units', 'severity', 'status',
                  'upper_disp_limit', 'lower_disp_limit',
