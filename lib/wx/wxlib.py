@@ -741,8 +741,8 @@ class PVFloatCtrl(FloatCtrl, PVCtrlMixin):
 
     def _SetValue(self, value):
         "set widget value"
-        self.SetValue(value)
-
+        FloatCtrl.SetValue(self, value, act=False)
+            
     @EpicsFunction
     def SetPV(self, pv=None):
         "set pv, either an epics.PV object or a pvname"
@@ -791,7 +791,6 @@ class PVFloatCtrl(FloatCtrl, PVCtrlMixin):
                 char_value = ("%%.%if" % prec) % value
             else:
                 char_value = set_float(value)
-
         self.SetValue(char_value, act=False)
 
     @EpicsFunction
