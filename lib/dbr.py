@@ -278,29 +278,32 @@ def Name(ftype, reverse=False):
                 if name == val: return key
     return m.get(ftype, 'unknown')
 
-def sizeof_array(ftype, ntype, count):
-    # Array is of the structure:
-    #    head is: (1)     'promoted' type
-    # payload is: (count) native types
-
-    # TODO ensure this isn't off by 1
-    ftype_sz = ctypes.sizeof(Map[ftype])
-    ntype_sz = ctypes.sizeof(Map[ntype])
-    return ftype_sz + count * ntype_sz
-
 def cast_args(args):
-    """returns pointer to arg type for casting """
+    """returns casted array contents
+
+    returns: [dbr_ctrl or dbr_time struct,
+              count * native_type structs]
+
+    If data is already of a native_type, the first
+    value in the list will be None.
+    """
     ftype = args.type
     if ftype not in Map:
         ftype = double_t
 
     ntype = native_type(ftype)
-    if ntype != ftype and args.count > 1:
-        array_sz = sizeof_array(ftype, ntype, args.count)
-        return ctypes.cast(args.raw_dbr,
-                           ctypes.POINTER(array_sz * ubyte_t))
+    if ftype != ntype:
+        native_start = args.raw_dbr + value_offset[ftype]
+        return [ctypes.cast(args.raw_dbr,
+                            ctypes.POINTER(Map[ftype])).contents,
+                ctypes.cast(native_start,
+                            ctypes.POINTER(args.count * Map[ntype])).contents
+                ]
     else:
-        return ctypes.cast(args.raw_dbr, ctypes.POINTER(args.count*Map[ftype]))
+        return [None,
+                ctypes.cast(args.raw_dbr,
+                            ctypes.POINTER(args.count * Map[ftype])).contents
+                ]
 
 class event_handler_args(ctypes.Structure):
     "event handler arguments"

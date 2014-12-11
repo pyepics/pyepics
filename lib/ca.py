@@ -449,7 +449,7 @@ def withSEVCHK(fcn):
 ## Event Handler for monitor event callbacks
 def _onMonitorEvent(args):
     """Event Handler for monitor events: not intended for use"""
-    value = dbr.cast_args(args).contents
+    value = dbr.cast_args(args)
     pvname = name(args.chid)
     kwds = {'ftype':args.type, 'count':args.count,
            'chid':args.chid, 'pvname': pvname,
@@ -536,7 +536,7 @@ def _onGetEvent(args, **kws):
     global _cache
     if args.status != dbr.ECA_NORMAL:
         return
-    get_cache(name(args.chid))[args.usr] = memcopy(dbr.cast_args(args).contents)
+    get_cache(name(args.chid))[args.usr] = memcopy(dbr.cast_args(args))
 
 
 ## put event handler:
@@ -982,32 +982,20 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
             out = copy(data)
         return out
 
-    def unpack_simple(data, count, ntype, use_numpy):
+    def unpack(data, count, ntype, use_numpy):
         "simple, native data type"
-        if data is None: return None
-        if count == 1 and ntype != dbr.STRING:
+        if data is None:
+            return None
+        elif count == 1 and ntype != dbr.STRING:
             return data[0]
-        if ntype == dbr.STRING:
+        elif ntype == dbr.STRING:
             return scan_string(data, count)
-        if count > 1:
-            data = array_cast(data, count, ntype, use_numpy)
+        elif count > 1:
+            return array_cast(data, count, ntype, use_numpy)
         return data
 
-    def unpack_ctrltime(data, count, ntype, use_numpy):
-        "ctrl and time data types"
-        # fix for CTRL / TIME array data:Thanks to Glen Wright !
-        data = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
-                                                  dbr.value_offset[ftype])
-        if ntype == dbr.STRING:
-            return scan_string(data, count)
-        if count == 1:
-            return data[0]
-        else:
-            return array_cast(data, count, ntype, use_numpy)
-
-    unpack = unpack_simple
-    if ftype >= dbr.TIME_STRING:
-        unpack = unpack_ctrltime
+    # Grab the native-data-type data
+    data = data[1]
 
     if count is None and chid is not None:
         count = element_count(chid)
