@@ -48,7 +48,7 @@ def get_pv(pvname, form='native',  connect=False,
     if connect:
         thispv.wait_for_connection()
         while not thispv.connected:
-            poll()
+            ca.poll()
             if time.time()-start_time > timeout:
                 break
         if not thispv.connected:
