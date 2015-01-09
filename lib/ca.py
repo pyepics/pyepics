@@ -41,6 +41,7 @@ except ImportError:
     pass
 
 from . import dbr
+from .dbr import native_type
 
 ## print to stdout
 def write(msg, newline=True, flush=True):
@@ -448,7 +449,7 @@ def withSEVCHK(fcn):
 ## Event Handler for monitor event callbacks
 def _onMonitorEvent(args):
     """Event Handler for monitor events: not intended for use"""
-    value = dbr.cast_args(args).contents
+    value = dbr.cast_args(args)
     pvname = name(args.chid)
     kwds = {'ftype':args.type, 'count':args.count,
            'chid':args.chid, 'pvname': pvname,
@@ -488,7 +489,7 @@ def _onConnectionEvent(args):
     connected. if provided, run a user-function"""
     ctx = current_context()
     pvname = name(args.chid)
-    conn = (args.op == dbr.OP_CONN_UP)    
+    conn = (args.op == dbr.OP_CONN_UP)
     global _cache
 
     if ctx is None and len(_cache.keys()) > 0:
@@ -535,7 +536,7 @@ def _onGetEvent(args, **kws):
     global _cache
     if args.status != dbr.ECA_NORMAL:
         return
-    get_cache(name(args.chid))[args.usr] = memcopy(dbr.cast_args(args).contents)
+    get_cache(name(args.chid))[args.usr] = memcopy(dbr.cast_args(args))
 
 
 ## put event handler:
@@ -771,7 +772,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         entry = {'conn':False,  'chid': None,
                  'ts': 0,  'failures':0, 'value': None,
                  'callbacks': [ callback ]}
-        # logging.debug("Create Channel %s " % pvname)        
+        # logging.debug("Create Channel %s " % pvname)
         _cache[ctx][pvname] = entry
     else:
         entry = _cache[ctx][pvname]
@@ -932,17 +933,6 @@ def promote_type(chid, use_time=False, use_ctrl=False):
         ftype = dbr.TIME_STRING
     return ftype
 
-def native_type(ftype):
-    "return native field type from TIME or CTRL variant"
-    if ftype == dbr.CTRL_STRING:
-        ftype = dbr.TIME_STRING
-    ntype = ftype
-    if ftype > dbr.CTRL_STRING:
-        ntype -= dbr.CTRL_STRING
-    elif ftype >= dbr.TIME_STRING:
-        ntype -= dbr.TIME_STRING
-    return ntype
-
 def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     """unpacks raw data for a Channel ID `chid` returned by libca functions
     including `ca_get_array_callback` or subscription callback, and returns
@@ -992,32 +982,20 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
             out = copy(data)
         return out
 
-    def unpack_simple(data, count, ntype, use_numpy):
+    def unpack(data, count, ntype, use_numpy):
         "simple, native data type"
-        if data is None: return None
-        if count == 1 and ntype != dbr.STRING:
+        if data is None:
+            return None
+        elif count == 1 and ntype != dbr.STRING:
             return data[0]
-        if ntype == dbr.STRING:
+        elif ntype == dbr.STRING:
             return scan_string(data, count)
-        if count > 1:
-            data = array_cast(data, count, ntype, use_numpy)
+        elif count > 1:
+            return array_cast(data, count, ntype, use_numpy)
         return data
 
-    def unpack_ctrltime(data, count, ntype, use_numpy):
-        "ctrl and time data types"
-        # fix for CTRL / TIME array data:Thanks to Glen Wright !
-        data = (count*dbr.Map[ntype]).from_address(ctypes.addressof(data) +
-                                                  dbr.value_offset[ftype])
-        if ntype == dbr.STRING:
-            return scan_string(data, count)
-        if count == 1:
-            return data[0]
-        else:
-            return array_cast(data, count, ntype, use_numpy)
-
-    unpack = unpack_simple
-    if ftype >= dbr.TIME_STRING:
-        unpack = unpack_ctrltime
+    # Grab the native-data-type data
+    data = data[1]
 
     if count is None and chid is not None:
         count = element_count(chid)
@@ -1186,7 +1164,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
     if as_string:
         val = _as_string(val, chid, count, ftype)
     elif isinstance(val, ctypes.Array) and HAS_NUMPY and as_numpy:
-        val = numpy.ctypeslib.as_array(copy(val))        
+        val = numpy.ctypeslib.as_array(copy(val))
 
     # value retrieved, clear cached value
     ncache['value'] = None
@@ -1361,7 +1339,7 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
         tmpv = ncache['ctrl_value'][0]
     except TypeError:
         return {}
-    
+
     out = {}
     for attr in ('precision', 'units', 'severity', 'status',
                  'upper_disp_limit', 'lower_disp_limit',

@@ -10,7 +10,6 @@
 This is mostly copied from CA header files
 """
 import ctypes
-import time
 
 HAS_NUMPY = False
 try:
@@ -234,6 +233,17 @@ Map = {STRING: string_t,
        CTRL_DOUBLE: ctrl_double
        }
 
+def native_type(ftype):
+    "return native field type from TIME or CTRL variant"
+    if ftype == CTRL_STRING:
+        ftype = TIME_STRING
+    ntype = ftype
+    if ftype > CTRL_STRING:
+        ntype -= CTRL_STRING
+    elif ftype >= TIME_STRING:
+        ntype -= TIME_STRING
+    return ntype
+
 def Name(ftype, reverse=False):
     """ convert integer data type to dbr Name, or optionally reverse that
     look up (that is, name to integer)"""
@@ -269,11 +279,31 @@ def Name(ftype, reverse=False):
     return m.get(ftype, 'unknown')
 
 def cast_args(args):
-    """returns pointer to arg type for casting """
+    """returns casted array contents
+
+    returns: [dbr_ctrl or dbr_time struct,
+              count * native_type structs]
+
+    If data is already of a native_type, the first
+    value in the list will be None.
+    """
     ftype = args.type
     if ftype not in Map:
         ftype = double_t
-    return ctypes.cast(args.raw_dbr, ctypes.POINTER(args.count*Map[ftype]))
+
+    ntype = native_type(ftype)
+    if ftype != ntype:
+        native_start = args.raw_dbr + value_offset[ftype]
+        return [ctypes.cast(args.raw_dbr,
+                            ctypes.POINTER(Map[ftype])).contents,
+                ctypes.cast(native_start,
+                            ctypes.POINTER(args.count * Map[ntype])).contents
+                ]
+    else:
+        return [None,
+                ctypes.cast(args.raw_dbr,
+                            ctypes.POINTER(args.count * Map[ftype])).contents
+                ]
 
 class event_handler_args(ctypes.Structure):
     "event handler arguments"
