@@ -206,7 +206,7 @@ def initialize_libca():
         load_dll = ctypes.windll.LoadLibrary
     try:
         libca = load_dll(dllname)
-    except Exception, exc:
+    except Exception as exc:
         raise ChannelAccessException('loading Epics CA DLL failed: ' + str(exc))
 
     ca_context = {False:0, True:1}[PREEMPTIVE_CALLBACK]
