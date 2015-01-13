@@ -237,10 +237,10 @@ PyEpics was originally written and is maintained by Matt Newville
 <newville@cars.uchicago.ed>.  Many important contributions to the library
 have come from Angus Gratton while at the Australian National University.
 Several other people have provided valuable additions, suggestions, or bug
-reports, which has greatly improved the quality of the library: Michael
-Abbott, Marco Cammarata, Craig Haskins, Pete Jemian, Andrew Johnson, Janko
-Kolar, Irina Kosheleva, Tim Mooney, Eric Norum, Mark Rivers, Friedrich
-Schotte, Mark Vigder, Steve Wasserman, and Glen Wright.
+reports, which has greatly improved the quality of the library: Ken Lauer,
+Michael Abbott, Marco Cammarata, Craig Haskins, Pete Jemian, Andrew
+Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Eric Norum, Mark Rivers,
+Friedrich Schotte, Mark Vigder, Steve Wasserman, and Glen Wright.
 
 
 
