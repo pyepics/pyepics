@@ -7,6 +7,7 @@ if sys.version_info[0] != 3:
     raise ImportError(" Python version 3 required")
 
 EPICS_STR_ENCODING = 'ASCII'
+EPICS_STR_ENCODING = 'latin_1'
 NULLCHAR_2 = '\x00'
 NULLCHAR   = b'\x00'
 
