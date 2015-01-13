@@ -19,7 +19,6 @@ import os
 import sys
 import time
 import logging
-from copy import copy
 from  math import log10
 import atexit
 import warnings
@@ -977,9 +976,9 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
                 out = numpy.empty(shape=(count,), dtype=dbr.NP_Map[ntype])
                 ctypes.memmove(out.ctypes.data, data, out.nbytes)
             else:
-                out = numpy.ctypeslib.as_array(copy(data))
+                out = numpy.ctypeslib.as_array(memcopy(data))
         else:
-            out = copy(data)
+            out = memcopy(data)
         return out
 
     def unpack(data, count, ntype, use_numpy):
@@ -1164,7 +1163,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
     if as_string:
         val = _as_string(val, chid, count, ftype)
     elif isinstance(val, ctypes.Array) and HAS_NUMPY and as_numpy:
-        val = numpy.ctypeslib.as_array(copy(val))
+        val = numpy.ctypeslib.as_array(memcopy(val))
 
     # value retrieved, clear cached value
     ncache['value'] = None

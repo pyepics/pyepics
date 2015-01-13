@@ -2,7 +2,7 @@
 String and data utils, where implementation differs between Python 2 & 3
 """
 import sys
-from copy import copy
+from copy import deepcopy
 
 PY_MAJOR, PY_MINOR = sys.version_info[:2]
 
@@ -19,7 +19,7 @@ strjoin = utils_mod.strjoin
 is_string = utils_mod.is_string
 ascii_string = utils_mod.ascii_string
 
-memcopy = copy
+memcopy = deepcopy
 if PY_MAJOR == 2 and PY_MINOR == 5:
     def memcopy(a):
         return a
