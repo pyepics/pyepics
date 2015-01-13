@@ -19,7 +19,7 @@ import os
 import sys
 import time
 import logging
-from copy import copy
+from copy import copy, deepcopy
 from  math import log10
 import atexit
 import warnings
@@ -59,7 +59,6 @@ error_message = ''
 
 ## PREEMPTIVE_CALLBACK determines the CA context
 PREEMPTIVE_CALLBACK = True
-
 AUTO_CLEANUP = (sys.version_info[0] == '2')
 
 ##
@@ -536,8 +535,7 @@ def _onGetEvent(args, **kws):
     global _cache
     if args.status != dbr.ECA_NORMAL:
         return
-    get_cache(name(args.chid))[args.usr] = memcopy(dbr.cast_args(args))
-
+    get_cache(name(args.chid))[args.usr] = memcopy(deepcopy(dbr.cast_args(args)))
 
 ## put event handler:
 def _onPutEvent(args, **kwds):
@@ -794,7 +792,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         ret = libca.ca_create_channel(pvn, conncb, 0, 0,
                                       ctypes.byref(chid))
         PySEVCHK('create_channel', ret)
-        entry['chid'] = chid
+        entry['chid'] = chid.value
 
     if connect:
         connect_channel(chid)
@@ -838,6 +836,9 @@ def connect_channel(chid, timeout=None, verbose=False):
     spending too much time waiting for a connection that may never happen.
 
     """
+    if isinstance(chid, ctypes.c_long):
+        chid = chid.value
+        
     if verbose:
         write(' connect channel -> %s %s %s ' %
                (repr(chid), repr(state(chid)), repr(dbr.CS_CONN)))
@@ -1074,6 +1075,9 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     """
     global _cache
 
+    if isinstance(chid, ctypes.c_long):
+        chid = chid.value
+        
     if ftype is None:
         ftype = field_type(chid)
     if ftype in (None, -1):
@@ -1138,6 +1142,9 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
 
     """
     global _cache
+    if isinstance(chid, ctypes.c_long):
+        chid = chid.value
+        
     if ftype is None:
         ftype = field_type(chid)
     if count is None:
@@ -1158,7 +1165,6 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
             msg = "ca.get('%s') timed out after %.2f seconds."
             warnings.warn(msg % (name(chid), timeout))
             return None
-
     val = _unpack(chid, ncache['value'], count=count,
                   ftype=ftype, as_numpy=as_numpy)
     if as_string:
