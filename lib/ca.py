@@ -793,7 +793,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         ret = libca.ca_create_channel(pvn, conncb, 0, 0,
                                       ctypes.byref(chid))
         PySEVCHK('create_channel', ret)
-        entry['chid'] = chid.value
+        entry['chid'] = chid
 
     if connect:
         connect_channel(chid)
@@ -837,9 +837,6 @@ def connect_channel(chid, timeout=None, verbose=False):
     spending too much time waiting for a connection that may never happen.
 
     """
-    if isinstance(chid, ctypes.c_long):
-        chid = chid.value
-        
     if verbose:
         write(' connect channel -> %s %s %s ' %
                (repr(chid), repr(state(chid)), repr(dbr.CS_CONN)))
@@ -1076,8 +1073,6 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     """
     global _cache
 
-    if isinstance(chid, ctypes.c_long):
-        chid = chid.value
         
     if ftype is None:
         ftype = field_type(chid)
@@ -1143,8 +1138,6 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
 
     """
     global _cache
-    if isinstance(chid, ctypes.c_long):
-        chid = chid.value
         
     if ftype is None:
         ftype = field_type(chid)
