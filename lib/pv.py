@@ -17,7 +17,7 @@ from .utils import is_string
 
 _PVcache_ = {}
 
-def get_pv(pvname, form='native',  connect=False,
+def get_pv(pvname, form='time',  connect=False,
            context=None, timeout=5.0, **kws):
     """get PV from PV cache or create one if needed.
 
