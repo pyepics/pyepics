@@ -94,7 +94,7 @@ class PV(object):
                'lower_alarm_limit', 'lower_warning_limit',
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
-    def __init__(self, pvname, callback=None, form='native',
+    def __init__(self, pvname, callback=None, form='time',
                  verbose=False, auto_monitor=None,
                  connection_callback=None,
                  connection_timeout=None):
