@@ -326,16 +326,6 @@ class event_handler_args(ctypes.Structure):
                 ('raw_dbr', void_p),
                 ('status',  int_t)]
 
-				
-class event_handler_args32(ctypes.Structure):
-    "event handler arguments"
-    _fields_ = [('usr',     py_obj),
-                ('chid',    chid_t),
-                ('type',    long_t),
-                ('count',   long_t),
-                ('raw_dbr', void_p),
-                ('status',  int_t)]
-
 class connection_args(ctypes.Structure):
     "connection arguments"
     _fields_ = [('chid', chid_t), 
