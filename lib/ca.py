@@ -79,6 +79,7 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 #  user_callback = one or more user functions to be called on
 #                  change (accumulated in the cache)
 _cache  = {}
+_namecache = {}
 
 # logging.basicConfig(filename='ca.log',level=logging.DEBUG)
 ## Cache of pvs waiting for put to be done.
@@ -224,6 +225,8 @@ def initialize_libca():
     libca.ca_version.restype   = ctypes.c_char_p
     libca.ca_host_name.restype = ctypes.c_char_p
     libca.ca_name.restype      = ctypes.c_char_p
+    # libca.ca_name.argstypes    = [dbr.chid_t]
+    # libca.ca_state.argstypes   = [dbr.chid_t]
     libca.ca_message.restype   = ctypes.c_char_p
 
     # save value offests used for unpacking
@@ -448,7 +451,11 @@ def withSEVCHK(fcn):
 ## Event Handler for monitor event callbacks
 def _onMonitorEvent(args):
     """Event Handler for monitor events: not intended for use"""
+    
+    # for 64-bit python on Windows!
+    if dbr.PY64_WINDOWS:   args = args.contents
     value = dbr.cast_args(args)
+    
     pvname = name(args.chid)
     kwds = {'ftype':args.type, 'count':args.count,
            'chid':args.chid, 'pvname': pvname,
@@ -486,8 +493,14 @@ def _onMonitorEvent(args):
 def _onConnectionEvent(args):
     """set flag in cache holding whteher channel is
     connected. if provided, run a user-function"""
+    # for 64-bit python on Windows!
+    if dbr.PY64_WINDOWS:   args = args.contents
+
+    # print(" Connection Event:  Chid:  ", args.chid)
+    # print(" Connection Event:  op, conn_up:  ", args.op, dbr.OP_CONN_UP)
+    # sys.stdout.flush()
+    
     ctx = current_context()
-    pvname = name(args.chid)
     conn = (args.op == dbr.OP_CONN_UP)
     global _cache
 
@@ -499,11 +512,14 @@ def _onConnectionEvent(args):
     # search for PV in any context...
     pv_found = False
     for context in _cache:
+        pvname = name(args.chid)
+
         if pvname in _cache[context]:
             pv_found = True
             break
 
     # logging.debug("ConnectionEvent %s/%i/%i " % (pvname, args.chid, conn))
+    # print("ConnectionEvent %s/%i/%i " % (pvname, args.chid, conn))
     if not pv_found:
         _cache[ctx][pvname] = {'conn':False, 'chid': args.chid,
                                'ts':0, 'failures':0, 'value': None,
@@ -525,16 +541,26 @@ def _onConnectionEvent(args):
                 for callback in entry.get('callbacks', []):
                     poll()
                     if hasattr(callback, '__call__'):
+                        # print( ' ==> connection callback ', callback, conn)
                         callback(pvname=pvname, chid=chid, conn=conn)
+    #print('Connection done')
+
     return
 
 ## get event handler:
 def _onGetEvent(args, **kws):
     """get_callback event: simply store data contents which
     will need conversion to python data with _unpack()."""
+    # for 64-bit python on Windows!
+    if dbr.PY64_WINDOWS:   args = args.contents
+        
+    # print("GET EVENT: chid, user ", args.chid, args.usr)
+    # print("GET EVENT: type, count ", args.type, args.count)
+    # print("GET EVENT: status ",  args.status, dbr.ECA_NORMAL)
     global _cache
     if args.status != dbr.ECA_NORMAL:
         return
+
     get_cache(name(args.chid))[args.usr] = memcopy(dbr.cast_args(args))
 
 
@@ -542,6 +568,9 @@ def _onGetEvent(args, **kws):
 def _onPutEvent(args, **kwds):
     """set put-has-completed for this channel,
     call optional user-supplied callback"""
+    # for 64-bit python on Windows!
+    if dbr.PY64_WINDOWS:   args = args.contents
+
     pvname = name(args.chid)
     fcn  = _put_done[pvname][1]
     data = _put_done[pvname][2]
@@ -554,13 +583,19 @@ def _onPutEvent(args, **kwds):
         fcn(pvname=pvname, **kwds)
 
 # create global reference to these callbacks
-_CB_CONNECT = ctypes.CFUNCTYPE(None, dbr.connection_args)(_onConnectionEvent)
-_CB_PUTWAIT = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvent)
-_CB_GET     = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onGetEvent)
-_CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onMonitorEvent)
 
-###
-#
+ 
+# _CB_PUTWAIT = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvet)
+# _CB_GET     = ctypes.CFUNCTYPE(None, ctypes.pointer(dbr.event_handler_args))(_onGetEvent)
+# _CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onMonitorEvent)
+ 
+# _CB_CONNECT = make_callback(_onConnectionEvent, dbr.connection_args)
+
+_CB_CONNECT = dbr.make_callback(_onConnectionEvent, dbr.connection_args)
+_CB_PUTWAIT = dbr.make_callback(_onPutEvent,        dbr.event_handler_args)
+_CB_GET     = dbr.make_callback(_onGetEvent,        dbr.event_handler_args)
+_CB_EVENT   = dbr.make_callback(_onMonitorEvent,    dbr.event_handler_args)
+
 # Now we're ready to wrap libca functions
 #
 ###
@@ -795,6 +830,11 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         PySEVCHK('create_channel', ret)
         entry['chid'] = chid
 
+    chid_key = chid
+    if isinstance(chid_key, dbr.chid_t):
+        chid_key = chid.value
+    _namecache[chid_key] = BYTES2STR(pvn)
+    # print("CREATE Channel ", pvn, chid)
     if connect:
         connect_channel(chid)
     if conncb != 0:
@@ -866,7 +906,15 @@ def connect_channel(chid, timeout=None, verbose=False):
 @withCHID
 def name(chid):
     "return PV name for channel name"
-    return BYTES2STR(libca.ca_name(chid))
+    global _namecache
+    # sys.stdout.write("NAME %s %s\n" % (repr(chid), repr(chid.value in _namecache)))
+    # sys.stdout.flush()
+
+    if chid.value in _namecache:
+        val = _namecache[chid.value]
+    else:
+        val = _namecache[chid.value] = BYTES2STR(val)
+    return val
 
 @withCHID
 def host_name(chid):
@@ -893,6 +941,7 @@ def write_access(chid):
 @withCHID
 def field_type(chid):
     "return the integer DBR field type."
+    # print(" Field Type", chid)
     return libca.ca_field_type(chid)
 
 @withCHID
@@ -903,6 +952,7 @@ def clear_channel(chid):
 @withCHID
 def state(chid):
     "return state (that is, attachment state) for channel"
+    
     return libca.ca_state(chid)
 
 def isConnected(chid):
@@ -1073,7 +1123,6 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     """
     global _cache
 
-        
     if ftype is None:
         ftype = field_type(chid)
     if ftype in (None, -1):
@@ -1089,7 +1138,7 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     #   GET_PENDING implies no value yet, callback expected.
     if ncache.get('value', None) is None:
         ncache['value'] = GET_PENDING
-        ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET,
+        ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, 
                                           ctypes.py_object('value'))
         PySEVCHK('get', ret)
 
@@ -1138,7 +1187,7 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
 
     """
     global _cache
-        
+
     if ftype is None:
         ftype = field_type(chid)
     if count is None:
@@ -1159,8 +1208,12 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
             msg = "ca.get('%s') timed out after %.2f seconds."
             warnings.warn(msg % (name(chid), timeout))
             return None
+    #print("Get Complete> Unpack ", ncache['value'], count, ftype)
+
     val = _unpack(chid, ncache['value'], count=count,
                   ftype=ftype, as_numpy=as_numpy)
+    # print("Get Complete unpacked to ", val)
+
     if as_string:
         val = _as_string(val, chid, count, ftype)
     elif isinstance(val, ctypes.Array) and HAS_NUMPY and as_numpy:

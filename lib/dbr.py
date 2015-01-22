@@ -10,6 +10,9 @@
 This is mostly copied from CA header files
 """
 import ctypes
+import os
+import sys
+from platform import architecture
 
 HAS_NUMPY = False
 try:
@@ -17,6 +20,8 @@ try:
     HAS_NUMPY = True
 except ImportError:
     pass
+
+PY64_WINDOWS =  (os.name == 'nt' and architecture()[0].startswith('64'))
 
 # EPICS Constants
 ECA_NORMAL = 1
@@ -304,8 +309,39 @@ def cast_args(args):
                 ctypes.cast(args.raw_dbr,
                             ctypes.POINTER(args.count * Map[ftype])).contents
                 ]
+def make_callback(func, args):
+    """ make callback function"""
+    # note that ctypes.POINTER is needed for 64-bit Python on Windows
+    if PY64_WINDOWS:
+        args = ctypes.POINTER(args)
+    return ctypes.CFUNCTYPE(None, args)(func)
+
 
 class event_handler_args(ctypes.Structure):
+    "event handler arguments"
+    _fields_ = [('usr',     ctypes.py_object),
+                ('chid',    ctypes.c_int32),
+                ('type',    ctypes.c_int32), 
+                ('count',   ctypes.c_int32),
+                ('raw_dbr', void_p),
+                ('status',  ctypes.c_int32)]
+
+if PY64_WINDOWS:
+    # need to add padding on 64-bit Windows -- yuck!
+    class event_handler_args(ctypes.Structure):
+        "event handler arguments"
+        _fields_ = [('usr',     ctypes.py_object),
+                    ('chid',    ctypes.c_int32),
+                    ('_pad_',   ctypes.c_int8),
+                    ('type',    ctypes.c_int32), 
+                    ('count',   ctypes.c_int32),
+                    ('raw_dbr', void_p),
+                    ('status',  ctypes.c_int32)]
+
+
+
+				
+class event_handler_args32(ctypes.Structure):
     "event handler arguments"
     _fields_ = [('usr',     py_obj),
                 ('chid',    chid_t),
@@ -316,7 +352,9 @@ class event_handler_args(ctypes.Structure):
 
 class connection_args(ctypes.Structure):
     "connection arguments"
-    _fields_ = [('chid', chid_t), ('op', long_t)]
+    _fields_ = [('chid', chid_t), 
+                ('_pad_',   ctypes.c_int8),
+                ('op', long_t)]
 
 class exception_handler_args(ctypes.Structure):
     "exception arguments"
