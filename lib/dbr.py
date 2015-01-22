@@ -320,25 +320,11 @@ def make_callback(func, args):
 class event_handler_args(ctypes.Structure):
     "event handler arguments"
     _fields_ = [('usr',     ctypes.py_object),
-                ('chid',    ctypes.c_int32),
-                ('type',    ctypes.c_int32), 
-                ('count',   ctypes.c_int32),
+                ('chid',    chid_t),
+                ('type',    long_t), 
+                ('count',   long_t),
                 ('raw_dbr', void_p),
-                ('status',  ctypes.c_int32)]
-
-if PY64_WINDOWS:
-    # need to add padding on 64-bit Windows -- yuck!
-    class event_handler_args(ctypes.Structure):
-        "event handler arguments"
-        _fields_ = [('usr',     ctypes.py_object),
-                    ('chid',    ctypes.c_int32),
-                    ('_pad_',   ctypes.c_int8),
-                    ('type',    ctypes.c_int32), 
-                    ('count',   ctypes.c_int32),
-                    ('raw_dbr', void_p),
-                    ('status',  ctypes.c_int32)]
-
-
+                ('status',  int_t)]
 
 				
 class event_handler_args32(ctypes.Structure):
@@ -353,19 +339,23 @@ class event_handler_args32(ctypes.Structure):
 class connection_args(ctypes.Structure):
     "connection arguments"
     _fields_ = [('chid', chid_t), 
-                ('_pad_',   ctypes.c_int8),
                 ('op', long_t)]
 
-class exception_handler_args(ctypes.Structure):
-    "exception arguments"
-    _fields_ = [('usr',   void_p),
-                ('chid',  chid_t),
-                ('type',  int_t),
-                ('count', int_t),
-                ('addr',  void_p),
-                ('stat',  int_t),
-                ('op',    int_t),
-                ('ctx',   char_p),
-                ('pFile', char_p),
-                ('lineNo', int_t)]
+if PY64_WINDOWS:
+    # need to add padding on 64-bit Windows -- yuck!
+    class event_handler_args(ctypes.Structure):
+        "event handler arguments"
+        _fields_ = [('usr',     ctypes.py_object),
+                    ('chid',    ctypes.c_int32),
+                    ('_pad_',   ctypes.c_int8),
+                    ('type',    ctypes.c_int32), 
+                    ('count',   ctypes.c_int32),
+                    ('raw_dbr', void_p),
+                    ('status',  ctypes.c_int32)]
+
+    class connection_args(ctypes.Structure):
+        "connection arguments"
+        _fields_ = [('chid', chid_t), 
+                    ('_pad_',ctypes.c_int8),
+                    ('op',   long_t)]
 
