@@ -6,6 +6,7 @@ import time
 from  sys import stdout
 from threading import Thread
 import epics
+from epics.ca import CAThread
 
 from  pvnames import updating_pvlist
 pvlist_a = updating_pvlist[:-1]
@@ -32,10 +33,10 @@ stdout.write( "First, create a PV in the main thread:\n")
 p = epics.PV(updating_pvlist[0])
 
 stdout.write("Run 2 Background Threads simultaneously:\n")
-th1 = Thread(target=run_test,args=(3, pvlist_a,  'A'))
+th1 = CAThread(target=run_test,args=(3, pvlist_a,  'A'))
 th1.start()
 
-th2 = Thread(target=run_test,args=(6, pvlist_b, 'B'))
+th2 = CAThread(target=run_test,args=(6, pvlist_b, 'B'))
 th2.start()
 
 th2.join()

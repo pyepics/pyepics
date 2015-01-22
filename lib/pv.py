@@ -17,7 +17,7 @@ from .utils import is_string
 
 _PVcache_ = {}
 
-def get_pv(pvname, form='native',  connect=False,
+def get_pv(pvname, form='time',  connect=False,
            context=None, timeout=5.0, **kws):
     """get PV from PV cache or create one if needed.
 
@@ -94,7 +94,7 @@ class PV(object):
                'lower_alarm_limit', 'lower_warning_limit',
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
-    def __init__(self, pvname, callback=None, form='native',
+    def __init__(self, pvname, callback=None, form='time',
                  verbose=False, auto_monitor=None,
                  connection_callback=None,
                  connection_timeout=None):
