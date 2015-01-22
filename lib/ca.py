@@ -494,12 +494,8 @@ def _onConnectionEvent(args):
     """set flag in cache holding whteher channel is
     connected. if provided, run a user-function"""
     # for 64-bit python on Windows!
-    if dbr.PY64_WINDOWS:   args = args.contents
+    if dbr.PY64_WINDOWS: args = args.contents
 
-    # print(" Connection Event:  Chid:  ", args.chid)
-    # print(" Connection Event:  op, conn_up:  ", args.op, dbr.OP_CONN_UP)
-    # sys.stdout.flush()
-    
     ctx = current_context()
     conn = (args.op == dbr.OP_CONN_UP)
     global _cache
