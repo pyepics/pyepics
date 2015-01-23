@@ -5,67 +5,70 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-This package requires Python version 2.6, 2.7, or 3.2 or 3.3.  It should
-work with Python 2.5 or 3.1 but these are no longer being tested as of this
-writing.
+This package requires Python version 2.6, 2.7, or 3.4.  It should work with
+Python 2.5, 3.1, 3.2, or 3.3, but these are not being tested regularly.
 
 In addition, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
 libCom.so and libca.so (or Com.dll and ca.dll on Windows) from *Epics Base*
 are required to use this module.  Using version 3.14.12 or higher is
 recommended -- some of the features for 'subarray records' will only work
-with this 3.14.12 and higher.
+with this 3.14.12 and higher. For Linux and Mac OS X (and other Unix-like
+systems), these dynamic libraries are assumed to be available, and findable
+by Python at runtime. This may mean you have to set environmental variables
+such as PATH, LD_LIBRARY_PATH, or DYLD_LIBRARY_PATH or using Linux tools
+such as ldconfig.
 
-For 32-bit Windows, pre-built DLLs from 3.14.12 (patched as of March, 2011)
-are included and installed so that no other Epics installation is required
-to use the modules.  For Unix-like systems, these are assumed to be
-available (and findable by Python at runtime) on the system. This may mean
-setting LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or configuring ldconfig.
+For 32-bit Python on 32-bit or 64-bit Windows, pre-built DLLs from 3.14.12
+(patched as of March, 2011) are included and installed so that no other
+Epics installation is required to use the modules.
 
-The Python `numpy module <http://numpy.scipy.org/>`_ is not strictly
-required, but will be used to convert EPICS waveforms values into numerical
-array data if available, and its use is strongly encouraged.
+For 64-bit Python on 64-bit Windows, pre-built DLLs from 3.14.12.4 (patched
+as of January, 2015) are also included.  Support for 64-bit Python on
+Windows is new in version 3.2.4, and requires Python version 2.7.9.  This
+should still be considered experimental.
+
+The Python `numpy module <http://numpy.scipy.org/>`_ is highly recommended,
+though it is not strictly required. If available, it will be used to
+convert EPICS waveforms values into numpy arrays.
+
 
 Downloads
 ~~~~~~~~~~~~~
 
-The latest stable version of the PyEpics Package is 3.2.3.  There are
+The latest stable version of the PyEpics Package is 3.2.4.  There are
 a few ways to get the PyEpics Package:
 
-.. _pyepics-3.2.3.tar.gz (CARS):   http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.3.tar.gz
-.. _pyepics-3.2.3.tar.gz (PyPI):   http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.3.tar.gz
-.. _pyepics-3.2.3.win32-py2.6.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.3.win32-py2.6.exe
-.. _pyepics-3.2.3.win32-py2.7.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.3.win32-py2.7.exe
-.. _pyepics-3.2.3.win32-py3.2.exe (CARS): http://cars9.uchicago.edu/software/python/pyepics3/src/pyepics-3.2.3.win32-py3.2.exe
-.. _pyepics-3.2.3.win32-py2.6.exe (PyPI): http://pypi.python.org/packages/2.6/p/pyepics/pyepics-3.2.3.win32-py2.6.exe
-.. _pyepics-3.2.3.win32-py2.7.exe (PyPI): http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.3.win32-py2.7.exe
-.. _pyepics-3.2.3.win32-py3.2.exe (PyPI): http://pypi.python.org/packages/3.2/p/pyepics/pyepics-3.2.3.win32-py3.2.exe
-.. _pyepics github repository:    http://github.com/pyepics/pyepics
-.. _PyEpics Source Tree:          http://cars9.uchicago.edu/software/python/pyepics3/src
-.. _PyPi Epics Entry:             http://pypi.python.org/pypi/pyepics/
-.. _Python Setup Tools:           http://pypi.python.org/pypi/setuptools
+.. _pyepics-3.2.4.tar.gz:              http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.4.tar.gz
+.. _pyepics-3.2.4.win32-py2.7.exe:     http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.4.win32-py2.7.exe
+.. _pyepics-3.2.4.win32-py3.4.exe:     http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.4.win32-py3.4.exe
+.. _pyepics-3.2.4.win-amd64-py2.7.exe: http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.4.win-amd64-py2.7.exe
+.. _pyepics-3.2.4.win-amd64-py3.4.exe: http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.4.win-amd64-py3.4.exe
+.. _pyepics github repository:         http://github.com/pyepics/pyepics
+.. _pyepics CARS downloads:            http://cars9.uchicago.edu/software/python/pyepics3/src/
+.. _Python Setup Tools:                http://pypi.python.org/pypi/setuptools
+
 
 +-----------------+------------+----------------------------------------------+
-|  Download Type  | Py Version |   Location                                   |
+|  Download Type  | Py Version |  PyPI link                                   |
 +=================+============+==============================================+
-| Source tarball  | All        |  `pyepics-3.2.3.tar.gz (CARS)`_  or          |
-|                 |            |  `pyepics-3.2.3.tar.gz (PyPI)`_              |
+| Source tarball  | All        |  `pyepics-3.2.4.tar.gz`_                     |
 +-----------------+------------+----------------------------------------------+
-| Win32 Installer | 2.6        |  `pyepics-3.2.3.win32-py2.6.exe (CARS)`_  or |
-|                 |            |  `pyepics-3.2.3.win32-py2.6.exe (PyPI)`_  or |
+| Win32 Installer | 2.7        |  `pyepics-3.2.4.win32-py2.7.exe`_            |
 +-----------------+------------+----------------------------------------------+
-| Win32 Installer | 2.7        |  `pyepics-3.2.3.win32-py2.7.exe (CARS)`_  or |
-|                 |            |  `pyepics-3.2.3.win32-py2.7.exe (PyPI)`_  or |
+| Win32 Installer | 3.4        |  `pyepics-3.2.4.win32-py3.4.exe`_            |
 +-----------------+------------+----------------------------------------------+
-| Win32 Installer | 3.2        |  `pyepics-3.2.3.win32-py3.2.exe (CARS)`_  or |
-|                 |            |  `pyepics-3.2.3.win32-py3.2.exe (PyPI)`_  or |
+| Win64 Installer | 2.7        |  `pyepics-3.2.4.win-amd64-py2.7.exe`_        |
++-----------------+------------+----------------------------------------------+
+| Win64 Installer | 3.4        |  `pyepics-3.2.4.win-amd64-py3.4.exe`_        |
 +-----------------+------------+----------------------------------------------+
 |  Development    | All        |  `pyepics github repository`_                |
 +-----------------+------------+----------------------------------------------+
 
 
-If you have `Python Setup Tools`_  installed, you can download and install
-the PyEpics Package simply with::
+Current and older source source kits, and Windows Installers can also be found
+at the `PyEpics CARS downloads`_ site.  If you have `Python Setup Tools`_
+installed, you can download and install the PyEpics Package simply with::
 
    easy_install -U pyepics
 
@@ -81,29 +84,33 @@ Some automated unit-testing is done, using the tests/ folder from the
 source distribution kit, and while the script ``tests/simulator.py`` is running
 (note that the Epics database in ``tests/pydebug.db`` must be loaded in a local
 IOC for the simulator and most of these tests to run).  The following
-systems were tested for 3.2.3, all with Epics base 3.14.12.1 or base
+systems were tested for 3.2.4, all with Epics base 3.14.12.1 or base
 3.14.12.2.
 
 
-+-----------+-----------------+------------+---------------------------+
-| Host OS   | Epics HOST ARCH |  Python    |  Failures, Notes          |
-+===========+=================+============+===========================+
-| Linux     |  linux-x86      |  2.6       | unknown                   |
-+-----------+-----------------+------------+---------------------------+
-| Linux     |  linux-x86      |  2.7.1     | unknown                   |
-+-----------+-----------------+------------+---------------------------+
-| Linux     |  linux-x86_64   |  2.7.1     | unknown                   |
-+-----------+-----------------+------------+---------------------------+
-| Linux     |  linux-x86_64   |  3.2.3     | unknown                   |
-+-----------+-----------------+------------+---------------------------+
-| Mac OSX   |  darwin-x86     |  2.6.5     | unknown                   |
-+-----------+-----------------+------------+---------------------------+
-| Windows   |  win32-x86      |  2.6.6     | unknown                   |
-+-----------+-----------------+------------+---------------------------+
-| Windows   |  win32-x86      |  2.7.2     | unknown                   |
-+-----------+-----------------+------------+---------------------------+
-| Windows   |  win32-x86      |  3.2.2     | unknown                   |
-+-----------+-----------------+------------+---------------------------+
++-----------+-----------------+--------------+---------------------------+
+| Host OS   | Epics HOST ARCH |  Python      | Test Status               |
++===========+=================+==============+===========================+
+| Linux     |  linux-x86      | 2.6   32bit  | pass                      |
++-----------+-----------------+--------------+---------------------------+
+| Linux     |  linux-x86      | 2.7.3 32bit  | pass                      |
++-----------+-----------------+--------------+---------------------------+
+| Linux     |  linux-x86_64   | 2.7.8 64bit  | pass                      |
++-----------+-----------------+--------------+---------------------------+
+| Linux     |  linux-x86_64   | 3.4.1 64bit  | pass                      |
++-----------+-----------------+--------------+---------------------------+
+| Mac OSX   |  darwin-x86     | 2.7.8 64bit  | pass                      |
++-----------+-----------------+--------------+---------------------------+
+| Windows   |  win32-x86      | 2.6.6 32bit  | pass                      |
++-----------+-----------------+--------------+---------------------------+
+| Windows   |  win32-x86      | 2.7.8 32bit  | pass                      |
++-----------+-----------------+--------------+---------------------------+
+| Windows   |  win32-x86      | 3.4.1 32bit  | pass                      |
++-----------+-----------------+--------------+---------------------------+
+| Windows   |  windows-x64    | 2.7.9 64bit  | pass                      |
++-----------+-----------------+--------------+---------------------------+
+| Windows   |  windows-x64    | 3.4.2 64bit  | pass                      |
++-----------+-----------------+--------------+---------------------------+
 
 
 Testing Notes:
@@ -136,8 +143,6 @@ version, use one of::
    git clone http://github.com/pyepics/pyepics.git
    git clone git@github.com/pyepics/pyepics.git
 
-Current and older source source kits, and Windows Installers can also be found
-at the `PyEpics Source Tree`_.
 
 Installation
 ~~~~~~~~~~~~~~~~~
