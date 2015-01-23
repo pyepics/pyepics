@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.3',
+        VERSION:     '3.2.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -41,9 +41,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="np-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="wx.html" title="wx: wxPython Widgets for Epics"
              accesskey="P">previous</a> |</li>
@@ -405,6 +402,7 @@ other.</p>
 <span class="kn">from</span>  <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stdout</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
 <span class="kn">import</span> <span class="nn">epics</span>
+<span class="kn">from</span> <span class="nn">epics.ca</span> <span class="kn">import</span> <span class="n">CAThread</span>
 
 <span class="kn">from</span>  <span class="nn">pvnames</span> <span class="kn">import</span> <span class="n">updating_pvlist</span>
 <span class="n">pvlist_a</span> <span class="o">=</span> <span class="n">updating_pvlist</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -431,10 +429,10 @@ other.</p>
 <span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">updating_pvlist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
 <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;Run 2 Background Threads simultaneously:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
-<span class="n">th1</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_test</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">pvlist_a</span><span class="p">,</span>  <span class="s">&#39;A&#39;</span><span class="p">))</span>
+<span class="n">th1</span> <span class="o">=</span> <span class="n">CAThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_test</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">pvlist_a</span><span class="p">,</span>  <span class="s">&#39;A&#39;</span><span class="p">))</span>
 <span class="n">th1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-<span class="n">th2</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_test</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">pvlist_b</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">))</span>
+<span class="n">th2</span> <span class="o">=</span> <span class="n">CAThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_test</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">pvlist_b</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">))</span>
 <span class="n">th2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
 <span class="n">th2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
@@ -591,9 +589,6 @@ been done on using multiprocessing Managers.</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="np-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="wx.html" title="wx: wxPython Widgets for Epics"
              >previous</a> |</li>

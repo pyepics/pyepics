@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.3',
+        VERSION:     '3.2.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -42,9 +42,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="np-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="alarm.html" title="Alarms: respond when a PV goes out of range"
              accesskey="N">next</a> |</li>
@@ -880,9 +877,9 @@ includes a Device for an Epics ai (analog input record).  The full
 implementation of this device is:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
 <span class="sd">&quot;&quot;&quot;Epics analog input record&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">epics</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">Device</span>
 
-<span class="k">class</span> <span class="nc">ai</span><span class="p">(</span><span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">ai</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="s">&quot;Simple analog input device&quot;</span>
 
     <span class="n">attrs</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;VAL&#39;</span><span class="p">,</span> <span class="s">&#39;EGU&#39;</span><span class="p">,</span> <span class="s">&#39;HOPR&#39;</span><span class="p">,</span> <span class="s">&#39;LOPR&#39;</span><span class="p">,</span> <span class="s">&#39;PREC&#39;</span><span class="p">,</span> <span class="s">&#39;NAME&#39;</span><span class="p">,</span> <span class="s">&#39;DESC&#39;</span><span class="p">,</span>
@@ -893,8 +890,7 @@ implementation of this device is:</p>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">prefix</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
             <span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">,</span>
-                              <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The code simply pre-defines the fields that are the <em>suffixes</em> of an Epics ai
@@ -925,9 +921,9 @@ of the Scaler Record from synApps, including methods for changing modes, and
 reading and writing data.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python </span>
 <span class="sd">&quot;&quot;&quot;Epics Scaler&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">epics</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">poll</span>
 
-<span class="k">class</span> <span class="nc">Scaler</span><span class="p">(</span><span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Scaler</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">    Simple implementation of SynApps Scaler Record.   </span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -946,7 +942,7 @@ reading and writing data.</p>
             <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chan_attrs</span><span class="p">:</span>
                 <span class="n">attrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">att</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
                 
-        <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">)</span>
+        <span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr_kws</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_pv</span><span class="p">(</span><span class="n">val</span> <span class="o">%</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span> <span class="n">key</span><span class="p">)</span>
@@ -973,7 +969,7 @@ reading and writing data.</p>
         <span class="k">if</span> <span class="n">ctime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">CountTime</span><span class="p">(</span><span class="n">ctime</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;CNT&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="n">wait</span><span class="p">)</span>
-        <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
+        <span class="n">poll</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">EnableCalcs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="s">&quot; enable calculations&quot;</span>
@@ -1122,9 +1118,6 @@ specific use of that Device.</div></blockquote>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="np-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="alarm.html" title="Alarms: respond when a PV goes out of range"
              >next</a> |</li>

@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.3',
+        VERSION:     '3.2.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -42,9 +42,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="np-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="pv.html" title="PV: Epics Process Variables"
              accesskey="N">next</a> |</li>
@@ -276,9 +273,10 @@ to the EPICS command line utilities and to the functions in the EZCA
 library.  They all take the name of an Epics Process Variable (PV) as the
 first argument.  As with the EZCA library, the python implementation keeps
 an internal cache of connected PV (in this case, using <cite>PV</cite> objects) so
-that repeated use of a PV name will not actually result in a new
-connection.  Thus, though the functionality is limited, the performance of
-the functional approach can be quite good.</p>
+that repeated use of a PV name will not actually result in a new connection
+&#8211; see <a class="reference internal" href="pv.html#pv-cache-label"><em>The get_pv() function and _PVcache_ cache of PVs</em></a> for more details.  Thus, though the
+functionality is limited, the performance of the functional approach can be
+quite good.</p>
 <div class="section" id="caget">
 <h3><a class="reference internal" href="#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">caget()</span></tt></a><a class="headerlink" href="#caget" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
@@ -604,9 +602,6 @@ contact the authors.</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="np-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="pv.html" title="PV: Epics Process Variables"
              >next</a> |</li>

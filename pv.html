@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.3',
+        VERSION:     '3.2.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -42,9 +42,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="np-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="ca.html" title="ca: Low-level Channel Access module"
              accesskey="N">next</a> |</li>
@@ -80,6 +77,7 @@
 <li><a class="reference internal" href="#user-supplied-callback-functions">User-supplied Callback functions</a></li>
 <li><a class="reference internal" href="#user-supplied-connection-callback-functions">User-supplied Connection Callback functions</a></li>
 <li><a class="reference internal" href="#put-with-wait-put-callbacks-and-put-complete">Put with wait, put callbacks, and  put_complete</a></li>
+<li><a class="reference internal" href="#the-get-pv-function-and-pvcache-cache-of-pvs">The <tt class="docutils literal"><span class="pre">get_pv()</span></tt> function and <tt class="docutils literal"><span class="pre">_PVcache_</span></tt> cache of PVs</a></li>
 <li><a class="reference internal" href="#examples">Examples</a><ul>
 <li><a class="reference internal" href="#basic-use">Basic Use</a></li>
 <li><a class="reference internal" href="#example-of-using-info-and-more-properties-examples">Example of using info and more properties examples</a></li>
@@ -134,7 +132,7 @@ both methods and attributes for accessing it&#8217;s properties.</p>
 <h2>The <a class="reference internal" href="#pv.PV" title="pv.PV"><tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt></a> class<a class="headerlink" href="#the-pv-class" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="pv.PV">
-<em class="property">class </em><tt class="descclassname">pv.</tt><tt class="descname">PV</tt><big>(</big><em>pvname</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>form='native'</em><span class="optional">[</span>, <em>auto_monitor=None</em><span class="optional">[</span>, <em>connection_callback=None</em><span class="optional">[</span>, <em>connection_timeout=None</em><span class="optional">[</span>, <em>verbose=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pv.PV" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">pv.</tt><tt class="descname">PV</tt><big>(</big><em>pvname</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>form='time'</em><span class="optional">[</span>, <em>auto_monitor=None</em><span class="optional">[</span>, <em>connection_callback=None</em><span class="optional">[</span>, <em>connection_timeout=None</em><span class="optional">[</span>, <em>verbose=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pv.PV" title="Permalink to this definition">¶</a></dt>
 <dt>
 <tt class="descname">create a PV object for a named Epics Process Variable.</tt></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -144,7 +142,7 @@ both methods and attributes for accessing it&#8217;s properties.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>pvname</strong> &#8211; name of Epics Process Variable</li>
 <li><strong>callback</strong> (<em>callable, tuple, list or None</em>) &#8211; user-defined callback function on changes to PV value or state.</li>
-<li><strong>form</strong> (<em>string, one of (&#8216;native&#8217;,&#8217;ctrl&#8217;, or &#8216;time&#8217;)</em>) &#8211; which epics <em>data type</em> to use:  the &#8216;native&#8217; , or the &#8216;ctrl&#8217; (Control) or &#8216;time&#8217; variant.</li>
+<li><strong>form</strong> (<em>string, one of (&#8216;native&#8217;,&#8217;ctrl&#8217;, or &#8216;time&#8217;)</em>) &#8211; which epics <em>data type</em> to use:  the &#8216;native&#8217;, &#8216;time&#8217;, or the &#8216;ctrl&#8217; (Control) variant.</li>
 <li><strong>auto_monitor</strong> (<tt class="docutils literal"><span class="pre">None</span></tt>, <tt class="docutils literal"><span class="pre">True</span></tt>, <tt class="docutils literal"><span class="pre">False</span></tt>, or bitmask (see <a class="reference internal" href="#pv-automonitor-label"><em>Automatic Monitoring of a PV</em></a>)) &#8211; whether to automatically monitor the PV for changes.</li>
 <li><strong>connection_callback</strong> (callable or <tt class="docutils literal"><span class="pre">None</span></tt>) &#8211; user-defined function called on changes to PV connection status.</li>
 <li><strong>connection_timeout</strong> (float or <tt class="docutils literal"><span class="pre">None</span></tt>) &#8211; time (in seconds) to wait for connection before giving up</li>
@@ -170,12 +168,14 @@ on changes, as discussed in more detail at <a class="reference internal" href="#
 <p>The <em>connection_callback</em> parameter specifies a python method to be called
 on changes to the connection status of the PV (that is, when it connects or
 disconnects).  This is discussed in more detail at <a class="reference internal" href="#pv-connection-callbacks-label"><em>User-supplied Connection Callback functions</em></a></p>
-<p>The <em>form</em> parameter specifies which of the three variants &#8216;native&#8217; (the
-default), &#8216;ctrl&#8217; (Control) or &#8216;time&#8217; to use for the PV.  The control and
-time variants add additional fields to the PV, which can be useful in some
-cases.  Also note that the additional &#8216;ctrl&#8217; value fields (see the
-<a class="reference internal" href="ca.html#ctrlvars-table"><em>Table of Control Attributes</em></a>) can be obtained with
-<a class="reference internal" href="#pv.get_ctrlvars" title="pv.get_ctrlvars"><tt class="xref py py-meth docutils literal"><span class="pre">get_ctrlvars()</span></tt></a> even for PVs of &#8216;native&#8217; form.</p>
+<p>The <em>form</em> parameter specifies which of the three variants &#8216;native&#8217;, &#8216;ctrl&#8217;
+(Control) or &#8216;time&#8217; (the default) to use for the PV.  The &#8216;native&#8217; form
+returns just the value, the &#8216;time&#8217; form includes the timestamp from the
+server the PV lives on, as well as status information.  The control form
+includes several additional fields such as limits to the PV, which can be
+useful in some cases.  Also note that the additional &#8216;ctrl&#8217; value fields
+(see the <a class="reference internal" href="ca.html#ctrlvars-table"><em>Table of Control Attributes</em></a>) can be
+obtained with <a class="reference internal" href="#pv.get_ctrlvars" title="pv.get_ctrlvars"><tt class="xref py py-meth docutils literal"><span class="pre">get_ctrlvars()</span></tt></a> even for PVs of &#8216;native&#8217; or &#8216;time&#8217; form.</p>
 <p>The <em>auto_monitor</em> parameter specifies whether the PV should be
 automatically monitored.  See <a class="reference internal" href="#pv-automonitor-label"><em>Automatic Monitoring of a PV</em></a> for a detailed
 description of this.</p>
@@ -920,6 +920,48 @@ data with the <em>callback_data</em> argument (which should be dict-like) to
 </pre></div>
 </div>
 </div>
+<div class="section" id="the-get-pv-function-and-pvcache-cache-of-pvs">
+<span id="pv-cache-label"></span><h2>The <a class="reference internal" href="#pv.get_pv" title="pv.get_pv"><tt class="xref py py-func docutils literal"><span class="pre">get_pv()</span></tt></a> function and <a class="reference internal" href="#pv._PVcache_" title="pv._PVcache_"><tt class="xref py py-attr docutils literal"><span class="pre">_PVcache_</span></tt></a> cache of PVs<a class="headerlink" href="#the-get-pv-function-and-pvcache-cache-of-pvs" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned in the previous chapter, a cache of PVs is maintained for each
+process using pyepics.  When using <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><tt class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></tt></a>, <a class="reference internal" href="overview.html#epics.caput" title="epics.caput"><tt class="xref py py-func docutils literal"><span class="pre">epics.caput()</span></tt></a>
+and so forth, or when creating a <a class="reference internal" href="#pv.PV" title="pv.PV"><tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt></a> directly, the corresponding PV
+is kept in a global cache, held in <a class="reference internal" href="#pv._PVcache_" title="pv._PVcache_"><tt class="xref py py-attr docutils literal"><span class="pre">pv._PVcache_</span></tt></a>.</p>
+<p>The function <a class="reference internal" href="#pv.get_pv" title="pv.get_pv"><tt class="xref py py-func docutils literal"><span class="pre">get_pv()</span></tt></a> will retrieve the named PV from this cache, or
+create a new <a class="reference internal" href="#pv.PV" title="pv.PV"><tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt></a> if one is not found.  In long-running or complex
+processes, it is not unusual to access a particular PV many times, perhaps
+calling a function that creates a PV but only keeping that PV object for
+the life of the function.  Using <a class="reference internal" href="#pv.get_pv" title="pv.get_pv"><tt class="xref py py-func docutils literal"><span class="pre">get_pv()</span></tt></a> instead of creating a
+<a class="reference internal" href="#pv.PV" title="pv.PV"><tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt></a> can improve performance (the PV is already connected) and is
+highly recommended.</p>
+<dl class="function">
+<dt id="pv.get_pv">
+<tt class="descclassname">pv.</tt><tt class="descname">get_pv</tt><big>(</big><em>pvname</em><span class="optional">[</span>, <em>form='time'</em><span class="optional">[</span>, <em>connect=False</em><span class="optional">[</span>, <em>timeout=5</em><span class="optional">[</span>, <em>context=None</em><span class="optional">[</span>, <em>**kws</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pv.get_pv" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves a PV from <tt class="xref py py-attr docutils literal"><span class="pre">_PVcache</span></tt> or creates and returns a new PV.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pvname</strong> &#8211; name of Epics Process Variable</li>
+<li><strong>form</strong> (<em>string, one of (&#8216;native&#8217;,&#8217;ctrl&#8217;, or &#8216;time&#8217;)</em>) &#8211; which epics <em>data type</em> to use:  the &#8216;native&#8217; , or the &#8216;ctrl&#8217; (Control) or &#8216;time&#8217; variant.</li>
+<li><strong>connect</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) &#8211; whether to wait for the PV to connect.</li>
+<li><strong>timeout</strong> (float or <tt class="docutils literal"><span class="pre">None</span></tt>) &#8211; maximum time to wait (in seconds) for value before returning None.</li>
+<li><strong>context</strong> (integer or  <tt class="docutils literal"><span class="pre">None</span></tt> (default)) &#8211; integer threading context.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Additional keywords are passed directly to <a class="reference internal" href="#pv.PV" title="pv.PV"><tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pv._PVcache_">
+<tt class="descclassname">pv.</tt><tt class="descname">_PVcache_</tt><a class="headerlink" href="#pv._PVcache_" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cache of <a class="reference internal" href="#pv.PV" title="pv.PV"><tt class="xref py py-class docutils literal"><span class="pre">PV</span></tt></a> objects for the process.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="examples">
 <span id="pv-examples-label"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <p>Some simple examples using PVs follow.</p>
@@ -1103,9 +1145,6 @@ See <a class="reference internal" href="#pv-callbacks-label"><em>User-supplied C
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="np-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="ca.html" title="ca: Low-level Channel Access module"
              >next</a> |</li>
