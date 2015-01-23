@@ -22,6 +22,7 @@ except ImportError:
     pass
 
 PY64_WINDOWS =  (os.name == 'nt' and architecture()[0].startswith('64'))
+PY_MAJOR, PY_MINOR = sys.version_info[:2]
 
 # EPICS Constants
 ECA_NORMAL = 1
@@ -81,6 +82,12 @@ DBE_PROPERTY = 8
 
 chid_t   = ctypes.c_long
 
+# Note that Windows needs to be told that chid is 8 bytes for 64-bit, 
+# except that Python2 is very weird -- using a 4byte chid for 64-bit, 
+# but needing a 1 byte padding! 
+if PY64_WINDOWS and PY_MAJOR > 2:
+    chid_t = ctypes.c_int64
+	
 short_t  = ctypes.c_short
 ushort_t = ctypes.c_ushort
 int_t    = ctypes.c_int
@@ -331,12 +338,12 @@ class connection_args(ctypes.Structure):
     _fields_ = [('chid', chid_t), 
                 ('op', long_t)]
 
-if PY64_WINDOWS:
-    # need to add padding on 64-bit Windows -- yuck!
+if PY64_WINDOWS and PY_MAJOR == 2:
+    # need to add padding on 64-bit Windows for Python2 -- yuck!
     class event_handler_args(ctypes.Structure):
         "event handler arguments"
         _fields_ = [('usr',     ctypes.py_object),
-                    ('chid',    ctypes.c_int32),
+                    ('chid',    chid_t),
                     ('_pad_',   ctypes.c_int8),
                     ('type',    ctypes.c_int32), 
                     ('count',   ctypes.c_int32),
