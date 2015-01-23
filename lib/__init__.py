@@ -1,9 +1,11 @@
-"""
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
+
+__doc__ = """
    epics channel access python module
 
-   version    :  3.2.4rc2
-   last update:  27-October-2014
-
+   version: %s
    Principal Authors:
       Matthew Newville <newville@cars.uchicago.edu> CARS, University of Chicago
       Angus Gratton <angus.gratton@anu.edu.au>, Australian National University
@@ -18,8 +20,8 @@
    Python Interface to the Epics Channel Access
    protocol of the Epics control system.
 
-"""
-__version__ = '3.2.4rc2'
+""" % (__version__)
+
 
 import time
 import sys
