@@ -395,10 +395,10 @@ def withConnectedCHID(fcn):
                                              (fcn.__name__))
             if not isConnected(chid):
                 timeout = kwds.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
-                fmt ="%s: timed out waiting for chid to connect (%d seconds)"
+                fmt ="%s() timed out waiting '%s' to connect (%d seconds)"
                 if not connect_channel(chid, timeout=timeout):
                     raise ChannelAccessException(fmt % (fcn.__name__,
-                                                        chid, timeout))
+                                                        name(chid), timeout))
 
         return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
@@ -948,7 +948,7 @@ def clear_channel(chid):
 @withCHID
 def state(chid):
     "return state (that is, attachment state) for channel"
-    
+
     return libca.ca_state(chid)
 
 def isConnected(chid):
