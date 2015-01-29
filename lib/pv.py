@@ -449,7 +449,10 @@ class PV(object):
         function  that fails may de-register itself (for example, if
         a GUI resource is no longer available).
         """
-        fcn, kwargs = self.callbacks[index]
+        try:
+            fcn, kwargs = self.callbacks[index]
+        except KeyError:
+            return
         kwd = copy.copy(self._args)
         kwd.update(kwargs)
         kwd['cb_info'] = (index, self)
