@@ -63,18 +63,22 @@ class ROI(Device):
     clear     remove ROI
     """
 
-    _nonpvs = ('_prefix', '_pvs', '_delim', 'attrs',
-               'left', 'right', 'name', 'width', 'center',
-               'bgr_width', 'address', 'net', 'total', '_dat_')
-
+    _nonpvs = ('_prefix', '_pvs', '_delim', 'attrs', 'width', 'center',
+               'bgr_width', 'address', 'net', 'total', '_dat_', '_net_')
+    _aliases = {'left': 'LO', 'right': 'HI', 'name': 'NM'}
     def __init__(self, prefix, roi=0, bgr_width=3, data_pv=None):
         self.address = self._prefix = '%s.R%i' % (prefix, roi)
         self.bgr_width = bgr_width
         _attrs = ('NM', 'LO', 'HI')
         Device.__init__(self,self._prefix, delim='', 
-                              attrs=_attrs, with_poll=False)
-
+                        attrs=_attrs, aliases=self._aliases, 
+                        with_poll=False)
+        if data_pv is None:
+            data_pv = self.address
+        if isinstance(data_pv, basestring):
+            data_pv = get_pv(data_pv)
         self._pvs['_dat_'] = data_pv
+        self._pvs['_net_'] = get_pv(self.address + 'N')
 
     def __eq__(self, other):
         """used for comparisons"""
@@ -112,30 +116,6 @@ class ROI(Device):
         return int(round(self.HI + self.LO)/2.0)
 
     @property
-    def left(self):    
-        return self.LO
-
-    @left.setter
-    def left(self, val):  
-        self.put('LO', val)
-
-    @property
-    def right(self):    
-        return self.HI
-
-    @right.setter
-    def right(self, val):  
-        self.put('HI', val)
-
-    @property
-    def name(self):
-        return self.NM
-
-    @name.setter
-    def name(self, val):  
-        self.put('NM', val)
-
-    @property
     def width(self):
         return int(round(self.HI - self.LO))
 
@@ -154,16 +134,12 @@ class ROI(Device):
         * net:  bool to set net counts (default=False: total counts returned)
         """
         # implicitly read data from a PV
-        if data is None:
-            # for a normal MCA/ROI, read from 'RI' or RIN' property
-            if self._pvs['_dat_'] is None:
-                if net:
-                    return self._net_
-                return self._sum_
-            # for 'fake' MCA/ROI, need a data source
+        if data is None and self._pvs['_dat_'] is not None:
             data = self._pvs['_dat_'].get()
+            if net and not isinstance(data, np.ndarray):
+                data = self._pvs['_net_'].get()
         if not isinstance(data, np.ndarray):
-            return 0
+            return data
 
         total = data[self.LO:self.HI+1].sum()
         if not net:
