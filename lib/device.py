@@ -114,6 +114,8 @@ class Device(object):
         self._prefix = prefix + delim
         self._pvs = {}
         self._mutable = mutable
+        if aliases is None:
+             aliases = {}
         self._aliases = aliases
         if nonpvs is not None:
             for npv in nonpvs:
