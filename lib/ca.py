@@ -1280,7 +1280,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         except TypeError:
             write('''PyEpics Warning:
      value put() to array PV must be an array or sequence''')
-    if ftype == dbr.CHAR and isinstance(value, str):
+
+    if ftype == dbr.CHAR and nativecount > 1 and isinstance(value, basestring):
         count += 1
 
     if is_string(value):
@@ -1296,8 +1297,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
                 data[elem].value = value[elem]
     elif nativecount == 1:
         if ftype == dbr.CHAR:
-            if isinstance(value, str):
-                value = [ord(i) for i in ("%s%s" % (value, NULLCHAR))]
+            if isinstance(value, basestring):
+                value = int(value)
             else:
                 data[0] = value
         else:
