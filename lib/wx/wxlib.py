@@ -46,7 +46,8 @@ def DelayedEpicsCallback(fcn):
                         pv.remove_callback(index=cb_index)
                     except RuntimeError:
                         pass
-        return wx.CallAfter(cb)
+        if wx.GetApp() is not None:
+            return wx.CallAfter(cb)
     return wrapper
 
 @EpicsFunction
