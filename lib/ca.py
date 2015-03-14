@@ -1280,7 +1280,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         except TypeError:
             write('''PyEpics Warning:
      value put() to array PV must be an array or sequence''')
-    if ftype == dbr.CHAR and is_string(value):
+    if ftype == dbr.CHAR and nativecount > 1 and is_string(value):
         count += 1
 
     if is_string(value):
