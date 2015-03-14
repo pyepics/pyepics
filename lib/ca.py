@@ -451,11 +451,11 @@ def withSEVCHK(fcn):
 ## Event Handler for monitor event callbacks
 def _onMonitorEvent(args):
     """Event Handler for monitor events: not intended for use"""
-    
+
     # for 64-bit python on Windows!
     if dbr.PY64_WINDOWS:   args = args.contents
     value = dbr.cast_args(args)
-    
+
     pvname = name(args.chid)
     kwds = {'ftype':args.type, 'count':args.count,
            'chid':args.chid, 'pvname': pvname,
@@ -549,7 +549,7 @@ def _onGetEvent(args, **kws):
     will need conversion to python data with _unpack()."""
     # for 64-bit python on Windows!
     if dbr.PY64_WINDOWS:   args = args.contents
-        
+
     # print("GET EVENT: chid, user ", args.chid, args.usr)
     # print("GET EVENT: type, count ", args.type, args.count)
     # print("GET EVENT: status ",  args.status, dbr.ECA_NORMAL)
@@ -580,11 +580,11 @@ def _onPutEvent(args, **kwds):
 
 # create global reference to these callbacks
 
- 
+
 # _CB_PUTWAIT = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvet)
 # _CB_GET     = ctypes.CFUNCTYPE(None, ctypes.pointer(dbr.event_handler_args))(_onGetEvent)
 # _CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onMonitorEvent)
- 
+
 # _CB_CONNECT = make_callback(_onConnectionEvent, dbr.connection_args)
 
 _CB_CONNECT = dbr.make_callback(_onConnectionEvent, dbr.connection_args)
@@ -1134,7 +1134,7 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     #   GET_PENDING implies no value yet, callback expected.
     if ncache.get('value', None) is None:
         ncache['value'] = GET_PENDING
-        ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET, 
+        ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET,
                                           ctypes.py_object('value'))
         PySEVCHK('get', ret)
 
@@ -1280,7 +1280,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         except TypeError:
             write('''PyEpics Warning:
      value put() to array PV must be an array or sequence''')
-    if ftype == dbr.CHAR and isinstance(value, str):
+    if ftype == dbr.CHAR and is_string(value):
         count += 1
 
     if is_string(value):
@@ -1296,11 +1296,14 @@ def put(chid, value, wait=False, timeout=30, callback=None,
                 data[elem].value = value[elem]
     elif nativecount == 1:
         if ftype == dbr.CHAR:
-            if isinstance(value, str):
+            if is_string(value):
                 value = [ord(i) for i in ("%s%s" % (value, NULLCHAR))]
             else:
                 data[0] = value
         else:
+            # allow strings (even bits/hex) to be put to integer types
+            if is_string(value) and isinstance(data[0], (int, long)):
+                value = int(value, base=0)
             try:
                 data[0] = value
             except TypeError:
