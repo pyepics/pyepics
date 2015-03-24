@@ -59,7 +59,7 @@ error_message = ''
 ## PREEMPTIVE_CALLBACK determines the CA context
 PREEMPTIVE_CALLBACK = True
 
-AUTO_CLEANUP = (sys.version_info[0] == '2')
+AUTO_CLEANUP = (sys.version_info.major == 2)
 
 ##
 # maximum element count for auto-monitoring of PVs in epics.pv
