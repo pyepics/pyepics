@@ -2,7 +2,7 @@
 import sys
 import time
 import numpy as np
-from .. import Device, get_pv, poll
+from .. import Device, get_pv, poll, caput, caget
 
 try:
     from collections import OrderedDict
@@ -256,7 +256,6 @@ class MCA(Device):
            calib = mca1.get_calib()
            mca2.set_rois(rois, calib=calib)
         """
-        poll(0.050, 1.0)
         data_pv = self._pvs['_dat_']
         prefix = self._prefix
         if prefix.endswith('.'): prefix = prefix[:-1]
@@ -269,7 +268,8 @@ class MCA(Device):
 
         # do an explicit get here to make sure all data is
         # available before trying to sort it!
-        poll(0.050, 1.0)
+        poll(0.0050, 1.0)
+        
         [(r.get('NM'), r.get('LO')) for r in rois]
         roidat = [(r.NM, r.LO, r.HI) for r in sorted(rois)]
 
@@ -285,10 +285,15 @@ class MCA(Device):
             self.rois.append(roi)
             iroi += 1
 
-        for i in range(iroi+1, MAX_ROIS):
-            roi = ROI(prefix=prefix, roi=i)
-            roi.clear()
-
+        # erase any remaning ROIs
+        for i in range(iroi, MAX_ROIS):
+            lo = caget("%s.R%iLO" % (prefix, i))
+            if lo < 0:
+                break
+            caput("%s.R%iLO" % (prefix, i), -1)
+            caput("%s.R%iHI" % (prefix, i), -1)
+            caput("%s.R%iNM" % (prefix, i), '')
+            
     def clear_rois(self, nrois=None):
         for roi in self.get_rois(nrois=nrois):
             roi.clear()
