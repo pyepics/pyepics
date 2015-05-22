@@ -123,7 +123,7 @@ class MotorPanel(wx.Panel):
         if self._size == 'medium':
             wdesc, wrbv, winfo, wdrv = 140, 85, 80, 100
         elif self._size == 'small':
-            wdesc, wrbv, winfo, wdrv = 70, 60, 30, 80
+            wdesc, wrbv, winfo, wdrv = 50, 60, 25, 80
 
         self.desc = PVText(self, size=(wdesc, 25), style=LTEXT)
         self.desc.SetForegroundColour("Blue")
@@ -144,11 +144,13 @@ class MotorPanel(wx.Panel):
             return
 
         spacer = wx.StaticText(self, label=' ', size=(5, 5), style=RIGHT)
-        self.__sizer.AddMany([(spacer,      0, CEN),
-                              (self.desc,   1, LCEN),
-                              (self.info,   0, CEN),
-                              (self.rbv,    0, CEN),
-                              (self.drive,  0, CEN)])
+        if self._size != 'small':
+            self.__sizer.AddMany([(spacer,      0, CEN)])
+
+        self.__sizer.AddMany([ (self.desc,   1, LCEN),
+                               (self.info,   0, CEN),
+                               (self.rbv,    0, CEN),
+                               (self.drive,  0, CEN)])
 
         if self._size == 'full':
             self.twk_list = ['','']
