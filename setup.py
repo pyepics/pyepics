@@ -7,8 +7,32 @@ import sys
 import lib
 import shutil
 
+import versioneer
+versioneer.VCS = 'git'
+versioneer.versionfile_source = 'lib/_version.py'
+versioneer.versionfile_build = 'epics/_version.py'
+versioneer.tag_prefix = ''
+versioneer.parentdir_prefix = 'pyepics-'
+
+
 long_desc = '''Python Interface to the Epics Channel Access protocol
-of the Epics control system. '''
+of the Epics control system.   PyEpics provides 3 layers of access to
+Channel Access (CA):
+  1. a light wrapping of the CA C library calls, using ctypes. This
+     provides a procedural CA library in which the user is expected
+     to manage Channel IDs. It is mostly provided as a foundation
+     upon which higher-level access is built.
+  2. PV() (Process Variable) objects, which represent the basic object
+     in CA, allowing one to keep a persistent connection to a remote
+     Process Variable.
+  3. A simple set of functions caget(), caput() and so on to mimic
+     the CA command-line tools and give the simplest access to CA.
+
+In addition, the library includes convenience classes to define
+Devices -- collections of PVs that might represent an Epics Record
+or physical device (say, a camera, amplifier, or power supply), and
+to help write GUIs for CA.
+'''
 
 #
 no_libca="""*******************************************************
@@ -24,6 +48,7 @@ problem before tyring to use the epics package.
 *******************************************************
 """
 
+# for Windows, we provide dlls
 data_files = None
 if os.name == 'nt':
     try:
@@ -46,15 +71,16 @@ if PY_MAJOR == 2 and PY_MINOR < 6:
                 os.path.join('lib', 'utils3.py'))
 
 setup(name = 'pyepics',
-      version      = lib.__version__,
+      version = versioneer.get_version(),
+      cmdclass = versioneer.get_cmdclass(),
       author       = 'Matthew Newville',
       author_email = 'newville@cars.uchicago.edu',
-      url          = 'http://pyepics.github.com/pyepics/',
-      download_url = 'http://pyepics.github.com/pyepics/',      
+      url          = 'http://pyepics.github.io/pyepics/',
+      download_url = 'http://pyepics.github.io/pyepics/',      
       license      = 'Epics Open License',
       description  = "Epics Channel Access for Python",
       long_description = long_desc,
-      platforms    = ('Windows', 'Linux', 'Mac OS X'),
+      platforms    = ['Windows', 'Linux', 'Mac OS X'],
       classifiers  = ['Intended Audience :: Science/Research',
                       'Operating System :: OS Independent',
                       'Programming Language :: Python',

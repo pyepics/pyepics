@@ -1,25 +1,27 @@
-"""
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
+
+__doc__ = """
    epics channel access python module
 
-   version    :  3.2.3
-   last update:  20-May-2014
-
-   Principle Authors:
+   version: %s
+   Principal Authors:
       Matthew Newville <newville@cars.uchicago.edu> CARS, University of Chicago
       Angus Gratton <angus.gratton@anu.edu.au>, Australian National University
 
 == License:
 
    Except where explicitly noted, this file and all files in this
-   distribution are licensed under the Epics Open License See license.txt in 
+   distribution are licensed under the Epics Open License See license.txt in
    the top-level directory of this distribution.
 
 == Overview:
    Python Interface to the Epics Channel Access
    protocol of the Epics control system.
 
-"""
-__version__ = '3.2.3'
+""" % (__version__)
+
 
 import time
 import sys
@@ -37,6 +39,8 @@ Motor = motor.Motor
 Device = device.Device
 poll  = ca.poll
 
+get_pv = pv.get_pv
+
 CAProcess = multiproc.CAProcess
 CAPool = multiproc.CAPool
 
@@ -46,24 +50,7 @@ MINOR_ALARM = 1
 MAJOR_ALARM = 2
 INVALID_ALARM = 3
 
-def __create_pv(pvname, timeout=5.0):
-    "create PV, wait for connection: "
-    if pvname in ca._PVCache:
-        return ca._PVCache[pvname]
-
-    start_time = time.time()
-    thispv = PV(pvname)
-    thispv.connect()
-    while not thispv.connected:
-        poll()
-        if time.time()-start_time > timeout:
-            break
-    if not thispv.connected:
-        ca.write('cannot connect to %s' % pvname)
-        return None
-    # save this one for next time
-    ca._PVCache[pvname] = thispv
-    return thispv
+_PVmonitors_ = {}
 
 def caput(pvname, value, wait=False, timeout=60):
     """caput(pvname, value, wait=False, timeout=60)
@@ -73,8 +60,8 @@ def caput(pvname, value, wait=False, timeout=60):
     to wait for pv to complete processing, use 'wait=True':
        >>> caput('xx.VAL',3.0,wait=True)
     """
-    thispv = __create_pv(pvname)
-    if thispv is not None:
+    thispv = get_pv(pvname, connect=True)
+    if thispv.connected:
         return thispv.put(value, wait=wait, timeout=timeout)
 
 def caget(pvname, as_string=False, count=None, as_numpy=True,
@@ -91,8 +78,8 @@ def caget(pvname, as_string=False, count=None, as_numpy=True,
     the count with
        >>> x = caget('MyArray.VAL', count=1000)
     """
-    thispv = __create_pv(pvname)
-    if thispv is not None:
+    thispv = get_pv(pvname, connect=True)
+    if thispv.connected:
         if as_string:
             thispv.get_ctrlvars()
         val = thispv.get(count=count, timeout=timeout,
@@ -113,8 +100,8 @@ def cainfo(pvname, print_out=True):
     If print_out=False, the status report will be printed,
     and not returned.
     """
-    thispv = __create_pv(pvname)
-    if thispv is not None:
+    thispv = get_pv(pvname, connect=True)
+    if thispv.connected:
         thispv.get()
         thispv.get_ctrlvars()
         if print_out:
@@ -124,10 +111,9 @@ def cainfo(pvname, print_out=True):
 
 def camonitor_clear(pvname):
     """clear a monitor on a PV"""
-    if pvname in ca._PVMonitors:
-        if isinstance(ca._PVMonitors[pvname], PV):
-            ca._PVMonitors[pvname].clear_callbacks()
-        ca._PVMonitors.pop(pvname)
+    if pvname in _PVmonitors_:
+        _PVmonitors_[pvname].remove_callback(index=-999)
+        _PVmonitors_.pop(pvname)
 
 def camonitor(pvname, writer=None, callback=None):
     """ camonitor(pvname, writer=None, callback=None)
@@ -157,8 +143,22 @@ def camonitor(pvname, writer=None, callback=None):
                 char_value = repr(value)
             writer("%.32s %s %s" % (pvname, pv.fmt_time(), char_value))
 
-    thispv = __create_pv(pvname)
-    if thispv is not None:
+    thispv = get_pv(pvname, connect=True)
+    if thispv.connected:
         thispv.get()
-        thispv.add_callback(callback, with_ctrlvars=True)
-        ca._PVMonitors[pvname] = thispv
+        thispv.add_callback(callback, index=-999, with_ctrlvars=True)
+        _PVmonitors_[pvname] = thispv
+
+def caget_many(pvlist):
+    """get values for a list of PVs
+    This does not maintain PV objects, and works as fast
+    as possible to fetch many values.
+    """
+    chids, out = [], []
+    for name in pvlist: chids.append(ca.create_channel(name,
+                                                       auto_cb=False,
+                                                       connect=False))
+    for chid in chids: ca.connect_channel(chid)
+    for chid in chids: ca.get(chid, wait=False)
+    for chid in chids: out.append(ca.get_complete(chid))
+    return out

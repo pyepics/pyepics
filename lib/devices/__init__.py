@@ -9,7 +9,7 @@ from .bo import bo
 from .scaler import Scaler
 from .struck import Struck
 from .srs570 import SRS570
-from .mca import DXP, MCA, MultiXMAP
+from .mca import DXP, MCA, MultiXMAP, ROI
 from .scan import Scan
 from .transform import Transform
 

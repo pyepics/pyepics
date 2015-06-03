@@ -11,7 +11,7 @@ pvnames = []
 
 results = OrderedDict()
 
-MAX_PVS = 20000
+MAX_PVS = 12500
 
 
 for line  in open('fastconn_pvlist.txt','r').readlines():
@@ -48,22 +48,19 @@ for name in pvnames:
     results[name]['value'] =  val
 
 dt.add("did ca.get(wait=False)")
-ca.pend_event(1.e-2)
-dt.add("pend complete")
+ca.poll(2.e-3, 1.0)
+dt.add("ca.poll() complete")
 
 for name in pvnames:
-    chid = results[name]['chid']    
-    val = ca.get_complete(chid)
-    results[name]['value'] =  val
-    
+    results[name]['value'] = ca.get_complete(results[name]['chid'])
 
-dt.add("unpacked PV values")
+dt.add("ca.get_complete() for all PVs")
  
 f = open('fastconn_pvdata.sav', 'w')
 for name, val in results.items():
     f.write("%s %s\n" % (name.strip(), val['value']))
 f.close()
-dt.add("wrote values PVs")
+dt.add("wrote PV values to disk")
 
 dt.show()
 

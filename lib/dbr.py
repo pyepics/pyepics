@@ -10,7 +10,9 @@
 This is mostly copied from CA header files
 """
 import ctypes
-import time
+import os
+import sys
+from platform import architecture
 
 HAS_NUMPY = False
 try:
@@ -18,6 +20,9 @@ try:
     HAS_NUMPY = True
 except ImportError:
     pass
+
+PY64_WINDOWS =  (os.name == 'nt' and architecture()[0].startswith('64'))
+PY_MAJOR, PY_MINOR = sys.version_info[:2]
 
 # EPICS Constants
 ECA_NORMAL = 1
@@ -77,6 +82,12 @@ DBE_PROPERTY = 8
 
 chid_t   = ctypes.c_long
 
+# Note that Windows needs to be told that chid is 8 bytes for 64-bit, 
+# except that Python2 is very weird -- using a 4byte chid for 64-bit, 
+# but needing a 1 byte padding! 
+if PY64_WINDOWS and PY_MAJOR > 2:
+    chid_t = ctypes.c_int64
+	
 short_t  = ctypes.c_short
 ushort_t = ctypes.c_ushort
 int_t    = ctypes.c_int
@@ -234,6 +245,17 @@ Map = {STRING: string_t,
        CTRL_DOUBLE: ctrl_double
        }
 
+def native_type(ftype):
+    "return native field type from TIME or CTRL variant"
+    if ftype == CTRL_STRING:
+        ftype = TIME_STRING
+    ntype = ftype
+    if ftype > CTRL_STRING:
+        ntype -= CTRL_STRING
+    elif ftype >= TIME_STRING:
+        ntype -= TIME_STRING
+    return ntype
+
 def Name(ftype, reverse=False):
     """ convert integer data type to dbr Name, or optionally reverse that
     look up (that is, name to integer)"""
@@ -269,35 +291,68 @@ def Name(ftype, reverse=False):
     return m.get(ftype, 'unknown')
 
 def cast_args(args):
-    """returns pointer to arg type for casting """
+    """returns casted array contents
+
+    returns: [dbr_ctrl or dbr_time struct,
+              count * native_type structs]
+
+    If data is already of a native_type, the first
+    value in the list will be None.
+    """
     ftype = args.type
     if ftype not in Map:
         ftype = double_t
-    return ctypes.cast(args.raw_dbr, ctypes.POINTER(args.count*Map[ftype]))
+
+    ntype = native_type(ftype)
+    if ftype != ntype:
+        native_start = args.raw_dbr + value_offset[ftype]
+        return [ctypes.cast(args.raw_dbr,
+                            ctypes.POINTER(Map[ftype])).contents,
+                ctypes.cast(native_start,
+                            ctypes.POINTER(args.count * Map[ntype])).contents
+                ]
+    else:
+        return [None,
+                ctypes.cast(args.raw_dbr,
+                            ctypes.POINTER(args.count * Map[ftype])).contents
+                ]
+def make_callback(func, args):
+    """ make callback function"""
+    # note that ctypes.POINTER is needed for 64-bit Python on Windows
+    if PY64_WINDOWS:
+        args = ctypes.POINTER(args)
+    return ctypes.CFUNCTYPE(None, args)(func)
+
 
 class event_handler_args(ctypes.Structure):
     "event handler arguments"
-    _fields_ = [('usr',     py_obj),
+    _fields_ = [('usr',     ctypes.py_object),
                 ('chid',    chid_t),
-                ('type',    long_t),
+                ('type',    long_t), 
                 ('count',   long_t),
                 ('raw_dbr', void_p),
                 ('status',  int_t)]
 
 class connection_args(ctypes.Structure):
     "connection arguments"
-    _fields_ = [('chid', chid_t), ('op', long_t)]
+    _fields_ = [('chid', chid_t), 
+                ('op', long_t)]
 
-class exception_handler_args(ctypes.Structure):
-    "exception arguments"
-    _fields_ = [('usr',   void_p),
-                ('chid',  chid_t),
-                ('type',  int_t),
-                ('count', int_t),
-                ('addr',  void_p),
-                ('stat',  int_t),
-                ('op',    int_t),
-                ('ctx',   char_p),
-                ('pFile', char_p),
-                ('lineNo', int_t)]
+if PY64_WINDOWS and PY_MAJOR == 2:
+    # need to add padding on 64-bit Windows for Python2 -- yuck!
+    class event_handler_args(ctypes.Structure):
+        "event handler arguments"
+        _fields_ = [('usr',     ctypes.py_object),
+                    ('chid',    chid_t),
+                    ('_pad_',   ctypes.c_int8),
+                    ('type',    ctypes.c_int32), 
+                    ('count',   ctypes.c_int32),
+                    ('raw_dbr', void_p),
+                    ('status',  ctypes.c_int32)]
+
+    class connection_args(ctypes.Structure):
+        "connection arguments"
+        _fields_ = [('chid', chid_t), 
+                    ('_pad_',ctypes.c_int8),
+                    ('op',   long_t)]
 

@@ -7,12 +7,53 @@
   Epics Process Variable
 """
 import time
+import ctypes
 import copy
 from math import log10
 
 from . import ca
 from . import dbr
 from .utils import is_string
+
+_PVcache_ = {}
+
+def get_pv(pvname, form='time',  connect=False,
+           context=None, timeout=5.0, **kws):
+    """get PV from PV cache or create one if needed.
+
+    Arguments
+    =========
+    form      PV form: one of 'native' (default), 'time', 'ctrl'
+    connect   whether to wait for connection (default False)
+    context   PV threading context (default None)
+    timeout   connection timeout, in seconds (default 5.0)
+    """
+    
+    if form not in ('native', 'time', 'ctrl'):
+        form = 'natiive'
+
+    thispv = None
+    if context is None:
+        context = ca.initial_context
+        if context is None:
+            context = ca.current_context()
+        if (pvname, form, context) in _PVcache_:
+            thispv = _PVcache_[(pvname, form, context)]
+    
+    start_time = time.time()
+    # not cached -- create pv (automaticall saved to cache)
+    if thispv is None:
+        thispv = PV(pvname, **kws)
+
+    if connect:
+        thispv.wait_for_connection()
+        while not thispv.connected:
+            ca.poll()
+            if time.time()-start_time > timeout:
+                break
+        if not thispv.connected:
+            ca.write('cannot connect to %s' % pvname)
+    return thispv
 
 def fmt_time(tstamp=None):
     "simple formatter for time values"
@@ -22,6 +63,7 @@ def fmt_time(tstamp=None):
     return "%s.%5.5i" % (time.strftime("%Y-%m-%d %H:%M:%S",
                                        time.localtime(tstamp)),
                          round(1.e5*frac))
+
 
 class PV(object):
     """Epics Process Variable
@@ -52,7 +94,7 @@ class PV(object):
                'lower_alarm_limit', 'lower_warning_limit',
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
-    def __init__(self, pvname, callback=None, form='native',
+    def __init__(self, pvname, callback=None, form='time',
                  verbose=False, auto_monitor=None,
                  connection_callback=None,
                  connection_timeout=None):
@@ -72,8 +114,10 @@ class PV(object):
         self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
         self.connection_callbacks = []
+
         if connection_callback is not None:
             self.connection_callbacks = [connection_callback]
+
         self.callbacks  = {}
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
@@ -97,13 +141,25 @@ class PV(object):
                                       use_time= self.form == 'time')
         self._args['type'] = dbr.Name(self.ftype).lower()
 
+        pvid = (self.pvname, self.form, self.context)
+        if pvid not in _PVcache_:
+            _PVcache_[pvid] = self
+
+    def force_connect(self, pvname=None, chid=None, conn=True, **kws):
+        if chid is None: chid = self.chid
+        if isinstance(chid, ctypes.c_long):
+            chid = chid.value
+        self._args['chid'] = self.chid = chid
+        self.__on_connect(pvname=pvname, chid=chid, conn=conn, **kws)
+        
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
         # occassionally chid is still None (ie if a second PV is created
         # while __on_connect is still pending for the first one.)
         # Just return here, and connection will happen later
+        t0 = time.time()
         if self.chid is None and chid is None:
-            time.sleep(0.001)
+            ca.poll(5.e-4)
             return
         if conn:
             ca.poll()
@@ -164,6 +220,7 @@ class PV(object):
 
         if not self._conn_started:
             self.connect()
+
         if not self.connected:
             if timeout is None:
                 timeout = self.connection_timeout
@@ -392,7 +449,10 @@ class PV(object):
         function  that fails may de-register itself (for example, if
         a GUI resource is no longer available).
         """
-        fcn, kwargs = self.callbacks[index]
+        try:
+            fcn, kwargs = self.callbacks[index]
+        except KeyError:
+            return
         kwd = copy.copy(self._args)
         kwd.update(kwargs)
         kwd['cb_info'] = (index, self)
@@ -678,16 +738,27 @@ class PV(object):
     def disconnect(self):
         "disconnect PV"
         self.connected = False
+
+        ctx = ca.current_context()
+        pvid = (self.pvname, self.form, ctx)
+        if pvid in _PVcache_:
+            _PVcache_.pop(pvid)
+
         if self._monref is not None:
             cback, uarg, evid = self._monref
             ca.clear_subscription(evid)
             ctx = ca.current_context()
             if self.pvname in ca._cache[ctx]:
                 ca._cache[ctx].pop(self.pvname)
-
             del cback
             del uarg
             del evid
+            try:
+                self._monref = None
+                self._args   = {}.fromkeys(self._fields)
+            except:
+                pass
+
         ca.poll(evt=1.e-3, iot=1.0)
         self.callbacks = {}
 

@@ -3,18 +3,19 @@ import sys
 import time
 import copy
 import numpy
-import epics
-import epics.devices
+from .. import Device
+from .scaler import Scaler
+from .mca import MCA
 
-HEADER = '''# Struck MCA data: %s 
+HEADER = '''# Struck MCA data: %s
 # Nchannels, Nmca = %i, %i
 # Time in microseconds
 #----------------------
 # %s
 # %s
-''' 
+'''
 
-class Struck(epics.Device):
+class Struck(Device):
     """
     Very simple implementation of Struck SIS MultiChannelScaler
     """
@@ -37,13 +38,13 @@ class Struck(epics.Device):
         self.clockrate = clockrate # clock rate in MHz
 
         if scaler is not None:
-            self.scaler = epics.devices.Scaler(scaler, nchan=nchan)
+            self.scaler = Scaler(scaler, nchan=nchan)
 
         self.mcas = []
         for i in range(nchan):
-            self.mcas.append(epics.devices.MCA(prefix, mca=i+1, nrois=2))
-            
-        epics.Device.__init__(self, prefix, delim='',
+            self.mcas.append(MCA(prefix, mca=i+1, nrois=2))
+
+        Device.__init__(self, prefix, delim='',
                               attrs=self.attrs, mutable=False)
 
     def ExternalMode(self, countonstart=0, initialadvance=None,
@@ -126,8 +127,8 @@ class Struck(epics.Device):
         for nchan in range(self._nchan):
             nmca  = nchan + 1
             _name = 'MCA%i' % nmca
-            _addr = '%s.MCA%i' % (self._prefix, nmca) 
-            time.sleep(0.002)           
+            _addr = '%s.MCA%i' % (self._prefix, nmca)
+            time.sleep(0.002)
             if self.scaler is not None:
                 scaler_name = self.scaler.get('NM%i' % nmca)
                 if scaler_name is not None:
@@ -139,13 +140,13 @@ class Struck(epics.Device):
                 names.append(_name)
                 addrs.append(_addr)
                 sdata.append(mcadat)
-            
+
         sdata = numpy.array([s[:npts] for s in sdata]).transpose()
         sdata[:, 0] = sdata[:, 0]/self.clockrate
 
         nelem, nmca = sdata.shape
         npts = min(nelem, npts)
-        
+
         addrs = ' | '.join(addrs)
         names = ' | '.join(names)
         formt = '%9i ' * nmca + '\n'
@@ -155,6 +156,7 @@ class Struck(epics.Device):
         for i in range(npts):
             fout.write(formt % tuple(sdata[i]))
         fout.close()
+        return (nmca, npts)
 
 if __name__ == '__main__':
     strk = Struck('13IDE:SIS1:')

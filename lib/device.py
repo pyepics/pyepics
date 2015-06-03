@@ -5,8 +5,8 @@
 """
 basic device object defined
 """
-from . import ca
-from . import pv
+from .ca import poll
+from .pv  import get_pv
 import time
 class Device(object):
     """A simple collection of related PVs, sharing a common prefix
@@ -107,15 +107,15 @@ class Device(object):
                '_mutable', '_nonpvs')
     def __init__(self, prefix='', attrs=None,
                  nonpvs=None, delim='', timeout=None,
-                 mutable=True, aliases={}):
-        if nonpvs is not None:
-            self._nonpvs =  nonpvs
-            
+                 mutable=True, aliases=None, with_poll=True):
+
         self._nonpvs = list(self._nonpvs)
         self._delim = delim
         self._prefix = prefix + delim
         self._pvs = {}
         self._mutable = mutable
+        if aliases is None:
+             aliases = {}
         self._aliases = aliases
         if nonpvs is not None:
             for npv in nonpvs:
@@ -133,7 +133,8 @@ class Device(object):
                     self.PV(attr, connect=False,
                             connection_timeout=timeout)
 
-        ca.poll()
+        if with_poll:
+            poll()
         self._init = True
 
     def PV(self, attr, connect=True, **kw):
@@ -145,7 +146,7 @@ class Device(object):
             pvname = attr
             if self._prefix is not None:
                 pvname = "%s%s" % (self._prefix, attr)
-            self._pvs[attr] = pv.PV(pvname, **kw)
+            self._pvs[attr] = get_pv(pvname, **kw)
         if connect and not self._pvs[attr].connected:
             self._pvs[attr].wait_for_connection()
         return self._pvs[attr]
@@ -170,7 +171,7 @@ class Device(object):
         """
         if attr is None:
             attr = pvname
-        self._pvs[attr] = pv.PV(pvname, **kw)
+        self._pvs[attr] = get_pv(pvname, **kw)
         return self._pvs[attr]
 
     def put(self, attr, value, wait=False, use_complete=False, timeout=10):

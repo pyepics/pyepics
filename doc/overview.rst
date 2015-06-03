@@ -169,9 +169,10 @@ to the EPICS command line utilities and to the functions in the EZCA
 library.  They all take the name of an Epics Process Variable (PV) as the
 first argument.  As with the EZCA library, the python implementation keeps
 an internal cache of connected PV (in this case, using `PV` objects) so
-that repeated use of a PV name will not actually result in a new
-connection.  Thus, though the functionality is limited, the performance of
-the functional approach can be quite good.
+that repeated use of a PV name will not actually result in a new connection
+-- see :ref:`pv-cache-label` for more details.  Thus, though the
+functionality is limited, the performance of the functional approach can be
+quite good.
 
 :func:`caget`
 ~~~~~~~~~~~~~

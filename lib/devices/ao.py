@@ -1,7 +1,7 @@
 #!/usr/bin/ao python
-import epics
+from .. import Device
 
-class ao(epics.Device):
+class ao(Device):
     "Simple analog output device"
 
     attrs = ('OUT', 'LINR', 'RVAL', 'ROFF', 'EGUF', 'EGUL', 'AOFF',
@@ -13,5 +13,4 @@ class ao(epics.Device):
     def __init__(self, prefix, **kwargs):
         if prefix.endswith('.'):
             prefix = prefix[:-1]
-        epics.Device.__init__(self, prefix, delim='.',
-                              attrs=self.attrs, **kwargs)
+        Device.__init__(self, prefix, delim='.', attrs=self.attrs, **kwargs)

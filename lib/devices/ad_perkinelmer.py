@@ -1,9 +1,9 @@
 #!/usr/bin/python
 import sys
 import time
-import epics
+from .. import Device
 
-class AD_PerkinElmer(epics.Device):
+class AD_PerkinElmer(Device):
     camattrs = ('PEAcquireOffset', 'PENumOffsetFrames',
                 'ImageMode', 'TriggerMode',
                 'Acquire',  'AcquireTime', 'Model_RBV',
@@ -20,9 +20,9 @@ class AD_PerkinElmer(epics.Device):
 
     def __init__(self,prefix, filesaver='netCDF1:'):
         camprefix = prefix + 'cam1:'
-        epics.Device.__init__(self, camprefix, delim='',
-                              mutable=False,
-                              attrs=self.camattrs)
+        Device.__init__(self, camprefix, delim='',
+                        mutable=False,
+                        attrs=self.camattrs)
         self.filesaver = "%s%s" % (prefix, filesaver)
         for p in self.pathattrs:
             pvname = '%s%s%s' % (prefix, filesaver, p)
