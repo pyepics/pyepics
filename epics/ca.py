@@ -26,7 +26,7 @@ from threading import Thread
 
 from .utils import (STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2,
                     strjoin, memcopy, is_string, is_string_or_bytes,
-                    asci_string)
+                    ascii_string)
 
 # ignore warning about item size... for now??
 warnings.filterwarnings('ignore',
@@ -1287,11 +1287,9 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     if ftype == dbr.CHAR and nativecount > 1 and is_string_or_bytes(value):
         count += 1
 
-    print("CA.PUT ", ftype, dbr.CHAR, dbr.STRING, count, type(value))
     if is_string(value):
         if value == '': value = '\x00'
         value = ascii_string(value)
-        print(" CAPUT -- convert  ")
 
     data  = (count*dbr.Map[ftype])()
 
