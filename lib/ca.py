@@ -1284,12 +1284,13 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     if ftype == dbr.CHAR and is_string_or_bytes(value):
         count += 1
 
+    # if needed (python3, especially) convert to basic string/bytes form
     if is_string(value):
-        if value == '': value = '\x00'
+        if value == '':
+            value = NULLCHAR
         value = ascii_string(value)
 
     data  = (count*dbr.Map[ftype])()
-
     if ftype == dbr.STRING:
         if count == 1:
             data[0].value = value
@@ -1316,7 +1317,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
                 raise ChannelAccessException(errmsg % (repr(value), tname))
 
     else:
-        if ftype == dbr.CHAR and is_string_or_bytes(str):
+        if ftype == dbr.CHAR and is_string_or_bytes(value):
             value = [ord(i) for i in ("%s%s" % (value, NULLCHAR))]
         try:
             ndata, nuser = len(data), len(value)
