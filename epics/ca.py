@@ -1303,12 +1303,14 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     elif nativecount == 1:
         if ftype == dbr.CHAR:
             if is_string_or_bytes(value):
-                value = [ord(i) for i in ("%s%s" % (value, NULLCHAR))]
+                if isinstance(value, bytes):
+                    value = value.decode('ascii', 'replace')
+                value = [ord(i) for i in value] + [0, ]
             else:
                 data[0] = value
         else:
             # allow strings (even bits/hex) to be put to integer types
-            if is_string(value) and isinstance(data[0], (int, long)):
+            if is_string(value) and isinstance(data[0], (int, )):
                 value = int(value, base=0)
             try:
                 data[0] = value
@@ -1323,7 +1325,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         if ftype == dbr.CHAR and is_string_or_bytes(value):
             if isinstance(value, bytes):
                 value = value.decode('ascii', 'replace')
-            value = [ord(i) for i in ("%s%s" % (value, NULLCHAR))]
+            value = [ord(i) for i in value] + [0, ]
         try:
             ndata, nuser = len(data), len(value)
             if nuser > ndata:
@@ -1651,8 +1653,11 @@ def sg_put(gid, chid, value):
         # numpy.fromstring(("%s%s" % (s,NULLCHAR*maxlen))[:maxlen],
         #                  dtype=numpy.uint8)
         if ftype == dbr.CHAR and is_string_or_bytes(value):
-            pad = NULLCHAR*(1+count-len(value))
-            value = [ord(i) for i in ("%s%s" % (value, pad))[:count]]
+            pad = [0]*(1+count-len(value))
+            if isinstance(value, bytes):
+                value = value.decode('ascii', 'replace')
+            value = ([ord(i) for i in value] + pad)[:count]
+
         try:
             ndata = len(data)
             nuser = len(value)
