@@ -638,7 +638,7 @@ def destroy_context():
     return context_destroy()
 
 @withCA
-@withSEVCHK
+# @withSEVCHK
 def attach_context(context):
     "attach to the supplied context"
     return libca.ca_attach_context(context)
