@@ -909,7 +909,7 @@ def name(chid):
     if chid.value in _namecache:
         val = _namecache[chid.value]
     else:
-        val = _namecache[chid.value] = BYTES2STR(val)
+        val = _namecache[chid.value] = BYTES2STR(libca.ca_name(chid))
     return val
 
 @withCHID
