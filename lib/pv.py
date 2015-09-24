@@ -355,7 +355,9 @@ class PV(object):
             return val
         # char waveform as string
         if ntype == dbr.CHAR and self.count < ca.AUTOMONITOR_MAXLENGTH:
-            if self.count==1: # handles single character in waveform
+            if isinstance(val, ca.numpy.ndarray):
+                val = val.tolist()
+            elif self.count==1: # handles single character in waveform
                 val = [val]
             val = list(val)
             if 0 in val:
