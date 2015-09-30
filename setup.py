@@ -4,12 +4,12 @@ from setuptools import setup
 
 import os
 import sys
-import lib
+import epics
 import shutil
 
 import versioneer
 versioneer.VCS = 'git'
-versioneer.versionfile_source = 'lib/_version.py'
+versioneer.versionfile_source = 'epics/_version.py'
 versioneer.versionfile_build = 'epics/_version.py'
 versioneer.tag_prefix = ''
 versioneer.parentdir_prefix = 'pyepics-'
@@ -65,10 +65,10 @@ if os.name == 'nt':
 
 PY_MAJOR, PY_MINOR = sys.version_info[:2]
 if PY_MAJOR == 2 and PY_MINOR < 6:
-    shutil.copy(os.path.join('lib', 'utils3.py'),
-                os.path.join('lib', 'utils3_save_py.txt'))
-    shutil.copy(os.path.join('lib', 'utils2.py'),
-                os.path.join('lib', 'utils3.py'))
+    shutil.copy(os.path.join('epics', 'utils3.py'),
+                os.path.join('epics', 'utils3_save_py.txt'))
+    shutil.copy(os.path.join('epics', 'utils2.py'),
+                os.path.join('epics', 'utils3.py'))
 
 setup(name = 'pyepics',
       version = versioneer.get_version(),
@@ -85,13 +85,12 @@ setup(name = 'pyepics',
                       'Operating System :: OS Independent',
                       'Programming Language :: Python',
                       'Topic :: Scientific/Engineering'],      
-      package_dir = {'epics': 'lib'},
       packages = ['epics','epics.wx','epics.devices',
                   'epics.compat', 'epics.autosave'],
       data_files = data_files )
 
 try:
-    libca = lib.ca.find_libca() 
+    libca = epics.ca.find_libca() 
     sys.stdout.write("\n  Will use CA library at:  %s \n\n" % libca)
 except:
     sys.stdout.write("%s" % no_libca)

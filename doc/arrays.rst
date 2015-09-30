@@ -28,7 +28,7 @@ Python list with something like::
     >>> epics.ca.HAS_NUMPY = False # turn numpy off for session
     >>> p = epics.PV('XX:scan1.P1PA')
     >>> p.get()
-    <lib.dbr.c_double_Array_500 object at 0x853980c>
+    <epics.dbr.c_double_Array_500 object at 0x853980c>
     >>> ldat = list(p.get())
 
 Note that this conversion to a list can be very slow for large arrays.
