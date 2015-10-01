@@ -18,6 +18,8 @@ def strjoin(sep, seq):
 def is_string(s):
     return isinstance(s, basestring)
 
+is_string_or_bytes = is_string
+
 ascii_string = str
 # def ascii_string(s):
 #     if isinstance(s, unicode):
