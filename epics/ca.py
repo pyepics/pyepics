@@ -470,6 +470,9 @@ def _onMonitorEvent(args):
             for attr in dbr.ctrl_limits + ('precision', 'units', 'severity'):
                 if hasattr(tmpv, attr):
                     kwds[attr] = getattr(tmpv, attr)
+                    if attr == 'units':
+                        kwds[attr] = BYTES2STR(getattr(tmpv, attr, None))
+                    
             if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
                 tmpv.no_str > 0):
                 kwds['enum_strs'] = tuple([tmpv.strs[i].value for
@@ -1399,6 +1402,9 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
                  'upper_ctrl_limit', 'lower_ctrl_limit'):
         if hasattr(tmpv, attr):
             out[attr] = getattr(tmpv, attr, None)
+            if attr == 'units':
+                out[attr] = BYTES2STR(getattr(tmpv, attr, None))
+                
     if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
         tmpv.no_str > 0):
         out['enum_strs'] = tuple([BYTES2STR(tmpv.strs[i].value)
