@@ -1043,7 +1043,10 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
         return data
 
     # Grab the native-data-type data
-    data = data[1]
+    try:
+        data = data[1]
+    except (TypeError, IndexError):
+        return None
 
     if count is None and chid is not None:
         count = element_count(chid)
