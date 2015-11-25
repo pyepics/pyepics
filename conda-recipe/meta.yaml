@@ -1,11 +1,11 @@
 package:
   name: pyepics
-  version: "3.2.4"
+  version: "3.2.5rc2"
 
 source:
-  fn: pyepics-3.2.4.tar.gz
-  url: https://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.4.tar.gz
-  md5: aa824e88f39a3aa01ca3fb9ad16842ae
+  fn: pyepics-3.2.5rc2.tar.gz
+  url: https://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.5rc2.tar.gz
+  md5: d378eda122ee65ef53fe4c8cedc4386d
 #  patches:
    # List any patch files here
    # - fix.patch
@@ -33,6 +33,8 @@ requirements:
 
   run:
     - python
+    - numpy
+    - pyparsing
 
 test:
   # Python imports
@@ -41,7 +43,6 @@ test:
     - epics.autosave
     - epics.compat
     - epics.devices
-    - epics.wx
 
   # commands:
     # You can put test commands to be run here.  Use this to test that the
