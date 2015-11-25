@@ -25,8 +25,7 @@ Epics installation is required to use the modules.
 
 For 64-bit Python on 64-bit Windows, pre-built DLLs from 3.14.12.4 (patched
 as of January, 2015) are also included.  Support for 64-bit Python on
-Windows is new in version 3.2.4, and requires Python version 2.7.9.  This
-should still be considered experimental.
+Windows is new in version 3.2.4, and requires Python version 2.7.9.
 
 The Python `numpy module <http://numpy.scipy.org/>`_ is highly recommended,
 though it is not strictly required. If available, it will be used to
@@ -36,10 +35,12 @@ convert EPICS waveforms values into numpy arrays.
 Downloads
 ~~~~~~~~~~~~~
 
-The latest stable version of the PyEpics Package is 3.2.4.  There are
-a few ways to get the PyEpics Package:
+The latest stable version of the PyEpics Package is 3.2.4, with version 3.2.5rc2
+(expected release as 3.2.5 in January, 2016) also available.  There are a few
+ways to get these package:
 
 .. _pyepics-3.2.4.tar.gz:              http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.4.tar.gz
+.. _pyepics-3.2.5rc2.tar.gz:           http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.45rc2.tar.gz
 .. _pyepics-3.2.4.win32-py2.7.exe:     http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.4.win32-py2.7.exe
 .. _pyepics-3.2.4.win32-py3.4.exe:     http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.4.win32-py3.4.exe
 .. _pyepics-3.2.4.win-amd64-py2.7.exe: http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.4.win-amd64-py2.7.exe
@@ -53,6 +54,7 @@ a few ways to get the PyEpics Package:
 |  Download Type  | Py Version |  PyPI link                                   |
 +=================+============+==============================================+
 | Source tarball  | All        |  `pyepics-3.2.4.tar.gz`_                     |
+|                 |            |  `pyepics-3.2.5rc2.tar.gz`_                  |
 +-----------------+------------+----------------------------------------------+
 | Win32 Installer | 2.7        |  `pyepics-3.2.4.win32-py2.7.exe`_            |
 +-----------------+------------+----------------------------------------------+
@@ -75,6 +77,11 @@ installed, you can download and install the PyEpics Package simply with::
 or::
 
   pip install pyepics
+
+If you're using Anaconda, there are several conda channels for PyEpics,
+including::
+
+ conda install -c https://conda.anaconda.org/newville pyepics
 
 
 Testing
@@ -124,13 +131,6 @@ Testing Notes:
 
   3. The wx module is not automatically tested.
 
-  4. CA is not yet working with 64-bit Python on 64-bit Windows. It *does*
-     work with 32-bit Python on 64-bit Linux, and Channel Access is known
-     to work with 64-bit  Windows.  The current status is: I can get the
-     64-bit ca.dll to load with 64-bit Python, but there seems to be some
-     disagreement about the lengths of basic C data types (for example,
-     does a double take 8 or 16 bytes).  This is being investigated....
-
 
 Development Version
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,10 +154,16 @@ Installation from source on any platform is::
 For more details, especially about how to set paths for LD_LIBRARY_PATH or
 DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.
 
-Again, if you have `Python Setup Tools`_  installed, you can download and
+If you have `Python Setup Tools`_  installed, you can download and
 install the PyEpics Package with::
 
    easy_install -U pyepics
+
+
+If you are using Anaconda Python, you can download and
+install the PyEpics Package with::
+
+   conda install -c https://conda.anaconda.org/newville pyepics
 
 
 Getting Started, Setting up the Epics Environment
@@ -227,7 +233,7 @@ License
 The PyEpics source code, this documentation, and all material associated
 with it are distributed under the Epics Open License:
 
-.. include:: ../license.txt
+.. include:: ../LICENSE
 
 In plain English, this says that there is no warranty or gaurantee that the
 code will actually work, but you can do anything you like with this code
@@ -243,11 +249,7 @@ PyEpics was originally written and is maintained by Matt Newville
 have come from Angus Gratton while at the Australian National University.
 Several other people have provided valuable additions, suggestions, or bug
 reports, which has greatly improved the quality of the library: Ken Lauer,
-Michael Abbott, Marco Cammarata, Craig Haskins, Pete Jemian, Andrew
-Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Eric Norum, Mark Rivers,
-Friedrich Schotte, Mark Vigder, Steve Wasserman, and Glen Wright.
-
-
-
-
-
+Michael Abbott, Daron Chabot, Thomas Caswell, Georg Brandl, Niklas
+Claesson, Jon Brinkmann, Marco Cammarata, Craig Haskins, Pete Jemian,
+Andrew Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Eric Norum, Mark
+Rivers, Friedrich Schotte, Mark Vigder, Steve Wasserman, and Glen Wright.
