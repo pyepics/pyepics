@@ -30,7 +30,7 @@ def get_pv(pvname, form='time',  connect=False,
     """
     
     if form not in ('native', 'time', 'ctrl'):
-        form = 'natiive'
+        form = 'native'
 
     thispv = None
     if context is None:
