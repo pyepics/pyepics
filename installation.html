@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.4',
+        VERSION:     '3.2.5rc2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -28,7 +28,7 @@
     <link rel="next" title="PyEpics Overview" href="overview.html" />
     <link rel="prev" title="Epics Channel Access for Python" href="index.html" /> 
   </head>
-  <body>
+  <body role="document">
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -36,7 +36,7 @@
   </font>
 </div>
 
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -62,7 +62,7 @@
       </ul>
     </div>
 
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -86,12 +86,14 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="overview.html"
                         title="next chapter">PyEpics Overview</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/installation.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/installation.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -110,7 +112,7 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="downloading-and-installation">
 <h1>Downloading and Installation<a class="headerlink" href="#downloading-and-installation" title="Permalink to this headline">¶</a></h1>
@@ -133,16 +135,16 @@ such as ldconfig.</p>
 Epics installation is required to use the modules.</p>
 <p>For 64-bit Python on 64-bit Windows, pre-built DLLs from 3.14.12.4 (patched
 as of January, 2015) are also included.  Support for 64-bit Python on
-Windows is new in version 3.2.4, and requires Python version 2.7.9.  This
-should still be considered experimental.</p>
+Windows is new in version 3.2.4, and requires Python version 2.7.9.</p>
 <p>The Python <a class="reference external" href="http://numpy.scipy.org/">numpy module</a> is highly recommended,
 though it is not strictly required. If available, it will be used to
 convert EPICS waveforms values into numpy arrays.</p>
 </div>
 <div class="section" id="downloads">
 <h2>Downloads<a class="headerlink" href="#downloads" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the PyEpics Package is 3.2.4.  There are
-a few ways to get the PyEpics Package:</p>
+<p>The latest stable version of the PyEpics Package is 3.2.4, with version 3.2.5rc2
+(expected release as 3.2.5 in January, 2016) also available.  There are a few
+ways to get these package:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="23%" />
@@ -158,7 +160,8 @@ a few ways to get the PyEpics Package:</p>
 <tbody valign="top">
 <tr class="row-even"><td>Source tarball</td>
 <td>All</td>
-<td><a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.4.tar.gz">pyepics-3.2.4.tar.gz</a></td>
+<td><a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.4.tar.gz">pyepics-3.2.4.tar.gz</a>
+<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.45rc2.tar.gz">pyepics-3.2.5rc2.tar.gz</a></td>
 </tr>
 <tr class="row-odd"><td>Win32 Installer</td>
 <td>2.7</td>
@@ -192,12 +195,17 @@ installed, you can download and install the PyEpics Package simply with:</p>
 <div class="highlight-python"><div class="highlight"><pre>pip install pyepics
 </pre></div>
 </div>
+<p>If you&#8217;re using Anaconda, there are several conda channels for PyEpics,
+including:</p>
+<div class="highlight-python"><div class="highlight"><pre>conda install -c https://conda.anaconda.org/newville pyepics
+</pre></div>
+</div>
 </div>
 <div class="section" id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
 <p>Some automated unit-testing is done, using the tests/ folder from the
-source distribution kit, and while the script <tt class="docutils literal"><span class="pre">tests/simulator.py</span></tt> is running
-(note that the Epics database in <tt class="docutils literal"><span class="pre">tests/pydebug.db</span></tt> must be loaded in a local
+source distribution kit, and while the script <code class="docutils literal"><span class="pre">tests/simulator.py</span></code> is running
+(note that the Epics database in <code class="docutils literal"><span class="pre">tests/pydebug.db</span></code> must be loaded in a local
 IOC for the simulator and most of these tests to run).  The following
 systems were tested for 3.2.4, all with Epics base 3.14.12.1 or base
 3.14.12.2.</p>
@@ -277,12 +285,6 @@ than 3.14.11.</li>
 seems to not work correctly for Python3, and has not been included in
 these tests.</li>
 <li>The wx module is not automatically tested.</li>
-<li>CA is not yet working with 64-bit Python on 64-bit Windows. It <em>does</em>
-work with 32-bit Python on 64-bit Linux, and Channel Access is known
-to work with 64-bit  Windows.  The current status is: I can get the
-64-bit ca.dll to load with 64-bit Python, but there seems to be some
-disagreement about the lengths of basic C data types (for example,
-does a double take 8 or 16 bytes).  This is being investigated....</li>
 </ol>
 </div></blockquote>
 </div>
@@ -305,9 +307,14 @@ git clone git@github.com/pyepics/pyepics.git
 </div>
 <p>For more details, especially about how to set paths for LD_LIBRARY_PATH or
 DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.</p>
-<p>Again, if you have <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Python Setup Tools</a>  installed, you can download and
+<p>If you have <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Python Setup Tools</a>  installed, you can download and
 install the PyEpics Package with:</p>
 <div class="highlight-python"><div class="highlight"><pre>easy_install -U pyepics
+</pre></div>
+</div>
+<p>If you are using Anaconda Python, you can download and
+install the PyEpics Package with:</p>
+<div class="highlight-python"><div class="highlight"><pre>conda install -c https://conda.anaconda.org/newville pyepics
 </pre></div>
 </div>
 </div>
@@ -319,12 +326,12 @@ depending on the system).  This dynamic library needs to found at runtime.</p>
 <p>There are a few ways to specify how to find this library:</p>
 <blockquote>
 <div><ol class="arabic">
-<li><p class="first">set the environmental variable <tt class="docutils literal"><span class="pre">PYEPICS_LIBCA</span></tt> to the full path of the dynamic library, for example:</p>
+<li><p class="first">set the environmental variable <code class="docutils literal"><span class="pre">PYEPICS_LIBCA</span></code> to the full path of the dynamic library, for example:</p>
 <div class="highlight-python"><div class="highlight"><pre>&gt; export PYEPICS_LIBCA=/usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so
 </pre></div>
 </div>
 </li>
-<li><p class="first">set the environmental variables <tt class="docutils literal"><span class="pre">EPICS_BASE</span></tt> and  <tt class="docutils literal"><span class="pre">EPICS_HOST_ARCH</span></tt>
+<li><p class="first">set the environmental variables <code class="docutils literal"><span class="pre">EPICS_BASE</span></code> and  <code class="docutils literal"><span class="pre">EPICS_HOST_ARCH</span></code>
 to point to where the library was built.   For example:</p>
 <div class="highlight-python"><div class="highlight"><pre>&gt; export EPICS_BASE=/usr/local/epics/base-3.14.12.1
 &gt; export EPICS_HOST_ARCH=linux-x86
@@ -333,7 +340,7 @@ to point to where the library was built.   For example:</p>
 <p>will find the library at /usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so.</p>
 </li>
 <li><p class="first">Put the dynamic library somewhere in the Python path.  A convenient
-place might be the same <tt class="docutils literal"><span class="pre">site-packages/pyepics</span> <span class="pre">library</span></tt> folder as the
+place might be the same <code class="docutils literal"><span class="pre">site-packages/pyepics</span> <span class="pre">library</span></code> folder as the
 python package is installed.</p>
 </li>
 </ol>
@@ -346,7 +353,7 @@ Process Variables. Generally, these variables are provided by Epics I/O
 controllers (IOCs) that are processes running on some device on the
 network.   If you&#8217;re connecting to PVs provided by IOCs on your local
 subnet, you should have no trouble.  If trying to reach further network,
-you may need to set the environmental variable <tt class="docutils literal"><span class="pre">EPICS_CA_ADDR_LIST</span></tt> to
+you may need to set the environmental variable <code class="docutils literal"><span class="pre">EPICS_CA_ADDR_LIST</span></code> to
 specify which networks to search for PVs.</p>
 </div>
 <div class="section" id="getting-help">
@@ -460,9 +467,10 @@ case you can probably do whatever you want.</p>
 have come from Angus Gratton while at the Australian National University.
 Several other people have provided valuable additions, suggestions, or bug
 reports, which has greatly improved the quality of the library: Ken Lauer,
-Michael Abbott, Marco Cammarata, Craig Haskins, Pete Jemian, Andrew
-Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Eric Norum, Mark Rivers,
-Friedrich Schotte, Mark Vigder, Steve Wasserman, and Glen Wright.</p>
+Michael Abbott, Daron Chabot, Thomas Caswell, Georg Brandl, Niklas
+Claesson, Jon Brinkmann, Marco Cammarata, Craig Haskins, Pete Jemian,
+Andrew Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Eric Norum, Mark
+Rivers, Friedrich Schotte, Mark Vigder, Steve Wasserman, and Glen Wright.</p>
 </div>
 </div>
 
@@ -472,7 +480,7 @@ Friedrich Schotte, Mark Vigder, Steve Wasserman, and Glen Wright.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -497,9 +505,9 @@ Friedrich Schotte, Mark Vigder, Steve Wasserman, and Glen Wright.</p>
  
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

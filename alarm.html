@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.4',
+        VERSION:     '3.2.5rc2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -28,7 +28,7 @@
     <link rel="next" title="Auto-saving: simple save/restore of PVs" href="autosave.html" />
     <link rel="prev" title="Devices: collections of PVs" href="devices.html" /> 
   </head>
-  <body>
+  <body role="document">
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -36,7 +36,7 @@
   </font>
 </div>
 
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -62,7 +62,7 @@
       </ul>
     </div>
 
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -79,12 +79,14 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="autosave.html"
                         title="next chapter">Auto-saving: simple save/restore of PVs</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/alarm.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/alarm.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -103,17 +105,17 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="alarms-respond-when-a-pv-goes-out-of-range">
 <h1>Alarms: respond when a PV goes out of range<a class="headerlink" href="#alarms-respond-when-a-pv-goes-out-of-range" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-alarm">
 <span id="overview"></span><h2>Overview<a class="headerlink" href="#module-alarm" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="#module-alarm" title="alarm: respond when a PV goes out of range by running user-supplied code"><tt class="xref py py-mod docutils literal"><span class="pre">alarm</span></tt></a> module provides an Alarm object to specify an alarm
+<p>The <a class="reference internal" href="#module-alarm" title="alarm: respond when a PV goes out of range by running user-supplied code"><code class="xref py py-mod docutils literal"><span class="pre">alarm</span></code></a> module provides an Alarm object to specify an alarm
 condition and what to do when that condition is met.</p>
 <dl class="class">
 <dt id="alarm.Alarm">
-<em class="property">class </em><tt class="descclassname">alarm.</tt><tt class="descname">Alarm</tt><big>(</big><em>pvname</em><span class="optional">[</span>, <em>comparison=None</em><span class="optional">[</span>, <em>trip_point=None</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>alert_delay=10</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#alarm.Alarm" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">alarm.</code><code class="descname">Alarm</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>comparison=None</em><span class="optional">[</span>, <em>trip_point=None</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>alert_delay=10</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#alarm.Alarm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>creates an alarm object.</p>
@@ -128,7 +130,7 @@ condition and what to do when that condition is met.</p>
 <tr class="field-even field"><td>&nbsp;</td><td class="field-body">operation used to compare PV value to trip_point.</td>
 </tr>
 <tr class="field-odd field"><th class="field-name" colspan="2">type  comparison:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">string or callable.  Built in comparisons are listed in <a class="reference internal" href="#alarmops-table"><em>Table of Alarm Operators</em></a>.</td>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">string or callable.  Built in comparisons are listed in <a class="reference internal" href="#alarmops-table"><span>Table of Alarm Operators</span></a>.</td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">param trip_point:</th></tr>
 <tr class="field-even field"><td>&nbsp;</td><td class="field-body">value that will trigger the alarm</td>
@@ -147,9 +149,9 @@ condition and what to do when that condition is met.</p>
 the new value is outside the acceptable range (violates the trip point),
 then the user-supplied callback function is run.  This callback could be
 set do send a message or to take some other course of action.</p>
-<p>The comparison supplied can either be a string as listed in <a class="reference internal" href="#alarmops-table"><em>Table of
-Alarm Operators</em></a> or a custom callable function which takes
-the two values (PV.value, trip_point) and returns <tt class="docutils literal"><span class="pre">True</span></tt> or <tt class="docutils literal"><span class="pre">False</span></tt>
+<p>The comparison supplied can either be a string as listed in <a class="reference internal" href="#alarmops-table"><span>Table of
+Alarm Operators</span></a> or a custom callable function which takes
+the two values (PV.value, trip_point) and returns <code class="docutils literal"><span class="pre">True</span></code> or <code class="docutils literal"><span class="pre">False</span></code>
 based on those values.</p>
 <blockquote id="alarmops-table">
 <div><p>Table of built-in Operators for Alarms:</p>
@@ -187,14 +189,14 @@ based on those values.</p>
 </table>
 </div></blockquote>
 </div></blockquote>
-<p>The <tt class="xref py py-attr docutils literal"><span class="pre">alert_delay</span></tt> prevents the alarm callback from being called too
+<p>The <code class="xref py py-attr docutils literal"><span class="pre">alert_delay</span></code> prevents the alarm callback from being called too
 many times. For PVs with floating point values, the value may
 fluctuate around the trip_point for a while.  If the value violates the
 trip_point, then momentarily goes back to an acceptable value, and back
 again to a violating value, it may not be desirable to send repeated,
 identical messages.   To prevent this situation, the alarm callback will be
 called when the alarm condition is met <strong>and</strong> the callback was not called
-within the time specified by  <tt class="xref py py-attr docutils literal"><span class="pre">alert_delay</span></tt>.</p>
+within the time specified by  <code class="xref py py-attr docutils literal"><span class="pre">alert_delay</span></code>.</p>
 </div>
 <div class="section" id="alarm-example">
 <h2>Alarm Example<a class="headerlink" href="#alarm-example" title="Permalink to this headline">¶</a></h2>
@@ -223,7 +225,7 @@ message when a PV&#8217;s value reaches a certain value:</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -248,9 +250,9 @@ message when a PV&#8217;s value reaches a certain value:</p>
  
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.4',
+        VERSION:     '3.2.5rc2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -28,7 +28,7 @@
     <link rel="next" title="Alarms: respond when a PV goes out of range" href="alarm.html" />
     <link rel="prev" title="Working with waveform / array data" href="arrays.html" /> 
   </head>
-  <body>
+  <body role="document">
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -36,7 +36,7 @@
   </font>
 </div>
 
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -62,15 +62,15 @@
       </ul>
     </div>
 
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Devices: collections of PVs</a><ul>
 <li><a class="reference internal" href="#module-device">Overview</a></li>
 <li><a class="reference internal" href="#module-motor">Epics Motor Device</a><ul>
-<li><a class="reference internal" href="#the-epics-motor-class">The <tt class="docutils literal"><span class="pre">epics.Motor</span></tt> class</a></li>
-<li><a class="reference internal" href="#methods-for-epics-motor">methods for <tt class="docutils literal"><span class="pre">epics.Motor</span></tt></a></li>
+<li><a class="reference internal" href="#the-epics-motor-class">The <code class="docutils literal"><span class="pre">epics.Motor</span></code> class</a></li>
+<li><a class="reference internal" href="#methods-for-epics-motor">methods for <code class="docutils literal"><span class="pre">epics.Motor</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#other-device-examples">Other Device Examples</a><ul>
@@ -90,12 +90,14 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="alarm.html"
                         title="next chapter">Alarms: respond when a PV goes out of range</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/devices.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/devices.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -114,14 +116,14 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="devices-collections-of-pvs">
 <h1>Devices: collections of PVs<a class="headerlink" href="#devices-collections-of-pvs" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-device">
 <span id="overview"></span><h2>Overview<a class="headerlink" href="#module-device" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="#module-device" title="device: collections of related PVs"><tt class="xref py py-mod docutils literal"><span class="pre">device</span></tt></a> module provides a simple interface to a collection of
-PVs.  Here an epics <a class="reference internal" href="#device.Device" title="device.Device"><tt class="xref py py-class docutils literal"><span class="pre">device.Device</span></tt></a> is an object holding a set of
+<p>The <a class="reference internal" href="#module-device" title="device: collections of related PVs"><code class="xref py py-mod docutils literal"><span class="pre">device</span></code></a> module provides a simple interface to a collection of
+PVs.  Here an epics <a class="reference internal" href="#device.Device" title="device.Device"><code class="xref py py-class docutils literal"><span class="pre">device.Device</span></code></a> is an object holding a set of
 PVs, all sharing a prefix, but having many <em>attributes</em>.  Many PVs will
 have names made up of <em>prefix+attribute</em>, with a common prefix for several
 related PVs.  This almost describes an Epics Record, but as it is concerned
@@ -139,14 +141,14 @@ Epics Record as it can actually hold PVs from several different records.:</p>
 </div>
 <p>While useful on its own like this, the real point of a <em>device</em> is as a
 base class, to be inherited and extended.  In fact, there is a more
-sophisticated   Motor device described below at <a class="reference internal" href="#device-motor-label"><em>Epics Motor Device</em></a></p>
+sophisticated   Motor device described below at <a class="reference internal" href="#device-motor-label"><span>Epics Motor Device</span></a></p>
 <dl class="class">
 <dt id="device.Device">
-<em class="property">class </em><tt class="descclassname">device.</tt><tt class="descname">Device</tt><big>(</big><em>prefix=None</em><span class="optional">[</span>, <em>delim=''</em><span class="optional">[</span>, <em>attrs=None</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#device.Device" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">device.</code><code class="descname">Device</code><span class="sig-paren">(</span><em>prefix=None</em><span class="optional">[</span>, <em>delim=''</em><span class="optional">[</span>, <em>attrs=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.Device" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>The attribute PVs are built as needed and held in an internal buffer
-<tt class="xref py py-data docutils literal"><span class="pre">self._pvs</span></tt>.  This class is kept intentionally simple so that it may
+<code class="xref py py-data docutils literal"><span class="pre">self._pvs</span></code>.  This class is kept intentionally simple so that it may
 be subclassed.</p>
 <p>To pre-load attribute names on initialization, provide a list or tuple of
 attributes with the <cite>attr</cite> option.</p>
@@ -154,39 +156,39 @@ attributes with the <cite>attr</cite> option.</p>
 used as an arbitrary container of PVs, or to turn any subclass into an
 epics Device.</p>
 <p>In general, PV names will be mapped as prefix+delim+attr.  See
-<a class="reference internal" href="#device.add_pv" title="device.add_pv"><tt class="xref py py-meth docutils literal"><span class="pre">add_pv()</span></tt></a> for details of how to override this.</p>
+<a class="reference internal" href="#device.add_pv" title="device.add_pv"><code class="xref py py-meth docutils literal"><span class="pre">add_pv()</span></code></a> for details of how to override this.</p>
 <dl class="method">
 <dt id="device.PV">
-<tt class="descclassname">device.</tt><tt class="descname">PV</tt><big>(</big><em>attr[, connect=True[, **kw]]]</em><big>)</big><a class="headerlink" href="#device.PV" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">device.</code><code class="descname">PV</code><span class="sig-paren">(</span><em>attr[, connect=True[, **kw]]]</em><span class="sig-paren">)</span><a class="headerlink" href="#device.PV" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the <cite>PV</cite> object for a device attribute.  The connect argument
-and any other keyword arguments are passed to <tt class="xref py py-meth docutils literal"><span class="pre">epics.PV()</span></tt>.</p>
+and any other keyword arguments are passed to <code class="xref py py-meth docutils literal"><span class="pre">epics.PV()</span></code>.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="device.put">
-<tt class="descclassname">device.</tt><tt class="descname">put</tt><big>(</big><em>attr</em>, <em>value</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=10.0</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#device.put" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">device.</code><code class="descname">put</code><span class="sig-paren">(</span><em>attr</em>, <em>value</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=10.0</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>put an attribute value, optionally wait for completion or up to a
 supplied timeout value</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="device.get">
-<tt class="descclassname">device.</tt><tt class="descname">get</tt><big>(</big><em>attr</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#device.get" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">device.</code><code class="descname">get</code><span class="sig-paren">(</span><em>attr</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>get an attribute value, option as_string returns a string
 representation</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="device.add_callback">
-<tt class="descclassname">device.</tt><tt class="descname">add_callback</tt><big>(</big><em>attr</em>, <em>callback</em><big>)</big><a class="headerlink" href="#device.add_callback" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">device.</code><code class="descname">add_callback</code><span class="sig-paren">(</span><em>attr</em>, <em>callback</em><span class="sig-paren">)</span><a class="headerlink" href="#device.add_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>add a callback function to an attribute PV, so that the callback
 function will be run when the at tribute&#8217;s value changes</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="device.add_pv">
-<tt class="descclassname">device.</tt><tt class="descname">add_pv</tt><big>(</big><em>pvname</em><span class="optional">[</span>, <em>attr=None</em><span class="optional">[</span>, <em>**kw</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#device.add_pv" title="Permalink to this definition">¶</a></dt>
-<dd><p>adds an explicitly names <tt class="xref py py-meth docutils literal"><span class="pre">epics.PV()</span></tt> to the device even though it
+<code class="descclassname">device.</code><code class="descname">add_pv</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>attr=None</em><span class="optional">[</span>, <em>**kw</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.add_pv" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds an explicitly names <code class="xref py py-meth docutils literal"><span class="pre">epics.PV()</span></code> to the device even though it
 may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 <cite>epics.PV(prefix+delim+attr)</cite>.   That is, one can say:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
@@ -200,32 +202,32 @@ may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 
 <dl class="method">
 <dt id="device.save_state">
-<tt class="descclassname">device.</tt><tt class="descname">save_state</tt><big>(</big><big>)</big><a class="headerlink" href="#device.save_state" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">device.</code><code class="descname">save_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#device.save_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>return a dictionary of all current values &#8211; the &#8216;&#8217;current state&#8217;&#8216;.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="device.restore_state">
-<tt class="descclassname">device.</tt><tt class="descname">restore_state</tt><big>(</big><em>state</em><big>)</big><a class="headerlink" href="#device.restore_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>restores a saved state, as saved with <a class="reference internal" href="#device.save_state" title="device.save_state"><tt class="xref py py-meth docutils literal"><span class="pre">save_state()</span></tt></a></p>
+<code class="descclassname">device.</code><code class="descname">restore_state</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="headerlink" href="#device.restore_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>restores a saved state, as saved with <a class="reference internal" href="#device.save_state" title="device.save_state"><code class="xref py py-meth docutils literal"><span class="pre">save_state()</span></code></a></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="device.write_state">
-<tt class="descclassname">device.</tt><tt class="descname">write_state</tt><big>(</big><em>fname</em><span class="optional">[</span>, <em>state=None</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#device.write_state" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">device.</code><code class="descname">write_state</code><span class="sig-paren">(</span><em>fname</em><span class="optional">[</span>, <em>state=None</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.write_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>write a saved state to a file.   If no state is provide, the current state is written.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="device.read_state">
-<tt class="descclassname">device.</tt><tt class="descname">read_state</tt><big>(</big><em>fname</em><span class="optional">[</span>, <em>restore=False</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#device.read_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>reads a state from a file, as written with <a class="reference internal" href="#device.write_state" title="device.write_state"><tt class="xref py py-meth docutils literal"><span class="pre">write_state()</span></tt></a>, and returns it.
-If &#8216;&#8217;restore&#8217;&#8217; is <tt class="docutils literal"><span class="pre">True</span></tt>, the read state will be restored.</p>
+<code class="descclassname">device.</code><code class="descname">read_state</code><span class="sig-paren">(</span><em>fname</em><span class="optional">[</span>, <em>restore=False</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.read_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>reads a state from a file, as written with <a class="reference internal" href="#device.write_state" title="device.write_state"><code class="xref py py-meth docutils literal"><span class="pre">write_state()</span></code></a>, and returns it.
+If &#8216;&#8217;restore&#8217;&#8217; is <code class="docutils literal"><span class="pre">True</span></code>, the read state will be restored.</p>
 </dd></dl>
 
 <dl class="data">
 <dt id="device._pvs">
-<tt class="descclassname">device.</tt><tt class="descname">_pvs</tt><a class="headerlink" href="#device._pvs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">device.</code><code class="descname">_pvs</code><a class="headerlink" href="#device._pvs" title="Permalink to this definition">¶</a></dt>
 <dd><p>a dictionary of PVs making up the device.</p>
 </dd></dl>
 
@@ -241,7 +243,7 @@ they are violated.  Thus, there is a fair amount of functionality for a
 Motor.  Typically, the user just wants to move the motor by setting its
 drive position, but a fully enabled Motor should allow the use to change
 and read many of the Motor parameters.</p>
-<p>The  <a class="reference internal" href="#motor.Motor" title="motor.Motor"><tt class="xref py py-class docutils literal"><span class="pre">Motor</span></tt></a> class helps the user create and use Epics motors.
+<p>The  <a class="reference internal" href="#motor.Motor" title="motor.Motor"><code class="xref py py-class docutils literal"><span class="pre">Motor</span></code></a> class helps the user create and use Epics motors.
 A simple example use would be:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
 <span class="n">m1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Motor</span><span class="p">(</span><span class="s">&#39;XXX:m1&#39;</span><span class="p">)</span>
@@ -262,16 +264,16 @@ few features for Motor:</p>
 <blockquote>
 <div><p>1.  Motors can use English-name aliases for attributes for fields of the
 motor record.  Thus &#8216;VAL&#8217; can be spelled &#8216;drive&#8217; and &#8216;DESC&#8217; can be
-&#8216;description&#8217;.   The <a class="reference internal" href="#motorattr-table"><em>Table of Motor Attributes</em></a>
+&#8216;description&#8217;.   The <a class="reference internal" href="#motorattr-table"><span>Table of Motor Attributes</span></a>
 give the list of names that can be used.</p>
 <p>2.  The methods for setting positions can use the User, Dial, or Step
 coordinate system, and can wait for completion.</p>
 </div></blockquote>
 <div class="section" id="the-epics-motor-class">
-<h3>The <tt class="xref py py-class docutils literal"><span class="pre">epics.Motor</span></tt> class<a class="headerlink" href="#the-epics-motor-class" title="Permalink to this headline">¶</a></h3>
+<h3>The <code class="xref py py-class docutils literal"><span class="pre">epics.Motor</span></code> class<a class="headerlink" href="#the-epics-motor-class" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="motor.Motor">
-<em class="property">class </em><tt class="descclassname">motor.</tt><tt class="descname">Motor</tt><big>(</big><em>pvname</em><span class="optional">[</span>, <em>timeout=30.</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#motor.Motor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">motor.</code><code class="descname">Motor</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>timeout=30.</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.Motor" title="Permalink to this definition">¶</a></dt>
 <dd><p>create a Motor object for a named Epics Process Variable.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -298,11 +300,11 @@ coordinate system, and can wait for completion.</p>
 </div>
 <p>A Motor has very many fields.  Only a few of them are created on
 initialization &#8211; the rest are retrieved as needed.  The motor fields can
-be retrieved either with an attribute or with the <a class="reference internal" href="#motor.get" title="motor.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> method.
+be retrieved either with an attribute or with the <a class="reference internal" href="#motor.get" title="motor.get"><code class="xref py py-meth docutils literal"><span class="pre">get()</span></code></a> method.
 A full list of Motor attributes and their aliases for the motor
-record is given in <a class="reference internal" href="#motorattr-table"><em>Table of Motor Attributes</em></a>.</p>
+record is given in <a class="reference internal" href="#motorattr-table"><span>Table of Motor Attributes</span></a>.</p>
 <blockquote id="motorattr-table">
-<div>Table of Aliases for attributes for the epics <a class="reference internal" href="#motor.Motor" title="motor.Motor"><tt class="xref py py-class docutils literal"><span class="pre">Motor</span></tt></a> class, and the
+<div>Table of Aliases for attributes for the epics <a class="reference internal" href="#motor.Motor" title="motor.Motor"><code class="xref py py-class docutils literal"><span class="pre">Motor</span></code></a> class, and the
 corresponding attribute name of the Motor Record field.</div></blockquote>
 <table border="1" class="docutils">
 <colgroup>
@@ -589,10 +591,10 @@ corresponding attribute name of the Motor Record field.</div></blockquote>
 </table>
 </div>
 <div class="section" id="methods-for-epics-motor">
-<h3>methods for <tt class="xref py py-class docutils literal"><span class="pre">epics.Motor</span></tt><a class="headerlink" href="#methods-for-epics-motor" title="Permalink to this headline">¶</a></h3>
+<h3>methods for <code class="xref py py-class docutils literal"><span class="pre">epics.Motor</span></code><a class="headerlink" href="#methods-for-epics-motor" title="Permalink to this headline">¶</a></h3>
 <dl class="method">
 <dt id="motor.get">
-<tt class="descclassname">motor.</tt><tt class="descname">get</tt><big>(</big><em>attr</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#motor.get" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">get</code><span class="sig-paren">(</span><em>attr</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets a field attribute for the motor.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -600,7 +602,7 @@ corresponding attribute name of the Motor Record field.</div></blockquote>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>attr</strong> (<em>string (from table above)</em>) &#8211; attribute name</li>
-<li><strong>as_string</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/ <tt class="docutils literal"><span class="pre">False</span></tt>) &#8211; whether to return string value.</li>
+<li><strong>as_string</strong> (<code class="docutils literal"><span class="pre">True</span></code>/ <code class="docutils literal"><span class="pre">False</span></code>) &#8211; whether to return string value.</li>
 </ul>
 </td>
 </tr>
@@ -608,7 +610,7 @@ corresponding attribute name of the Motor Record field.</div></blockquote>
 </table>
 </dd></dl>
 
-<p>Note that <a class="reference internal" href="#motor.get" title="motor.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> can return the string value, while fetching the
+<p>Note that <a class="reference internal" href="#motor.get" title="motor.get"><code class="xref py py-meth docutils literal"><span class="pre">get()</span></code></a> can return the string value, while fetching the
 attribute cannot do so:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Motor</span><span class="p">(</span><span class="s">&#39;XXX:m1&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">m</span><span class="o">.</span><span class="n">device_type</span>
@@ -619,7 +621,7 @@ attribute cannot do so:</p>
 </div>
 <dl class="method">
 <dt id="motor.put">
-<tt class="descclassname">motor.</tt><tt class="descname">put</tt><big>(</big><em>attr</em>, <em>value</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=30</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#motor.put" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">put</code><span class="sig-paren">(</span><em>attr</em>, <em>value</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=30</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets a field attribute for the motor.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -628,7 +630,7 @@ attribute cannot do so:</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>attr</strong> (<em>string (from table above)</em>) &#8211; attribute name</li>
 <li><strong>value</strong> &#8211; value for attribute</li>
-<li><strong>wait</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) &#8211; whether to wait for completion.</li>
+<li><strong>wait</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) &#8211; whether to wait for completion.</li>
 <li><strong>timeout</strong> (<em>float</em>) &#8211; time (in seconds) to wait before giving up trying to connect.</li>
 </ul>
 </td>
@@ -639,15 +641,15 @@ attribute cannot do so:</p>
 
 <dl class="method">
 <dt id="motor.check_limits">
-<tt class="descclassname">motor.</tt><tt class="descname">check_limits</tt><big>(</big><big>)</big><a class="headerlink" href="#motor.check_limits" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">check_limits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.check_limits" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks whether the current motor position is causing a motor limit
 violation, and raises a MotorLimitException if it is.</p>
-<p>returns <tt class="docutils literal"><span class="pre">None</span></tt> if there is no limit violation.</p>
+<p>returns <code class="docutils literal"><span class="pre">None</span></code> if there is no limit violation.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="motor.within_limits">
-<tt class="descclassname">motor.</tt><tt class="descname">within_limits</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>limits='user'</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#motor.within_limits" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">within_limits</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>limits='user'</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.within_limits" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks whether a target value <strong>would be</strong> a limit violation.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -659,7 +661,7 @@ violation, and raises a MotorLimitException if it is.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -668,7 +670,7 @@ violation, and raises a MotorLimitException if it is.</p>
 
 <dl class="method">
 <dt id="motor.move">
-<tt class="descclassname">motor.</tt><tt class="descname">move</tt><big>(</big><em>val=None</em><span class="optional">[</span>, <em>relative=None</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=300.0</em><span class="optional">[</span>, <em>dial=False</em><span class="optional">[</span>, <em>raw=False</em><span class="optional">[</span>, <em>ignore_limits=False</em><span class="optional">[</span>, <em>confirm_move=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#motor.move" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">move</code><span class="sig-paren">(</span><em>val=None</em><span class="optional">[</span>, <em>relative=None</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=300.0</em><span class="optional">[</span>, <em>dial=False</em><span class="optional">[</span>, <em>raw=False</em><span class="optional">[</span>, <em>ignore_limits=False</em><span class="optional">[</span>, <em>confirm_move=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.move" title="Permalink to this definition">¶</a></dt>
 <dd><p>moves motor to specified drive position.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -699,7 +701,7 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 </dd></dl>
 
 <blockquote id="motor-move-return-vals-table">
-<div><p>Table of return values from <a class="reference internal" href="#motor.move" title="motor.move"><tt class="xref py py-func docutils literal"><span class="pre">move()</span></tt></a>.</p>
+<div><p>Table of return values from <a class="reference internal" href="#motor.move" title="motor.move"><code class="xref py py-func docutils literal"><span class="pre">move()</span></code></a>.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="19%" />
@@ -727,7 +729,7 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 <td>move started, timed-out, but appears done.</td>
 </tr>
 <tr class="row-odd"><td>-5</td>
-<td>move started, unexpected return value from <a class="reference internal" href="#motor.put" title="motor.put"><tt class="xref py py-func docutils literal"><span class="pre">put()</span></tt></a></td>
+<td>move started, unexpected return value from <a class="reference internal" href="#motor.put" title="motor.put"><code class="xref py py-func docutils literal"><span class="pre">put()</span></code></a></td>
 </tr>
 <tr class="row-even"><td>-4</td>
 <td>move-with-wait finished, soft limit violation seen.</td>
@@ -755,7 +757,7 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 </div></blockquote>
 <dl class="method">
 <dt id="motor.tweak">
-<tt class="descclassname">motor.</tt><tt class="descname">tweak</tt><big>(</big><em>direction='forward'</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=300.</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#motor.tweak" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">tweak</code><span class="sig-paren">(</span><em>direction='forward'</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=300.</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.tweak" title="Permalink to this definition">¶</a></dt>
 <dd><p>move the motor by the current <em>tweak value</em></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -763,7 +765,7 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>direction</strong> (<em>string: &#8216;forward&#8217; (default) or &#8216;reverse&#8217;</em>) &#8211; direction of motion</li>
-<li><strong>wait</strong> (<tt class="docutils literal"><span class="pre">True</span></tt>/<tt class="docutils literal"><span class="pre">False</span></tt>) &#8211; whether to wait for completion</li>
+<li><strong>wait</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) &#8211; whether to wait for completion</li>
 <li><strong>timeout</strong> (<em>float</em>) &#8211; max time for move to complete (in seconds) [default=300]</li>
 </ul>
 </td>
@@ -774,7 +776,7 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 
 <dl class="method">
 <dt id="motor.get_position">
-<tt class="descclassname">motor.</tt><tt class="descname">get_position</tt><big>(</big><em>readback=False</em><span class="optional">[</span>, <em>dial=False</em><span class="optional">[</span>, <em>raw=False</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#motor.get_position" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">get_position</code><span class="sig-paren">(</span><em>readback=False</em><span class="optional">[</span>, <em>dial=False</em><span class="optional">[</span>, <em>raw=False</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.get_position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the motor position in user, dial or raw coordinates.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -799,7 +801,7 @@ The &#8220;readback&#8221; keyword can be used in user, dial or raw coordinates.
 
 <dl class="method">
 <dt id="motor.set_position">
-<tt class="descclassname">motor.</tt><tt class="descname">set_position</tt><big>(</big><em>position[ dial=False[, raw=False]]</em><big>)</big><a class="headerlink" href="#motor.set_position" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">set_position</code><span class="sig-paren">(</span><em>position[ dial=False[, raw=False]]</em><span class="sig-paren">)</span><a class="headerlink" href="#motor.set_position" title="Permalink to this definition">¶</a></dt>
 <dd><p>set (that is, redefine) the current position to supplied value.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -820,25 +822,25 @@ The &#8220;readback&#8221; keyword can be used in user, dial or raw coordinates.
 
 <dl class="method">
 <dt id="motor.get_pv">
-<tt class="descclassname">motor.</tt><tt class="descname">get_pv</tt><big>(</big><em>attr</em><big>)</big><a class="headerlink" href="#motor.get_pv" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">get_pv</code><span class="sig-paren">(</span><em>attr</em><span class="sig-paren">)</span><a class="headerlink" href="#motor.get_pv" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the <cite>PV</cite> for the corresponding attribute.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="motor.set_callback">
-<tt class="descclassname">motor.</tt><tt class="descname">set_callback</tt><big>(</big><em>attr='drive'</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>kw=None</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#motor.set_callback" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">set_callback</code><span class="sig-paren">(</span><em>attr='drive'</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>kw=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.set_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets a callback on the <cite>PV</cite> for a particular attribute.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="motor.clear_callback">
-<tt class="descclassname">motor.</tt><tt class="descname">clear_callback</tt><big>(</big><em>attr='drive'</em><big>)</big><a class="headerlink" href="#motor.clear_callback" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">clear_callback</code><span class="sig-paren">(</span><em>attr='drive'</em><span class="sig-paren">)</span><a class="headerlink" href="#motor.clear_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>clears a callback on the <cite>PV</cite> for a particular attribute.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="motor.show_info">
-<tt class="descclassname">motor.</tt><tt class="descname">show_info</tt><big>(</big><big>)</big><a class="headerlink" href="#motor.show_info" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">show_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.show_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>prints out a table of attributes and their current values.</p>
 </dd></dl>
 
@@ -894,9 +896,9 @@ implementation of this device is:</p>
 </pre></div>
 </div>
 <p>The code simply pre-defines the fields that are the <em>suffixes</em> of an Epics ai
-input record, and subclasses <tt class="xref py py-class docutils literal"><span class="pre">Device</span></tt> with these fields to create the
+input record, and subclasses <code class="xref py py-class docutils literal"><span class="pre">Device</span></code> with these fields to create the
 corresponding PVs.  For most record suffixes, these will be available as
-attributes of the Device object.  For example, the <tt class="xref py py-class docutils literal"><span class="pre">ai</span></tt> class above can
+attributes of the Device object.  For example, the <code class="xref py py-class docutils literal"><span class="pre">ai</span></code> class above can
 be used simply and cleanly as:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics.devices</span> <span class="kn">import</span> <span class="n">ai</span>
 <span class="n">This_ai</span> <span class="o">=</span> <span class="n">ai</span><span class="p">(</span><span class="s">&#39;XXX.PRES&#39;</span><span class="p">)</span>
@@ -904,8 +906,8 @@ be used simply and cleanly as:</p>
 <span class="k">print</span> <span class="s">&#39;Units: &#39;</span><span class="p">,</span> <span class="n">This_ai</span><span class="o">.</span><span class="n">EGU</span>
 </pre></div>
 </div>
-<p>Of course, you can also use the <a class="reference internal" href="#motor.get" title="motor.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a>, <a class="reference internal" href="#motor.put" title="motor.put"><tt class="xref py py-meth docutils literal"><span class="pre">put()</span></tt></a> methods above for a
-basic <tt class="xref py py-class docutils literal"><span class="pre">Device</span></tt>:</p>
+<p>Of course, you can also use the <a class="reference internal" href="#motor.get" title="motor.get"><code class="xref py py-meth docutils literal"><span class="pre">get()</span></code></a>, <a class="reference internal" href="#motor.put" title="motor.put"><code class="xref py py-meth docutils literal"><span class="pre">put()</span></code></a> methods above for a
+basic <code class="xref py py-class docutils literal"><span class="pre">Device</span></code>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">This_ai</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;DESC&#39;</span><span class="p">,</span> <span class="s">&#39;My Pump&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -992,8 +994,8 @@ reading and writing data.</p>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chans</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>Note that we can then create a <tt class="xref py py-class docutils literal"><span class="pre">scaler</span></tt> object from its base PV
-prefix, and use methods like <tt class="xref py py-meth docutils literal"><span class="pre">Count()</span></tt> and <tt class="xref py py-meth docutils literal"><span class="pre">Read()</span></tt> without
+<p>Note that we can then create a <code class="xref py py-class docutils literal"><span class="pre">scaler</span></code> object from its base PV
+prefix, and use methods like <code class="xref py py-meth docutils literal"><span class="pre">Count()</span></code> and <code class="xref py py-meth docutils literal"><span class="pre">Read()</span></code> without
 directly invoking epics calls:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">s1</span> <span class="o">=</span> <span class="n">Scaler</span><span class="p">(</span><span class="s">&#39;XXX:scaler1&#39;</span><span class="p">)</span>
 <span class="n">s1</span><span class="o">.</span><span class="n">setCalc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&#39;(B-2000*A/10000000.)&#39;</span><span class="p">)</span>
@@ -1011,8 +1013,8 @@ directly invoking epics calls:</p>
 <p>Several other Epics Records have been exposed as Devices, and included in
 PyEpics distribution.  These vary some in how complete and feature-rich they
 are, and are definitely skewed toward data collection at synchrotron beamlines.
-A table of current Devices are listed in the <a class="reference internal" href="#devices-table"><em>Table of Included Epics
-Devices</em></a> table below.  For further details, consult the source
+A table of current Devices are listed in the <a class="reference internal" href="#devices-table"><span>Table of Included Epics
+Devices</span></a> table below.  For further details, consult the source
 code for these modules.</p>
 <blockquote id="devices-table">
 <div>Table of Epics Devices Included in the PyEpics distribtion.  For those
@@ -1112,7 +1114,7 @@ specific use of that Device.</div></blockquote>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -1137,9 +1139,9 @@ specific use of that Device.</div></blockquote>
  
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>
