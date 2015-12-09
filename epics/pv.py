@@ -43,7 +43,7 @@ def get_pv(pvname, form='time',  connect=False,
     start_time = time.time()
     # not cached -- create pv (automaticall saved to cache)
     if thispv is None:
-        thispv = PV(pvname, **kws)
+        thispv = PV(pvname, form=form, **kws)
 
     if connect:
         thispv.wait_for_connection()
