@@ -1290,11 +1290,10 @@ def put(chid, value, wait=False, timeout=30, callback=None,
      value put() to array PV must be an array or sequence''')
     if ftype == dbr.CHAR and nativecount > 1 and is_string_or_bytes(value):
         count += 1
+        count = min(count, nativecount)
 
     # if needed (python3, especially) convert to basic string/bytes form
     if is_string(value):
-        if value == '':
-            value = NULLCHAR
         value = ascii_string(value)
 
     data  = (count*dbr.Map[ftype])()
@@ -1342,7 +1341,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
 
     # simple put, without wait or callback
     if not (wait or hasattr(callback, '__call__')):
-        ret =  libca.ca_array_put(ftype, count, chid, data)
+        ret = libca.ca_array_put(ftype, count, chid, data)
         PySEVCHK('put', ret)
         poll()
         return ret
