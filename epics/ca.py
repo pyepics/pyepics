@@ -1040,7 +1040,7 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
             return data[0]
         elif ntype == dbr.STRING:
             return scan_string(data, count)
-        elif count > 1:
+        elif count != 1:
             return array_cast(data, count, ntype, use_numpy)
         return data
 
@@ -1060,7 +1060,7 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     if ftype is None:
         ftype = dbr.INT
     ntype = native_type(ftype)
-    use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and count > 1)
+    use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and count != 1)
     return unpack(data, count, ntype, use_numpy)
 
 @withConnectedCHID
