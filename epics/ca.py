@@ -1050,10 +1050,10 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     except (TypeError, IndexError):
         return None
 
-    if count is None and chid is not None:
-        count = element_count(chid)
-    if count is None:
-        count = 1
+    if count == 0 or count is None:
+        count = len(data)
+    else:
+        count = min(len(data), count)
 
     if ftype is None and chid is not None:
         ftype = field_type(chid)
@@ -1132,7 +1132,10 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     if ftype in (None, -1):
         return None
     if count is None:
-        count = element_count(chid)
+        count = 0
+        # count = element_count(chid)
+        # don't default to the element_count here - let EPICS tell us the size
+        # in the _onGetEvent callback
     else:
         count = min(count, element_count(chid))
 
