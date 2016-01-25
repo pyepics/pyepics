@@ -7,6 +7,7 @@ import time
 import unittest
 import numpy
 import ctypes
+from contextlib import contextmanager
 from epics import ca, dbr, caput
 
 import pvnames
@@ -38,11 +39,14 @@ def onChanges(pvname=None, value=None, **kws):
     global CHANGE_DAT
     CHANGE_DAT[pvname] = value
 
-def pause_updating():
-    caput(pvnames.pause_pv, 1)
-
-def resume_updating():
-    caput(pvnames.pause_pv, 0)
+@contextmanager
+def no_simulator_updates():
+    '''Context manager which pauses and resumes simulator PV updating'''
+    try:
+        caput(pvnames.pause_pv, 1)
+        yield
+    finally:
+        caput(pvnames.pause_pv, 0)
 
 class CA_BasicTests(unittest.TestCase):
 
@@ -304,90 +308,88 @@ class CA_BasicTests(unittest.TestCase):
         write( 'CA test Values (compare 5 values with caget)')
         os.system('rm ./caget.tst')
         vals = {}
-        pause_updating()
-        for pvn in (pvnames.str_pv,  pvnames.int_pv,
-                    pvnames.float_pv, pvnames.enum_pv,
-                    pvnames.long_pv):
-            os.system('caget  -n -f5 %s >> ./caget.tst' % pvn)
-            chid = ca.create_channel(pvn)
-            ca.connect_channel(chid)
-            vals[pvn] = ca.get(chid)
-        rlines = open('./caget.tst', 'r').readlines()
-        for line in rlines:
-            pvn, sval = [i.strip() for i in line[:-1].split(' ', 1)]
-            tval = str(vals[pvn])
-            if pvn in (pvnames.float_pv,pvnames.double_pv): # use float precision!
-                tval = "%.5f" % vals[pvn]
-            self.assertEqual(tval, sval)
-        resume_updating()
+        with no_simulator_updates():
+            for pvn in (pvnames.str_pv,  pvnames.int_pv,
+                        pvnames.float_pv, pvnames.enum_pv,
+                        pvnames.long_pv):
+                os.system('caget  -n -f5 %s >> ./caget.tst' % pvn)
+                chid = ca.create_channel(pvn)
+                ca.connect_channel(chid)
+                vals[pvn] = ca.get(chid)
+            rlines = open('./caget.tst', 'r').readlines()
+            for line in rlines:
+                pvn, sval = [i.strip() for i in line[:-1].split(' ', 1)]
+                tval = str(vals[pvn])
+                if pvn in (pvnames.float_pv,pvnames.double_pv):
+                    # use float precision!
+                    tval = "%.5f" % vals[pvn]
+                self.assertEqual(tval, sval)
 
     def test_type_converions_1(self):
         write("CA type conversions scalars")
         pvlist = (pvnames.str_pv, pvnames.int_pv, pvnames.float_pv,
                   pvnames.enum_pv,  pvnames.long_pv,  pvnames.double_pv2)
         chids = []
-        pause_updating()
-        for name in pvlist:
-            chid = ca.create_channel(name)
-            ca.connect_channel(chid)
-            chids.append((chid, name))
-            ca.poll(evt=0.025, iot=5.0)
-        ca.poll(evt=0.05, iot=10.0)
+        with no_simulator_updates():
+            for name in pvlist:
+                chid = ca.create_channel(name)
+                ca.connect_channel(chid)
+                chids.append((chid, name))
+                ca.poll(evt=0.025, iot=5.0)
+            ca.poll(evt=0.05, iot=10.0)
 
-        values = {}
-        for chid, name in chids:
-            values[name] = ca.get(chid, as_string=True)
+            values = {}
+            for chid, name in chids:
+                values[name] = ca.get(chid, as_string=True)
 
-        for promotion in ('ctrl', 'time'):
-            for chid, pvname in chids:
-                write('=== %s  chid=%s as %s' % (ca.name(chid),
-                                                   repr(chid), promotion))
-                time.sleep(0.01)
-                if promotion == 'ctrl':
-                    ntype = ca.promote_type(chid, use_ctrl=True)
-                else:
-                    ntype = ca.promote_type(chid, use_time=True)
+            for promotion in ('ctrl', 'time'):
+                for chid, pvname in chids:
+                    write('=== %s  chid=%s as %s' % (ca.name(chid), repr(chid),
+                                                     promotion))
+                    time.sleep(0.01)
+                    if promotion == 'ctrl':
+                        ntype = ca.promote_type(chid, use_ctrl=True)
+                    else:
+                        ntype = ca.promote_type(chid, use_time=True)
 
-                val  = ca.get(chid, ftype=ntype)
-                cval = ca.get(chid, as_string=True)
-                if ca.element_count(chid) > 1:
-                    val = val[:12]
-                self.assertEqual(cval, values[pvname])
-        resume_updating()
+                    val  = ca.get(chid, ftype=ntype)
+                    cval = ca.get(chid, as_string=True)
+                    if ca.element_count(chid) > 1:
+                        val = val[:12]
+                    self.assertEqual(cval, values[pvname])
 
     def test_type_converions_2(self):
         write("CA type conversions arrays")
         pvlist = (pvnames.char_arr_pv,
                   pvnames.long_arr_pv,
                   pvnames.double_arr_pv)
-        pause_updating()
-        chids = []
-        for name in pvlist:
-            chid = ca.create_channel(name)
-            ca.connect_channel(chid)
-            chids.append((chid, name))
-            ca.poll(evt=0.025, iot=5.0)
-        ca.poll(evt=0.05, iot=10.0)
+        with no_simulator_updates():
+            chids = []
+            for name in pvlist:
+                chid = ca.create_channel(name)
+                ca.connect_channel(chid)
+                chids.append((chid, name))
+                ca.poll(evt=0.025, iot=5.0)
+            ca.poll(evt=0.05, iot=10.0)
 
-        values = {}
-        for chid, name in chids:
-            values[name] = ca.get(chid)
-        for promotion in ('ctrl', 'time'):
-            for chid, pvname in chids:
-                write('=== %s  chid=%s as %s' % (ca.name(chid),
-                                                   repr(chid), promotion))
-                time.sleep(0.01)
-                if promotion == 'ctrl':
-                    ntype = ca.promote_type(chid, use_ctrl=True)
-                else:
-                    ntype = ca.promote_type(chid, use_time=True)
+            values = {}
+            for chid, name in chids:
+                values[name] = ca.get(chid)
+            for promotion in ('ctrl', 'time'):
+                for chid, pvname in chids:
+                    write('=== %s  chid=%s as %s' % (ca.name(chid), repr(chid),
+                                                     promotion))
+                    time.sleep(0.01)
+                    if promotion == 'ctrl':
+                        ntype = ca.promote_type(chid, use_ctrl=True)
+                    else:
+                        ntype = ca.promote_type(chid, use_time=True)
 
-                val  = ca.get(chid, ftype=ntype)
-                cval = ca.get(chid, as_string=True)
-                for a, b in zip(val, values[pvname]):
-                    self.assertEqual(a, b)
+                    val  = ca.get(chid, ftype=ntype)
+                    cval = ca.get(chid, as_string=True)
+                    for a, b in zip(val, values[pvname]):
+                        self.assertEqual(a, b)
 
-        resume_updating()
 
     def test_Array0(self):
         write('Array Test: get double array as numpy array, ctypes Array, and list')
