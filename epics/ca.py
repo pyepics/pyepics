@@ -1305,7 +1305,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
             data[0].value = value
         else:
             for elem in range(min(count, len(value))):
-                data[elem].value = value[elem]
+                data[elem].value = ascii_string(value[elem])
     elif nativecount == 1:
         if ftype == dbr.CHAR:
             if is_string_or_bytes(value):

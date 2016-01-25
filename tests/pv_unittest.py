@@ -72,7 +72,7 @@ class PV_Tests(unittest.TestCase):
 
             self.failUnless(int(cval)== val)
 
-    def test_stringarray(self):
+    def test_get_string_waveform(self):
         write('String Array: \n')
         with no_simulator_updates():
             pv = PV(pvnames.string_arr_pv)
@@ -82,6 +82,15 @@ class PV_Tests(unittest.TestCase):
             self.failUnless(len(val[0]) > 1)
             self.assertIsInstance(val[1], str)
             self.failUnless(len(val[1]) > 1)
+
+    def test_put_string_waveform(self):
+        write('String Array: \n')
+        with no_simulator_updates():
+            pv = PV(pvnames.string_arr_pv)
+            put_value = ['a', 'b', 'c']
+            pv.put(put_value)
+            get_value = pv.get(use_monitor=False, count=len(put_value))
+            numpy.testing.assert_array_equal(get_value, put_value)
 
     def test_putcomplete(self):
         write('Put with wait and put_complete (using real motor!) \n')
