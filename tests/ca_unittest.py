@@ -58,17 +58,12 @@ class CA_BasicTests(unittest.TestCase):
     def testA_CreateChid(self):
         write('Simple Test: create chid')
         chid = ca.create_channel(pvnames.double_pv)
-        self.assertIsNot(chid,None)
+        self.assertIsNot(chid, None)
 
     def testA_GetNonExistentPV(self):
         write('Simple Test: get on a non-existent PV')
         chid = ca.create_channel('Definitely-Not-A-Real-PV')
-        val, out = None, False
-        try:
-            val = ca.get(chid)
-        except ca.ChannelAccessException:
-            out = True
-        assert(out)
+        self.assertRaises(ca.ChannelAccessException, ca.get, chid)
 
     def testA_CreateChid_CheckTypeCount(self):
         write('Simple Test: create chid, check count, type, host, and access')
@@ -421,9 +416,9 @@ class CA_BasicTests(unittest.TestCase):
         chid = ca.create_channel(pvnames.double_arrays[0])
         maxpts = ca.element_count(chid)
         npts = int(max(2, maxpts/2.3 - 1))
-        print('max points is', maxpts)
+        write('max points is %s' % (maxpts, ))
         dat = numpy.random.normal(size=npts)
-        print('setting array to a length of npts=', npts)
+        write('setting array to a length of npts=%s' % (npts, ))
         ca.put(chid, dat)
         out1 = ca.get(chid)
         self.assertTrue(isinstance(out1, numpy.ndarray))
