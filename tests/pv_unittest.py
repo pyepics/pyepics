@@ -37,7 +37,7 @@ class PV_Tests(unittest.TestCase):
     def testA_CreatePV(self):
         write('Simple Test: create pv\n')
         pv = PV(pvnames.double_pv)
-        self.assertNotEqual(pv, None)
+        self.assertIsNot(pv, None)
 
     def testA_CreatedWithConn(self):
         write('Simple Test: create pv with conn callback\n')
@@ -54,7 +54,7 @@ class PV_Tests(unittest.TestCase):
         pvs = (pvnames.double_pv, pvnames.enum_pv, pvnames.str_pv)
         for p in pvs:
             val = caget(p)
-            self.assertNotEqual(val, None)
+            self.assertIsNot(val, None)
         sval = caget(pvnames.str_pv)
         self.assertEqual(sval, 'ao')
 
@@ -85,6 +85,10 @@ class PV_Tests(unittest.TestCase):
         write('Put with wait and put_complete (using real motor!) \n')
         vals = (1.35, 1.50, 1.44, 1.445, 1.45, 1.453, 1.446, 1.447, 1.450, 1.450, 1.490, 1.5, 1.500)
         p = PV(pvnames.motor1)
+        # this works with a real motor, fail if it doesn't connect quickly
+        if not p.wait_for_connection(timeout=0.2):
+            self.skipTest('Unable to connect to real motor record')
+
         see_complete = []
         for v in vals:
             t0 = time.time()
@@ -102,6 +106,10 @@ class PV_Tests(unittest.TestCase):
     def test_putwait(self):
         write('Put with wait (using real motor!) \n')
         pv = PV(pvnames.motor1)
+        # this works with a real motor, fail if it doesn't connect quickly
+        if not pv.wait_for_connection(timeout=0.2):
+            self.skipTest('Unable to connect to real motor record')
+
         val = pv.get()
 
         t0 = time.time()
@@ -214,9 +222,23 @@ class PV_Tests(unittest.TestCase):
         self.assertEqual(len(subval), 5)
         self.failUnless(numpy.all(subval == full_data[13:5+13]))
 
+    def test_subarray_zerolen(self):
+        subarr1 = PV(pvnames.zero_len_subarr1)
+        subarr1.wait_for_connection()
+
+        val = subarr1.get(use_monitor=True, as_numpy=True)
+        self.assertIsInstance(val, numpy.ndarray, msg='using monitor')
+        self.assertEquals(len(val), 0, msg='using monitor')
+        self.assertEquals(val.dtype, numpy.float64, msg='using monitor')
+
+        val = subarr1.get(use_monitor=False, as_numpy=True)
+        self.assertIsInstance(val, numpy.ndarray, msg='no monitor')
+        self.assertEquals(len(val), 0, msg='no monitor')
+        self.assertEquals(val.dtype, numpy.float64, msg='no monitor')
+
     def testEnumPut(self):
         pv = PV(pvnames.enum_pv)
-        self.assertNotEqual(pv, None)
+        self.assertIsNot(pv, None)
         pv.put('Stop')
         time.sleep(0.1)
         val = pv.get()

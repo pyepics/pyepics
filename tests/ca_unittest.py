@@ -54,7 +54,7 @@ class CA_BasicTests(unittest.TestCase):
     def testA_CreateChid(self):
         write('Simple Test: create chid')
         chid = ca.create_channel(pvnames.double_pv)
-        self.assertNotEqual(chid,None)
+        self.assertIsNot(chid,None)
 
     def testA_GetNonExistentPV(self):
         write('Simple Test: get on a non-existent PV')
@@ -65,7 +65,7 @@ class CA_BasicTests(unittest.TestCase):
         except ca.ChannelAccessException:
             out = True
         assert(out)
-        
+
     def testA_CreateChid_CheckTypeCount(self):
         write('Simple Test: create chid, check count, type, host, and access')
         chid = ca.create_channel(pvnames.double_pv)
@@ -77,8 +77,8 @@ class CA_BasicTests(unittest.TestCase):
         host    = ca.host_name(chid)
         rwacc = ca.access(chid)
 
-        self.assertNotEqual(chid, None)
-        self.assertNotEqual(host, None)
+        self.assertIsNot(chid, None)
+        self.assertIsNot(host, None)
         self.assertEqual(count, 1)
         self.assertEqual(ftype, 6)
         self.assertEqual(rwacc,'read/write')
@@ -192,7 +192,7 @@ class CA_BasicTests(unittest.TestCase):
                 ret = ca.put(chid, 1)
             except:
                 pass
-            self.assertNotEqual(ret, None)
+            self.assertIsNot(ret, None)
 
     def test_subscription_double(self):
         pvn = pvnames.updating_pv1
@@ -207,7 +207,7 @@ class CA_BasicTests(unittest.TestCase):
                 break
         val = CHANGE_DAT.get(pvn, None)
         ca.clear_subscription(eventID)
-        self.assertNotEqual(val, None)
+        self.assertIsNot(val, None)
 
     def test_subscription_custom(self):
         pvn = pvnames.updating_pv1
@@ -247,7 +247,7 @@ class CA_BasicTests(unittest.TestCase):
                 break
         val = CHANGE_DAT.get(pvn, None)
         # ca.clear_subscription(eventID)
-        self.assertNotEqual(val, None)
+        self.assertIsNot(val, None)
         time.sleep(0.2)
 
 
@@ -271,7 +271,7 @@ class CA_BasicTests(unittest.TestCase):
                 timeout = timeout+1
             val = CHANGE_DAT.get(arrayname, None)
             ca.clear_subscription(eventID)
-            self.assertNotEqual(val, None)
+            self.assertIsNot(val, None)
             self.assertEqual(type(val), array_type)
             self.assertEqual(len(val), length)
             self.assertEqual(type(val[0]), element_type)
@@ -419,16 +419,17 @@ class CA_BasicTests(unittest.TestCase):
         chid = ca.create_channel(pvnames.double_arrays[0])
         maxpts = ca.element_count(chid)
         npts = int(max(2, maxpts/2.3 - 1))
+        print('max points is', maxpts)
         dat = numpy.random.normal(size=npts)
+        print('setting array to a length of npts=', npts)
         ca.put(chid, dat)
         out1 = ca.get(chid)
         self.assertTrue(isinstance(out1, numpy.ndarray))
-        self.assertEqual(len(out1), maxpts)
+        self.assertEqual(len(out1), npts)
         out2 = ca.get(chid, count=0)
         self.assertTrue(isinstance(out2, numpy.ndarray))
         self.assertEqual(len(out2), npts)
 
-        
     def test_xArray3(self):
         write('Array Test: get char array as string')
         chid = ca.create_channel(pvnames.char_arrays[0])
