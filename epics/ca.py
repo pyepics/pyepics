@@ -98,7 +98,9 @@ class ChannelAccessException(Exception):
     """Channel Access Exception: General Errors"""
     def __init__(self, *args):
         Exception.__init__(self, *args)
-        sys.excepthook(*sys.exc_info())
+        type_, value, traceback = sys.exc_info()
+        if type_ is not None:
+            sys.excepthook(type_, value, traceback)
 
 class CASeverityException(Exception):
     """Channel Access Severity Check Exception:
