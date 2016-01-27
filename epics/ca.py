@@ -98,7 +98,9 @@ class ChannelAccessException(Exception):
     """Channel Access Exception: General Errors"""
     def __init__(self, *args):
         Exception.__init__(self, *args)
-        sys.excepthook(*sys.exc_info())
+        type_, value, traceback = sys.exc_info()
+        if type_ is not None:
+            sys.excepthook(type_, value, traceback)
 
 class CASeverityException(Exception):
     """Channel Access Severity Check Exception:
@@ -1305,7 +1307,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
             data[0].value = value
         else:
             for elem in range(min(count, len(value))):
-                data[elem].value = value[elem]
+                data[elem].value = ascii_string(value[elem])
     elif nativecount == 1:
         if ftype == dbr.CHAR:
             if is_string_or_bytes(value):
