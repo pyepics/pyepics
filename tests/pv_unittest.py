@@ -233,6 +233,24 @@ class PV_Tests(unittest.TestCase):
         self.assertEqual(len(subval), 5)
         self.failUnless(numpy.all(subval == full_data[13:5+13]))
 
+    def test_subarray_zerolen_no_monitor(self):
+        # a test of a char waveform of length 1 (NORD=1): value "\0"
+        # without using autom_onitor
+        zerostr = PV(pvnames.char_arr_zeroish_length_pv, auto_monitor=False)
+        zerostr.wait_for_connection()
+
+        self.assertEquals(zerostr.get(as_string=True), '')
+        self.assertEquals(zerostr.get(as_string=False), 0)
+
+    def test_subarray_zerolen_monitor(self):
+        # a test of a char waveform of length 1 (NORD=1): value "\0"
+        # with using auto_monitor
+        zerostr = PV(pvnames.char_arr_zeroish_length_pv, auto_monitor=True)
+        zerostr.wait_for_connection()
+
+        self.assertEquals(zerostr.get(as_string=True), '')
+        self.assertEquals(zerostr.get(as_string=False), 0)
+
     def test_subarray_zerolen(self):
         subarr1 = PV(pvnames.zero_len_subarr1)
         subarr1.wait_for_connection()
