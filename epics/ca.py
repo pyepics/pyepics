@@ -232,6 +232,7 @@ def initialize_libca():
     # libca.ca_name.argstypes    = [dbr.chid_t]
     # libca.ca_state.argstypes   = [dbr.chid_t]
     libca.ca_message.restype   = ctypes.c_char_p
+    ibca.ca_attach_context.argtypes = [ctypes.c_void_p]
 
     # save value offests used for unpacking
     # TIME and CTRL data as an array in dbr module
