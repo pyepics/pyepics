@@ -294,7 +294,12 @@ class PV(object):
             return val
 
         if count is None:
-            count = len(val)
+            try:
+                count = len(val)
+            except TypeError:
+                # not an array-type, just return the value itself
+                return val
+
         if (as_numpy and ca.HAS_NUMPY and
             not isinstance(val, ca.numpy.ndarray)):
             if count == 1:
@@ -373,9 +378,13 @@ class PV(object):
             self._args['char_value'] = cval
             return cval
 
-        cval  = repr(val)
+        cval = repr(val)
         if self.count > 1:
-            cval = '<array size=%d, type=%s>' % (len(val),
+            try:
+                array_size = len(val)
+            except TypeError:
+                array_size = None
+            cval = '<array size=%s, type=%s>' % (array_size,
                                                  dbr.Name(ftype).lower())
         elif ntype in (dbr.FLOAT, dbr.DOUBLE):
             if call_ca and self._args['precision'] is None:
