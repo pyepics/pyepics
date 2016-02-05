@@ -395,7 +395,7 @@ class CA_BasicTests(unittest.TestCase):
         self.assertTrue(isinstance(aval, numpy.ndarray))
         self.assertTrue(len(aval) > 2)
 
-        self.assertTrue(isinstance(cval, ctypes.Array))
+        self.assertTrue(isinstance(cval, list))
         self.assertTrue(len(cval) > 2)
         lval = list(cval)
         self.assertTrue(isinstance(lval, list))

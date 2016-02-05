@@ -34,6 +34,7 @@ double_arr_pv = 'Py:double2k'
 string_arr_pv = 'Py:string128'
 # char / byte array
 char_arr_pv   = 'Py:char128'
+char_arr_zeroish_length_pv = 'Py:waveform_char256'
 char_arrays   = ['Py:char128', 'Py:char2k', 'Py:char64k']
 long_arrays   = ['Py:long128', 'Py:long2k', 'Py:long64k']
 double_arrays   = ['Py:double128', 'Py:double2k', 'Py:double64k']

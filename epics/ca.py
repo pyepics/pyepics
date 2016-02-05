@@ -1032,13 +1032,15 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
             else:
                 out = numpy.ctypeslib.as_array(memcopy(data))
         else:
-            out = memcopy(data)
+            out = list(data)
         return out
 
-    def unpack(data, count, ntype, use_numpy):
+    def unpack(data, count, ntype, use_numpy, elem_count):
         "simple, native data type"
         if data is None:
             return None
+        elif ntype == dbr.CHAR and elem_count > 1:
+            return array_cast(data, count, ntype, use_numpy)
         elif count == 1 and ntype != dbr.STRING:
             return data[0]
         elif ntype == dbr.STRING:
@@ -1063,8 +1065,11 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     if ftype is None:
         ftype = dbr.INT
     ntype = native_type(ftype)
-    use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and count != 1)
-    return unpack(data, count, ntype, use_numpy)
+    elem_count = element_count(chid)
+    numpy_count = (count != 1 and elem_count > 1)
+    use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and
+                 numpy_count)
+    return unpack(data, count, ntype, use_numpy, elem_count)
 
 @withConnectedCHID
 def get(chid, ftype=None, count=None, wait=True, timeout=None,
