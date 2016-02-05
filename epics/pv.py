@@ -294,23 +294,16 @@ class PV(object):
             return val
 
         if count is None:
-            try:
-                count = len(val)
-            except TypeError:
-                # not an array-type, just return the value itself
-                return val
+            count = len(val)
 
-        if (as_numpy and ca.HAS_NUMPY and
-            not isinstance(val, ca.numpy.ndarray)):
-            if count == 1:
-                val = [val]
-            val = ca.numpy.array(val)
-        elif (as_numpy and ca.HAS_NUMPY and count == 1 and
-            not isinstance(val, ca.numpy.ndarray)):
-            val = ca.numpy.array([val])
-        elif (not as_numpy and ca.HAS_NUMPY and
-              isinstance(val, ca.numpy.ndarray)):
-            val = list(val)
+        if ca.HAS_NUMPY:
+            is_array = isinstance(val, ca.numpy.ndarray)
+            if as_numpy and not is_array:
+                if not isinstance(val, list):
+                    val = [val]
+                val = ca.numpy.array(val)
+            elif not as_numpy and is_array:
+                val = val.tolist()
         # allow asking for less data than actually exists in the cached value
         if count < len(val):
             val = val[:count]
@@ -360,15 +353,13 @@ class PV(object):
             return val
         # char waveform as string
         if ntype == dbr.CHAR and self.count < ca.AUTOMONITOR_MAXLENGTH:
-            if isinstance(val, ca.numpy.ndarray):
+            if ca.HAS_NUMPY and isinstance(val, ca.numpy.ndarray):
                 val = val.tolist()
-            elif self.count==1 or isinstance(val, int):
-                # single character in waveform
+            elif not isinstance(val, list):
                 val = [val]
-            else:
-                val = list(val)
+
             if 0 in val:
-                firstnull  = val.index(0)
+                firstnull = val.index(0)
             else:
                 firstnull = len(val)
             try:
@@ -379,12 +370,9 @@ class PV(object):
             return cval
 
         cval = repr(val)
+
         if self.count > 1:
-            try:
-                array_size = len(val)
-            except TypeError:
-                array_size = None
-            cval = '<array size=%s, type=%s>' % (array_size,
+            cval = '<array size=%s, type=%s>' % (len(val),
                                                  dbr.Name(ftype).lower())
         elif ntype in (dbr.FLOAT, dbr.DOUBLE):
             if call_ca and self._args['precision'] is None:

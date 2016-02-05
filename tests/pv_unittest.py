@@ -240,7 +240,7 @@ class PV_Tests(unittest.TestCase):
         zerostr.wait_for_connection()
 
         self.assertEquals(zerostr.get(as_string=True), '')
-        self.assertEquals(zerostr.get(as_string=False), 0)
+        numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0])
 
     def test_subarray_zerolen_monitor(self):
         # a test of a char waveform of length 1 (NORD=1): value "\0"
@@ -249,7 +249,7 @@ class PV_Tests(unittest.TestCase):
         zerostr.wait_for_connection()
 
         self.assertEquals(zerostr.get(as_string=True), '')
-        self.assertEquals(zerostr.get(as_string=False), 0)
+        numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0])
 
     def test_subarray_zerolen(self):
         subarr1 = PV(pvnames.zero_len_subarr1)
