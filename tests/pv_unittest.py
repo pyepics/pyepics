@@ -257,6 +257,8 @@ class PV_Tests(unittest.TestCase):
 
             # elem_count = 128, requested count = None, libca returns count = 1
             zerostr.put([0], wait=True)
+            time.sleep(0.2)
+
             self.assertEquals(zerostr.get(as_string=True), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0])
             self.assertEquals(zerostr.get(as_string=True, as_numpy=False), '')
@@ -264,6 +266,8 @@ class PV_Tests(unittest.TestCase):
 
             # elem_count = 128, requested count = None, libca returns count = 2
             zerostr.put([0, 0], wait=True)
+            time.sleep(0.2)
+
             self.assertEquals(zerostr.get(as_string=True), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0, 0])
             self.assertEquals(zerostr.get(as_string=True, as_numpy=False), '')
@@ -350,6 +354,23 @@ class PV_Tests(unittest.TestCase):
         val = pv.get(count=1, use_monitor=False)
         self.failUnless(isinstance(val, numpy.ndarray))
         self.failUnless(len(val), 1)
+
+    def test_subarray_1elem(self):
+        with no_simulator_updates():
+            # pv = PV(pvnames.zero_len_subarr1)
+            pv = PV(pvnames.double_arr_pv)
+            pv.wait_for_connection()
+
+            val = pv.get(count=1, use_monitor=False)
+            print('val is', val, type(val))
+            self.assertIsInstance(val, numpy.ndarray)
+            self.assertEqual(len(val), 1)
+
+            val = pv.get(count=1, as_numpy=False, use_monitor=False)
+            print('val is', val, type(val))
+            self.assertIsInstance(val, list)
+            self.assertEqual(len(val), 1)
+
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase( PV_Tests)

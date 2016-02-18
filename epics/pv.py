@@ -293,19 +293,24 @@ class PV(object):
         if self.count <= 1 or val is None:
             return val
 
+        # After this point:
+        #   * self.count is > 1
+        #   * val should be set and a sequence
+        try:
+            len(val)
+        except TypeError:
+            # Edge case where a scalar value leaks through ca.unpack()
+            val = [val]
+
         if count is None:
             count = len(val)
+
         if (as_numpy and ca.HAS_NUMPY and
-            not isinstance(val, ca.numpy.ndarray)):
-            if count == 1:
-                val = [val]
-            val = ca.numpy.array(val)
-        elif (as_numpy and ca.HAS_NUMPY and count == 1 and
-            not isinstance(val, ca.numpy.ndarray)):
-            val = ca.numpy.array([val])
+                not isinstance(val, ca.numpy.ndarray)):
+            val = ca.numpy.asarray(val)
         elif (not as_numpy and ca.HAS_NUMPY and
-              isinstance(val, ca.numpy.ndarray)):
-            val = list(val)
+                isinstance(val, ca.numpy.ndarray)):
+            val = val.tolist()
         # allow asking for less data than actually exists in the cached value
         if count < len(val):
             val = val[:count]
@@ -385,7 +390,11 @@ class PV(object):
 
         cval  = repr(val)
         if self.count > 1:
-            cval = '<array size=%d, type=%s>' % (len(val),
+            try:
+                length = len(val)
+            except TypeError:
+                length = 1
+            cval = '<array size=%d, type=%s>' % (length,
                                                  dbr.Name(ftype).lower())
         elif ntype in (dbr.FLOAT, dbr.DOUBLE):
             if call_ca and self._args['precision'] is None:
