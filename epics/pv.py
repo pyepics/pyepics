@@ -28,7 +28,7 @@ def get_pv(pvname, form='time',  connect=False,
     context   PV threading context (default None)
     timeout   connection timeout, in seconds (default 5.0)
     """
-    
+
     if form not in ('native', 'time', 'ctrl'):
         form = 'native'
 
@@ -39,7 +39,7 @@ def get_pv(pvname, form='time',  connect=False,
             context = ca.current_context()
         if (pvname, form, context) in _PVcache_:
             thispv = _PVcache_[(pvname, form, context)]
-    
+
     start_time = time.time()
     # not cached -- create pv (automaticall saved to cache)
     if thispv is None:
@@ -151,7 +151,7 @@ class PV(object):
             chid = chid.value
         self._args['chid'] = self.chid = chid
         self.__on_connect(pvname=pvname, chid=chid, conn=conn, **kws)
-        
+
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
         # occassionally chid is still None (ie if a second PV is created
@@ -295,7 +295,7 @@ class PV(object):
 
         if count is None:
             count = len(val)
-        if (as_numpy and ca.HAS_NUMPY and 
+        if (as_numpy and ca.HAS_NUMPY and
             not isinstance(val, ca.numpy.ndarray)):
             if count == 1:
                 val = [val]
@@ -356,10 +356,22 @@ class PV(object):
         # char waveform as string
         if ntype == dbr.CHAR and self.count < ca.AUTOMONITOR_MAXLENGTH:
             if isinstance(val, ca.numpy.ndarray):
+                # a numpy array
                 val = val.tolist()
-            elif self.count==1: # handles single character in waveform
-                val = [val]
-            val = list(val)
+
+                if not isinstance(val, list):
+                    # a scalar value from numpy, tolist() turns it into a
+                    # native python integer
+                    val = [val.tolist()]
+            else:
+                try:
+                    # otherwise, try forcing it into a list. this will fail for
+                    # scalar types
+                    val = list(val)
+                except TypeError:
+                    # and when it fails, make it a list of one scalar value
+                    val = [val]
+
             if 0 in val:
                 firstnull  = val.index(0)
             else:
@@ -370,7 +382,7 @@ class PV(object):
                 cval = ''
             self._args['char_value'] = cval
             return cval
-        
+
         cval  = repr(val)
         if self.count > 1:
             cval = '<array size=%d, type=%s>' % (len(val),
@@ -404,7 +416,7 @@ class PV(object):
         kwds = ca.get_ctrlvars(self.chid, timeout=timeout, warn=warn)
         self._args.update(kwds)
         return kwds
-        
+
     def get_timevars(self, timeout=5, warn=True):
         "get time values for variable"
         if not self.wait_for_connection():
