@@ -247,6 +247,38 @@ class PV_Tests(unittest.TestCase):
         self.assertEquals(len(val), 0, msg='no monitor')
         self.assertEquals(val.dtype, numpy.float64, msg='no monitor')
 
+    def test_emptyish_char_waveform_no_monitor(self):
+        '''a test of a char waveform of length 1 (NORD=1): value "\0"
+        without using auto_monitor
+        '''
+        with no_simulator_updates():
+            zerostr = PV(pvnames.char_arr_pv, auto_monitor=False)
+            zerostr.wait_for_connection()
+
+            zerostr.put([0], wait=True)
+            self.assertEquals(zerostr.get(as_string=True), '')
+            numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0])
+
+            zerostr.put([0, 0], wait=True)
+            self.assertEquals(zerostr.get(as_string=True), '')
+            numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0, 0])
+
+    def test_emptyish_char_waveform_monitor(self):
+        '''a test of a char waveform of length 1 (NORD=1): value "\0"
+        with using auto_monitor
+        '''
+        with no_simulator_updates():
+            zerostr = PV(pvnames.char_arr_pv, auto_monitor=True)
+            zerostr.wait_for_connection()
+
+            zerostr.put([0], wait=True)
+            self.assertEquals(zerostr.get(as_string=True), '')
+            numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0])
+
+            zerostr.put([0, 0], wait=True)
+            self.assertEquals(zerostr.get(as_string=True), '')
+            numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0, 0])
+
     def testEnumPut(self):
         pv = PV(pvnames.enum_pv)
         self.assertIsNot(pv, None)
