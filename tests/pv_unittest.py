@@ -259,11 +259,15 @@ class PV_Tests(unittest.TestCase):
             zerostr.put([0], wait=True)
             self.assertEquals(zerostr.get(as_string=True), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0])
+            self.assertEquals(zerostr.get(as_string=True, as_numpy=False), '')
+            numpy.testing.assert_array_equal(zerostr.get(as_string=False, as_numpy=False), [0])
 
             # elem_count = 128, requested count = None, libca returns count = 2
             zerostr.put([0, 0], wait=True)
             self.assertEquals(zerostr.get(as_string=True), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0, 0])
+            self.assertEquals(zerostr.get(as_string=True, as_numpy=False), '')
+            numpy.testing.assert_array_equal(zerostr.get(as_string=False, as_numpy=False), [0, 0])
 
     def test_emptyish_char_waveform_monitor(self):
         '''a test of a char waveform of length 1 (NORD=1): value "\0"
@@ -276,10 +280,14 @@ class PV_Tests(unittest.TestCase):
             zerostr.put([0], wait=True)
             self.assertEquals(zerostr.get(as_string=True), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0])
+            self.assertEquals(zerostr.get(as_string=True, as_numpy=False), '')
+            numpy.testing.assert_array_equal(zerostr.get(as_string=False, as_numpy=False), [0])
 
             zerostr.put([0, 0], wait=True)
             self.assertEquals(zerostr.get(as_string=True), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0, 0])
+            self.assertEquals(zerostr.get(as_string=True, as_numpy=False), '')
+            numpy.testing.assert_array_equal(zerostr.get(as_string=False, as_numpy=False), [0, 0])
 
     def testEnumPut(self):
         pv = PV(pvnames.enum_pv)
