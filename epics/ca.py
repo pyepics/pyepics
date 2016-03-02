@@ -457,14 +457,20 @@ def withSEVCHK(fcn):
 def _onMonitorEvent(args):
     """Event Handler for monitor events: not intended for use"""
 
+    # If read access to a process variable is lost, this callback is invoked
+    # indicating the loss in the status argument. Users can use the connection
+    # callback to get informed of connection loss, so we just ignore any
+    # bad status codes.
+    if args.status != dbr.ECA_NORMAL:
+      return
+
     # for 64-bit python on Windows!
     if dbr.PY64_WINDOWS:   args = args.contents
     value = dbr.cast_args(args)
 
     pvname = name(args.chid)
     kwds = {'ftype':args.type, 'count':args.count,
-           'chid':args.chid, 'pvname': pvname,
-           'status':args.status}
+            'chid':args.chid, 'pvname': pvname}
 
     # add kwds arguments for CTRL and TIME variants
     # this is in a try/except clause to avoid problems
@@ -472,7 +478,7 @@ def _onMonitorEvent(args):
     if args.type >= dbr.CTRL_STRING:
         try:
             tmpv = value[0]
-            for attr in dbr.ctrl_limits + ('precision', 'units', 'severity'):
+            for attr in dbr.ctrl_limits + ('precision', 'units', 'status', 'severity'):
                 if hasattr(tmpv, attr):
                     kwds[attr] = getattr(tmpv, attr)
                     if attr == 'units':
