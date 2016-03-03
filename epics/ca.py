@@ -1488,8 +1488,8 @@ def get_precision(chid):
     """return the precision of a Channel.  For Channels with
     native type other than FLOAT or DOUBLE, this will be 0"""
     if field_type(chid) in (dbr.FLOAT, dbr.DOUBLE):
-        return get_ctrlvars(chid).get('precision', 0)
-    return 0
+        return get_ctrlvars(chid).get('precision', None)
+    return None
 
 def get_enum_strings(chid):
     """return list of names for ENUM states of a Channel.  Returns
