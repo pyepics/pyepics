@@ -11,7 +11,11 @@ provides two classes:
 #  Aug 21 2004 M Newville:  initial working version.
 #
 import wx
-from wx._core import PyDeadObjectError
+try:
+    from wx._core import PyDeadObjectError
+except:
+    PyDeadObjectError = Exception
+
 import epics
 from epics.wx.wxlib import PVText, PVFloatCtrl, PVButton, PVComboBox, \
      DelayedEpicsCallback, EpicsFunction
@@ -203,7 +207,7 @@ class MotorPanel(wx.Panel):
             epics.poll()
         else:
             self.motor.SPMG = 3
- 
+
     @EpicsFunction
     def OnMoreButton(self, event=None):
         "more button"
