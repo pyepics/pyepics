@@ -134,7 +134,7 @@ def FileOpen(parent, message, default_dir=None,
     if wildcard is None:
         wildcard = 'All files (*.*)|*.*'
 
-    style = wx.OPEN|wx.CHANGE_DIR
+    style = wx.FD_OPEN|wx.FD_CHANGE_DIR
     if multiple:
         style = style|wx.MULTIPLE
     dlg = wx.FileDialog(parent, message=message,
@@ -162,7 +162,7 @@ def FileSave(parent, message, default_file=None,
     dlg = wx.FileDialog(parent, message=message,
                         defaultFile=default_file,
                         wildcard=wildcard,
-                        style=wx.SAVE|wx.CHANGE_DIR)
+                        style=wx.FD_SAVE|wx.FD_CHANGE_DIR)
     if dlg.ShowModal() == wx.ID_OK:
         out = os.path.abspath(dlg.GetPath())
     dlg.Destroy()
@@ -506,4 +506,3 @@ class DateTimeCtrl(object):
         sizer.Fit(panel)
         if use_now:
             self.timectrl.SetValue(wx.DateTime_Now())
-
