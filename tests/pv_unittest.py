@@ -257,8 +257,6 @@ class PV_Tests(unittest.TestCase):
 
             # elem_count = 128, requested count = None, libca returns count = 1
             zerostr.put([0], wait=True)
-            time.sleep(0.2)
-
             self.assertEquals(zerostr.get(as_string=True), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0])
             self.assertEquals(zerostr.get(as_string=True, as_numpy=False), '')
@@ -266,8 +264,6 @@ class PV_Tests(unittest.TestCase):
 
             # elem_count = 128, requested count = None, libca returns count = 2
             zerostr.put([0, 0], wait=True)
-            time.sleep(0.2)
-
             self.assertEquals(zerostr.get(as_string=True), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0, 0])
             self.assertEquals(zerostr.get(as_string=True, as_numpy=False), '')
@@ -282,12 +278,16 @@ class PV_Tests(unittest.TestCase):
             zerostr.wait_for_connection()
 
             zerostr.put([0], wait=True)
+            time.sleep(0.2)
+
             self.assertEquals(zerostr.get(as_string=True), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0])
             self.assertEquals(zerostr.get(as_string=True, as_numpy=False), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False, as_numpy=False), [0])
 
             zerostr.put([0, 0], wait=True)
+            time.sleep(0.2)
+
             self.assertEquals(zerostr.get(as_string=True), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0, 0])
             self.assertEquals(zerostr.get(as_string=True, as_numpy=False), '')
