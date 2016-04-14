@@ -360,7 +360,7 @@ class PV(object):
             return val
         # char waveform as string
         if ntype == dbr.CHAR and self.count < ca.AUTOMONITOR_MAXLENGTH:
-            if isinstance(val, ca.numpy.ndarray):
+            if ca.HAS_NUMPY and isinstance(val, ca.numpy.ndarray):
                 # a numpy array
                 val = val.tolist()
 
