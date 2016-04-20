@@ -66,6 +66,14 @@ install:
   - export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$EPICS_BASE/lib/$EPICS_HOST_ARCH"
   - echo "PATH=$PATH"
 
+  # allow gdb backtrace to show when tests fail
+  - sudo apt-get -y install gdb
+  - ulimit -c
+
+before_script:
+  # ref: github.com/springmeyer/travis-coredump
+  - ulimit -c unlimited -S
+
 script:
   # check/record some basic pyepics things
   - echo "Checking pyepics version and libca locations:"
@@ -83,7 +91,9 @@ script:
   - caget Py:long1
 
   # running tests
-  - py.test -vv --cov=epics --cov-report term-missing tests/ca_unittest.py tests/pv_unittest.py
+  - py.test -vv --cov=epics --cov-report term-missing tests/ca_unittest.py tests/pv_unittest.py  || RESULT=$?
+  - if [[ ${RESULT} != 0 ]]; then gdb python core* -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
+  - if [[ ${RESULT} != 0 ]]; then exit $RESULT ; fi;
 
 after_success:
     - env
