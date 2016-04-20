@@ -769,9 +769,10 @@ class PV(object):
 
         if self._monref is not None:
             cback, uarg, evid = self._monref
-            ca.clear_subscription(evid)
             ctx = ca.current_context()
             if self.pvname in ca._cache[ctx]:
+                # atexit may have already cleared the subscription
+                ca.clear_subscription(evid)
                 ca._cache[ctx].pop(self.pvname)
             del cback
             del uarg

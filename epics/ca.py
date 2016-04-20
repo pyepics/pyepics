@@ -262,14 +262,13 @@ def finalize_libca(maxtime=10.0):
         start_time = time.time()
         flush_io()
         poll()
-        for ctx in _cache.values():
-            for key, info in ctx.items():
+        for ctxid, ctx in _cache.items():
+            for pvname, info in ctx.items():
                 try:
                     clear_channel(info['chid'])
                 except KeyError:
                     pass
             ctx.clear()
-
         _cache.clear()
         flush_count = 0
         while (flush_count < 5 and
@@ -647,8 +646,7 @@ def context_destroy():
     ctx = current_context()
     ret = libca.ca_context_destroy()
     if ctx in _cache:
-        for key in list(_cache[ctx].keys()):
-            _cache[ctx].pop(key)
+        _cache[ctx].clear()
         _cache.pop(ctx)
     return ret
 
