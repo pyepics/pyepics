@@ -1,4 +1,5 @@
 from __future__ import print_function
+from contextlib import contextmanager
 import epics
 import multiprocessing as mp
 
@@ -6,19 +7,16 @@ import pvnames
 PVS = [pvnames.double_pv, pvnames.double_pv2]
 
 
-class CAPoolTest(object):
-    def __enter__(self):
-        self.pool = epics.CAPool()
-        return self.pool
-
-    def __exit__(self, type_, value, traceback):
-        if type_ is None:
-            self.pool.close()
-            self.pool.join()
+@contextmanager
+def pool_ctx():
+    pool = epics.CAPool()
+    yield pool
+    pool.close()
+    pool.join()
 
 
-def caget_test():
-    with CAPoolTest() as pool:
+def test_caget():
+    with pool_ctx() as pool:
         print('Using caget() in subprocess pools:')
         print('\tpool.process =', pool.Process)
         values = pool.map(epics.caget, PVS)
@@ -31,11 +29,11 @@ def _manager_test_fcn(pv_dict, pv):
     pv_dict[pv] = epics.caget(pv)
 
 
-def manager_test():
+def test_manager():
     '''
     Fill up a shared dictionary using a manager
     '''
-    with CAPoolTest() as pool:
+    with pool_ctx() as pool:
         print('Multiprocessing Manager test:')
 
         manager = mp.Manager()
