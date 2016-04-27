@@ -60,7 +60,7 @@ error_message = ''
 ## PREEMPTIVE_CALLBACK determines the CA context
 PREEMPTIVE_CALLBACK = True
 
-AUTO_CLEANUP = (sys.version_info.major == 2)
+AUTO_CLEANUP = True
 
 ##
 # maximum element count for auto-monitoring of PVs in epics.pv
@@ -262,9 +262,13 @@ def finalize_libca(maxtime=10.0):
         start_time = time.time()
         flush_io()
         poll()
-        for ctx in _cache.values():
-            for key in list(ctx.keys()):
-                ctx.pop(key)
+        for ctxid, ctx in _cache.items():
+            for pvname, info in ctx.items():
+                try:
+                    clear_channel(info['chid'])
+                except KeyError:
+                    pass
+            ctx.clear()
         _cache.clear()
         flush_count = 0
         while (flush_count < 5 and
@@ -642,8 +646,7 @@ def context_destroy():
     ctx = current_context()
     ret = libca.ca_context_destroy()
     if ctx in _cache:
-        for key in list(_cache[ctx].keys()):
-            _cache[ctx].pop(key)
+        _cache[ctx].clear()
         _cache.pop(ctx)
     return ret
 

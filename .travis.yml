@@ -1,0 +1,100 @@
+language: python
+
+sudo: required
+dist: trusty
+
+services:
+  - docker
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+matrix:
+  include:
+    - python: 2.7
+    - python: 3.4
+    - python: 3.5
+
+before_install:
+  - export DOCKER0_IP=$(/sbin/ifconfig docker0 |grep 'inet addr' | sed -e 's/.*addr:\([^ ]*\).*/\1/')
+  - export EPICS_CA_ADDR_LIST=$( echo $DOCKER0_IP | sed -e 's/^\([0-9]\+\)\.\([0-9]\+\)\..*$/\1.\2.255.255/' )
+  - export EPICS_CA_AUTO_ADDR_LIST="no"
+  - export EPICS_CA_MAX_ARRAY_BYTES=10000000
+  - export DOCKERIMAGE="klauer/simioc-docker"
+  - export DOCKERTAG="pyepics-docker"
+  - export CONDA_ENV="testenv"
+
+  - perl --version
+  - git fetch --unshallow
+  - docker pull ${DOCKERIMAGE}:${DOCKERTAG}
+  - docker images
+  - docker ps -a
+  - docker run -d -p $DOCKER0_IP:5064:5064/tcp -p $DOCKER0_IP:5065:5065/udp --name epics_iocs ${DOCKERIMAGE}:${DOCKERTAG}
+  - docker ps -a
+
+  # INSTALL CONDA
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - "./miniconda.sh -b -p /home/travis/mc"
+  - env
+
+  - export PATH=/home/travis/mc/bin:$PATH
+  - conda config --set always_yes true
+  - conda update conda --yes
+  - conda install conda-build anaconda-client jinja2
+  - conda config --add channels lightsource2
+  - conda config --add channels soft-matter
+
+  # MAKE THE CONDA RECIPE
+  - conda create -n $CONDA_ENV python=$TRAVIS_PYTHON_VERSION epics-base
+  - source activate $CONDA_ENV
+
+  # need to reactivate after installing epics-base so that the EPICS_BASE env
+  # var is set
+  - source activate $CONDA_ENV
+
+install:
+  # install pyepics dependencies
+  - conda install numpy
+  - pip install coveralls pytest pytest-cov
+  # install pyepics as a source install
+  - python setup.py develop
+
+  # setup some path environment variables for epics
+  - export PATH=$PATH:$EPICS_BASE/bin/$EPICS_HOST_ARCH
+  - export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$EPICS_BASE/lib/$EPICS_HOST_ARCH"
+  - echo "PATH=$PATH"
+
+  # allow gdb backtrace to show when tests fail
+  - sudo apt-get -y install gdb
+  - ulimit -c
+
+before_script:
+  # ref: github.com/springmeyer/travis-coredump
+  - ulimit -c unlimited -S
+
+script:
+  # check/record some basic pyepics things
+  - echo "Checking pyepics version and libca locations:"
+  - python -c "import epics; print(epics.__version__)"
+  - python -c "import epics.ca; print(epics.ca.find_libca())"
+
+  - echo "Checking if the motor/areadetector IOC is running:"
+  - python -c "import epics; print('mtr1', epics.caget('sim:mtr1.RBV'))"
+  - python -c "import epics; print('arraycounter', epics.caget('sim:det:ROI1:ArrayCounter'))"
+  - echo "Checking if the pyepics test suite ioc is running:"
+  - python -c "import epics; print('long1', epics.caget('Py:long1'))"
+
+  - caget sim:mtr1.RBV
+  - caget sim:det:ROI1:ArrayCounter
+  - caget Py:long1
+
+  # running tests
+  - py.test -vv --cov=epics --cov-report term-missing tests/ca_unittest.py tests/pv_unittest.py  || RESULT=$?
+  - if [[ ${RESULT} != 0 ]]; then gdb python core* -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
+  - if [[ ${RESULT} != 0 ]]; then exit $RESULT ; fi;
+
+after_success:
+    - env
+    - coveralls
