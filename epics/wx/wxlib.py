@@ -2,7 +2,10 @@
 wx utility functions for Epics and wxPython interaction
 """
 import wx
-from wx._core import PyDeadObjectError
+try:
+    from wx._core import PyDeadObjectError
+except:
+    PyDeadObjectError = Exception
 
 import time
 import sys
@@ -108,7 +111,7 @@ class PVMixin(object):
 
         self._popupmenu = None
         self.Bind(wx.EVT_RIGHT_DOWN, self._onRightDown)
-            
+
     def _onRightDown(self, event=None):
         """right button down: show pop-up"""
         if event is None:
@@ -117,7 +120,7 @@ class PVMixin(object):
             self.build_popupmenu()
         wx.CallAfter(self.PopupMenu, self._popupmenu, event.GetPosition())
         event.Skip()
-    
+
     def build_popupmenu(self, event=None):
         self._copy_name = wx.NewId()
         self._copy_val  = wx.NewId()
@@ -131,7 +134,7 @@ class PVMixin(object):
         self.Bind(wx.EVT_MENU, self.copy_name,  id=self._copy_name)
         self.Bind(wx.EVT_MENU, self.copy_val,   id=self._copy_val)
         self.Bind(wx.EVT_MENU, self.show_info,  id=self._show_info)
-        
+
     @EpicsFunction
     def copy_name(self, event=None):
         dat = wx.TextDataObject()
@@ -139,7 +142,7 @@ class PVMixin(object):
         wx.TheClipboard.Open()
         wx.TheClipboard.SetData(dat)
         wx.TheClipboard.Close()
-        
+
     @EpicsFunction
     def copy_val(self, event=None):
         dat = wx.TextDataObject()
@@ -612,7 +615,7 @@ class PVEnumButtons(wx.Panel, PVCtrlMixin):
         self.OnPVChange(self.pv.get(as_string=True))
         ncback = len(self.pv.callbacks) + 1
         self.pv.add_callback(self._pvEvent, wid=self.GetId(), cb_info=ncback)
-        
+
         pv_value = pv.get(as_string=True)
         enum_strings = pv.enum_strs
 
@@ -679,10 +682,10 @@ class PVEnumChoice(wx.Choice, PVCtrlMixin):
         self.pv.add_callback(self._pvEvent, wid=self.GetId(), cb_info=ncback)
 
         self.Bind(wx.EVT_CHOICE, self._onChoice)
-        
+
         pv_value = pv.get(as_string=True)
         enum_strings = pv.enum_strs
-            
+
         self.Clear()
         self.AppendItems(enum_strings)
         self.SetStringSelection(pv_value)
@@ -743,7 +746,7 @@ class PVFloatCtrl(FloatCtrl, PVCtrlMixin):
     def _SetValue(self, value):
         "set widget value"
         FloatCtrl.SetValue(self, value, act=False)
-            
+
     @EpicsFunction
     def SetPV(self, pv=None):
         "set pv, either an epics.PV object or a pvname"
@@ -960,7 +963,7 @@ class PVSpinCtrl(wx.SpinCtrl, PVCtrlMixin):
     both reads and writes the PV on changes.
 
     """
-    def __init__(self, parent, pv=None, 
+    def __init__(self, parent, pv=None,
                  min_val=None, max_val=None, **kws):
         """
         Most arguments are common with SpinCtrl
@@ -1012,7 +1015,7 @@ class PVButton(wx.Button, PVCtrlMixin):
         self.disableValue = disableValue
         if disablePV is not None:
             ncback = len(self.disablePV.callbacks) + 1
-            self.disablePV.add_callback(self._disableEvent, wid=self.GetId(), 
+            self.disablePV.add_callback(self._disableEvent, wid=self.GetId(),
                                         cb_info=ncback)
         self.maskedEnabled = True
 
@@ -1207,4 +1210,3 @@ class PVCollapsiblePane(wx.CollapsiblePane, PVCtrlMixin):
     def _SetValue(self, value):
         if value:
             self.SetLabel(value)
-
