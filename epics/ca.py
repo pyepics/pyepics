@@ -1700,8 +1700,5 @@ class CAThread(Thread):
     initial CA context is used.
     """
     def run(self):
-        if sys.platform == 'darwin':
-            create_context()
-        else:
-            use_initial_context()
+        use_initial_context()
         Thread.run(self)
