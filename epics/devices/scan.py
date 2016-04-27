@@ -13,7 +13,6 @@ class Scan(Device):
     """
     A Device representing an Epics sscan record.
 
-    The Scan Device represents an sscan record.
     """
 
     attrs = ('VAL', 'SMSG', 'CMND', 'NPTS', 'EXSC', 'NAME', 'PDLY',
@@ -62,9 +61,6 @@ class Scan(Device):
             raise ScanException("%s is not an Epics Scan" % name)
 
         self.put('SMSG', '')
-        self.put('NPTS', 0)
-        for i in range(1, NUM_TRIGGERS+1):
-            self.put('T%iPV' % i, '')
 
     def run(self, wait=False):
         """
@@ -83,7 +79,8 @@ class Scan(Device):
             self.waitSemaphore.release()
 
     def reset(self):
-        """Reset scan to some default values"""
+        """Reset scan, clearing positioners, detectors, triggers"""
+        self.put('NPTS', 0)
         for i in range(1, NUM_TRIGGERS+1):
             self.put('T%iPV' % i, '')
         for i in range(1, NUM_POSITIONERS+1):
