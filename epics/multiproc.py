@@ -17,6 +17,7 @@ Channel Access or using Epics process variables
 
 import multiprocessing as mp
 from multiprocessing.pool import Pool
+from . import ca
 from .ca import clear_cache
 
 
@@ -33,6 +34,7 @@ class CAProcess(mp.Process):
         mp.Process.__init__(self, **kws)
 
     def run(self):
+        ca.initial_context = None
         clear_cache()
         mp.Process.run(self)
 

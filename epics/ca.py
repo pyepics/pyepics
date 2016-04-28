@@ -311,16 +311,20 @@ def show_cache(print_out=True):
 
 def clear_cache():
     """
-    Clears global caches of Epics CA connectsions, and fully
-    detached from CA contex.  This is important when doing
+    Clears global caches of Epics CA connections, and fully
+    detaches from the CA context.  This is important when doing
     multiprocessing (and is done internally by CAProcess),
-    but can be  useful to fully reset a Channel Access session.
+    but can be useful to fully reset a Channel Access session.
     """
 
     # Clear global state variables
     global _cache
     _cache.clear()
     _put_done.clear()
+
+    # Clear the cache of PVs used by epics.caget()-like functions
+    from . import pv
+    pv._PVcache_ = {}
 
     # The old context is copied directly from the old process
     # in systems with proper fork() implementations
@@ -621,7 +625,12 @@ def context_create(ctx=None):
     "create a context. if argument is None, use PREEMPTIVE_CALLBACK"
     if ctx is None:
         ctx = {False:0, True:1}[PREEMPTIVE_CALLBACK]
-    return libca.ca_context_create(ctx)
+    ret = libca.ca_context_create(ctx)
+    new_ctx = current_context()
+    if new_ctx and new_ctx not in _cache:
+        _cache[new_ctx] = {}
+    return ret
+
 
 def create_context(ctx=None):
     """Create a new context, using the value of :data:`PREEMPTIVE_CALLBACK`
@@ -638,6 +647,9 @@ def create_context(ctx=None):
 
     """
     context_create(ctx=ctx)
+    global initial_context
+    if initial_context is None:
+        initial_context = current_context()
 
 @withCA
 def context_destroy():

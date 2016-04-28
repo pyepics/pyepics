@@ -14,7 +14,6 @@ def pool_ctx():
     pool.close()
     pool.join()
 
-
 def test_caget():
     with pool_ctx() as pool:
         print('Using caget() in subprocess pools:')
@@ -43,16 +42,3 @@ def test_manager():
                    for pv in PVS]
 
     print('\tResulting pv dictionary: %s' % pv_dict)
-
-
-def main():
-    print('Initializing ca context in main process...')
-    value = epics.caget(PVS[0])
-    print('\t%s = %s' % (PVS[0], value))
-
-    caget_test()
-    manager_test()
-
-
-if __name__ == '__main__':
-    main()
