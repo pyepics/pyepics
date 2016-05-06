@@ -291,6 +291,6 @@ class ADMCA(Device):
             pref = "%s:%i" % (roi_prefix, i)
             lo = caget("%s:MinX" % pref)
             if lo > 0:
-                caput("%s:MinX"  % pref,  0)
-                caput("%s:SizeX" % pref, -1)
+                caput("%s:MinX"  % pref, 0)
+                caput("%s:SizeX" % pref, 0)
                 caput("%s:Name"  % pref, '')
