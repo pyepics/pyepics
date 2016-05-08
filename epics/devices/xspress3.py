@@ -12,8 +12,11 @@ MAX_ROIS = 32
 
 class ADFileMixin(object):
     """mixin class for Xspress3"""
-    def filePut(self, attr, value, **kw):
-        return self.put("%s%s" % (self.filesaver, attr), value, **kw)
+    def filePut(self, attr, value, **kws):
+        return self.put("%s%s" % (self.filesaver, attr), value, **kws)
+
+    def fileGet(self, attr, **kws):
+        return self.get("%s%s" % (self.filesaver, attr), **kws)
 
     def setFilePath(self, pathname):
         fullpath = os.path.join(self.fileroot, pathname)
@@ -94,43 +97,40 @@ class Xspress3BaseMixin(object):
 
 class Xspress3(Device, ADFileMixin, Xspress3BaseMixin):
     """Epics Xspress3.20 interface (with areaDetector2)"""
-    det_attrs = ('NumImages', 'NumImages_RBV',
-                 'Acquire', 'Acquire_RBV',
-                 'ArrayCounter_RBV',
-                 'ERASE', 'UPDATE', 'AcquireTime',
-                 'TriggerMode', 'StatusMessage_RBV',
-                 'DetectorState_RBV')
 
-    _nonpvs  = ('_prefix', '_pvs', '_delim', 'filesaver',
-                'fileroot', 'pathattrs', '_nonpvs', '_save_rois',
-                'nmca', 'dxps', 'mcas')
+    det_attrs = ('NumImages', 'NumImages_RBV', 'Acquire', 'Acquire_RBV',
+                 'ArrayCounter_RBV', 'ERASE', 'UPDATE', 'AcquireTime',
+                 'TriggerMode', 'StatusMessage_RBV', 'DetectorState_RBV')
 
-    pathattrs = ('FilePath', 'FileTemplate',
-                 'FileName', 'FileNumber',
-                 'Capture',  'NumCapture')
+    _nonpvs = ('_prefix', '_pvs', '_delim', 'filesaver', 'fileroot',
+                'pathattrs', '_nonpvs', '_save_rois', 'nmca', 'mcas')
+
+    pathattrs = ('FilePath', 'FileTemplate', 'FileName', 'FileNumber',
+                 'Capture', 'NumCapture')
 
     def __init__(self, prefix, nmca=4, filesaver='HDF1:',
                  fileroot='/home/xspress3/cars5/Data'):
         if not prefix.endswith(':'):
             prefix = "%s:" % prefix
         self.nmca = nmca
-        attrs = list(self.attrs)
+        attrs = []
         attrs.extend(['%s%s' % (filesaver,p) for p in self.pathattrs])
 
         self.filesaver = filesaver
         self.fileroot = fileroot
         self._prefix = prefix
         self._save_rois = []
+        self.mcas = []
         for i in range(nmca):
             imca = i+1
             dprefix = "%sdet1" % prefix
             rprefix = "%sMCA%iROI" % (prefix, imca)
             data_pv = "%sMCA%i:ArrayData" % (prefix, imca)
-            mca = ADMCA(dprefix, mca=imca, data_pv=data_pv, roi_prefix=rprefix)
+            mca = ADMCA(dprefix, data_pv=data_pv, roi_prefix=rprefix)
             self.mcas.append(mca)
 
         Device.__init__(self, prefix, attrs=attrs, delim='')
-        for attr in det_attrs:
+        for attr in self.det_attrs:
             self.add_pv("%sdet1:%s" % (prefix,attr), attr)
         time.sleep(0.1)
 
