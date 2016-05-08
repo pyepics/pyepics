@@ -74,14 +74,14 @@ class ADMCAROI(Device):
         self.MinX = 0
         self.SizeX = 0
 
-    def get_counts(self, net=False, data=None):
+    def get_counts(self, data=None, net=False):
         """
         calculate total and net counts for a spectra
 
         Parameters:
         -----------
-         net    bool to set net counts (default=False: total counts returned)
          data   numpy array of spectra or None to read from PV
+         net    bool to set net counts (default=False: total counts returned)
         """
         if data is None and self.data_pv is not None:
             data = self.data_pv.get()
@@ -171,7 +171,7 @@ class ADMCA(Device):
         if nrois is None:
             nrois = self._nrois
         for i in range(nrois):
-            roi = ADMCAROI(prefix=self._roi_prefix, roi=i+1, data_pv=data_pv)
+            roi = ADMCAROI(prefix=self._roi_prefix, roi=i+1)
             if len(roi.Name.strip()) <= 0 or roi.MinX < 0:
                 break
             self.rois.append(roi)
