@@ -210,9 +210,10 @@ class ADMCA(Device):
             return
         rois = self.get_rois()
         try:
-            iroi = len(rois)
+            iroi = len(rois) + 1
         except:
             iroi = 0
+
         if iroi >= MAX_ROIS:
             raise ValueError('too many ROIs - cannot add more %i/%i' % (iroi, MAX_ROIS))
         data_pv = self._pvs['VAL']
