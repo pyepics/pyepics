@@ -10,24 +10,30 @@ class ADMCAROI(Device):
     MCA ROI using ROIStat plugin from areaDetector2,
     as used for Xspress3 detector.
     """
-    _attrs =('Use', 'Name', 'MinX', 'SizeX', 'BgdWidth',
-             'SizeX_RBV', 'MinX_RBV',
+
+    _attrs =('Use', 'Name', 'MinX', 'SizeX',
+             'BgdWidth', 'SizeX_RBV', 'MinX_RBV',
              'Total_RBV', 'Net_RBV')
+
     _aliases = {'left': 'MinX',
                 'width': 'SizeX',
                 'name': 'Name',
                 'sum': 'Total_RBV',
                 'net': 'Net_RBV'}
-    _nonpvs = ('_prefix', '_pvs', '_delim', 'attrs',
-               'center', 'set_center', 'get_center',  'data_pv')
+
+    _nonpvs = ('_prefix', '_pvs', '_delim', '_init',
+               '_aliases', 'data_pv')
 
     _reprfmt = "<ADMCAROI '%s', name='%s', range=[%s:%s]>"
-    def __init__(self, prefix, roi=1, bgr_width=3, data_pv=None):
+    def __init__(self, prefix, roi=1, bgr_width=3, data_pv=None, with_poll=False):
         self._prefix = '%s:%i' % (prefix, roi)
-        Device.__init__(self,self._prefix, delim=':',
-                        attrs=self._attrs,
-                        aliases=self._aliases,
-                        with_poll=True)
+        Device.__init__(self, self._prefix, delim=':', with_poll=with_poll)
+        self._aliases = {'left': 'MinX',
+                         'width': 'SizeX',
+                         'name': 'Name',
+                         'sum': 'Total_RBV',
+                         'net': 'Net_RBV'}
+
         self.data_pv = data_pv
 
     def __eq__(self, other):
@@ -119,7 +125,6 @@ class ADMCA(Device):
                               attrs=self._attrs, with_poll=False)
         if data_pv is not None:
             self._pvs['VAL'] = PV(data_pv)
-
         self._npts = None
         self._nrois = nrois
         if self._nrois is None:
@@ -128,9 +133,8 @@ class ADMCA(Device):
         self._roi_prefix = roi_prefix
         if roi_prefix is not None:
             for i in range(self._nrois):
-                self.rois.append(ADMCAROI(roi_prefix, roi=i+1))
+                self.rois.append(ADMCAROI(roi_prefix, roi=i+1, with_poll=False))
         poll()
-
 
     def start(self):
         "Start AD MCA"
