@@ -123,7 +123,7 @@ class Xspress3(Device, ADFileMixin, Xspress3BaseMixin):
         self.mcas = []
         for i in range(nmca):
             imca = i+1
-            dprefix = "%sdet1" % prefix
+            dprefix = "%sdet1:" % prefix
             rprefix = "%sMCA%iROI" % (prefix, imca)
             data_pv = "%sMCA%i:ArrayData" % (prefix, imca)
             mca = ADMCA(dprefix, data_pv=data_pv, roi_prefix=rprefix)
@@ -132,7 +132,7 @@ class Xspress3(Device, ADFileMixin, Xspress3BaseMixin):
         Device.__init__(self, prefix, attrs=attrs, delim='')
         for attr in self.det_attrs:
             self.add_pv("%sdet1:%s" % (prefix,attr), attr)
-        time.sleep(0.1)
+        time.sleep(0.05)
 
     def roi_calib_info(self):
         buff = ['[rois]']
