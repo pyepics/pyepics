@@ -130,7 +130,13 @@ class Xspress3(Device, ADFileMixin, Xspress3BaseMixin):
 
         Device.__init__(self, prefix, attrs=attrs, delim='')
         for attr in self.det_attrs:
-            self.add_pv("%sdet1:%s" % (prefix,attr), attr)
+            self.add_pv("%sdet1:%s" % (prefix, attr), attr)
+        for i in range(nmca):
+            imca = i+1
+            for j in range(8):
+                isca = j+1
+                attr="C%iSCA%i"% (imca, isca)
+                self.add_pv("%s%s:Value_RBV" % (prefix, attr), attr)
         time.sleep(0.05)
 
     def roi_calib_info(self):
