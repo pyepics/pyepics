@@ -1,10 +1,12 @@
 import numpy as np
 import time
 
-from .. import PV, caget, caput, poll, Device
+from epics import PV, caget, caput, poll, Device
 
 MAX_CHAN = 4096
 MAX_ROIS = 32
+TOOMANY_ROIS = 'Too many ROIS, only %i ROIS allowed.' % (MAX_ROIS)
+
 class ADMCAROI(Device):
     """
     MCA ROI using ROIStat plugin from areaDetector2,
@@ -27,7 +29,8 @@ class ADMCAROI(Device):
     _reprfmt = "<ADMCAROI '%s', name='%s', range=[%s:%s]>"
     def __init__(self, prefix, roi=1, bgr_width=3, data_pv=None, with_poll=False):
         self._prefix = '%s:%i' % (prefix, roi)
-        Device.__init__(self, self._prefix, delim=':', with_poll=with_poll)
+        Device.__init__(self, self._prefix, delim=':',
+                        attrs=('Name', 'MinX'), with_poll=with_poll)
         self._aliases = {'left': 'MinX',
                          'width': 'SizeX',
                          'name': 'Name',
@@ -91,7 +94,6 @@ class ADMCAROI(Device):
         """
         if data is None and self.data_pv is not None:
             data = self.data_pv.get()
-
         out = self.Total_RBV
         if net:
             out = self.Net_RBV
@@ -117,7 +119,6 @@ class ADMCA(Device):
     _nonpvs = ('_prefix', '_pvs', '_delim', '_roi_prefix',
                '_npts', 'rois', '_nrois', 'rois', '_calib')
     _calib = (0.00, 0.01, 0.00)
-
     def __init__(self, prefix, data_pv=None, nrois=None, roi_prefix=None):
 
         self._prefix = prefix
@@ -129,11 +130,8 @@ class ADMCA(Device):
         self._nrois = nrois
         if self._nrois is None:
             self._nrois = MAX_ROIS
-        self.rois = []
         self._roi_prefix = roi_prefix
-        if roi_prefix is not None:
-            for i in range(self._nrois):
-                self.rois.append(ADMCAROI(roi_prefix, roi=i+1, with_poll=False))
+        self.get_rois()
         poll()
 
     def start(self):
@@ -160,7 +158,10 @@ class ADMCA(Device):
         return cal[0] + en*(cal[1] + en*cal[2])
 
     def clear_rois(self, nrois=None):
-        for roi in self.get_rois(nrois=nrois):
+        "clear all rois"
+        if self.rois is None:
+            self.get_rois()
+        for roi in self.rois:
             roi.clear()
         self.rois = []
 
@@ -168,6 +169,8 @@ class ADMCA(Device):
         "get all rois"
         self.rois = []
         data_pv = self._pvs['VAL']
+        poll()
+        data_pv.connect()
         prefix = self._roi_prefix
         if prefix is None:
             return self.rois
@@ -175,12 +178,12 @@ class ADMCA(Device):
         if nrois is None:
             nrois = self._nrois
         for i in range(nrois):
-            roi = ADMCAROI(prefix=self._roi_prefix, roi=i+1)
-            if len(roi.Name.strip()) <= 0 or roi.MinX < 0:
+            roi = ADMCAROI(prefix=self._roi_prefix, roi=i+1, data_pv=data_pv)
+            if len(roi.Name.strip()) > 0 and roi.MinX > 0 and roi.SizeX > 0:
+                self.rois.append(roi)
+            else:
                 break
-            self.rois.append(roi)
-        poll()
-
+            poll(0.005, 1.0)
         return self.rois
 
     def del_roi(self, roiname):
@@ -191,111 +194,90 @@ class ADMCA(Device):
             if roi.Name.strip().lower() == roiname.strip().lower():
                 roi.clear()
         poll(0.010, 1.0)
-        self.set_rois(self.rois)
+        self.sort_rois()
 
-    def add_roi(self, roiname, lo, wid=None, hi=None, calib=None):
-        """add an roi, given name, lo, and hi channels, and
-        an optional calibration other than that of this mca.
-
-        That is, specifying an ROI with all of lo, hi AND calib
-        will set the ROI **by energy** so that it matches the
-        provided calibration.  To add an ROI to several MCAs
-        with differing calibration, use
-
-           cal_1 = mca1.get_calib()
-           for mca im (mca1, mca2, mca3, mca4):
-               mca.add_roi('Fe Ka', lo=600, hi=700, calib=cal_1)
+    def add_roi(self, roiname, lo, wid=None, hi=None, sort=True):
+        """
+        add an roi, given name, lo, and hi channels.
         """
         if lo is None or (hi is None and wid is None):
             return
-        rois = self.get_rois()
+        if self.rois is None:
+            self.get_rois()
+
         try:
-            iroi = len(rois) + 1
+            iroi = len(self.rois) + 1
         except:
             iroi = 0
 
-        if iroi >= MAX_ROIS:
-            raise ValueError('too many ROIs - cannot add more %i/%i' % (iroi, MAX_ROIS))
+        if iroi > MAX_ROIS:
+            raise ValueError(TOOMANY_ROIS)
         data_pv = self._pvs['VAL']
         prefix = self._roi_prefix
 
         roi = ADMCAROI(prefix=prefix, roi=iroi, data_pv=data_pv)
         roi.Name = roiname.strip()
 
-        offset, scale = 0.0, 1.0
-        if calib is not None:
-            off, slope, quad = self.get_calib()
-            offset = calib[0] - off
-            scale  = calib[1] / slope
-
         nmax = MAX_CHAN
         if self._npts is None and self._pvs['VAL'] is not None:
             nmax = self._npts = len(self.get('VAL'))
 
-        roi.MinX = min(nmax-1, round(offset + scale*lo))
+        roi.MinX = min(nmax-1, lo)
         if hi is not None:
             hi = min(nmax, hi)
-            roi.SizeX = round(offset + scale*(hi-lo))
+            roi.SizeX = hi-lo
         elif wid is not None:
-            wid = min(nmax, wid+roi.MinX) - roi.MinX
-            roi.SizeX = round(scale*(wid))
+            roi.SizeX = min(nmax, wid+roi.MinX) - roi.MinX
+        self.rois.append(roi)
+        if sort:
+            self.sort_rois()
 
-        rois.append(roi)
-        self.set_rois(rois)
+    def sort_rois(self):
+        """
+        make sure rois are sorted, and Epics PVs are cleared
+        """
+        if self.rois is None:
+            self.get_rois()
 
-    def set_rois(self, rois, calib=None):
-        """set all rois, with optional calibration that those
-        ROIs correspond to (if they have a different energy
-        calibration), and ensures they are ordered and contiguous.
+        poll(0.05, 1.0)
+        unsorted = []
+        empties  = 0
+        for roi in self.rois:
+            if len(roi.Name) > 0 and roi.right > 0:
+                unsorted.append(roi)
+            else:
+                empties =+ 1
+            if empties > 3:
+                break
 
+        self.rois = sorted(unsorted)
+        rpref = self._roi_prefix
+        roidat = [(r.Name, r.MinX, r.SizeX) for r in self.rois]
 
-           rois  = mca1.get_rois()
-           calib = mca1.get_calib()
-           mca2.set_rois(rois, calib=calib)
+        for iroi, roi in enumerate(roidat):
+            caput("%s:%i:Name"  % (rpref, iroi+1), roi[0])
+            caput("%s:%i:MinX"  % (rpref, iroi+1), roi[1])
+            caput("%s:%i:SizeX" % (rpref, iroi+1), roi[2])
+
+        iroi = len(roidat)
+        caput("%s:%i:Name" % (rpref, iroi+1), '')
+        caput("%s:%i:MinX" % (rpref, iroi+1),  0)
+        caput("%s:%i:SizeX" % (rpref, iroi+1), 0)
+        self.get_rois()
+
+    def set_rois(self, roidata):
+        """
+        set all rois from list/tuple of (Name, Lo, Hi),
+        and ensures they are ordered and contiguous.
         """
         data_pv = self._pvs['VAL']
-        nmax = MAX_CHAN
-        if self._npts is None and data_pv is not None:
-            nmax = self._npts = len(data_pv.get())
 
-        roi_prefix = self._roi_prefix
-        offset, scale = 0.0, 1.0
-        if calib is not None:
-            off, slope, quad = self.get_calib()
-            offset = calib[0] - off
-            scale  = calib[1] / slope
-
-        # do an explicit get here to make sure all data is
-        # available before trying to sort it!
-        poll(0.0050, 1.0)
-
-        [(r.Name, r.MinX, r.SizeX) for r in rois]
-        roidat = [(r.Name, r.MinX, r.SizeX) for r in sorted(rois)]
-
-        iroi = 1
-        self.rois = []
-        previous_roi = ('', 0, 0)
-        for ix, dat in enumerate(roidat):
-            if dat == previous_roi:
-                continue
-
-            name, lo, wid = previous_roi = dat
-
-            if len(name)<1 or lo<0 or wid<=0:
-                continue
-            roi = ADMCAROI(prefix=roi_prefix, roi=iroi, data_pv=data_pv)
-            roi.Name  = name.strip()
-            roi.MinX  = min(nmax-1, round(offset + scale*lo))
-            hi        = min(nmax, round(offset + scale*(lo+wid)))
-            roi.SizeX = hi-roi.MinX
-            self.rois.append(roi)
-            iroi += 1
-
-        # erase any remaining ROIs
-        for i in range(iroi, MAX_ROIS+1):
-            pref = "%s:%i" % (roi_prefix, i)
-            lo = caget("%s:MinX" % pref)
-            if lo > 0:
-                caput("%s:MinX"  % pref, 0)
-                caput("%s:SizeX" % pref, 0)
-                caput("%s:Name"  % pref, '')
+        iroi = 0
+        self.clear_rois()
+        for name, lo, hi in roidata:
+            if len(name) > 0 and hi > lo and hi > 0:
+                iroi +=1
+                if iroi >= MAX_ROIS:
+                    raise ValueError(TOOMANY_ROIS)
+                self.add_roi(name=name, lo=lo, hi=hi, sort=False)
+        self.sort_rois()
