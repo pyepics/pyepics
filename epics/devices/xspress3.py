@@ -103,7 +103,7 @@ class Xspress3(Device, ADFileMixin, Xspress3BaseMixin):
                  'TriggerMode', 'StatusMessage_RBV', 'DetectorState_RBV')
 
     _nonpvs = ('_prefix', '_pvs', '_delim', 'filesaver', 'fileroot',
-                'pathattrs', '_nonpvs', '_save_rois', 'nmca', 'mcas')
+                'pathattrs', '_nonpvs',  'nmca', 'mcas')
 
     pathattrs = ('FilePath', 'FileTemplate', 'FileName', 'FileNumber',
                  'Capture', 'NumCapture')
@@ -119,7 +119,6 @@ class Xspress3(Device, ADFileMixin, Xspress3BaseMixin):
         self.filesaver = filesaver
         self.fileroot = fileroot
         self._prefix = prefix
-        self._save_rois = []
         self.mcas = []
         for i in range(nmca):
             imca = i+1
@@ -159,23 +158,17 @@ class Xspress3(Device, ADFileMixin, Xspress3BaseMixin):
         """restore ROI setting from ROI.dat file"""
         cp =  ConfigParser()
         cp.read(roifile)
-        rois = []
-        prefix = self.roi_prefix
+        roidat = []
         iroi = 0
         for a in cp.options('rois'):
             if a.lower().startswith('roi'):
                 name, dat = cp.get('rois', a).split('|')
                 lims = [int(i) for i in dat.split()]
                 lo, hi = lims[0], lims[1]
-                roi = ADMCAROI(prefix=prefix, roi=iroi)
-                roi.MinX= lo
-                roi.SizeX = hi-lo
-                roi.Name = name.strip()
-                rois.append(roi)
-                iroi += 1
+                roidat.append((name.strip(), lo, hi))
 
         for mca in self.mcas:
-            mca.set_rois(rois)
+            mca.set_rois(roidat)
 
 class Xspress310(Device, ADFileMixin, Xspress3BaseMixin):
     """Epics Xspress3.10 interface (older version)"""
