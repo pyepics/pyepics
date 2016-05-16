@@ -279,5 +279,5 @@ class ADMCA(Device):
                 iroi +=1
                 if iroi >= MAX_ROIS:
                     raise ValueError(TOOMANY_ROIS)
-                self.add_roi(name=name, lo=lo, hi=hi, sort=False)
+                self.add_roi(name, lo, hi=hi, sort=False)
         self.sort_rois()
