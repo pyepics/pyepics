@@ -16,7 +16,7 @@ advantages including no need for extension code written in C, better
 thread-safety, and easier installation on multiple platforms.
 
 This package requires python2.6 or higher.  The EPICS Channel Access
-library v 3.14.8 or higher is also required, with v 3.14.11 or higher being
+library v 3.14.8 or higher is also required, with v 3.14.12 or higher being
 recommended. More specifically, the shared libraries libCom.so and libca.so
 (or Com.dll and ca.dll on Windows) are required to use this module.  For
 Unix-like systems, these are assumed to be available (and findable by

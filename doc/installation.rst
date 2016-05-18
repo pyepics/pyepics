@@ -5,8 +5,8 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-This package requires Python version 2.6, 2.7, or 3.4.  It should work with
-Python 2.5, 3.1, 3.2, or 3.3, but these are not being tested regularly.
+This package requires Python version 2.7, 3.4, or 3.5.  It should work with
+Python 2.6, 3.2, or 3.3, but these are no longer being tested regularly.
 
 In addition, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
@@ -25,7 +25,7 @@ Epics installation is required to use the modules.
 
 For 64-bit Python on 64-bit Windows, pre-built DLLs from 3.14.12.4 (patched
 as of January, 2015) are also included.  Support for 64-bit Python on
-Windows is new in version 3.2.4, and requires Python version 2.7.9.
+Windows was new in version 3.2.4, and requires Python version 2.7.9.
 
 The Python `numpy module <http://numpy.scipy.org/>`_ is highly recommended,
 though it is not strictly required. If available, it will be used to
@@ -35,16 +35,13 @@ convert EPICS waveforms values into numpy arrays.
 Downloads
 ~~~~~~~~~~~~~
 
-The latest stable version of the PyEpics Package is 3.2.4, with version 3.2.5rc2
-(expected release as 3.2.5 in January, 2016) also available.  There are a few
-ways to get these package:
+The latest stable version of the PyEpics Package is 3.2.5. There are a few ways to get this package:
 
-.. _pyepics-3.2.4.tar.gz:              http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.4.tar.gz
-.. _pyepics-3.2.5rc2.tar.gz:           http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.45rc2.tar.gz
-.. _pyepics-3.2.4.win32-py2.7.exe:     http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.4.win32-py2.7.exe
-.. _pyepics-3.2.4.win32-py3.4.exe:     http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.4.win32-py3.4.exe
-.. _pyepics-3.2.4.win-amd64-py2.7.exe: http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.4.win-amd64-py2.7.exe
-.. _pyepics-3.2.4.win-amd64-py3.4.exe: http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.4.win-amd64-py3.4.exe
+.. _pyepics-3.2.5.tar.gz:              http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.5.tar.gz
+.. _pyepics-3.2.5.win32-py2.7.exe:     http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.5.win32-py2.7.exe
+.. _pyepics-3.2.5.win32-py3.4.exe:     http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.5.win32-py3.4.exe
+.. _pyepics-3.2.5.win-amd64-py2.7.exe: http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.5.win-amd64-py2.7.exe
+.. _pyepics-3.2.5.win-amd64-py3.4.exe: http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.5.win-amd64-py3.4.exe
 .. _pyepics github repository:         http://github.com/pyepics/pyepics
 .. _pyepics CARS downloads:            http://cars9.uchicago.edu/software/python/pyepics3/src/
 .. _Python Setup Tools:                http://pypi.python.org/pypi/setuptools
@@ -53,16 +50,15 @@ ways to get these package:
 +-----------------+------------+----------------------------------------------+
 |  Download Type  | Py Version |  PyPI link                                   |
 +=================+============+==============================================+
-| Source tarball  | All        |  `pyepics-3.2.4.tar.gz`_                     |
-|                 |            |  `pyepics-3.2.5rc2.tar.gz`_                  |
+| Source tarball  | All        |  `pyepics-3.2.5.tar.gz`_                     |
 +-----------------+------------+----------------------------------------------+
-| Win32 Installer | 2.7        |  `pyepics-3.2.4.win32-py2.7.exe`_            |
+| Win32 Installer | 2.7        |  `pyepics-3.2.5.win32-py2.7.exe`_            |
 +-----------------+------------+----------------------------------------------+
-| Win32 Installer | 3.4        |  `pyepics-3.2.4.win32-py3.4.exe`_            |
+| Win32 Installer | 3.4        |  `pyepics-3.2.5.win32-py3.4.exe`_            |
 +-----------------+------------+----------------------------------------------+
-| Win64 Installer | 2.7        |  `pyepics-3.2.4.win-amd64-py2.7.exe`_        |
+| Win64 Installer | 2.7        |  `pyepics-3.2.5.win-amd64-py2.7.exe`_        |
 +-----------------+------------+----------------------------------------------+
-| Win64 Installer | 3.4        |  `pyepics-3.2.4.win-amd64-py3.4.exe`_        |
+| Win64 Installer | 3.4        |  `pyepics-3.2.5.win-amd64-py3.4.exe`_        |
 +-----------------+------------+----------------------------------------------+
 |  Development    | All        |  `pyepics github repository`_                |
 +-----------------+------------+----------------------------------------------+
@@ -87,12 +83,13 @@ including::
 Testing
 ~~~~~~~~~~~~~
 
-Some automated unit-testing is done, using the tests/ folder from the
-source distribution kit, and while the script ``tests/simulator.py`` is running
-(note that the Epics database in ``tests/pydebug.db`` must be loaded in a local
-IOC for the simulator and most of these tests to run).  The following
-systems were tested for 3.2.4, all with Epics base 3.14.12.1 or base
-3.14.12.2.
+Automated, continuous unit-testing is done with the TravisCI
+(https://travis-ci.org/pyepics/pyepics) for Python 2.7, 3.4, and 3.5 using
+an Epics IOC running in a Docker image.  Many tests located in the `tests`
+folder can also be run using the script ``tests/simulator.py`` as long as
+the Epics database in ``tests/pydebug.db`` is loaded in a local IOC.  The
+following systems were tested for 3.2.5 were tested locally, all with Epics
+base 3.14.12.1 or higher:
 
 
 +-----------+-----------------+--------------+---------------------------+
@@ -249,7 +246,8 @@ PyEpics was originally written and is maintained by Matt Newville
 have come from Angus Gratton while at the Australian National University.
 Several other people have provided valuable additions, suggestions, or bug
 reports, which has greatly improved the quality of the library: Ken Lauer,
-Michael Abbott, Daron Chabot, Thomas Caswell, Georg Brandl, Niklas
-Claesson, Jon Brinkmann, Marco Cammarata, Craig Haskins, Pete Jemian,
-Andrew Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Eric Norum, Mark
-Rivers, Friedrich Schotte, Mark Vigder, Steve Wasserman, and Glen Wright.
+Robbie Clarken, Daniel Allen, Michael Abbott, Daron Chabot, Thomas Caswell,
+Georg Brandl, Niklas Claesson, Jon Brinkmann, Marco Cammarata, Craig
+Haskins, Pete Jemian, Andrew Johnson, Janko Kolar, Irina Kosheleva, Tim
+Mooney, Eric Norum, Mark Rivers, Friedrich Schotte, Mark Vigder, Steve
+Wasserman, and Glen Wright.
