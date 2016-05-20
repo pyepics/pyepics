@@ -232,11 +232,21 @@ record(subArray, "$(P)subArr4") {
   field(MALM, "64")
 }
 
+record(subArray, "$(P)ZeroLenSubArr1") {
+  field(DESC, "zero length subarray")
+  field(NELM, "0")
+  field(INP, "$(P)wave_test.VAL")
+  field(INDX, "10")
+  field(FTVL, "DOUBLE")
+  field(MALM, "64")
+}
+
 record(fanout, "$(P)mylinker") {
   field(FLNK, "$(P)subArr1")
   field(LNK1, "$(P)subArr3")
   field(LNK2, "$(P)subArr2")
   field(LNK3, "$(P)subArr4")
+  field(LNK4, "$(P)ZeroLenSubArr1")
 }
 
 record(waveform, "$(P)wave_test") {
