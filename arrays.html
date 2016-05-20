@@ -1,0 +1,315 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Working with waveform / array data &mdash; Epics Channel Access for Python</title>
+    
+    <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '3.2.5rc2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Epics Channel Access for Python" href="index.html" />
+    <link rel="next" title="Devices: collections of PVs" href="devices.html" />
+    <link rel="prev" title="ca: Low-level Channel Access module" href="ca.html" /> 
+  </head>
+  <body role="document">
+<div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
+  <font size=+3><a href="index.html">
+      <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
+    &nbsp; PyEpics: Epics Channel Access for Python</a>
+  </font>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="devices.html" title="Devices: collections of PVs"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ca.html" title="ca: Low-level Channel Access module"
+             accesskey="P">previous</a> |</li>
+   <li>[<a href="installation.html">install</a></li>
+   <li>|<a href="overview.html">overview</a></li>
+   <li>|<a href="pv.html">pv</a></li>
+   <li>|<a href="ca.html">ca</a></li>
+   <li>|<a href="#">arrays</a></li>
+   <li>|<a href="devices.html">devices</a></li>
+   <li>|<a href="alarm.html">alarm</a></li>
+   <li>|<a href="autosave.html">autosave</a></li>
+   <li>|<a href="wx.html">wx</a></li>
+   <li>|<a href="advanced.html">advanced</a>]</li>
+ 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Working with waveform / array data</a><ul>
+<li><a class="reference internal" href="#arrays-without-numpy">Arrays without Numpy</a></li>
+<li><a class="reference internal" href="#variable-length-arrays-nord-and-nelm">Variable Length Arrays:  NORD  and NELM</a></li>
+<li><a class="reference internal" href="#character-arrays">Character Arrays</a><ul>
+<li><a class="reference internal" href="#strategies-for-working-with-large-arrays">Strategies for working with large arrays</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example-handling-large-arrays">Example handling Large Arrays</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ca.html"
+                        title="previous chapter">ca: Low-level Channel Access module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="devices.html"
+                        title="next chapter">Devices: collections of PVs</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/arrays.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="working-with-waveform-array-data">
+<span id="arrays-label"></span><h1>Working with waveform / array data<a class="headerlink" href="#working-with-waveform-array-data" title="Permalink to this headline">¶</a></h1>
+<p>Though most EPICS Process Variables hold single values, PVs can hold array
+data from EPICS waveform records.  These are always data of a homogenous
+data type, and have a fixed maximum element count (defined when the
+waveform is created from the host EPICS process).  Epics waveforms are
+most naturally mapped to Arrays from the <a class="reference external" href="http://numpy.scipy.org/">numpy module</a>, and this is strongly encouraged.</p>
+<div class="section" id="arrays-without-numpy">
+<h2>Arrays without Numpy<a class="headerlink" href="#arrays-without-numpy" title="Permalink to this headline">¶</a></h2>
+<p>If you have numpy installed, and use the default <em>as_numpy=True</em> in
+<code class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></code>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><code class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></code></a> or <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal"><span class="pre">epics.caget()</span></code></a>, you will get a
+numpy array for the value of a waveform PV.  If you do <em>not</em> have numpy
+installed, or explicitly use <em>as_numpy=False</em> in a get request, you will
+get the raw C-like array reference from the Python
+<a class="reference external" href="http://docs.python.org/library/ctypes.html#arrays">ctypes module</a>.
+These objects are not normally meant for casual use, but are not too
+difficult to work with either.  They can be easily converted to a simple
+Python list with something like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">HAS_NUMPY</span> <span class="o">=</span> <span class="bp">False</span> <span class="c"># turn numpy off for session</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XX:scan1.P1PA&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="go">&lt;epics.dbr.c_double_Array_500 object at 0x853980c&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ldat</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Note that this conversion to a list can be very slow for large arrays.</p>
+</div>
+<div class="section" id="variable-length-arrays-nord-and-nelm">
+<h2>Variable Length Arrays:  NORD  and NELM<a class="headerlink" href="#variable-length-arrays-nord-and-nelm" title="Permalink to this headline">¶</a></h2>
+<p>While the maximum length of an array is fixed, the length of data you get
+back from a monitor, <code class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></code>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><code class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></code></a>, or <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal"><span class="pre">epics.caget()</span></code></a>
+may be shorter than the maximumn length, reflecting the most recent data
+put to that PV.  That is, if some process puts a smaller array to a PV than
+its maximum length, monitors on that PV may receive only the changed data.
+For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;Py:double2k&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p</span>
+<span class="go">&lt;PV &#39;Py:double2k&#39;, count=2048/2048, type=double, access=read/write&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">/</span><span class="mf">5.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="go">array([ 0. ,  0.2,  0.4,  0.6,  0.8,  1. ,  1.2,  1.4,  1.6,  1.8])</span>
+</pre></div>
+</div>
+<p>To be clear, the <a class="reference internal" href="pv.html#pv.put" title="pv.put"><code class="xref py py-meth docutils literal"><span class="pre">pv.put()</span></code></a> above could be done in a separate process
+&#8211; the <a class="reference internal" href="pv.html#pv.get" title="pv.get"><code class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></code></a> is not using a value cached from the <a class="reference internal" href="pv.html#pv.put" title="pv.put"><code class="xref py py-meth docutils literal"><span class="pre">pv.put()</span></code></a>.</p>
+<p>This feature seems to depend on the record definition, and requires version
+3.14.12.1 of Epics base or higher, and can be checked by comparing
+<code class="xref py py-meth docutils literal"><span class="pre">ca.version()</span></code> with the string &#8216;4.13&#8217;.</p>
+</div>
+<div class="section" id="character-arrays">
+<h2>Character Arrays<a class="headerlink" href="#character-arrays" title="Permalink to this headline">¶</a></h2>
+<p>As noted in other sections, character waveforms can be used to hold strings
+longer than 40 characters, which is otherwise a fundamental limit for
+native Epics strings.  Character waveforms shorter than
+<code class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></code> can be turned into strings with an
+optional <em>as_string=True</em> to <code class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></code>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><code class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></code></a> , or
+<a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal"><span class="pre">epics.caget()</span></code></a>.  If you&#8217;ve defined a Epics waveform record as:</p>
+<div class="highlight-python"><div class="highlight"><pre>record(waveform,&quot;$(P):filename&quot;)  {
+          field(DTYP,&quot;Soft Channel&quot;)
+          field(DESC,&quot;file name&quot;)
+          field(NELM,&quot;128&quot;)
+          field(FTVL,&quot;CHAR&quot;)
+ }
+</pre></div>
+</div>
+<p>Then you can use this record with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvname</span> <span class="o">=</span> <span class="s">&#39;PREFIX:filename.VAL&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pv</span>  <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">pv</span><span class="o">.</span><span class="n">info</span>
+<span class="go">....</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plain_val</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">plain_val</span>
+<span class="go">array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 101, 114,  92,  77,</span>
+<span class="go">     97, 114,  99, 104,  50,  48,  49,  48,  92,  70,  97, 115, 116,</span>
+<span class="go">     77,  97, 112])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">char_val</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">char_val</span>
+<span class="go">&#39;T:\\xas_user\\March2010\\FastMap&#39;</span>
+</pre></div>
+</div>
+<p>This example uses <a class="reference internal" href="pv.html#pv.get" title="pv.get"><code class="xref py py-meth docutils literal"><span class="pre">pv.get()</span></code></a> but <code class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></code> is essentially
+equivalent, as its <em>as_string</em> parameter works exactly the same way.</p>
+<p>Note that Epics character waveforms as defined as above are really arrays
+of bytes.  The converion to a string assumes the ASCII character set.
+Unicode is not directly supported.  If you are storing non-ASCII data, you
+would have to convert the raw array data yourself, perhaps like this (for
+Python3):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">arr_data</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr_bytes</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">array_data</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr_string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">arr_bytes</span><span class="p">,</span> <span class="s">&#39;LATIN-1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="strategies-for-working-with-large-arrays">
+<span id="arrays-large-label"></span><h3>Strategies for working with large arrays<a class="headerlink" href="#strategies-for-working-with-large-arrays" title="Permalink to this headline">¶</a></h3>
+<p>EPICS Channels / Process Variables usually have values that can be stored
+with a small number of bytes.  This means that their storage and transfer
+speeds over real networks is not a significant concern.  However, some
+Process Variables can store much larger amounts of data (say, several
+megabytes) which means that some of the assumptions about dealing with
+Channels / PVs may need reconsideration.</p>
+<p>When using PVs with large array sizes (here, I&#8217;ll assert that <em>large</em> means
+more than a few thousand elements), it is necessary to make sure that the
+environmental variable <code class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_BYTES</span></code> is suitably set.
+Unfortunately, this represents a pretty crude approach to memory management
+within Epics for handling array data as it is used not only sets how large
+an array the client can accept, but how much memory will be allocated on
+the server.  In addition, this value must be set prior to using the CA
+library &#8211; it cannot be altered during the running of a CA program.</p>
+<p>Normally, the default value for <code class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_BYTES</span></code> is 16384 (16k,
+and it turns out that you cannot set it smaller than this value!).  As
+Python is used for clients, generally running on workstations or servers
+with sufficient memory, this default value is changed to 2**24, or 16Mb)
+when <a class="reference internal" href="ca.html#module-epics.ca" title="epics.ca: low-level Channel Access  module."><code class="xref py py-mod docutils literal"><span class="pre">epics.ca</span></code></a> is initialized.  If the environmental variable
+<code class="docutils literal"><span class="pre">EPICS_CA_MAX_ARRAY_BYTES</span></code> has not already been set.</p>
+<p>The other main issue for PVs holding large arrays is whether they should be
+automatically monitored.  For PVs holding scalar data or small arrays, any
+penalty for automatically monitoring these variables (that is, causing
+network traffic every time a PV changes) is a small price to pay for being
+assured that the latest value is always available.  As arrays get larger
+(as for data streams from Area Detectors), it is less obvious that
+automatic monitoring is desirable.</p>
+<p>The Python <a class="reference internal" href="ca.html#module-epics.ca" title="epics.ca: low-level Channel Access  module."><code class="xref py py-mod docutils literal"><span class="pre">epics.ca</span></code></a> module defines a variable
+<code class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></code> which controls whether array PVs are
+automatically monitored.  The default value for this variable is 65536, but
+can be changed at runtime.  Arrays with fewer elements than
+<code class="xref py py-data docutils literal"><span class="pre">ca.AUTOMONITOR_MAXLENGTH</span></code> will be automatically monitored, unless
+explicitly set, and arrays larger than <code class="xref py py-data docutils literal"><span class="pre">AUTOMONITOR_MAXLENGTH</span></code> will
+not be automatically monitored unless explicitly set. Auto-monitoring of
+PVs can be be explicitly set with</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pv2</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;ScalerPV&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;LargeArrayPV&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="example-handling-large-arrays">
+<h2>Example handling Large Arrays<a class="headerlink" href="#example-handling-large-arrays" title="Permalink to this headline">¶</a></h2>
+<p>Here is an example reading data from an <a class="reference external" href="http://cars9.uchicago.edu/software/epics/areaDetector.html">EPICS areaDetector</a>, as if it
+were an image from a digital camera.  This uses the <a class="reference external" href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> for much of the image
+processing:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">Image</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvname</span> <span class="o">=</span> <span class="s">&#39;13IDCPS1:image1:ArrayData&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img_pv</span>  <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">raw_image</span> <span class="o">=</span> <span class="n">img_pv</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">im_mode</span> <span class="o">=</span> <span class="s">&#39;RGB&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">im_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1360</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">im_mode</span><span class="p">,</span> <span class="n">im_size</span><span class="p">,</span> <span class="n">raw_image</span><span class="p">,</span>
+<span class="go">                            &#39;raw&#39;, im_mode, 0, 1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The result looks like this (taken with a Prosilica GigE camera):</p>
+<img alt="_images/AreaDetector1.png" src="_images/AreaDetector1.png" />
+<p>A more complete application for reading and displaying image from Epics
+Area Detectors is included  at <a class="reference external" href="http://github.com/pyepics/epicsapps/">http://github.com/pyepics/epicsapps/</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="devices.html" title="Devices: collections of PVs"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ca.html" title="ca: Low-level Channel Access module"
+             >previous</a> |</li>
+   <li>[<a href="installation.html">install</a></li>
+   <li>|<a href="overview.html">overview</a></li>
+   <li>|<a href="pv.html">pv</a></li>
+   <li>|<a href="ca.html">ca</a></li>
+   <li>|<a href="#">arrays</a></li>
+   <li>|<a href="devices.html">devices</a></li>
+   <li>|<a href="alarm.html">alarm</a></li>
+   <li>|<a href="autosave.html">autosave</a></li>
+   <li>|<a href="wx.html">wx</a></li>
+   <li>|<a href="advanced.html">advanced</a>]</li>
+ 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Matthew Newville.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

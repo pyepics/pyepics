@@ -1,0 +1,610 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>wx: wxPython Widgets for Epics &mdash; Epics Channel Access for Python</title>
+    
+    <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '3.2.5rc2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Epics Channel Access for Python" href="index.html" />
+    <link rel="next" title="Advanced Topic with Python Channel Access" href="advanced.html" />
+    <link rel="prev" title="Auto-saving: simple save/restore of PVs" href="autosave.html" /> 
+  </head>
+  <body role="document">
+<div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
+  <font size=+3><a href="index.html">
+      <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
+    &nbsp; PyEpics: Epics Channel Access for Python</a>
+  </font>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="advanced.html" title="Advanced Topic with Python Channel Access"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="autosave.html" title="Auto-saving: simple save/restore of PVs"
+             accesskey="P">previous</a> |</li>
+   <li>[<a href="installation.html">install</a></li>
+   <li>|<a href="overview.html">overview</a></li>
+   <li>|<a href="pv.html">pv</a></li>
+   <li>|<a href="ca.html">ca</a></li>
+   <li>|<a href="arrays.html">arrays</a></li>
+   <li>|<a href="devices.html">devices</a></li>
+   <li>|<a href="alarm.html">alarm</a></li>
+   <li>|<a href="autosave.html">autosave</a></li>
+   <li>|<a href="#">wx</a></li>
+   <li>|<a href="advanced.html">advanced</a>]</li>
+ 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">wx: wxPython Widgets for Epics</a><ul>
+<li><a class="reference internal" href="#pv-aware-widgets">PV-aware Widgets</a><ul>
+<li><a class="reference internal" href="#pvmixin">PVMixin</a></li>
+<li><a class="reference internal" href="#pvctrlmixin">PVCtrlMixin</a></li>
+<li><a class="reference internal" href="#pvtext">PVText</a></li>
+<li><a class="reference internal" href="#pvtextctrl">PVTextCtrl</a></li>
+<li><a class="reference internal" href="#pvfloatctrl">PVFloatCtrl</a></li>
+<li><a class="reference internal" href="#pvbitmap">PVBitmap</a></li>
+<li><a class="reference internal" href="#pvcheckbox">PVCheckBox</a></li>
+<li><a class="reference internal" href="#pvfloatspin">PVFloatSpin</a></li>
+<li><a class="reference internal" href="#pvbutton">PVButton</a></li>
+<li><a class="reference internal" href="#pvradiobutton">PVRadioButton</a></li>
+<li><a class="reference internal" href="#pvcombobox">PVComboBox</a></li>
+<li><a class="reference internal" href="#pvenumcombobox">PVEnumComboBox</a></li>
+<li><a class="reference internal" href="#pvenumbuttons">PVEnumButtons</a></li>
+<li><a class="reference internal" href="#pvenumchoice">PVEnumChoice</a></li>
+<li><a class="reference internal" href="#pvalarm">PVAlarm</a></li>
+<li><a class="reference internal" href="#pvcollapsiblepane">PVCollapsiblePane</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#decorators-and-other-utility-functions">Decorators and other Utility Functions</a></li>
+<li><a class="reference internal" href="#wxmotorpanel-widget">wxMotorPanel Widget</a></li>
+<li><a class="reference internal" href="#ogl-classes">OGL Classes</a><ul>
+<li><a class="reference internal" href="#pvshapemixin">PVShapeMixin</a></li>
+<li><a class="reference internal" href="#pvrectangle">PVRectangle</a></li>
+<li><a class="reference internal" href="#pvcircle">PVCircle</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="autosave.html"
+                        title="previous chapter">Auto-saving: simple save/restore of PVs</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="advanced.html"
+                        title="next chapter">Advanced Topic with Python Channel Access</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/wx.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-wx">
+<span id="wx-wxpython-widgets-for-epics"></span><h1>wx: wxPython Widgets for Epics<a class="headerlink" href="#module-wx" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#module-wx" title="wx: wxPython Widgets for Epics"><code class="xref py py-mod docutils literal"><span class="pre">wx</span></code></a> module of <a class="reference internal" href="overview.html#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal"><span class="pre">epics</span></code></a> (that is, <strong>epics.wx</strong>) provides a set
+of wxPython classes for epics PVs. Most of these are derived from wxPython
+widgets, with special support added for epics PVs, especially regarding
+when to automatically update the widget based on a changing value for a PV.</p>
+<p>Some examples of code that uses pyepics and wxPython are included in the
+<em>scripts</em> folder of the pyepics source distribution kit.  In addition,
+there are a some full-fledged applications using Epics and wxPython at
+<a class="reference external" href="http://github.com/pyepics/epicsapps">pyepics applications</a>.</p>
+<div class="section" id="pv-aware-widgets">
+<span id="wx-functions-label"></span><h2>PV-aware Widgets<a class="headerlink" href="#pv-aware-widgets" title="Permalink to this headline">¶</a></h2>
+<p>Several basic wxPython widgets have been extended so as to connect the
+widget with a corresponding <cite>PV</cite>.  For example, setting the text value of a
+<code class="xref py py-mod docutils literal"><span class="pre">PVTextCtrl</span></code> will forward that value to the epics <cite>PV</cite>, and if the
+<cite>PV</cite> is changed by externally, the value displayed in the widget will be
+automatically updated.</p>
+<div class="section" id="pvmixin">
+<h3>PVMixin<a class="headerlink" href="#pvmixin" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVMixin">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVMixin</code><span class="sig-paren">(</span><span class="optional">[</span><em>pv=None</em><span class="optional">[</span>, <em>pvname=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a mixin class for wx Controls with epics PVs:  This connects to
+PV, and manages connection and callback events for the PV.  It provides
+the following basic methods used by most of the PV&lt;-&gt;widget classes
+below.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="wx.SetPV">
+<code class="descclassname">wx.</code><code class="descname">SetPV</code><span class="sig-paren">(</span><em>pv=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.SetPV" title="Permalink to this definition">¶</a></dt>
+<dd><p>set the PV corresponding to the widget.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="wx.Update">
+<code class="descclassname">wx.</code><code class="descname">Update</code><span class="sig-paren">(</span><em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.Update" title="Permalink to this definition">¶</a></dt>
+<dd><p>set the widgets value from the PV&#8217;s value.   If value=``None``, the current
+value for the PV is used.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="wx.GetValue">
+<code class="descclassname">wx.</code><code class="descname">GetValue</code><span class="sig-paren">(</span><em>as_string=True</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.GetValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the PVs value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="wx.OnEpicsConnect">
+<code class="descclassname">wx.</code><code class="descname">OnEpicsConnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.OnEpicsConnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>PV connection event handler.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="wx.OnPVChange">
+<code class="descclassname">wx.</code><code class="descname">OnPVChange</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.OnPVChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>PV monitor (subscription) event handler.  Must be overwritten for each
+widget type.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="wx.GetEnumStrings">
+<code class="descclassname">wx.</code><code class="descname">GetEnumStrings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.GetEnumStrings" title="Permalink to this definition">¶</a></dt>
+<dd><p>return enumeration strings for the PV</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvctrlmixin">
+<h3>PVCtrlMixin<a class="headerlink" href="#pvctrlmixin" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVCtrlMixin">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVCtrlMixin</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCtrlMixin" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>This is a mixin class for wx Controls with epics PVs:  This subclasses
+PVCtrlMixin and adds colour translations
+PV, and manages callback events for the PV.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>parent</strong> &#8211; wx parent widget</li>
+<li><strong>pv</strong> &#8211; epics.PV</li>
+<li><strong>font</strong> &#8211; wx.Font for display</li>
+<li><strong>fg</strong> &#8211; foreground colour</li>
+<li><strong>bg</strong> &#8211; <p>background colour</p>
+<p>A class that inherits from this class <strong>must</strong> provide a method called
+<cite>_SetValue</cite>, which will set the contents of the corresponding widget
+when the PV&#8217;s value changes.</p>
+<p>In general, the widgets will automatically update when the PV
+changes. Where appropriate, setting the value with the widget will set
+the PV value.</p>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="pvtext">
+<h3>PVText<a class="headerlink" href="#pvtext" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVText">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVText</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>minor_alarm=&quot;DARKRED&quot;</em>, <em>major_alarm=&quot;RED&quot;</em>, <em>invalid_alarm=&quot;ORANGERED&quot;</em>, <em>auto_units=False</em>, <em>units=&quot;&quot;</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVText" title="Permalink to this definition">¶</a></dt>
+<dd><p>derived from wx.StaticText and PVCtrlMixin, this is a StaticText widget
+whose value is set to the string representation of the value for the
+corresponding PV.</p>
+<p>By default, the text colour will be overridden when the PV enters an
+alarm state. These colours can be modified (or disabled by being set
+to <code class="docutils literal"><span class="pre">None</span></code>) as part of the constructor.</p>
+<p>&#8220;units&#8221; specifies a unit suffix (like &#8216; A&#8217; or &#8216; mm&#8217;) to put after the text
+value whenever it is displayed.</p>
+<p>Alternatively, &#8220;auto_units&#8221; means the control will automatically display
+the &#8220;EGU&#8221; units value from the PV, whenever it updates. If this value is
+set, &#8220;units&#8221; is ignored. A space is inserted between the value and the
+unit.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvtextctrl">
+<h3>PVTextCtrl<a class="headerlink" href="#pvtextctrl" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVTextCtrl">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVTextCtrl</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>dirty_timeout=2500</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVTextCtrl" title="Permalink to this definition">¶</a></dt>
+<dd><p>derived from wx.TextCtrl and PVCtrlMixin, this is a TextCtrl widget
+whose value is set to the string representation of the value for the
+corresponding PV.</p>
+<blockquote>
+<div>Setting the value (hitting Return or Enter) or changing focus away
+from the widget will set the PV value immediately. Otherwise, the
+widget will wait for &#8216;dirty_timeout&#8217; milliseconds after the last
+keypress and then set the PV value to whatever is written in the field.</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="pvfloatctrl">
+<h3>PVFloatCtrl<a class="headerlink" href="#pvfloatctrl" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVFloatCtrl">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVFloatCtrl</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVFloatCtrl" title="Permalink to this definition">¶</a></dt>
+<dd><p>A special variation of a wx.TextCtrl that allows only floating point
+numbers, as associated with a double, float, or integer PV.  Trying to
+type in a non-numerical value will be ignored.  Furthermore, if a PV&#8217;s
+limits can be determined, they will be used to limit the allowed range
+of input values.  For a value that is within limits, the value will be
+<cite>put</cite> to the PV on return.  Out-of-limit values will be highlighted in
+a different color.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvbitmap">
+<h3>PVBitmap<a class="headerlink" href="#pvbitmap" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVBitmap">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVBitmap</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>bitmaps={}</em>, <em>defaultBitmap=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVBitmap" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>A Static Bitmap where the image is based on PV value.</div></blockquote>
+<p>If the bitmaps dictionary is set, it should be set as PV.Value(Bitmap)
+where particular bitmaps will be shown if the PV takes those certain values.</p>
+<p>If you need to do any more complex or dynamic drawing, you may want to look at the OGL PV controls.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvcheckbox">
+<h3>PVCheckBox<a class="headerlink" href="#pvcheckbox" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVCheckBox">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVCheckBox</code><span class="sig-paren">(</span><em>self</em>, <em>parent</em>, <em>pv=None</em>, <em>on_value=1</em>, <em>off_value=0</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCheckBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checkbox based on a binary PV value, both reads/writes the PV on
+changes.  on_value and off_value are the specific values that are
+mapped to the checkbox.</p>
+<p>There are multiple options for translating PV values to checkbox
+settings (from least to most complex):</p>
+<ul class="simple">
+<li>Use a PV with values 0 and 1</li>
+<li>Use a PV with values that convert via Python&#8217;s own bool(x)</li>
+<li>Set on_value and off_value in the constructor</li>
+<li>Use SetTranslations() to set a dictionary for converting various
+PV values to booleans.</li>
+</ul>
+</dd></dl>
+
+</div>
+<div class="section" id="pvfloatspin">
+<h3>PVFloatSpin<a class="headerlink" href="#pvfloatspin" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVFloatSpin">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVFloatSpin</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>deadTime=500</em>, <em>min_val=None</em>, <em>max_val=None</em>, <em>increment=1.0</em>, <em>digits=-1</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVFloatSpin" title="Permalink to this definition">¶</a></dt>
+<dd><p>A FloatSpin is a floating point spin control with buttons to increase
+and decrease the value by a particular increment. Arrow keys and page
+up/down can also be used (the latter changes the value by 10x the
+increment.)</p>
+<p>PVFloatSpin is a special derivation that assigns a PV to the FloatSpin
+control. deadTime is the delay (in milliseconds) between when the user
+finishes typing a value and when the PV is set to it (to prevent
+half-typed numeric values being set.)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvbutton">
+<h3>PVButton<a class="headerlink" href="#pvbutton" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt>
+<code class="descname">PVButton(parent, pv=None, pushValue=1, disablePV=None,</code></dt>
+<dt>
+<code class="descname">disableValue=1, **kw)</code></dt>
+<dd><p>A wx.Button linked to a PV. When the button is pressed, &#8216;pushValue&#8217; is
+written to the PV (useful for momentary PVs with HIGH= set.)  Setting
+disablePV and disableValue will automatically cause the button to
+disable when that PV has a certain value.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvradiobutton">
+<h3>PVRadioButton<a class="headerlink" href="#pvradiobutton" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVRadioButton">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVRadioButton</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>pvValue=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVRadioButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>A PVRadioButton is a radio button associated with a particular PV and
+one particular value.</p>
+<p>Suggested for use in a group where all radio buttons are
+PVRadioButtons, and they all have a discrete value set.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvcombobox">
+<h3>PVComboBox<a class="headerlink" href="#pvcombobox" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVComboBox">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVComboBox</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVComboBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>A ComboBox linked to a PV. Both reads/writes the combo value on
+changes.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvenumcombobox">
+<h3>PVEnumComboBox<a class="headerlink" href="#pvenumcombobox" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVEnumComboBox">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVEnumComboBox</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVEnumComboBox" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>A ComboBox linked to an &#8220;enum&#8221; type PV (such as bi,bo,mbbi,mbbo.) The ComboBox</dt>
+<dd><p class="first">is automatically populated with a non-editable list of the PV enum values, allowing
+the user to select them from the dropdown.</p>
+<p class="last">Both reads/writes the combo value on changes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="pvenumbuttons">
+<h3>PVEnumButtons<a class="headerlink" href="#pvenumbuttons" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVEnumButtons">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVEnumButtons</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVEnumButtons" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will create a wx.Panel of buttons (a button bar), 1 for each
+enumeration state of an enum PV.  The set of buttons will correspond to
+the current state of the PV</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvenumchoice">
+<h3>PVEnumChoice<a class="headerlink" href="#pvenumchoice" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVEnumChoice">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVEnumChoice</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVEnumChoice" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will create a dropdown list (a wx.Choice) with a list of
+enumeration states for an enum PV.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvalarm">
+<h3>PVAlarm<a class="headerlink" href="#pvalarm" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVAlarm">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVAlarm</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>trip_point=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVAlarm" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will create a pop-up message (wx.MessageDialog) that is shown when
+the corresponding PV trips the alarm level.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvcollapsiblepane">
+<h3>PVCollapsiblePane<a class="headerlink" href="#pvcollapsiblepane" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVCollapsiblePane">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVCollapsiblePane</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>minor_alarm=&quot;DARKRED&quot;</em>, <em>major_alarm=&quot;RED&quot;</em>, <em>invalid_alarm=&quot;ORANGERED&quot;</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCollapsiblePane" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is equivalent to wx.CollapsiblePane, except the label shown
+on the pane&#8217;s &#8220;expansion button&#8221; comes from a PV.</p>
+<p>The additional keyword arguments can be any of the other constructor
+arguments supported by wx.CollapsiblePane.</p>
+<p>By default, the foreground colour of the pane button will be overridden
+when the PV enters an alarm state. On GTK, this means the colour of the
+triangular drop-down button but not the label text. These colours can
+be modified (or disabled by being set to <code class="docutils literal"><span class="pre">None</span></code>) as part of the
+constructor.</p>
+<p>Supports the .SetTranslation() method, whose argument is a dictionary
+mapping PV values to display labels. If the PV value is not found in
+the dictionary, it will displayed verbatim as the label.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="decorators-and-other-utility-functions">
+<h2>Decorators and other Utility Functions<a class="headerlink" href="#decorators-and-other-utility-functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="wx.DelayedEpicsCallback">
+<code class="descclassname">wx.</code><code class="descname">DelayedEpicsCallback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.DelayedEpicsCallback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>decorator to wrap an Epics callback in a wx.CallAfter,
+so that the wx and epics ca threads do not clash
+This also checks for dead wxPython objects (say, from a
+closed window), and remove callbacks to them.</p>
+<dl class="function">
+<dt id="wx.EpicsFunction">
+<code class="descclassname">wx.</code><code class="descname">EpicsFunction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.EpicsFunction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>decorator to wrap function in a wx.CallAfter() so that
+Epics calls can be made in a separate thread, and asynchronously.</p>
+<p>This decorator should be used for all code that mix calls to wx and epics</p>
+<dl class="function">
+<dt id="wx.finalize_epics">
+<code class="descclassname">wx.</code><code class="descname">finalize_epics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.finalize_epics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>This function will finalize epics, and close all Channel Access
+communication, by calling <a class="reference internal" href="ca.html#epics.ca.finalize_libca" title="epics.ca.finalize_libca"><code class="xref py py-meth docutils literal"><span class="pre">epics.ca.finalize_libca()</span></code></a>.  This may be
+useful when closing an application, as in a method bound to <cite>wx.EVT_CLOSE</cite>
+event from a top-level application window.  Be careful to <strong>not</strong> call this
+function when closing a Window if your application is not closing, and if
+you are still doing any Channel Access work in the other windows.</p>
+</div>
+<div class="section" id="wxmotorpanel-widget">
+<h2>wxMotorPanel Widget<a class="headerlink" href="#wxmotorpanel-widget" title="Permalink to this headline">¶</a></h2>
+<p>A dedicated wx Widget for Epics Motors is included in the <a class="reference internal" href="#module-wx" title="wx: wxPython Widgets for Epics"><code class="xref py py-mod docutils literal"><span class="pre">wx</span></code></a> module
+that provides an easy-to-use Motor panel that is similar to the normal MEDM
+window, but with a few niceties from the more sophisticated wx
+toolkit. This widget can be used simply as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wx</span>
+<span class="kn">from</span> <span class="nn">epics.wx</span> <span class="kn">import</span> <span class="n">MotorPanel</span>
+<span class="o">....</span>
+<span class="n">mymotor</span> <span class="o">=</span> <span class="n">MotorPanel</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s">&#39;XXX:m1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A sample panel looks like this</p>
+<img alt="_images/wx_motor.png" src="_images/wx_motor.png" />
+<p>Which shows from right to left: the motor description, an information
+message (blank most of the time), the readback value, the drive value,
+arrows to tweak the motor, and a drop-down combobox for tweak values, a
+&#8220;Stop&#8221; button and a &#8220;More&#8221; button.  The panel has the following features:</p>
+<blockquote>
+<div><ul class="simple">
+<li>All controls are &#8220;live&#8221; and will respond to changes from other source.</li>
+<li>The values for the tweak values in the ComboBox are automatically
+generated from the precision and travel range of the motor.</li>
+<li>The entry box for the drive value will <em>only</em> accept numeric input,
+and will only set the drive value when hitting Enter or Return.</li>
+<li>The drive value  will change to Red text on a Yellow background when
+the value in the box violates the motors (user) limits.  If Enter or
+Return when the the displayed value violates the limit, the motor
+will not be moved, but the displayed value will be changed to the
+closest limit value.</li>
+<li>Pressing the &#8220;Stop&#8221; button will stop the motor (with the <cite>.SPMG</cite>
+field), and set the Info field to &#8220;Stopped&#8221;.  The button label will
+change to &#8220;Go&#8221;, and the motor will not move until this button is pressed.</li>
+</ul>
+</div></blockquote>
+<p>Finally, the &#8220;More&#8221; button will bring up a more complete form of Motor
+parameters that looks like:</p>
+<img alt="_images/wx_motordetail.png" src="_images/wx_motordetail.png" />
+<p>Many such MotorPanels can be put in a vertical stack, as generated from the
+&#8216;wx_motor.py&#8217; script in the scripts folder of the source distribution as:</p>
+<div class="highlight-python"><div class="highlight"><pre>~&gt;python wx_motor.py XXX:m1 XXX:m2 XXX:m3 XXX:m4
+</pre></div>
+</div>
+<p>will look like this:</p>
+<img alt="_images/wx_motor_many.png" src="_images/wx_motor_many.png" />
+</div>
+<div class="section" id="ogl-classes">
+<h2>OGL Classes<a class="headerlink" href="#ogl-classes" title="Permalink to this headline">¶</a></h2>
+<p>OGL is a graphics drawing library shipped with wxPython. Is it built around
+the concept of &#8220;shapes&#8221; which are added to &#8220;canvases&#8221; and can be moved,
+scrolled, zoomed, animated, etc.</p>
+<p>There is a PVShapeMixin class which allows PV callback functionality to be
+added to any OGL Shape class, and there are also PVRectangle and PVCircle
+subclasses already created.</p>
+<p>A recommended way to use these OGL classes is to make a static bitmap
+background for your display, place it in an OGL Canvas and then add an
+overlay of shapes which appear/disappear/resize/change colour based on
+the PV values.</p>
+<div class="section" id="pvshapemixin">
+<h3>PVShapeMixin<a class="headerlink" href="#pvshapemixin" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVShapeMixin">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVShapeMixin</code><span class="sig-paren">(</span><em>self</em>, <em>pv=None</em>, <em>pvname=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVShapeMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Similar to PVMixin, this mixin should be added to any
+ogl.Shape subclass that needs PV callback support.</p>
+<p>The main method is PVChanged(self, raw_value), which should be
+overridden in the subclass to provide specific processing based on
+the changed value.</p>
+<p>There are also some built-in pieces of functionality. These are
+enough to do simple show/hide or change colour shape functionality,
+without needing to write specific code.</p>
+<p>SetBrushTranslations(translations) allows setting a dict of PV Value -&gt;
+wx.Brush mappings, which can be used to automatically repaint the shape
+foreground (fill) when the PV changes.</p>
+<p>SetPenTranslations(translations) similar to brush translations, but
+the values are wx.Pen instances that are used to repaint the shape
+outline when the PV changes.</p>
+<p>SetShownTranslations(translations) sets a dictionary of PV Value -&gt;bool
+values which are used to show/hide the shape depending on the PV value,
+as it changes.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvrectangle">
+<h3>PVRectangle<a class="headerlink" href="#pvrectangle" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVRectangle">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVRectangle</code><span class="sig-paren">(</span><em>self</em>, <em>w</em>, <em>h</em>, <em>pv=None</em>, <em>pvname=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVRectangle" title="Permalink to this definition">¶</a></dt>
+<dd><p>A PVCtrlMixin for the Rectangle shape class.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pvcircle">
+<h3>PVCircle<a class="headerlink" href="#pvcircle" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="wx.PVCircle">
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVCircle</code><span class="sig-paren">(</span><em>self</em>, <em>diameter</em>, <em>pv=None</em>, <em>pvname=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCircle" title="Permalink to this definition">¶</a></dt>
+<dd><p>A PVCtrlMixin for the Circle shape class.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="advanced.html" title="Advanced Topic with Python Channel Access"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="autosave.html" title="Auto-saving: simple save/restore of PVs"
+             >previous</a> |</li>
+   <li>[<a href="installation.html">install</a></li>
+   <li>|<a href="overview.html">overview</a></li>
+   <li>|<a href="pv.html">pv</a></li>
+   <li>|<a href="ca.html">ca</a></li>
+   <li>|<a href="arrays.html">arrays</a></li>
+   <li>|<a href="devices.html">devices</a></li>
+   <li>|<a href="alarm.html">alarm</a></li>
+   <li>|<a href="autosave.html">autosave</a></li>
+   <li>|<a href="#">wx</a></li>
+   <li>|<a href="advanced.html">advanced</a>]</li>
+ 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Matthew Newville.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>
