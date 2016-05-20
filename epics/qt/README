@@ -1,4 +1,0 @@
-This folder has some preliminary code for using pyepics with Qt. 
-The good news is that easy things work!  
-
-See pvprobe_qt.py for a simple example in which an epics callback updates a text label.  Additions welcome!
