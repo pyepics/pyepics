@@ -40,8 +40,10 @@ The latest stable version of the PyEpics Package is 3.2.5. There are a few ways 
 .. _pyepics-3.2.5.tar.gz:              http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.5.tar.gz
 .. _pyepics-3.2.5.win32-py2.7.exe:     http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.5.win32-py2.7.exe
 .. _pyepics-3.2.5.win32-py3.4.exe:     http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.5.win32-py3.4.exe
+.. _pyepics-3.2.5.win32-py3.5.exe:     http://pypi.python.org/packages/3.5/p/pyepics/pyepics-3.2.5.win32-py3.5.exe
 .. _pyepics-3.2.5.win-amd64-py2.7.exe: http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.5.win-amd64-py2.7.exe
 .. _pyepics-3.2.5.win-amd64-py3.4.exe: http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.5.win-amd64-py3.4.exe
+.. _pyepics-3.2.5.win-amd64-py3.5.exe: http://pypi.python.org/packages/3.5/p/pyepics/pyepics-3.2.5.win-amd64-py3.5.exe
 .. _pyepics github repository:         http://github.com/pyepics/pyepics
 .. _pyepics CARS downloads:            http://cars9.uchicago.edu/software/python/pyepics3/src/
 .. _Python Setup Tools:                http://pypi.python.org/pypi/setuptools
@@ -54,11 +56,11 @@ The latest stable version of the PyEpics Package is 3.2.5. There are a few ways 
 +-----------------+------------+----------------------------------------------+
 | Win32 Installer | 2.7        |  `pyepics-3.2.5.win32-py2.7.exe`_            |
 +-----------------+------------+----------------------------------------------+
-| Win32 Installer | 3.4        |  `pyepics-3.2.5.win32-py3.4.exe`_            |
+| Win32 Installer | 3.5        |  `pyepics-3.2.5.win32-py3.5.exe`_            |
 +-----------------+------------+----------------------------------------------+
 | Win64 Installer | 2.7        |  `pyepics-3.2.5.win-amd64-py2.7.exe`_        |
 +-----------------+------------+----------------------------------------------+
-| Win64 Installer | 3.4        |  `pyepics-3.2.5.win-amd64-py3.4.exe`_        |
+| Win64 Installer | 3.5        |  `pyepics-3.2.5.win-amd64-py3.5.exe`_        |
 +-----------------+------------+----------------------------------------------+
 |  Development    | All        |  `pyepics github repository`_                |
 +-----------------+------------+----------------------------------------------+
