@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.5rc2',
+        VERSION:     '3.2.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -658,10 +658,10 @@ returned the listing instead of having it printed out.</p>
 <dl class="function">
 <dt id="epics.ca.clear_cache">
 <code class="descclassname">epics.ca.</code><code class="descname">clear_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.clear_cache" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clears global caches of Epics CA connectsions, and fully
-detached from CA contex.  This is important when doing
+<dd><p>Clears global caches of Epics CA connections, and fully
+detaches from the CA context.  This is important when doing
 multiprocessing (and is done internally by CAProcess),
-but can be  useful to fully reset a Channel Access session.</p>
+but can be useful to fully reset a Channel Access session.</p>
 </dd></dl>
 
 </div>
@@ -1147,42 +1147,42 @@ to convert this data address to the actual value(s).</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
-<span class="n">pvs</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;X1.VAL&#39;</span><span class="p">,</span> <span class="s">&#39;X2.VAL&#39;</span><span class="p">,</span> <span class="s">&#39;X3.VAL&#39;</span><span class="p">)</span>
+<span class="n">pvs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;X1.VAL&#39;</span><span class="p">,</span> <span class="s1">&#39;X2.VAL&#39;</span><span class="p">,</span> <span class="s1">&#39;X3.VAL&#39;</span><span class="p">)</span>
 <span class="n">chids</span> <span class="o">=</span> <span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span> <span class="k">for</span> <span class="n">pvname</span> <span class="ow">in</span> <span class="n">pvs</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">chids</span><span class="p">:</span>
     <span class="n">ca</span><span class="o">.</span><span class="n">connect_channel</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
     <span class="n">ca</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="c"># create synchronous group</span>
+<span class="c1"># create synchronous group</span>
 <span class="n">sg</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">sg_create</span><span class="p">()</span>
 
-<span class="c"># get data pointers from ca.sg_get</span>
+<span class="c1"># get data pointers from ca.sg_get</span>
 <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">sg_get</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span> <span class="n">chid</span><span class="p">)</span> <span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">chids</span><span class="p">]</span>
 
-<span class="k">print</span> <span class="s">&#39;Now change these PVs for the next 10 seconds&#39;</span>
+<span class="k">print</span> <span class="s1">&#39;Now change these PVs for the next 10 seconds&#39;</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="s">&#39;will now block for i/o&#39;</span>
+<span class="k">print</span> <span class="s1">&#39;will now block for i/o&#39;</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">sg_block</span><span class="p">(</span><span class="n">sg</span><span class="p">)</span>
-<span class="c">#</span>
-<span class="c"># CALL ca._unpack with data points and chid to extract data</span>
+<span class="c1">#</span>
+<span class="c1"># CALL ca._unpack with data points and chid to extract data</span>
 <span class="k">for</span> <span class="n">pvname</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">chid</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pvs</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">chids</span><span class="p">):</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">_unpack</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">chid</span><span class="o">=</span><span class="n">chid</span><span class="p">)</span>
-    <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
 
 <span class="n">ca</span><span class="o">.</span><span class="n">sg_reset</span><span class="p">(</span><span class="n">sg</span><span class="p">)</span>
 
-<span class="c">#  Now a SG Put</span>
-<span class="k">print</span> <span class="s">&#39;OK, now we will put everything back to 0 synchronously&#39;</span>
+<span class="c1">#  Now a SG Put</span>
+<span class="k">print</span> <span class="s1">&#39;OK, now we will put everything back to 0 synchronously&#39;</span>
 
 <span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">chids</span><span class="p">:</span>
     <span class="n">ca</span><span class="o">.</span><span class="n">sg_put</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span> <span class="n">chid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="s">&#39;sg_put done, but not blocked / committed. Sleep for 5 seconds &#39;</span>
+<span class="k">print</span> <span class="s1">&#39;sg_put done, but not blocked / committed. Sleep for 5 seconds &#39;</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">sg_block</span><span class="p">(</span><span class="n">sg</span><span class="p">)</span>
-<span class="k">print</span> <span class="s">&#39;done.&#39;</span>
+<span class="k">print</span> <span class="s1">&#39;done.&#39;</span>
 </pre></div>
 </div>
 </div>
@@ -1587,10 +1587,10 @@ the target function.</p>
 initialization and creating a main-thread context are handled, and connection
 of channels is handled in the background:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
-<span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
+<span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="n">count</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">element_count</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
 <span class="n">ftype</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">field_type</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
-<span class="k">print</span> <span class="s">&quot;Channel &quot;</span><span class="p">,</span> <span class="n">chid</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">ftype</span>
+<span class="k">print</span> <span class="s2">&quot;Channel &quot;</span><span class="p">,</span> <span class="n">chid</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">ftype</span>
 <span class="n">value</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="k">print</span> <span class="n">value</span>
 </pre></div>
@@ -1600,7 +1600,7 @@ of channels is handled in the background:</p>
 <h3>Put, waiting for completion<a class="headerlink" href="#put-waiting-for-completion" title="Permalink to this headline">¶</a></h3>
 <p>Here we set a PVs value, waiting for it to complete:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
-<span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
+<span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1617,21 +1617,21 @@ standard output:</p>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 
-<span class="c"># define a callback function.  Note that this should</span>
-<span class="c"># expect certain keyword arguments, including &#39;pvname&#39; and &#39;value&#39;</span>
+<span class="c1"># define a callback function.  Note that this should</span>
+<span class="c1"># expect certain keyword arguments, including &#39;pvname&#39; and &#39;value&#39;</span>
 <span class="k">def</span> <span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-    <span class="n">fmt</span> <span class="o">=</span> <span class="s">&#39;New Value: </span><span class="si">%s</span><span class="s">  value=</span><span class="si">%s</span><span class="s">, kw=</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;New Value: </span><span class="si">%s</span><span class="s1">  value=</span><span class="si">%s</span><span class="s1">, kw=</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">kw</span><span class="p">)))</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
-<span class="c"># create the channel</span>
-<span class="n">mypv</span> <span class="o">=</span> <span class="s">&#39;XXX.VAL&#39;</span>
+<span class="c1"># create the channel</span>
+<span class="n">mypv</span> <span class="o">=</span> <span class="s1">&#39;XXX.VAL&#39;</span>
 <span class="n">chid</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">mypv</span><span class="p">)</span>
 
-<span class="c"># subscribe to events giving a callback function</span>
+<span class="c1"># subscribe to events giving a callback function</span>
 <span class="n">eventID</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_subscription</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onChanges</span><span class="p">)</span>
 
-<span class="c"># now we simply wait for changes</span>
+<span class="c1"># now we simply wait for changes</span>
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span> <span class="o">&lt;</span> <span class="mf">10.0</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
@@ -1651,13 +1651,13 @@ initial connection:</p>
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="k">def</span> <span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">chid</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-    <span class="k">print</span> <span class="s">&#39;ca connection status changed:  &#39;</span><span class="p">,</span> <span class="n">pvname</span><span class="p">,</span>  <span class="n">conn</span><span class="p">,</span> <span class="n">chid</span>
+    <span class="k">print</span> <span class="s1">&#39;ca connection status changed:  &#39;</span><span class="p">,</span> <span class="n">pvname</span><span class="p">,</span>  <span class="n">conn</span><span class="p">,</span> <span class="n">chid</span>
 
-<span class="c"># create channel, provide connection callback</span>
-<span class="n">motor1</span> <span class="o">=</span> <span class="s">&#39;13IDC:m1&#39;</span>
+<span class="c1"># create channel, provide connection callback</span>
+<span class="n">motor1</span> <span class="o">=</span> <span class="s1">&#39;13IDC:m1&#39;</span>
 <span class="n">chid</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">motor1</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onConnectionChange</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="s">&#39;Now waiting, watching values and connection changes:&#39;</span>
+<span class="k">print</span> <span class="s1">&#39;Now waiting, watching values and connection changes:&#39;</span>
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
@@ -1705,7 +1705,7 @@ callback should be prepared to accept keyword arguments of <cite>pvname</cite>,
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

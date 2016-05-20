@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.5rc2',
+        VERSION:     '3.2.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -131,8 +131,8 @@ These objects are not normally meant for casual use, but are not too
 difficult to work with either.  They can be easily converted to a simple
 Python list with something like:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">HAS_NUMPY</span> <span class="o">=</span> <span class="bp">False</span> <span class="c"># turn numpy off for session</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XX:scan1.P1PA&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">HAS_NUMPY</span> <span class="o">=</span> <span class="bp">False</span> <span class="c1"># turn numpy off for session</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XX:scan1.P1PA&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="go">&lt;epics.dbr.c_double_Array_500 object at 0x853980c&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ldat</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
@@ -149,7 +149,7 @@ put to that PV.  That is, if some process puts a smaller array to a PV than
 its maximum length, monitors on that PV may receive only the changed data.
 For example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;Py:double2k&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;Py:double2k&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p</span>
 <span class="go">&lt;PV &#39;Py:double2k&#39;, count=2048/2048, type=double, access=read/write&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span>
@@ -182,7 +182,7 @@ optional <em>as_string=True</em> to <code class="xref py py-meth docutils litera
 </div>
 <p>Then you can use this record with:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pvname</span> <span class="o">=</span> <span class="s">&#39;PREFIX:filename.VAL&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvname</span> <span class="o">=</span> <span class="s1">&#39;PREFIX:filename.VAL&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pv</span>  <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">pv</span><span class="o">.</span><span class="n">info</span>
 <span class="go">....</span>
@@ -205,7 +205,7 @@ would have to convert the raw array data yourself, perhaps like this (for
 Python3):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">arr_data</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arr_bytes</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">array_data</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">arr_string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">arr_bytes</span><span class="p">,</span> <span class="s">&#39;LATIN-1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr_string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">arr_bytes</span><span class="p">,</span> <span class="s1">&#39;LATIN-1&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="section" id="strategies-for-working-with-large-arrays">
@@ -245,8 +245,8 @@ can be changed at runtime.  Arrays with fewer elements than
 explicitly set, and arrays larger than <code class="xref py py-data docutils literal"><span class="pre">AUTOMONITOR_MAXLENGTH</span></code> will
 not be automatically monitored unless explicitly set. Auto-monitoring of
 PVs can be be explicitly set with</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pv2</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;ScalerPV&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;LargeArrayPV&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pv2</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;ScalerPV&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;LargeArrayPV&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -258,11 +258,11 @@ were an image from a digital camera.  This uses the <a class="reference external
 processing:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">Image</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pvname</span> <span class="o">=</span> <span class="s">&#39;13IDCPS1:image1:ArrayData&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvname</span> <span class="o">=</span> <span class="s1">&#39;13IDCPS1:image1:ArrayData&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">img_pv</span>  <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">raw_image</span> <span class="o">=</span> <span class="n">img_pv</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">im_mode</span> <span class="o">=</span> <span class="s">&#39;RGB&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">im_mode</span> <span class="o">=</span> <span class="s1">&#39;RGB&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">im_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1360</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">im_mode</span><span class="p">,</span> <span class="n">im_size</span><span class="p">,</span> <span class="n">raw_image</span><span class="p">,</span>
 <span class="go">                            &#39;raw&#39;, im_mode, 0, 1)</span>
@@ -309,7 +309,7 @@ Area Detectors is included  at <a class="reference external" href="http://github
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

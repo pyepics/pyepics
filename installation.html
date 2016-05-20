@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.5rc2',
+        VERSION:     '3.2.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -118,8 +118,8 @@
 <h1>Downloading and Installation<a class="headerlink" href="#downloading-and-installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>This package requires Python version 2.6, 2.7, or 3.4.  It should work with
-Python 2.5, 3.1, 3.2, or 3.3, but these are not being tested regularly.</p>
+<p>This package requires Python version 2.7, 3.4, or 3.5.  It should work with
+Python 2.6, 3.2, or 3.3, but these are no longer being tested regularly.</p>
 <p>In addition, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
 higher, I believe) is required.  More specifically, the shared libraries
 libCom.so and libca.so (or Com.dll and ca.dll on Windows) from <em>Epics Base</em>
@@ -135,16 +135,14 @@ such as ldconfig.</p>
 Epics installation is required to use the modules.</p>
 <p>For 64-bit Python on 64-bit Windows, pre-built DLLs from 3.14.12.4 (patched
 as of January, 2015) are also included.  Support for 64-bit Python on
-Windows is new in version 3.2.4, and requires Python version 2.7.9.</p>
+Windows was new in version 3.2.4, and requires Python version 2.7.9.</p>
 <p>The Python <a class="reference external" href="http://numpy.scipy.org/">numpy module</a> is highly recommended,
 though it is not strictly required. If available, it will be used to
 convert EPICS waveforms values into numpy arrays.</p>
 </div>
 <div class="section" id="downloads">
 <h2>Downloads<a class="headerlink" href="#downloads" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the PyEpics Package is 3.2.4, with version 3.2.5rc2
-(expected release as 3.2.5 in January, 2016) also available.  There are a few
-ways to get these package:</p>
+<p>The latest stable version of the PyEpics Package is 3.2.5. There are a few ways to get this package:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="23%" />
@@ -160,24 +158,23 @@ ways to get these package:</p>
 <tbody valign="top">
 <tr class="row-even"><td>Source tarball</td>
 <td>All</td>
-<td><a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.4.tar.gz">pyepics-3.2.4.tar.gz</a>
-<a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.45rc2.tar.gz">pyepics-3.2.5rc2.tar.gz</a></td>
+<td><a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.5.tar.gz">pyepics-3.2.5.tar.gz</a></td>
 </tr>
 <tr class="row-odd"><td>Win32 Installer</td>
 <td>2.7</td>
-<td><a class="reference external" href="http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.4.win32-py2.7.exe">pyepics-3.2.4.win32-py2.7.exe</a></td>
+<td><a class="reference external" href="http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.5.win32-py2.7.exe">pyepics-3.2.5.win32-py2.7.exe</a></td>
 </tr>
 <tr class="row-even"><td>Win32 Installer</td>
-<td>3.4</td>
-<td><a class="reference external" href="http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.4.win32-py3.4.exe">pyepics-3.2.4.win32-py3.4.exe</a></td>
+<td>3.5</td>
+<td><a class="reference external" href="http://pypi.python.org/packages/3.5/p/pyepics/pyepics-3.2.5.win32-py3.5.exe">pyepics-3.2.5.win32-py3.5.exe</a></td>
 </tr>
 <tr class="row-odd"><td>Win64 Installer</td>
 <td>2.7</td>
-<td><a class="reference external" href="http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.4.win-amd64-py2.7.exe">pyepics-3.2.4.win-amd64-py2.7.exe</a></td>
+<td><a class="reference external" href="http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.5.win-amd64-py2.7.exe">pyepics-3.2.5.win-amd64-py2.7.exe</a></td>
 </tr>
 <tr class="row-even"><td>Win64 Installer</td>
-<td>3.4</td>
-<td><a class="reference external" href="http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.4.win-amd64-py3.4.exe">pyepics-3.2.4.win-amd64-py3.4.exe</a></td>
+<td>3.5</td>
+<td><a class="reference external" href="http://pypi.python.org/packages/3.5/p/pyepics/pyepics-3.2.5.win-amd64-py3.5.exe">pyepics-3.2.5.win-amd64-py3.5.exe</a></td>
 </tr>
 <tr class="row-odd"><td>Development</td>
 <td>All</td>
@@ -203,12 +200,13 @@ including:</p>
 </div>
 <div class="section" id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
-<p>Some automated unit-testing is done, using the tests/ folder from the
-source distribution kit, and while the script <code class="docutils literal"><span class="pre">tests/simulator.py</span></code> is running
-(note that the Epics database in <code class="docutils literal"><span class="pre">tests/pydebug.db</span></code> must be loaded in a local
-IOC for the simulator and most of these tests to run).  The following
-systems were tested for 3.2.4, all with Epics base 3.14.12.1 or base
-3.14.12.2.</p>
+<p>Automated, continuous unit-testing is done with the TravisCI
+(<a class="reference external" href="https://travis-ci.org/pyepics/pyepics">https://travis-ci.org/pyepics/pyepics</a>) for Python 2.7, 3.4, and 3.5 using
+an Epics IOC running in a Docker image.  Many tests located in the <cite>tests</cite>
+folder can also be run using the script <code class="docutils literal"><span class="pre">tests/simulator.py</span></code> as long as
+the Epics database in <code class="docutils literal"><span class="pre">tests/pydebug.db</span></code> is loaded in a local IOC.  The
+following systems were tested for 3.2.5 were tested locally, all with Epics
+base 3.14.12.1 or higher:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="16%" />
@@ -467,10 +465,11 @@ case you can probably do whatever you want.</p>
 have come from Angus Gratton while at the Australian National University.
 Several other people have provided valuable additions, suggestions, or bug
 reports, which has greatly improved the quality of the library: Ken Lauer,
-Michael Abbott, Daron Chabot, Thomas Caswell, Georg Brandl, Niklas
-Claesson, Jon Brinkmann, Marco Cammarata, Craig Haskins, Pete Jemian,
-Andrew Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Eric Norum, Mark
-Rivers, Friedrich Schotte, Mark Vigder, Steve Wasserman, and Glen Wright.</p>
+Robbie Clarken, Daniel Allen, Michael Abbott, Daron Chabot, Thomas Caswell,
+Georg Brandl, Niklas Claesson, Jon Brinkmann, Marco Cammarata, Craig
+Haskins, Pete Jemian, Andrew Johnson, Janko Kolar, Irina Kosheleva, Tim
+Mooney, Eric Norum, Mark Rivers, Friedrich Schotte, Mark Vigder, Steve
+Wasserman, and Glen Wright.</p>
 </div>
 </div>
 
@@ -507,7 +506,7 @@ Rivers, Friedrich Schotte, Mark Vigder, Steve Wasserman, and Glen Wright.</p>
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>

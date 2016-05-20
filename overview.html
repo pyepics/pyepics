@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.5rc2',
+        VERSION:     '3.2.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -180,14 +180,14 @@ discussions.</p>
 <h3>Functional Approach: caget(), caput()<a class="headerlink" href="#functional-approach-caget-caput" title="Permalink to this headline">¶</a></h3>
 <p>To get values from PVs, you can use the <code class="xref py py-func docutils literal"><span class="pre">caget()</span></code> function:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">=</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">=</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">m1</span>
 <span class="go">1.2001</span>
 </pre></div>
 </div>
 <p>To set PV values, you can use the <code class="xref py py-func docutils literal"><span class="pre">caput()</span></code> function:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span> <span class="mf">1.90</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span> <span class="mf">1.90</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="go">1.9000</span>
 </pre></div>
 </div>
@@ -200,7 +200,7 @@ clarity.</p>
 convenient to &#8216;&#8217;create a PV object&#8217;&#8217; and use it in a more object-oriented
 manner.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>PV objects have several methods and attributes.  The most important methods
@@ -330,21 +330,21 @@ for example.  For float and doubles, the internal precision of the PV is
 used to format the string value.  For enum types, the name of the enum
 state is returned:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>     <span class="c"># A double PV</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>     <span class="c1"># A double PV</span>
 <span class="go">0.10000000000000001</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:m1.DESC&#39;</span><span class="p">)</span>    <span class="c"># A string PV</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.DESC&#39;</span><span class="p">)</span>    <span class="c1"># A string PV</span>
 <span class="go">&#39;Motor 1&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:m1.FOFF&#39;</span><span class="p">)</span>    <span class="c"># An Enum PV</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.FOFF&#39;</span><span class="p">)</span>    <span class="c1"># An Enum PV</span>
 <span class="go">1</span>
 </pre></div>
 </div>
 <p>Adding the <cite>as_string=True</cite> argument always results in string being
 returned, with the conversion method depending on the data type:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">&#39;0.10000&#39;</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:m1.FOFF&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.FOFF&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">&#39;Frozen&#39;</span>
 </pre></div>
 </div>
@@ -353,11 +353,11 @@ a numpy array (or a python list if numpy is not installed).  The string
 representation will be something like &#8216;&lt;array size=128, type=int&gt;&#8217;
 depending on the size and type of the waveform.  An array of doubles might
 be:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:scan1.P1PA&#39;</span><span class="p">)</span>  <span class="c"># A Double Waveform</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:scan1.P1PA&#39;</span><span class="p">)</span>  <span class="c1"># A Double Waveform</span>
 <span class="go">array([-0.08      , -0.078     , -0.076     , ...,</span>
 <span class="go">    1.99599814, 1.99799919,  2.     ])</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:scan1.P1PA&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:scan1.P1PA&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">&#39;&lt;array size=2000, type=DOUBLE&gt;&#39;</span>
 </pre></div>
 </div>
@@ -366,12 +366,12 @@ strings when <em>as_string</em> is <code class="docutils literal"><span class="p
 low limit of the maximum length (40 characters!) of EPICS strings, and
 means that it is fairly common to use CHAR waveforms when long strings are
 desired:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:dir&#39;</span><span class="p">)</span>      <span class="c"># A CHAR waveform</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:dir&#39;</span><span class="p">)</span>      <span class="c1"># A CHAR waveform</span>
 <span class="go">array([ 84,  58,  92, 120,  97, 115,  95, 117, 115,</span>
 <span class="go">   101, 114,  92,  77,  97, 114,  99, 104,  50,  48,</span>
 <span class="go">    49,  48,  92,  70,  97, 115, 116,  77,  97, 112])</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s">&#39;XXX:dir&#39;</span><span class="p">,</span><span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:dir&#39;</span><span class="p">,</span><span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">&#39;T:\\xas_user\\March2010\\Fastmap&#39;</span>
 </pre></div>
 </div>
@@ -414,9 +414,9 @@ even if the <a class="reference internal" href="#epics.caput" title="epics.caput
 <p>This function returns 1 on success, and a negative number if the timeout
 has been exceeded.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span><span class="mf">2.30</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span><span class="mf">2.30</span><span class="p">)</span>
 <span class="go">1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span><span class="o">-</span><span class="mf">2.30</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span><span class="o">-</span><span class="mf">2.30</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="gp">... </span><span class="n">waits</span> <span class="n">a</span> <span class="n">few</span> <span class="n">seconds</span> <span class="o">...</span>
 <span class="go">1</span>
 </pre></div>
@@ -478,7 +478,7 @@ should take keyword arguments for <em>pvname</em>, <em>value</em>, and <em>char_
 <a class="reference internal" href="pv.html#pv-callbacks-label"><span>User-supplied Callback functions</span></a> for information on writing callback functions for
 <a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal"><span class="pre">camonitor()</span></code></a>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">camonitor</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">camonitor</span><span class="p">(</span><span class="s">&#39;XXX.m1.VAL&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">camonitor</span><span class="p">(</span><span class="s1">&#39;XXX.m1.VAL&#39;</span><span class="p">)</span>
 <span class="go">XXX.m1.VAL 2010-08-01 10:34:15.822452 1.3</span>
 <span class="go">XXX.m1.VAL 2010-08-01 10:34:16.823233 1.2</span>
 <span class="go">XXX.m1.VAL 2010-08-01 10:34:17.823233 1.1</span>
@@ -506,12 +506,12 @@ should take keyword arguments for <em>pvname</em>, <em>value</em>, and <em>char_
 changes being saved to a log file.   After a while, the monitor is cleared
 and the log file is inspected:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fh</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;PV1.log&#39;</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">camonitor</span><span class="p">(</span><span class="s">&#39;XXX:DMM1Ch2_calc.VAL&#39;</span><span class="p">,</span><span class="n">writer</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fh</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;PV1.log&#39;</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">camonitor</span><span class="p">(</span><span class="s1">&#39;XXX:DMM1Ch2_calc.VAL&#39;</span><span class="p">,</span><span class="n">writer</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">....</span> <span class="n">wait</span> <span class="k">for</span> <span class="n">changes</span> <span class="o">...</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">camonitor_clear</span><span class="p">(</span><span class="s">&#39;XXX:DMM1Ch2_calc.VAL&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">camonitor_clear</span><span class="p">(</span><span class="s1">&#39;XXX:DMM1Ch2_calc.VAL&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fh</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;PV1.log&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fh</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;PV1.log&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fh</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span> <span class="k">print</span> <span class="n">i</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 <span class="go"> XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:40.536946 -183.5035</span>
 <span class="go"> XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:41.536757 -183.6716</span>
@@ -627,7 +627,7 @@ contact the authors.</p>
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>
 </html>
