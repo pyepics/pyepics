@@ -68,11 +68,10 @@
   <ul>
 <li><a class="reference internal" href="#">Downloading and Installation</a><ul>
 <li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
-<li><a class="reference internal" href="#downloads">Downloads</a></li>
+<li><a class="reference internal" href="#downloads-and-installation">Downloads and Installation</a></li>
+<li><a class="reference internal" href="#getting-started-setting-up-the-epics-environment">Getting Started, Setting up the Epics Environment</a></li>
 <li><a class="reference internal" href="#testing">Testing</a></li>
 <li><a class="reference internal" href="#development-version">Development Version</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#getting-started-setting-up-the-epics-environment">Getting Started, Setting up the Epics Environment</a></li>
 <li><a class="reference internal" href="#getting-help">Getting Help</a></li>
 <li><a class="reference internal" href="#license">License</a></li>
 <li><a class="reference internal" href="#acknowledgments">Acknowledgments</a></li>
@@ -140,63 +139,74 @@ Windows was new in version 3.2.4, and requires Python version 2.7.9.</p>
 though it is not strictly required. If available, it will be used to
 convert EPICS waveforms values into numpy arrays.</p>
 </div>
-<div class="section" id="downloads">
-<h2>Downloads<a class="headerlink" href="#downloads" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the PyEpics Package is 3.2.5. There are a few ways to get this package:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="23%" />
-<col width="16%" />
-<col width="61%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Download Type</th>
-<th class="head">Py Version</th>
-<th class="head">PyPI link</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>Source tarball</td>
-<td>All</td>
-<td><a class="reference external" href="http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.5.tar.gz">pyepics-3.2.5.tar.gz</a></td>
-</tr>
-<tr class="row-odd"><td>Win32 Installer</td>
-<td>2.7</td>
-<td><a class="reference external" href="http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.5.win32-py2.7.exe">pyepics-3.2.5.win32-py2.7.exe</a></td>
-</tr>
-<tr class="row-even"><td>Win32 Installer</td>
-<td>3.5</td>
-<td><a class="reference external" href="http://pypi.python.org/packages/3.5/p/pyepics/pyepics-3.2.5.win32-py3.5.exe">pyepics-3.2.5.win32-py3.5.exe</a></td>
-</tr>
-<tr class="row-odd"><td>Win64 Installer</td>
-<td>2.7</td>
-<td><a class="reference external" href="http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.5.win-amd64-py2.7.exe">pyepics-3.2.5.win-amd64-py2.7.exe</a></td>
-</tr>
-<tr class="row-even"><td>Win64 Installer</td>
-<td>3.5</td>
-<td><a class="reference external" href="http://pypi.python.org/packages/3.5/p/pyepics/pyepics-3.2.5.win-amd64-py3.5.exe">pyepics-3.2.5.win-amd64-py3.5.exe</a></td>
-</tr>
-<tr class="row-odd"><td>Development</td>
-<td>All</td>
-<td><a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github repository</a></td>
-</tr>
-</tbody>
-</table>
-<p>Current and older source source kits, and Windows Installers can also be found
-at the <a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/">PyEpics CARS downloads</a> site.  If you have <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Python Setup Tools</a>
-installed, you can download and install the PyEpics Package simply with:</p>
-<div class="highlight-python"><div class="highlight"><pre>easy_install -U pyepics
-</pre></div>
-</div>
-<p>or:</p>
+<div class="section" id="downloads-and-installation">
+<h2>Downloads and Installation<a class="headerlink" href="#downloads-and-installation" title="Permalink to this headline">¶</a></h2>
+<p>The latest stable version of the PyEpics Package is 3.2.5.  Source code
+kits and Windows installers can be found at either <a class="reference external" href="https://pypi.python.org/pypi/pyepics/3.2.5">pyepics PyPI</a> or
+<a class="reference external" href="http://cars9.uchicago.edu/software/python/pyepics3/src/">pyepics CARS downloads</a> site.  With <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Python Setup Tools</a> now standard
+for Python 2.7 and abouve, the simplest way to install the pyepics is
+with:</p>
 <div class="highlight-python"><div class="highlight"><pre>pip install pyepics
 </pre></div>
 </div>
-<p>If you&#8217;re using Anaconda, there are several conda channels for PyEpics,
+<p>If you&#8217;re using Anaconda, there are a few conda channels for pyepics,
 including:</p>
 <div class="highlight-python"><div class="highlight"><pre>conda install -c https://conda.anaconda.org/newville pyepics
 </pre></div>
 </div>
+</div>
+<div class="section" id="getting-started-setting-up-the-epics-environment">
+<h2>Getting Started, Setting up the Epics Environment<a class="headerlink" href="#getting-started-setting-up-the-epics-environment" title="Permalink to this headline">¶</a></h2>
+<p>In order for PyEpics to work at correctly, it must be able to find and load the
+Channel Access dynamic library (<em>libca.so</em>, <em>libca.dylib</em>, or <em>ca.dll</em>
+depending on the system).  This dynamic library needs to found at runtime.</p>
+<p>There are a few ways to specify how to find this library:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">set the environmental variable <code class="docutils literal"><span class="pre">PYEPICS_LIBCA</span></code> to the full path of the dynamic library, for example:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; export PYEPICS_LIBCA=/usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so
+</pre></div>
+</div>
+</li>
+<li><p class="first">set the environmental variables <code class="docutils literal"><span class="pre">EPICS_BASE</span></code> and  <code class="docutils literal"><span class="pre">EPICS_HOST_ARCH</span></code>
+to point to where the library was built.   For example:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; export EPICS_BASE=/usr/local/epics/base-3.14.12.1
+&gt; export EPICS_HOST_ARCH=linux-x86
+</pre></div>
+</div>
+<p>will find the library at /usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so.</p>
+</li>
+<li><p class="first">Put the dynamic library somewhere in the Python path.  A convenient
+place might be the same <code class="docutils literal"><span class="pre">site-packages/pyepics</span> <span class="pre">library</span></code> folder as the
+python package is installed.</p>
+</li>
+</ol>
+</div></blockquote>
+<dl class="docutils">
+<dt>To find out which CA library will be used by pyepics, use:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">find_libca</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>which will print out the full path of the CA dynamic library that will be
+used.</p>
+<p><strong>Note for Windows users</strong>: The needed CA DLLs (ca.dll and Com.dll) are
+included in the installation kit, and should be automatically installed to
+where they can be found at runtime (following rule 3 above).  If they are
+not found (or another version is found that conflicts),  you should copy
+them to a place where they can be found, such as the Python DLLs folder,
+which might be something like <code class="docutils literal"><span class="pre">C:\Python27\DLLs</span></code>.</p>
+<p>For more details, especially about how to set paths for LD_LIBRARY_PATH or
+DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.</p>
+<p>With the Epics library loaded, it will need to be able to connect to Epics
+Process Variables. Generally, these variables are provided by Epics I/O
+controllers (IOCs) that are processes running on some device on the
+network.   If you&#8217;re connecting to PVs provided by IOCs on your local
+subnet, you should have no trouble.  If trying to reach further network,
+you may need to set the environmental variable <code class="docutils literal"><span class="pre">EPICS_CA_ADDR_LIST</span></code> to
+specify which networks to search for PVs.</p>
 </div>
 <div class="section" id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
@@ -296,63 +306,6 @@ version, use one of:</p>
 git clone git@github.com/pyepics/pyepics.git
 </pre></div>
 </div>
-</div>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>Installation from source on any platform is:</p>
-<div class="highlight-python"><div class="highlight"><pre>python setup.py install
-</pre></div>
-</div>
-<p>For more details, especially about how to set paths for LD_LIBRARY_PATH or
-DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.</p>
-<p>If you have <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Python Setup Tools</a>  installed, you can download and
-install the PyEpics Package with:</p>
-<div class="highlight-python"><div class="highlight"><pre>easy_install -U pyepics
-</pre></div>
-</div>
-<p>If you are using Anaconda Python, you can download and
-install the PyEpics Package with:</p>
-<div class="highlight-python"><div class="highlight"><pre>conda install -c https://conda.anaconda.org/newville pyepics
-</pre></div>
-</div>
-</div>
-<div class="section" id="getting-started-setting-up-the-epics-environment">
-<h2>Getting Started, Setting up the Epics Environment<a class="headerlink" href="#getting-started-setting-up-the-epics-environment" title="Permalink to this headline">¶</a></h2>
-<p>In order for PyEpics to work at correctly, it must be able to find and load the
-Channel Access dynamic library (<em>libca.so</em>, <em>libca.dylib</em>, or <em>ca.dll</em>
-depending on the system).  This dynamic library needs to found at runtime.</p>
-<p>There are a few ways to specify how to find this library:</p>
-<blockquote>
-<div><ol class="arabic">
-<li><p class="first">set the environmental variable <code class="docutils literal"><span class="pre">PYEPICS_LIBCA</span></code> to the full path of the dynamic library, for example:</p>
-<div class="highlight-python"><div class="highlight"><pre>&gt; export PYEPICS_LIBCA=/usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so
-</pre></div>
-</div>
-</li>
-<li><p class="first">set the environmental variables <code class="docutils literal"><span class="pre">EPICS_BASE</span></code> and  <code class="docutils literal"><span class="pre">EPICS_HOST_ARCH</span></code>
-to point to where the library was built.   For example:</p>
-<div class="highlight-python"><div class="highlight"><pre>&gt; export EPICS_BASE=/usr/local/epics/base-3.14.12.1
-&gt; export EPICS_HOST_ARCH=linux-x86
-</pre></div>
-</div>
-<p>will find the library at /usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so.</p>
-</li>
-<li><p class="first">Put the dynamic library somewhere in the Python path.  A convenient
-place might be the same <code class="docutils literal"><span class="pre">site-packages/pyepics</span> <span class="pre">library</span></code> folder as the
-python package is installed.</p>
-</li>
-</ol>
-</div></blockquote>
-<p>Note, that For Windows users, the DLLs (ca.dll and Com.dll) are included in the
-installation kit, and automatically installed to where they can be found at
-runtime (following rule 3 above).</p>
-<p>With the Epics library loaded, it will need to be able to connect to Epics
-Process Variables. Generally, these variables are provided by Epics I/O
-controllers (IOCs) that are processes running on some device on the
-network.   If you&#8217;re connecting to PVs provided by IOCs on your local
-subnet, you should have no trouble.  If trying to reach further network,
-you may need to set the environmental variable <code class="docutils literal"><span class="pre">EPICS_CA_ADDR_LIST</span></code> to
-specify which networks to search for PVs.</p>
 </div>
 <div class="section" id="getting-help">
 <h2>Getting Help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h2>
@@ -506,7 +459,7 @@ Wasserman, and Glen Wright.</p>
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

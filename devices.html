@@ -130,13 +130,13 @@ related PVs.  This almost describes an Epics Record, but as it is concerned
 only with PV names, the mapping to an Epics Record is not exact.  On the
 other hand, the concept of a <em>device</em> is more flexible than a predefined
 Epics Record as it can actually hold PVs from several different records.:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">motor1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="s1">&#39;XXX:motor1.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;VAL&#39;</span><span class="p">,</span> <span class="s1">&#39;RBV&#39;</span><span class="p">,</span> <span class="s1">&#39;DESC&#39;</span><span class="p">,</span> <span class="s1">&#39;RVAL&#39;</span><span class="p">,</span>
-                                           <span class="s1">&#39;LVIO&#39;</span><span class="p">,</span> <span class="s1">&#39;HLS&#39;</span><span class="p">,</span> <span class="s1">&#39;LLS&#39;</span><span class="p">))</span>
-<span class="n">motor1</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;VAL&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="k">print</span> <span class="s1">&#39;Motor </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">motor1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DESC&#39;</span><span class="p">),</span> <span class="n">motor1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;RBV&#39;</span><span class="p">))</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">motor1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="s">&#39;XXX:motor1.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;VAL&#39;</span><span class="p">,</span> <span class="s">&#39;RBV&#39;</span><span class="p">,</span> <span class="s">&#39;DESC&#39;</span><span class="p">,</span> <span class="s">&#39;RVAL&#39;</span><span class="p">,</span>
+                                           <span class="s">&#39;LVIO&#39;</span><span class="p">,</span> <span class="s">&#39;HLS&#39;</span><span class="p">,</span> <span class="s">&#39;LLS&#39;</span><span class="p">))</span>
+<span class="n">motor1</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;VAL&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Motor </span><span class="si">%s</span><span class="s"> = </span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">motor1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;DESC&#39;</span><span class="p">),</span> <span class="n">motor1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;RBV&#39;</span><span class="p">))</span>
 
 <span class="n">motor1</span><span class="o">.</span><span class="n">VAL</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="k">print</span> <span class="s1">&#39;Motor </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">motor1</span><span class="o">.</span><span class="n">DESC</span><span class="p">,</span> <span class="n">motor1</span><span class="o">.</span><span class="n">RBV</span> <span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Motor </span><span class="si">%s</span><span class="s"> = </span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">motor1</span><span class="o">.</span><span class="n">DESC</span><span class="p">,</span> <span class="n">motor1</span><span class="o">.</span><span class="n">RBV</span> <span class="p">)</span>
 </pre></div>
 </div>
 <p>While useful on its own like this, the real point of a <em>device</em> is as a
@@ -192,10 +192,10 @@ function will be run when the at tribute&#8217;s value changes</p>
 may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 <cite>epics.PV(prefix+delim+attr)</cite>.   That is, one can say:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
-<span class="n">m1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="s1">&#39;XXX:m1&#39;</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
-<span class="n">m1</span><span class="o">.</span><span class="n">add_pv</span><span class="p">(</span><span class="s1">&#39;XXX:m2.VAL&#39;</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;other&#39;</span><span class="p">)</span>
-<span class="k">print</span> <span class="n">m1</span><span class="o">.</span><span class="n">VAL</span>     <span class="c1"># print value of XXX:m1.VAL</span>
-<span class="k">print</span> <span class="n">m1</span><span class="o">.</span><span class="n">other</span>   <span class="c1"># prints value of XXX:m2.VAL</span>
+<span class="n">m1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="s">&#39;XXX:m1&#39;</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">m1</span><span class="o">.</span><span class="n">add_pv</span><span class="p">(</span><span class="s">&#39;XXX:m2.VAL&#39;</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="s">&#39;other&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">m1</span><span class="o">.</span><span class="n">VAL</span>     <span class="c"># print value of XXX:m1.VAL</span>
+<span class="k">print</span> <span class="n">m1</span><span class="o">.</span><span class="n">other</span>   <span class="c"># prints value of XXX:m2.VAL</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -246,17 +246,17 @@ and read many of the Motor parameters.</p>
 <p>The  <a class="reference internal" href="#motor.Motor" title="motor.Motor"><code class="xref py py-class docutils literal"><span class="pre">Motor</span></code></a> class helps the user create and use Epics motors.
 A simple example use would be:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
-<span class="n">m1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Motor</span><span class="p">(</span><span class="s1">&#39;XXX:m1&#39;</span><span class="p">)</span>
+<span class="n">m1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Motor</span><span class="p">(</span><span class="s">&#39;XXX:m1&#39;</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="s1">&#39;Motor:  &#39;</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">DESC</span> <span class="p">,</span> <span class="s1">&#39; Currently at &#39;</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">RBV</span>
+<span class="k">print</span> <span class="s">&#39;Motor:  &#39;</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">DESC</span> <span class="p">,</span> <span class="s">&#39; Currently at &#39;</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">RBV</span>
 
 <span class="n">m1</span><span class="o">.</span><span class="n">tweak_val</span> <span class="o">=</span> <span class="mf">0.10</span>
 <span class="n">m1</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dial</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-    <span class="n">m1</span><span class="o">.</span><span class="n">tweak</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">m1</span><span class="o">.</span><span class="n">tweak</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="s">&#39;forward&#39;</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
-    <span class="k">print</span> <span class="s1">&#39;Motor:  &#39;</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">DESC</span> <span class="p">,</span> <span class="s1">&#39; Currently at &#39;</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">RBV</span>
+    <span class="k">print</span> <span class="s">&#39;Motor:  &#39;</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">DESC</span> <span class="p">,</span> <span class="s">&#39; Currently at &#39;</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">RBV</span>
 </pre></div>
 </div>
 <p>Which will step the motor through a set of positions.    You&#8217;ll notice a
@@ -291,10 +291,10 @@ coordinate system, and can wait for completion.</p>
 
 <p>Once created, a Motor should be ready to use.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">Motor</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s1">&#39;XX:m1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s">&#39;XX:m1&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">m</span><span class="o">.</span><span class="n">drive</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">slew_speed</span>
 <span class="go">1.030 Fine X 5.0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">m</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;device_type&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">m</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;device_type&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">&#39;asynMotor&#39;</span>
 </pre></div>
 </div>
@@ -612,10 +612,10 @@ corresponding attribute name of the Motor Record field.</div></blockquote>
 
 <p>Note that <a class="reference internal" href="#motor.get" title="motor.get"><code class="xref py py-meth docutils literal"><span class="pre">get()</span></code></a> can return the string value, while fetching the
 attribute cannot do so:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Motor</span><span class="p">(</span><span class="s1">&#39;XXX:m1&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Motor</span><span class="p">(</span><span class="s">&#39;XXX:m1&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">m</span><span class="o">.</span><span class="n">device_type</span>
 <span class="go">0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">m</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;device_type&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">m</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;device_type&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="go">&#39;asynMotor&#39;</span>
 </pre></div>
 </div>
@@ -764,7 +764,7 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>direction</strong> (<em>string: 'forward' (default) or 'reverse'</em>) &#8211; direction of motion</li>
+<li><strong>direction</strong> (<em>string: &#8216;forward&#8217; (default) or &#8216;reverse&#8217;</em>) &#8211; direction of motion</li>
 <li><strong>wait</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) &#8211; whether to wait for completion</li>
 <li><strong>timeout</strong> (<em>float</em>) &#8211; max time for move to complete (in seconds) [default=300]</li>
 </ul>
@@ -859,11 +859,11 @@ given, all PVs in the device must be <em>fully qualified</em>.  Note that there 
 no requirement to share a common prefix in such a collection of PVs:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">Device</span>
 <span class="n">dev</span> <span class="o">=</span> <span class="n">Device</span><span class="p">()</span>
-<span class="n">p1</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;13IDC:m1.VAL&#39;</span><span class="p">)</span>
-<span class="n">p2</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;13IDC:m2.VAL&#39;</span><span class="p">)</span>
-<span class="n">dev</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;13IDC:m1.VAL&#39;</span><span class="p">,</span> <span class="mf">2.8</span><span class="p">)</span>
-<span class="n">dev</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;13IDC:m2.VAL&#39;</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">)</span>
-<span class="k">print</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;13IDC:m3.DIR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">p1</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;13IDC:m1.VAL&#39;</span><span class="p">)</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;13IDC:m2.VAL&#39;</span><span class="p">)</span>
+<span class="n">dev</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;13IDC:m1.VAL&#39;</span><span class="p">,</span> <span class="mf">2.8</span><span class="p">)</span>
+<span class="n">dev</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;13IDC:m2.VAL&#39;</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;13IDC:m3.DIR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Note that this device cannot use the attributes based on field names.</p>
@@ -877,22 +877,22 @@ start to get interesting.</p>
 <p>For a slightly more useful and typical example, the pyepics distribution
 includes a Device for an Epics ai (analog input record).  The full
 implementation of this device is:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="ch">#!/usr/bin/env python</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
 <span class="sd">&quot;&quot;&quot;Epics analog input record&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">Device</span>
 
 <span class="k">class</span> <span class="nc">ai</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="s2">&quot;Simple analog input device&quot;</span>
+    <span class="s">&quot;Simple analog input device&quot;</span>
 
-    <span class="n">attrs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;VAL&#39;</span><span class="p">,</span> <span class="s1">&#39;EGU&#39;</span><span class="p">,</span> <span class="s1">&#39;HOPR&#39;</span><span class="p">,</span> <span class="s1">&#39;LOPR&#39;</span><span class="p">,</span> <span class="s1">&#39;PREC&#39;</span><span class="p">,</span> <span class="s1">&#39;NAME&#39;</span><span class="p">,</span> <span class="s1">&#39;DESC&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;DTYP&#39;</span><span class="p">,</span> <span class="s1">&#39;INP&#39;</span><span class="p">,</span> <span class="s1">&#39;LINR&#39;</span><span class="p">,</span> <span class="s1">&#39;RVAL&#39;</span><span class="p">,</span> <span class="s1">&#39;ROFF&#39;</span><span class="p">,</span> <span class="s1">&#39;EGUF&#39;</span><span class="p">,</span> <span class="s1">&#39;EGUL&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;AOFF&#39;</span><span class="p">,</span> <span class="s1">&#39;ASLO&#39;</span><span class="p">,</span> <span class="s1">&#39;ESLO&#39;</span><span class="p">,</span> <span class="s1">&#39;EOFF&#39;</span><span class="p">,</span> <span class="s1">&#39;SMOO&#39;</span><span class="p">,</span> <span class="s1">&#39;HIHI&#39;</span><span class="p">,</span> <span class="s1">&#39;LOLO&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;HIGH&#39;</span><span class="p">,</span> <span class="s1">&#39;LOW&#39;</span><span class="p">,</span> <span class="s1">&#39;HHSV&#39;</span><span class="p">,</span> <span class="s1">&#39;LLSV&#39;</span><span class="p">,</span> <span class="s1">&#39;HSV&#39;</span><span class="p">,</span> <span class="s1">&#39;LSV&#39;</span><span class="p">,</span> <span class="s1">&#39;HYST&#39;</span><span class="p">)</span>
+    <span class="n">attrs</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;VAL&#39;</span><span class="p">,</span> <span class="s">&#39;EGU&#39;</span><span class="p">,</span> <span class="s">&#39;HOPR&#39;</span><span class="p">,</span> <span class="s">&#39;LOPR&#39;</span><span class="p">,</span> <span class="s">&#39;PREC&#39;</span><span class="p">,</span> <span class="s">&#39;NAME&#39;</span><span class="p">,</span> <span class="s">&#39;DESC&#39;</span><span class="p">,</span>
+             <span class="s">&#39;DTYP&#39;</span><span class="p">,</span> <span class="s">&#39;INP&#39;</span><span class="p">,</span> <span class="s">&#39;LINR&#39;</span><span class="p">,</span> <span class="s">&#39;RVAL&#39;</span><span class="p">,</span> <span class="s">&#39;ROFF&#39;</span><span class="p">,</span> <span class="s">&#39;EGUF&#39;</span><span class="p">,</span> <span class="s">&#39;EGUL&#39;</span><span class="p">,</span>
+             <span class="s">&#39;AOFF&#39;</span><span class="p">,</span> <span class="s">&#39;ASLO&#39;</span><span class="p">,</span> <span class="s">&#39;ESLO&#39;</span><span class="p">,</span> <span class="s">&#39;EOFF&#39;</span><span class="p">,</span> <span class="s">&#39;SMOO&#39;</span><span class="p">,</span> <span class="s">&#39;HIHI&#39;</span><span class="p">,</span> <span class="s">&#39;LOLO&#39;</span><span class="p">,</span>
+             <span class="s">&#39;HIGH&#39;</span><span class="p">,</span> <span class="s">&#39;LOW&#39;</span><span class="p">,</span> <span class="s">&#39;HHSV&#39;</span><span class="p">,</span> <span class="s">&#39;LLSV&#39;</span><span class="p">,</span> <span class="s">&#39;HSV&#39;</span><span class="p">,</span> <span class="s">&#39;LSV&#39;</span><span class="p">,</span> <span class="s">&#39;HYST&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">prefix</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">prefix</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
             <span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The code simply pre-defines the fields that are the <em>suffixes</em> of an Epics ai
@@ -901,14 +901,14 @@ corresponding PVs.  For most record suffixes, these will be available as
 attributes of the Device object.  For example, the <code class="xref py py-class docutils literal"><span class="pre">ai</span></code> class above can
 be used simply and cleanly as:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics.devices</span> <span class="kn">import</span> <span class="n">ai</span>
-<span class="n">This_ai</span> <span class="o">=</span> <span class="n">ai</span><span class="p">(</span><span class="s1">&#39;XXX.PRES&#39;</span><span class="p">)</span>
-<span class="k">print</span> <span class="s1">&#39;Value: &#39;</span><span class="p">,</span> <span class="n">This_ai</span><span class="o">.</span><span class="n">VAL</span>
-<span class="k">print</span> <span class="s1">&#39;Units: &#39;</span><span class="p">,</span> <span class="n">This_ai</span><span class="o">.</span><span class="n">EGU</span>
+<span class="n">This_ai</span> <span class="o">=</span> <span class="n">ai</span><span class="p">(</span><span class="s">&#39;XXX.PRES&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Value: &#39;</span><span class="p">,</span> <span class="n">This_ai</span><span class="o">.</span><span class="n">VAL</span>
+<span class="k">print</span> <span class="s">&#39;Units: &#39;</span><span class="p">,</span> <span class="n">This_ai</span><span class="o">.</span><span class="n">EGU</span>
 </pre></div>
 </div>
 <p>Of course, you can also use the <a class="reference internal" href="#motor.get" title="motor.get"><code class="xref py py-meth docutils literal"><span class="pre">get()</span></code></a>, <a class="reference internal" href="#motor.put" title="motor.put"><code class="xref py py-meth docutils literal"><span class="pre">put()</span></code></a> methods above for a
 basic <code class="xref py py-class docutils literal"><span class="pre">Device</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">This_ai</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;DESC&#39;</span><span class="p">,</span> <span class="s1">&#39;My Pump&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">This_ai</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;DESC&#39;</span><span class="p">,</span> <span class="s">&#39;My Pump&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Several of the other standard Epics records can easily be exposed as Devices in
@@ -921,7 +921,7 @@ synApps.</p>
 <p>For a slightly more complicated example: an incomplete, but very useful mapping
 of the Scaler Record from synApps, including methods for changing modes, and
 reading and writing data.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="ch">#!/usr/bin/env python </span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python </span>
 <span class="sd">&quot;&quot;&quot;Epics Scaler&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">poll</span>
 
@@ -929,11 +929,11 @@ reading and writing data.</p>
     <span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">    Simple implementation of SynApps Scaler Record.   </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">attrs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;CNT&#39;</span><span class="p">,</span> <span class="s1">&#39;CONT&#39;</span><span class="p">,</span> <span class="s1">&#39;TP&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;VAL&#39;</span><span class="p">)</span>
-    <span class="n">attr_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;calc_enable&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_calcEnable.VAL&#39;</span><span class="p">}</span>
-    <span class="n">chan_attrs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;NM</span><span class="si">%i</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;S</span><span class="si">%i</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">calc_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;calc</span><span class="si">%i</span><span class="s1">&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_calc</span><span class="si">%i</span><span class="s1">.VAL&#39;</span><span class="p">,</span> <span class="s1">&#39;expr</span><span class="si">%i</span><span class="s1">&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_calc</span><span class="si">%i</span><span class="s1">.CALC&#39;</span><span class="p">}</span>
-    <span class="n">_nonpvs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_prefix&#39;</span><span class="p">,</span> <span class="s1">&#39;_pvs&#39;</span><span class="p">,</span> <span class="s1">&#39;_delim&#39;</span><span class="p">,</span> <span class="s1">&#39;_nchan&#39;</span><span class="p">,</span> <span class="s1">&#39;_chans&#39;</span><span class="p">)</span>
+    <span class="n">attrs</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;CNT&#39;</span><span class="p">,</span> <span class="s">&#39;CONT&#39;</span><span class="p">,</span> <span class="s">&#39;TP&#39;</span><span class="p">,</span> <span class="s">&#39;T&#39;</span><span class="p">,</span> <span class="s">&#39;VAL&#39;</span><span class="p">)</span>
+    <span class="n">attr_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;calc_enable&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">_calcEnable.VAL&#39;</span><span class="p">}</span>
+    <span class="n">chan_attrs</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;NM</span><span class="si">%i</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;S</span><span class="si">%i</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">calc_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;calc</span><span class="si">%i</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">_calc</span><span class="si">%i</span><span class="s">.VAL&#39;</span><span class="p">,</span> <span class="s">&#39;expr</span><span class="si">%i</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">_calc</span><span class="si">%i</span><span class="s">.CALC&#39;</span><span class="p">}</span>
+    <span class="n">_nonpvs</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;_prefix&#39;</span><span class="p">,</span> <span class="s">&#39;_pvs&#39;</span><span class="p">,</span> <span class="s">&#39;_delim&#39;</span><span class="p">,</span> <span class="s">&#39;_nchan&#39;</span><span class="p">,</span> <span class="s">&#39;_chans&#39;</span><span class="p">)</span>
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nchan</span>  <span class="o">=</span> <span class="n">nchan</span>
@@ -944,7 +944,7 @@ reading and writing data.</p>
             <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chan_attrs</span><span class="p">:</span>
                 <span class="n">attrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">att</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
                 
-        <span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">)</span>
+        <span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr_kws</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_pv</span><span class="p">(</span><span class="n">val</span> <span class="o">%</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span> <span class="n">key</span><span class="p">)</span>
@@ -955,56 +955,56 @@ reading and writing data.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mutable</span> <span class="o">=</span> <span class="bp">False</span>
         
     <span class="k">def</span> <span class="nf">AutoCountMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot;set to autocount mode&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;CONT&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="s">&quot;set to autocount mode&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;CONT&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">OneShotMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot;set to one shot mode&quot;</span>        
-        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;CONT&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="s">&quot;set to one shot mode&quot;</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;CONT&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">CountTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctime</span><span class="p">):</span>
-        <span class="s2">&quot;set count time&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;TP&#39;</span><span class="p">,</span> <span class="n">ctime</span><span class="p">)</span>
+        <span class="s">&quot;set count time&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;TP&#39;</span><span class="p">,</span> <span class="n">ctime</span><span class="p">)</span>
         
     <span class="k">def</span> <span class="nf">Count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctime</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-        <span class="s2">&quot;set count, with optional counttime&quot;</span>
+        <span class="s">&quot;set count, with optional counttime&quot;</span>
         <span class="k">if</span> <span class="n">ctime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">CountTime</span><span class="p">(</span><span class="n">ctime</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;CNT&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="n">wait</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;CNT&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="n">wait</span><span class="p">)</span>
         <span class="n">poll</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">EnableCalcs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot; enable calculations&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;calc_enable&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="s">&quot; enable calculations&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;calc_enable&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">setCalc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">calc</span><span class="p">):</span>
-        <span class="s2">&quot;set the calculation for scaler i&quot;</span>
-        <span class="n">attr</span> <span class="o">=</span> <span class="s1">&#39;expr</span><span class="si">%i</span><span class="s1">&#39;</span>  <span class="o">%</span> <span class="n">i</span>
+        <span class="s">&quot;set the calculation for scaler i&quot;</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="s">&#39;expr</span><span class="si">%i</span><span class="s">&#39;</span>  <span class="o">%</span> <span class="n">i</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">calc</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">getNames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot;get all names&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;NM</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chans</span><span class="p">]</span>
+        <span class="s">&quot;get all names&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;NM</span><span class="si">%i</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chans</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">Read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_calc</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-        <span class="s2">&quot;read all values&quot;</span>
-        <span class="n">attr</span> <span class="o">=</span> <span class="s1">&#39;S</span><span class="si">%i</span><span class="s1">&#39;</span>
+        <span class="s">&quot;read all values&quot;</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="s">&#39;S</span><span class="si">%i</span><span class="s">&#39;</span>
         <span class="k">if</span> <span class="n">use_calc</span><span class="p">:</span>
-            <span class="n">attr</span> <span class="o">=</span> <span class="s1">&#39;calc</span><span class="si">%i</span><span class="s1">&#39;</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="s">&#39;calc</span><span class="si">%i</span><span class="s">&#39;</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chans</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Note that we can then create a <code class="xref py py-class docutils literal"><span class="pre">scaler</span></code> object from its base PV
 prefix, and use methods like <code class="xref py py-meth docutils literal"><span class="pre">Count()</span></code> and <code class="xref py py-meth docutils literal"><span class="pre">Read()</span></code> without
 directly invoking epics calls:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">s1</span> <span class="o">=</span> <span class="n">Scaler</span><span class="p">(</span><span class="s1">&#39;XXX:scaler1&#39;</span><span class="p">)</span>
-<span class="n">s1</span><span class="o">.</span><span class="n">setCalc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;(B-2000*A/10000000.)&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">s1</span> <span class="o">=</span> <span class="n">Scaler</span><span class="p">(</span><span class="s">&#39;XXX:scaler1&#39;</span><span class="p">)</span>
+<span class="n">s1</span><span class="o">.</span><span class="n">setCalc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&#39;(B-2000*A/10000000.)&#39;</span><span class="p">)</span>
 <span class="n">s1</span><span class="o">.</span><span class="n">enableCalcs</span><span class="p">()</span>
 <span class="n">s1</span><span class="o">.</span><span class="n">OneShotMode</span><span class="p">()</span>
 <span class="n">s1</span><span class="o">.</span><span class="n">Count</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="k">print</span> <span class="s1">&#39;Names:       &#39;</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">getNames</span><span class="p">()</span>
-<span class="k">print</span> <span class="s1">&#39;Raw  values: &#39;</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">use_calc</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-<span class="k">print</span> <span class="s1">&#39;Calc values: &#39;</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">use_calc</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Names:       &#39;</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">getNames</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&#39;Raw  values: &#39;</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">use_calc</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;Calc values: &#39;</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">use_calc</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1141,7 +1141,7 @@ specific use of that Device.</div></blockquote>
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

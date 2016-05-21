@@ -144,7 +144,7 @@ both methods and attributes for accessing it&#8217;s properties.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>pvname</strong> &#8211; name of Epics Process Variable</li>
 <li><strong>callback</strong> (<em>callable, tuple, list or None</em>) &#8211; user-defined callback function on changes to PV value or state.</li>
-<li><strong>form</strong> (<em>string, one of ('native','ctrl', or 'time')</em>) &#8211; which epics <em>data type</em> to use:  the &#8216;native&#8217;, &#8216;time&#8217;, or the &#8216;ctrl&#8217; (Control) variant.</li>
+<li><strong>form</strong> (<em>string, one of (&#8216;native&#8217;,&#8217;ctrl&#8217;, or &#8216;time&#8217;)</em>) &#8211; which epics <em>data type</em> to use:  the &#8216;native&#8217;, &#8216;time&#8217;, or the &#8216;ctrl&#8217; (Control) variant.</li>
 <li><strong>auto_monitor</strong> (<code class="docutils literal"><span class="pre">None</span></code>, <code class="docutils literal"><span class="pre">True</span></code>, <code class="docutils literal"><span class="pre">False</span></code>, or bitmask (see <a class="reference internal" href="#pv-automonitor-label"><span>Automatic Monitoring of a PV</span></a>)) &#8211; whether to automatically monitor the PV for changes.</li>
 <li><strong>connection_callback</strong> (callable or <code class="docutils literal"><span class="pre">None</span></code>) &#8211; user-defined function called on changes to PV connection status.</li>
 <li><strong>connection_timeout</strong> (float or <code class="docutils literal"><span class="pre">None</span></code>) &#8211; time (in seconds) to wait for connection before giving up</li>
@@ -159,7 +159,7 @@ both methods and attributes for accessing it&#8217;s properties.</p>
 <p>Once created, a PV should (barring any network issues) automatically
 connect and be ready to use.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XX:m1.VAL&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;XX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">type</span>
 </pre></div>
@@ -413,7 +413,7 @@ When read, the latest value will be returned, even if that means a
 <p>Assigning to <a class="reference internal" href="#pv.value" title="pv.value"><code class="xref py py-attr docutils literal"><span class="pre">value</span></code></a> is equivalent to setting the value with the
 <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-meth docutils literal"><span class="pre">put()</span></code></a> method.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;xxx.VAL&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;xxx.VAL&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">value</span>
 <span class="go">1.00</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">2.00</span>
@@ -679,7 +679,7 @@ to <a class="reference internal" href="#pv.char_value" title="pv.char_value"><co
 with <em>count</em> &gt; 1), the <a class="reference internal" href="#pv.char_value" title="pv.char_value"><code class="xref py py-attr docutils literal"><span class="pre">char_value</span></code></a> will be set according to:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">firstnull</span>  <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">firstnull</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="n">firstnull</span><span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">char_value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">val</span><span class="p">[:</span><span class="n">firstnull</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">char_value</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">val</span><span class="p">[:</span><span class="n">firstnull</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -723,9 +723,9 @@ behavior is the same as the default in EPICS&#8217; <em>camonitor</em> tool.</p>
 setting <em>auto_monitor</em> to a numeric subscription mask made up of
 dbr.DBE_ALARM, dbr.DBE_LOG and/or dbr.DBE_VALUE. This mask will be
 passed directly to <code class="xref py py-meth docutils literal"><span class="pre">ca.create_subscription()</span></code> An example would be:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">pv1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;AAA&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="p">)</span>
-<span class="n">pv2</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;BBB&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_ALARM</span><span class="p">)</span>
-<span class="n">pv3</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;CCC&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_ALARM</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_LOG</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">pv1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;AAA&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="p">)</span>
+<span class="n">pv2</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;BBB&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_ALARM</span><span class="p">)</span>
+<span class="n">pv3</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;CCC&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_ALARM</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_LOG</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="last">which will generate callbacks for pv1 only when the value of &#8216;AAA&#8217;
@@ -869,9 +869,9 @@ sometimes you want to wait until the processing completes before going on.
 There are a few ways to accomplish this.  First, one can simply wait until
 the processing is done:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
-<span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">)</span>
 <span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="k">print</span> <span class="s1">&#39;Done&#39;</span>
+<span class="k">print</span> <span class="s">&#39;Done&#39;</span>
 </pre></div>
 </div>
 <p>This will hang until the processing of the PV completes (motor moving, etc)
@@ -897,7 +897,7 @@ what to do in the interim.  A simple example would be:</p>
 </div>
 <p>An additional advantage of this approach is that you can easily wait for
 multiple PVs to complete with python&#8217;s built-in <em>all</em> function, as with:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">pvgroup</span> <span class="o">=</span> <span class="p">(</span><span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">),</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;YYY&#39;</span><span class="p">),</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;ZZZ&#39;</span><span class="p">))</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">pvgroup</span> <span class="o">=</span> <span class="p">(</span><span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">),</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;YYY&#39;</span><span class="p">),</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;ZZZ&#39;</span><span class="p">))</span>
 <span class="n">newvals</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span>  <span class="mf">3.0</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">pv</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pvgroup</span><span class="p">,</span> <span class="n">newvals</span><span class="p">):</span>
     <span class="n">pv</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">use_complete</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -906,7 +906,7 @@ multiple PVs to complete with python&#8217;s built-in <em>all</em> function, as 
 <span class="k">while</span> <span class="n">waiting</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
     <span class="n">waiting</span> <span class="o">=</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">pv</span><span class="o">.</span><span class="n">put_complete</span> <span class="k">for</span> <span class="n">pv</span> <span class="ow">in</span> <span class="n">pvgroup</span><span class="p">])</span>
-<span class="k">print</span> <span class="s1">&#39;All puts are done!&#39;</span>
+<span class="k">print</span> <span class="s">&#39;All puts are done!&#39;</span>
 </pre></div>
 </div>
 <p>For maximum flexibility, one can all define a <em>put callback</em>, a function to
@@ -914,9 +914,9 @@ be run when the <a class="reference internal" href="#pv.put" title="pv.put"><cod
 <em>pvname</em> keyword argument, but will receive no others, unless you pass in
 data with the <em>callback_data</em> argument (which should be dict-like) to
 <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-meth docutils literal"><span class="pre">put()</span></code></a>.   A simple example would be:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">pv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">pv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">onPutComplete</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
-    <span class="k">print</span> <span class="s1">&#39;Put done for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pvname</span>
+    <span class="k">print</span> <span class="s">&#39;Put done for </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">pvname</span>
 
 <span class="n">pv</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onPutComplete</span><span class="p">)</span>
 </pre></div>
@@ -945,7 +945,7 @@ highly recommended.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>pvname</strong> &#8211; name of Epics Process Variable</li>
-<li><strong>form</strong> (<em>string, one of ('native','ctrl', or 'time')</em>) &#8211; which epics <em>data type</em> to use:  the &#8216;native&#8217; , or the &#8216;ctrl&#8217; (Control) or &#8216;time&#8217; variant.</li>
+<li><strong>form</strong> (<em>string, one of (&#8216;native&#8217;,&#8217;ctrl&#8217;, or &#8216;time&#8217;)</em>) &#8211; which epics <em>data type</em> to use:  the &#8216;native&#8217; , or the &#8216;ctrl&#8217; (Control) or &#8216;time&#8217; variant.</li>
 <li><strong>connect</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) &#8211; whether to wait for the PV to connect.</li>
 <li><strong>timeout</strong> (float or <code class="docutils literal"><span class="pre">None</span></code>) &#8211; maximum time to wait (in seconds) for value before returning None.</li>
 <li><strong>context</strong> (integer or  <code class="docutils literal"><span class="pre">None</span></code> (default)) &#8211; integer threading context.</li>
@@ -972,7 +972,7 @@ highly recommended.</p>
 <p>The simplest approach is to simply create a PV and use its <a class="reference internal" href="#pv.value" title="pv.value"><code class="xref py py-attr docutils literal"><span class="pre">value</span></code></a>
 attribute:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;xxx.VAL&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;xxx.VAL&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">value</span>
 <span class="go">1.00</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">2.00</span>
@@ -983,7 +983,7 @@ attribute:</p>
 necessary processing over the network.</p>
 <p>The above example is equivalent to</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;xxx.VAL&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;xxx.VAL&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="go">1.00</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="mf">2.00</span><span class="p">)</span>
@@ -1004,7 +1004,7 @@ necessary processing over the network.</p>
 <h3>Example of using info and more properties examples<a class="headerlink" href="#example-of-using-info-and-more-properties-examples" title="Permalink to this headline">¶</a></h3>
 <p>A PV has many attributes.  This can be seen from its <em>info</em> paragraph:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;13IDA:m3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;13IDA:m3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">info</span>
 <span class="go">== 13IDA:m3  (native_double) ==</span>
 <span class="go">   value      = 0.2</span>
@@ -1058,13 +1058,13 @@ value.</p>
 <p>To put a new value to a variable, either of these two approaches can be
 used:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Or (equivalently):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">1.0</span>
 </pre></div>
 </div>
@@ -1080,18 +1080,18 @@ function: a function to be run when the value has changed.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="k">def</span> <span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-    <span class="k">print</span> <span class="s1">&#39;PV Changed! &#39;</span><span class="p">,</span> <span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">()</span>
+    <span class="k">print</span> <span class="s">&#39;PV Changed! &#39;</span><span class="p">,</span> <span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">()</span>
 
 
 <span class="n">mypv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span>
 <span class="n">mypv</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">onChanges</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="s1">&#39;Now wait for changes&#39;</span>
+<span class="k">print</span> <span class="s">&#39;Now wait for changes&#39;</span>
 
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span> <span class="o">&lt;</span> <span class="mf">60.0</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.e-3</span><span class="p">)</span>
-<span class="k">print</span> <span class="s1">&#39;Done.&#39;</span>
+<span class="k">print</span> <span class="s">&#39;Done.&#39;</span>
 </pre></div>
 </div>
 <p>This first defines a <em>callback function</em> called <cite>onChanges()</cite> and then
@@ -1102,9 +1102,9 @@ See <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied
 <div class="section" id="example-of-connection-callback">
 <h3>Example of connection callback<a class="headerlink" href="#example-of-connection-callback" title="Permalink to this headline">¶</a></h3>
 <p>A connection callback:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c1">#</span>
-<span class="c1"># example of using a connection callback that will be called</span>
-<span class="c1"># for any change in connection status</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#</span>
+<span class="c"># example of using a connection callback that will be called</span>
+<span class="c"># for any change in connection status</span>
 
 <span class="kn">import</span> <span class="nn">epics</span>
 <span class="kn">import</span> <span class="nn">time</span>
@@ -1113,11 +1113,11 @@ See <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied
 
 <span class="n">write</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span>
 <span class="k">def</span> <span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
-    <span class="n">write</span><span class="p">(</span><span class="s1">&#39;PV connection status changed: </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span>  <span class="nb">repr</span><span class="p">(</span><span class="n">conn</span><span class="p">)))</span>
+    <span class="n">write</span><span class="p">(</span><span class="s">&#39;PV connection status changed: </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span>  <span class="nb">repr</span><span class="p">(</span><span class="n">conn</span><span class="p">)))</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
 <span class="k">def</span> <span class="nf">onValueChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
-    <span class="n">write</span><span class="p">(</span><span class="s1">&#39;PV value changed: </span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">)  </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">pvname</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+    <span class="n">write</span><span class="p">(</span><span class="s">&#39;PV value changed: </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)  </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">pvname</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 <span class="n">mypv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">motor1</span><span class="p">,</span> 
                 <span class="n">connection_callback</span><span class="o">=</span> <span class="n">onConnectionChange</span><span class="p">,</span>
@@ -1125,7 +1125,7 @@ See <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied
 
 <span class="n">mypv</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
-<span class="n">write</span><span class="p">(</span><span class="s1">&#39;Now waiting, watching values and connection changes:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">write</span><span class="p">(</span><span class="s">&#39;Now waiting, watching values and connection changes:</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
@@ -1168,7 +1168,7 @@ See <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

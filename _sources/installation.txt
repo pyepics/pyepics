@@ -32,54 +32,80 @@ though it is not strictly required. If available, it will be used to
 convert EPICS waveforms values into numpy arrays.
 
 
-Downloads
-~~~~~~~~~~~~~
+Downloads and Installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The latest stable version of the PyEpics Package is 3.2.5. There are a few ways to get this package:
-
-.. _pyepics-3.2.5.tar.gz:              http://pypi.python.org/packages/source/p/pyepics/pyepics-3.2.5.tar.gz
-.. _pyepics-3.2.5.win32-py2.7.exe:     http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.5.win32-py2.7.exe
-.. _pyepics-3.2.5.win32-py3.4.exe:     http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.5.win32-py3.4.exe
-.. _pyepics-3.2.5.win32-py3.5.exe:     http://pypi.python.org/packages/3.5/p/pyepics/pyepics-3.2.5.win32-py3.5.exe
-.. _pyepics-3.2.5.win-amd64-py2.7.exe: http://pypi.python.org/packages/2.7/p/pyepics/pyepics-3.2.5.win-amd64-py2.7.exe
-.. _pyepics-3.2.5.win-amd64-py3.4.exe: http://pypi.python.org/packages/3.4/p/pyepics/pyepics-3.2.5.win-amd64-py3.4.exe
-.. _pyepics-3.2.5.win-amd64-py3.5.exe: http://pypi.python.org/packages/3.5/p/pyepics/pyepics-3.2.5.win-amd64-py3.5.exe
-.. _pyepics github repository:         http://github.com/pyepics/pyepics
-.. _pyepics CARS downloads:            http://cars9.uchicago.edu/software/python/pyepics3/src/
+.. _pyepics github repository:      http://github.com/pyepics/pyepics
 .. _Python Setup Tools:                http://pypi.python.org/pypi/setuptools
+.. _pyepics PyPi:                           https://pypi.python.org/pypi/pyepics/3.2.5
+.. _pyepics CARS downloads:       http://cars9.uchicago.edu/software/python/pyepics3/src/
 
 
-+-----------------+------------+----------------------------------------------+
-|  Download Type  | Py Version |  PyPI link                                   |
-+=================+============+==============================================+
-| Source tarball  | All        |  `pyepics-3.2.5.tar.gz`_                     |
-+-----------------+------------+----------------------------------------------+
-| Win32 Installer | 2.7        |  `pyepics-3.2.5.win32-py2.7.exe`_            |
-+-----------------+------------+----------------------------------------------+
-| Win32 Installer | 3.5        |  `pyepics-3.2.5.win32-py3.5.exe`_            |
-+-----------------+------------+----------------------------------------------+
-| Win64 Installer | 2.7        |  `pyepics-3.2.5.win-amd64-py2.7.exe`_        |
-+-----------------+------------+----------------------------------------------+
-| Win64 Installer | 3.5        |  `pyepics-3.2.5.win-amd64-py3.5.exe`_        |
-+-----------------+------------+----------------------------------------------+
-|  Development    | All        |  `pyepics github repository`_                |
-+-----------------+------------+----------------------------------------------+
+The latest stable version of the PyEpics Package is 3.2.5.  Source code
+kits and Windows installers can be found at either `pyepics PyPI`_ or
+`pyepics CARS downloads`_ site.  With `Python Setup Tools`_ now standard
+for Python 2.7 and abouve, the simplest way to install the pyepics is
+with::
 
+     pip install pyepics
 
-Current and older source source kits, and Windows Installers can also be found
-at the `PyEpics CARS downloads`_ site.  If you have `Python Setup Tools`_
-installed, you can download and install the PyEpics Package simply with::
-
-   easy_install -U pyepics
-
-or::
-
-  pip install pyepics
-
-If you're using Anaconda, there are several conda channels for PyEpics,
+If you're using Anaconda, there are a few conda channels for pyepics,
 including::
 
- conda install -c https://conda.anaconda.org/newville pyepics
+     conda install -c https://conda.anaconda.org/newville pyepics
+
+
+
+Getting Started, Setting up the Epics Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order for PyEpics to work at correctly, it must be able to find and load the
+Channel Access dynamic library (*libca.so*, *libca.dylib*, or *ca.dll*
+depending on the system).  This dynamic library needs to found at runtime.
+
+There are a few ways to specify how to find this library:
+
+ 1. set the environmental variable ``PYEPICS_LIBCA`` to the full path of the dynamic library, for example::
+
+     > export PYEPICS_LIBCA=/usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so
+
+ 2. set the environmental variables ``EPICS_BASE`` and  ``EPICS_HOST_ARCH``
+    to point to where the library was built.   For example::
+
+     > export EPICS_BASE=/usr/local/epics/base-3.14.12.1
+     > export EPICS_HOST_ARCH=linux-x86
+
+    will find the library at /usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so.
+
+ 3. Put the dynamic library somewhere in the Python path.  A convenient
+    place might be the same ``site-packages/pyepics library`` folder as the
+    python package is installed.
+
+To find out which CA library will be used by pyepics, use:
+    >>> import epics
+    >>> epics.ca.find_libca()
+
+which will print out the full path of the CA dynamic library that will be
+used.
+
+
+**Note for Windows users**: The needed CA DLLs (ca.dll and Com.dll) are
+included in the installation kit, and should be automatically installed to
+where they can be found at runtime (following rule 3 above).  If they are
+not found (or another version is found that conflicts),  you should copy
+them to a place where they can be found, such as the Python DLLs folder,
+which might be something like ``C:\Python27\DLLs``.
+
+For more details, especially about how to set paths for LD_LIBRARY_PATH or
+DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.
+
+With the Epics library loaded, it will need to be able to connect to Epics
+Process Variables. Generally, these variables are provided by Epics I/O
+controllers (IOCs) that are processes running on some device on the
+network.   If you're connecting to PVs provided by IOCs on your local
+subnet, you should have no trouble.  If trying to reach further network,
+you may need to set the environmental variable ``EPICS_CA_ADDR_LIST`` to
+specify which networks to search for PVs.
 
 
 Testing
@@ -143,64 +169,6 @@ version, use one of::
    git clone git@github.com/pyepics/pyepics.git
 
 
-Installation
-~~~~~~~~~~~~~~~~~
-
-Installation from source on any platform is::
-
-   python setup.py install
-
-For more details, especially about how to set paths for LD_LIBRARY_PATH or
-DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.
-
-If you have `Python Setup Tools`_  installed, you can download and
-install the PyEpics Package with::
-
-   easy_install -U pyepics
-
-
-If you are using Anaconda Python, you can download and
-install the PyEpics Package with::
-
-   conda install -c https://conda.anaconda.org/newville pyepics
-
-
-Getting Started, Setting up the Epics Environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In order for PyEpics to work at correctly, it must be able to find and load the
-Channel Access dynamic library (*libca.so*, *libca.dylib*, or *ca.dll*
-depending on the system).  This dynamic library needs to found at runtime.
-
-There are a few ways to specify how to find this library:
-
- 1. set the environmental variable ``PYEPICS_LIBCA`` to the full path of the dynamic library, for example::
-
-     > export PYEPICS_LIBCA=/usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so
-
- 2. set the environmental variables ``EPICS_BASE`` and  ``EPICS_HOST_ARCH``
-    to point to where the library was built.   For example::
-
-     > export EPICS_BASE=/usr/local/epics/base-3.14.12.1
-     > export EPICS_HOST_ARCH=linux-x86
-
-    will find the library at /usr/local/epics/base-3.14.12.1/lib/linux-x86/libca.so.
-
- 3. Put the dynamic library somewhere in the Python path.  A convenient
-    place might be the same ``site-packages/pyepics library`` folder as the
-    python package is installed.
-
-Note, that For Windows users, the DLLs (ca.dll and Com.dll) are included in the
-installation kit, and automatically installed to where they can be found at
-runtime (following rule 3 above).
-
-With the Epics library loaded, it will need to be able to connect to Epics
-Process Variables. Generally, these variables are provided by Epics I/O
-controllers (IOCs) that are processes running on some device on the
-network.   If you're connecting to PVs provided by IOCs on your local
-subnet, you should have no trouble.  If trying to reach further network,
-you may need to set the environmental variable ``EPICS_CA_ADDR_LIST`` to
-specify which networks to search for PVs.
 
 
 Getting Help

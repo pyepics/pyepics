@@ -140,7 +140,7 @@ $(P)$(Q).FOFF
 however, no mechanism for automatically finding request files.</p>
 <p>With such a file, simply using:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics.autosave</span>
-<span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">save_pvs</span><span class="p">(</span><span class="s2">&quot;My.req&quot;</span><span class="p">,</span> <span class="s2">&quot;my_values.sav&quot;</span><span class="p">)</span>
+<span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">save_pvs</span><span class="p">(</span><span class="s">&quot;My.req&quot;</span><span class="p">,</span> <span class="s">&quot;my_values.sav&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>will save the current values for the PVs to the file <strong>my_values.sav</strong>.  At
@@ -203,15 +203,15 @@ module.</p>
 <h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
 <p>A simple example usign the autosave module:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics.autosave</span>
-<span class="c1"># save values</span>
-<span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">save_pvs</span><span class="p">(</span><span class="s2">&quot;my_request_file.req&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;/tmp/my_recent_save.sav&quot;</span><span class="p">)</span>
+<span class="c"># save values</span>
+<span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">save_pvs</span><span class="p">(</span><span class="s">&quot;my_request_file.req&quot;</span><span class="p">,</span>
+                        <span class="s">&quot;/tmp/my_recent_save.sav&quot;</span><span class="p">)</span>
 
-<span class="c1"># wait 30 seconds</span>
+<span class="c"># wait 30 seconds</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
 
-<span class="c1"># restore those values back</span>
-<span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">restore_pvs</span><span class="p">(</span><span class="s2">&quot;/tmp/my_recent_save.sav&quot;</span><span class="p">)</span>
+<span class="c"># restore those values back</span>
+<span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">restore_pvs</span><span class="p">(</span><span class="s">&quot;/tmp/my_recent_save.sav&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -251,7 +251,7 @@ module.</p>
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>
