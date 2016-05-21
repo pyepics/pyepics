@@ -49,9 +49,15 @@ copyright = u'2014, Matthew Newville'
 try:
     import epics
     release = epics.__version__
+    if '-' in release:
+        a, b = release.split('-', 1)
+        release = a
+    if '_' in release:
+        a, b = release.split('_', 1)
+        release = a
     # The full version, including alpha/beta/rc tags.
 except ImportError:
-    release = '3.0.X'
+    release = '3.X.Y'
 
 print 'Building Docs for EPICS version %s / Python version %s ' % (release, sys.version)
 
