@@ -130,7 +130,10 @@ def find_libca():
         path_sep = ';'
         dylib = 'DLLs'
 
-    _path = [os.path.split(os.path.abspath(__file__))[0],
+    basepath = os.path.split(os.path.abspath(__file__))[0]
+    parent   = os.path.split(basepath)[0]
+    _path = [basepath, parent,
+             os.path.join(parent, dylib),             
              os.path.split(os.path.dirname(os.__file__))[0],
              os.path.join(sys.prefix, dylib)]
 
