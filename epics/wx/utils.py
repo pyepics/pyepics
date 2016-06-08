@@ -91,6 +91,7 @@ def add_menu(parent, menu, label='', text='', action=None):
     wid = wx.NewId()
     menu.Append(wid, label, text)
     if hasattr(action, '__call__'):
+        parent.Bind(wx.EVT_MENU, action, id=wid)
 
 def popup(parent, message, title, style=None):
     """
