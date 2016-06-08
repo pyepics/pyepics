@@ -83,7 +83,7 @@ def add_button(parent, label, size=(-1, -1), action=None):
     "add simple button with bound action"
     thisb = wx.Button(parent, label=label, size=size)
     if hasattr(action, '__call__'):
-        parent.Bind(wx.EVT_BUTTON, action, thisb)
+        thisb.Bind(wx.EVT_BUTTON, action)
     return thisb
 
 def add_menu(parent, menu, label='', text='', action=None):
@@ -91,7 +91,6 @@ def add_menu(parent, menu, label='', text='', action=None):
     wid = wx.NewId()
     menu.Append(wid, label, text)
     if hasattr(action, '__call__'):
-        wx.EVT_MENU(parent, wid, action)
 
 def popup(parent, message, title, style=None):
     """
