@@ -66,13 +66,9 @@ The latest stable version of the PyEpics Package is 3.2.5. There are a few ways 
 +-----------------+------------+----------------------------------------------+
 
 
-Current and older source source kits, and Windows Installers can also be found
-at the `PyEpics CARS downloads`_ site.  If you have `Python Setup Tools`_
-installed, you can download and install the PyEpics Package simply with::
-
-   easy_install -U pyepics
-
-or::
+Current and older source source kits, and Windows Installers can also be
+found at the `PyEpics CARS downloads`_ site.  If you have `Python Setup
+Tools`_ and pip installed, you can install the PyEpics Package simply with::
 
   pip install pyepics
 
