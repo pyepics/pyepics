@@ -1,6 +1,9 @@
 .. image:: https://travis-ci.org/pyepics/pyepics.png
    :target: https://travis-ci.org/pyepics/pyepics
 
+.. image:: https://zenodo.org/badge/4185/pyepics/pyepics.svg
+   :target: https://zenodo.org/badge/latestdoi/4185/pyepics/pyepics
+
 
 PyEpics 3:  Epics Channel Access for Python
 ============================================

@@ -1,7 +1,7 @@
 import numpy as np
 import time
 
-from epics import PV, caget, caput, poll, Device
+from epics import PV, caget, caput, poll, Device, get_pv
 
 MAX_CHAN = 4096
 MAX_ROIS = 32
@@ -130,7 +130,12 @@ class ADMCA(Device):
         self._nrois = nrois
         if self._nrois is None:
             self._nrois = MAX_ROIS
+
         self._roi_prefix = roi_prefix
+        for i in range(self._nrois):
+            p = get_pv('%s:%i:Name' % (self._roi_prefix, i+1))
+            p = get_pv('%s:%i:MinX' % (self._roi_prefix, i+1))
+            p = get_pv('%s:%i:SizeX' % (self._roi_prefix, i+1))
         self.get_rois()
         poll()
 
@@ -183,7 +188,7 @@ class ADMCA(Device):
                 self.rois.append(roi)
             else:
                 break
-            poll(0.005, 1.0)
+            poll(0.001, 1.0)
         return self.rois
 
     def del_roi(self, roiname):

@@ -472,13 +472,15 @@ def _onMonitorEvent(args):
     # indicating the loss in the status argument. Users can use the connection
     # callback to get informed of connection loss, so we just ignore any
     # bad status codes.
-    if args.status != dbr.ECA_NORMAL:
-      return
 
     # for 64-bit python on Windows!
-    if dbr.PY64_WINDOWS:   args = args.contents
-    value = dbr.cast_args(args)
+    if dbr.PY64_WINDOWS:   
+        args = args.contents
 
+    if args.status != dbr.ECA_NORMAL:
+        return
+
+    value = dbr.cast_args(args)
     pvname = name(args.chid)
     kwds = {'ftype':args.type, 'count':args.count,
             'chid':args.chid, 'pvname': pvname}
