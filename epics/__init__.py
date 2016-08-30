@@ -65,7 +65,7 @@ def caput(pvname, value, wait=False, timeout=60):
         return thispv.put(value, wait=wait, timeout=timeout)
 
 def caget(pvname, as_string=False, count=None, as_numpy=True,
-          use_monitor=False, timeout=None):
+          use_monitor=False, timeout=5.0):
     """caget(pvname, as_string=False)
     simple get of a pv's value..
        >>> x = caget('xx.VAL')
@@ -78,10 +78,12 @@ def caget(pvname, as_string=False, count=None, as_numpy=True,
     the count with
        >>> x = caget('MyArray.VAL', count=1000)
     """
-    thispv = get_pv(pvname, connect=True)
+    start_time = time.time()
+    thispv = get_pv(pvname, timeout=timeout, connect=True)
     if thispv.connected:
         if as_string:
             thispv.get_ctrlvars()
+        timeout -= (time.time() - start_time)
         val = thispv.get(count=count, timeout=timeout,
                          use_monitor=use_monitor,
                          as_string=as_string,
