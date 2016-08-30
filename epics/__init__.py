@@ -65,7 +65,7 @@ def caput(pvname, value, wait=False, timeout=60):
         return thispv.put(value, wait=wait, timeout=timeout)
 
 def caget(pvname, as_string=False, count=None, as_numpy=True,
-          use_monitor=False, timeout=None):
+          use_monitor=False, timeout=5.0):
     """caget(pvname, as_string=False)
     simple get of a pv's value..
        >>> x = caget('xx.VAL')
