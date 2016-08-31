@@ -106,6 +106,8 @@ class PV(object):
         self.ftype      = None
         self.connected  = False
         self.connection_timeout = connection_timeout
+        if self.connection_timeout is None:
+            self.connection_timeout = ca.DEFAULT_CONNECTION_TIMEOUT
         self._args      = {}.fromkeys(self._fields)
         self._args['pvname'] = self.pvname
         self._args['count'] = -1
@@ -217,19 +219,16 @@ class PV(object):
         # make sure we're in the CA context used to create this PV
         if self.context != ca.current_context():
             ca.attach_context(self.context)
-
-        if not self._conn_started:
-            self.connect()
-
         if not self.connected:
-            if timeout is None:
-                timeout = self.connection_timeout
-                if timeout is None:
-                    timeout = ca.DEFAULT_CONNECTION_TIMEOUT
             start_time = time.time()
-            while (not self.connected and
-                   time.time()-start_time < timeout):
-                ca.poll()
+            if not self._conn_started:
+                self.connect()
+
+            if not self.connected:
+                if timeout is None:
+                    timeout = self.connection_timeout
+                while not self.connected and time.time()-start_time < timeout:
+                    ca.poll()
         return self.connected
 
     def connect(self, timeout=None):
@@ -272,7 +271,7 @@ class PV(object):
         >>> p.get('13BMD:m1.DIR', as_string=True)
         'Pos'
         """
-        if not self.wait_for_connection():
+        if not self.wait_for_connection(timeout=timeout):
             return None
         if with_ctrlvars and getattr(self, 'units', None) is None:
             self.get_ctrlvars()
