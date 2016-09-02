@@ -2,14 +2,25 @@
 
 import epics
 import sys
-from PySide.QtGui import QWidget, QLabel, QLineEdit, QGridLayout, QApplication
+try:
+    from PySide.QtGui import QWidget, QLabel, QLineEdit, QGridLayout, QApplication
+except:
+    from PyQt4.QtGui import QWidget, QLabel, QLineEdit, QGridLayout, QApplication
 
+from epics.utils import BYTES2STR
 class PVText(QLabel):
     def __init__(self, pvname,  **kws):
         QLabel.__init__(self, '', **kws)
+        self.pv = None
+        self.cb_index = None        
         
     def SetPV(self, pvname):
-        self.pv = epics.PV(pvname, callback=self.onPVChange)
+        if self.pv is not None and self.cb_index is not None:
+            self.pv.remove_callback(self.cb_index)
+        
+        self.pv = epics.PV(BYTES2STR(pvname))
+        self.setText(self.pv.get(as_string=True))
+        self.cb_index = self.pv.add_callback(self.onPVChange)
 
     def onPVChange(self, pvname=None, char_value=None, **kws):
         self.setText(char_value)
@@ -18,22 +29,28 @@ class PVLineEdit(QLineEdit):
     def __init__(self, pvname=None,  **kws):
         QLineEdit.__init__(self, **kws)
         self.returnPressed.connect(self.onReturn)
+        self.pv = None
+        self.cb_index = None
         if pvname is not None:
             self.SetPV(pvname)
         
     def SetPV(self, pvname):
-        self.pv = epics.PV(pvname, callback=self.onPVChange)
+        if self.pv is not None and self.cb_index is not None:
+            self.pv.remove_callback(self.cb_index)
+            
+        self.pv = epics.PV(BYTES2STR(pvname))
+        self.cb_index = self.pv.add_callback(self.onPVChange)
 
     def onPVChange(self, pvname=None, char_value=None, **kws):
         self.setText(char_value)
 
     def onReturn(self):
-        self.pv.put(self.text())
+        self.pv.put(BYTES2STR(self.text()))
         
 class PVProbe(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        self.setWindowTitle("PySide PV Probe:")
+        self.setWindowTitle("PyQt4 PV Probe:")
 
         self.pv1name = QLineEdit()
         self.pv2name = QLineEdit()
@@ -56,8 +73,6 @@ class PVProbe(QWidget):
         self.setLayout(grid)
 
     def onPV1NameReturn(self):
-        print(" PV Value set with", self.pv1name.text())
-        print()
         self.value.SetPV(self.pv1name.text())
         
     def onPV2NameReturn(self):
