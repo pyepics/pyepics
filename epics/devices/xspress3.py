@@ -137,29 +137,7 @@ class Xspress3(Device, ADFileMixin, Xspress3BaseMixin):
                 isca = j+1
                 attr="C%iSCA%i"% (imca, isca)
                 self.add_pv("%s%s:Value_RBV" % (prefix, attr), attr)
-            for attr in ('TSNumPoints', 'TSControl'):
-                self.add_pv("%sMCA%iROI:%s" % (prefix, imca, attr),
-                            "MCA%i%s" % (imca, attr))
-                self.add_pv("%sC%iSCA:%s" % (prefix, imca, attr),
-                            "SCA%i%s" % (imca, attr))
         time.sleep(0.05)
-
-    def TimeSeriesCaptureOn(self, npts=None):
-        """ turns on a Time Series Capture"""
-        for imca in range(len(self.mcas)):
-            if npts is not None:
-                self._pvs["MCA%iTSNumPoints" % (imca+1)].put(npts)
-                self._pvs["SCA%iTSNumPoints" % (imca+1)].put(npts)
-        time.sleep(0.025)
-        for imca in range(len(self.mcas)):
-            self._pvs["MCA%iTSControl" % (imca+1)].put(0)
-            self._pvs["SCA%iTSControl" % (imca+1)].put(0)
-
-    def TimeSeriesCaptureOff(self):
-        """ turns off a Time Series Capture"""
-        for imca in range(len(self.mcas)):
-            self._pvs["MCA%iTSControl" % (imca+1)].put(2)
-            self._pvs["SCA%iTSControl" % (imca+1)].put(2)
 
     def roi_calib_info(self):
         buff = ['[rois]']
