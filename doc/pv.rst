@@ -327,6 +327,18 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
    timestamp will be the timestamp according to the client, indicating when
    the data arrive from the server.
 
+.. attribute:: seconds
+
+   Integer part of the Epics (not Unix!!) timestamp of the last seen event
+   for this PV.   This will only be set if the PV object was created with
+   the ``form='time'`` option.  
+
+.. attribute:: nanoseconds
+
+   Integer number of nanoseconds of the Epics (not Unix!!) timestamp of the
+   last seen event for this PV.  This will only be set if the PV object was
+   created with the ``form='time'`` option.
+
 .. attribute:: precision
 
    number of decimal places of precision to use for float and double PVs
