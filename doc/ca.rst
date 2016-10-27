@@ -569,7 +569,7 @@ the callback function may also include some of these as keyword arguments:
     * `units`:  string for PV units
     * `severity`: PV severity
     * `timestamp`: timestamp from CA server.
-    * `seconds`: integer seconds of timestamp from CA server.
+    * `posixseconds`: integer seconds since POSIX epoch of timestamp from CA server.
     * `nanoseconds`: integer nanoseconds of timestamp from CA server.
 
 Note that a the user-supplied callback will be run *inside* a CA function,
