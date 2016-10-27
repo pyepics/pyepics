@@ -509,6 +509,8 @@ def _onMonitorEvent(args):
             kwds['status']    = tmpv.status
             kwds['severity']  = tmpv.severity
             kwds['timestamp'] = dbr.make_unixtime(tmpv.stamp)
+            kwds['posixseconds'] = tmpv.stamp.secs + dbr.EPICS2UNIX_EPOCH
+            kwds['nanoseconds'] = tmpv.stamp.nsec
         except IndexError:
             pass
 
