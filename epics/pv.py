@@ -89,7 +89,7 @@ class PV(object):
     _fmtarr = "<PV '%(pvname)s', count=%(count)i/%(nelm)i, type=%(typefull)s, access=%(access)s>"
     _fields = ('pvname',  'value',  'char_value',  'status',  'ftype',  'chid',
                'host', 'count', 'access', 'write_access', 'read_access',
-               'severity', 'timestamp', 'seconds', 'nanoseconds',
+               'severity', 'timestamp', 'posixseconds', 'nanoseconds',
                'precision', 'units', 'enum_strs',
                'upper_disp_limit', 'lower_disp_limit', 'upper_alarm_limit',
                'lower_alarm_limit', 'lower_warning_limit',
@@ -443,7 +443,7 @@ class PV(object):
         self._args.update(kwd)
         self._args['value']  = value
         self._args['timestamp'] = kwd.get('timestamp', time.time())
-        self._args['seconds'] = kwd.get('seconds', 0)
+        self._args['posixseconds'] = kwd.get('posixseconds', 0)
         self._args['nanoseconds'] = kwd.get('nanoseconds', 0)
         self._set_charval(self._args['value'], call_ca=False)
         if self.verbose:
@@ -551,7 +551,7 @@ class PV(object):
         for nam in ('char_value', 'count', 'nelm', 'type', 'units',
                     'precision', 'host', 'access',
                     'status', 'severity', 'timestamp',
-                    'seconds', 'nanoseconds',
+                    'posixseconds', 'nanoseconds',
                     'upper_ctrl_limit', 'lower_ctrl_limit',
                     'upper_disp_limit', 'lower_disp_limit',
                     'upper_alarm_limit', 'lower_alarm_limit',
@@ -592,7 +592,7 @@ class PV(object):
             self.get()
         if self._args[arg] is None:
             if arg in ('status', 'severity', 'timestamp',
-                       'seconds', 'nanoseconds'):
+                       'posixseconds', 'nanoseconds'):
                 self.get_timevars(timeout=1, warn=False)
             else:
                 self.get_ctrlvars(timeout=1, warn=False)
@@ -677,9 +677,10 @@ class PV(object):
         return self._getarg('timestamp')
 
     @property
-    def seconds(self):
-        "integer seconds for timestamp of last pv action"
-        return self._getarg('seconds')
+    def posixseconds(self):
+        """integer seconds for timestamp of last pv action
+        using POSIX time convention"""
+        return self._getarg('posixseconds')
 
     @property
     def nanoseconds(self):

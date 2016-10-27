@@ -321,23 +321,28 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
 .. attribute:: timestamp
 
-   Unix (not Epics!!) timestamp of the last seen event for this PV.  Note
-   that this is will contain the timestamp from the Epics record if the PV
-   object was created with the ``form='time'`` option.  Otherwise, the
-   timestamp will be the timestamp according to the client, indicating when
-   the data arrive from the server.
+   floating point timestamp (relative to the POSIX time origin, not the
+   EPICS time origin) of the last event seen for this PV.  Note that this
+   is will contain the timestamp from the Epics server if the PV object was
+   created with the ``form='time'`` option.  Otherwise, the timestamp will
+   be set to time according to the client, indicating when the data arrive
+   from the server.
 
-.. attribute:: seconds
+.. attribute:: posixseconds
 
-   Integer part of the Epics (not Unix!!) timestamp of the last seen event
-   for this PV.   This will only be set if the PV object was created with
-   the ``form='time'`` option.  
+   Integer number of seconds (relative to the POSIX time origin, not the
+   EPICS time origin) of the last event seen for this PV.  This will be set
+   only if the PV object was created with the ``form='time'`` option, and
+   will reflect the timestamp from the server.  Otherwise, this value will
+   be 0 which can be used to signal that the `timestamp` attribute is from
+   the client.
 
 .. attribute:: nanoseconds
 
-   Integer number of nanoseconds of the Epics (not Unix!!) timestamp of the
-   last seen event for this PV.  This will only be set if the PV object was
-   created with the ``form='time'`` option.
+   Integer number of nanoseconds for the last event seen for ths PV.  This
+   will be set only if the PV object was created with the ``form='time'``
+   option, and will give higher time resolution than the `timestamp`
+   attribute.
 
 .. attribute:: precision
 
