@@ -1528,7 +1528,7 @@ DEFAULT_SUBSCRIPTION_MASK = dbr.DBE_VALUE|dbr.DBE_ALARM
 
 @withConnectedCHID
 def create_subscription(chid, use_time=False, use_ctrl=False,
-                        mask=None, callback=None):
+                        mask=None, callback=None, count=0):
     """create a *subscription to changes*. Sets up a user-supplied
     callback function to be called on any changes to the channel.
 
@@ -1572,7 +1572,7 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     uarg  = ctypes.py_object(callback)
     evid  = ctypes.c_void_p()
     poll()
-    ret = libca.ca_create_subscription(ftype, 0, chid, mask,
+    ret = libca.ca_create_subscription(ftype, count, chid, mask,
                                        _CB_EVENT, uarg, ctypes.byref(evid))
     PySEVCHK('create_subscription', ret)
 

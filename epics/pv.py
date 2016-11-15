@@ -96,7 +96,7 @@ class PV(object):
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
     def __init__(self, pvname, callback=None, form='time',
-                 verbose=False, auto_monitor=None,
+                 verbose=False, auto_monitor=None, count= -1,
                  connection_callback=None,
                  connection_timeout=None):
 
@@ -111,7 +111,7 @@ class PV(object):
             self.connection_timeout = ca.DEFAULT_CONNECTION_TIMEOUT
         self._args      = {}.fromkeys(self._fields)
         self._args['pvname'] = self.pvname
-        self._args['count'] = -1
+        self._args['count'] = count
         self._args['nelm']  = -1
         self._args['type'] = 'unknown'
         self._args['typefull'] = 'unknown'
@@ -172,8 +172,10 @@ class PV(object):
             except ca.ChannelAccessException:
                 time.sleep(0.025)
                 count = ca.element_count(self.chid)
-            self._args['count']  = count
             self._args['nelm']  = count
+            if self._args['count']>0 :
+                count = min(count,self._args['count'])
+            self._args['count']  = count
             self._args['host']   = ca.host_name(self.chid)
             self._args['access'] = ca.access(self.chid)
             self._args['read_access'] = (1 == ca.read_access(self.chid))
@@ -200,7 +202,8 @@ class PV(object):
                                          use_ctrl=(self.form == 'ctrl'),
                                          use_time=(self.form == 'time'),
                                          callback=self.__on_changes,
-                                         mask=mask)
+                                         mask=mask,
+                                         count=count)
 
         for conn_cb in self.connection_callbacks:
             if hasattr(conn_cb, '__call__'):
