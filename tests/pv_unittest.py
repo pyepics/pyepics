@@ -247,6 +247,41 @@ class PV_Tests(unittest.TestCase):
         self.assertEquals(len(val), 0, msg='no monitor')
         self.assertEquals(val.dtype, numpy.float64, msg='no monitor')
 
+
+    def test_waveform_get_with_count_arg(self):
+        with no_simulator_updates():
+            wf = PV(pvnames.char_arr_pv, count=32)
+            val=wf.get()
+            self.assertEquals(len(val), 32)
+
+            val=wf.get(count=wf.nelm)
+            self.assertEquals(len(val), wf.nelm)
+            
+
+    def test_waveform_callback_with_count_arg(self):
+        values = []
+        
+        wf = PV(pvnames.char_arr_pv, count=32)
+        def onChanges(pvname=None, value=None, char_value=None, **kw):
+            write( 'PV %s %s, %s Changed!\n' % (pvname, repr(value), char_value))
+            values.append( value)
+
+        wf.add_callback(onChanges)
+        write('Added a callback.  Now wait for changes...\n')
+
+        t0 = time.time()
+        while time.time() - t0 < 3:
+            time.sleep(1.e-4)
+            if len(values)>0:
+                break
+
+        self.failUnless(len(values) > 0)
+        self.assertEquals(len(values[0]),32)
+
+        wf.clear_callbacks()
+
+
+            
     def test_emptyish_char_waveform_no_monitor(self):
         '''a test of a char waveform of length 1 (NORD=1): value "\0"
         without using auto_monitor
