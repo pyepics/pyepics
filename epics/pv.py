@@ -96,7 +96,7 @@ class PV(object):
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
     def __init__(self, pvname, callback=None, form='time',
-                 verbose=False, auto_monitor=None,
+                 verbose=False, auto_monitor=None, count= None,
                  connection_callback=None,
                  connection_timeout=None):
 
@@ -111,7 +111,7 @@ class PV(object):
             self.connection_timeout = ca.DEFAULT_CONNECTION_TIMEOUT
         self._args      = {}.fromkeys(self._fields)
         self._args['pvname'] = self.pvname
-        self._args['count'] = -1
+        self._args['count'] = count
         self._args['nelm']  = -1
         self._args['type'] = 'unknown'
         self._args['typefull'] = 'unknown'
@@ -172,8 +172,15 @@ class PV(object):
             except ca.ChannelAccessException:
                 time.sleep(0.025)
                 count = ca.element_count(self.chid)
-            self._args['count']  = count
             self._args['nelm']  = count
+
+            # allow reduction of elements, via count argument
+            maxcount = 0
+            if self._args['count'] is not None:
+                maxcount = self._args['count']
+                count = min(count,self._args['count'])
+                
+            self._args['count']  = count
             self._args['host']   = ca.host_name(self.chid)
             self._args['access'] = ca.access(self.chid)
             self._args['read_access'] = (1 == ca.read_access(self.chid))
@@ -200,7 +207,7 @@ class PV(object):
                                          use_ctrl=(self.form == 'ctrl'),
                                          use_time=(self.form == 'time'),
                                          callback=self.__on_changes,
-                                         mask=mask)
+                                                      mask=mask, count=maxcount)
 
         for conn_cb in self.connection_callbacks:
             if hasattr(conn_cb, '__call__'):
@@ -281,6 +288,11 @@ class PV(object):
             (not self.auto_monitor) or
             (self._args['value'] is None) or
             (count is not None and count > len(self._args['value']))):
+
+            # respect count argument on subscription also for calls to get 
+            if count is None and self._args['count']!=self._args['nelm']:
+                count = self._args['count']
+                
             ca_get = ca.get
             if ca.get_cache(self.pvname)['value'] is not None:
                 ca_get = ca.get_complete
@@ -637,7 +649,7 @@ class PV(object):
     def count(self):
         """count (number of elements). For array data and later EPICS versions,
         this is equivalent to the .NORD field.  See also 'nelm' property"""
-        if self._args['count'] >=0:
+        if self._args['count'] is not None:
             return self._args['count']
         else:
             return self._getarg('count')
