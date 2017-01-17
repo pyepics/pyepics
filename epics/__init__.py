@@ -1,7 +1,3 @@
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
-
 __doc__ = """
    epics channel access python module
 
@@ -164,3 +160,8 @@ def caget_many(pvlist):
     for chid in chids: ca.get(chid, wait=False)
     for chid in chids: out.append(ca.get_complete(chid))
     return out
+
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
+

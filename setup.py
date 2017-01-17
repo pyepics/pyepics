@@ -8,12 +8,6 @@ import epics
 import shutil
 
 import versioneer
-versioneer.VCS = 'git'
-versioneer.versionfile_source = 'epics/_version.py'
-versioneer.versionfile_build = 'epics/_version.py'
-versioneer.tag_prefix = ''
-versioneer.parentdir_prefix = 'pyepics-'
-
 
 long_desc = '''Python Interface to the Epics Channel Access protocol
 of the Epics control system.   PyEpics provides 3 layers of access to
