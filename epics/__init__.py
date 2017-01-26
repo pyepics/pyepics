@@ -164,3 +164,6 @@ def caget_many(pvlist):
     for chid in chids: ca.get(chid, wait=False)
     for chid in chids: out.append(ca.get_complete(chid))
     return out
+
+
+
