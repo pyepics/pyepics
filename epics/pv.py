@@ -292,10 +292,10 @@ class PV(object):
             # respect count argument on subscription also for calls to get 
             if count is None and self._args['count']!=self._args['nelm']:
                 count = self._args['count']
-                
             ca_get = ca.get
             if ca.get_cache(self.pvname)['value'] is not None:
                 ca_get = ca.get_complete
+
             self._args['value'] = ca_get(self.chid, ftype=self.ftype,
                                          count=count, timeout=timeout,
                                          as_numpy=as_numpy)
