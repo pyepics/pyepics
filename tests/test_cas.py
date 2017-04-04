@@ -69,6 +69,7 @@ def softioc():
                                  '/home/travis/mc/envs/testenv/epics/dbd/softIoc.dbd',
                                  '-m', 'P=test', '-a', cf.name,
                                  '-d', df.name],
+                                 mode='w+',
                                  stdin=subprocess.PIPE,
                                  stdout=subprocess.PIPE)
         yield proc
