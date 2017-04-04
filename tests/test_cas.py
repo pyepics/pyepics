@@ -65,7 +65,9 @@ def softioc():
         df.write(cas_test_db)
         df.flush()
 
-        proc = subprocess.Popen(['softIoc', '-m', 'P=test', '-a', cf.name,
+        proc = subprocess.Popen(['softIoc', '-D', 
+                                 '/home/travis/mc/envs/testenv/epics/dbd/softIoc.dbd',
+                                 '-m', 'P=test', '-a', cf.name,
                                  '-d', df.name],
                                  stdin=subprocess.PIPE,
                                  stdout=subprocess.PIPE)
