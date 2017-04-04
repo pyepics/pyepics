@@ -1,23 +1,78 @@
 import pytest
 import subprocess
-import pkg_resources
+import tempfile
 import epics
 
+
+cas_test_db = '''
+                record(ao, "test:ao") {
+                    field(ASG, "rps_threshold")
+                    field(DRVH, "10")
+                    field(DRVL, "0")
+                }
+
+                record(bo, "test:bo") {
+                    field(ASG, "rps_lock")
+                    field(ZNAM, "OUT")
+                    field(ONAM, "IN")
+                }
+
+                record(ao, "test:ao2") {
+                    field(DRVH, "5")
+                    field(DRVL, "1")
+                }
+
+                record(bo, "test:permit") {
+                    field(VAL, "0")
+                    field(PINI, "1")
+                    field(ZNAM, "DISABLED")
+                    field(ONAM, "ENABLED")
+                }
+            '''
+
+cas_rules = '''
+                ASG(DEFAULT) {
+                    RULE(1,READ)
+                    RULE(1,WRITE,TRAPWRITE)
+                }
+
+                ASG(rps_threshold) {
+                    INPA("$(P):permit")
+                    RULE(1, READ)
+                    RULE(0, WRITE, TRAPWRITE) {
+                        CALC("A=1")
+                    }
+                    RULE(1, WRITE, TRAPWRITE) {
+                        CALC("A=0")
+                    }
+                }
+
+                ASG(rps_lock) {
+                    INPA("$(P):permit")
+                    RULE(1, READ)
+                    RULE(1, WRITE, TRAPWRITE) {
+                        CALC("A=0")
+                    }
+                }
+            '''
 
 # use yield_fixture() for compatibility with pytest < 2.10
 @pytest.yield_fixture(scope='module')
 def softioc():
-    cas_rules = pkg_resources.resource_filename('rps',
-                                                '../test/crit_sig_rules.cfg')
-    cas_test_db = pkg_resources.resource_filename('rps', '../test/cas_test.db')
-    proc = subprocess.Popen(['softIoc', '-m', 'P=test', '-a', cas_rules,
-                             '-d', cas_test_db],
-                             stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE)
-    yield proc
+    with tempfile.NamedTemporaryFile() as cf, tempfile.NamedTemporaryFile() as df:
+        cf.write(cas_rules)
+        cf.flush()
+        df.write(cas_test_db)
+        df.flush()
 
-    proc.kill()
-    proc.wait()
+        proc = subprocess.Popen(['softIoc', '-m', 'P=test', '-a', cf.name,
+                                 '-d', df.name],
+                                 stdin=subprocess.PIPE,
+                                 stdout=subprocess.PIPE)
+        yield proc
+
+        proc.kill()
+        proc.wait()
 
 @pytest.yield_fixture(scope='module')
 def pvs():
