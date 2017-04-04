@@ -139,6 +139,8 @@ class PV(object):
         self._args['chid'] = ca.create_channel(self.pvname,
                                                callback=self.__on_connect)
         self.chid = self._args['chid']
+        ca.replace_access_rights_event(self.chid,
+                                       callback=self.__access_rights_event)
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
@@ -154,6 +156,14 @@ class PV(object):
             chid = chid.value
         self._args['chid'] = self.chid = chid
         self.__on_connect(pvname=pvname, chid=chid, conn=conn, **kws)
+
+    def __access_rights_event(self, read_access, write_access):
+        self._args['read_access'] = bool(read_access)
+        self._args['write_access'] = bool(write_access)
+
+        acc = read_access + 2 * write_access
+        access_strs = ('no access', 'read-only', 'write-only', 'read/write')
+        self._args['access'] = access_strs[acc]
 
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
@@ -182,9 +192,6 @@ class PV(object):
                 
             self._args['count']  = count
             self._args['host']   = ca.host_name(self.chid)
-            self._args['access'] = ca.access(self.chid)
-            self._args['read_access'] = (1 == ca.read_access(self.chid))
-            self._args['write_access'] = (1 == ca.write_access(self.chid))
             self.ftype  = ca.promote_type(self.chid,
                                           use_ctrl= self.form == 'ctrl',
                                           use_time= self.form == 'time')
