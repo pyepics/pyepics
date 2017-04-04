@@ -1,6 +1,6 @@
 import pytest
 import subprocess
-import tempfile
+from tempfile import NamedTemporaryFile as NTF
 import epics
 
 
@@ -59,7 +59,7 @@ cas_rules = '''
 # use yield_fixture() for compatibility with pytest < 2.10
 @pytest.yield_fixture(scope='module')
 def softioc():
-    with tempfile.NamedTemporaryFile() as cf, tempfile.NamedTemporaryFile() as df:
+    with NTF(mode='w+') as cf, NTF(mode='w+') as df:
         cf.write(cas_rules)
         cf.flush()
         df.write(cas_test_db)
@@ -69,7 +69,6 @@ def softioc():
                                  '/home/travis/mc/envs/testenv/epics/dbd/softIoc.dbd',
                                  '-m', 'P=test', '-a', cf.name,
                                  '-d', df.name],
-                                 mode='w+',
                                  stdin=subprocess.PIPE,
                                  stdout=subprocess.PIPE)
         yield proc
