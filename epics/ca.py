@@ -620,9 +620,10 @@ def _onAccessRightsEvent(args):
         pvname = name(chid)
         if pvname in ctx:
             ch = ctx[pvname]
-            for callback in ch['access_event_callback']:
-                if callable(callback):
-                    callback(ra, wa)
+            if 'access_event_callback' in ch:
+                for callback in ch['access_event_callback']:
+                    if callable(callback):
+                        callback(ra, wa)
 
 # create global reference to these callbacks
 
