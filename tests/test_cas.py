@@ -115,3 +115,22 @@ def test_permit_enabled(softioc, pvs):
     assert pvs['test:ao.DRVH'].write_access is False
     with pytest.raises(epics.ca.CASeverityException):
         pvs['test:ao.DRVH'].put(100, wait=True)
+
+def test_user_callback(softioc, pvs):
+    # clear the run-permit
+    pvs['test:permit'].put(0, wait=True)
+    assert pvs['test:permit'].get(as_string=True) == 'DISABLED'
+
+    def lcb(read_access, write_access, pv=None):
+        assert pv.read_access == read_access
+        assert pv.write_access == write_access
+        pv.flag = True
+
+    bo = epics.PV('test:bo', access_callback=lcb)
+    bo.flag = False
+
+    # set the run-permit to trigger an access rights event
+    pvs['test:permit'].put(1, wait=True)
+    assert pvs['test:permit'].get(as_string=True) == 'ENABLED'
+
+    assert bo.flag is True
