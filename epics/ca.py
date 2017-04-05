@@ -609,6 +609,9 @@ def _onPutEvent(args, **kwds):
 
 
 def _onAccessRightsEvent(args):
+    # for 64-bit python on Windows!
+    if dbr.PY64_WINDOWS: args = args.contents
+
     chid = args.chid
     ra = args.read_access
     wa = args.write_access
