@@ -98,7 +98,8 @@ class PV(object):
     def __init__(self, pvname, callback=None, form='time',
                  verbose=False, auto_monitor=None, count= None,
                  connection_callback=None,
-                 connection_timeout=None):
+                 connection_timeout=None,
+                 access_callback=None):
 
         self.pvname     = pvname.strip()
         self.form       = form.lower()
@@ -121,6 +122,10 @@ class PV(object):
         if connection_callback is not None:
             self.connection_callbacks = [connection_callback]
 
+        self.access_callbacks = []
+        if access_callback is not None:
+            self.access_callbacks = [access_callback]
+
         self.callbacks  = {}
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
@@ -140,7 +145,7 @@ class PV(object):
                                                callback=self.__on_connect)
         self.chid = self._args['chid']
         ca.replace_access_rights_event(self.chid,
-                                       callback=self.__access_rights_event)
+                                       callback=self.__on_access_rights_event)
         self.ftype  = ca.promote_type(self.chid,
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
@@ -157,13 +162,17 @@ class PV(object):
         self._args['chid'] = self.chid = chid
         self.__on_connect(pvname=pvname, chid=chid, conn=conn, **kws)
 
-    def __access_rights_event(self, read_access, write_access):
-        self._args['read_access'] = bool(read_access)
-        self._args['write_access'] = bool(write_access)
+    def __on_access_rights_event(self, read_access, write_access):
+        self._args['read_access'] = read_access
+        self._args['write_access'] = write_access
 
         acc = read_access + 2 * write_access
         access_strs = ('no access', 'read-only', 'write-only', 'read/write')
         self._args['access'] = access_strs[acc]
+
+        for cb in self.access_callbacks:
+            if callable(cb):
+                cb(read_access, write_access, pv=self)
 
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
