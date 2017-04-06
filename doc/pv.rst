@@ -16,7 +16,7 @@ both methods and attributes for accessing it's properties.
 The :class:`PV` class
 =======================
 
-.. class:: PV(pvname[, callback=None[, form='time'[, auto_monitor=None[, connection_callback=None[,  connection_timeout=None[, verbose=False]]]]]] )
+.. class:: PV(pvname[, callback=None[, form='time'[, verbose=False[, auto_monitor=None[, count=None[, connection_callback=None[, connection_timeout=None[, access_callback=None]]]]]]]] )
    create a PV object for a named Epics Process Variable.
 
    :param pvname: name of Epics Process Variable
@@ -24,14 +24,18 @@ The :class:`PV` class
    :type callback: callable, tuple, list or None
    :param form:  which epics *data type* to use:  the 'native', 'time', or the 'ctrl' (Control) variant.
    :type form: string, one of ('native','ctrl', or 'time')
+   :param verbose:  whether to print out debugging messages
+   :type verbose: ``True``/``False``
    :param auto_monitor:  whether to automatically monitor the PV for changes.
    :type auto_monitor: ``None``, ``True``, ``False``, or bitmask (see :ref:`pv-automonitor-label`)
+   :param count: number of data elements to return by default (see :ref:`pv-get-label`)
+   :type count: int
    :param connection_callback: user-defined function called on changes to PV connection status.
    :type connection_callback:  callable or ``None``
    :param connection_timeout:  time (in seconds) to wait for connection before giving up
    :type connection_timeout:  float or ``None``
-   :param verbose:  whether to print out debugging messages
-   :type verbose: ``True``/``False``
+   :param access_callback: user-defined function called on changes to PV access rights
+   :type access_callback: callable or ``None``
 
 Once created, a PV should (barring any network issues) automatically
 connect and be ready to use.
@@ -67,6 +71,10 @@ description of this.
 The *verbose* parameter specifies more verbose output on changes, and is
 intended for debugging purposes.
 
+The *access_callback* parameter specifies a python method to be called on
+changes to the access rights of the PV (read/write access changes). This
+is discussed in more detail at :ref:`pv-access-rights-callback-label`
+
 
 
 methods
@@ -74,6 +82,8 @@ methods
 
 A `PV` has several methods for getting and setting its value and defining
 callbacks to be executed when the PV changes.
+
+..  _pv-get-label:
 
 .. method:: get([, count=None[, as_string=False[, as_numpy=True[, timeout=None[, use_monitor=True]]]]])
 
@@ -403,6 +413,12 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
    connection status of the PV changes. See
    :ref:`pv-connection_callbacks-label` for more details.
 
+.. attribute:: access_callbacks
+
+   an :attr:`list` of access callbacks: functions to be run when the
+   access rights of the PV changes. See
+   :ref:`pv-access-rights-callbacks-label` for more details.
+
 ..  _pv-as-string-label:
 
 String representation for a PV
@@ -604,6 +620,19 @@ A connection callback should be prepared to receive the following keyword argume
 where *conn* will be either ``True` or ``False``, specifying whether the PV is
 now connected.   A simple example is given below.
 
+.. pv-access-rights-callback-label
+
+User-supplied Connection Callback functions
+=============================================
+
+An *access rights* callback is a user-defined function that is called when the
+access rights - read/write permissions - of a PV undergo changes. The callback
+will be invoked upon successful initialization and at all events that change
+a PV's access rights, including disconnection and reconnection events.
+An *access rights* callback can be specified when a PV is created, or can be
+added by appending to the :attr:`access_callbacks` list of the PV object.
+If there are multiple access rights callbacks defined for a PV, they will all
+be run on access rights events.
 
 ..  _pv-putwait-label:
 
@@ -863,3 +892,24 @@ Example of connection callback
 A connection callback:
 
 .. literalinclude:: ../tests/pv_connection_callback.py
+
+Example of an access rights callback
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Associating an access rights callback with a PV::
+
+    import epics
+    import time
+
+    def access_rights_callback(read_access, write_access, pv=None):
+        print "%s - read=%s, write=%s" % (pv.pvname, read_access, write_access)
+
+    # should immediately see the message upon connection
+    apv = epics.PV('pvname', access_callback=access_rights_callback)
+
+    try:
+        start = time.time()
+        while (time.time() - start) < 30:
+            time.sleep(0.25)
+    except KeyboardInterrupt:
+        pass
