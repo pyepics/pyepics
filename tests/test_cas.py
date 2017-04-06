@@ -103,7 +103,7 @@ def test_permit_disabled(softioc, pvs):
 def test_permit_enabled(softioc, pvs):
     # set the run-permit
     pvs['test:permit'].put(1, wait=True)
-    assert pvs['test:permit'].get(as_string=True) == 'ENABLED'
+    assert pvs['test:permit'].get(as_string=True, use_monitor=False) == 'ENABLED'
 
     # rps_lock rule should disable write access
     assert pvs['test:bo'].write_access is False
@@ -119,7 +119,7 @@ def test_permit_enabled(softioc, pvs):
 def test_user_callback(softioc, pvs):
     # clear the run-permit
     pvs['test:permit'].put(0, wait=True)
-    assert pvs['test:permit'].get(as_string=True) == 'DISABLED'
+    assert pvs['test:permit'].get(as_string=True, use_monitor=False) == 'DISABLED'
 
     def lcb(read_access, write_access, pv=None):
         assert pv.read_access == read_access
@@ -131,6 +131,6 @@ def test_user_callback(softioc, pvs):
 
     # set the run-permit to trigger an access rights event
     pvs['test:permit'].put(1, wait=True)
-    assert pvs['test:permit'].get(as_string=True) == 'ENABLED'
+    assert pvs['test:permit'].get(as_string=True, use_monitor=False) == 'ENABLED'
 
     assert bo.flag is True
