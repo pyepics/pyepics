@@ -116,7 +116,7 @@ def test_permit_enabled(softioc, pvs):
     with pytest.raises(epics.ca.CASeverityException):
         pvs['test:ao.DRVH'].put(100, wait=True)
 
-def test_user_callback(softioc, pvs):
+def test_pv_access_event_callback(softioc, pvs):
     # clear the run-permit
     pvs['test:permit'].put(0, wait=True)
     assert pvs['test:permit'].get(as_string=True, use_monitor=False) == 'DISABLED'
@@ -134,3 +134,21 @@ def test_user_callback(softioc, pvs):
     assert pvs['test:permit'].get(as_string=True, use_monitor=False) == 'ENABLED'
 
     assert bo.flag is True
+
+def test_ca_access_event_callback(softioc, pvs):
+    # clear the run-permit
+    pvs['test:permit'].put(0, wait=True)
+    assert pvs['test:permit'].get(as_string=True, use_monitor=False) == 'DISABLED'
+
+    bo_id = None
+    bo_id = epics.ca.create_channel('test:bo')
+    assert bo_id is not None
+
+    def lcb(read_access, write_access):
+        assert read_access and write_access
+        lcb.sentinal = True
+
+    lcb.sentinal = False
+    epics.ca.replace_access_rights_event(bo_id, callback=lcb)
+
+    assert lcb.sentinal is True
