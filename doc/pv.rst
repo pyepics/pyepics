@@ -28,7 +28,7 @@ The :class:`PV` class
    :type verbose: ``True``/``False``
    :param auto_monitor:  whether to automatically monitor the PV for changes.
    :type auto_monitor: ``None``, ``True``, ``False``, or bitmask (see :ref:`pv-automonitor-label`)
-   :param count: number of data elements to return by default (see :ref:`pv-get-label`)
+   :param count: number of data elements to return by default (see :ref:`here <pv-get-label>`)
    :type count: int
    :param connection_callback: user-defined function called on changes to PV connection status.
    :type connection_callback:  callable or ``None``
@@ -73,7 +73,7 @@ intended for debugging purposes.
 
 The *access_callback* parameter specifies a python method to be called on
 changes to the access rights of the PV (read/write access changes). This
-is discussed in more detail at :ref:`pv-access-rights-callback-label`
+is discussed in more detail :ref:`here <pv-access-rights-callback-label>`.
 
 
 
@@ -417,7 +417,7 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
    an :attr:`list` of access callbacks: functions to be run when the
    access rights of the PV changes. See
-   :ref:`pv-access-rights-callbacks-label` for more details.
+   :ref:`pv-access-rights-callback-label` for more details.
 
 ..  _pv-as-string-label:
 
@@ -620,10 +620,10 @@ A connection callback should be prepared to receive the following keyword argume
 where *conn* will be either ``True` or ``False``, specifying whether the PV is
 now connected.   A simple example is given below.
 
-.. pv-access-rights-callback-label
+..  _pv-access-rights-callback-label:
 
-User-supplied Connection Callback functions
-=============================================
+User-supplied Access Rights Callback functions
+===============================================
 
 An *access rights* callback is a user-defined function that is called when the
 access rights - read/write permissions - of a PV undergo changes. The callback
