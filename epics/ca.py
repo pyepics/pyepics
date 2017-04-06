@@ -613,8 +613,8 @@ def _onAccessRightsEvent(args):
     if dbr.PY64_WINDOWS: args = args.contents
 
     chid = args.chid
-    ra = args.read_access
-    wa = args.write_access
+    ra = bool(args.read_access)
+    wa = bool(args.write_access)
 
     global _cache
     # Getting bunk result from ca.current_context on channel disconnect
