@@ -70,8 +70,8 @@ class ROI(Device):
         self.address = self._prefix = '%s.R%i' % (prefix, roi)
         self.bgr_width = bgr_width
         _attrs = ('NM', 'LO', 'HI')
-        Device.__init__(self,self._prefix, delim='', 
-                        attrs=_attrs, aliases=self._aliases, 
+        Device.__init__(self,self._prefix, delim='',
+                        attrs=_attrs, aliases=self._aliases,
                         with_poll=False)
         if data_pv is None:
             data_pv = self.address
@@ -105,6 +105,10 @@ class ROI(Device):
 
     @property
     def total(self):
+        return self.get_counts(net=False)
+
+    @property
+    def sum(self):
         return self.get_counts(net=False)
 
     @property
@@ -154,8 +158,8 @@ class ROI(Device):
         return (total - bgr_counts*(self.HI-self.LO))
 
 class MCA(Device):
-    _attrs =('CALO', 'CALS', 'CALQ', 'TTH', 'EGU', 
-             'PRTM', 'PLTM', 'ACQG', 'NUSE',  'DWEL', 
+    _attrs =('CALO', 'CALS', 'CALQ', 'TTH', 'EGU',
+             'PRTM', 'PLTM', 'ACQG', 'NUSE',  'DWEL',
              'ERTM', 'ELTM', 'IDTIM')
     _nonpvs = ('_prefix', '_pvs', '_delim',
                '_npts', 'rois', '_nrois', 'rois')
@@ -190,11 +194,13 @@ class MCA(Device):
             nrois = self._nrois
         for i in range(nrois):
             roi = ROI(prefix=prefix, roi=i, data_pv=data_pv)
+            if roi.NM is None:
+                break
             if len(roi.NM.strip()) <= 0 or roi.HI <= 0:
                 break
             self.rois.append(roi)
         poll()
-        
+
         return self.rois
 
     def del_roi(self, roiname):
@@ -269,7 +275,7 @@ class MCA(Device):
         # do an explicit get here to make sure all data is
         # available before trying to sort it!
         poll(0.0050, 1.0)
-        
+
         [(r.get('NM'), r.get('LO')) for r in rois]
         roidat = [(r.NM, r.LO, r.HI) for r in sorted(rois)]
 
@@ -293,7 +299,7 @@ class MCA(Device):
             caput("%s.R%iLO" % (prefix, i), -1)
             caput("%s.R%iHI" % (prefix, i), -1)
             caput("%s.R%iNM" % (prefix, i), '')
-            
+
     def clear_rois(self, nrois=None):
         for roi in self.get_rois(nrois=nrois):
             roi.clear()
@@ -599,4 +605,3 @@ class MultiXMAP(Device):
 
     def getFileNameByIndex(self,index):
         return self.getFileTemplate() % (self.getFilePath(), self.getFileName(), index)
-
