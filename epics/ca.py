@@ -607,6 +607,27 @@ def _onPutEvent(args, **kwds):
             kwds['data'] = data
         fcn(pvname=pvname, **kwds)
 
+
+def _onAccessRightsEvent(args):
+    # for 64-bit python on Windows!
+    if dbr.PY64_WINDOWS: args = args.contents
+
+    chid = args.chid
+    ra = bool(args.read_access)
+    wa = bool(args.write_access)
+
+    global _cache
+    # Getting bunk result from ca.current_context on channel disconnect
+    # Do this the long way...
+    for ctx in _cache.values():
+        pvname = name(chid)
+        if pvname in ctx:
+            ch = ctx[pvname]
+            if 'access_event_callback' in ch:
+                for callback in ch['access_event_callback']:
+                    if callable(callback):
+                        callback(ra, wa)
+
 # create global reference to these callbacks
 
 
@@ -620,6 +641,8 @@ _CB_CONNECT = dbr.make_callback(_onConnectionEvent, dbr.connection_args)
 _CB_PUTWAIT = dbr.make_callback(_onPutEvent,        dbr.event_handler_args)
 _CB_GET     = dbr.make_callback(_onGetEvent,        dbr.event_handler_args)
 _CB_EVENT   = dbr.make_callback(_onMonitorEvent,    dbr.event_handler_args)
+_CB_ACCESS  = dbr.make_callback(_onAccessRightsEvent,
+                                dbr.access_rights_handler_args)
 
 # Now we're ready to wrap libca functions
 #
@@ -935,6 +958,21 @@ def connect_channel(chid, timeout=None, verbose=False):
     return conn
 
 # functions with very light wrappings:
+@withCHID
+def replace_access_rights_event(chid, callback=None):
+    global _cache
+
+    ctx = current_context()
+    ch = _cache[ctx][name(chid)]
+    if 'access_event_callback' not in ch:
+        ch.update({'access_event_callback': list()})
+
+    if callback is not None:
+        ch['access_event_callback'].append(callback)
+
+    ret = libca.ca_replace_access_rights_event(chid, _CB_ACCESS)
+    PySEVCHK('replace_access_rights_event', ret)
+
 @withCHID
 def name(chid):
     "return PV name for channel name"
