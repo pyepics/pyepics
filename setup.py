@@ -59,7 +59,7 @@ if os.name == 'nt':
 elif sys.platform == 'darwin':
     libsrc = 'darwin'
     libfmt = 'lib%s.dylib'
-elif sys.plaform.startswith('linux'):
+elif sys.platform.startswith('linux'):
     libsrc = 'linux'
 
 pjoin = os.path.join
