@@ -122,7 +122,21 @@ def find_libca():
         os.path.isfile(dllpath)):
         return dllpath
 
-    # Test 2: look through Python path and PATH env var for dll
+    # Test 2: look in installed python location for dll
+    lname = 'libca.so'
+    if os.uname == 'nt':
+        lname = 'ca.dll'
+    elif sys.platform == 'darwin':
+        lname = 'libca.dylib'
+
+    basepath = os.path.split(os.path.abspath(__file__))[0]
+    parent   = os.path.split(basepath)[0]
+    dllpath  = os.path.join(parent, 'lib', lname)
+    if (os.path.exists(dllpath) and os.path.isfile(dllpath)):
+        return dllpath
+
+
+    # Test 3: look through Python path and PATH env var for dll
     path_sep = ':'
     dylib   = 'lib'
     # For windows, we assume the DLLs are installed with the library
@@ -133,7 +147,7 @@ def find_libca():
     basepath = os.path.split(os.path.abspath(__file__))[0]
     parent   = os.path.split(basepath)[0]
     _path = [basepath, parent,
-             os.path.join(parent, dylib),             
+             os.path.join(parent, dylib),
              os.path.split(os.path.dirname(os.__file__))[0],
              os.path.join(sys.prefix, dylib)]
 
@@ -153,8 +167,9 @@ def find_libca():
     if dllpath is not None:
         return dllpath
 
-    # Test 3: on unixes, look expliticly with EPICS_BASE env var and
-    # known architectures for ca.so q
+
+    # Test 4: on unixes, look expliticly with EPICS_BASE env var and
+    # known architectures for ca.so
     if os.name == 'posix':
         known_hosts = {'Linux':   ('linux-x86', 'linux-x86_64') ,
                        'Darwin':  ('darwin-ppc', 'darwin-x86'),
@@ -474,7 +489,7 @@ def _onMonitorEvent(args):
     # bad status codes.
 
     # for 64-bit python on Windows!
-    if dbr.PY64_WINDOWS:   
+    if dbr.PY64_WINDOWS:
         args = args.contents
 
     if args.status != dbr.ECA_NORMAL:
@@ -523,7 +538,8 @@ def _onConnectionEvent(args):
     """set flag in cache holding whteher channel is
     connected. if provided, run a user-function"""
     # for 64-bit python on Windows!
-    if dbr.PY64_WINDOWS: args = args.contents
+    if dbr.PY64_WINDOWS:
+        args = args.contents
 
     ctx = current_context()
     conn = (args.op == dbr.OP_CONN_UP)
@@ -577,7 +593,8 @@ def _onGetEvent(args, **kws):
     """get_callback event: simply store data contents which
     will need conversion to python data with _unpack()."""
     # for 64-bit python on Windows!
-    if dbr.PY64_WINDOWS:   args = args.contents
+    if dbr.PY64_WINDOWS:
+        args = args.contents
 
     # print("GET EVENT: chid, user ", args.chid, args.usr)
     # print("GET EVENT: type, count ", args.type, args.count)
@@ -594,7 +611,8 @@ def _onPutEvent(args, **kwds):
     """set put-has-completed for this channel,
     call optional user-supplied callback"""
     # for 64-bit python on Windows!
-    if dbr.PY64_WINDOWS:   args = args.contents
+    if dbr.PY64_WINDOWS:
+        args = args.contents
 
     pvname = name(args.chid)
     fcn  = _put_done[pvname][1]
@@ -610,7 +628,8 @@ def _onPutEvent(args, **kwds):
 
 def _onAccessRightsEvent(args):
     # for 64-bit python on Windows!
-    if dbr.PY64_WINDOWS: args = args.contents
+    if dbr.PY64_WINDOWS:
+        args = args.contents
 
     chid = args.chid
     ra = bool(args.read_access)
