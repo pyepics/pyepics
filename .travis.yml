@@ -15,6 +15,7 @@ matrix:
     - python: 2.7
     - python: 3.4
     - python: 3.5
+    - python: 3.6
 
 before_install:
   - export DOCKER0_IP=$(/sbin/ifconfig docker0 |grep 'inet addr' | sed -e 's/.*addr:\([^ ]*\).*/\1/')
