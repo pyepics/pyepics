@@ -15,6 +15,7 @@ matrix:
     - python: 2.7
     - python: 3.4
     - python: 3.5
+    - python: 3.6
 
 before_install:
   - export DOCKER0_IP=$(/sbin/ifconfig docker0 |grep 'inet addr' | sed -e 's/.*addr:\([^ ]*\).*/\1/')
@@ -30,7 +31,7 @@ before_install:
   - docker pull ${DOCKERIMAGE}:${DOCKERTAG}
   - docker images
   - docker ps -a
-  - docker run -d -p $DOCKER0_IP:5064:5064/tcp -p $DOCKER0_IP:5065:5065/udp --name epics_iocs ${DOCKERIMAGE}:${DOCKERTAG}
+  - docker run -d -p $DOCKER0_IP:7000-8000:5064/tcp --name epics_iocs ${DOCKERIMAGE}:${DOCKERTAG}
   - docker ps -a
 
   # INSTALL CONDA
