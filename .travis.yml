@@ -61,7 +61,7 @@ install:
   - conda install numpy
   - pip install coveralls pytest pytest-cov
   # install pyepics as a source install
-  - NOLIBCA=0 pip install -v .
+  - pip install -v .
 
   # setup some path environment variables for epics
   - export PATH=$PATH:$EPICS_BASE/bin/$EPICS_HOST_ARCH
@@ -81,6 +81,7 @@ script:
   - echo "Checking pyepics version and libca locations:"
   - python -c "import epics; print(epics.__version__)"
   - python -c "import epics.ca; print(epics.ca.find_libca())"
+  - ldd /home/travis/mc/envs/testenv/lib/libca.so
 
   - echo "Checking if the motor/areadetector IOC is running:"
   - python -c "import epics; print('mtr1', epics.caget('sim:mtr1.RBV'))"
