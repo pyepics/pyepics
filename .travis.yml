@@ -62,7 +62,7 @@ install:
   - pip install coveralls pytest pytest-cov
   # install pyepics as a source install
   - ls -l /home/travis/mc/envs/testenv/lib/
-  - pip install -v .
+  - python setup.py install
   - ls -l /home/travis/mc/envs/testenv/lib/
   
   # setup some path environment variables for epics
