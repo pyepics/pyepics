@@ -61,8 +61,10 @@ install:
   - conda install numpy
   - pip install coveralls pytest pytest-cov
   # install pyepics as a source install
+  - ls -l /home/travis/mc/envs/testenv/lib/
   - pip install -v .
-
+  - ls -l /home/travis/mc/envs/testenv/lib/
+  
   # setup some path environment variables for epics
   - export PATH=$PATH:$EPICS_BASE/bin/$EPICS_HOST_ARCH
   - export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$EPICS_BASE/lib/$EPICS_HOST_ARCH"
