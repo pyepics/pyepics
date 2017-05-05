@@ -238,9 +238,9 @@ def initialize_libca():
     else:
         load_dll = ctypes.cdll.LoadLibrary
     try:
-        libca = load_dll(find_libca())
         # force loading the chosen version of libCom
         load_dll(find_libCom())
+        libca = load_dll(find_libca())
     except Exception as exc:
         raise ChannelAccessException('loading Epics CA DLL failed: ' + str(exc))
 
