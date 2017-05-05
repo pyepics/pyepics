@@ -52,6 +52,7 @@ if nolibca is None:
         nbits = '32bit'
     nbits = nbits.replace('bit', '')
 
+    libfmt = 'lib%s.so'
     if os.name == 'nt':
         libsrc = 'win'
         libfmt = '%s.dll'
@@ -60,7 +61,6 @@ if nolibca is None:
         libfmt = 'lib%s.dylib'
     elif sys.platform.startswith('linux'):
         libsrc = 'linux'
-        libfmt = 'lib%s.so'
     else:
         libsrc = None
 
