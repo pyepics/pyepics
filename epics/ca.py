@@ -239,7 +239,11 @@ def initialize_libca():
 
     # save value offests used for unpacking
     # TIME and CTRL data as an array in dbr module
-    dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
+
+    # in_dll is not available for arrays in IronPython, so use a reference to the first element
+    value_offset0 = ctypes.c_short.in_dll(libca,'dbr_value_offset')
+    dbr.value_offset = ctypes.cast(ctypes.addressof(value_offset0), (39*ctypes.c_short))
+
     initial_context = current_context()
     if AUTO_CLEANUP:
         atexit.register(finalize_libca)
@@ -855,7 +859,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         chid = _cache[ctx][pvname]['chid']
     else:
         chid = dbr.chid_t()
-        ret = libca.ca_create_channel(pvn, conncb, 0, 0,
+        ret = libca.ca_create_channel(ctypes.c_char_p(pvn), conncb, 0, 0,
                                       ctypes.byref(chid))
         PySEVCHK('create_channel', ret)
         entry['chid'] = chid
