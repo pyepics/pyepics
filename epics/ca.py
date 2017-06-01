@@ -588,7 +588,7 @@ def _onGetEvent(args, **kws):
     if args.status != dbr.ECA_NORMAL:
         return
 
-    get_cache(name(args.chid))[args.usr] = memcopy(dbr.cast_args(args))
+    get_cache(name(args.chid))[args.usr.value] = (dbr.cast_args(args))
 
 
 ## put event handler:
