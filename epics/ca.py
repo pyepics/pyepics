@@ -241,8 +241,11 @@ def initialize_libca():
     # TIME and CTRL data as an array in dbr module
 
     # in_dll is not available for arrays in IronPython, so use a reference to the first element
-    value_offset0 = ctypes.c_short.in_dll(libca,'dbr_value_offset')
-    dbr.value_offset = ctypes.cast(ctypes.addressof(value_offset0), (39*ctypes.c_short))
+    if dbr.IRONPY_WINDOWS:
+	    value_offset0 = ctypes.c_short.in_dll(libca,'dbr_value_offset')
+	    dbr.value_offset = ctypes.cast(ctypes.addressof(value_offset0), (39*ctypes.c_short))
+    else: 
+        dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
 
     initial_context = current_context()
     if AUTO_CLEANUP:
@@ -588,7 +591,10 @@ def _onGetEvent(args, **kws):
     if args.status != dbr.ECA_NORMAL:
         return
 
-    get_cache(name(args.chid))[args.usr.value] = (dbr.cast_args(args))
+    if dbr.IRONPY_WINDOWS:
+        get_cache(name(args.chid))[args.usr.value] = (dbr.cast_args(args))
+    else:
+        get_cache(name(args.chid))[args.usr] = memcopy(dbr.cast_args(args))
 
 
 ## put event handler:
