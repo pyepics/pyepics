@@ -24,7 +24,9 @@ except ImportError:
 PY64_WINDOWS =  (os.name == 'nt' and architecture()[0].startswith('64'))
 PY_MAJOR, PY_MINOR = sys.version_info[:2]
 
-IRONPY_WINDOWS = 'IronPython' in sys.version
+def isIronPython():
+    import platform
+    return platform.python_implementation() = 'IronPython'
 
 # EPICS Constants
 ECA_NORMAL = 1
