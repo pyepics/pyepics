@@ -26,7 +26,7 @@ PY_MAJOR, PY_MINOR = sys.version_info[:2]
 
 def isIronPython():
     import platform
-    return platform.python_implementation() = 'IronPython'
+    return platform.python_implementation() == 'IronPython'
 
 # EPICS Constants
 ECA_NORMAL = 1
