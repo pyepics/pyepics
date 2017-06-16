@@ -12,7 +12,7 @@ This is mostly copied from CA header files
 import ctypes
 import os
 import sys
-from platform import architecture
+import platform
 
 HAS_NUMPY = False
 try:
@@ -21,12 +21,9 @@ try:
 except ImportError:
     pass
 
-PY64_WINDOWS =  (os.name == 'nt' and architecture()[0].startswith('64'))
+PY64_WINDOWS =  (os.name == 'nt' and platform.architecture()[0].startswith('64'))
+IRON_PYTHON = platform.python_implementation() == 'IronPython'
 PY_MAJOR, PY_MINOR = sys.version_info[:2]
-
-def isIronPython():
-    import platform
-    return platform.python_implementation() == 'IronPython'
 
 # EPICS Constants
 ECA_NORMAL = 1
