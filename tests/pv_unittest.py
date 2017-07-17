@@ -204,8 +204,9 @@ class PV_Tests(unittest.TestCase):
         with no_simulator_updates():
             pv = PV(pvnames.string_arr_pv)
             put_value = ['a', 2, 'b']
-            with self.assertRaises(TypeError):
-                pv.put(put_value, wait=True)
+            pv.put(put_value, wait=True)
+            get_value = pv.get(use_monitor=False)
+            numpy.testing.assert_array_equal(get_value, ['a', '2', 'b'])
 
     def test_put_string_waveform_empty_list(self):
         write('String Array: put empty list\n')
