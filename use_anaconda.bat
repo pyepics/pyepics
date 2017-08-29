@@ -1,2 +1,2 @@
 @echo off
-SET PATH=%LOCALAPPDAT%\Continuum\Anaconda2;%LOCALAPPDAT%\Continuum\Anaconda2\Scripts;%PATH%
+SET PATH=%LOCALAPPDATA%\Continuum\Anaconda2;%LOCALAPPDATA%\Continuum\Anaconda2\Scripts;%PATH%
