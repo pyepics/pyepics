@@ -1399,7 +1399,12 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     if count > 1:
         # check that data for array PVS is a list, array, or string
         try:
-            count = min(len(value), count)
+            if ftype == dbr.STRING and is_string_or_bytes(value):
+                # len('abc') --> 3, however this is one element for dbr.STRING ftype
+                count = 1
+            else:
+                count = min(len(value), count)
+
             if count == 0:
                 count = nativecount
         except TypeError:
@@ -1413,9 +1418,9 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     if is_string(value):
         value = ascii_string(value)
 
-    data  = (count*dbr.Map[ftype])()
+    data = (count*dbr.Map[ftype])()
     if ftype == dbr.STRING:
-        if count == 1:
+        if is_string_or_bytes(value):
             data[0].value = value
         else:
             for elem in range(min(count, len(value))):

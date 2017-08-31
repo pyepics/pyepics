@@ -50,4 +50,4 @@ def is_string_or_bytes(s):
     return isinstance(s, str) or isinstance(s, bytes) 
 
 def ascii_string(s):
-    return bytes(s, EPICS_STR_ENCODING)
+    return bytes(str(s), EPICS_STR_ENCODING)

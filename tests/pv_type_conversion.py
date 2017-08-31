@@ -20,6 +20,7 @@ pvlist = (
     pvnames.long_arr_pv,       
     pvnames.double_pv,
     pvnames.double_arr_pv,
+    pvnames.string_arr_pv,
     )
 
 def onConnect(pvname=None,  **kw):

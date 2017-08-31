@@ -83,15 +83,6 @@ class PV_Tests(unittest.TestCase):
             self.assertIsInstance(val[1], str)
             self.failUnless(len(val[1]) > 1)
 
-    def test_put_string_waveform(self):
-        write('String Array: \n')
-        with no_simulator_updates():
-            pv = PV(pvnames.string_arr_pv)
-            put_value = ['a', 'b', 'c']
-            pv.put(put_value)
-            get_value = pv.get(use_monitor=False, count=len(put_value))
-            numpy.testing.assert_array_equal(get_value, put_value)
-
     def test_putcomplete(self):
         write('Put with wait and put_complete (using real motor!) \n')
         vals = (1.35, 1.50, 1.44, 1.445, 1.45, 1.453, 1.446, 1.447, 1.450, 1.450, 1.490, 1.5, 1.500)
@@ -190,6 +181,50 @@ class PV_Tests(unittest.TestCase):
         self.failUnless(len(NEWVALS) > 3)
         mypv.clear_callbacks()
 
+    def test_put_string_waveform(self):
+        write('String Array: put\n')
+        with no_simulator_updates():
+            pv = PV(pvnames.string_arr_pv)
+            put_value = ['a', 'b', 'c']
+            pv.put(put_value, wait=True)
+            get_value = pv.get(use_monitor=False)
+            numpy.testing.assert_array_equal(get_value, put_value)
+
+    def test_put_string_waveform_single_element(self):
+        write('String Array: put single element\n')
+        with no_simulator_updates():
+            pv = PV(pvnames.string_arr_pv)
+            put_value = ['a']
+            pv.put(put_value, wait=True)
+            get_value = pv.get(use_monitor=False)
+            self.failUnless(put_value[0] == get_value)
+
+    def test_put_string_waveform_mixed_types(self):
+        write('String Array: put mixed types\n')
+        with no_simulator_updates():
+            pv = PV(pvnames.string_arr_pv)
+            put_value = ['a', 2, 'b']
+            pv.put(put_value, wait=True)
+            get_value = pv.get(use_monitor=False)
+            numpy.testing.assert_array_equal(get_value, ['a', '2', 'b'])
+
+    def test_put_string_waveform_empty_list(self):
+        write('String Array: put empty list\n')
+        with no_simulator_updates():
+            pv = PV(pvnames.string_arr_pv)
+            put_value = []
+            pv.put(put_value, wait=True)
+            get_value = pv.get(use_monitor=False, as_numpy=False)
+            self.failUnless('' == ''.join(get_value))
+
+    def test_put_string_waveform_zero_length_strings(self):
+        write('String Array: put zero length strings\n')
+        with no_simulator_updates():
+            pv = PV(pvnames.string_arr_pv)
+            put_value = ['', '', '']
+            pv.put(put_value, wait=True)
+            get_value = pv.get(use_monitor=False)
+            numpy.testing.assert_array_equal(get_value, put_value)
 
     def test_subarrays(self):
         write("Subarray test:  dynamic length arrays\n")
