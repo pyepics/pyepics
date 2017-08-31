@@ -198,7 +198,7 @@ class PV(object):
             if self._args['count'] is not None:
                 maxcount = self._args['count']
                 count = min(count,self._args['count'])
-                
+
             self._args['count']  = count
             self._args['host']   = ca.host_name(self.chid)
             self.ftype  = ca.promote_type(self.chid,
@@ -264,12 +264,21 @@ class PV(object):
         self._conn_started = True
         return self.connected and self.ftype is not None
 
+    def clear_auto_monitor(self):
+        """turn off auto-monitoring: must reconnect to re-enable monitoring"""
+        self.auto_monitor = False
+        if self._monref is not None:
+            evid = self._monref[2]
+            ca.clear_subscription(evid)
+            self._monref = None
+
     def reconnect(self):
         "try to reconnect PV"
         self.auto_monitor = None
         self._monref = None
         self.connected = False
         self._conn_started = False
+        self.force_connect()
         return self.wait_for_connection()
 
     def poll(self, evt=1.e-4, iot=1.0):
@@ -305,7 +314,7 @@ class PV(object):
             (self._args['value'] is None) or
             (count is not None and count > len(self._args['value']))):
 
-            # respect count argument on subscription also for calls to get 
+            # respect count argument on subscription also for calls to get
             if count is None and self._args['count']!=self._args['nelm']:
                 count = self._args['count']
             ca_get = ca.get
