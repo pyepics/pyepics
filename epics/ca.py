@@ -112,33 +112,34 @@ class CASeverityException(Exception):
     def __str__(self):
         return " %s returned '%s'" % (self.fcn, self.msg)
 
-def find_libca():
+
+def _find_lib(inp_lib_name):
     """
     find location of ca dynamic library
     """
     # Test 1: if PYEPICS_LIBCA env var is set, use it.
-    dllpath = os.environ.get('PYEPICS_LIBCA', None)
+    dllpath = os.environ.get(
+        'PYEPICS_LIB{}'.format(inp_lib_name.upper()), None)
     if (dllpath is not None and os.path.exists(dllpath) and
-        os.path.isfile(dllpath)):
+            os.path.isfile(dllpath)):
         return dllpath
 
     # Test 2: look in installed python location for dll
-    lname = 'libca.so'
+    lname = 'lib{}.so'.format(inp_lib_name)
     if os.uname == 'nt':
-        lname = 'ca.dll'
+        lname = '{}.dll'.format(inp_lib_name)
     elif sys.platform == 'darwin':
-        lname = 'libca.dylib'
+        lname = 'lib{}.dylib'.format(inp_lib_name)
 
     basepath = os.path.split(os.path.abspath(__file__))[0]
-    parent   = os.path.split(basepath)[0]
-    dllpath  = os.path.join(parent, 'lib', lname)
+    parent = os.path.split(basepath)[0]
+    dllpath = os.path.join(parent, 'lib', lname)
     if (os.path.exists(dllpath) and os.path.isfile(dllpath)):
         return dllpath
 
-
     # Test 3: look through Python path and PATH env var for dll
     path_sep = ':'
-    dylib   = 'lib'
+    dylib = 'lib'
     # For windows, we assume the DLLs are installed with the library
     if os.name == 'nt':
         path_sep = ';'
@@ -163,21 +164,21 @@ def find_libca():
 
     # with PATH set above, the ctypes utility, find_library *should*
     # find the dll....
-    dllpath  = ctypes.util.find_library('ca')
+    dllpath = ctypes.util.find_library(inp_lib_name)
     if dllpath is not None:
         return dllpath
-
 
     # Test 4: on unixes, look expliticly with EPICS_BASE env var and
     # known architectures for ca.so
     if os.name == 'posix':
-        known_hosts = {'Linux':   ('linux-x86', 'linux-x86_64') ,
-                       'Darwin':  ('darwin-ppc', 'darwin-x86'),
-                       'SunOS':   ('solaris-sparc', 'solaris-sparc-gnu') }
+        known_hosts = {'Linux': ('linux-x86', 'linux-x86_64'),
+                       'Darwin': ('darwin-ppc', 'darwin-x86'),
+                       'SunOS': ('solaris-sparc', 'solaris-sparc-gnu')
+                       }
 
-        libname = 'libca.so'
+        libname = 'lib{}.so'.format(inp_lib_name)
         if sys.platform == 'darwin':
-            libname = 'libca.dylib'
+            libname = 'lib{}.dylib'.format(inp_lib_name)
 
         epics_base = os.environ.get('EPICS_BASE', '.')
         epics_host_arch = os.environ.get('EPICS_HOST_ARCH')
@@ -192,6 +193,15 @@ def find_libca():
                     return os.path.join(adir, libname)
 
     raise ChannelAccessException('cannot find Epics CA DLL')
+
+
+def find_libca():
+    return _find_lib('ca')
+
+
+def find_libCom():
+    return _find_lib('Com')
+
 
 def initialize_libca():
     """Initialize the Channel Access library.
@@ -221,13 +231,16 @@ def initialize_libca():
     if 'EPICS_CA_MAX_ARRAY_BYTES' not in os.environ:
         os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = "%i" %  2**24
 
-    dllname = find_libca()
-    load_dll = ctypes.cdll.LoadLibrary
     global libca, initial_context, _cache
+
     if os.name == 'nt':
         load_dll = ctypes.windll.LoadLibrary
+    else:
+        load_dll = ctypes.cdll.LoadLibrary
     try:
-        libca = load_dll(dllname)
+        # force loading the chosen version of libCom
+        load_dll(find_libCom())
+        libca = load_dll(find_libca())
     except Exception as exc:
         raise ChannelAccessException('loading Epics CA DLL failed: ' + str(exc))
 

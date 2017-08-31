@@ -12,9 +12,17 @@ cache:
 
 matrix:
   include:
+    # do not install libca / libcom from pyepics
     - python: 2.7
+      env: NOLIBCA=1
     - python: 3.4
+      env: NOLIBCA=1
     - python: 3.5
+      env: NOLIBCA=1
+    - python: 3.6
+      env: NOLIBCA=1
+    # install libca / libcom from pyepics
+    - python: 2.7
     - python: 3.6
 
 before_install:
@@ -44,6 +52,7 @@ before_install:
   - conda config --set always_yes true
   - conda update conda --yes
   - conda install conda-build anaconda-client jinja2
+  - conda config --add channels lightsource2-tag
   - conda config --add channels lightsource2
   - conda config --add channels soft-matter
 
@@ -60,7 +69,9 @@ install:
   - conda install numpy
   - pip install coveralls pytest pytest-cov
   # install pyepics as a source install
-  - python setup.py develop
+  - pip install -v .
+
+  - find /home/travis/mc -name 'libca*'
 
   # setup some path environment variables for epics
   - export PATH=$PATH:$EPICS_BASE/bin/$EPICS_HOST_ARCH
@@ -80,6 +91,7 @@ script:
   - echo "Checking pyepics version and libca locations:"
   - python -c "import epics; print(epics.__version__)"
   - python -c "import epics.ca; print(epics.ca.find_libca())"
+  - ldd /home/travis/mc/envs/testenv/lib/libca.so
 
   - echo "Checking if the motor/areadetector IOC is running:"
   - python -c "import epics; print('mtr1', epics.caget('sim:mtr1.RBV'))"

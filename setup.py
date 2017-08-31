@@ -42,32 +42,38 @@ problem before tyring to use the epics package.
 *******************************************************
 """
 
-# determine which libca / libCom dll is appropriate
-data_files = None
-try:
-    import platform
-    nbits = platform.architecture()[0]
-except:
-    nbits = '32bit'
-nbits = nbits.replace('bit', '')
+nolibca = os.environ.get('NOLIBCA', None)
+if nolibca is None:
+    # determine which libca / libCom dll is appropriate
+    try:
+        import platform
+        nbits = platform.architecture()[0]
+    except:
+        nbits = '32bit'
+    nbits = nbits.replace('bit', '')
 
-libfmt = 'lib%s.so'
-libsrc = None
-if os.name == 'nt':
-    libsrc = 'win'
-    libfmt = '%s.dll'
-elif sys.platform == 'darwin':
-    libsrc = 'darwin'
-    libfmt = 'lib%s.dylib'
-elif sys.platform.startswith('linux'):
-    libsrc = 'linux'
+    libfmt = 'lib%s.so'
+    if os.name == 'nt':
+        libsrc = 'win'
+        libfmt = '%s.dll'
+    elif sys.platform == 'darwin':
+        libsrc = 'darwin'
+        libfmt = 'lib%s.dylib'
+    elif sys.platform.startswith('linux'):
+        libsrc = 'linux'
+    else:
+        libsrc = None
 
-pjoin = os.path.join
-if libsrc is not None:
-    data_files = [('lib',
-                   [pjoin("dlls", "%s%s" % (libsrc, nbits), libfmt % "ca"),
-                    pjoin("dlls", "%s%s" % (libsrc, nbits), libfmt % "Com")]
-                   )]
+    pjoin = os.path.join
+
+    if libsrc is not None:
+        data_files = [('lib',
+                       [pjoin("dlls", "%s%s" % (libsrc, nbits), libfmt % "ca"),
+                        pjoin("dlls", "%s%s" % (libsrc, nbits), libfmt % "Com")
+                        ]
+                       )]
+else:
+    data_files = None
 
 PY_MAJOR, PY_MINOR = sys.version_info[:2]
 if PY_MAJOR == 2 and PY_MINOR < 6:

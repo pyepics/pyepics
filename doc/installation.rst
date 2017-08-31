@@ -5,19 +5,16 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-This package requires Python version 2.7, 3.4, or 3.5.  It should work with
-Python 2.6, 3.2, or 3.3, but these are no longer being tested regularly.
+This package requires Python version 2.7, 3.4, 3.5, or 3.6.  It should
+work with Python 2.6, 3.2, or 3.3, but these are no longer being
+tested regularly.
 
-In addition, version 3.14 of the EPICS Channel Access library (v 3.14.8 or
-higher, I believe) is required.  More specifically, the shared libraries
-libCom.so and libca.so (or Com.dll and ca.dll on Windows) from *Epics Base*
-are required to use this module.  Using version 3.14.12 or higher is
-recommended -- some of the features for 'subarray records' will only work
-with this 3.14.12 and higher. For Linux and Mac OS X (and other Unix-like
-systems), these dynamic libraries are assumed to be available, and findable
-by Python at runtime. This may mean you have to set environmental variables
-such as PATH, LD_LIBRARY_PATH, or DYLD_LIBRARY_PATH or using Linux tools
-such as ldconfig.
+In addition, version 3.14 of the EPICS Channel Access library (v
+3.14.8 or higher, I believe) is required.  More specifically, the
+shared libraries libCom.so and libca.so (or Com.dll and ca.dll on
+Windows) from *Epics Base* are required to use this module.  Using
+version 3.14.12 or higher is recommended -- some of the features for
+'subarray records' will only work with this 3.14.12 and higher.
 
 For 32-bit Python on 32-bit or 64-bit Windows, pre-built DLLs from 3.14.12
 (patched as of March, 2011) are included and installed so that no other
@@ -26,6 +23,18 @@ Epics installation is required to use the modules.
 For 64-bit Python on 64-bit Windows, pre-built DLLs from 3.14.12.4 (patched
 as of January, 2015) are also included.  Support for 64-bit Python on
 Windows was new in version 3.2.4, and requires Python version 2.7.9.
+
+For 32-bit, 64-bit Linux and 64-bit OSX binaries are also included.
+
+If you have epics-base already installed on your machine you can
+suppress installing the binaries set the env `NOLIBCA` ::
+
+  NOLIBCA=1 pip install pyepics
+
+You may have to set environmental variables such as PATH,
+LD_LIBRARY_PATH, or DYLD_LIBRARY_PATH or using Linux tools such as
+ldconfig to find the required libraries.
+
 
 The Python `numpy module <http://numpy.scipy.org/>`_ is highly recommended,
 though it is not strictly required. If available, it will be used to
