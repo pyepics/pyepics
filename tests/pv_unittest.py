@@ -196,6 +196,7 @@ class PV_Tests(unittest.TestCase):
             pv = PV(pvnames.string_arr_pv)
             put_value = ['a']
             pv.put(put_value, wait=True)
+            time.sleep(0.05)
             get_value = pv.get(use_monitor=False, as_numpy=False)
             self.failUnless(put_value[0] == get_value)
 
@@ -205,6 +206,7 @@ class PV_Tests(unittest.TestCase):
             pv = PV(pvnames.string_arr_pv)
             put_value = ['a', 2, 'b']
             pv.put(put_value, wait=True)
+            time.sleep(0.05)
             get_value = pv.get(use_monitor=False, as_numpy=False)
             numpy.testing.assert_array_equal(get_value, ['a', '2', 'b'])
 
@@ -214,6 +216,7 @@ class PV_Tests(unittest.TestCase):
             pv = PV(pvnames.string_arr_pv)
             put_value = []
             pv.put(put_value, wait=True)
+            time.sleep(0.05)
             get_value = pv.get(use_monitor=False, as_numpy=False)
             self.failUnless('' == ''.join(get_value))
 
@@ -223,6 +226,7 @@ class PV_Tests(unittest.TestCase):
             pv = PV(pvnames.string_arr_pv)
             put_value = ['', '', '']
             pv.put(put_value, wait=True)
+            time.sleep(0.05)
             get_value = pv.get(use_monitor=False, as_numpy=False)
             numpy.testing.assert_array_equal(get_value, put_value)
 
