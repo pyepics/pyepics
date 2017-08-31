@@ -187,7 +187,7 @@ class PV_Tests(unittest.TestCase):
             pv = PV(pvnames.string_arr_pv)
             put_value = ['a', 'b', 'c']
             pv.put(put_value, wait=True)
-            get_value = pv.get(use_monitor=False)
+            get_value = pv.get(use_monitor=False, as_numpy=False)
             numpy.testing.assert_array_equal(get_value, put_value)
 
     def test_put_string_waveform_single_element(self):
@@ -196,7 +196,7 @@ class PV_Tests(unittest.TestCase):
             pv = PV(pvnames.string_arr_pv)
             put_value = ['a']
             pv.put(put_value, wait=True)
-            get_value = pv.get(use_monitor=False)
+            get_value = pv.get(use_monitor=False, as_numpy=False)
             self.failUnless(put_value[0] == get_value)
 
     def test_put_string_waveform_mixed_types(self):
@@ -205,7 +205,7 @@ class PV_Tests(unittest.TestCase):
             pv = PV(pvnames.string_arr_pv)
             put_value = ['a', 2, 'b']
             pv.put(put_value, wait=True)
-            get_value = pv.get(use_monitor=False)
+            get_value = pv.get(use_monitor=False, as_numpy=False)
             numpy.testing.assert_array_equal(get_value, ['a', '2', 'b'])
 
     def test_put_string_waveform_empty_list(self):
@@ -223,7 +223,7 @@ class PV_Tests(unittest.TestCase):
             pv = PV(pvnames.string_arr_pv)
             put_value = ['', '', '']
             pv.put(put_value, wait=True)
-            get_value = pv.get(use_monitor=False)
+            get_value = pv.get(use_monitor=False, as_numpy=False)
             numpy.testing.assert_array_equal(get_value, put_value)
 
     def test_subarrays(self):
@@ -291,11 +291,11 @@ class PV_Tests(unittest.TestCase):
 
             val=wf.get(count=wf.nelm)
             self.assertEquals(len(val), wf.nelm)
-            
+
 
     def test_waveform_callback_with_count_arg(self):
         values = []
-        
+
         wf = PV(pvnames.char_arr_pv, count=32)
         def onChanges(pvname=None, value=None, char_value=None, **kw):
             write( 'PV %s %s, %s Changed!\n' % (pvname, repr(value), char_value))
@@ -316,7 +316,7 @@ class PV_Tests(unittest.TestCase):
         wf.clear_callbacks()
 
 
-            
+
     def test_emptyish_char_waveform_no_monitor(self):
         '''a test of a char waveform of length 1 (NORD=1): value "\0"
         without using auto_monitor
@@ -451,4 +451,3 @@ if __name__ == '__main__':
 #                              callback=onConnect)
 #
 #     time.sleep(0.1)
-
