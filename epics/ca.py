@@ -126,7 +126,7 @@ def _find_lib(inp_lib_name):
 
     # Test 2: look in installed python location for dll
     lname = 'lib{}.so'.format(inp_lib_name)
-    if os.uname == 'nt':
+    if os.name == 'nt':
         lname = '{}.dll'.format(inp_lib_name)
     elif sys.platform == 'darwin':
         lname = 'lib{}.dylib'.format(inp_lib_name)
@@ -272,7 +272,7 @@ def initialize_libca():
     if dbr.IRON_PYTHON:
 	    value_offset0 = ctypes.c_short.in_dll(libca,'dbr_value_offset')
 	    dbr.value_offset = ctypes.cast(ctypes.addressof(value_offset0), (39*ctypes.c_short))
-    else: 
+    else:
         dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
 
     initial_context = current_context()
