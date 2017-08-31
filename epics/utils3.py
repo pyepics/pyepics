@@ -2,12 +2,12 @@
 """
 String Utils for Python 3
 """
+import os
 import sys
 if sys.version_info[0] != 3:
     raise ImportError(" Python version 3 required")
 
-EPICS_STR_ENCODING = 'ASCII'
-EPICS_STR_ENCODING = 'latin_1'
+EPICS_STR_ENCODING = os.environ.get('PYTHONIOENCODING', 'utf-8')
 NULLCHAR_2 = '\x00'
 NULLCHAR   = b'\x00'
 
@@ -25,7 +25,7 @@ def b2s(st1):
         return str(st1, EPICS_STR_ENCODING)
     else:
         return str(st1)
- 
+
 STR2BYTES, BYTES2STR = s2b, b2s
 
 def strjoin(sep, seq):
@@ -47,7 +47,7 @@ def is_string(s):
     return isinstance(s, str)
 
 def is_string_or_bytes(s):
-    return isinstance(s, str) or isinstance(s, bytes) 
+    return isinstance(s, str) or isinstance(s, bytes)
 
 def ascii_string(s):
     return bytes(str(s), EPICS_STR_ENCODING)
