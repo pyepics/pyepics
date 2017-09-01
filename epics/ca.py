@@ -134,6 +134,7 @@ def _find_lib(inp_lib_name):
     basepath = os.path.split(os.path.abspath(__file__))[0]
     parent = os.path.split(basepath)[0]
     dllpath = os.path.join(parent, 'lib', lname)
+
     if (os.path.exists(dllpath) and os.path.isfile(dllpath)):
         return dllpath
 
@@ -152,16 +153,26 @@ def _find_lib(inp_lib_name):
              os.path.split(os.path.dirname(os.__file__))[0],
              os.path.join(sys.prefix, dylib)]
 
+    def envpath2list(envname, path_sep):
+        plist = ['']
+        try:
+            plist = os.environ.get(envname, '').split(path_sep)
+        except AttributError:
+            pass
+        return plist
+
+    env_path = envpath2list('PATH', path_sep)
+    ldname = 'LD_LIBRARY_PATH'
+    if sys.platform == 'darwin':
+        ldname = 'DYLD_LIBRARY_PATH'
+    env_ldpath = envpath2list(ldname, path_sep)
+
     search_path = []
-    for adir in (_path + sys.path +
-                 os.environ.get('PATH','').split(path_sep) +
-                 os.environ.get('LD_LIBRARY_PATH','').split(path_sep) +
-                 os.environ.get('DYLD_LIBRARY_PATH','').split(path_sep)):
+    for adir in (_path + env_path + env_ldpath):
         if adir not in search_path and os.path.isdir(adir):
             search_path.append(adir)
 
     os.environ['PATH'] = path_sep.join(search_path)
-
     # with PATH set above, the ctypes utility, find_library *should*
     # find the dll....
     dllpath = ctypes.util.find_library(inp_lib_name)
@@ -198,10 +209,8 @@ def _find_lib(inp_lib_name):
 def find_libca():
     return _find_lib('ca')
 
-
 def find_libCom():
     return _find_lib('Com')
-
 
 def initialize_libca():
     """Initialize the Channel Access library.
@@ -651,6 +660,7 @@ def _onPutEvent(args, **kwds):
 
 def _onAccessRightsEvent(args):
     # for 64-bit python on Windows!
+    global _cache
     if dbr.PY64_WINDOWS:
         args = args.contents
 
@@ -658,7 +668,6 @@ def _onAccessRightsEvent(args):
     ra = bool(args.read_access)
     wa = bool(args.write_access)
 
-    global _cache
     # Getting bunk result from ca.current_context on channel disconnect
     # Do this the long way...
     for ctx in _cache.values():
@@ -671,14 +680,6 @@ def _onAccessRightsEvent(args):
                         callback(ra, wa)
 
 # create global reference to these callbacks
-
-
-# _CB_PUTWAIT = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onPutEvet)
-# _CB_GET     = ctypes.CFUNCTYPE(None, ctypes.pointer(dbr.event_handler_args))(_onGetEvent)
-# _CB_EVENT   = ctypes.CFUNCTYPE(None, dbr.event_handler_args)(_onMonitorEvent)
-
-# _CB_CONNECT = make_callback(_onConnectionEvent, dbr.connection_args)
-
 _CB_CONNECT = dbr.make_callback(_onConnectionEvent, dbr.connection_args)
 _CB_PUTWAIT = dbr.make_callback(_onPutEvent,        dbr.event_handler_args)
 _CB_GET     = dbr.make_callback(_onGetEvent,        dbr.event_handler_args)
@@ -1053,7 +1054,6 @@ def write_access(chid):
 @withCHID
 def field_type(chid):
     "return the integer DBR field type."
-    # print(" Field Type", chid)
     return libca.ca_field_type(chid)
 
 @withCHID
