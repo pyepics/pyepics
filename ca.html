@@ -1,13 +1,13 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>ca: Low-level Channel Access module &mdash; Epics Channel Access for Python</title>
+    <title>ca: Low-level Channel Access module &#8212; Epics Channel Access for Python</title>
     
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,20 +15,23 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.5',
+        VERSION:     '3.2.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Epics Channel Access for Python" href="index.html" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Working with waveform / array data" href="arrays.html" />
     <link rel="prev" title="PV: Epics Process Variables" href="pv.html" /> 
   </head>
-  <body role="document">
+  <body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -42,6 +45,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="arrays.html" title="Working with waveform / array data"
              accesskey="N">next</a> |</li>
@@ -94,6 +100,7 @@
 <li><a class="reference internal" href="#put-waiting-for-completion">Put, waiting for completion</a></li>
 <li><a class="reference internal" href="#define-a-callback-to-subscribe-to-changes">Define a callback to Subscribe to Changes</a></li>
 <li><a class="reference internal" href="#define-a-connection-callback">Define a connection callback</a></li>
+<li><a class="reference internal" href="#define-an-access-rights-change-event-callback">Define an access rights change event callback</a></li>
 </ul>
 </li>
 </ul>
@@ -109,21 +116,18 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/ca.txt"
+      <li><a href="_sources/ca.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -158,7 +162,7 @@ do.</p>
 <p>As a general rule, a CA function named <cite>ca_XXX</cite> in the C library will have the
 equivalent function called <cite>XXX</cite> in the <cite>ca</cite> module.  This is because the
 intention is that one will import the <cite>ca</cite> module with</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">ca</span>
 </pre></div>
 </div>
 <p>so that the Python function <code class="xref py py-func docutils literal"><span class="pre">ca.XXX()</span></code> will corresponds to the C
@@ -174,12 +178,12 @@ becomes dbr.STRING in Python.</p>
 <p>Several function in the C version of the CA library are not implemented in
 the Python module.  Most of these unimplemented functions are currently
 seen as unnecessary for Python, though some of these could be added without
-much trouble if needed. See <a class="reference internal" href="#ca-omissions-label"><span>Omissions</span></a> for further details.</p>
+much trouble if needed. See <a class="reference internal" href="#ca-omissions-label"><span class="std std-ref">Omissions</span></a> for further details.</p>
 <p>In addition, while the CA library supports several <cite>DBR</cite> types in C, not
 all of these are supported in Python. Only native types and their DBR_TIME
 and DBR_CTRL variants are supported here.  The DBR_STS and DBR_GR variants
 are not, as they are subsets of the DBR_CTRL type, and space optimization
-is not something you&#8217;ll be striving for with Python.  Several <cite>dbr_XXX</cite>
+is not something you’ll be striving for with Python.  Several <cite>dbr_XXX</cite>
 functions are also not supported, as they appear to be needed only to be
 able to dynamically allocate memory, which is not necessary in Python.</p>
 </div>
@@ -203,7 +207,7 @@ explicitly initializing a Channel Access session.  Instead, the library is
 initialized as soon as it is needed, and intervention is really only
 required to change default settings.  The <a class="reference internal" href="#module-ca" title="ca: low-level Channel Access  module."><code class="xref py py-mod docutils literal"><span class="pre">ca</span></code></a> module also handles
 finalizing the CA session, so that core-dumps and warning messages do not
-happen due to CA still being &#8216;alive&#8217; as a program ends.</p>
+happen due to CA still being ‘alive’ as a program ends.</p>
 <p>Because some users may wish to customize the initialization and
 finalization process, the detailed steps will be described here.  These
 initialization and finalization tasks are handled in the following way:</p>
@@ -253,7 +257,7 @@ clear: waveforms with fewer elements than this value will be
 automatically monitored changes, and will be converted to numpy arrays
 (if numpy is installed).  Larger waveforms will not be automatically
 monitored.</p>
-<p><a class="reference internal" href="arrays.html#arrays-label"><span>Working with waveform / array data</span></a> and <a class="reference internal" href="arrays.html#arrays-large-label"><span>Strategies for working with large arrays</span></a> for more details.</p>
+<p><a class="reference internal" href="arrays.html#arrays-label"><span class="std std-ref">Working with waveform / array data</span></a> and <a class="reference internal" href="arrays.html#arrays-large-label"><span class="std std-ref">Strategies for working with large arrays</span></a> for more details.</p>
 </dd></dl>
 
 </div>
@@ -335,9 +339,9 @@ the rest of the CA library) are supported.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ctx</strong> : int</p>
 <blockquote class="last">
-<div><p>0 &#8211; No preemptive callbacks,
-1 &#8211; use use preemptive callbacks,
-None &#8211; use value of <a class="reference internal" href="#epics.ca.PREEMPTIVE_CALLBACK" title="epics.ca.PREEMPTIVE_CALLBACK"><code class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></code></a></p>
+<div><p>0 – No preemptive callbacks,
+1 – use use preemptive callbacks,
+None – use value of <a class="reference internal" href="#epics.ca.PREEMPTIVE_CALLBACK" title="epics.ca.PREEMPTIVE_CALLBACK"><code class="xref py py-data docutils literal"><span class="pre">PREEMPTIVE_CALLBACK</span></code></a></p>
 </div></blockquote>
 </td>
 </tr>
@@ -382,7 +386,7 @@ Using this function is recommended when writing threaded programs that
 using CA.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="advanced.html#advanced-threads-label"><span>Using Python Threads</span></a></p>
+<p class="last"><a class="reference internal" href="advanced.html#advanced-threads-label"><span class="std std-ref">Using Python Threads</span></a></p>
 </div>
 </dd></dl>
 
@@ -397,7 +401,7 @@ including status for each channel, and search and connection statistics.</p>
 <dt id="epics.ca.version">
 <code class="descclassname">epics.ca.</code><code class="descname">version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print Channel Access version string.
-Currently, this should report &#8216;4.13&#8217;</p>
+Currently, this should report ‘4.13’</p>
 </dd></dl>
 
 <dl class="function">
@@ -557,8 +561,8 @@ when needed in most cases.</p>
 </ol>
 <p>2. Normally, channels will connect in milliseconds, and the connection
 callback will succeed on the first attempt.</p>
-<p>3. For un-connected Channels (that are nevertheless queried), the &#8216;ts&#8217;
-(timestamp of last connection attempt) and &#8216;failures&#8217; (number of failed
+<p>3. For un-connected Channels (that are nevertheless queried), the ‘ts’
+(timestamp of last connection attempt) and ‘failures’ (number of failed
 connection attempts) from the <a class="reference internal" href="#epics.ca._cache" title="epics.ca._cache"><code class="xref py py-data docutils literal"><span class="pre">_cache</span></code></a> will be used to prevent
 spending too much time waiting for a connection that may never happen.</p>
 </dd></dl>
@@ -581,9 +585,14 @@ library versions, and include:</p>
 <dl class="function">
 <dt id="epics.ca.element_count">
 <code class="descclassname">epics.ca.</code><code class="descname">element_count</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.element_count" title="Permalink to this definition">¶</a></dt>
-<dd><p>return number of elements in Channel&#8217;s data.
+<dd><p>return number of elements in Channel’s data.
 1 for most Channels, &gt; 1 for waveform Channels</p>
 </dd></dl>
+
+<dl class="function">
+<dt id="epics.ca.replace_access_rights_event">
+<code class="descclassname">epics.ca.</code><code class="descname">replace_access_rights_event</code><span class="sig-paren">(</span><em>chid</em>, <em>callback=None</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.replace_access_rights_event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="epics.ca.read_access">
@@ -601,7 +610,7 @@ library versions, and include:</p>
 <dt id="epics.ca.field_type">
 <code class="descclassname">epics.ca.</code><code class="descname">field_type</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.field_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the integer DBR field type.</p>
-<p>See the <em>ftype</em> column from <a class="reference internal" href="#dbrtype-table"><span>Table of DBR Types</span></a>.</p>
+<p>See the <em>ftype</em> column from <a class="reference internal" href="#dbrtype-table"><span class="std std-ref">Table of DBR Types</span></a>.</p>
 </dd></dl>
 
 <dl class="function">
@@ -636,7 +645,7 @@ library versions, and include:</p>
 <code class="descclassname">epics.ca.</code><code class="descname">promote_type</code><span class="sig-paren">(</span><em>chid</em><span class="optional">[</span>, <em>use_time=False</em><span class="optional">[</span>, <em>use_ctrl=False</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.promote_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>promotes the native field type of a <code class="docutils literal"><span class="pre">chid</span></code> to its TIME or CTRL variant.
 Returns the integer corresponding to the promoted field value.</p>
-<p>See <a class="reference internal" href="#dbrtype-table"><span>Table of DBR Types</span></a>.</p>
+<p>See <a class="reference internal" href="#dbrtype-table"><span class="std std-ref">Table of DBR Types</span></a>.</p>
 </dd></dl>
 
 <dl class="data">
@@ -752,13 +761,13 @@ could imply that the channel is disconnected or that the data size is
 larger or network slower than normal.  In that case, the <em>get</em>
 operation is said to be <em>incomplete</em>, and the data may become available
 later with <a class="reference internal" href="#epics.ca.get_complete" title="epics.ca.get_complete"><code class="xref py py-func docutils literal"><span class="pre">get_complete()</span></code></a>.</p>
-<p>See <a class="reference internal" href="#dbrtype-table"><span>Table of DBR Types</span></a> for a listing of values of
+<p>See <a class="reference internal" href="#dbrtype-table"><span class="std std-ref">Table of DBR Types</span></a> for a listing of values of
 <em>ftype</em>,</p>
-<p>See <a class="reference internal" href="arrays.html#arrays-large-label"><span>Strategies for working with large arrays</span></a> for a discussion of strategies
+<p>See <a class="reference internal" href="arrays.html#arrays-large-label"><span class="std std-ref">Strategies for working with large arrays</span></a> for a discussion of strategies
 for how to best deal with very large arrays.</p>
-<p>See <a class="reference internal" href="advanced.html#advanced-connecting-many-label"><span>Strategies for connecting to a large number of PVs</span></a> for a discussion of when using
+<p>See <a class="reference internal" href="advanced.html#advanced-connecting-many-label"><span class="std std-ref">Strategies for connecting to a large number of PVs</span></a> for a discussion of when using
 <cite>wait=False</cite> can give a large performance boost.</p>
-<p>See <a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><span>The wait and timeout options for get(), ca.get_complete()</span></a> for further discussion of the
+<p>See <a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><span class="std std-ref">The wait and timeout options for get(), ca.get_complete()</span></a> for further discussion of the
 <em>wait</em> and <em>timeout</em> options and the associated <a class="reference internal" href="#epics.ca.get_complete" title="epics.ca.get_complete"><code class="xref py py-func docutils literal"><span class="pre">get_complete()</span></code></a>
 function.</p>
 </dd></dl>
@@ -816,7 +825,7 @@ default_timout = 1.0 + log10(count)  (in seconds)</p>
 <ol class="arabic simple" start="2">
 <li>Consult the doc for <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal"><span class="pre">get()</span></code></a> for more information.</li>
 </ol>
-<p>See <a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><span>The wait and timeout options for get(), ca.get_complete()</span></a> for further discussion.</p>
+<p>See <a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><span class="std std-ref">The wait and timeout options for get(), ca.get_complete()</span></a> for further discussion.</p>
 </dd></dl>
 
 <dl class="function">
@@ -861,17 +870,15 @@ before returning.</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<ol class="arabic">
-<li><p class="first">Specifying a callback will override setting <cite>wait=True</cite>.</p>
-</li>
+<ol class="arabic simple">
+<li>Specifying a callback will override setting <cite>wait=True</cite>.</li>
 <li><dl class="first docutils">
 <dt>A put-callback function will be called with keyword arguments</dt>
-<dd><p class="first last">pvname=pvname, data=callback_data</p>
-</dd>
+<dd>pvname=pvname, data=callback_data</dd>
 </dl>
 </li>
 </ol>
-<p>For more on this <em>put callback</em>, see <a class="reference internal" href="#ca-callbacks-label"><span>User-supplied Callback functions</span></a> below.</p>
+<p>For more on this <em>put callback</em>, see <a class="reference internal" href="#ca-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a> below.</p>
 </dd></dl>
 
 <dl class="function">
@@ -922,7 +929,7 @@ a subscription).</p>
 <p class="rubric">Notes</p>
 <p>Keep the returned tuple in named variable!! if the return argument
 gets garbage collected, a coredump will occur.</p>
-<p>For more on writing the user-supplied callback, see <a class="reference internal" href="#ca-callbacks-label"><span>User-supplied Callback functions</span></a> below.</p>
+<p>For more on writing the user-supplied callback, see <a class="reference internal" href="#ca-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a> below.</p>
 </dd></dl>
 
 <div class="admonition warning">
@@ -934,8 +941,8 @@ If you do <em>not</em> keep this data, the return value will be garbage
 collected, the C-level reference to the callback will disappear, and you
 will see coredumps.</p>
 <p>On Linux, a message like:</p>
-<div class="highlight-python"><div class="highlight"><pre>python: Objects/funcobject.c:451: func_dealloc: Assertion &#39;g-&gt;gc.gc_refs != (-2)&#39; failed.
-Abort (core dumped)
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span><span class="p">:</span> <span class="n">Objects</span><span class="o">/</span><span class="n">funcobject</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="mi">451</span><span class="p">:</span> <span class="n">func_dealloc</span><span class="p">:</span> <span class="n">Assertion</span> <span class="s1">&#39;g-&gt;gc.gc_refs != (-2)&#39;</span> <span class="n">failed</span><span class="o">.</span>
+<span class="n">Abort</span> <span class="p">(</span><span class="n">core</span> <span class="n">dumped</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="last">is a hint that you have <em>not</em> kept this data.</p>
@@ -966,7 +973,7 @@ change any existing subscriptions.</p>
 <dl class="function">
 <dt id="epics.ca.get_timestamp">
 <code class="descclassname">epics.ca.</code><code class="descname">get_timestamp</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_timestamp" title="Permalink to this definition">¶</a></dt>
-<dd><p>return the timestamp of a Channel &#8211; the time of last update.</p>
+<dd><p>return the timestamp of a Channel – the time of last update.</p>
 </dd></dl>
 
 <dl class="function">
@@ -1002,7 +1009,7 @@ None for non-ENUM Channels</p>
 </dl>
 <p class="rubric">Notes</p>
 <p>enum_strs will be a list of strings for the names of ENUM states.</p>
-<p>See <a class="reference internal" href="#ctrlvars-table"><span>Table of Control Attributes</span></a></p>
+<p>See <a class="reference internal" href="#ctrlvars-table"><span class="std std-ref">Table of Control Attributes</span></a></p>
 </dd></dl>
 
 <blockquote id="ctrlvars-table">
@@ -1020,43 +1027,43 @@ None for non-ENUM Channels</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>status</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>severity</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>precision</td>
 <td>0 for all but double, float</td>
 </tr>
 <tr class="row-odd"><td>units</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>enum_strs</td>
 <td>enum only</td>
 </tr>
 <tr class="row-odd"><td>upper_disp_limit</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>lower_disp_limit</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>upper_alarm_limit</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>lower_alarm_limit</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>upper_warning_limit</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>lower_warning_limit</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>upper_ctrl_limit</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>lower_ctrl_limit</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 </tbody>
 </table>
@@ -1113,12 +1120,12 @@ address of the underlying data.</p>
 <p>After the <a class="reference internal" href="#epics.ca.sg_block" title="epics.ca.sg_block"><code class="xref py py-func docutils literal"><span class="pre">sg_block()</span></code></a> has completed, you must use <a class="reference internal" href="#epics.ca._unpack" title="epics.ca._unpack"><code class="xref py py-func docutils literal"><span class="pre">_unpack()</span></code></a>
 to convert this data address to the actual value(s).</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">chid</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">PV_Name</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chid</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">PV_Name</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">connect_channel</span><span class="p">(</span><span class="n">chid1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">sg_create</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">sg_get</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span> <span class="n">chid</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">sg_block</span><span class="p">(</span><span class="n">sg</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">_unpack</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">chid</span><span class="o">=</span><span class="n">chid</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">_unpack</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">chid</span><span class="o">=</span><span class="n">chid</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>See further example below.</p>
@@ -1144,45 +1151,45 @@ to convert this data address to the actual value(s).</p>
 </dd></dl>
 
 <p>An example use of a synchronous group:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">ca</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
-<span class="n">pvs</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;X1.VAL&#39;</span><span class="p">,</span> <span class="s">&#39;X2.VAL&#39;</span><span class="p">,</span> <span class="s">&#39;X3.VAL&#39;</span><span class="p">)</span>
+<span class="n">pvs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;X1.VAL&#39;</span><span class="p">,</span> <span class="s1">&#39;X2.VAL&#39;</span><span class="p">,</span> <span class="s1">&#39;X3.VAL&#39;</span><span class="p">)</span>
 <span class="n">chids</span> <span class="o">=</span> <span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span> <span class="k">for</span> <span class="n">pvname</span> <span class="ow">in</span> <span class="n">pvs</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">chids</span><span class="p">:</span>
     <span class="n">ca</span><span class="o">.</span><span class="n">connect_channel</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
     <span class="n">ca</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="c"># create synchronous group</span>
+<span class="c1"># create synchronous group</span>
 <span class="n">sg</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">sg_create</span><span class="p">()</span>
 
-<span class="c"># get data pointers from ca.sg_get</span>
+<span class="c1"># get data pointers from ca.sg_get</span>
 <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">sg_get</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span> <span class="n">chid</span><span class="p">)</span> <span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">chids</span><span class="p">]</span>
 
-<span class="k">print</span> <span class="s">&#39;Now change these PVs for the next 10 seconds&#39;</span>
+<span class="nb">print</span> <span class="s1">&#39;Now change these PVs for the next 10 seconds&#39;</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="s">&#39;will now block for i/o&#39;</span>
+<span class="nb">print</span> <span class="s1">&#39;will now block for i/o&#39;</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">sg_block</span><span class="p">(</span><span class="n">sg</span><span class="p">)</span>
-<span class="c">#</span>
-<span class="c"># CALL ca._unpack with data points and chid to extract data</span>
+<span class="c1">#</span>
+<span class="c1"># CALL ca._unpack with data points and chid to extract data</span>
 <span class="k">for</span> <span class="n">pvname</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">chid</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pvs</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">chids</span><span class="p">):</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">_unpack</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">chid</span><span class="o">=</span><span class="n">chid</span><span class="p">)</span>
-    <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+    <span class="nb">print</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
 
 <span class="n">ca</span><span class="o">.</span><span class="n">sg_reset</span><span class="p">(</span><span class="n">sg</span><span class="p">)</span>
 
-<span class="c">#  Now a SG Put</span>
-<span class="k">print</span> <span class="s">&#39;OK, now we will put everything back to 0 synchronously&#39;</span>
+<span class="c1">#  Now a SG Put</span>
+<span class="nb">print</span> <span class="s1">&#39;OK, now we will put everything back to 0 synchronously&#39;</span>
 
 <span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">chids</span><span class="p">:</span>
     <span class="n">ca</span><span class="o">.</span><span class="n">sg_put</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span> <span class="n">chid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="s">&#39;sg_put done, but not blocked / committed. Sleep for 5 seconds &#39;</span>
+<span class="nb">print</span> <span class="s1">&#39;sg_put done, but not blocked / committed. Sleep for 5 seconds &#39;</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">sg_block</span><span class="p">(</span><span class="n">sg</span><span class="p">)</span>
-<span class="k">print</span> <span class="s">&#39;done.&#39;</span>
+<span class="nb">print</span> <span class="s1">&#39;done.&#39;</span>
 </pre></div>
 </div>
 </div>
@@ -1244,67 +1251,67 @@ those looking to translate lower-level C or Python code to this module.</p>
 </tr>
 <tr class="row-even"><td>time_string</td>
 <td>14</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>time_int</td>
 <td>15</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>time_short</td>
 <td>15</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>time_float</td>
 <td>16</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>time_enum</td>
 <td>17</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>time_char</td>
 <td>18</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>time_long</td>
 <td>19</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>time_double</td>
 <td>20</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>ctrl_string</td>
 <td>28</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>ctrl_int</td>
 <td>29</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>ctrl_short</td>
 <td>29</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>ctrl_float</td>
 <td>30</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>ctrl_enum</td>
 <td>31</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>ctrl_char</td>
 <td>32</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>ctrl_long</td>
 <td>33</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>ctrl_double</td>
 <td>34</td>
-<td>&nbsp;</td>
+<td>&#160;</td>
 </tr>
 </tbody>
 </table>
@@ -1380,7 +1387,7 @@ before calling the decorated function.</p>
 <code class="descclassname">epics.ca.</code><code class="descname">withInitialContext</code><span class="sig-paren">(</span><em>fcn</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.withInitialContext" title="Permalink to this definition">¶</a></dt>
 <dd><p>decorator to ensure that the wrapped function uses the
 initial threading context created at initialization of CA</p>
-<p>See <a class="reference internal" href="advanced.html#advanced-threads-label"><span>Using Python Threads</span></a> for further discussion.</p>
+<p>See <a class="reference internal" href="advanced.html#advanced-threads-label"><span class="std std-ref">Using Python Threads</span></a> for further discussion.</p>
 </dd></dl>
 
 </div>
@@ -1434,22 +1441,25 @@ it will be necessary why using <a class="reference internal" href="#epics.ca.sg_
 </div>
 <div class="section" id="user-supplied-callback-functions">
 <span id="ca-callbacks-label"></span><h2>User-supplied Callback functions<a class="headerlink" href="#user-supplied-callback-functions" title="Permalink to this headline">¶</a></h2>
-<p>User-supplied callback functions can be provided for both <a class="reference internal" href="#epics.ca.put" title="epics.ca.put"><code class="xref py py-func docutils literal"><span class="pre">put()</span></code></a> and
-<a class="reference internal" href="#epics.ca.create_subscription" title="epics.ca.create_subscription"><code class="xref py py-func docutils literal"><span class="pre">create_subscription()</span></code></a>.  Note that callbacks for <cite>PV</cite> objects are
-slightly different: see <a class="reference internal" href="pv.html#pv-callbacks-label"><span>User-supplied Callback functions</span></a> in the <a class="reference internal" href="pv.html#module-pv" title="pv: PV objects for Epics Channel Access"><code class="xref py py-mod docutils literal"><span class="pre">pv</span></code></a> module
-for details.</p>
-<p>When defining a callback function to be run either when a <a class="reference internal" href="#epics.ca.put" title="epics.ca.put"><code class="xref py py-func docutils literal"><span class="pre">put()</span></code></a>
-completes or on changes to the Channel, as set from
-<a class="reference internal" href="#epics.ca.create_subscription" title="epics.ca.create_subscription"><code class="xref py py-func docutils literal"><span class="pre">create_subscription()</span></code></a>, it is important to know two things:</p>
+<p>User-supplied callback functions can be provided for <a class="reference internal" href="#epics.ca.put" title="epics.ca.put"><code class="xref py py-func docutils literal"><span class="pre">put()</span></code></a>,
+<a class="reference internal" href="#epics.ca.replace_access_rights_event" title="epics.ca.replace_access_rights_event"><code class="xref py py-func docutils literal"><span class="pre">replace_access_rights_event()</span></code></a>, and <a class="reference internal" href="#epics.ca.create_subscription" title="epics.ca.create_subscription"><code class="xref py py-func docutils literal"><span class="pre">create_subscription()</span></code></a>.
+Note that callbacks for <cite>PV</cite> objects are slightly different: see
+<a class="reference internal" href="pv.html#pv-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a> in the <a class="reference internal" href="pv.html#module-pv" title="pv: PV objects for Epics Channel Access"><code class="xref py py-mod docutils literal"><span class="pre">pv</span></code></a> module for details.</p>
+<p>When defining a callback function to be run either when a <a class="reference internal" href="#epics.ca.put" title="epics.ca.put"><code class="xref py py-func docutils literal"><span class="pre">put()</span></code></a> completes
+or on changes to the Channel, as set from <a class="reference internal" href="#epics.ca.create_subscription" title="epics.ca.create_subscription"><code class="xref py py-func docutils literal"><span class="pre">create_subscription()</span></code></a>, or when
+read/write permissions change from <a class="reference internal" href="#epics.ca.replace_access_rights_event" title="epics.ca.replace_access_rights_event"><code class="xref py py-func docutils literal"><span class="pre">replace_access_rights_event()</span></code></a>, it is
+important to know two things:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li>how your function will be called.</li>
 <li>what is permissible to do inside your callback function.</li>
 </ol>
 </div></blockquote>
-<p>In both cases, callbacks will be called with keyword arguments.  You should be
-prepared to have them passed to your function.  Use <cite>**kw</cite> unless you are very
-sure of what will be sent.</p>
+<p>Callbacks will be called with keyword arguments for <a class="reference internal" href="#epics.ca.put" title="epics.ca.put"><code class="xref py py-func docutils literal"><span class="pre">put()</span></code></a> and for
+<a class="reference internal" href="#epics.ca.create_subscription" title="epics.ca.create_subscription"><code class="xref py py-func docutils literal"><span class="pre">create_subscription()</span></code></a>.  You should be prepared to have them passed to
+your function.  Use <cite>**kw</cite> unless you are very sure of what will be sent.
+For the case of <a class="reference internal" href="#epics.ca.replace_access_rights_event" title="epics.ca.replace_access_rights_event"><code class="xref py py-func docutils literal"><span class="pre">replace_access_rights_event()</span></code></a>, only positional arguments
+will be passed.</p>
 <p>For callbacks sent when a <a class="reference internal" href="#epics.ca.put" title="epics.ca.put"><code class="xref py py-func docutils literal"><span class="pre">put()</span></code></a> completes, your function will be passed these:</p>
 <blockquote>
 <div><ul class="simple">
@@ -1469,6 +1479,13 @@ pairs that will include:</p>
 <li><cite>chid</cite>:   the integer address for the channel ID.</li>
 </ul>
 </div></blockquote>
+<p>For access rights event callbacks, your function will be passed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><cite>read_access</cite>: boolean indicating read access status</li>
+<li><cite>write_access</cite>: boolean indicating write access status</li>
+</ul>
+</div></blockquote>
 <p>Depending on the data type, and whether the CTRL or TIME variant was used,
 the callback function may also include some of these as keyword arguments:</p>
 <blockquote>
@@ -1478,15 +1495,17 @@ the callback function may also include some of these as keyword arguments:</p>
 <li><cite>units</cite>:  string for PV units</li>
 <li><cite>severity</cite>: PV severity</li>
 <li><cite>timestamp</cite>: timestamp from CA server.</li>
+<li><cite>posixseconds</cite>: integer seconds since POSIX epoch of timestamp from CA server.</li>
+<li><cite>nanoseconds</cite>: integer nanoseconds of timestamp from CA server.</li>
 </ul>
 </div></blockquote>
 <p>Note that a the user-supplied callback will be run <em>inside</em> a CA function,
-and cannot reliably make any other CA calls.  It is helpful to think &#8220;this
-all happens inside of a <a class="reference internal" href="#epics.ca.pend_event" title="epics.ca.pend_event"><code class="xref py py-func docutils literal"><span class="pre">pend_event()</span></code></a> call&#8221;, and in an epics thread
+and cannot reliably make any other CA calls.  It is helpful to think “this
+all happens inside of a <a class="reference internal" href="#epics.ca.pend_event" title="epics.ca.pend_event"><code class="xref py py-func docutils literal"><span class="pre">pend_event()</span></code></a> call”, and in an epics thread
 that may or may not be the main thread of your program.  It is advisable to
 keep the callback functions short and not resource-intensive.  Consider
 strategies which use the callback only to record that a change has occurred
-and then act on that change later &#8211; perhaps in a separate thread, perhaps
+and then act on that change later – perhaps in a separate thread, perhaps
 after <a class="reference internal" href="#epics.ca.pend_event" title="epics.ca.pend_event"><code class="xref py py-func docutils literal"><span class="pre">pend_event()</span></code></a> has completed.</p>
 </div>
 <div class="section" id="omissions">
@@ -1504,12 +1523,6 @@ can be used in user code.</p>
 <dl class="function">
 <dt id="epics.ca.ca_add_fd_registration">
 <code class="descclassname">epics.ca.</code><code class="descname">ca_add_fd_registration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_add_fd_registration" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>Not implemented</em></p>
-</dd></dl>
-
-<dl class="function">
-<dt id="epics.ca.ca_replace_access_rights_event">
-<code class="descclassname">epics.ca.</code><code class="descname">ca_replace_access_rights_event</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_replace_access_rights_event" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>Not implemented</em></p>
 </dd></dl>
 
@@ -1574,7 +1587,7 @@ standard library documentation for further information on how to use Thread obje
 <p>A <cite>CAThread</cite> simply runs <a class="reference internal" href="#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><code class="xref py py-func docutils literal"><span class="pre">use_initial_context()</span></code></a> prior to running each target
 function, so that <a class="reference internal" href="#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><code class="xref py py-func docutils literal"><span class="pre">use_initial_context()</span></code></a> does not have to be explicitly put inside
 the target function.</p>
-<p>The See <a class="reference internal" href="advanced.html#advanced-threads-label"><span>Using Python Threads</span></a> for further discussion.</p>
+<p>The See <a class="reference internal" href="advanced.html#advanced-threads-label"><span class="std std-ref">Using Python Threads</span></a> for further discussion.</p>
 </dd></dl>
 
 </div>
@@ -1586,22 +1599,22 @@ the target function.</p>
 <p>Note here that several things have been simplified compare to using CA in C:
 initialization and creating a main-thread context are handled, and connection
 of channels is handled in the background:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
-<span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">ca</span>
+<span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="n">count</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">element_count</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
 <span class="n">ftype</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">field_type</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
-<span class="k">print</span> <span class="s">&quot;Channel &quot;</span><span class="p">,</span> <span class="n">chid</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">ftype</span>
+<span class="nb">print</span> <span class="s2">&quot;Channel &quot;</span><span class="p">,</span> <span class="n">chid</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">ftype</span>
 <span class="n">value</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="k">print</span> <span class="n">value</span>
+<span class="nb">print</span> <span class="n">value</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="put-waiting-for-completion">
 <h3>Put, waiting for completion<a class="headerlink" href="#put-waiting-for-completion" title="Permalink to this headline">¶</a></h3>
 <p>Here we set a PVs value, waiting for it to complete:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
-<span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
-<span class="n">ca</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">ca</span>
+<span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
+<span class="n">ca</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The  <a class="reference internal" href="#epics.ca.put" title="epics.ca.put"><code class="xref py py-func docutils literal"><span class="pre">put()</span></code></a> method will wait to return until the processing is
@@ -1613,25 +1626,25 @@ complete.</p>
 callback function to be called whenever the PV value changes.   In the case
 below, the function to be called will simply write the latest value out to
 standard output:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">ca</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 
-<span class="c"># define a callback function.  Note that this should</span>
-<span class="c"># expect certain keyword arguments, including &#39;pvname&#39; and &#39;value&#39;</span>
-<span class="k">def</span> <span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-    <span class="n">fmt</span> <span class="o">=</span> <span class="s">&#39;New Value: </span><span class="si">%s</span><span class="s">  value=</span><span class="si">%s</span><span class="s">, kw=</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span>
+<span class="c1"># define a callback function.  Note that this should</span>
+<span class="c1"># expect certain keyword arguments, including &#39;pvname&#39; and &#39;value&#39;</span>
+<span class="k">def</span> <span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;New Value: </span><span class="si">%s</span><span class="s1">  value=</span><span class="si">%s</span><span class="s1">, kw=</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">kw</span><span class="p">)))</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
-<span class="c"># create the channel</span>
-<span class="n">mypv</span> <span class="o">=</span> <span class="s">&#39;XXX.VAL&#39;</span>
+<span class="c1"># create the channel</span>
+<span class="n">mypv</span> <span class="o">=</span> <span class="s1">&#39;XXX.VAL&#39;</span>
 <span class="n">chid</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">mypv</span><span class="p">)</span>
 
-<span class="c"># subscribe to events giving a callback function</span>
+<span class="c1"># subscribe to events giving a callback function</span>
 <span class="n">eventID</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_subscription</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onChanges</span><span class="p">)</span>
 
-<span class="c"># now we simply wait for changes</span>
+<span class="c1"># now we simply wait for changes</span>
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span> <span class="o">&lt;</span> <span class="mf">10.0</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
@@ -1644,20 +1657,20 @@ faults (on Windows) or seemingly inexplicable crashes later (on linux).</p>
 </div>
 <div class="section" id="define-a-connection-callback">
 <h3>Define a connection callback<a class="headerlink" href="#define-a-connection-callback" title="Permalink to this headline">¶</a></h3>
-<p>Here, we define a connection callback &#8211; a function to be called when the
+<p>Here, we define a connection callback – a function to be called when the
 connection status of the PV changes. Note that this will be called on
 initial connection:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
-<span class="k">def</span> <span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">chid</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-    <span class="k">print</span> <span class="s">&#39;ca connection status changed:  &#39;</span><span class="p">,</span> <span class="n">pvname</span><span class="p">,</span>  <span class="n">conn</span><span class="p">,</span> <span class="n">chid</span>
+<span class="k">def</span> <span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="s1">&#39;ca connection status changed:  &#39;</span><span class="p">,</span> <span class="n">pvname</span><span class="p">,</span>  <span class="n">conn</span><span class="p">,</span> <span class="n">chid</span>
 
-<span class="c"># create channel, provide connection callback</span>
-<span class="n">motor1</span> <span class="o">=</span> <span class="s">&#39;13IDC:m1&#39;</span>
+<span class="c1"># create channel, provide connection callback</span>
+<span class="n">motor1</span> <span class="o">=</span> <span class="s1">&#39;13IDC:m1&#39;</span>
 <span class="n">chid</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">motor1</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onConnectionChange</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="s">&#39;Now waiting, watching values and connection changes:&#39;</span>
+<span class="nb">print</span> <span class="s1">&#39;Now waiting, watching values and connection changes:&#39;</span>
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
@@ -1668,6 +1681,32 @@ created, when a successful connection has been made.  Note that the
 callback should be prepared to accept keyword arguments of <cite>pvname</cite>,
 <cite>chid</cite>, and <cite>conn</cite> for the PV name, channel ID, and connection state
 (<code class="docutils literal"><span class="pre">True</span></code> or <code class="docutils literal"><span class="pre">False</span></code>).</p>
+</div>
+<div class="section" id="define-an-access-rights-change-event-callback">
+<h3>Define an access rights change event callback<a class="headerlink" href="#define-an-access-rights-change-event-callback" title="Permalink to this headline">¶</a></h3>
+<p>The following example demonstrates the addition of a function to be
+called when the access rights of a channel changes. Note this will be
+called immediately after successful installation:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">def</span> <span class="nf">on_access_rights_change</span><span class="p">(</span><span class="n">read_access</span><span class="p">,</span> <span class="n">write_access</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="s1">&#39;read access = </span><span class="si">%s</span><span class="s1">, write access = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">read_access</span><span class="p">,</span> <span class="n">write_access</span><span class="p">)</span>
+
+<span class="c1"># create a channel and attach the above function for access rights events</span>
+<span class="n">chid</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s1">&#39;pv_name&#39;</span><span class="p">)</span>
+<span class="c1"># a message should be printed immediately following this registration</span>
+<span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">replace_access_rights_event</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">on_access_rights_change</span><span class="p">)</span>
+
+<span class="c1"># Affecting the channel&#39;s access rights, (for example, by enabling/disabling</span>
+<span class="c1"># CA Security rules), should produce additional console messages</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -1684,6 +1723,9 @@ callback should be prepared to accept keyword arguments of <cite>pvname</cite>,
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="arrays.html" title="Working with waveform / array data"
              >next</a> |</li>
@@ -1704,8 +1746,8 @@ callback should be prepared to accept keyword arguments of <cite>pvname</cite>,
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+        &#169; Copyright 2014, Matthew Newville.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

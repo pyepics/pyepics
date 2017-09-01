@@ -1,13 +1,13 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>PV: Epics Process Variables &mdash; Epics Channel Access for Python</title>
+    <title>PV: Epics Process Variables &#8212; Epics Channel Access for Python</title>
     
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,20 +15,23 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.5',
+        VERSION:     '3.2.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Epics Channel Access for Python" href="index.html" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ca: Low-level Channel Access module" href="ca.html" />
     <link rel="prev" title="PyEpics Overview" href="overview.html" /> 
   </head>
-  <body role="document">
+  <body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -42,6 +45,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="ca.html" title="ca: Low-level Channel Access module"
              accesskey="N">next</a> |</li>
@@ -76,6 +82,7 @@
 <li><a class="reference internal" href="#automatic-monitoring-of-a-pv">Automatic Monitoring of a PV</a></li>
 <li><a class="reference internal" href="#user-supplied-callback-functions">User-supplied Callback functions</a></li>
 <li><a class="reference internal" href="#user-supplied-connection-callback-functions">User-supplied Connection Callback functions</a></li>
+<li><a class="reference internal" href="#user-supplied-access-rights-callback-functions">User-supplied Access Rights Callback functions</a></li>
 <li><a class="reference internal" href="#put-with-wait-put-callbacks-and-put-complete">Put with wait, put callbacks, and  put_complete</a></li>
 <li><a class="reference internal" href="#the-get-pv-function-and-pvcache-cache-of-pvs">The <code class="docutils literal"><span class="pre">get_pv()</span></code> function and <code class="docutils literal"><span class="pre">_PVcache_</span></code> cache of PVs</a></li>
 <li><a class="reference internal" href="#examples">Examples</a><ul>
@@ -85,6 +92,7 @@
 <li><a class="reference internal" href="#example-of-put">Example of <code class="docutils literal"><span class="pre">put()</span></code></a></li>
 <li><a class="reference internal" href="#example-of-simple-callback">Example of simple callback</a></li>
 <li><a class="reference internal" href="#example-of-connection-callback">Example of connection callback</a></li>
+<li><a class="reference internal" href="#example-of-an-access-rights-callback">Example of an access rights callback</a></li>
 </ul>
 </li>
 </ul>
@@ -100,21 +108,18 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/pv.txt"
+      <li><a href="_sources/pv.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -129,12 +134,12 @@
 <span id="pv-epics-process-variables"></span><span id="pv-label"></span><h1>PV: Epics Process Variables<a class="headerlink" href="#module-pv" title="Permalink to this headline">¶</a></h1>
 <p>The <a class="reference internal" href="#module-pv" title="pv: PV objects for Epics Channel Access"><code class="xref py py-mod docutils literal"><span class="pre">pv</span></code></a> module provides a higher-level class <a class="reference internal" href="#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal"><span class="pre">pv.PV</span></code></a>, which
 creates a <cite>PV</cite> object for an EPICS Process Variable.  A <cite>PV</cite> object has
-both methods and attributes for accessing it&#8217;s properties.</p>
+both methods and attributes for accessing it’s properties.</p>
 <div class="section" id="the-pv-class">
 <h2>The <a class="reference internal" href="#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal"><span class="pre">PV</span></code></a> class<a class="headerlink" href="#the-pv-class" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="pv.PV">
-<em class="property">class </em><code class="descclassname">pv.</code><code class="descname">PV</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>form='time'</em><span class="optional">[</span>, <em>auto_monitor=None</em><span class="optional">[</span>, <em>connection_callback=None</em><span class="optional">[</span>, <em>connection_timeout=None</em><span class="optional">[</span>, <em>verbose=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.PV" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pv.</code><code class="descname">PV</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>form=’time’</em><span class="optional">[</span>, <em>verbose=False</em><span class="optional">[</span>, <em>auto_monitor=None</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>connection_callback=None</em><span class="optional">[</span>, <em>connection_timeout=None</em><span class="optional">[</span>, <em>access_callback=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.PV" title="Permalink to this definition">¶</a></dt>
 <dt>
 <code class="descname">create a PV object for a named Epics Process Variable.</code></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -142,13 +147,15 @@ both methods and attributes for accessing it&#8217;s properties.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pvname</strong> &#8211; name of Epics Process Variable</li>
-<li><strong>callback</strong> (<em>callable, tuple, list or None</em>) &#8211; user-defined callback function on changes to PV value or state.</li>
-<li><strong>form</strong> (<em>string, one of (&#8216;native&#8217;,&#8217;ctrl&#8217;, or &#8216;time&#8217;)</em>) &#8211; which epics <em>data type</em> to use:  the &#8216;native&#8217;, &#8216;time&#8217;, or the &#8216;ctrl&#8217; (Control) variant.</li>
-<li><strong>auto_monitor</strong> (<code class="docutils literal"><span class="pre">None</span></code>, <code class="docutils literal"><span class="pre">True</span></code>, <code class="docutils literal"><span class="pre">False</span></code>, or bitmask (see <a class="reference internal" href="#pv-automonitor-label"><span>Automatic Monitoring of a PV</span></a>)) &#8211; whether to automatically monitor the PV for changes.</li>
-<li><strong>connection_callback</strong> (callable or <code class="docutils literal"><span class="pre">None</span></code>) &#8211; user-defined function called on changes to PV connection status.</li>
-<li><strong>connection_timeout</strong> (float or <code class="docutils literal"><span class="pre">None</span></code>) &#8211; time (in seconds) to wait for connection before giving up</li>
-<li><strong>verbose</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) &#8211; whether to print out debugging messages</li>
+<li><strong>pvname</strong> – name of Epics Process Variable</li>
+<li><strong>callback</strong> (<em>callable</em><em>, </em><em>tuple</em><em>, </em><em>list</em><em> or </em><em>None</em>) – user-defined callback function on changes to PV value or state.</li>
+<li><strong>form</strong> (<em>string</em><em>, </em><em>one of</em><em> (</em><em>'native'</em><em>,</em><em>'ctrl'</em><em>, or </em><em>'time'</em><em>)</em>) – which epics <em>data type</em> to use:  the ‘native’, ‘time’, or the ‘ctrl’ (Control) variant.</li>
+<li><strong>verbose</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to print out debugging messages</li>
+<li><strong>auto_monitor</strong> (<code class="docutils literal"><span class="pre">None</span></code>, <code class="docutils literal"><span class="pre">True</span></code>, <code class="docutils literal"><span class="pre">False</span></code>, or bitmask (see <a class="reference internal" href="#pv-automonitor-label"><span class="std std-ref">Automatic Monitoring of a PV</span></a>)) – whether to automatically monitor the PV for changes.</li>
+<li><strong>count</strong> (<em>int</em>) – number of data elements to return by default (see <a class="reference internal" href="#pv-get-label"><span class="std std-ref">here</span></a>)</li>
+<li><strong>connection_callback</strong> (callable or <code class="docutils literal"><span class="pre">None</span></code>) – user-defined function called on changes to PV connection status.</li>
+<li><strong>connection_timeout</strong> (float or <code class="docutils literal"><span class="pre">None</span></code>) – time (in seconds) to wait for connection before giving up</li>
+<li><strong>access_callback</strong> (callable or <code class="docutils literal"><span class="pre">None</span></code>) – user-defined function called on changes to PV access rights</li>
 </ul>
 </td>
 </tr>
@@ -158,36 +165,39 @@ both methods and attributes for accessing it&#8217;s properties.</p>
 
 <p>Once created, a PV should (barring any network issues) automatically
 connect and be ready to use.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;XX:m1.VAL&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">type</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">PV</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XX:m1.VAL&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">type</span>
 </pre></div>
 </div>
 <p>The <em>pvname</em> is required, and is the name of an existing Process Variable.</p>
 <p>The <em>callback</em> parameter specifies one or more python methods to be called
-on changes, as discussed in more detail at <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied Callback functions</span></a></p>
+on changes, as discussed in more detail at <a class="reference internal" href="#pv-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a></p>
 <p>The <em>connection_callback</em> parameter specifies a python method to be called
 on changes to the connection status of the PV (that is, when it connects or
-disconnects).  This is discussed in more detail at <a class="reference internal" href="#pv-connection-callbacks-label"><span>User-supplied Connection Callback functions</span></a></p>
-<p>The <em>form</em> parameter specifies which of the three variants &#8216;native&#8217;, &#8216;ctrl&#8217;
-(Control) or &#8216;time&#8217; (the default) to use for the PV.  The &#8216;native&#8217; form
-returns just the value, the &#8216;time&#8217; form includes the timestamp from the
+disconnects).  This is discussed in more detail at <a class="reference internal" href="#pv-connection-callbacks-label"><span class="std std-ref">User-supplied Connection Callback functions</span></a></p>
+<p>The <em>form</em> parameter specifies which of the three variants ‘native’, ‘ctrl’
+(Control) or ‘time’ (the default) to use for the PV.  The ‘native’ form
+returns just the value, the ‘time’ form includes the timestamp from the
 server the PV lives on, as well as status information.  The control form
 includes several additional fields such as limits to the PV, which can be
-useful in some cases.  Also note that the additional &#8216;ctrl&#8217; value fields
-(see the <a class="reference internal" href="ca.html#ctrlvars-table"><span>Table of Control Attributes</span></a>) can be
-obtained with <a class="reference internal" href="#pv.get_ctrlvars" title="pv.get_ctrlvars"><code class="xref py py-meth docutils literal"><span class="pre">get_ctrlvars()</span></code></a> even for PVs of &#8216;native&#8217; or &#8216;time&#8217; form.</p>
+useful in some cases.  Also note that the additional ‘ctrl’ value fields
+(see the <a class="reference internal" href="ca.html#ctrlvars-table"><span class="std std-ref">Table of Control Attributes</span></a>) can be
+obtained with <a class="reference internal" href="#pv.get_ctrlvars" title="pv.get_ctrlvars"><code class="xref py py-meth docutils literal"><span class="pre">get_ctrlvars()</span></code></a> even for PVs of ‘native’ or ‘time’ form.</p>
 <p>The <em>auto_monitor</em> parameter specifies whether the PV should be
-automatically monitored.  See <a class="reference internal" href="#pv-automonitor-label"><span>Automatic Monitoring of a PV</span></a> for a detailed
+automatically monitored.  See <a class="reference internal" href="#pv-automonitor-label"><span class="std std-ref">Automatic Monitoring of a PV</span></a> for a detailed
 description of this.</p>
 <p>The <em>verbose</em> parameter specifies more verbose output on changes, and is
 intended for debugging purposes.</p>
+<p>The <em>access_callback</em> parameter specifies a python method to be called on
+changes to the access rights of the PV (read/write access changes). This
+is discussed in more detail <a class="reference internal" href="#pv-access-rights-callback-label"><span class="std std-ref">here</span></a>.</p>
 <div class="section" id="methods">
 <h3>methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
 <p>A <cite>PV</cite> has several methods for getting and setting its value and defining
 callbacks to be executed when the PV changes.</p>
-<dl class="method">
+<span class="target" id="pv-get-label"></span><dl class="method">
 <dt id="pv.get">
 <code class="descclassname">pv.</code><code class="descname">get</code><span class="sig-paren">(</span><span class="optional">[</span><em>count=None</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">[</span>, <em>timeout=None</em><span class="optional">[</span>, <em>use_monitor=True</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>get and return the current value of the PV</p>
@@ -196,21 +206,21 @@ callbacks to be executed when the PV changes.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>count</strong> (integer or <code class="docutils literal"><span class="pre">None</span></code>) &#8211; maximum number of array elements to return</li>
-<li><strong>as_string</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) &#8211; whether to return the string representation of the  value.</li>
-<li><strong>as_numpy</strong> &#8211; whether to try to return a numpy array where appropriate.</li>
-<li><strong>timeout</strong> (float or <code class="docutils literal"><span class="pre">None</span></code>) &#8211; maximum time to wait for data before returning <code class="docutils literal"><span class="pre">None</span></code>.</li>
-<li><strong>use_monitor</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) &#8211; whether to rely on monitor callbacks or explicitly get value now.</li>
+<li><strong>count</strong> (integer or <code class="docutils literal"><span class="pre">None</span></code>) – maximum number of array elements to return</li>
+<li><strong>as_string</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to return the string representation of the  value.</li>
+<li><strong>as_numpy</strong> – whether to try to return a numpy array where appropriate.</li>
+<li><strong>timeout</strong> (float or <code class="docutils literal"><span class="pre">None</span></code>) – maximum time to wait for data before returning <code class="docutils literal"><span class="pre">None</span></code>.</li>
+<li><strong>use_monitor</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to rely on monitor callbacks or explicitly get value now.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<p>see <a class="reference internal" href="#pv-as-string-label"><span>String representation for a PV</span></a> for details on how the string
+<p>see <a class="reference internal" href="#pv-as-string-label"><span class="std std-ref">String representation for a PV</span></a> for details on how the string
 representation is determined.</p>
 <p>With the <em>as_numpy</em> option, an array PV (that is, a PV whose value has
 more than one element) will be returned as a numpy array, provided the
-numpy module is available.  See <a class="reference internal" href="arrays.html#arrays-large-label"><span>Strategies for working with large arrays</span></a> for a
+numpy module is available.  See <a class="reference internal" href="arrays.html#arrays-large-label"><span class="std std-ref">Strategies for working with large arrays</span></a> for a
 discussion of strategies for how to best deal with very large arrays.</p>
 <p>The <em>use_monitor</em> option controls whether the most recent value from the automatic
 monitoring will be used or whether the value will be explicitly asked
@@ -222,8 +232,8 @@ is not instantaneous and hard to predict, the value returned with
 sent.  This only applies with <cite>use_monitor=False</cite>, or if the PV is not
 automatically monitored.   Otherwise, the most recently received value
 will be sent immediately.</p>
-<p>See <a class="reference internal" href="#pv-automonitor-label"><span>Automatic Monitoring of a PV</span></a> for more on monitoring PVs and
-<a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><span>The wait and timeout options for get(), ca.get_complete()</span></a> for more details on what happens when
+<p>See <a class="reference internal" href="#pv-automonitor-label"><span class="std std-ref">Automatic Monitoring of a PV</span></a> for more on monitoring PVs and
+<a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><span class="std std-ref">The wait and timeout options for get(), ca.get_complete()</span></a> for more details on what happens when
 a <a class="reference internal" href="#pv.get" title="pv.get"><code class="xref py py-func docutils literal"><span class="pre">pv.get()</span></code></a> times out.</p>
 </dd></dl>
 
@@ -237,12 +247,12 @@ completed, or setting the <a class="reference internal" href="#pv.put_complete" 
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>value</strong> &#8211; value to set PV</li>
-<li><strong>wait</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) &#8211; whether to wait for processing to complete (or time-out) before returning.</li>
-<li><strong>timeout</strong> (<em>float</em>) &#8211; maximum time to wait for processing to complete before returning anyway.</li>
-<li><strong>use_complete</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) &#8211; whether to use a built-in callback to set <a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><code class="xref py py-attr docutils literal"><span class="pre">put_complete</span></code></a>.</li>
-<li><strong>callback</strong> (<code class="docutils literal"><span class="pre">None</span></code> or a valid python function) &#8211; user-supplied function to run when processing has completed.</li>
-<li><strong>callback_data</strong> &#8211; extra data to pass on to a user-supplied callback function.</li>
+<li><strong>value</strong> – value to set PV</li>
+<li><strong>wait</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to wait for processing to complete (or time-out) before returning.</li>
+<li><strong>timeout</strong> (<em>float</em>) – maximum time to wait for processing to complete before returning anyway.</li>
+<li><strong>use_complete</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to use a built-in callback to set <a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><code class="xref py py-attr docutils literal"><span class="pre">put_complete</span></code></a>.</li>
+<li><strong>callback</strong> (<code class="docutils literal"><span class="pre">None</span></code> or a valid python function) – user-supplied function to run when processing has completed.</li>
+<li><strong>callback_data</strong> – extra data to pass on to a user-supplied callback function.</li>
 </ul>
 </td>
 </tr>
@@ -250,15 +260,23 @@ completed, or setting the <a class="reference internal" href="#pv.put_complete" 
 </table>
 </dd></dl>
 
-<p>The <cite>wait</cite> and <cite>callback</cite> arguments, as well as the &#8216;use_complete&#8217; / <a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><code class="xref py py-attr docutils literal"><span class="pre">put_complete</span></code></a>
+<p>The <cite>wait</cite> and <cite>callback</cite> arguments, as well as the ‘use_complete’ / <a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><code class="xref py py-attr docutils literal"><span class="pre">put_complete</span></code></a>
 attribute give a few options for knowing that a <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-meth docutils literal"><span class="pre">put()</span></code></a> has
-completed.   See <a class="reference internal" href="#pv-putwait-label"><span>Put with wait, put callbacks, and  put_complete</span></a> for more details.</p>
+completed.   See <a class="reference internal" href="#pv-putwait-label"><span class="std std-ref">Put with wait, put callbacks, and  put_complete</span></a> for more details.</p>
 <span class="target" id="pv-get-ctrlvars-label"></span><dl class="method">
 <dt id="pv.get_ctrlvars">
 <code class="descclassname">pv.</code><code class="descname">get_ctrlvars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.get_ctrlvars" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a dictionary of the <strong>control values</strong> for the PV.  This
 dictionary may have many members, depending on the data type of PV.  See
-the <a class="reference internal" href="ca.html#ctrlvars-table"><span>Table of Control Attributes</span></a>  for details.</p>
+the <a class="reference internal" href="ca.html#ctrlvars-table"><span class="std std-ref">Table of Control Attributes</span></a>  for details.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pv.get_timevars">
+<code class="descclassname">pv.</code><code class="descname">get_timevars</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.get_timevars" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a dictionary of the <strong>time values</strong> for the PV, which
+include <cite>status</cite>, <cite>severity</cite>, and the <cite>timestamp</cite> from the CA
+server.</p>
 </dd></dl>
 
 <dl class="method">
@@ -270,8 +288,8 @@ the <a class="reference internal" href="ca.html#ctrlvars-table"><span>Table of C
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>evt</strong> (<em>float</em>) &#8211; time to pass to <code class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></code></li>
-<li><strong>iot</strong> (<em>float</em>) &#8211; time to pass to <code class="xref py py-meth docutils literal"><span class="pre">ca.pend_io()</span></code></li>
+<li><strong>evt</strong> (<em>float</em>) – time to pass to <code class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></code></li>
+<li><strong>iot</strong> (<em>float</em>) – time to pass to <code class="xref py py-meth docutils literal"><span class="pre">ca.pend_io()</span></code></li>
 </ul>
 </td>
 </tr>
@@ -289,7 +307,7 @@ should happen automatically. See <a class="reference internal" href="#pv.wait_fo
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>float</em>) &#8211; maximum connection time, passed to <code class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></code></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>float</em>) – maximum connection time, passed to <code class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></code></td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code></td>
 </tr>
@@ -308,7 +326,7 @@ connection.  Returns  whether the connection has occurred.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>float</em>) &#8211; maximum connection time.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<em>float</em>) – maximum connection time.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code></td>
 </tr>
@@ -325,6 +343,22 @@ connection.  Returns  whether the connection has occurred.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="pv.reconnect">
+<code class="descclassname">pv.</code><code class="descname">reconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.reconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>reconnect (or try to) a disconnected PV.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pv.clear_auto_monitor">
+<code class="descclassname">pv.</code><code class="descname">clear_auto_monitor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.clear_auto_monitor" title="Permalink to this definition">¶</a></dt>
+<dd><p>turn off automatic monitoring of a PV.  Note that this will suspend
+all event callbacks on a PV at the CA level by calling
+<code class="xref py py-func docutils literal"><span class="pre">ca.clear_subscription()</span></code>, but will not clear the list of PVs
+callbacks.  This means that doing <a class="reference internal" href="#pv.reconnect" title="pv.reconnect"><code class="xref py py-meth docutils literal"><span class="pre">reconnect()</span></code></a> will resume
+event processing including any callbacks or the PV.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="pv.add_callback">
 <code class="descclassname">pv.</code><code class="descname">add_callback</code><span class="sig-paren">(</span><em>callback=None[, index=None [, with_ctrlvars=True[, **kw]]</em><span class="sig-paren">)</span><a class="headerlink" href="#pv.add_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>adds a user-defined callback routine to be run on each change event for
@@ -334,10 +368,10 @@ this PV.  Returns the integer <em>index</em>  for the callback.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>callback</strong> (<code class="docutils literal"><span class="pre">None</span></code> or callable) &#8211; user-supplied function to run when PV changes.</li>
-<li><strong>index</strong> (<code class="docutils literal"><span class="pre">None</span></code> (integer will be produced) or immutable) &#8211; identifying key for this callback</li>
-<li><strong>with_ctrlvars</strong> &#8211; whether to (try to) make sure that accurate  <code class="docutils literal"><span class="pre">control</span> <span class="pre">values</span></code> will be sent to the callback.</li>
-<li><strong>kw</strong> &#8211; additional keyword/value arguments to pass to each execution of the callback.</li>
+<li><strong>callback</strong> (<code class="docutils literal"><span class="pre">None</span></code> or callable) – user-supplied function to run when PV changes.</li>
+<li><strong>index</strong> (<code class="docutils literal"><span class="pre">None</span></code> (integer will be produced) or immutable) – identifying key for this callback</li>
+<li><strong>with_ctrlvars</strong> – whether to (try to) make sure that accurate  <code class="docutils literal"><span class="pre">control</span> <span class="pre">values</span></code> will be sent to the callback.</li>
+<li><strong>kw</strong> – additional keyword/value arguments to pass to each execution of the callback.</li>
 </ul>
 </td>
 </tr>
@@ -350,7 +384,7 @@ this PV.  Returns the integer <em>index</em>  for the callback.</p>
 (a dictionary key, typically an integer).   When a PV changes, all the
 defined callbacks will be executed.  They will be called in order (by
 sorting  the keys of the <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><code class="xref py py-attr docutils literal"><span class="pre">callbacks</span></code></a> dictionary)</p>
-<p>See also: <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><code class="xref py py-attr docutils literal"><span class="pre">callbacks</span></code></a>  attribute, <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied Callback functions</span></a></p>
+<p>See also: <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><code class="xref py py-attr docutils literal"><span class="pre">callbacks</span></code></a>  attribute, <a class="reference internal" href="#pv-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a></p>
 </dd></dl>
 
 <dl class="method">
@@ -361,16 +395,16 @@ sorting  the keys of the <a class="reference internal" href="#pv.callbacks" titl
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<code class="docutils literal"><span class="pre">None</span></code> or integer) &#8211; index of user-supplied function, as returned by <a class="reference internal" href="#pv.add_callback" title="pv.add_callback"><code class="xref py py-meth docutils literal"><span class="pre">add_callback()</span></code></a>,
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<code class="docutils literal"><span class="pre">None</span></code> or integer) – index of user-supplied function, as returned by <a class="reference internal" href="#pv.add_callback" title="pv.add_callback"><code class="xref py py-meth docutils literal"><span class="pre">add_callback()</span></code></a>,
 and also to key for  this callback in the  <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><code class="xref py py-attr docutils literal"><span class="pre">callbacks</span></code></a> dictionary.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
 </tr>
 </tbody>
 </table>
-<p>If only one callback is defined an index=``None``, this will clear the
+<p>If only one callback is defined an index=“None“, this will clear the
 only defined callback.</p>
-<p>See also: <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><code class="xref py py-attr docutils literal"><span class="pre">callbacks</span></code></a>  attribute, <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied Callback functions</span></a></p>
+<p>See also: <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><code class="xref py py-attr docutils literal"><span class="pre">callbacks</span></code></a>  attribute, <a class="reference internal" href="#pv-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a></p>
 </dd></dl>
 
 <dl class="method">
@@ -384,7 +418,7 @@ only defined callback.</p>
 <code class="descclassname">pv.</code><code class="descname">run_callbacks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.run_callbacks" title="Permalink to this definition">¶</a></dt>
 <dd><p>execute all user-defined callbacks right now, even if the PV has not
 changed.  Useful for debugging!</p>
-<p>See also: <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><code class="xref py py-attr docutils literal"><span class="pre">callbacks</span></code></a>  attribute, <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied Callback functions</span></a></p>
+<p>See also: <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><code class="xref py py-attr docutils literal"><span class="pre">callbacks</span></code></a>  attribute, <a class="reference internal" href="#pv-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a></p>
 </dd></dl>
 
 <dl class="method">
@@ -392,7 +426,17 @@ changed.  Useful for debugging!</p>
 <code class="descclassname">pv.</code><code class="descname">run_callback</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#pv.run_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>execute a particular user-defined callback right now, even if the PV
 has not changed.  Useful for debugging!</p>
-<p>See also: <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><code class="xref py py-attr docutils literal"><span class="pre">callbacks</span></code></a>  attribute, <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied Callback functions</span></a></p>
+<p>See also: <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><code class="xref py py-attr docutils literal"><span class="pre">callbacks</span></code></a>  attribute, <a class="reference internal" href="#pv-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pv.force_read_access_rights">
+<code class="descclassname">pv.</code><code class="descname">force_read_access_rights</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.force_read_access_rights" title="Permalink to this definition">¶</a></dt>
+<dd><p>force a read of the access rights for a PV.  Normally, a PV will
+have access rights determined automatically and subscribe to
+changes in access rights.  But sometimes (especially 64-bit
+Windows), the automatically reported values are wrong.  This
+methods will explicitly read the access rights.</p>
 </dd></dl>
 
 </div>
@@ -412,9 +456,9 @@ When read, the latest value will be returned, even if that means a
 <a class="reference internal" href="#pv.get" title="pv.get"><code class="xref py py-meth docutils literal"><span class="pre">get()</span></code></a> needs to be called.</p>
 <p>Assigning to <a class="reference internal" href="#pv.value" title="pv.value"><code class="xref py py-attr docutils literal"><span class="pre">value</span></code></a> is equivalent to setting the value with the
 <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-meth docutils literal"><span class="pre">put()</span></code></a> method.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;xxx.VAL&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">value</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">PV</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;xxx.VAL&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">value</span>
 <span class="go">1.00</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">2.00</span>
 </pre></div>
@@ -439,14 +483,14 @@ When read, the latest value will be returned, even if that means a
 <dd><p>string describing data type of PV, such as <cite>double</cite>, <cite>float</cite>, <cite>enum</cite>, <cite>string</cite>,
 <cite>int</cite>,  <cite>long</cite>, <cite>char</cite>, or one of the <cite>ctrl</cite> or <cite>time</cite> variants of these, which
 will be named <cite>ctrl_double</cite>, <cite>time_enum</cite>, and so on.  See the
-<a class="reference internal" href="ca.html#dbrtype-table"><span>Table of DBR Types</span></a></p>
+<a class="reference internal" href="ca.html#dbrtype-table"><span class="std std-ref">Table of DBR Types</span></a></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="pv.ftype">
 <code class="descclassname">pv.</code><code class="descname">ftype</code><a class="headerlink" href="#pv.ftype" title="Permalink to this definition">¶</a></dt>
 <dd><p>The integer value (from the underlying C library) indicating the PV data
-type according to <a class="reference internal" href="ca.html#dbrtype-table"><span>Table of DBR Types</span></a></p>
+type according to <a class="reference internal" href="ca.html#dbrtype-table"><span class="std std-ref">Table of DBR Types</span></a></p>
 </dd></dl>
 
 <dl class="attribute">
@@ -490,7 +534,7 @@ parameter.  See also the <cite>count</cite> attribute above.</p>
 <dt id="pv.access">
 <code class="descclassname">pv.</code><code class="descname">access</code><a class="headerlink" href="#pv.access" title="Permalink to this definition">¶</a></dt>
 <dd><p>string describing read/write access.  One of
-&#8216;read/write&#8217;,&#8217;read-only&#8217;,&#8217;write-only&#8217;, &#8216;no access&#8217;.</p>
+‘read/write’,’read-only’,’write-only’, ‘no access’.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -503,11 +547,32 @@ condition.</p>
 <dl class="attribute">
 <dt id="pv.timestamp">
 <code class="descclassname">pv.</code><code class="descname">timestamp</code><a class="headerlink" href="#pv.timestamp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Unix (not Epics!!) timestamp of the last seen event for this PV.  Note
-that this is will contain the timestamp from the Epics record if the PV
-object was created with the <code class="docutils literal"><span class="pre">form='time'</span></code> option.  Otherwise, the
-timestamp will be the timestamp according to the client, indicating when
-the data arrive from the server.</p>
+<dd><p>floating point timestamp (relative to the POSIX time origin, not the
+EPICS time origin) of the last event seen for this PV.  Note that this
+is will contain the timestamp from the Epics server if the PV object was
+created with the <code class="docutils literal"><span class="pre">form='time'</span></code> option.  Otherwise, the timestamp will
+be set to time according to the client, indicating when the data arrive
+from the server.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pv.posixseconds">
+<code class="descclassname">pv.</code><code class="descname">posixseconds</code><a class="headerlink" href="#pv.posixseconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer number of seconds (relative to the POSIX time origin, not the
+EPICS time origin) of the last event seen for this PV.  This will be set
+only if the PV object was created with the <code class="docutils literal"><span class="pre">form='time'</span></code> option, and
+will reflect the timestamp from the server.  Otherwise, this value will
+be 0 which can be used to signal that the <cite>timestamp</cite> attribute is from
+the client.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pv.nanoseconds">
+<code class="descclassname">pv.</code><code class="descname">nanoseconds</code><a class="headerlink" href="#pv.nanoseconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer number of nanoseconds for the last event seen for ths PV.  This
+will be set only if the PV object was created with the <code class="docutils literal"><span class="pre">form='time'</span></code>
+option, and will give higher time resolution than the <cite>timestamp</cite>
+attribute.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -604,7 +669,15 @@ methods <a class="reference internal" href="#pv.add_callback" title="pv.add_call
 <code class="descclassname">pv.</code><code class="descname">connection_callbacks</code><a class="headerlink" href="#pv.connection_callbacks" title="Permalink to this definition">¶</a></dt>
 <dd><p>a simple list of connection callbacks: functions to be run when the
 connection status of the PV changes. See
-<a class="reference internal" href="#pv-connection-callbacks-label"><span>User-supplied Connection Callback functions</span></a> for more details.</p>
+<a class="reference internal" href="#pv-connection-callbacks-label"><span class="std std-ref">User-supplied Connection Callback functions</span></a> for more details.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pv.access_callbacks">
+<code class="descclassname">pv.</code><code class="descname">access_callbacks</code><a class="headerlink" href="#pv.access_callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>an <code class="xref py py-attr docutils literal"><span class="pre">list</span></code> of access callbacks: functions to be run when the
+access rights of the PV changes. See
+<a class="reference internal" href="#pv-access-rights-callback-label"><span class="std std-ref">User-supplied Access Rights Callback functions</span></a> for more details.</p>
 </dd></dl>
 
 </div>
@@ -616,7 +689,7 @@ connection status of the PV changes. See
 attribute (they are equivalent) needs some further explanation.</p>
 <p>The value of the string representation (hereafter, the <a class="reference internal" href="#pv.char_value" title="pv.char_value"><code class="xref py py-attr docutils literal"><span class="pre">char_value</span></code></a>),
 will depend on the native type and count of a <cite>PV</cite>.
-<a class="reference internal" href="#charvalue-table"><span>Table of String Representations</span></a></p>
+<a class="reference internal" href="#charvalue-table"><span class="std std-ref">Table of String Representations</span></a></p>
 <blockquote id="charvalue-table">
 <div><p>Table of String Representations:  How raw data <a class="reference internal" href="#pv.value" title="pv.value"><code class="xref py py-attr docutils literal"><span class="pre">value</span></code></a> is mapped
 to <a class="reference internal" href="#pv.char_value" title="pv.char_value"><code class="xref py py-attr docutils literal"><span class="pre">char_value</span></code></a> for different native data types.</p>
@@ -656,11 +729,11 @@ to <a class="reference internal" href="#pv.char_value" title="pv.char_value"><co
 </tr>
 <tr class="row-odd"><td>double</td>
 <td>1</td>
-<td>= (&#8220;%%.%if&#8221; % (precision)) % value</td>
+<td>= (“%%.%if” % (precision)) % value</td>
 </tr>
 <tr class="row-even"><td>float</td>
 <td>1</td>
-<td>= (&#8220;%%.%if&#8221; % (precision)) % value</td>
+<td>= (“%%.%if” % (precision)) % value</td>
 </tr>
 <tr class="row-odd"><td>char</td>
 <td>&gt; 1</td>
@@ -675,11 +748,11 @@ to <a class="reference internal" href="#pv.char_value" title="pv.char_value"><co
 </div></blockquote>
 </div></blockquote>
 <p>For double/float values with large exponents, the formatting will be
-<cite>(&#8220;%%.%ig&#8221; % (precision)) % value</cite>.  For character waveforms (<em>char</em> data
+<cite>(“%%.%ig” % (precision)) % value</cite>.  For character waveforms (<em>char</em> data
 with <em>count</em> &gt; 1), the <a class="reference internal" href="#pv.char_value" title="pv.char_value"><code class="xref py py-attr docutils literal"><span class="pre">char_value</span></code></a> will be set according to:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">firstnull</span>  <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">firstnull</span>  <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">firstnull</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="n">firstnull</span><span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">char_value</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">val</span><span class="p">[:</span><span class="n">firstnull</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">char_value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">val</span><span class="p">[:</span><span class="n">firstnull</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -691,14 +764,14 @@ an internal callback will be registered for changes.  Any callbacks defined
 by the user will be called by this internal callback when changes occur.</p>
 <p>For most scalar-value PVs, this automatic monitoring is desirable, as the
 PV will see all changes (and run callbacks) without any additional
-interaction from the user. The PV&#8217;s value will always be up-to-date and no
+interaction from the user. The PV’s value will always be up-to-date and no
 unnecessary network traffic is needed.</p>
 <p>Possible values for <code class="xref py py-attr docutils literal"><span class="pre">auto_monitor</span></code> are:</p>
 <dl class="docutils">
 <dt><code class="docutils literal"><span class="pre">False</span></code></dt>
 <dd>For some PVs, especially those that change much more rapidly than you care
 about or those that contain large arrays as values, auto_monitoring can add
-network traffic that you don&#8217;t need.  For these, you may wish to create
+network traffic that you don’t need.  For these, you may wish to create
 your PVs with <em>auto_monitor=False</em>.  When you do this, you will need to
 make calls to <a class="reference internal" href="#pv.get" title="pv.get"><code class="xref py py-meth docutils literal"><span class="pre">get()</span></code></a> to explicitly get the latest value.</dd>
 <dt><code class="docutils literal"><span class="pre">None</span></code></dt>
@@ -709,28 +782,28 @@ monitoring of PVs with fewer array values, you will have to explicitly
 turn <em>auto_monitor</em> to <code class="docutils literal"><span class="pre">False</span></code>. For waveform arrays with more elements,
 automatic monitoring will not be done unless you explicitly set
 <em>auto_monitor=True</em>, or to an explicit mask.  See
-<a class="reference internal" href="arrays.html#arrays-large-label"><span>Strategies for working with large arrays</span></a> for more details.</dd>
+<a class="reference internal" href="arrays.html#arrays-large-label"><span class="std std-ref">Strategies for working with large arrays</span></a> for more details.</dd>
 <dt><code class="docutils literal"><span class="pre">True</span></code></dt>
 <dd><p class="first">When <em>auto_monitor</em> is set to <code class="docutils literal"><span class="pre">True</span></code>, the value will be monitored using
 the default subscription mask set at <code class="xref py py-data docutils literal"><span class="pre">ca.DEFAULT_SUBSCRIPTION_MASK</span></code>.</p>
 <p class="last">This mask determines which kinds of changes cause the PV to update. By
 default, the subscription updates when the PV value changes by more
 than the monitor deadband, or when the PV alarm status changes. This
-behavior is the same as the default in EPICS&#8217; <em>camonitor</em> tool.</p>
+behavior is the same as the default in EPICS’ <em>camonitor</em> tool.</p>
 </dd>
 <dt><em>Mask</em></dt>
 <dd><p class="first">It is also possible to request an explicit type of CA subscription by
 setting <em>auto_monitor</em> to a numeric subscription mask made up of
 dbr.DBE_ALARM, dbr.DBE_LOG and/or dbr.DBE_VALUE. This mask will be
 passed directly to <code class="xref py py-meth docutils literal"><span class="pre">ca.create_subscription()</span></code> An example would be:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">pv1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;AAA&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="p">)</span>
-<span class="n">pv2</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;BBB&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_ALARM</span><span class="p">)</span>
-<span class="n">pv3</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;CCC&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_ALARM</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_LOG</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pv1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;AAA&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="p">)</span>
+<span class="n">pv2</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;BBB&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_ALARM</span><span class="p">)</span>
+<span class="n">pv3</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;CCC&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_VALUE</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_ALARM</span><span class="o">|</span><span class="n">dbr</span><span class="o">.</span><span class="n">DBE_LOG</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="last">which will generate callbacks for pv1 only when the value of &#8216;AAA&#8217;
+<p class="last">which will generate callbacks for pv1 only when the value of ‘AAA’
 changes, while pv2 will receive callbacks if the value or alarm state of
-&#8216;BBB&#8217; changes, and pv3 will receive callbacks for all changes to &#8216;CCC&#8217;.
+‘BBB’ changes, and pv3 will receive callbacks for all changes to ‘CCC’.
 Note that these dbr.DBE_**** constants are ORed together as a bitmask.</p>
 </dd>
 </dl>
@@ -741,7 +814,7 @@ Note that these dbr.DBE_**** constants are ORed together as a bitmask.</p>
 value of a PV changes.  These callback functions are useful as they allow
 you to be notified of changes without having to continually ask for a PVs
 current value.  Much of this information is similar to that in
-<a class="reference internal" href="ca.html#ca-callbacks-label"><span>User-supplied Callback functions</span></a> for the <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><code class="xref py py-mod docutils literal"><span class="pre">ca</span></code></a> module, though there are some
+<a class="reference internal" href="ca.html#ca-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a> for the <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><code class="xref py py-mod docutils literal"><span class="pre">ca</span></code></a> module, though there are some
 important enhancements to callbacks on <cite>PV</cite> objects.</p>
 <p>You can define more than one callback function per PV to be run on value
 changes.  These functions can be specified when creating a PV, with the
@@ -764,61 +837,35 @@ should be prepared to have them passed to your function, and should always
 include <cite>**kw</cite> to catch all arguments.  Your callback will be sent the
 following keyword parameters:</p>
 <blockquote>
-<div><ul>
-<li><p class="first"><cite>pvname</cite>: the name of the pv</p>
-</li>
-<li><p class="first"><cite>value</cite>: the latest value</p>
-</li>
-<li><p class="first"><cite>char_value</cite>: string representation of value</p>
-</li>
-<li><p class="first"><cite>count</cite>: the number of data elements</p>
-</li>
-<li><p class="first"><cite>ftype</cite>: the numerical CA type indicating the data type</p>
-</li>
-<li><p class="first"><cite>type</cite>: the python type for the data</p>
-</li>
-<li><p class="first"><cite>status</cite>: the status of the PV (1 for OK)</p>
-</li>
-<li><p class="first"><cite>precision</cite>: number of decimal places of precision for floating point values</p>
-</li>
-<li><p class="first"><cite>units</cite>:  string for PV units</p>
-</li>
-<li><p class="first"><cite>severity</cite>: PV severity</p>
-</li>
-<li><p class="first"><cite>timestamp</cite>: timestamp from CA server.</p>
-</li>
-<li><p class="first"><cite>read_access</cite>: read access (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>)</p>
-</li>
-<li><p class="first"><cite>write_access</cite>: write access (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>)</p>
-</li>
-<li><p class="first"><cite>access</cite>: string description of  read- and write-access</p>
-</li>
-<li><p class="first"><cite>host</cite>: host machine and CA port serving PV</p>
-</li>
-<li><p class="first"><cite>enum_strs</cite>: the list of enumeration strings</p>
-</li>
-<li><p class="first"><cite>upper_disp_limit</cite>: upper display limit</p>
-</li>
-<li><p class="first"><cite>lower_disp_limit</cite>:  lower display limit</p>
-</li>
-<li><p class="first"><cite>upper_alarm_limit</cite>:  upper alarm limit</p>
-</li>
-<li><p class="first"><cite>lower_alarm_limit</cite>:  lower alarm limit</p>
-</li>
-<li><p class="first"><cite>upper_warning_limit</cite>:  upper warning limit</p>
-</li>
-<li><p class="first"><cite>lower_warning_limit</cite>:  lower warning limit</p>
-</li>
-<li><p class="first"><cite>upper_ctrl_limit</cite>:  upper control limit</p>
-</li>
-<li><p class="first"><cite>lower_ctrl_limit</cite>:  lower control limit</p>
-</li>
-<li><p class="first"><cite>chid</cite>:  integer channel ID</p>
-</li>
+<div><ul class="simple">
+<li><cite>pvname</cite>: the name of the pv</li>
+<li><cite>value</cite>: the latest value</li>
+<li><cite>char_value</cite>: string representation of value</li>
+<li><cite>count</cite>: the number of data elements</li>
+<li><cite>ftype</cite>: the numerical CA type indicating the data type</li>
+<li><cite>type</cite>: the python type for the data</li>
+<li><cite>status</cite>: the status of the PV (1 for OK)</li>
+<li><cite>precision</cite>: number of decimal places of precision for floating point values</li>
+<li><cite>units</cite>:  string for PV units</li>
+<li><cite>severity</cite>: PV severity</li>
+<li><cite>timestamp</cite>: timestamp from CA server.</li>
+<li><cite>read_access</cite>: read access (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>)</li>
+<li><cite>write_access</cite>: write access (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>)</li>
+<li><cite>access</cite>: string description of  read- and write-access</li>
+<li><cite>host</cite>: host machine and CA port serving PV</li>
+<li><cite>enum_strs</cite>: the list of enumeration strings</li>
+<li><cite>upper_disp_limit</cite>: upper display limit</li>
+<li><cite>lower_disp_limit</cite>:  lower display limit</li>
+<li><cite>upper_alarm_limit</cite>:  upper alarm limit</li>
+<li><cite>lower_alarm_limit</cite>:  lower alarm limit</li>
+<li><cite>upper_warning_limit</cite>:  upper warning limit</li>
+<li><cite>lower_warning_limit</cite>:  lower warning limit</li>
+<li><cite>upper_ctrl_limit</cite>:  upper control limit</li>
+<li><cite>lower_ctrl_limit</cite>:  lower control limit</li>
+<li><cite>chid</cite>:  integer channel ID</li>
 <li><dl class="first docutils">
 <dt><cite>cb_info</cite>:  (index, self) tuple containing callback ID</dt>
-<dd><p class="first last">and the PV object</p>
-</dd>
+<dd>and the PV object</dd>
 </dl>
 </li>
 </ul>
@@ -828,11 +875,11 @@ values may be <code class="docutils literal"><span class="pre">None</span></code
 <a class="reference internal" href="#pv.get_ctrlvars" title="pv.get_ctrlvars"><code class="xref py py-meth docutils literal"><span class="pre">get_ctrlvars()</span></code></a>.</p>
 <p>It is important to keep in mind that the callback function will be run
 <em>inside</em> a CA function, and cannot reliably make any other CA calls.  It is
-helpful to think &#8220;this all happens inside of a <code class="xref py py-func docutils literal"><span class="pre">pend_event()</span></code> call&#8221;,
+helpful to think “this all happens inside of a <code class="xref py py-func docutils literal"><span class="pre">pend_event()</span></code> call”,
 and in an epics thread that may or may not be the main thread of your
 program.  It is advisable to keep the callback functions short and not
 resource-intensive.  Consider strategies which use the callback only to
-record that a change has occurred and then act on that change later &#8211;
+record that a change has occurred and then act on that change later –
 perhaps in a separate thread, perhaps after <code class="xref py py-func docutils literal"><span class="pre">pend_event()</span></code> has
 completed.</p>
 <p>The <cite>cb_info</cite> parameter supplied to the callback needs special attention,
@@ -846,7 +893,7 @@ code if the widget that the callback is meant to update disappears.</p>
 <div class="section" id="user-supplied-connection-callback-functions">
 <span id="pv-connection-callbacks-label"></span><h2>User-supplied Connection Callback functions<a class="headerlink" href="#user-supplied-connection-callback-functions" title="Permalink to this headline">¶</a></h2>
 <p>A <em>connection</em> callback is a user-defined function that is called when the
-connection status of a PV changes &#8211; that is, when a PV initially
+connection status of a PV changes – that is, when a PV initially
 connects, disconnects or reconnects due to the process serving the PV going
 away, or loss of network connection.  A connection callback can be
 specified when a PV is created, or can be added by appending to the
@@ -862,51 +909,62 @@ callback defined, they will all be run when the connection state changes.</p>
 <p>where <em>conn</em> will be either <code class="docutils literal"><span class="pre">True`</span> <span class="pre">or</span> <span class="pre">``False</span></code>, specifying whether the PV is
 now connected.   A simple example is given below.</p>
 </div>
+<div class="section" id="user-supplied-access-rights-callback-functions">
+<span id="pv-access-rights-callback-label"></span><h2>User-supplied Access Rights Callback functions<a class="headerlink" href="#user-supplied-access-rights-callback-functions" title="Permalink to this headline">¶</a></h2>
+<p>An <em>access rights</em> callback is a user-defined function that is called when the
+access rights - read/write permissions - of a PV undergo changes. The callback
+will be invoked upon successful initialization and at all events that change
+a PV’s access rights, including disconnection and reconnection events.
+An <em>access rights</em> callback can be specified when a PV is created, or can be
+added by appending to the <a class="reference internal" href="#pv.access_callbacks" title="pv.access_callbacks"><code class="xref py py-attr docutils literal"><span class="pre">access_callbacks</span></code></a> list of the PV object.
+If there are multiple access rights callbacks defined for a PV, they will all
+be run on access rights events.</p>
+</div>
 <div class="section" id="put-with-wait-put-callbacks-and-put-complete">
 <span id="pv-putwait-label"></span><h2>Put with wait, put callbacks, and  put_complete<a class="headerlink" href="#put-with-wait-put-callbacks-and-put-complete" title="Permalink to this headline">¶</a></h2>
 <p>Some EPICS records take a significant amount of time to fully process, and
 sometimes you want to wait until the processing completes before going on.
 There are a few ways to accomplish this.  First, one can simply wait until
 the processing is done:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
-<span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">)</span>
-<span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="k">print</span> <span class="s">&#39;Done&#39;</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span> <span class="s1">&#39;Done&#39;</span>
 </pre></div>
 </div>
 <p>This will hang until the processing of the PV completes (motor moving, etc)
-before printing &#8216;Done&#8217;.   You can also specify a maximum time to wait &#8211; a
+before printing ‘Done’.   You can also specify a maximum time to wait – a
 <em>timeout</em> (in seconds):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>which will wait up to 30 seconds.  For the pedantic, this timeout should
-not be used as an accurate clock &#8211; the actual wait time may be slightly
+not be used as an accurate clock – the actual wait time may be slightly
 longer.</p>
-<p>A second method is to use the &#8216;use_complete&#8217; option and watch for the
+<p>A second method is to use the ‘use_complete’ option and watch for the
 <a class="reference internal" href="#pv.put_complete" title="pv.put_complete"><code class="xref py py-attr docutils literal"><span class="pre">put_complete</span></code></a> attribute to become <code class="docutils literal"><span class="pre">True</span></code> after a <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-meth docutils literal"><span class="pre">put()</span></code></a>.  This is
 somewhat more flexible than using <cite>wait=True</cite> as above, because you can more
 carefully control how often you look for a <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-meth docutils literal"><span class="pre">put()</span></code></a> to complete, and
 what to do in the interim.  A simple example would be:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">use_complete</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">waiting</span> <span class="o">=</span> <span class="bp">True</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">use_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">waiting</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">while</span> <span class="n">waiting</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
     <span class="n">waiting</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">put_complete</span>
 </pre></div>
 </div>
 <p>An additional advantage of this approach is that you can easily wait for
-multiple PVs to complete with python&#8217;s built-in <em>all</em> function, as with:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">pvgroup</span> <span class="o">=</span> <span class="p">(</span><span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">),</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;YYY&#39;</span><span class="p">),</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;ZZZ&#39;</span><span class="p">))</span>
+multiple PVs to complete with python’s built-in <em>all</em> function, as with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pvgroup</span> <span class="o">=</span> <span class="p">(</span><span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">),</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;YYY&#39;</span><span class="p">),</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;ZZZ&#39;</span><span class="p">))</span>
 <span class="n">newvals</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span>  <span class="mf">3.0</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">pv</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pvgroup</span><span class="p">,</span> <span class="n">newvals</span><span class="p">):</span>
-    <span class="n">pv</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">use_complete</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">pv</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">use_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="n">waiting</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">waiting</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">while</span> <span class="n">waiting</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
     <span class="n">waiting</span> <span class="o">=</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">pv</span><span class="o">.</span><span class="n">put_complete</span> <span class="k">for</span> <span class="n">pv</span> <span class="ow">in</span> <span class="n">pvgroup</span><span class="p">])</span>
-<span class="k">print</span> <span class="s">&#39;All puts are done!&#39;</span>
+<span class="nb">print</span> <span class="s1">&#39;All puts are done!&#39;</span>
 </pre></div>
 </div>
 <p>For maximum flexibility, one can all define a <em>put callback</em>, a function to
@@ -914,9 +972,9 @@ be run when the <a class="reference internal" href="#pv.put" title="pv.put"><cod
 <em>pvname</em> keyword argument, but will receive no others, unless you pass in
 data with the <em>callback_data</em> argument (which should be dict-like) to
 <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-meth docutils literal"><span class="pre">put()</span></code></a>.   A simple example would be:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">pv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">onPutComplete</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
-    <span class="k">print</span> <span class="s">&#39;Put done for </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">pvname</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">onPutComplete</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="s1">&#39;Put done for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pvname</span>
 
 <span class="n">pv</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onPutComplete</span><span class="p">)</span>
 </pre></div>
@@ -937,18 +995,18 @@ the life of the function.  Using <a class="reference internal" href="#pv.get_pv"
 highly recommended.</p>
 <dl class="function">
 <dt id="pv.get_pv">
-<code class="descclassname">pv.</code><code class="descname">get_pv</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>form='time'</em><span class="optional">[</span>, <em>connect=False</em><span class="optional">[</span>, <em>timeout=5</em><span class="optional">[</span>, <em>context=None</em><span class="optional">[</span>, <em>**kws</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.get_pv" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pv.</code><code class="descname">get_pv</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>form=’time’</em><span class="optional">[</span>, <em>connect=False</em><span class="optional">[</span>, <em>timeout=5</em><span class="optional">[</span>, <em>context=None</em><span class="optional">[</span>, <em>**kws</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.get_pv" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves a PV from <code class="xref py py-attr docutils literal"><span class="pre">_PVcache</span></code> or creates and returns a new PV.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pvname</strong> &#8211; name of Epics Process Variable</li>
-<li><strong>form</strong> (<em>string, one of (&#8216;native&#8217;,&#8217;ctrl&#8217;, or &#8216;time&#8217;)</em>) &#8211; which epics <em>data type</em> to use:  the &#8216;native&#8217; , or the &#8216;ctrl&#8217; (Control) or &#8216;time&#8217; variant.</li>
-<li><strong>connect</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) &#8211; whether to wait for the PV to connect.</li>
-<li><strong>timeout</strong> (float or <code class="docutils literal"><span class="pre">None</span></code>) &#8211; maximum time to wait (in seconds) for value before returning None.</li>
-<li><strong>context</strong> (integer or  <code class="docutils literal"><span class="pre">None</span></code> (default)) &#8211; integer threading context.</li>
+<li><strong>pvname</strong> – name of Epics Process Variable</li>
+<li><strong>form</strong> (<em>string</em><em>, </em><em>one of</em><em> (</em><em>'native'</em><em>,</em><em>'ctrl'</em><em>, or </em><em>'time'</em><em>)</em>) – which epics <em>data type</em> to use:  the ‘native’ , or the ‘ctrl’ (Control) or ‘time’ variant.</li>
+<li><strong>connect</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to wait for the PV to connect.</li>
+<li><strong>timeout</strong> (float or <code class="docutils literal"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for value before returning None.</li>
+<li><strong>context</strong> (integer or  <code class="docutils literal"><span class="pre">None</span></code> (default)) – integer threading context.</li>
 </ul>
 </td>
 </tr>
@@ -971,9 +1029,9 @@ highly recommended.</p>
 <h3>Basic Use<a class="headerlink" href="#basic-use" title="Permalink to this headline">¶</a></h3>
 <p>The simplest approach is to simply create a PV and use its <a class="reference internal" href="#pv.value" title="pv.value"><code class="xref py py-attr docutils literal"><span class="pre">value</span></code></a>
 attribute:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;xxx.VAL&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">value</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">PV</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;xxx.VAL&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">value</span>
 <span class="go">1.00</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">2.00</span>
 </pre></div>
@@ -982,20 +1040,20 @@ attribute:</p>
 <em>p1.value = 2.00</em> line does a <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-func docutils literal"><span class="pre">put()</span></code></a> to set the value, causing any
 necessary processing over the network.</p>
 <p>The above example is equivalent to</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s">&#39;xxx.VAL&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">PV</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;xxx.VAL&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="go">1.00</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="mf">2.00</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>To get a string representation of the value, you can use either</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">as_string</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">as_string</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">&#39;1.000&#39;</span>
 </pre></div>
 </div>
 <p>or, equivalently</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">char_value</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">p1</span><span class="o">.</span><span class="n">char_value</span>
 <span class="go">&#39;1.000&#39;</span>
 </pre></div>
 </div>
@@ -1003,9 +1061,9 @@ necessary processing over the network.</p>
 <div class="section" id="example-of-using-info-and-more-properties-examples">
 <h3>Example of using info and more properties examples<a class="headerlink" href="#example-of-using-info-and-more-properties-examples" title="Permalink to this headline">¶</a></h3>
 <p>A PV has many attributes.  This can be seen from its <em>info</em> paragraph:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;13IDA:m3&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">info</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;13IDA:m3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">info</span>
 <span class="go">== 13IDA:m3  (native_double) ==</span>
 <span class="go">   value      = 0.2</span>
 <span class="go">   char_value = &#39;0.200&#39;</span>
@@ -1031,11 +1089,11 @@ necessary processing over the network.</p>
 </pre></div>
 </div>
 <p>The individual attributes can also be accessed as below.  Many of these
-(the <em>control attributes</em>, see <a class="reference internal" href="ca.html#ctrlvars-table"><span>Table of Control Attributes</span></a>) will not be filled in until either the <a class="reference internal" href="#pv.info" title="pv.info"><code class="xref py py-attr docutils literal"><span class="pre">info</span></code></a>
+(the <em>control attributes</em>, see <a class="reference internal" href="ca.html#ctrlvars-table"><span class="std std-ref">Table of Control Attributes</span></a>) will not be filled in until either the <a class="reference internal" href="#pv.info" title="pv.info"><code class="xref py py-attr docutils literal"><span class="pre">info</span></code></a>
 attribute is accessed or until <a class="reference internal" href="#pv.get_ctrlvars" title="pv.get_ctrlvars"><code class="xref py py-meth docutils literal"><span class="pre">get_ctrlvars()</span></code></a> is called.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span> <span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">type</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">type</span>
 <span class="go">double</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">lower_disp_limit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">lower_disp_limit</span>
 <span class="go">mm 3 -14.5060658455</span>
 </pre></div>
 </div>
@@ -1057,14 +1115,14 @@ value.</p>
 <h3>Example of <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-meth docutils literal"><span class="pre">put()</span></code></a><a class="headerlink" href="#example-of-put" title="Permalink to this headline">¶</a></h3>
 <p>To put a new value to a variable, either of these two approaches can be
 used:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Or (equivalently):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s">&#39;XXX&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">1.0</span>
 </pre></div>
 </div>
@@ -1077,47 +1135,47 @@ it would be inconvenient (and possibly inefficient) to have to continually
 ask if a PVs value has changed.  Instead, it is better to set a <em>callback</em>
 function: a function to be run when the value has changed.</p>
 <p>A simple example of this would be:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
 <span class="kn">import</span> <span class="nn">time</span>
-<span class="k">def</span> <span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-    <span class="k">print</span> <span class="s">&#39;PV Changed! &#39;</span><span class="p">,</span> <span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="s1">&#39;PV Changed! &#39;</span><span class="p">,</span> <span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">()</span>
 
 
 <span class="n">mypv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span>
 <span class="n">mypv</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">onChanges</span><span class="p">)</span>
 
-<span class="k">print</span> <span class="s">&#39;Now wait for changes&#39;</span>
+<span class="nb">print</span> <span class="s1">&#39;Now wait for changes&#39;</span>
 
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span> <span class="o">&lt;</span> <span class="mf">60.0</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.e-3</span><span class="p">)</span>
-<span class="k">print</span> <span class="s">&#39;Done.&#39;</span>
+<span class="nb">print</span> <span class="s1">&#39;Done.&#39;</span>
 </pre></div>
 </div>
 <p>This first defines a <em>callback function</em> called <cite>onChanges()</cite> and then
 simply waits for changes to happen.  Note that the callback function should
 take keyword arguments, and generally use <cite>**kw</cite> to catch all arguments.
-See <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied Callback functions</span></a> for more details.</p>
+See <a class="reference internal" href="#pv-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a> for more details.</p>
 </div>
 <div class="section" id="example-of-connection-callback">
 <h3>Example of connection callback<a class="headerlink" href="#example-of-connection-callback" title="Permalink to this headline">¶</a></h3>
 <p>A connection callback:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c">#</span>
-<span class="c"># example of using a connection callback that will be called</span>
-<span class="c"># for any change in connection status</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">#</span>
+<span class="c1"># example of using a connection callback that will be called</span>
+<span class="c1"># for any change in connection status</span>
 
 <span class="kn">import</span> <span class="nn">epics</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span>  <span class="nn">pvnames</span> <span class="kn">import</span> <span class="n">motor1</span>
+<span class="kn">from</span>  <span class="nn">pvnames</span> <span class="k">import</span> <span class="n">motor1</span>
 
 <span class="n">write</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span>
-<span class="k">def</span> <span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
-    <span class="n">write</span><span class="p">(</span><span class="s">&#39;PV connection status changed: </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span>  <span class="nb">repr</span><span class="p">(</span><span class="n">conn</span><span class="p">)))</span>
+<span class="k">def</span> <span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
+    <span class="n">write</span><span class="p">(</span><span class="s1">&#39;PV connection status changed: </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span>  <span class="nb">repr</span><span class="p">(</span><span class="n">conn</span><span class="p">)))</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">onValueChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
-    <span class="n">write</span><span class="p">(</span><span class="s">&#39;PV value changed: </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)  </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">pvname</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+<span class="k">def</span> <span class="nf">onValueChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
+    <span class="n">write</span><span class="p">(</span><span class="s1">&#39;PV value changed: </span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">)  </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">pvname</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 <span class="n">mypv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">motor1</span><span class="p">,</span> 
                 <span class="n">connection_callback</span><span class="o">=</span> <span class="n">onConnectionChange</span><span class="p">,</span>
@@ -1125,10 +1183,31 @@ See <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied
 
 <span class="n">mypv</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
-<span class="n">write</span><span class="p">(</span><span class="s">&#39;Now waiting, watching values and connection changes:</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+<span class="n">write</span><span class="p">(</span><span class="s1">&#39;Now waiting, watching values and connection changes:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-of-an-access-rights-callback">
+<h3>Example of an access rights callback<a class="headerlink" href="#example-of-an-access-rights-callback" title="Permalink to this headline">¶</a></h3>
+<p>Associating an access rights callback with a PV:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">def</span> <span class="nf">access_rights_callback</span><span class="p">(</span><span class="n">read_access</span><span class="p">,</span> <span class="n">write_access</span><span class="p">,</span> <span class="n">pv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - read=</span><span class="si">%s</span><span class="s2">, write=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">pvname</span><span class="p">,</span> <span class="n">read_access</span><span class="p">,</span> <span class="n">write_access</span><span class="p">)</span>
+
+<span class="c1"># should immediately see the message upon connection</span>
+<span class="n">apv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;pvname&#39;</span><span class="p">,</span> <span class="n">access_callback</span><span class="o">=</span><span class="n">access_rights_callback</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">:</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+    <span class="k">pass</span>
 </pre></div>
 </div>
 </div>
@@ -1147,6 +1226,9 @@ See <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="ca.html" title="ca: Low-level Channel Access module"
              >next</a> |</li>
@@ -1167,8 +1249,8 @@ See <a class="reference internal" href="#pv-callbacks-label"><span>User-supplied
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+        &#169; Copyright 2014, Matthew Newville.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

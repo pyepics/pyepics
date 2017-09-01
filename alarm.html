@@ -1,13 +1,13 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Alarms: respond when a PV goes out of range &mdash; Epics Channel Access for Python</title>
+    <title>Alarms: respond when a PV goes out of range &#8212; Epics Channel Access for Python</title>
     
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,20 +15,23 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.5',
+        VERSION:     '3.2.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Epics Channel Access for Python" href="index.html" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Auto-saving: simple save/restore of PVs" href="autosave.html" />
     <link rel="prev" title="Devices: collections of PVs" href="devices.html" /> 
   </head>
-  <body role="document">
+  <body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -42,6 +45,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="autosave.html" title="Auto-saving: simple save/restore of PVs"
              accesskey="N">next</a> |</li>
@@ -82,21 +88,18 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/alarm.txt"
+      <li><a href="_sources/alarm.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -127,20 +130,20 @@ condition and what to do when that condition is met.</p>
 <tr class="field-odd field"><th class="field-name">param pvname:</th><td class="field-body">name of Epics PV (string)</td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">param comparison:</th></tr>
-<tr class="field-even field"><td>&nbsp;</td><td class="field-body">operation used to compare PV value to trip_point.</td>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">operation used to compare PV value to trip_point.</td>
 </tr>
 <tr class="field-odd field"><th class="field-name" colspan="2">type  comparison:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">string or callable.  Built in comparisons are listed in <a class="reference internal" href="#alarmops-table"><span>Table of Alarm Operators</span></a>.</td>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">string or callable.  Built in comparisons are listed in <a class="reference internal" href="#alarmops-table"><span class="std std-ref">Table of Alarm Operators</span></a>.</td>
 </tr>
 <tr class="field-even field"><th class="field-name" colspan="2">param trip_point:</th></tr>
-<tr class="field-even field"><td>&nbsp;</td><td class="field-body">value that will trigger the alarm</td>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">value that will trigger the alarm</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">param callback:</th><td class="field-body">user-defined callback function to be run when the PVs value meets the alarm condition</td>
 </tr>
 <tr class="field-even field"><th class="field-name">type callback:</th><td class="field-body">callable or None</td>
 </tr>
 <tr class="field-odd field"><th class="field-name" colspan="2">param alert_delay:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">time (in seconds) to wait before executing another alarm callback.</td>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">time (in seconds) to wait before executing another alarm callback.</td>
 </tr>
 </tbody>
 </table>
@@ -149,7 +152,7 @@ condition and what to do when that condition is met.</p>
 the new value is outside the acceptable range (violates the trip point),
 then the user-supplied callback function is run.  This callback could be
 set do send a message or to take some other course of action.</p>
-<p>The comparison supplied can either be a string as listed in <a class="reference internal" href="#alarmops-table"><span>Table of
+<p>The comparison supplied can either be a string as listed in <a class="reference internal" href="#alarmops-table"><span class="std std-ref">Table of
 Alarm Operators</span></a> or a custom callable function which takes
 the two values (PV.value, trip_point) and returns <code class="docutils literal"><span class="pre">True</span></code> or <code class="docutils literal"><span class="pre">False</span></code>
 based on those values.</p>
@@ -167,22 +170,22 @@ based on those values.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&#8216;eq&#8217;, &#8216;==&#8217;</td>
+<tr class="row-even"><td>‘eq’, ‘==’</td>
 <td>__eq__</td>
 </tr>
-<tr class="row-odd"><td>&#8216;ne&#8217;, &#8216;!=&#8217;</td>
+<tr class="row-odd"><td>‘ne’, ‘!=’</td>
 <td>__ne__</td>
 </tr>
-<tr class="row-even"><td>&#8216;le&#8217;, &#8216;&lt;=&#8217;</td>
+<tr class="row-even"><td>‘le’, ‘&lt;=’</td>
 <td>__le__</td>
 </tr>
-<tr class="row-odd"><td>&#8216;lt&#8217;, &#8216;&lt;&#8217;</td>
+<tr class="row-odd"><td>‘lt’, ‘&lt;’</td>
 <td>__lt__</td>
 </tr>
-<tr class="row-even"><td>&#8216;ge&#8217;, &#8216;&gt;=&#8217;</td>
+<tr class="row-even"><td>‘ge’, ‘&gt;=’</td>
 <td>__ge__</td>
 </tr>
-<tr class="row-odd"><td>&#8216;gt&#8217;, &#8216;&gt;&#8217;</td>
+<tr class="row-odd"><td>‘gt’, ‘&gt;’</td>
 <td>__gt__</td>
 </tr>
 </tbody>
@@ -201,18 +204,18 @@ within the time specified by  <code class="xref py py-attr docutils literal"><sp
 <div class="section" id="alarm-example">
 <h2>Alarm Example<a class="headerlink" href="#alarm-example" title="Permalink to this headline">¶</a></h2>
 <p>An epics Alarm is very easy to use.  Here is an alarm set to print a
-message when a PV&#8217;s value reaches a certain value:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">Alarm</span><span class="p">,</span> <span class="n">poll</span>
+message when a PV’s value reaches a certain value:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">Alarm</span><span class="p">,</span> <span class="n">poll</span>
 
-<span class="k">def</span> <span class="nf">alertMe</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-    <span class="k">print</span> <span class="s">&quot;Soup&#39;s on!   </span><span class="si">%s</span><span class="s"> = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">alertMe</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="s2">&quot;Soup&#39;s on!   </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">)</span>
 
-<span class="n">my_alarm</span> <span class="o">=</span> <span class="n">Alarm</span><span class="p">(</span><span class="n">pvname</span> <span class="o">=</span> <span class="s">&#39;WaterTemperature.VAL&#39;</span><span class="p">,</span>
-                 <span class="n">comparison</span> <span class="o">=</span> <span class="s">&#39;&gt;&#39;</span><span class="p">,</span>
+<span class="n">my_alarm</span> <span class="o">=</span> <span class="n">Alarm</span><span class="p">(</span><span class="n">pvname</span> <span class="o">=</span> <span class="s1">&#39;WaterTemperature.VAL&#39;</span><span class="p">,</span>
+                 <span class="n">comparison</span> <span class="o">=</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span>
                  <span class="n">callback</span> <span class="o">=</span> <span class="n">alertMe</span><span class="p">,</span>
                  <span class="n">trip_point</span> <span class="o">=</span> <span class="mf">100.0</span><span class="p">,</span>
                  <span class="n">alert_delay</span> <span class="o">=</span> <span class="mi">600</span><span class="p">)</span>
-<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
     <span class="n">poll</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -231,6 +234,9 @@ message when a PV&#8217;s value reaches a certain value:</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="autosave.html" title="Auto-saving: simple save/restore of PVs"
              >next</a> |</li>
@@ -251,8 +257,8 @@ message when a PV&#8217;s value reaches a certain value:</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+        &#169; Copyright 2014, Matthew Newville.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

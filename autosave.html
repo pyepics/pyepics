@@ -1,13 +1,13 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Auto-saving: simple save/restore of PVs &mdash; Epics Channel Access for Python</title>
+    <title>Auto-saving: simple save/restore of PVs &#8212; Epics Channel Access for Python</title>
     
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,20 +15,23 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.5',
+        VERSION:     '3.2.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Epics Channel Access for Python" href="index.html" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="wx: wxPython Widgets for Epics" href="wx.html" />
     <link rel="prev" title="Alarms: respond when a PV goes out of range" href="alarm.html" /> 
   </head>
-  <body role="document">
+  <body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -42,6 +45,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="wx.html" title="wx: wxPython Widgets for Epics"
              accesskey="N">next</a> |</li>
@@ -84,21 +90,18 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/autosave.txt"
+      <li><a href="_sources/autosave.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -125,12 +128,12 @@ installed with tools such as <em>easy_install</em> or <em>pip</em>, or downloade
 <p>Request and Save file formats are designed to be compatible with synApps
 autosave.  Notably, the <cite>file</cite> command with macro substitutions are
 supported, so that one can have a Request like:</p>
-<div class="highlight-python"><div class="highlight"><pre># My.req
-file &quot;SimpleMotor.req&quot;, P=IOC:, Q=m1
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># My.req</span>
+<span class="n">file</span> <span class="s2">&quot;SimpleMotor.req&quot;</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="n">IOC</span><span class="p">:,</span> <span class="n">Q</span><span class="o">=</span><span class="n">m1</span>
 </pre></div>
 </div>
 <p>with a  <strong>SimpleMotor.req</strong> file of:</p>
-<div class="highlight-python"><div class="highlight"><pre># SimpleMotor.req
+<div class="highlight-default"><div class="highlight"><pre><span></span># SimpleMotor.req
 $(P)$(Q).VAL
 $(P)$(Q).DIR
 $(P)$(Q).FOFF
@@ -139,15 +142,15 @@ $(P)$(Q).FOFF
 <p>which can then be used for many instances of a SimpleMotor.  There is,
 however, no mechanism for automatically finding request files.</p>
 <p>With such a file, simply using:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics.autosave</span>
-<span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">save_pvs</span><span class="p">(</span><span class="s">&quot;My.req&quot;</span><span class="p">,</span> <span class="s">&quot;my_values.sav&quot;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics.autosave</span>
+<span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">save_pvs</span><span class="p">(</span><span class="s2">&quot;My.req&quot;</span><span class="p">,</span> <span class="s2">&quot;my_values.sav&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>will save the current values for the PVs to the file <strong>my_values.sav</strong>.  At
 a later time, these values can be restored with</p>
 <blockquote>
 <div>import epics.autosave
-epics.autosave.restore_pvs(&#8220;my_values.sav&#8221;)</div></blockquote>
+epics.autosave.restore_pvs(“my_values.sav”)</div></blockquote>
 <p>The saved file will be of nearly identical format as that of the autosave
 mechanism, and the <a class="reference internal" href="#autosave.restore_pvs" title="autosave.restore_pvs"><code class="xref py py-func docutils literal"><span class="pre">restore_pvs()</span></code></a> function can read and restore values
 using save files from autosave.  Note, however, that the purpose here is
@@ -164,8 +167,8 @@ values.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>request_file</strong> &#8211; name of Request file to read PVs to save.</li>
-<li><strong>save_file</strong> &#8211; name of file to save values to write values to</li>
+<li><strong>request_file</strong> – name of Request file to read PVs to save.</li>
+<li><strong>save_file</strong> – name of file to save values to write values to</li>
 </ul>
 </td>
 </tr>
@@ -183,7 +186,7 @@ autosave module from synApps.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>save_file</strong> &#8211; name of file to save values to read data from.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>save_file</strong> – name of file to save values to read data from.</td>
 </tr>
 </tbody>
 </table>
@@ -202,16 +205,16 @@ module.</p>
 <div class="section" id="examples">
 <h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
 <p>A simple example usign the autosave module:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">epics.autosave</span>
-<span class="c"># save values</span>
-<span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">save_pvs</span><span class="p">(</span><span class="s">&quot;my_request_file.req&quot;</span><span class="p">,</span>
-                        <span class="s">&quot;/tmp/my_recent_save.sav&quot;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics.autosave</span>
+<span class="c1"># save values</span>
+<span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">save_pvs</span><span class="p">(</span><span class="s2">&quot;my_request_file.req&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/tmp/my_recent_save.sav&quot;</span><span class="p">)</span>
 
-<span class="c"># wait 30 seconds</span>
+<span class="c1"># wait 30 seconds</span>
 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
 
-<span class="c"># restore those values back</span>
-<span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">restore_pvs</span><span class="p">(</span><span class="s">&quot;/tmp/my_recent_save.sav&quot;</span><span class="p">)</span>
+<span class="c1"># restore those values back</span>
+<span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">restore_pvs</span><span class="p">(</span><span class="s2">&quot;/tmp/my_recent_save.sav&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -230,6 +233,9 @@ module.</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="wx.html" title="wx: wxPython Widgets for Epics"
              >next</a> |</li>
@@ -250,8 +256,8 @@ module.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+        &#169; Copyright 2014, Matthew Newville.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

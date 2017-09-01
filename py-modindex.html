@@ -3,29 +3,31 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Python Module Index &mdash; Epics Channel Access for Python</title>
+    <title>Python Module Index &#8212; Epics Channel Access for Python</title>
     
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '3.2.0',
+        URL_ROOT:    './',
+        VERSION:     '3.2.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Epics Channel Access for Python" href="index.html" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
  
 
     <script type="text/javascript">
@@ -35,14 +37,14 @@
 
   </head>
   <body>
-<div style="background-color: #E4EAED; text-align: left; padding: 8px 4px 8px 4px">
-  <font size=28px><a href="index.html">
-      <img src="_static/pyepics.png" height=55 border="0" alt="pyepics"/>
+<div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
+  <font size=+3><a href="index.html">
+      <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
     &nbsp; PyEpics: Epics Channel Access for Python</a>
   </font>
 </div>
 
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -51,35 +53,30 @@
         <li class="right" >
           <a href="#" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="np-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-   <li><a href="overview.html">overview</a>|</li>
-   <li><a href="installation.html">download</a>|</li>
-   <li><a href="pv.html">pv</a>|</li>
-   <li><a href="ca.html">ca</a>|</li>
-   <li><a href="devices.html">devices</a>|</li>
-   <li><a href="wx.html">wx</a>|</li>
-   <li><a href="advanced.html">advanced</a>|</li>
-   <li><a href="more.html">contents</a>|</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
+   <li>[<a href="installation.html">install</a></li>
+   <li>|<a href="overview.html">overview</a></li>
+   <li>|<a href="pv.html">pv</a></li>
+   <li>|<a href="ca.html">ca</a></li>
+   <li>|<a href="arrays.html">arrays</a></li>
+   <li>|<a href="devices.html">devices</a></li>
+   <li>|<a href="alarm.html">alarm</a></li>
+   <li>|<a href="autosave.html">autosave</a></li>
+   <li>|<a href="wx.html">wx</a></li>
+   <li>|<a href="advanced.html">advanced</a>]</li>
  
       </ul>
     </div>
 
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -88,7 +85,7 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
 
    <h1>Python Module Index</h1>
@@ -103,73 +100,73 @@
    <a href="#cap-w"><strong>w</strong></a>
    </div>
 
-   <table class="indextable modindextable" cellspacing="0" cellpadding="2">
-     <tr class="pcap"><td></td><td>&nbsp;</td><td></td></tr>
+   <table class="indextable modindextable">
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-a"><td></td><td>
        <strong>a</strong></td><td></td></tr>
      <tr>
        <td></td>
        <td>
-       <a href="alarm.html#module-alarm"><tt class="xref">alarm</tt></a></td><td>
+       <a href="alarm.html#module-alarm"><code class="xref">alarm</code></a></td><td>
        <em>respond when a PV goes out of range by running user-supplied code</em></td></tr>
      <tr>
        <td></td>
        <td>
-       <a href="autosave.html#module-autosave"><tt class="xref">autosave</tt></a></td><td>
+       <a href="autosave.html#module-autosave"><code class="xref">autosave</code></a></td><td>
        <em>simple save/restore of PVs</em></td></tr>
-     <tr class="pcap"><td></td><td>&nbsp;</td><td></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-c"><td></td><td>
        <strong>c</strong></td><td></td></tr>
      <tr>
        <td></td>
        <td>
-       <a href="ca.html#module-ca"><tt class="xref">ca</tt></a></td><td>
+       <a href="ca.html#module-ca"><code class="xref">ca</code></a></td><td>
        <em>low-level Channel Access  module.</em></td></tr>
-     <tr class="pcap"><td></td><td>&nbsp;</td><td></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-d"><td></td><td>
        <strong>d</strong></td><td></td></tr>
      <tr>
        <td></td>
        <td>
-       <a href="devices.html#module-device"><tt class="xref">device</tt></a></td><td>
+       <a href="devices.html#module-device"><code class="xref">device</code></a></td><td>
        <em>collections of related PVs</em></td></tr>
-     <tr class="pcap"><td></td><td>&nbsp;</td><td></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-e"><td></td><td>
        <strong>e</strong></td><td></td></tr>
      <tr>
        <td><img src="_static/minus.png" class="toggler"
               id="toggle-1" style="display: none" alt="-" /></td>
        <td>
-       <a href="overview.html#module-epics"><tt class="xref">epics</tt></a></td><td>
+       <a href="overview.html#module-epics"><code class="xref">epics</code></a></td><td>
        <em>top-level epics module, and container for simplest CA functions</em></td></tr>
      <tr class="cg-1">
        <td></td>
-       <td>&nbsp;&nbsp;&nbsp;
-       <a href="ca.html#module-epics.ca"><tt class="xref">epics.ca</tt></a></td><td>
+       <td>&#160;&#160;&#160;
+       <a href="ca.html#module-epics.ca"><code class="xref">epics.ca</code></a></td><td>
        <em>low-level Channel Access  module.</em></td></tr>
-     <tr class="pcap"><td></td><td>&nbsp;</td><td></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-m"><td></td><td>
        <strong>m</strong></td><td></td></tr>
      <tr>
        <td></td>
        <td>
-       <a href="devices.html#module-motor"><tt class="xref">motor</tt></a></td><td>
+       <a href="devices.html#module-motor"><code class="xref">motor</code></a></td><td>
        <em></em></td></tr>
-     <tr class="pcap"><td></td><td>&nbsp;</td><td></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-p"><td></td><td>
        <strong>p</strong></td><td></td></tr>
      <tr>
        <td></td>
        <td>
-       <a href="pv.html#module-pv"><tt class="xref">pv</tt></a></td><td>
+       <a href="pv.html#module-pv"><code class="xref">pv</code></a></td><td>
        <em>PV objects for Epics Channel Access</em></td></tr>
-     <tr class="pcap"><td></td><td>&nbsp;</td><td></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-w"><td></td><td>
        <strong>w</strong></td><td></td></tr>
      <tr>
        <td></td>
        <td>
-       <a href="wx.html#module-wx"><tt class="xref">wx</tt></a></td><td>
+       <a href="wx.html#module-wx"><code class="xref">wx</code></a></td><td>
        <em>wxPython Widgets for Epics</em></td></tr>
    </table>
 
@@ -179,7 +176,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -188,24 +185,22 @@
         <li class="right" >
           <a href="#" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="np-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-   <li><a href="overview.html">overview</a>|</li>
-   <li><a href="installation.html">download</a>|</li>
-   <li><a href="pv.html">pv</a>|</li>
-   <li><a href="ca.html">ca</a>|</li>
-   <li><a href="devices.html">devices</a>|</li>
-   <li><a href="wx.html">wx</a>|</li>
-   <li><a href="advanced.html">advanced</a>|</li>
-   <li><a href="more.html">contents</a>|</li>
-   &nbsp;&nbsp;<li><a href="search.html">search</a></li>
+   <li>[<a href="installation.html">install</a></li>
+   <li>|<a href="overview.html">overview</a></li>
+   <li>|<a href="pv.html">pv</a></li>
+   <li>|<a href="ca.html">ca</a></li>
+   <li>|<a href="arrays.html">arrays</a></li>
+   <li>|<a href="devices.html">devices</a></li>
+   <li>|<a href="alarm.html">alarm</a></li>
+   <li>|<a href="autosave.html">autosave</a></li>
+   <li>|<a href="wx.html">wx</a></li>
+   <li>|<a href="advanced.html">advanced</a>]</li>
  
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2012, Matthew Newville.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014, Matthew Newville.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>
