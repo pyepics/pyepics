@@ -5,8 +5,8 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-This package requires Python version 2.7, 3.4, 3.5, or 3.6.  It should
-work with Python 2.6, 3.2, or 3.3, but these are no longer being
+This package requires Python version 2.7, 3.5, or 3.6.  It may
+work with Python 2.6, 3.2, 3.3, or 3.4, but these are no longer being
 tested regularly.
 
 In addition, version 3.14 of the EPICS Channel Access library (v
@@ -50,18 +50,18 @@ Downloads and Installation
 .. _pyepics CARS downloads:       http://cars9.uchicago.edu/software/python/pyepics3/src/
 
 
-The latest stable version of the PyEpics Package is 3.2.5.  Source code
-kits and Windows installers can be found at either `pyepics PyPI`_ or
-`pyepics CARS downloads`_ site.  With `Python Setup Tools`_ now standard
-for Python 2.7 and abouve, the simplest way to install the pyepics is
-with::
+The latest stable version of the PyEpics Package is 3.2.7.  Source
+code kits and Windows installers can be found at either `pyepics
+PyPI`_ or `pyepics CARS downloads`_ site.  With `Python Setup Tools`_
+now standard for Python 2.7 and abouve, the simplest way to install
+the pyepics is with::
 
      pip install pyepics
 
 If you're using Anaconda, there are a few conda channels for pyepics,
 including::
 
-     conda install -c https://conda.anaconda.org/newville pyepics
+     conda install -c https://conda.anaconda.org/GSECARS pyepics
 
 
 Getting Started, Setting up the Epics Environment
@@ -102,7 +102,7 @@ included in the installation kit, and should be automatically installed to
 where they can be found at runtime (following rule 3 above).  If they are
 not found (or another version is found that conflicts),  you should copy
 them to a place where they can be found, such as the Python DLLs folder,
-which might be something like ``C:\Python27\DLLs``.
+which might be something like ``C:\Python36\DLLs``.
 
 For more details, especially about how to set paths for LD_LIBRARY_PATH or
 DYLD_LIBRARY_PATH on Unix-like systems, see the INSTALL file.

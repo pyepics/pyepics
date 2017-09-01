@@ -153,6 +153,12 @@ completed.   See :ref:`pv-putwait-label` for more details.
    dictionary may have many members, depending on the data type of PV.  See
    the :ref:`Table of Control Attributes <ctrlvars_table>`  for details.
 
+.. method:: get_timevars()
+
+   returns a dictionary of the **time values** for the PV, which
+   include `status`, `severity`, and the `timestamp` from the CA
+   server.
+
 .. method:: poll([evt=1.e-4, [iot=1.0]])
 
    poll for changes.  This simply calls :meth:`ca.poll`
@@ -187,10 +193,21 @@ completed.   See :ref:`pv-putwait-label` for more details.
    if timeout is ``None``, the PVs connection_timeout parameter will be used. If that is also ``None``,
    :data:`ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
 
-
 .. method:: disconnect()
 
    disconnect a PV, clearing all callbacks.
+
+.. method:: reconnect()
+
+   reconnect (or try to) a disconnected PV.
+
+.. method:: clear_auto_monitor()
+
+   turn off automatic monitoring of a PV.  Note that this will suspend
+   all event callbacks on a PV at the CA level by calling
+   :func:`ca.clear_subscription`, but will not clear the list of PVs
+   callbacks.  This means that doing :meth:`reconnect` will resume
+   event processing including any callbacks or the PV.
 
 .. method:: add_callback(callback=None[, index=None [, with_ctrlvars=True[, **kw]])
 
@@ -244,6 +261,13 @@ completed.   See :ref:`pv-putwait-label` for more details.
 
    See also: :attr:`callbacks`  attribute, :ref:`pv-callbacks-label`
 
+.. method:: force_read_access_rights()
+
+   force a read of the access rights for a PV.  Normally, a PV will
+   have access rights determined automatically and subscribe to
+   changes in access rights.  But sometimes (especially 64-bit
+   Windows), the automatically reported values are wrong.  This
+   methods will explicitly read the access rights.
 
 attributes
 ~~~~~~~~~~
