@@ -23,10 +23,11 @@ from  math import log10
 import atexit
 import warnings
 from threading import Thread
+from pkg_resources import resource_filename
 
 from .utils import (STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2,
                     strjoin, memcopy, is_string, is_string_or_bytes,
-                    ascii_string)
+                    ascii_string, clib_search_path)
 
 # ignore warning about item size... for now??
 warnings.filterwarnings('ignore',
@@ -125,15 +126,7 @@ def _find_lib(inp_lib_name):
         return dllpath
 
     # Test 2: look in installed python location for dll
-    lname = 'lib{}.so'.format(inp_lib_name)
-    if os.name == 'nt':
-        lname = '{}.dll'.format(inp_lib_name)
-    elif sys.platform == 'darwin':
-        lname = 'lib{}.dylib'.format(inp_lib_name)
-
-    basepath = os.path.split(os.path.abspath(__file__))[0]
-    parent = os.path.split(basepath)[0]
-    dllpath = os.path.join(parent, 'lib', lname)
+    dllpath = resource_filename('epics.clibs', clib_search_path(inp_lib_name))
 
     if (os.path.exists(dllpath) and os.path.isfile(dllpath)):
         return dllpath

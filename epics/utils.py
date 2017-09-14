@@ -3,6 +3,7 @@ String and data utils, where implementation differs between Python 2 & 3
 """
 import sys
 from copy import deepcopy
+import os
 
 PY_MAJOR, PY_MINOR = sys.version_info[:2]
 
@@ -24,3 +25,44 @@ memcopy = deepcopy
 if PY_MAJOR == 2 and PY_MINOR == 5:
     def memcopy(a):
         return a
+
+def clib_search_path(lib):
+    '''Assemble path to c library.
+
+    Parameters
+    ----------
+    lib : str
+        Either 'ca' or 'Com'.
+
+    Returns
+    --------
+    str : string
+
+    Examples
+    --------
+    >>> clib_search_path('ca')
+    'linux64/libca.so'
+
+    '''
+
+    # determine which libca / libCom dll is appropriate
+    try:
+        import platform
+        nbits = platform.architecture()[0]
+    except:
+        nbits = '32bit'
+    nbits = nbits.replace('bit', '')
+
+    libfmt = 'lib%s.so'
+    if os.name == 'nt':
+        libsrc = 'win'
+        libfmt = '%s.dll'
+    elif sys.platform == 'darwin':
+        libsrc = 'darwin'
+        libfmt = 'lib%s.dylib'
+    elif sys.platform.startswith('linux'):
+        libsrc = 'linux'
+    else:
+        return None
+
+    return os.path.join("%s%s" % (libsrc, nbits), libfmt % lib)

@@ -44,31 +44,8 @@ problem before tyring to use the epics package.
 
 nolibca = os.environ.get('NOLIBCA', None)
 if nolibca is None:
-    # determine which libca / libCom dll is appropriate
-    try:
-        import platform
-        nbits = platform.architecture()[0]
-    except:
-        nbits = '32bit'
-    nbits = nbits.replace('bit', '')
-
-    libfmt = 'lib%s.so'
-    if os.name == 'nt':
-        libsrc = 'win'
-        libfmt = '%s.dll'
-    elif sys.platform == 'darwin':
-        libsrc = 'darwin'
-        libfmt = 'lib%s.dylib'
-    elif sys.platform.startswith('linux'):
-        libsrc = 'linux'
-    else:
-        libsrc = None
-
-    pjoin = os.path.join
-
-    if libsrc is not None:
-        data_files = [pjoin("%s%s" % (libsrc, nbits), libfmt % "ca"),
-                      pjoin("%s%s" % (libsrc, nbits), libfmt % "Com")]
+    data_files = [epics.utils.clib_search_path("ca"),
+                  epics.utils.clib_search_path("Com")]
 else:
     data_files = None
 
