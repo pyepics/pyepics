@@ -67,11 +67,8 @@ if nolibca is None:
     pjoin = os.path.join
 
     if libsrc is not None:
-        data_files = [('lib',
-                       [pjoin("dlls", "%s%s" % (libsrc, nbits), libfmt % "ca"),
-                        pjoin("dlls", "%s%s" % (libsrc, nbits), libfmt % "Com")
-                        ]
-                       )]
+        data_files = [pjoin("%s%s" % (libsrc, nbits), libfmt % "ca"),
+                      pjoin("%s%s" % (libsrc, nbits), libfmt % "Com")]
 else:
     data_files = None
 
@@ -98,8 +95,9 @@ setup(name = 'pyepics',
                       'Programming Language :: Python',
                       'Topic :: Scientific/Engineering'],
       packages = ['epics','epics.wx','epics.devices',
-                  'epics.compat', 'epics.autosave'],
-      data_files = data_files )
+                  'epics.compat', 'epics.autosave', 'epics.clibs'],
+      package_data = {'epics.clibs': data_files},
+     )
 
 try:
     libca = epics.ca.find_libca()
