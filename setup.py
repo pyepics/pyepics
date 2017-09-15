@@ -44,10 +44,10 @@ problem before tyring to use the epics package.
 
 nolibca = os.environ.get('NOLIBCA', None)
 if nolibca is None:
-    data_files = [epics.utils.clib_search_path("ca"),
-                  epics.utils.clib_search_path("Com")]
+    pkg_data = {'epics.clibs': [epics.utils.clib_search_path("ca"),
+                                epics.utils.clib_search_path("Com")],}
 else:
-    data_files = None
+    pkg_data = dict()
 
 PY_MAJOR, PY_MINOR = sys.version_info[:2]
 if PY_MAJOR == 2 and PY_MINOR < 6:
@@ -71,9 +71,9 @@ setup(name = 'pyepics',
                       'Operating System :: OS Independent',
                       'Programming Language :: Python',
                       'Topic :: Scientific/Engineering'],
-      packages = ['epics','epics.wx','epics.devices',
-                  'epics.compat', 'epics.autosave', 'epics.clibs'],
-      package_data = {'epics.clibs': data_files},
+      packages = ['epics','epics.wx','epics.devices', 'epics.compat',
+                  'epics.autosave', 'epics.clibs'],
+      package_data = pkg_data,
      )
 
 try:
