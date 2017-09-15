@@ -78,6 +78,5 @@ setup(name = 'pyepics',
 
 try:
     libca = epics.ca.find_libca()
-    sys.stdout.write("\n  Will use CA library at:  %s \n\n" % libca)
 except:
     sys.stdout.write("%s" % no_libca)
