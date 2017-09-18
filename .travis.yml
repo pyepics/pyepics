@@ -88,6 +88,7 @@ before_script:
 
 script:
   - cd tests
+  - find /home/travis/mc/envs/testenv/lib/python2.7/site-packages/epics/
   # check/record some basic pyepics things
   - echo "Checking pyepics version and libca locations:"
   - python -c "import epics; print(epics.__version__)"
