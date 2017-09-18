@@ -58,10 +58,6 @@ before_install:
   - conda create -n $CONDA_ENV python=$TRAVIS_PYTHON_VERSION epics-base
   - source activate $CONDA_ENV
 
-  # need to reactivate after installing epics-base so that the EPICS_BASE env
-  # var is set
-  - source activate $CONDA_ENV
-
 install:
   # install pyepics dependencies
   - conda install numpy
