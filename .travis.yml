@@ -52,7 +52,6 @@ before_install:
   - export PATH=/home/travis/mc/bin:$PATH
   - conda config --set always_yes true
   - conda update conda --yes
-  - conda install conda-build anaconda-client jinja2
   - conda config --add channels lightsource2-tag
 
   # MAKE THE CONDA RECIPE
