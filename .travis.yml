@@ -46,6 +46,7 @@ before_install:
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
   - "./miniconda.sh -b -p /home/travis/mc"
+  - if [ -n "$NOLIBCA" ]; then export PYEPICS_LIBCA=$HOME/mc/envs/$CONDA_ENV/lib/libca.so; fi
   - env
 
   - export PATH=/home/travis/mc/bin:$PATH
