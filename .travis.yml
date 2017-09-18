@@ -72,12 +72,6 @@ install:
   # install pyepics as a source install
   - pip install -v .
 
-
-  # setup some path environment variables for epics
-  - export PATH=$PATH:$EPICS_BASE/bin/$EPICS_HOST_ARCH
-  - export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$EPICS_BASE/lib/$EPICS_HOST_ARCH"
-  - echo "PATH=$PATH"
-
   # allow gdb backtrace to show when tests fail
   - sudo apt-get -y install gdb
   - ulimit -c
