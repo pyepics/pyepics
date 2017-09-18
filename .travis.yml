@@ -35,7 +35,6 @@ before_install:
   - export CONDA_ENV="testenv"
 
   - perl --version
-  - git fetch --unshallow
   - docker pull ${DOCKERIMAGE}:${DOCKERTAG}
   - docker images
   - docker ps -a
