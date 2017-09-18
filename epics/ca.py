@@ -23,10 +23,11 @@ from  math import log10
 import atexit
 import warnings
 from threading import Thread
+from pkg_resources import resource_filename
 
 from .utils import (STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2,
                     strjoin, memcopy, is_string, is_string_or_bytes,
-                    ascii_string)
+                    ascii_string, clib_search_path)
 
 # ignore warning about item size... for now??
 warnings.filterwarnings('ignore',
@@ -125,15 +126,7 @@ def _find_lib(inp_lib_name):
         return dllpath
 
     # Test 2: look in installed python location for dll
-    lname = 'lib{}.so'.format(inp_lib_name)
-    if os.name == 'nt':
-        lname = '{}.dll'.format(inp_lib_name)
-    elif sys.platform == 'darwin':
-        lname = 'lib{}.dylib'.format(inp_lib_name)
-
-    basepath = os.path.split(os.path.abspath(__file__))[0]
-    parent = os.path.split(basepath)[0]
-    dllpath = os.path.join(parent, 'lib', lname)
+    dllpath = resource_filename('epics.clibs', clib_search_path(inp_lib_name))
 
     if (os.path.exists(dllpath) and os.path.isfile(dllpath)):
         return dllpath
@@ -178,30 +171,6 @@ def _find_lib(inp_lib_name):
     dllpath = ctypes.util.find_library(inp_lib_name)
     if dllpath is not None:
         return dllpath
-
-    # Test 4: on unixes, look expliticly with EPICS_BASE env var and
-    # known architectures for ca.so
-    if os.name == 'posix':
-        known_hosts = {'Linux': ('linux-x86', 'linux-x86_64'),
-                       'Darwin': ('darwin-ppc', 'darwin-x86'),
-                       'SunOS': ('solaris-sparc', 'solaris-sparc-gnu')
-                       }
-
-        libname = 'lib{}.so'.format(inp_lib_name)
-        if sys.platform == 'darwin':
-            libname = 'lib{}.dylib'.format(inp_lib_name)
-
-        epics_base = os.environ.get('EPICS_BASE', '.')
-        epics_host_arch = os.environ.get('EPICS_HOST_ARCH')
-        host_arch = os.uname()[0]
-        if host_arch in known_hosts:
-            epicspath = [os.path.join(epics_base, 'lib', epics_host_arch)] if epics_host_arch else []
-            for adir in known_hosts[host_arch]:
-                epicspath.append(os.path.join(epics_base, 'lib', adir))
-        for adir in search_path + epicspath:
-            if os.path.exists(adir) and os.path.isdir(adir):
-                if libname in os.listdir(adir):
-                    return os.path.join(adir, libname)
 
     raise ChannelAccessException('cannot find Epics CA DLL')
 

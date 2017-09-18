@@ -87,6 +87,8 @@ before_script:
   - ulimit -c unlimited -S
 
 script:
+  - cd tests
+  - find /home/travis/mc/envs/testenv/lib/python2.7/site-packages/epics/
   # check/record some basic pyepics things
   - echo "Checking pyepics version and libca locations:"
   - python -c "import epics; print(epics.__version__)"
@@ -104,7 +106,7 @@ script:
   - caget Py:long1
 
   # running tests
-  - py.test -vv --cov=epics --cov-report term-missing tests/ca_unittest.py tests/pv_unittest.py tests/test_pool.py tests/test_threading.py tests/test_cas.py || RESULT=$?
+  - py.test -vv --cov=epics --cov-report term-missing ca_unittest.py pv_unittest.py test_pool.py test_threading.py test_cas.py || RESULT=$?
   - if [[ ${RESULT} != 0 ]]; then gdb python core* -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
   - if [[ ${RESULT} != 0 ]]; then exit $RESULT ; fi;
 
