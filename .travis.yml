@@ -54,8 +54,6 @@ before_install:
   - conda update conda --yes
   - conda install conda-build anaconda-client jinja2
   - conda config --add channels lightsource2-tag
-  - conda config --add channels lightsource2
-  - conda config --add channels soft-matter
 
   # MAKE THE CONDA RECIPE
   - conda create -n $CONDA_ENV python=$TRAVIS_PYTHON_VERSION epics-base
