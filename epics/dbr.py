@@ -83,12 +83,12 @@ DBE_PROPERTY = 8
 
 chid_t   = ctypes.c_long
 
-# Note that Windows needs to be told that chid is 8 bytes for 64-bit, 
-# except that Python2 is very weird -- using a 4byte chid for 64-bit, 
-# but needing a 1 byte padding! 
+# Note that Windows needs to be told that chid is 8 bytes for 64-bit,
+# except that Python2 is very weird -- using a 4byte chid for 64-bit,
+# but needing a 1 byte padding!
 if PY64_WINDOWS and PY_MAJOR > 2:
     chid_t = ctypes.c_int64
-	
+
 short_t  = ctypes.c_short
 ushort_t = ctypes.c_ushort
 int_t    = ctypes.c_int
@@ -329,14 +329,14 @@ class event_handler_args(ctypes.Structure):
     "event handler arguments"
     _fields_ = [('usr',     ctypes.py_object),
                 ('chid',    chid_t),
-                ('type',    long_t), 
+                ('type',    long_t),
                 ('count',   long_t),
                 ('raw_dbr', void_p),
                 ('status',  int_t)]
 
 class connection_args(ctypes.Structure):
     "connection arguments"
-    _fields_ = [('chid', chid_t), 
+    _fields_ = [('chid', chid_t),
                 ('op', long_t)]
 
 class access_rights_handler_args(ctypes.Structure):
@@ -352,14 +352,21 @@ if PY64_WINDOWS and PY_MAJOR == 2:
         _fields_ = [('usr',     ctypes.py_object),
                     ('chid',    chid_t),
                     ('_pad_',   ctypes.c_int8),
-                    ('type',    ctypes.c_int32), 
+                    ('type',    ctypes.c_int32),
                     ('count',   ctypes.c_int32),
                     ('raw_dbr', void_p),
                     ('status',  ctypes.c_int32)]
 
     class connection_args(ctypes.Structure):
         "connection arguments"
-        _fields_ = [('chid', chid_t), 
+        _fields_ = [('chid', chid_t),
                     ('_pad_',ctypes.c_int8),
                     ('op',   long_t)]
 
+
+    class access_rights_handler_args(ctypes.Structure):
+        "access rights arguments"
+        _fields_ = [('chid', chid_t),
+                    ('_pad_',ctypes.c_int8),
+                    ('read_access', uint_t, 1),
+                    ('write_access', uint_t, 1)]
