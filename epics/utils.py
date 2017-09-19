@@ -54,15 +54,19 @@ def clib_search_path(lib):
     nbits = nbits.replace('bit', '')
 
     libfmt = 'lib%s.so'
-    if os.name == 'nt':
-        libsrc = 'win'
-        libfmt = '%s.dll'
-    elif sys.platform == 'darwin':
-        libsrc = 'darwin'
-        libfmt = 'lib%s.dylib'
-    elif sys.platform.startswith('linux'):
-        libsrc = 'linux'
-    else:
-        return None
+    try:
+        if os.name == 'nt':
+            libsrc = 'win'
+            libfmt = '%s.dll'
+        elif sys.platform == 'darwin':
+            libsrc = 'darwin'
+            libfmt = 'lib%s.dylib'
+        elif sys.platform.startswith('linux'):
+            libsrc = 'linux'
+        else:
+            return None
+    except AttributeError:
+        pass
 
-    return os.path.join("%s%s" % (libsrc, nbits), libfmt % lib)
+    if libsrc is not None:
+        return os.path.join("%s%s" % (libsrc, nbits), libfmt % lib)
