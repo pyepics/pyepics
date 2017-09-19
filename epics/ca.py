@@ -251,8 +251,9 @@ def initialize_libca():
 
     # in_dll is not available for arrays in IronPython, so use a reference to the first element
     if dbr.IRON_PYTHON:
-	    value_offset0 = ctypes.c_short.in_dll(libca,'dbr_value_offset')
-	    dbr.value_offset = ctypes.cast(ctypes.addressof(value_offset0), (39*ctypes.c_short))
+        value_offset0 = ctypes.c_short.in_dll(libca,'dbr_value_offset')
+        dbr.value_offset = ctypes.cast(ctypes.addressof(value_offset0),
+                                       (39*ctypes.c_short))
     else:
         dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
 
