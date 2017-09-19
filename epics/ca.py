@@ -181,6 +181,9 @@ def _find_lib(inp_lib_name):
 def find_libca():
     return _find_lib('ca')
 
+def find_libCom():
+    return _find_lib('Com')
+
 def initialize_libca():
     """Initialize the Channel Access library.
 
@@ -216,6 +219,8 @@ def initialize_libca():
     else:
         load_dll = ctypes.cdll.LoadLibrary
     try:
+        # force loading the chosen version of libCom
+        load_dll(find_libCom())
         libca = load_dll(find_libca())
     except Exception as exc:
         raise ChannelAccessException('loading Epics CA DLL failed: ' + str(exc))
