@@ -11,5 +11,6 @@ The web site is http://pyparsing.wikispaces.com/
 """
 from . import save_restore
 
+AutoSaver = save_restore.AutoSaver
 restore_pvs = save_restore.restore_pvs
 save_pvs = save_restore.save_pvs

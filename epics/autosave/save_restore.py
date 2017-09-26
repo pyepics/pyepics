@@ -27,10 +27,9 @@ from pyparsing import Literal, Optional, Word, Combine, Regex, Group, \
 
 import sys
 import os
-import time
 import datetime
 import json
-from epics.pv import PV
+from epics.pv import get_pv
 
 def restore_pvs(filepath, debug=False):
     """ 
@@ -40,43 +39,42 @@ def restore_pvs(filepath, debug=False):
 
     Returns True if all pvs were restored successfully.
     """
-    success = True
-    fout = open(filepath, 'r')
-    lines = fout.readlines()
-    fout.close()
-    for line in lines:
-        if line.startswith('<END'):
-            break
-        if line.startswith('#'):
-            continue
-        pvname, value = [w.strip() for w in line[:-1].split(' ', 1)]            
-        if value.startswith('<JSON>:'):  # for older version, could be deprecated
-            value = value.replace('<JSON>:', '@array@')
-        if value.startswith('@array@'):
-            value = value.replace('@array@', '').strip()
-            if value.startswith('{') and value.endswith('}'):
-                value = value[1:-1]
-            value = json.loads(value)            
-        if debug:
-            print( "Setting %s to %s..." % (pvname, value))
-        try:
-            thispv = PV(pvname)
-            thispv.connect()
-            if not thispv.connected:
-                print("Cannot connect to %s" % (pvname))
-            elif not thispv.write_access:
-                print("No write access to %s" % (pvname))
-            else:
-                thispv.put(value, wait=False)
+    pv_vals = []
+    failures = []
+    # preload PV names and values, hoping PV connections happen in background
+    with open(filepath, 'r') as fh:
+        for line in fh.readlines():
+            if len(line) < 2 or  line.startswith('<END') or line.startswith('#'):
+                continue
+            pvname, value = [w.strip() for w in line[:-1].split(' ', 1)]
+            if value.startswith('@array@'):
+                value = value.replace('@array@', '').strip()
+                if value.startswith('{') and value.endswith('}'):
+                    value = value[1:-1]
+                value = json.loads(value)
+            thispv = get_pv(pvname, connect=False)
+            pv_vals.append((thispv, value))
 
-        except:
-            exctype, excvalue, exctrace = sys.exc_info()
-            print("Error restoring %s to %s : %s" % (pvname, value,
-                                                     exctype, excvalue))
-            success = False
-    return success
-    
-def save_pvs(request_file, save_pvs, debug=False):
+    for thispv, value in pv_vals:
+        thispv.connect()
+        pvname = thispv.pvname
+        if not thispv.connected:
+            print("Cannot connect to %s" % (pvname))
+        elif not thispv.write_access:
+            print("No write access to %s" % (pvname))
+        else:
+            if debug:
+                print("Setting %s to %s" % (pvname, value))
+            try:
+                thispv.put(value, wait=False)
+            except:
+                exctype, excvalue, exctrace = sys.exc_info()
+                print("Error restoring %s to %s : %s" % (pvname, value,
+                                                         exctype, excvalue))
+                failues.append(pvname)
+    return len(failures) == 0
+
+def save_pvs(request_file, save_file, debug=False):
     """
     Save pvs from a request file to a save file, via Channel Access
 
@@ -84,35 +82,56 @@ def save_pvs(request_file, save_pvs, debug=False):
 
     Will print a warning if a PV cannot connect.
     """
-    pv_vals = []
-    pvobjs = [PV(pvn) for pvn in _parse_request_file(request_file)]
-    [pv.connect() for pv in pvobjs]
-    for thispv in pvobjs:
-        pvname = thispv.pvname
-        thispv.connect()
-        if not thispv.connected:
-            print("Cannot connect to %s" % (pvname))
-            continue
-        if thispv.count == 1:
-            value = str(thispv.get())
-        elif thispv.count > 1 and thispv.type == 'char':
-            value = thispv.get(as_string=True)
-        elif thispv.count > 1 and thispv.type != 'char':
-            value = '@array@ %s' % json.dumps(thispv.get().tolist())
-        pv_vals.append((pvname, value))
-
-    if debug:
-        for (pv,val) in pv_vals:
-            print( "PV %s = %s" % (pv, val))
-
-    f = open(save_pvs, "w")
-    f.write("# File saved by pyepics autosave.save_pvs() on %s\n" % 
-            datetime.datetime.now().isoformat())
-    f.write("# Edit with extreme care.\n")
-    f.writelines([ "%s %s\n" % v for v in pv_vals ])
-    f.write("<END>\n")
-    f.close()
+    saver = AutoSaver(request_file)
+    saver.save(save_file, verbose=debug)
     
+class AutoSaver(object):
+    """Autosave class"""
+    def __init__(self, request_file=None, use_timestamp=True):
+        self.request_file = request_file
+        self.use_timestamp = use_timestamp
+        self.pvs = []
+        if request_file is not None:
+            self.read_request_file(request_file)
+
+    def read_request_file(self, request_file=None):
+        if request_file is not None:
+            self.request_file = request_file
+        self.pvs = []
+        for pvname in _parse_request_file(request_file):
+            self.pvs.append(get_pv(pvname, connect=False))
+
+    def save(self, save_file=None, verbose=False):
+        """save PVs to save_file"""
+        now = datetime.datetime.now()
+        if save_file is None:
+            tstamp = now.strftime("%Y%b%d_%H%M%S")
+            save_file = "%s.%s" % (self.request_file, tstamp)
+
+        buff = ["# File saved by pyepics autosave.save_pvs() on %s" % now,
+                "# Edit with extreme care."]
+
+        for thispv in self.pvs:
+            pvname = thispv.pvname
+            thispv.connect()
+            if not thispv.connected:
+                print("Cannot connect to %s" % (pvname))
+                continue
+            if thispv.count == 1:
+                value = str(thispv.get())
+            elif thispv.count > 1 and 'char' in thispv.type:
+                value = thispv.get(as_string=True)
+            elif thispv.count > 1 and char not in thispv.type:
+                value = '@array@ %s' % json.dumps(thispv.get().tolist())
+            buff.append("%s %s" % (pvname, value))
+            if verbose:
+                print( "PV %s = %s" % (pvname, value))
+
+        buff.append("<END>\n")
+        with open(save_file, 'w') as fh:
+            fh.write("\n".join(buff))
+            print("wrote %s"% save_file)
+
 def _parse_request_file(request_file, macro_values={}):
     """ 
     Internal function to parse a request file.
