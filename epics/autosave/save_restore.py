@@ -13,7 +13,7 @@ Files -
 xxx.req - A request file with a list of pvs to save. Format is the same as autosave request format,
           including being able to have "file yyy.req VAR=A,OTHER=B" style macro expansions.
 
-xxx.sav - A saved file with the current PV values, to save/restore. Standalone file, this is a 
+xxx.sav - A saved file with the current PV values, to save/restore. Standalone file, this is a
           compatible format to the .sav files which are used by autosave.
 
 This module requires/uses pyparsing parser framework. Debian/Ubuntu package is "python-pyparsing"
@@ -32,9 +32,9 @@ import json
 from epics.pv import get_pv
 
 def restore_pvs(filepath, debug=False):
-    """ 
-    Restore pvs from a save file via Channel Access 
-    
+    """
+    Restore pvs from a save file via Channel Access
+
     debug - Set to True if you want a line printed for each value set
 
     Returns True if all pvs were restored successfully.
@@ -84,12 +84,11 @@ def save_pvs(request_file, save_file, debug=False):
     """
     saver = AutoSaver(request_file)
     saver.save(save_file, verbose=debug)
-    
+
 class AutoSaver(object):
     """Autosave class"""
-    def __init__(self, request_file=None, use_timestamp=True):
+    def __init__(self, request_file=None):
         self.request_file = request_file
-        self.use_timestamp = use_timestamp
         self.pvs = []
         if request_file is not None:
             self.read_request_file(request_file)
@@ -105,35 +104,39 @@ class AutoSaver(object):
         """save PVs to save_file"""
         now = datetime.datetime.now()
         if save_file is None:
+            sfile = self.request_file
+            if sfile.endswith('.req'):
+                sfile = sfile:[:-4]
             tstamp = now.strftime("%Y%b%d_%H%M%S")
-            save_file = "%s.%s" % (self.request_file, tstamp)
+            save_file = "%s_%s.sav" % (sfile, tstamp)
 
-        buff = ["# File saved by pyepics autosave.save_pvs() on %s" % now,
+        buff = ["# File saved by pyepics AutoSaver.save() on %s" % now,
                 "# Edit with extreme care."]
 
         for thispv in self.pvs:
             pvname = thispv.pvname
-            thispv.connect()
-            if not thispv.connected:
-                print("Cannot connect to %s" % (pvname))
-                continue
-            if thispv.count == 1:
-                value = str(thispv.get())
-            elif thispv.count > 1 and 'char' in thispv.type:
-                value = thispv.get(as_string=True)
-            elif thispv.count > 1 and char not in thispv.type:
-                value = '@array@ %s' % json.dumps(thispv.get().tolist())
-            buff.append("%s %s" % (pvname, value))
-            if verbose:
-                print( "PV %s = %s" % (pvname, value))
+            thispv.wait_for_connection()
+            if thispv.connected:
+                if thispv.count == 1:
+                    value = str(thispv.get())
+                elif thispv.count > 1 and 'char' in thispv.type:
+                    value = thispv.get(as_string=True)
+                elif thispv.count > 1 and 'char' not in thispv.type:
+                    value = '@array@ %s' % json.dumps(thispv.get().tolist())
+                buff.append("%s %s" % (pvname, value))
+                if verbose:
+                    print( "PV %s = %s" % (pvname, value))
+            elif verbose:
+                print("PV %s not connected" % (pvname))
+
 
         buff.append("<END>\n")
         with open(save_file, 'w') as fh:
             fh.write("\n".join(buff))
-            print("wrote %s"% save_file)
+        print("wrote %s"% save_file)
 
 def _parse_request_file(request_file, macro_values={}):
-    """ 
+    """
     Internal function to parse a request file.
 
     Parse happens in two stages, first build an AST then walk it and do
@@ -169,7 +172,7 @@ ignored_comma = Literal(',').suppress()
 
 file_name = Word(alphanums+":._-+/\\")
 
-number = Word(nums) 
+number = Word(nums)
 integer = Combine( Optional(minus) + number )
 float_number = Combine( integer +
                         Optional( point + Optional(number) )
