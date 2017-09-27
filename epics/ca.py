@@ -119,8 +119,13 @@ def _find_lib(inp_lib_name):
     find location of ca dynamic library
     """
     # Test 1: if PYEPICS_LIBCA env var is set, use it.
-    dllpath = os.environ.get(
-        'PYEPICS_LIB{}'.format(inp_lib_name.upper()), None)
+    dllpath = os.environ.get('PYEPICS_LIBCA', None)
+
+    # find libCom.so *next to* libca.so if PYEPICS_LIBCA was set
+    if dllpath is not None and inp_lib_name != 'ca':
+        _parent, _name = os.path.split(dllpath)
+        dllpath = os.path.join(_parent, _name.replace('ca', inp_lib_name))
+    
     if (dllpath is not None and os.path.exists(dllpath) and
             os.path.isfile(dllpath)):
         return dllpath
@@ -220,7 +225,8 @@ def initialize_libca():
         load_dll = ctypes.cdll.LoadLibrary
     try:
         # force loading the chosen version of libCom
-        load_dll(find_libCom())
+        if os.name == 'nt':
+            load_dll(find_libCom())
         libca = load_dll(find_libca())
     except Exception as exc:
         raise ChannelAccessException('loading Epics CA DLL failed: ' + str(exc))
