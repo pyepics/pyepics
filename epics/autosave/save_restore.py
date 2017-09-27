@@ -106,7 +106,7 @@ class AutoSaver(object):
         if save_file is None:
             sfile = self.request_file
             if sfile.endswith('.req'):
-                sfile = sfile:[:-4]
+                sfile = sfile[:-4]
             tstamp = now.strftime("%Y%b%d_%H%M%S")
             save_file = "%s_%s.sav" % (sfile, tstamp)
 
