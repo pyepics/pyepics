@@ -854,6 +854,9 @@ class PV(object):
         self.callbacks = {}
 
     def __del__(self):
+        if getattr(ca, 'libca', None) is None:
+            return
+
         try:
             self.disconnect()
         except:

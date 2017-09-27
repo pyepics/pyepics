@@ -131,10 +131,7 @@ def _find_lib(inp_lib_name):
         return dllpath
 
     # Test 2: look in installed python location for dll
-    try:
-        dllpath = resource_filename('epics.clibs', clib_search_path(inp_lib_name))
-    except TypeError:
-        return None
+    dllpath = resource_filename('epics.clibs', clib_search_path(inp_lib_name))
 
     if (os.path.exists(dllpath) and os.path.isfile(dllpath)):
         return dllpath
