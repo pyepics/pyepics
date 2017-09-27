@@ -13,7 +13,7 @@ Files -
 xxx.req - A request file with a list of pvs to save. Format is the same as autosave request format,
           including being able to have "file yyy.req VAR=A,OTHER=B" style macro expansions.
 
-xxx.sav - A saved file with the current PV values, to save/restore. Standalone file, this is a 
+xxx.sav - A saved file with the current PV values, to save/restore. Standalone file, this is a
           compatible format to the .sav files which are used by autosave.
 
 This module requires/uses pyparsing parser framework. Debian/Ubuntu package is "python-pyparsing"
@@ -27,56 +27,54 @@ from pyparsing import Literal, Optional, Word, Combine, Regex, Group, \
 
 import sys
 import os
-import time
 import datetime
 import json
-from epics.pv import PV
+from epics.pv import get_pv
 
 def restore_pvs(filepath, debug=False):
-    """ 
-    Restore pvs from a save file via Channel Access 
-    
+    """
+    Restore pvs from a save file via Channel Access
+
     debug - Set to True if you want a line printed for each value set
 
     Returns True if all pvs were restored successfully.
     """
-    success = True
-    fout = open(filepath, 'r')
-    lines = fout.readlines()
-    fout.close()
-    for line in lines:
-        if line.startswith('<END'):
-            break
-        if line.startswith('#'):
-            continue
-        pvname, value = [w.strip() for w in line[:-1].split(' ', 1)]            
-        if value.startswith('<JSON>:'):  # for older version, could be deprecated
-            value = value.replace('<JSON>:', '@array@')
-        if value.startswith('@array@'):
-            value = value.replace('@array@', '').strip()
-            if value.startswith('{') and value.endswith('}'):
-                value = value[1:-1]
-            value = json.loads(value)            
-        if debug:
-            print( "Setting %s to %s..." % (pvname, value))
-        try:
-            thispv = PV(pvname)
-            thispv.connect()
-            if not thispv.connected:
-                print("Cannot connect to %s" % (pvname))
-            elif not thispv.write_access:
-                print("No write access to %s" % (pvname))
-            else:
-                thispv.put(value, wait=False)
+    pv_vals = []
+    failures = []
+    # preload PV names and values, hoping PV connections happen in background
+    with open(filepath, 'r') as fh:
+        for line in fh.readlines():
+            if len(line) < 2 or  line.startswith('<END') or line.startswith('#'):
+                continue
+            pvname, value = [w.strip() for w in line[:-1].split(' ', 1)]
+            if value.startswith('@array@'):
+                value = value.replace('@array@', '').strip()
+                if value.startswith('{') and value.endswith('}'):
+                    value = value[1:-1]
+                value = json.loads(value)
+            thispv = get_pv(pvname, connect=False)
+            pv_vals.append((thispv, value))
 
-        except:
-            exctype, excvalue, exctrace = sys.exc_info()
-            print("Error restoring %s to %s : %s" % (pvname, value,
-                                                     exctype, excvalue))
-            success = False
-    return success
-    
-def save_pvs(request_file, save_pvs, debug=False):
+    for thispv, value in pv_vals:
+        thispv.connect()
+        pvname = thispv.pvname
+        if not thispv.connected:
+            print("Cannot connect to %s" % (pvname))
+        elif not thispv.write_access:
+            print("No write access to %s" % (pvname))
+        else:
+            if debug:
+                print("Setting %s to %s" % (pvname, value))
+            try:
+                thispv.put(value, wait=False)
+            except:
+                exctype, excvalue, exctrace = sys.exc_info()
+                print("Error restoring %s to %s : %s" % (pvname, value,
+                                                         exctype, excvalue))
+                failues.append(pvname)
+    return len(failures) == 0
+
+def save_pvs(request_file, save_file, debug=False):
     """
     Save pvs from a request file to a save file, via Channel Access
 
@@ -84,37 +82,61 @@ def save_pvs(request_file, save_pvs, debug=False):
 
     Will print a warning if a PV cannot connect.
     """
-    pv_vals = []
-    pvobjs = [PV(pvn) for pvn in _parse_request_file(request_file)]
-    [pv.connect() for pv in pvobjs]
-    for thispv in pvobjs:
-        pvname = thispv.pvname
-        thispv.connect()
-        if not thispv.connected:
-            print("Cannot connect to %s" % (pvname))
-            continue
-        if thispv.count == 1:
-            value = str(thispv.get())
-        elif thispv.count > 1 and thispv.type == 'char':
-            value = thispv.get(as_string=True)
-        elif thispv.count > 1 and thispv.type != 'char':
-            value = '@array@ %s' % json.dumps(thispv.get().tolist())
-        pv_vals.append((pvname, value))
+    saver = AutoSaver(request_file)
+    saver.save(save_file, verbose=debug)
 
-    if debug:
-        for (pv,val) in pv_vals:
-            print( "PV %s = %s" % (pv, val))
+class AutoSaver(object):
+    """Autosave class"""
+    def __init__(self, request_file=None):
+        self.request_file = request_file
+        self.pvs = []
+        if request_file is not None:
+            self.read_request_file(request_file)
 
-    f = open(save_pvs, "w")
-    f.write("# File saved by pyepics autosave.save_pvs() on %s\n" % 
-            datetime.datetime.now().isoformat())
-    f.write("# Edit with extreme care.\n")
-    f.writelines([ "%s %s\n" % v for v in pv_vals ])
-    f.write("<END>\n")
-    f.close()
-    
+    def read_request_file(self, request_file=None):
+        if request_file is not None:
+            self.request_file = request_file
+        self.pvs = []
+        for pvname in _parse_request_file(request_file):
+            self.pvs.append(get_pv(pvname, connect=False))
+
+    def save(self, save_file=None, verbose=False):
+        """save PVs to save_file"""
+        now = datetime.datetime.now()
+        if save_file is None:
+            sfile = self.request_file
+            if sfile.endswith('.req'):
+                sfile = sfile[:-4]
+            tstamp = now.strftime("%Y%b%d_%H%M%S")
+            save_file = "%s_%s.sav" % (sfile, tstamp)
+
+        buff = ["# File saved by pyepics AutoSaver.save() on %s" % now,
+                "# Edit with extreme care."]
+
+        for thispv in self.pvs:
+            pvname = thispv.pvname
+            thispv.wait_for_connection()
+            if thispv.connected:
+                if thispv.count == 1:
+                    value = str(thispv.get())
+                elif thispv.count > 1 and 'char' in thispv.type:
+                    value = thispv.get(as_string=True)
+                elif thispv.count > 1 and 'char' not in thispv.type:
+                    value = '@array@ %s' % json.dumps(thispv.get().tolist())
+                buff.append("%s %s" % (pvname, value))
+                if verbose:
+                    print( "PV %s = %s" % (pvname, value))
+            elif verbose:
+                print("PV %s not connected" % (pvname))
+
+
+        buff.append("<END>\n")
+        with open(save_file, 'w') as fh:
+            fh.write("\n".join(buff))
+        print("wrote %s"% save_file)
+
 def _parse_request_file(request_file, macro_values={}):
-    """ 
+    """
     Internal function to parse a request file.
 
     Parse happens in two stages, first build an AST then walk it and do
@@ -150,7 +172,7 @@ ignored_comma = Literal(',').suppress()
 
 file_name = Word(alphanums+":._-+/\\")
 
-number = Word(nums) 
+number = Word(nums)
 integer = Combine( Optional(minus) + number )
 float_number = Combine( integer +
                         Optional( point + Optional(number) )
