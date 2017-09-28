@@ -301,7 +301,7 @@ def finalize_libca(maxtime=10.0):
             flush_count += 1
         context_destroy()
         libca = None
-    except StandardError:
+    except Exception:
         pass
     time.sleep(0.01)
 
