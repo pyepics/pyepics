@@ -186,7 +186,7 @@ class ADMCA(Device):
             roi = ADMCAROI(prefix=self._roi_prefix, roi=i+1, data_pv=data_pv)
             if roi.Name is None:
                 roi = ADMCAROI(prefix=self._roi_prefix, roi=i+1,
-                               data_pv=data_pvi, with_poll=True)
+                               data_pv=data_pv, with_poll=True)
             if roi.Name is None:
                 continue
             if len(roi.Name.strip()) > 0 and roi.MinX > 0 and roi.SizeX > 0:
