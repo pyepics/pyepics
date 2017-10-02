@@ -5,6 +5,10 @@ To install the epics module from source, use
 
    python setup.py install
 
+Or,
+
+   pip install .
+
 This assumes that Python 2.5 or higher is installed and is the
 enviroment you wish to istall pyepics in to.
 
@@ -16,7 +20,7 @@ and installed for you.  To prevent the installation of the binaries use
    NOLIBCA=1 python setup.py install
 
 The code is tested via continuation integration on linux for
-python 2.7, 3.4, 3.5, and 3.6.  It is also extensively used on
+python 2.7, 3.5, and 3.6.  It is also extensively used on
 on windows and OSX machine.
 
 
