@@ -18,16 +18,37 @@ level objects on top of that basic interface.  This approach has several
 advantages including no need for extension code written in C, better
 thread-safety, and easier installation on multiple platforms.
 
+Installation
+================
+
 This package requires python2.6 or higher.  The EPICS Channel Access
 library v 3.14.8 or higher is also required, with v 3.14.12 or higher being
-recommended. More specifically, the shared libraries libCom.so and libca.so
-(or Com.dll and ca.dll on Windows) are required to use this module.  For
-Unix-like systems, these are assumed to be available (and findable by
-Python at runtime) on the system. For Windows, pre-built DLLs are included
-and installed so that no other Epics installation is required.
+recommended. Specifically, the shared libraries libCom.so and libca.so
+(or Com.dll and ca.dll on Windows, or libca.dylib and libCom.dylib on macOS)
+are required to use this module.
 
-For installation from source, see the INSTALL file. Binary installers for
-Windows are available.
+To support this requirement, suitably recent versions of the libraries are
+included here, and the OS-appropriate library will be installed alongside
+the python packages. To install from source::
+
+    > python setup.py install
+
+Or,::
+
+    > pip install .
+
+If it is desirable to forgo installation of the pre-packaged EPICS libraries,
+(i.e. suitable libraries already exist on the target system), then simply
+define the _NOLIBCA_ environment variable prior to installation::
+
+    > NOLIBCA=1 python setup.py install
+
+Or,::
+
+    > NOLIBCA=1 pip install .
+
+For additional installation details, see the INSTALL file. Binary installers
+for Windows are available.
 
 License
 ========
