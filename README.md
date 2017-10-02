@@ -28,7 +28,7 @@ To support this requirement, suitably recent versions of the libraries are
 included here, and the OS-appropriate library will be installed alongside
 the python packages. To install from source:
 
-```shell
+```
 > python setup.py install
 ```
 
@@ -42,13 +42,13 @@ If it is desirable to forgo installation of the pre-packaged EPICS libraries,
 (i.e. suitable libraries already exist on the target system), then simply
 define the _NOLIBCA_ environment variable prior to installation:
 
-```shell
+```
 > NOLIBCA=1 python setup.py install
 ```
 
 Or,
 
-```shell
+```
 > NOLIBCA=1 pip install .
 ```
 
