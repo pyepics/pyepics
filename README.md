@@ -133,18 +133,19 @@ caput('PVName', value)
 A partial consequence of that design goal is that not every part of the
 C-level Channel Access library is implemented.   Channel Access features
 that ARE included here are:
-     user callbacks:       user-supplied python function(s) that are run
-			   when a PV's value changes.
-     control values:       a full Control DBR record can be requested.
-     enumeration strings:  enum PV types have integer or string
-			   representation, and you get access to both.
 
-     put with wait:        The PV.put() method can optionally wait until
-			   the record is done processing (and a timeout
+* user callbacks - user-supplied python function(s) that are run when a PV's
+  value changes
+* control values - a full Control DBR record can be requested
+* enumeration strings - enum PV types have integer or string representation,
+  and you get access to both
+* put with wait - The PV.put() method can optionally wait until the record is
+  done processing (with timeout)
 
 Features that you won't have to worry about:
-     connection management (unless you choose to worry about this)
-     PV record types -- this is handled automatically.
+
+* connection management (unless you choose to worry about this)
+* PV record types - this is handled automatically.
 
 
 Matt Newville <newville@cars.uchicago.edu>
