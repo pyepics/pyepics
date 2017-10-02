@@ -29,23 +29,31 @@ are required to use this module.
 
 To support this requirement, suitably recent versions of the libraries are
 included here, and the OS-appropriate library will be installed alongside
-the python packages. To install from source::
+the python packages. To install from source:
 
-    > python setup.py install
+```shell
+> python setup.py install
+```
 
-Or,::
+Or,
 
-    > pip install .
+```
+> pip install .
+```
 
 If it is desirable to forgo installation of the pre-packaged EPICS libraries,
 (i.e. suitable libraries already exist on the target system), then simply
-define the _NOLIBCA_ environment variable prior to installation::
+define the _NOLIBCA_ environment variable prior to installation:
 
-    > NOLIBCA=1 python setup.py install
+```shell
+> NOLIBCA=1 python setup.py install
+```
 
-Or,::
+Or,
 
-    > NOLIBCA=1 pip install .
+```shell
+> NOLIBCA=1 pip install .
+```
 
 For additional installation details, see the INSTALL file. Binary installers
 for Windows are available.
@@ -72,34 +80,36 @@ caput(), and cainfo(), similar to the EZCA interface and to the
 EPICS-supplied command line utilities.  These all take the name of an Epics
 Process Variable as the first argument.
 
-    >>> from epics import caget, caput, cainfo
-    >>> print caget('XXX:m1.VAL')
-    1.200
-    >>> caput('XXX:m1.VAL',2.30)
-    1
-    >>> cainfo('XXX.m1.VAL')
-    == XXX:m1.VAL  (double) ==
-       value      = 2.3
-       char_value = 2.3000
-       count      = 1
-       units      = mm
-       precision  = 4
-       host       = xxx.aps.anl.gov:5064
-       access     = read/write
-       status     = 1
-       severity   = 0
-       timestamp  = 1265996455.417 (2010-Feb-12 11:40:55.417)
-       upper_ctrl_limit    = 200.0
-       lower_ctrl_limit    = -200.0
-       upper_disp_limit    = 200.0
-       lower_disp_limit    = -200.0
-       upper_alarm_limit   = 0.0
-       lower_alarm_limit   = 0.0
-       upper_warning_limit = 0.0
-       lower_warning       = 0.0
-       PV is monitored internally
-       no user callbacks defined.
-    =============================
+```python
+>>> from epics import caget, caput, cainfo
+>>> print caget('XXX:m1.VAL')
+1.200
+>>> caput('XXX:m1.VAL',2.30)
+1
+>>> cainfo('XXX.m1.VAL')
+== XXX:m1.VAL  (double) ==
+   value      = 2.3
+   char_value = 2.3000
+   count      = 1
+   units      = mm
+   precision  = 4
+   host       = xxx.aps.anl.gov:5064
+   access     = read/write
+   status     = 1
+   severity   = 0
+   timestamp  = 1265996455.417 (2010-Feb-12 11:40:55.417)
+   upper_ctrl_limit    = 200.0
+   lower_ctrl_limit    = -200.0
+   upper_disp_limit    = 200.0
+   lower_disp_limit    = -200.0
+   upper_alarm_limit   = 0.0
+   lower_alarm_limit   = 0.0
+   upper_warning_limit = 0.0
+   lower_warning       = 0.0
+   PV is monitored internally
+   no user callbacks defined.
+=============================
+```
 
 ca: Low-level Channel Access interface
 ======================================
@@ -108,15 +118,20 @@ The ca module provides a low-level
 
 The general concept is that an Epics Process Variable is implemented as a
 python PV object, which provides the normal way to interact with Epics.
-     pv = EpicsCA.PV('PVName')
-     print pv.value
-     pv.value = new_value
 
+```python
+ pv = EpicsCA.PV('PVName')
+ print pv.value
+ pv.value = new_value
+```
 
 For convenience, there are also procedural functions caget and caput to
 mimic the "Ezca" interface:
-   x = caget('PVName')
-   caput('PVName', value)
+
+```python
+x = caget('PVName')
+caput('PVName', value)
+```
 
 A partial consequence of that design goal is that not every part of the
 C-level Channel Access library is implemented.   Channel Access features
