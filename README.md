@@ -106,34 +106,27 @@ Process Variable as the first argument.
 =============================
 ```
 
-ca: Low-level Channel Access interface
+PV: Object Oriented CA interface
 ======================================
 
-The ca module provides a low-level
-
 The general concept is that an Epics Process Variable is implemented as a
-python PV object, which provides the normal way to interact with Epics.
+Python PV object, which provides a natural way to interact with EPICS.
 
 ```python
- pv = EpicsCA.PV('PVName')
- print pv.value
- pv.value = new_value
+>>> import epics
+
+>>> pv = epics.PV('PVName')
+>>> pv.connected
+True
+>>> pv.get()
+3.14
+>>> pv.put(2.71)
 ```
 
-For convenience, there are also procedural functions caget and caput to
-mimic the "Ezca" interface:
+Channel Access features that are included here:
 
-```python
-x = caget('PVName')
-caput('PVName', value)
-```
-
-A partial consequence of that design goal is that not every part of the
-C-level Channel Access library is implemented.   Channel Access features
-that ARE included here are:
-
-* user callbacks - user-supplied python function(s) that are run when a PV's
-  value changes
+* user callbacks - user-supplied Python function(s) that are run when a PV's
+  value, access rights, or connection status changes
 * control values - a full Control DBR record can be requested
 * enumeration strings - enum PV types have integer or string representation,
   and you get access to both
