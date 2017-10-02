@@ -1,6 +1,4 @@
-[![Travis CI](https://travis-ci.org/pyepics/pyepics.png)](https://travis-ci.org/pyepics/pyepics)
-
-[![Zenondo](https://zenodo.org/badge/4185/pyepics/pyepics.svg)](https://zenodo.org/badge/latestdoi/4185/pyepics/pyepics)
+[![Travis CI](https://travis-ci.org/pyepics/pyepics.png)](https://travis-ci.org/pyepics/pyepics)   [![Zenondo](https://zenodo.org/badge/4185/pyepics/pyepics.svg)](https://zenodo.org/badge/latestdoi/4185/pyepics/pyepics)
 
 PyEpics 3:  Epics Channel Access for Python
 ============================================
@@ -25,8 +23,8 @@ recommended. Specifically, the shared libraries libCom.so and libca.so
 are required to use this module.
 
 To support this requirement, suitably recent versions of the libraries are
-included here, and the OS-appropriate library will be installed alongside
-the python packages. To install from source:
+included here (version 3.15.3), and the OS-appropriate library will be
+installed alongside the python packages. To install from source:
 
 ```
 > python setup.py install
@@ -40,7 +38,7 @@ Or,
 
 If it is desirable to forgo installation of the pre-packaged EPICS libraries,
 (i.e. suitable libraries already exist on the target system), then simply
-define the _NOLIBCA_ environment variable prior to installation:
+define the `NOLIBCA` environment variable prior to installation:
 
 ```
 > NOLIBCA=1 python setup.py install
