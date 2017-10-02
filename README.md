@@ -1,7 +1,7 @@
 [![Travis CI](https://travis-ci.org/pyepics/pyepics.png)](https://travis-ci.org/pyepics/pyepics)   [![Zenondo](https://zenodo.org/badge/4185/pyepics/pyepics.svg)](https://zenodo.org/badge/latestdoi/4185/pyepics/pyepics)
 
-PyEpics 3:  Epics Channel Access for Python
-============================================
+# PyEpics 3:  Epics Channel Access for Python
+
 
 PyEpics is a Python interface to the EPICS Channel Access (CA) library
 for the EPICS control system.
@@ -13,8 +13,7 @@ level objects on top of that basic interface.  This approach has several
 advantages including no need for extension code written in C, better
 thread-safety, and easier installation on multiple platforms.
 
-Installation
-================
+## Installation
 
 This package requires python2.6 or higher.  The EPICS Channel Access
 library v 3.14.8 or higher is also required, with v 3.14.12 or higher being
@@ -53,13 +52,11 @@ Or,
 For additional installation details, see the INSTALL file. Binary installers
 for Windows are available.
 
-License
-========
+## License
 
 This code is distributed under the  Epics Open License
 
-Overview
-========
+## Overview
 
 Py-Epics3 provides two principle modules: ca, and pv, and functions
 caget(), caput(), and cainfo() for the simplest of interaction with EPICS.
@@ -67,8 +64,7 @@ In addition, there are modules for Epics Motors and Alarms, autosave support
 via CA, and special widget classes for using EPICS PVs with wxPython.
 
 
-caget(), caput() and cainfo()
-=============================
+## caget(), caput() and cainfo()
 
 The simplest interface to EPICS Channel Access provides functions caget(),
 caput(), and cainfo(), similar to the EZCA interface and to the
@@ -106,8 +102,7 @@ Process Variable as the first argument.
 =============================
 ```
 
-PV: Object Oriented CA interface
-======================================
+## PV: Object Oriented CA interface
 
 The general concept is that an Epics Process Variable is implemented as a
 Python PV object, which provides a natural way to interact with EPICS.
