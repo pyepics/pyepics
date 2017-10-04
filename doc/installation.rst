@@ -67,6 +67,18 @@ You can also download the source package, unpack it, and install with::
 
      python setup.py install
 
+If you know that you will not want to use the default version of *libca*,
+you can suppress the installation of the default versions by setting the
+environmental variable `NOLIBCA` at install time, as with::
+
+    NOLIBCA=1 python setup.py install
+
+or::
+
+    NOLIBCA=1 pip install pyepics
+
+Note that this should be considered an expert-level option.
+
 
 Getting Started, Setting up the Epics Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,28 +89,19 @@ depending on the system) at runtime in order to actually work.  By
 default, the provided versions of these libraries will be used.
 
 
-If you wish to use a different version of *libca* from the default
-versions, there are a few ways to specify control how *libca* will be
-found. First, you can set the environmental variable ``PYEPICS_LIBCA``
-to the full path of the dynamic library, for example::
+If you wish to use a version of *libca* other than the default versions,
+there are a few ways to specify control how *libca* will be found. First,
+you can set the environmental variable ``PYEPICS_LIBCA`` to the full path
+of the dynamic library, for example::
 
    > export PYEPICS_LIBCA=/usr/local/epics/base-3.15.5/lib/linux-x86_64/libca.so
 
-For experts who want to never use the default version, you can avoid
-installing the default versions of *libca* (and *libCom*) altogether
-by setting the environmental variable `NOLIBCA` at install time, as with::
-
-    NOLIBCA=1 python setup.py install
-
-or::
-
-    NOLIBCA=1 pip install pyepics
-
-  
-If you do this, you will want to make sure that *libca.so* can be
-found in your `PATH` environmental variable, or in `LD_LIBRARY_PATH`
-or `DYLD_LIBRARY_PATH` on Mac OSX.
-
+For experts who want to never use the default version, you can turn off the
+installation of the default versions of *libca* (and *libCom*) by setting
+the environmental variable `NOLIBCA` at install time, as shown above.  If
+you do this, you will want to make sure that *libca.so* can be found in
+your `PATH` environmental variable, or in `LD_LIBRARY_PATH` or
+`DYLD_LIBRARY_PATH` on Mac OSX.
 
 To find out which CA library will be used by pyepics, use:
     >>> import epics
@@ -123,7 +126,7 @@ Automated, continuous unit-testing is done with the TravisCI
 (https://travis-ci.org/pyepics/pyepics) for Python 2.7, 3.5, and 3.6 using
 an Epics IOC running in a Docker image.  Many tests located in the `tests`
 folder can also be run using the script ``tests/simulator.py`` as long as
-the Epics database in ``tests/pydebug.db`` is loaded in a local IOC.  
+the Epics database in ``tests/pydebug.db`` is loaded in a local IOC.
 In addition, tests are regularly run on Mac OSX, and 32-bit and 64-bit Windows.
 
 
