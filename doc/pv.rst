@@ -373,7 +373,7 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
 .. attribute:: nanoseconds
 
-   Integer number of nanoseconds for the last event seen for ths PV.  This
+   Integer number of nanoseconds for the last event seen for this PV.  This
    will be set only if the PV object was created with the ``form='time'``
    option, and will give higher time resolution than the `timestamp`
    attribute.

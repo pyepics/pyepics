@@ -24,8 +24,8 @@ higher, and version 3.15 or higher is recommended.
 For all supported operating systems, pre-built and recent versions of libca
 and libCom are provided, and will be installed within the python packages
 directory and used by default.  Though they will be found by default by
-pyepics, these librarries will be hard for other applications to find, and
-so should not cause conflicts with other CA cliet programs.  We regularly
+pyepics, these libraries will be hard for other applications to find, and
+so should not cause conflicts with other CA client programs.  We regularly
 test with these libraries and recommend using them.  If you want to not use
 them or even install them, instructions for how to do this are given below.
 

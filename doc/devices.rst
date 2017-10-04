@@ -370,7 +370,7 @@ attribute cannot do so::
    +---------------+----------------------------------------------------------------+
    |        0      | move-with-wait finish OK.                                      |
    +---------------+----------------------------------------------------------------+
-   |        0      | move-without-wait executed, not cpmfirmed.                     |
+   |        0      | move-without-wait executed, not confirmed.                     |
    +---------------+----------------------------------------------------------------+
    |        1      | move-without-wait executed, move confirmed.                    |
    +---------------+----------------------------------------------------------------+
@@ -534,7 +534,7 @@ code for these modules.
 
 .. _devices_table:
 
-   Table of Epics Devices Included in the PyEpics distribtion.  For those
+   Table of Epics Devices Included in the PyEpics distribution.  For those
    described as "pretty basic", there are generally only PV suffixes to
    attributes mapped.  Many of the others include one or more methods for
    specific use of that Device.
@@ -576,4 +576,6 @@ code for these modules.
 | struck         | Struck          | SIS Multichannel Scaler, many methods          |
 +----------------+-----------------+------------------------------------------------+
 | transform      | Transform       | epics userTransform record                     |
++----------------+-----------------+------------------------------------------------+
+| xspress3       | Xspress3        | Quantum Electronics Xspress3 Multi-MCA         |
 +----------------+-----------------+------------------------------------------------+

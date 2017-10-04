@@ -125,10 +125,10 @@ request file,  and :meth:`save` to save the results.
 
 .. method:: save(save_file=None, verbose=False)
 
-   read currect PV values, write save file.
+   read current PV values, write save file.
 
    :param save_file: name of save file or `None`.  If `None`, the name of
-                     the request file and timaestamp (to seconds) will be
+                     the request file and timestamp (to seconds) will be
                      used to build a file name.  Note that there is no
                      check for overwriting files.
    :param verbose: whether to print results to the screen [default `False`]
@@ -149,7 +149,7 @@ module.
 Examples
 ==========
 
-A simple example usign the autosave module::
+A simple example using the autosave module::
 
     import epics.autosave
     # save values
