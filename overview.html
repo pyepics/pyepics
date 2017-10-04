@@ -6,16 +6,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>PyEpics Overview &#8212; Epics Channel Access for Python</title>
-    
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.7',
+        VERSION:     '3.3.0rc1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -25,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PV: Epics Process Variables" href="pv.html" />
@@ -200,7 +197,7 @@ clarity.</p>
 <div class="section" id="object-oriented-approach-pv">
 <h3>Object Oriented Approach: PV<a class="headerlink" href="#object-oriented-approach-pv" title="Permalink to this headline">¶</a></h3>
 <p>If you want to repeatedly access the same PV, you may find it more
-convenient to ”create a PV object” and use it in a more object-oriented
+convenient to ‘’create a PV object’’ and use it in a more object-oriented
 manner.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">PV</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
@@ -577,7 +574,7 @@ PyEpics3 does work with both Python 2.* and 3.*.</p>
 <p>The PyEpics package is actively maintained, but the core library seems
 reasonably stable and ready to use in production code.  Features are being
 added slowly, and testing is integrated into development so that the
-changce of introducing bugs into existing codes is minimized.  The package
+chance of introducing bugs into existing codes is minimized.  The package
 is targeted and tested to work with Python 2.6, 2.7, 3.2 and 3.3
 simultaneously (that is, the same code is meant to support all these
 versions).</p>
@@ -588,7 +585,7 @@ versions).</p>
 suport for Area Detectors.</li>
 <li>incorporate some or all of the Channel Access Server from <a class="reference external" href="http://code.google.com/p/pcaspy/">pcaspy</a></li>
 <li>build and improve applications using PyEpics, especially for common data
-acquistion needs.</li>
+acquisition needs.</li>
 <li>improve and extend the use of PyQt widgets with PyEpics.</li>
 </ul>
 </div></blockquote>
@@ -633,7 +630,7 @@ contact the authors.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

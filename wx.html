@@ -6,16 +6,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>wx: wxPython Widgets for Epics &#8212; Epics Channel Access for Python</title>
-    
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.7',
+        VERSION:     '3.3.0rc1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -25,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Advanced Topic with Python Channel Access" href="advanced.html" />
@@ -172,7 +169,7 @@ below.</p>
 <dl class="method">
 <dt id="wx.Update">
 <code class="descclassname">wx.</code><code class="descname">Update</code><span class="sig-paren">(</span><em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.Update" title="Permalink to this definition">¶</a></dt>
-<dd><p>set the widgets value from the PV’s value.   If value=“None“, the current
+<dd><p>set the widgets value from the PV’s value.   If value=``None``, the current
 value for the PV is used.</p>
 </dd></dl>
 
@@ -240,7 +237,7 @@ the PV value.</p>
 <h3>PVText<a class="headerlink" href="#pvtext" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="wx.PVText">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVText</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>minor_alarm=”DARKRED”</em>, <em>major_alarm=”RED”</em>, <em>invalid_alarm=”ORANGERED”</em>, <em>auto_units=False</em>, <em>units=”“</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVText" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVText</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>minor_alarm=&quot;DARKRED&quot;</em>, <em>major_alarm=&quot;RED&quot;</em>, <em>invalid_alarm=&quot;ORANGERED&quot;</em>, <em>auto_units=False</em>, <em>units=&quot;&quot;</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVText" title="Permalink to this definition">¶</a></dt>
 <dd><p>derived from wx.StaticText and PVCtrlMixin, this is a StaticText widget
 whose value is set to the string representation of the value for the
 corresponding PV.</p>
@@ -422,7 +419,7 @@ the corresponding PV trips the alarm level.</p>
 <h3>PVCollapsiblePane<a class="headerlink" href="#pvcollapsiblepane" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="wx.PVCollapsiblePane">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVCollapsiblePane</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>minor_alarm=”DARKRED”</em>, <em>major_alarm=”RED”</em>, <em>invalid_alarm=”ORANGERED”</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCollapsiblePane" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVCollapsiblePane</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>minor_alarm=&quot;DARKRED&quot;</em>, <em>major_alarm=&quot;RED&quot;</em>, <em>invalid_alarm=&quot;ORANGERED&quot;</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCollapsiblePane" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is equivalent to wx.CollapsiblePane, except the label shown
 on the pane’s “expansion button” comes from a PV.</p>
 <p>The additional keyword arguments can be any of the other constructor
@@ -610,7 +607,7 @@ as it changes.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

@@ -7,17 +7,17 @@ Auto-saving: simple save/restore of PVs
    :synopsis: simple save/restore of PVs
 
 The :mod:`autosave` module provides simple save/restore functionality for
-PVs, with the functions :func:`save_pvs` and :func:`restore_pvs`.  These
-are similar to the autosave module from synApps for IOCs in that they use a
-compatible *request file* which describes the PVs to save, and a compatible
-*save file* which holds the saved values. Of course, the reading and
-writing is done here via Channel Access, and need not be related to any
-particular running IOC.
+PVs, with the functions :func:`save_pvs` and :func:`restore_pvs`, and an
+:class:`AutoSaver` class.  These are similar to the autosave module from
+synApps for IOCs in that they use a compatible *request file* which
+describes the PVs to save, and a compatible *save file* which holds the
+saved values. Of course, the reading and writing is done here via Channel
+Access, and need not be related to an single IOC.
 
 Use of this module requires the `pyparsing package
 <http://pyparsing.wikispaces.com/>`_ to be installed.  This is a fairly
 common third-party python package, included in many package managers, or
-installed with tools such as *easy_install* or *pip*, or downloaded from 
+installed with tools such as *easy_install* or *pip*, or downloaded from
 `PyPI <http://pypi.python.org/pypi/pyparsing>`_
 
 Request and Save file formats are designed to be compatible with synApps
@@ -35,7 +35,8 @@ with a  **SimpleMotor.req** file of::
    $(P)$(Q).FOFF
 
 which can then be used for many instances of a SimpleMotor.  There is,
-however, no mechanism for automatically finding request files.
+however, no automated mechanism for finding request files.  You will need
+to include these in the working directory or specify absolute paths.
 
 With such a file, simply using::
 
@@ -43,7 +44,7 @@ With such a file, simply using::
     epics.autosave.save_pvs("My.req", "my_values.sav")
 
 will save the current values for the PVs to the file **my_values.sav**.  At
-a later time, these values can be restored with
+a later time, these values can be restored with::
 
     import epics.autosave
     epics.autosave.restore_pvs("my_values.sav")
@@ -66,7 +67,7 @@ values.
 
    As discussed above, the **request_file** follows the conventions of the
    autosave module from synApps.
- 
+
 .. function:: restore_pvs(save_file)
 
    reads values from *save_file* and restores them for the corresponding PVs
@@ -76,6 +77,62 @@ values.
 
    Note that :func:`restore_pvs` will restore all the values it can, skipping
    over any values that it cannot restore.
+
+
+:class:`AutoSaver` class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :class:`AutoSaver` class provides a convenient way to repeatedly save
+PVs listed in a request file without having to re-connect all of the PVs.
+The :class:`AutoSaver` retains the PV connections, and provides a simple
+:meth:`save` method to save the current PV values to a file.  By default,
+that file will be named from the request file and the current time.  This
+allows you to do something like this::
+
+    #!/usr/bin/env python
+    # save PVs from a request file once per minute
+    import time
+    from epics.autosave import AutoSaver
+    my_saver = AutoSaver("My.req")
+
+    # save all PVs every minute for a day
+    t0 = time.time()
+    while True:
+        if time.localtime().tm_sec < 5:
+            my_saver.save()
+	    time.sleep(30 - time.localtime().tm_sec)
+	if time.time() - t0 > 86400.0:
+	    break
+        time.sleep(0.5)
+
+This will save PVs to files with names like *My_2017Oct02_141800.sav*
+
+.. class:: AutoSaver(request_file)
+
+   create an Automatic Saver based on a request file.
+
+   :param request_file: name of request file
+
+:class:`AutoSaver` has two methods: :meth:`read_request_file` to read a
+request file,  and :meth:`save` to save the results.
+
+
+.. method:: read_request_file(request_file)
+
+   read and parse request file, begin making PV connections
+
+   :param request_file: name of request file
+
+.. method:: save(save_file=None, verbose=False)
+
+   read current PV values, write save file.
+
+   :param save_file: name of save file or `None`.  If `None`, the name of
+                     the request file and timestamp (to seconds) will be
+                     used to build a file name.  Note that there is no
+                     check for overwriting files.
+   :param verbose: whether to print results to the screen [default `False`]
+
 
 
 Supported Data Types
@@ -92,11 +149,11 @@ module.
 Examples
 ==========
 
-A simple example usign the autosave module::
+A simple example using the autosave module::
 
     import epics.autosave
     # save values
-    epics.autosave.save_pvs("my_request_file.req", 
+    epics.autosave.save_pvs("my_request_file.req",
                             "/tmp/my_recent_save.sav")
 
     # wait 30 seconds
@@ -104,4 +161,3 @@ A simple example usign the autosave module::
 
     # restore those values back
     epics.autosave.restore_pvs("/tmp/my_recent_save.sav")
-

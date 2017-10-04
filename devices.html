@@ -6,16 +6,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>Devices: collections of PVs &#8212; Epics Channel Access for Python</title>
-    
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.7',
+        VERSION:     '3.3.0rc1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -25,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Alarms: respond when a PV goes out of range" href="alarm.html" />
@@ -147,7 +144,7 @@ base class, to be inherited and extended.  In fact, there is a more
 sophisticated   Motor device described below at <a class="reference internal" href="#device-motor-label"><span class="std std-ref">Epics Motor Device</span></a></p>
 <dl class="class">
 <dt id="device.Device">
-<em class="property">class </em><code class="descclassname">device.</code><code class="descname">Device</code><span class="sig-paren">(</span><em>prefix=None</em><span class="optional">[</span>, <em>delim=”</em><span class="optional">[</span>, <em>attrs=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.Device" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">device.</code><code class="descname">Device</code><span class="sig-paren">(</span><em>prefix=None</em><span class="optional">[</span>, <em>delim=''</em><span class="optional">[</span>, <em>attrs=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.Device" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>The attribute PVs are built as needed and held in an internal buffer
@@ -206,7 +203,7 @@ may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 <dl class="method">
 <dt id="device.save_state">
 <code class="descclassname">device.</code><code class="descname">save_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#device.save_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>return a dictionary of all current values – the ”current state”.</p>
+<dd><p>return a dictionary of all current values – the ‘’current state’‘.</p>
 </dd></dl>
 
 <dl class="method">
@@ -225,7 +222,7 @@ may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 <dt id="device.read_state">
 <code class="descclassname">device.</code><code class="descname">read_state</code><span class="sig-paren">(</span><em>fname</em><span class="optional">[</span>, <em>restore=False</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.read_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>reads a state from a file, as written with <a class="reference internal" href="#device.write_state" title="device.write_state"><code class="xref py py-meth docutils literal"><span class="pre">write_state()</span></code></a>, and returns it.
-If ”restore” is <code class="docutils literal"><span class="pre">True</span></code>, the read state will be restored.</p>
+If ‘’restore’’ is <code class="docutils literal"><span class="pre">True</span></code>, the read state will be restored.</p>
 </dd></dl>
 
 <dl class="data">
@@ -652,7 +649,7 @@ violation, and raises a MotorLimitException if it is.</p>
 
 <dl class="method">
 <dt id="motor.within_limits">
-<code class="descclassname">motor.</code><code class="descname">within_limits</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>limits=’user’</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.within_limits" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">within_limits</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>limits='user'</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.within_limits" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks whether a target value <strong>would be</strong> a limit violation.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -744,7 +741,7 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 <td>move-with-wait finish OK.</td>
 </tr>
 <tr class="row-odd"><td>0</td>
-<td>move-without-wait executed, not cpmfirmed.</td>
+<td>move-without-wait executed, not confirmed.</td>
 </tr>
 <tr class="row-even"><td>1</td>
 <td>move-without-wait executed, move confirmed.</td>
@@ -760,7 +757,7 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 </div></blockquote>
 <dl class="method">
 <dt id="motor.tweak">
-<code class="descclassname">motor.</code><code class="descname">tweak</code><span class="sig-paren">(</span><em>direction=’forward’</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=300.</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.tweak" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">tweak</code><span class="sig-paren">(</span><em>direction='forward'</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=300.</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.tweak" title="Permalink to this definition">¶</a></dt>
 <dd><p>move the motor by the current <em>tweak value</em></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -831,13 +828,13 @@ The “readback” keyword can be used in user, dial or raw coordinates.</p>
 
 <dl class="method">
 <dt id="motor.set_callback">
-<code class="descclassname">motor.</code><code class="descname">set_callback</code><span class="sig-paren">(</span><em>attr=’drive’</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>kw=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.set_callback" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">set_callback</code><span class="sig-paren">(</span><em>attr='drive'</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>kw=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.set_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets a callback on the <cite>PV</cite> for a particular attribute.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="motor.clear_callback">
-<code class="descclassname">motor.</code><code class="descname">clear_callback</code><span class="sig-paren">(</span><em>attr=’drive’</em><span class="sig-paren">)</span><a class="headerlink" href="#motor.clear_callback" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">motor.</code><code class="descname">clear_callback</code><span class="sig-paren">(</span><em>attr='drive'</em><span class="sig-paren">)</span><a class="headerlink" href="#motor.clear_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>clears a callback on the <cite>PV</cite> for a particular attribute.</p>
 </dd></dl>
 
@@ -1020,7 +1017,7 @@ A table of current Devices are listed in the <a class="reference internal" href=
 Devices</span></a> table below.  For further details, consult the source
 code for these modules.</p>
 <blockquote id="devices-table">
-<div>Table of Epics Devices Included in the PyEpics distribtion.  For those
+<div>Table of Epics Devices Included in the PyEpics distribution.  For those
 described as “pretty basic”, there are generally only PV suffixes to
 attributes mapped.  Many of the others include one or more methods for
 specific use of that Device.</div></blockquote>
@@ -1105,6 +1102,10 @@ specific use of that Device.</div></blockquote>
 <td>Transform</td>
 <td>epics userTransform record</td>
 </tr>
+<tr class="row-odd"><td>xspress3</td>
+<td>Xspress3</td>
+<td>Quantum Electronics Xspress3 Multi-MCA</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1147,7 +1148,7 @@ specific use of that Device.</div></blockquote>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

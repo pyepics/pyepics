@@ -6,16 +6,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>PV: Epics Process Variables &#8212; Epics Channel Access for Python</title>
-    
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2.7',
+        VERSION:     '3.3.0rc1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -25,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ca: Low-level Channel Access module" href="ca.html" />
@@ -139,7 +136,7 @@ both methods and attributes for accessing it’s properties.</p>
 <h2>The <a class="reference internal" href="#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal"><span class="pre">PV</span></code></a> class<a class="headerlink" href="#the-pv-class" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="pv.PV">
-<em class="property">class </em><code class="descclassname">pv.</code><code class="descname">PV</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>form=’time’</em><span class="optional">[</span>, <em>verbose=False</em><span class="optional">[</span>, <em>auto_monitor=None</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>connection_callback=None</em><span class="optional">[</span>, <em>connection_timeout=None</em><span class="optional">[</span>, <em>access_callback=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.PV" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pv.</code><code class="descname">PV</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>form='time'</em><span class="optional">[</span>, <em>verbose=False</em><span class="optional">[</span>, <em>auto_monitor=None</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>connection_callback=None</em><span class="optional">[</span>, <em>connection_timeout=None</em><span class="optional">[</span>, <em>access_callback=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.PV" title="Permalink to this definition">¶</a></dt>
 <dt>
 <code class="descname">create a PV object for a named Epics Process Variable.</code></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -402,7 +399,7 @@ and also to key for  this callback in the  <a class="reference internal" href="#
 </tr>
 </tbody>
 </table>
-<p>If only one callback is defined an index=“None“, this will clear the
+<p>If only one callback is defined an index=``None``, this will clear the
 only defined callback.</p>
 <p>See also: <a class="reference internal" href="#pv.callbacks" title="pv.callbacks"><code class="xref py py-attr docutils literal"><span class="pre">callbacks</span></code></a>  attribute, <a class="reference internal" href="#pv-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a></p>
 </dd></dl>
@@ -569,7 +566,7 @@ the client.</p>
 <dl class="attribute">
 <dt id="pv.nanoseconds">
 <code class="descclassname">pv.</code><code class="descname">nanoseconds</code><a class="headerlink" href="#pv.nanoseconds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integer number of nanoseconds for the last event seen for ths PV.  This
+<dd><p>Integer number of nanoseconds for the last event seen for this PV.  This
 will be set only if the PV object was created with the <code class="docutils literal"><span class="pre">form='time'</span></code>
 option, and will give higher time resolution than the <cite>timestamp</cite>
 attribute.</p>
@@ -995,7 +992,7 @@ the life of the function.  Using <a class="reference internal" href="#pv.get_pv"
 highly recommended.</p>
 <dl class="function">
 <dt id="pv.get_pv">
-<code class="descclassname">pv.</code><code class="descname">get_pv</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>form=’time’</em><span class="optional">[</span>, <em>connect=False</em><span class="optional">[</span>, <em>timeout=5</em><span class="optional">[</span>, <em>context=None</em><span class="optional">[</span>, <em>**kws</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.get_pv" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pv.</code><code class="descname">get_pv</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>form='time'</em><span class="optional">[</span>, <em>connect=False</em><span class="optional">[</span>, <em>timeout=5</em><span class="optional">[</span>, <em>context=None</em><span class="optional">[</span>, <em>**kws</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.get_pv" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves a PV from <code class="xref py py-attr docutils literal"><span class="pre">_PVcache</span></code> or creates and returns a new PV.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1250,7 +1247,7 @@ See <a class="reference internal" href="#pv-callbacks-label"><span class="std st
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>
