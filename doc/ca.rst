@@ -541,8 +541,9 @@ When defining a callback function to be run either when a :func:`put` completes
 or on changes to the Channel, as set from :func:`create_subscription`, or when
 read/write permissions change from :func:`replace_access_rights_event`, it is
 important to know two things:
-    1)  how your function will be called.
-    2)  what is permissible to do inside your callback function.
+
+   1)  how your function will be called.
+   2)  what is permissible to do inside your callback function.
 
 Callbacks will be called with keyword arguments for :func:`put` and for
 :func:`create_subscription`.  You should be prepared to have them passed to

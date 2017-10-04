@@ -39,7 +39,7 @@ Variable Length Arrays:  NORD  and NELM
 
 While the maximum length of an array is fixed, the length of data you get
 back from a monitor, :meth:`ca.get`, :meth:`pv.get`, or :meth:`epics.caget`
-may be shorter than the maximumn length, reflecting the most recent data
+may be shorter than the maximum length, reflecting the most recent data
 put to that PV.  That is, if some process puts a smaller array to a PV than
 its maximum length, monitors on that PV may receive only the changed data.
 For example::
@@ -98,7 +98,7 @@ This example uses :meth:`pv.get` but :meth:`ca.get` is essentially
 equivalent, as its *as_string* parameter works exactly the same way.
 
 Note that Epics character waveforms as defined as above are really arrays
-of bytes.  The converion to a string assumes the ASCII character set.
+of bytes.  The conversion to a string assumes the ASCII character set.
 Unicode is not directly supported.  If you are storing non-ASCII data, you
 would have to convert the raw array data yourself, perhaps like this (for
 Python3)::
@@ -187,4 +187,3 @@ The result looks like this (taken with a Prosilica GigE camera):
 A more complete application for reading and displaying image from Epics
 Area Detectors is included  at `http://github.com/pyepics/epicsapps/
 <http://github.com/pyepics/epicsapps/>`_.
-

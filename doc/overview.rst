@@ -460,7 +460,7 @@ Status and To-Do List
 The PyEpics package is actively maintained, but the core library seems
 reasonably stable and ready to use in production code.  Features are being
 added slowly, and testing is integrated into development so that the
-changce of introducing bugs into existing codes is minimized.  The package
+chance of introducing bugs into existing codes is minimized.  The package
 is targeted and tested to work with Python 2.6, 2.7, 3.2 and 3.3
 simultaneously (that is, the same code is meant to support all these
 versions).
@@ -474,7 +474,7 @@ There are several desired features are left unfinished:
    <http://code.google.com/p/pcaspy/>`_
 
  * build and improve applications using PyEpics, especially for common data
-   acquistion needs.
+   acquisition needs.
 
  * improve and extend the use of PyQt widgets with PyEpics.
 

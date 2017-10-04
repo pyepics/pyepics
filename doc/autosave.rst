@@ -44,7 +44,7 @@ With such a file, simply using::
     epics.autosave.save_pvs("My.req", "my_values.sav")
 
 will save the current values for the PVs to the file **my_values.sav**.  At
-a later time, these values can be restored with
+a later time, these values can be restored with::
 
     import epics.autosave
     epics.autosave.restore_pvs("my_values.sav")
@@ -103,9 +103,9 @@ allows you to do something like this::
 	    time.sleep(30 - time.localtime().tm_sec)
 	if time.time() - t0 > 86400.0:
 	    break
-        time.sleep(1)
+        time.sleep(0.5)
 
-This will save PVs to files with names like *My_2017Oct02_142021.sav*
+This will save PVs to files with names like *My_2017Oct02_141800.sav*
 
 .. class:: AutoSaver(request_file)
 
@@ -125,10 +125,10 @@ request file,  and :meth:`save` to save the results.
 
 .. method:: save(save_file=None, verbose=False)
 
-   read currect PV values, write save file.
+   read current PV values, write save file.
 
    :param save_file: name of save file or `None`.  If `None`, the name of
-                     the request file and timaestamp (to seconds) will be
+                     the request file and timestamp (to seconds) will be
                      used to build a file name.  Note that there is no
                      check for overwriting files.
    :param verbose: whether to print results to the screen [default `False`]
@@ -149,7 +149,7 @@ module.
 Examples
 ==========
 
-A simple example usign the autosave module::
+A simple example using the autosave module::
 
     import epics.autosave
     # save values
