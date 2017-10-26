@@ -286,7 +286,7 @@ devices.
   waveform PVs.
   
   :param pvlist: A list of process variable names.
-  :type pvlist:  list of str
+  :type pvlist:  ``list`` of ``str``
   :param as_string:  whether to return string representation of the PV values.
   :type as_string:  ``True``/``False``
   :param count:  number of elements to return for array data.
