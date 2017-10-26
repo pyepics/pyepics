@@ -84,7 +84,7 @@ def caget(pvname, as_string=False, count=None, as_numpy=True,
         return caget_many(pvname,
                           as_string=as_string,
                           count=count,
-                          as_numpy=as_numpy
+                          as_numpy=as_numpy,
                           timeout=timeout)
     start_time = time.time()
     thispv = get_pv(pvname, timeout=timeout, connect=True)
