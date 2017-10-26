@@ -435,6 +435,33 @@ and the log file is inspected::
 For detailed information about the arguments, see the documentation for
 :func:`caget`.
 
+:func:`caput_many`
+~~~~~~~~~~~~~~~~~~
+
+..  function:: caput_many(pvlist, values[, wait=False[, connection_timeout=None[, put_timeout=60]]])
+
+  put values to a list of PVs as quickly as possible.  Returns a list of ints
+  for each PV in the list: 1 if the put was successful, -1 if it timed out.
+  Unlike :func:`caput`, this method does not use automatic monitoring (see
+  :ref:`pv-automonitor-label`), even for large waveform PVs.
+  
+  :param pvlist: A list of process variable names.
+  :type pvlist:  ``list`` or ``tuple`` of ``str``
+  :param values: values to put to each PV.
+  :type values: ``list`` or ``tuple``
+  :param wait:  whether or not to wait for processing to complete (or time-out) for each put before returning.
+  :type wait:  ``True``/``False``
+  :param connection_timeout:  maximum time to wait (in seconds) for a connection to be established to each PV.
+  :type connection_timeout:  float or ``None``
+  :param put_timeout: maximum time to wait (in seconds) for processing to complete for each PV.
+  :type put_timeout: float or ``None``
+  
+Because connections to channels normally connect very quickly (less than a
+second), but processing a put may take a significant amount of time (due to 
+a physical device moving, or due to complex calculations or data processing
+sequences), a separate timeout duration can be specified for connections and
+processing puts.
+
 Motivation: Why another Python-Epics Interface?
 ================================================
 

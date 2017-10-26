@@ -177,5 +177,23 @@ def caget_many(pvlist, as_string=False, count=None, as_numpy=True, timeout=5.0):
                                                   timeout=timeout))
     return out
 
-
+def caput_many(pvlist, values, wait=False, connection_timeout=None, put_timeout=60):
+    """put values to a list of PVs
+    This does not maintain PV objects.  If wait is true,
+    *each* put operation will block until it is complete.
+    Returns a list of integers for each PV, 1 if the put
+    was successful, or a negative number if the timeout
+    was exceeded.
+    """
+    chids, out, conns = [], [], []
+    for name in pvlist: chids.append(ca.create_channel(name,
+                                                       auto_cb=False,
+                                                       connect=False))
+    for chid in chids: conns.append(ca.connect_channel(chid, timeout=connection_timeout))
+    for (i, chid) in enumerate(chids):
+        if conns[i]:
+            out.append(ca.put(chid, values[i], wait=wait, timeout=put_timeout))
+        else:
+            out.append(-1)
+    return out
 
