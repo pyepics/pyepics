@@ -7,7 +7,7 @@ import time
 import unittest
 import numpy
 from contextlib import contextmanager
-from epics import PV, caput, caget, ca
+from epics import PV, caput, caget, caget_many, ca
 
 import pvnames
 
@@ -62,6 +62,15 @@ class PV_Tests(unittest.TestCase):
             self.assertIsNot(val, None)
         sval = caget(pvnames.str_pv)
         self.assertEqual(sval, 'ao')
+
+    def test_caget_many(self):
+        write('Simple Test of caget_multi() function\n')
+        pvs = [pvnames.double_pv, pvnames.enum_pv, pvnames.str_pv]
+        vals = caget_many(pvs)
+        self.assertEqual(len(vals), len(pvs))
+        self.assertIsInstance(vals[0], float)
+        self.assertIsInstance(vals[1], int)
+        self.assertIsInstance(vals[2], str)
 
     def test_get1(self):
         write('Simple Test: test value and char_value on an integer\n')
