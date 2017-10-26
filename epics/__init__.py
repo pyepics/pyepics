@@ -80,7 +80,7 @@ def caget(pvname, as_string=False, count=None, as_numpy=True,
     
     if pvname is a list of strings, caget_many is called instead.
     """
-    if isinstance(pvname, list):
+    if isinstance(pvname, (list, tuple)):
         return caget_many(pvname,
                           as_string=as_string,
                           count=count,
