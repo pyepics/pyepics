@@ -1352,7 +1352,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         before returning.
     timeout : float
         maximum time to wait for processing to complete before returning anyway.
-    callback : ``None`` of callable
+    callback : ``None`` or callable
         user-supplied function to run when processing has completed.
     callback_data :  object
         extra data to pass on to a user-supplied callback function.
