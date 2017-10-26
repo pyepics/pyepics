@@ -77,7 +77,15 @@ def caget(pvname, as_string=False, count=None, as_numpy=True,
     to get a truncated amount of data from an array, you can specify
     the count with
        >>> x = caget('MyArray.VAL', count=1000)
+    
+    if pvname is a list of strings, caget_many is called instead.
     """
+    if isinstance(pvname, list):
+        return caget_many(pvname,
+                          as_string=as_string,
+                          count=count,
+                          as_numpy=as_numpy
+                          timeout=timeout)
     start_time = time.time()
     thispv = get_pv(pvname, timeout=timeout, connect=True)
     if thispv.connected:
@@ -151,7 +159,7 @@ def camonitor(pvname, writer=None, callback=None):
         thispv.add_callback(callback, index=-999, with_ctrlvars=True)
         _PVmonitors_[pvname] = thispv
 
-def caget_many(pvlist):
+def caget_many(pvlist, as_string=False, count=None, as_numpy=True, timeout=5.0):
     """get values for a list of PVs
     This does not maintain PV objects, and works as fast
     as possible to fetch many values.
@@ -161,8 +169,12 @@ def caget_many(pvlist):
                                                        auto_cb=False,
                                                        connect=False))
     for chid in chids: ca.connect_channel(chid)
-    for chid in chids: ca.get(chid, wait=False)
-    for chid in chids: out.append(ca.get_complete(chid))
+    for chid in chids: ca.get(chid, count=count, as_string=as_string, as_numpy=as_numpy, wait=False)
+    for chid in chids: out.append(ca.get_complete(chid, 
+                                                  count=count, 
+                                                  as_string=as_string, 
+                                                  as_numpy=as_numpy, 
+                                                  timeout=timeout))
     return out
 
 
