@@ -275,30 +275,6 @@ Of course,character waveforms are not always used for long strings,  but
 can also hold byte array data, such as comes from some detectors and
 devices.
 
-:func:`caget_many`
-~~~~~~~~~~~~~~~~~~
-
-..  function:: caget_many(pvlist[, as_string=False[, count=None[, as_numpy=True[, timeout=None]]]])
-
-  get a list of PVs as quickly as possible.  Returns a list of values for
-  each PV in the list.  Unlike :func:`caget`, this method does not use 
-  automatic monitoring (see :ref:`pv-automonitor-label`), even for large
-  waveform PVs.
-  
-  :param pvlist: A list of process variable names.
-  :type pvlist:  ``list`` of ``str``
-  :param as_string:  whether to return string representation of the PV values.
-  :type as_string:  ``True``/``False``
-  :param count:  number of elements to return for array data.
-  :type count:  integer or ``None``
-  :param as_numpy:  whether to return the Numerical Python representation for array data.
-  :type as_numpy:  ``True``/``False``
-  :param timeout:  maximum time to wait (in seconds) for value before returning None.
-  :type timeout:  float or ``None``
-  
-For detailed information about the arguments, see the documentation for
-:func:`caget`.
-
 :func:`caput`
 ~~~~~~~~~~~~~~~~
 
@@ -435,6 +411,29 @@ and the log file is inspected::
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:47.536623 -183.5223
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:48.536434 -183.6832
 
+:func:`caget_many`
+~~~~~~~~~~~~~~~~~~
+
+..  function:: caget_many(pvlist[, as_string=False[, count=None[, as_numpy=True[, timeout=None]]]])
+
+  get a list of PVs as quickly as possible.  Returns a list of values for
+  each PV in the list.  Unlike :func:`caget`, this method does not use 
+  automatic monitoring (see :ref:`pv-automonitor-label`), even for large
+  waveform PVs.
+  
+  :param pvlist: A list of process variable names.
+  :type pvlist:  ``list`` of ``str``
+  :param as_string:  whether to return string representation of the PV values.
+  :type as_string:  ``True``/``False``
+  :param count:  number of elements to return for array data.
+  :type count:  integer or ``None``
+  :param as_numpy:  whether to return the Numerical Python representation for array data.
+  :type as_numpy:  ``True``/``False``
+  :param timeout:  maximum time to wait (in seconds) for value before returning None.
+  :type timeout:  float or ``None``
+  
+For detailed information about the arguments, see the documentation for
+:func:`caget`.
 
 Motivation: Why another Python-Epics Interface?
 ================================================
