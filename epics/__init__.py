@@ -25,6 +25,7 @@ __doc__ = """
 
 import time
 import sys
+import threading
 from . import ca
 from . import dbr
 from . import pv
@@ -179,21 +180,73 @@ def caget_many(pvlist, as_string=False, count=None, as_numpy=True, timeout=5.0):
 
 def caput_many(pvlist, values, wait=False, connection_timeout=None, put_timeout=60):
     """put values to a list of PVs
-    This does not maintain PV objects.  If wait is true,
+    This does not maintain PV objects.  If wait is 'each',
     *each* put operation will block until it is complete.
+    or until the put_timeout duration expires.
+    If wait is 'all', this method will block until *all*
+    put operations are complete, or until the put_timeout
+    duration expires.
+    Note that the behavior of 'wait' only applies to the
+    put timeout, not the connection timeout.
     Returns a list of integers for each PV, 1 if the put
     was successful, or a negative number if the timeout
     was exceeded.
     """
-    chids, out, conns = [], [], []
+    chids, conns = [], []
     for name in pvlist: chids.append(ca.create_channel(name,
                                                        auto_cb=False,
                                                        connect=False))
-    for chid in chids: conns.append(ca.connect_channel(chid, timeout=connection_timeout))
+    for chid in chids: conns.append(ca.connect_channel(chid,
+                                                       timeout=connection_timeout))
+    #Number of put requests awaiting completion. Only used if wait=='all'.
+    #Reminder: acquire 'all_done' (defined further down) 
+    #before using unfinished.
+    unfinished = len([conn for conn in conns if conn > 0])
+    #mutex is used to coordinate access to 'unfinished'.
+    mutex = threading.Lock()
+    #Notify all_done if there are no remaining puts to complete.
+    #This function will block until all_done is notified, or
+    #the put_timeout expires.
+    all_done  = threading.Condition(mutex)
+    t0 = time.time()
+    wait_for_each = (wait == "each")
+    wait_for_all = (wait == "all")
+    #'out' is a list of return statuses for each put request.  1 if success, -1 if fail.
+    #'out' is filled with fail to begin with.
+    out = [-1 for i in range(0,len(chids))]
+    #To get around the fact that you can't *assign* to variables while
+    #in put_complete_callback's scope, but you can modify them.
+    put_context = {"unfinished": unfinished, "all_done": all_done, "status": out}
+    def put_complete_callback(data=None, **kws):
+        #put_complete_callback is used in wait_all mode.
+        put_context["all_done"].acquire()
+        remaining = put_context["unfinished"] - 1
+        put_context["status"][data] = 1
+        if remaining <= 0:
+            #We're all done!
+            #Notify the main thread to stop waiting for puts to complete.
+            put_context["all_done"].notify_all()
+        put_context["unfinished"] = remaining
+        put_context["all_done"].release()
     for (i, chid) in enumerate(chids):
         if conns[i]:
-            out.append(ca.put(chid, values[i], wait=wait, timeout=put_timeout))
-        else:
-            out.append(-1)
+            if wait_for_all:
+                ca.put(chid, values[i], callback=put_complete_callback, callback_data=i)
+            else:
+                #If we are waiting for each, or not waiting for anything, don't bother
+                #with callbacks.
+                out[i] = ca.put(chid, values[i], wait=wait_for_each, timeout=put_timeout)
+    if not wait_for_all:
+        return out
+    #All put requests have been submitted, now we wait...
+    with all_done:
+        while put_context["unfinished"] > 0:
+            elapsed_time = time.time() - t0
+            remaining_time = put_timeout - elapsed_time
+            if remaining_time <= 0.0:
+                #Timeout expired, return the status of the puts.
+                return out
+            all_done.wait(remaining_time)
+    #If you get this far, all puts completed successfully within the timeout.
     return out
 

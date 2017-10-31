@@ -72,12 +72,40 @@ class PV_Tests(unittest.TestCase):
         self.assertIsInstance(vals[1], int)
         self.assertIsInstance(vals[2], str)
 
-    def test_caput_many(self):
-        write('Simple Test of caput_many() function\n')
+    def test_caput_many_wait_all(self):
+        write('Test of caput_many() function, waiting for all.\n')
         pvs = [pvnames.double_pv, pvnames.enum_pv, 'ceci nest pas une PV']
+        #pvs = ["MTEST:Val1", "MTEST:Val2", "MTEST:SlowVal"]
         vals = [0.5, 0, 23]
-        success = caput_many(pvs, vals, connection_timeout=0.5)
+        t0 = time.time()
+        success = caput_many(pvs, vals, wait='all', connection_timeout=0.5, put_timeout=5.0)
+        t1 = time.time()
         self.assertEqual(len(success), len(pvs))
+        self.assertEqual(success[0], 1)
+        self.assertEqual(success[1], 1)
+        self.failUnless(success[2] < 0)
+        
+    
+    def test_caput_many_wait_each(self):
+        write('Simple Test of caput_many() function, waiting for each.\n')
+        pvs = [pvnames.double_pv, pvnames.enum_pv, 'ceci nest pas une PV']
+        #pvs = ["MTEST:Val1", "MTEST:Val2", "MTEST:SlowVal"]
+        vals = [0.5, 0, 23]
+        success = caput_many(pvs, vals, wait='each', connection_timeout=0.5, put_timeout=1.0)
+        self.assertEqual(len(success), len(pvs))
+        self.assertEqual(success[0], 1)
+        self.assertEqual(success[1], 1)
+        self.failUnless(success[2] < 0)
+
+    def test_caput_many_no_wait(self):
+        write('Simple Test of caput_many() function, without waiting.\n')
+        pvs = [pvnames.double_pv, pvnames.enum_pv, 'ceci nest pas une PV']
+        #pvs = ["MTEST:Val1", "MTEST:Val2", "MTEST:SlowVal"]
+        vals = [0.5, 0, 23]
+        success = caput_many(pvs, vals, wait=None, connection_timeout=0.5)
+        self.assertEqual(len(success), len(pvs))
+        #If you don't wait, ca.put returns 1 as long as the PV connects
+        #and the put request is valid.
         self.assertEqual(success[0], 1)
         self.assertEqual(success[1], 1)
         self.failUnless(success[2] < 0)
