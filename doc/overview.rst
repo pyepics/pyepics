@@ -449,11 +449,17 @@ For detailed information about the arguments, see the documentation for
   :type pvlist:  ``list`` or ``tuple`` of ``str``
   :param values: values to put to each PV.
   :type values: ``list`` or ``tuple``
-  :param wait:  whether or not to wait for processing to complete (or time-out) for each put before returning.
-  :type wait:  ``True``/``False``
-  :param connection_timeout:  maximum time to wait (in seconds) for a connection to be established to each PV.
+  :param wait:  if ``'each'``, :func:`caput_many` will wait for each 
+    PV to process before starting the next.  If ``'all'``,
+    :func:`caput_many` will issue puts for all PVs immediately, then
+    wait for all of them to complete.  If any other value,
+    :func:`caput_many` will not wait for put processing to complete.
+  :param connection_timeout:  maximum time to wait (in seconds) for 
+    a connection to be established to each PV.
   :type connection_timeout:  float or ``None``
-  :param put_timeout: maximum time to wait (in seconds) for processing to complete for each PV.
+  :param put_timeout: maximum time to wait (in seconds) for processing
+   to complete for each PV (if ``wait`` is ``'each'``), or for processing
+   to complete for all PVs (if ``wait`` is ``'all'``).
   :type put_timeout: float or ``None``
   
 Because connections to channels normally connect very quickly (less than a
