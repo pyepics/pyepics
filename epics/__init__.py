@@ -78,15 +78,7 @@ def caget(pvname, as_string=False, count=None, as_numpy=True,
     to get a truncated amount of data from an array, you can specify
     the count with
        >>> x = caget('MyArray.VAL', count=1000)
-    
-    if pvname is a list of strings, caget_many is called instead.
     """
-    if isinstance(pvname, (list, tuple)):
-        return caget_many(pvname,
-                          as_string=as_string,
-                          count=count,
-                          as_numpy=as_numpy,
-                          timeout=timeout)
     start_time = time.time()
     thispv = get_pv(pvname, timeout=timeout, connect=True)
     if thispv.connected:
