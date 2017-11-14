@@ -418,8 +418,7 @@ and the log file is inspected::
 
   get a list of PVs as quickly as possible.  Returns a list of values for
   each PV in the list.  Unlike :func:`caget`, this method does not use 
-  automatic monitoring (see :ref:`pv-automonitor-label`), even for large
-  waveform PVs.
+  automatic monitoring (see :ref:`pv-automonitor-label`).
   
   :param pvlist: A list of process variable names.
   :type pvlist:  ``list`` or ``tuple`` of ``str``
@@ -443,7 +442,7 @@ For detailed information about the arguments, see the documentation for
   put values to a list of PVs as quickly as possible.  Returns a list of ints
   for each PV in the list: 1 if the put was successful, -1 if it timed out.
   Unlike :func:`caput`, this method does not use automatic monitoring (see
-  :ref:`pv-automonitor-label`), even for large waveform PVs.
+  :ref:`pv-automonitor-label`).
   
   :param pvlist: A list of process variable names.
   :type pvlist:  ``list`` or ``tuple`` of ``str``
