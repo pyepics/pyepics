@@ -171,10 +171,10 @@ def caget_many(pvlist, as_string=False, count=None, as_numpy=True, timeout=5.0):
     return out
 
 def caput_many(pvlist, values, wait=False, connection_timeout=None, put_timeout=60):
-    """put values to a list of PVs
-    This does not maintain PV objects.  If wait is 'each',
-    *each* put operation will block until it is complete.
-    or until the put_timeout duration expires.
+    """put values to a list of PVs, as fast as possible
+    This does not maintain the PV objects it makes.  If 
+    wait is 'each', *each* put operation will block until
+    it is complete or until the put_timeout duration expires.
     If wait is 'all', this method will block until *all*
     put operations are complete, or until the put_timeout
     duration expires.
@@ -184,61 +184,24 @@ def caput_many(pvlist, values, wait=False, connection_timeout=None, put_timeout=
     was successful, or a negative number if the timeout
     was exceeded.
     """
-    chids, conns = [], []
-    for name in pvlist: chids.append(ca.create_channel(name,
-                                                       auto_cb=False,
-                                                       connect=False))
-    for chid in chids: conns.append(ca.connect_channel(chid,
-                                                       timeout=connection_timeout))
-    #Number of put requests awaiting completion. Only used if wait=='all'.
-    #Reminder: acquire 'all_done' (defined further down) 
-    #before using unfinished.
-    unfinished = len([conn for conn in conns if conn > 0])
-    #mutex is used to coordinate access to 'unfinished'.
-    mutex = threading.Lock()
-    #Notify all_done if there are no remaining puts to complete.
-    #This function will block until all_done is notified, or
-    #the put_timeout expires.
-    all_done  = threading.Condition(mutex)
-    t0 = time.time()
-    wait_for_each = (wait == "each")
-    wait_for_all = (wait == "all")
-    #'out' is a list of return statuses for each put request.  1 if success, -1 if fail.
-    #'out' is filled with fail to begin with.
-    out = [-1 for i in range(0,len(chids))]
-    #To get around the fact that you can't *assign* to variables while
-    #in put_complete_callback's scope, but you can modify them.
-    put_context = {"unfinished": unfinished, "all_done": all_done, "status": out}
-    def put_complete_callback(data=None, **kws):
-        #put_complete_callback is used in wait_all mode.
-        put_context["all_done"].acquire()
-        remaining = put_context["unfinished"] - 1
-        put_context["status"][data] = 1
-        if remaining <= 0:
-            #We're all done!
-            #Notify the main thread to stop waiting for puts to complete.
-            put_context["all_done"].notify_all()
-        put_context["unfinished"] = remaining
-        put_context["all_done"].release()
-    for (i, chid) in enumerate(chids):
-        if conns[i]:
-            if wait_for_all:
-                ca.put(chid, values[i], callback=put_complete_callback, callback_data=i)
-            else:
-                #If we are waiting for each, or not waiting for anything, don't bother
-                #with callbacks.
-                out[i] = ca.put(chid, values[i], wait=wait_for_each, timeout=put_timeout)
-    if not wait_for_all:
-        return out
-    #All put requests have been submitted, now we wait...
-    with all_done:
-        while put_context["unfinished"] > 0:
-            elapsed_time = time.time() - t0
-            remaining_time = put_timeout - elapsed_time
-            if remaining_time <= 0.0:
-                #Timeout expired, return the status of the puts.
-                return out
-            all_done.wait(remaining_time)
-    #If you get this far, all puts completed successfully within the timeout.
-    return out
+    if len(pvlist) != len(values):
+        raise ValueError("List of PV names must be equal to list of values.")
+    out = []    
+    pvs = [PV(name, auto_monitor=False, connection_timeout=connection_timeout) for name in pvlist]
+    conns = [p.connected for p in pvs]
+    wait_all = (wait == 'all')
+    wait_each = (wait == 'each')
+    for p, v in zip(pvs, values):
+        out.append(p.put(v, wait=wait_each, timeout=put_timeout, use_complete=wait_all))
+    if wait_all:
+        start_time = time.time()
+        while not all([(p.connected and p.put_complete) for p in pvs]):
+            ca.poll()
+            elapsed_time = time.time() - start_time
+            if elapsed_time > put_timeout:
+                break
+        return [1 if (p.connected and p.put_complete) else -1 for p in pvs]
+    else:
+        return [o if o == 1 else -1 for o in out]
+        
 
