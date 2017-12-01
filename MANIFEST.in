@@ -1,4 +1,4 @@
-include README.txt INSTALL MANIFEST.in Changelog license.txt setup.py publish.sh *.bat versioneer.py
+include README.txt INSTALL MANIFEST.in Changelog LICENSE setup.py publish.sh *.bat versioneer.py
 exclude *.pyc core.* *~ *.pdf
 recursive-include epics *.py
 recursive-include scripts *
