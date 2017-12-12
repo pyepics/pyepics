@@ -25,6 +25,7 @@ __doc__ = """
 
 import time
 import sys
+import threading
 from . import ca
 from . import dbr
 from . import pv
@@ -151,7 +152,7 @@ def camonitor(pvname, writer=None, callback=None):
         thispv.add_callback(callback, index=-999, with_ctrlvars=True)
         _PVmonitors_[pvname] = thispv
 
-def caget_many(pvlist):
+def caget_many(pvlist, as_string=False, count=None, as_numpy=True, timeout=5.0):
     """get values for a list of PVs
     This does not maintain PV objects, and works as fast
     as possible to fetch many values.
@@ -161,9 +162,46 @@ def caget_many(pvlist):
                                                        auto_cb=False,
                                                        connect=False))
     for chid in chids: ca.connect_channel(chid)
-    for chid in chids: ca.get(chid, wait=False)
-    for chid in chids: out.append(ca.get_complete(chid))
+    for chid in chids: ca.get(chid, count=count, as_string=as_string, as_numpy=as_numpy, wait=False)
+    for chid in chids: out.append(ca.get_complete(chid, 
+                                                  count=count, 
+                                                  as_string=as_string, 
+                                                  as_numpy=as_numpy, 
+                                                  timeout=timeout))
     return out
 
-
+def caput_many(pvlist, values, wait=False, connection_timeout=None, put_timeout=60):
+    """put values to a list of PVs, as fast as possible
+    This does not maintain the PV objects it makes.  If 
+    wait is 'each', *each* put operation will block until
+    it is complete or until the put_timeout duration expires.
+    If wait is 'all', this method will block until *all*
+    put operations are complete, or until the put_timeout
+    duration expires.
+    Note that the behavior of 'wait' only applies to the
+    put timeout, not the connection timeout.
+    Returns a list of integers for each PV, 1 if the put
+    was successful, or a negative number if the timeout
+    was exceeded.
+    """
+    if len(pvlist) != len(values):
+        raise ValueError("List of PV names must be equal to list of values.")
+    out = []    
+    pvs = [PV(name, auto_monitor=False, connection_timeout=connection_timeout) for name in pvlist]
+    conns = [p.connected for p in pvs]
+    wait_all = (wait == 'all')
+    wait_each = (wait == 'each')
+    for p, v in zip(pvs, values):
+        out.append(p.put(v, wait=wait_each, timeout=put_timeout, use_complete=wait_all))
+    if wait_all:
+        start_time = time.time()
+        while not all([(p.connected and p.put_complete) for p in pvs]):
+            ca.poll()
+            elapsed_time = time.time() - start_time
+            if elapsed_time > put_timeout:
+                break
+        return [1 if (p.connected and p.put_complete) else -1 for p in pvs]
+    else:
+        return [o if o == 1 else -1 for o in out]
+        
 

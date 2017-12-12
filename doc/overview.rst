@@ -179,9 +179,9 @@ quite good.
 
 ..  function:: caget(pvname[, as_string=False[, count=None[, as_numpy=True[, timeout=None[, use_monitor=False]]]]])
 
-  retrieves and returns the value of the named PV.
+  retrieves and returns the value of the named PV(s).
 
-  :param pvname: name of Epics Process Variable
+  :param pvname: name of Epics Process Variable or list of names.
   :param as_string:  whether to return string representation of the PV value.
   :type as_string:  ``True``/``False``
   :param count:  number of elements to return for array data.
@@ -192,6 +192,9 @@ quite good.
   :type timeout:  float or ``None``
   :param use_monitor:  whether to rely on monitor callbacks or explicitly get value now.
   :type use_monitor: ``True``/``False``
+
+If *pvname* is a list of strings, :func:`caget_many` will be called
+instead with the same arguments.
 
 The *count* and *as_numpy* options apply only to array or waveform
 data. The default behavior is to return the full data array and convert to
@@ -408,6 +411,61 @@ and the log file is inspected::
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:47.536623 -183.5223
     XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:48.536434 -183.6832
 
+:func:`caget_many`
+~~~~~~~~~~~~~~~~~~
+
+..  function:: caget_many(pvlist[, as_string=False[, count=None[, as_numpy=True[, timeout=None]]]])
+
+  get a list of PVs as quickly as possible.  Returns a list of values for
+  each PV in the list.  Unlike :func:`caget`, this method does not use 
+  automatic monitoring (see :ref:`pv-automonitor-label`).
+  
+  :param pvlist: A list of process variable names.
+  :type pvlist:  ``list`` or ``tuple`` of ``str``
+  :param as_string:  whether to return string representation of the PV values.
+  :type as_string:  ``True``/``False``
+  :param count:  number of elements to return for array data.
+  :type count:  integer or ``None``
+  :param as_numpy:  whether to return the Numerical Python representation for array data.
+  :type as_numpy:  ``True``/``False``
+  :param timeout:  maximum time to wait (in seconds) for value before returning None.
+  :type timeout:  float or ``None``
+  
+For detailed information about the arguments, see the documentation for
+:func:`caget`.
+
+:func:`caput_many`
+~~~~~~~~~~~~~~~~~~
+
+..  function:: caput_many(pvlist, values[, wait=False[, connection_timeout=None[, put_timeout=60]]])
+
+  put values to a list of PVs as quickly as possible.  Returns a list of ints
+  for each PV in the list: 1 if the put was successful, -1 if it timed out.
+  Unlike :func:`caput`, this method does not use automatic monitoring (see
+  :ref:`pv-automonitor-label`).
+  
+  :param pvlist: A list of process variable names.
+  :type pvlist:  ``list`` or ``tuple`` of ``str``
+  :param values: values to put to each PV.
+  :type values: ``list`` or ``tuple``
+  :param wait:  if ``'each'``, :func:`caput_many` will wait for each 
+    PV to process before starting the next.  If ``'all'``,
+    :func:`caput_many` will issue puts for all PVs immediately, then
+    wait for all of them to complete.  If any other value,
+    :func:`caput_many` will not wait for put processing to complete.
+  :param connection_timeout:  maximum time to wait (in seconds) for 
+    a connection to be established to each PV.
+  :type connection_timeout:  float or ``None``
+  :param put_timeout: maximum time to wait (in seconds) for processing
+   to complete for each PV (if ``wait`` is ``'each'``), or for processing
+   to complete for all PVs (if ``wait`` is ``'all'``).
+  :type put_timeout: float or ``None``
+  
+Because connections to channels normally connect very quickly (less than a
+second), but processing a put may take a significant amount of time (due to 
+a physical device moving, or due to complex calculations or data processing
+sequences), a separate timeout duration can be specified for connections and
+processing puts.
 
 Motivation: Why another Python-Epics Interface?
 ================================================
