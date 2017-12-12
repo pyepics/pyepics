@@ -44,8 +44,8 @@ problem before tyring to use the epics package.
 
 nolibca = os.environ.get('NOLIBCA', None)
 if nolibca is None:
-    pkg_data = {'epics.clibs': [epics.utils.clib_search_path("ca"),
-                                epics.utils.clib_search_path("Com")],}
+    pkg_data = {'epics.clibs': ['darwin64/*', 'linux64/*', 'linux32/*',
+                                'win32/*', 'win64/*']}
 else:
     pkg_data = dict()
 
