@@ -90,96 +90,145 @@ to do this, say::
         pv = epics.PV(name)
 	pv_vals[name] = pv.get()
 
-does incur some small performance penalty.  As shown below, the penalty
-is generally pretty small in absolute terms, but can be noticeable when
-you are connecting to a large number (say, more than 100) PVs at once.
+or even just::
 
-The cause for the penalty, and its remedy, are two-fold.  First, a `PV`
-object automatically use connection and event callbacks.  Normally, these
-are advantages, as you don't need to explicitly deal with them.  But,
-internally, they do pause for network responses using :meth:`ca.pend_event`
-and these pauses can add up.  Second, the :meth:`ca.get` also pauses for
-network response, so that the returned value actually contains the latest
-data right away, as discussed in the previous section.
+    values = [epics.caget(name) for name in pvnamelist]
 
-The remedies are to
-   1. not use connection or event callbacks.
-   2. not explicitly wait for values to be returned for each :meth:`get`.
 
-A more complicated but faster approach relies on a carefully-tuned use of
-the CA library, and would be the following::
+does incur some performance penalty. To minimize the penalty, we need to
+understand its cause.
 
+Creating a `PV` object (using any of :class:`pv.PV`, or :func:`pv.get_pv`,
+or :func:`epics.caget`) will automatically use connection and event
+callbacks in an attempt to keep the `PV` alive and up-to-date during the
+seesion.  Normally, this is an advantage, as you don't need to explicitly
+deal with many aspects of Channel Access.  But creating a `PV` does request
+some network traffic, and the `PV` will not be "fully connected" and ready
+to do a :meth:`PV.get` until all the connection and event callbacks are
+established.  In fact, :meth:`PV.get` will not run until those connections
+are all established.  This takes very close to 30 milliseconds for each PV.
+That is, for 1000 PVs, the above approach will take about 30 seconds.
+
+The simplest remedy is to allow all those connections to happen in parallel
+and in the background by first creating all the PVs and then getting their
+values.  That would look like::
+
+    # improve time to get multiple PVs:  Method 1
+    import epics
+
+    pvnamelist = read_list_pvs()
+    pvs = [epics.PV(name) for name in pvnamelist]
+    values = [p.get() for p in pvs]
+
+Though it doesn't look that different, this improves performance by a
+factor of 100, so that getting 1000 PV values will take around 0.4 seconds.
+
+Can it be improved further?  The answer is Yes, but at a price.  For the
+discussion here, we'll can the original version "Method 0" and the method
+of creating all the PVs then getting their values "Method 1".  With both of
+these approaches, the script has fully connected PV objects for all PVs
+named, so that subsequent use of these PVs will be very efficient.
+
+But this can be made even faster by turning off any connection or event
+callbacks, avoiding `PV` objects altogether, and using the `epics.ca`
+interface.  This has been encapsulated into :func:`epics.caget_many` which
+can be used as::
+
+    # get multiple PVs as fast as possible:  Method 2
+    import epics
+    pvnamelist = read_list_pvs()
+    values = epics.caget_many(pvlist)
+
+In tests using 1000 PVs that were all really connected, Method 2 will take
+about 0.25 seconds, compared to 0.4 seconds for Method 1 and 30 seconds for
+Method 0.  To understand what :func:`epics.caget_many` is doing, a more
+complete version of this looks like this::
+
+    # epics.caget_many made explicit:  Method 3
     from epics import ca
 
     pvnamelist = read_list_pvs()
 
     pvdata = {}
+    pvchids = []
+    # create, don't connect or create callbacks
     for name in pvnamelist:
         chid = ca.create_channel(name, connect=False, auto_cb=False) # note 1
-	pvdata[name] = (chid, None)
+	pvchids.append(chid)
 
-    for name, data in pvdata.items():
-        ca.connect_channel(data[0])
-    ca.poll()
-    for name, data in pvdata.items():
-        ca.get(data[0], wait=False)  # note 2
+    # connect
+    for chid in pvchids:
+        ca.connect_channel(chid)
 
+    # request get, but do not wait for result
     ca.poll()
-    for name, data in pvdata.items():
+    for chid in pvchids:
+        ca.get(chid, wait=False)  # note 2
+
+    # now wait for get() to complete
+    ca.poll()
+    for chid in pvchids:
         val = ca.get_complete(data[0])
-        pvdata[name][1] = val
+        pvdata[ca.name(chid)] = val
 
-    for name, data in pvdata.items():
-        print name, data[1]
+The code here probably needs detailed explanation.  As mentioned above, it
+uses the `ca` level, not `PV` objects.  Second, the call to
+:meth:`ca.create_channel` (Note 1) uses `connect=False` and `auto_cb=False`
+which mean to not wait for a connection before returning, and to not
+automatically assign a connection callback.  Normally, these are not what
+you want, as you want a connected channel and to be informed if the
+connection state changes, but we're aiming for maximum speed here.  We then
+use :meth:`ca.connect_channel` to connect all the channels.  Next (Note 2),
+we tell the CA library to request the data for the channel without waiting
+around to receive it.  The main point of not having :meth:`ca.get` wait for
+the data for each channel as we go is that each data transfer takes time.
+Instead we request data to be sent in a separate thread for all channels
+without waiting.  Then we do wait by calling :meth:`ca.poll` once and only
+once, (not `len(pvnamelist)` times!).  Finally, we use the
+:meth:`ca.get_complete` method to convert the data that has now been
+received by the companion thread to a python value.
 
-The code here probably needs detailed explanation.  The first thing to
-notice is that this is using the `ca` level, not `PV` objects.  Second
-(Note 1), the `connect=False` and `auto_cb=False` options to
-:meth:`ca.create_channel`.  These respectively tell
-:meth:`ca.create_channel` to not wait for a connection before returning,
-and to not automatically assign a connection callback.  Normally, these are
-not what you want, as you want a connected channel and to know if the
-connection state changes.  But we're aiming for maximum speed here, so we
-avoid these.
+Method 2 and 3 have essentially the same runtime, which is somewhat faster
+than Method 1, and much faster than Method 0. Which method you should use
+depends on use case.  In fact, the test shown here only gets the PV values
+once.  If you're writing a script to get 1000 PVs, write them to disk, and
+exit, then Method 2 (:func:`epics.caget_many`) may be exactly what you
+want.  But if your script will get 1000 PVs and stay alive doing other
+work, or even if it runs a loop to get 1000 PVs and write them to disk once
+a minute, then Method 1 will actually be faster.  That is doing
+:func:`epics.caget_many` in a loop, as with::
 
-We then explicitly call :meth:`ca.connect_channel` for all the channels.
-Next (Note 2), we tell the CA library to request the data for the channel
-without waiting around to receive it.  The main point of not having
-:meth:`ca.get` wait for the data for each channel as we go is that each
-data transfer takes time.  Instead we request data to be sent in a separate
-thread for all channels without waiting.  Then we do wait by calling
-:meth:`ca.poll` once and only once, (not len(channels) times!).  Finally,
-we use the :meth:`ca.get_complete` method to convert the data that has now
-been received by the companion thread to a python value.
+    # caget_many() 10 times
+    import epics
+    import time
+    pvnamelist = read_list_pvs()
+    for i in range(10):
+        values = epics.caget_many(pvlist)
+	time.sleep(0.01)
 
-How much faster is the more explicit method?  In my tests, I used 20,000
-PVs, all scalar values, all actually connected, and all on the same subnet
-as the test client, though on a mixture of several vxWorks and linux IOCs.
-I found that the simplest, obvious approach as above took around 12 seconds
-to read all 20,000 PVs.  Using the `ca` layer with connection callbacks and
-a normal call to :meth:`ca.get` also took about 12 seconds.  The method
-without connection callbacks and with delayed unpacking above took about 2
-seconds to read all 20,000 PVs.
+will take around considerably *longer* than creating the PVs once and
+getting their values in a loop with::
 
-Is that performance boost from 12 to 2 seconds significant?  If you're
-writing a script that is intended to run once, fetch a large number of PVs
-and get their values (say, an auto-save script that runs on demand), then
-the boost is definitely significant.  On the other hand, if you're writing
-a long running process or a process that will retain the PV connections and
-get their values multiple times, the difference in start-up speed is less
-significant.  For a long running auto-save script that periodically writes
-out all the PV values, the "obvious" way using automatically monitored PVs
-may be much *better*, as the time for the initial connection is small, and
-the use of event callbacks will reduce network traffic for PVs that don't
-change between writes.
+    # pv.get() 10 times
+    import epics
+    import time
+    pvnamelist = read_list_pvs()
+    pvs = [epics.PV(name) for name in pvnamelist]
+    for i in range(10):
+        values = [p.get() for p in pvs]
+	time.sleep(0.01)
 
-Note that the tests also show that, with the simplest approach, 1,000 PVs
-should connect and receive values in under 1 second.  Any application that
-is sure it needs to connect to PVs faster than that rate will want to do
-careful timing tests.  Finally, note also that the issues are not really a
-classic *python is slow compared to C* issue, but rather a matter of how
-much pausing with :meth:`ca.poll` one does to make sure values are
-immediately useful.
+In tests with 1000 PVs, looping with :func:`epics.caget_many` took about
+1.5 seconds, while the version looping over :meth:`PV.get()` took about 0.5
+seconds.
+
+To be clear, it is **connecting** to Epics PVs that is expensive, not the
+retreiving of data from connected PVs.  You can lower the connection
+expense by not retaining the connection or creating monitors on the PVs,
+but if you are going to re-use the PVs, that savings will be lost quickly.
+In short, use Method 1 over :func:`caget_many` unless you've benchmarked
+your use-case and have demonstrated that :func:`caget_many` is better for
+your needs.
 
 .. _advanced-sleep-label:
 
