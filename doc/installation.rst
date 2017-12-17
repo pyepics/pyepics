@@ -13,7 +13,7 @@ older versions of Python, but these are rarely tested. For Windows, use of
 pyepics with IronPython (Python written with .NET) has been recently
 reported, but is not routinely tested.
 
-Version 3.14 or higher of the EPICS Channel Access library is required for
+The EPICS Channel Access library Version 3.14 or higher is required for
 pyepics to actually communicate with Epics variables.  Specifically, the
 shared libraries libca and libCom (*libca.so* and *libCom.so* on Linux,
 *libca.dylib* and *libCom.dylib* on Mac OSX, or *ca.dll* and *Com.dll* on
@@ -48,15 +48,15 @@ Downloads and Installation
 .. _pyepics CARS downloads:       http://cars9.uchicago.edu/software/python/pyepics3/src/
 
 
-The latest stable version of the pyepics package is 3.3.0.  Source code
+The latest stable version of the pyepics package is |release|.  Source code
 kits and Windows installers can be found at `pyepics PyPI`_.  With `Python
 Setup Tools`_ now standard for Python 2.7 and above, the simplest way to
 install the pyepics is with::
 
      pip install pyepics
 
-If you're using Anaconda, there are a few conda channels for pyepics,
-including::
+If you're using Anaconda Python, there are a few conda channels for
+pyepics, including::
 
      conda install -c GSECARS pyepics
 
@@ -64,9 +64,10 @@ You can also download the source package, unpack it, and install with::
 
      python setup.py install
 
-If you know that you will not want to use the default version of *libca*,
-you can suppress the installation of the default versions by setting the
-environmental variable `NOLIBCA` at install time, as with::
+If you are certain that you will not want to use the default version of
+*libca* that pyepics provides and is tested with, you can suppress the
+installation of the default versions by setting the environmental variable
+`NOLIBCA` at install time, as with::
 
     NOLIBCA=1 python setup.py install
 
@@ -182,10 +183,10 @@ pyepics was originally written and is maintained by Matt Newville
 <newville@cars.uchicago.ed>.  Many important contributions to the library
 have come from Angus Gratton while at the Australian National University,
 and from Daron Chabot and Ken Lauer.  Several other people have provided
-valuable additions, suggestions, or bug reports, which has greatly improved
-the quality of the library:  Robbie Clarken, Daniel Allen, Michael Abbott,
-Thomas Caswell, Alain Peteut, Steven Hartmann, Rokvintar, Georg Brandl,
-Niklas Claesson, Jon Brinkmann, Marco Cammarata, Craig Haskins, David Vine,
-Pete Jemian, Andrew Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Eric
-Norum, Mark Rivers, Friedrich Schotte, Mark Vigder, Steve Wasserman, and
-Glen Wright.
+valuable additions, suggestions, pull requests or bug reports, which has
+greatly improved the quality of the library: Robbie Clarken, Daniel Allen,
+Michael Abbott, Thomas Caswell, Alain Peteut, Steven Hartmann, Rokvintar,
+Georg Brandl, Niklas Claesson, Jon Brinkmann, Marco Cammarata, Craig
+Haskins, David Vine, Pete Jemian, Andrew Johnson, Janko Kolar, Irina
+Kosheleva, Tim Mooney, Eric Norum, Mark Rivers, Friedrich Schotte, Mark
+Vigder, Steve Wasserman, and Glen Wright.
