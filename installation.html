@@ -12,7 +12,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.3.0',
+        VERSION:     '3.3.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -123,7 +123,7 @@ and 32-bit Windows. It should still work on 32-bit Linux, and may work with
 older versions of Python, but these are rarely tested. For Windows, use of
 pyepics with IronPython (Python written with .NET) has been recently
 reported, but is not routinely tested.</p>
-<p>Version 3.14 or higher of the EPICS Channel Access library is required for
+<p>The EPICS Channel Access library Version 3.14 or higher is required for
 pyepics to actually communicate with Epics variables.  Specifically, the
 shared libraries libca and libCom (<em>libca.so</em> and <em>libCom.so</em> on Linux,
 <em>libca.dylib</em> and <em>libCom.dylib</em> on Mac OSX, or <em>ca.dll</em> and <em>Com.dll</em> on
@@ -147,15 +147,15 @@ requires <cite>PyQt</cite> or <cite>PySide</cite>.</p>
 </div>
 <div class="section" id="downloads-and-installation">
 <h2>Downloads and Installation<a class="headerlink" href="#downloads-and-installation" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the pyepics package is 3.3.0.  Source code
+<p>The latest stable version of the pyepics package is 3.3.1.  Source code
 kits and Windows installers can be found at <a class="reference external" href="https://pypi.python.org/pypi/pyepics/">pyepics PyPI</a>.  With <a class="reference external" href="http://pypi.python.org/pypi/setuptools">Python
 Setup Tools</a> now standard for Python 2.7 and above, the simplest way to
 install the pyepics is with:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyepics</span>
 </pre></div>
 </div>
-<p>If you’re using Anaconda, there are a few conda channels for pyepics,
-including:</p>
+<p>If you’re using Anaconda Python, there are a few conda channels for
+pyepics, including:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">GSECARS</span> <span class="n">pyepics</span>
 </pre></div>
 </div>
@@ -163,9 +163,10 @@ including:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
 </pre></div>
 </div>
-<p>If you know that you will not want to use the default version of <em>libca</em>,
-you can suppress the installation of the default versions by setting the
-environmental variable <cite>NOLIBCA</cite> at install time, as with:</p>
+<p>If you are certain that you will not want to use the default version of
+<em>libca</em> that pyepics provides and is tested with, you can suppress the
+installation of the default versions by setting the environmental variable
+<cite>NOLIBCA</cite> at install time, as with:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">NOLIBCA</span><span class="o">=</span><span class="mi">1</span> <span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
 </pre></div>
 </div>
@@ -341,13 +342,13 @@ case you can probably do whatever you want.</p>
 &lt;<a class="reference external" href="mailto:newville&#37;&#52;&#48;cars&#46;uchicago&#46;ed">newville<span>&#64;</span>cars<span>&#46;</span>uchicago<span>&#46;</span>ed</a>&gt;.  Many important contributions to the library
 have come from Angus Gratton while at the Australian National University,
 and from Daron Chabot and Ken Lauer.  Several other people have provided
-valuable additions, suggestions, or bug reports, which has greatly improved
-the quality of the library:  Robbie Clarken, Daniel Allen, Michael Abbott,
-Thomas Caswell, Alain Peteut, Steven Hartmann, Rokvintar, Georg Brandl,
-Niklas Claesson, Jon Brinkmann, Marco Cammarata, Craig Haskins, David Vine,
-Pete Jemian, Andrew Johnson, Janko Kolar, Irina Kosheleva, Tim Mooney, Eric
-Norum, Mark Rivers, Friedrich Schotte, Mark Vigder, Steve Wasserman, and
-Glen Wright.</p>
+valuable additions, suggestions, pull requests or bug reports, which has
+greatly improved the quality of the library: Robbie Clarken, Daniel Allen,
+Michael Abbott, Thomas Caswell, Alain Peteut, Steven Hartmann, Rokvintar,
+Georg Brandl, Niklas Claesson, Jon Brinkmann, Marco Cammarata, Craig
+Haskins, David Vine, Pete Jemian, Andrew Johnson, Janko Kolar, Irina
+Kosheleva, Tim Mooney, Eric Norum, Mark Rivers, Friedrich Schotte, Mark
+Vigder, Steve Wasserman, and Glen Wright.</p>
 </div>
 </div>
 

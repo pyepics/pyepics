@@ -12,7 +12,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.3.0',
+        VERSION:     '3.3.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -182,94 +182,138 @@ to do this, say:</p>
     <span class="n">pv_vals</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>does incur some small performance penalty.  As shown below, the penalty
-is generally pretty small in absolute terms, but can be noticeable when
-you are connecting to a large number (say, more than 100) PVs at once.</p>
-<p>The cause for the penalty, and its remedy, are two-fold.  First, a <cite>PV</cite>
-object automatically use connection and event callbacks.  Normally, these
-are advantages, as you don’t need to explicitly deal with them.  But,
-internally, they do pause for network responses using <code class="xref py py-meth docutils literal"><span class="pre">ca.pend_event()</span></code>
-and these pauses can add up.  Second, the <code class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></code> also pauses for
-network response, so that the returned value actually contains the latest
-data right away, as discussed in the previous section.</p>
-<dl class="docutils">
-<dt>The remedies are to</dt>
-<dd><ol class="first last arabic simple">
-<li>not use connection or event callbacks.</li>
-<li>not explicitly wait for values to be returned for each <code class="xref py py-meth docutils literal"><span class="pre">get()</span></code>.</li>
-</ol>
-</dd>
-</dl>
-<p>A more complicated but faster approach relies on a carefully-tuned use of
-the CA library, and would be the following:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">ca</span>
+<p>or even just:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">pvnamelist</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>does incur some performance penalty. To minimize the penalty, we need to
+understand its cause.</p>
+<p>Creating a <cite>PV</cite> object (using any of <a class="reference internal" href="pv.html#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal"><span class="pre">pv.PV</span></code></a>, or <a class="reference internal" href="pv.html#pv.get_pv" title="pv.get_pv"><code class="xref py py-func docutils literal"><span class="pre">pv.get_pv()</span></code></a>,
+or <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal"><span class="pre">epics.caget()</span></code></a>) will automatically use connection and event
+callbacks in an attempt to keep the <cite>PV</cite> alive and up-to-date during the
+seesion.  Normally, this is an advantage, as you don’t need to explicitly
+deal with many aspects of Channel Access.  But creating a <cite>PV</cite> does request
+some network traffic, and the <cite>PV</cite> will not be “fully connected” and ready
+to do a <code class="xref py py-meth docutils literal"><span class="pre">PV.get()</span></code> until all the connection and event callbacks are
+established.  In fact, <code class="xref py py-meth docutils literal"><span class="pre">PV.get()</span></code> will not run until those connections
+are all established.  This takes very close to 30 milliseconds for each PV.
+That is, for 1000 PVs, the above approach will take about 30 seconds.</p>
+<p>The simplest remedy is to allow all those connections to happen in parallel
+and in the background by first creating all the PVs and then getting their
+values.  That would look like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># improve time to get multiple PVs:  Method 1</span>
+<span class="kn">import</span> <span class="nn">epics</span>
+
+<span class="n">pvnamelist</span> <span class="o">=</span> <span class="n">read_list_pvs</span><span class="p">()</span>
+<span class="n">pvs</span> <span class="o">=</span> <span class="p">[</span><span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">pvnamelist</span><span class="p">]</span>
+<span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pvs</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Though it doesn’t look that different, this improves performance by a
+factor of 100, so that getting 1000 PV values will take around 0.4 seconds.</p>
+<p>Can it be improved further?  The answer is Yes, but at a price.  For the
+discussion here, we’ll can the original version “Method 0” and the method
+of creating all the PVs then getting their values “Method 1”.  With both of
+these approaches, the script has fully connected PV objects for all PVs
+named, so that subsequent use of these PVs will be very efficient.</p>
+<p>But this can be made even faster by turning off any connection or event
+callbacks, avoiding <cite>PV</cite> objects altogether, and using the <cite>epics.ca</cite>
+interface.  This has been encapsulated into <a class="reference internal" href="overview.html#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal"><span class="pre">epics.caget_many()</span></code></a> which
+can be used as:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># get multiple PVs as fast as possible:  Method 2</span>
+<span class="kn">import</span> <span class="nn">epics</span>
+<span class="n">pvnamelist</span> <span class="o">=</span> <span class="n">read_list_pvs</span><span class="p">()</span>
+<span class="n">values</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget_many</span><span class="p">(</span><span class="n">pvlist</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In tests using 1000 PVs that were all really connected, Method 2 will take
+about 0.25 seconds, compared to 0.4 seconds for Method 1 and 30 seconds for
+Method 0.  To understand what <a class="reference internal" href="overview.html#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal"><span class="pre">epics.caget_many()</span></code></a> is doing, a more
+complete version of this looks like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># epics.caget_many made explicit:  Method 3</span>
+<span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">ca</span>
 
 <span class="n">pvnamelist</span> <span class="o">=</span> <span class="n">read_list_pvs</span><span class="p">()</span>
 
 <span class="n">pvdata</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">pvchids</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># create, don&#39;t connect or create callbacks</span>
 <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">pvnamelist</span><span class="p">:</span>
     <span class="n">chid</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">connect</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">auto_cb</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># note 1</span>
-    <span class="n">pvdata</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">pvchids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
 
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">pvdata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="n">ca</span><span class="o">.</span><span class="n">connect_channel</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">ca</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">pvdata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="n">ca</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># note 2</span>
+<span class="c1"># connect</span>
+<span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">pvchids</span><span class="p">:</span>
+    <span class="n">ca</span><span class="o">.</span><span class="n">connect_channel</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
 
+<span class="c1"># request get, but do not wait for result</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">pvdata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">pvchids</span><span class="p">:</span>
+    <span class="n">ca</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># note 2</span>
+
+<span class="c1"># now wait for get() to complete</span>
+<span class="n">ca</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">pvchids</span><span class="p">:</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">get_complete</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">pvdata</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">pvdata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">pvdata</span><span class="p">[</span><span class="n">ca</span><span class="o">.</span><span class="n">name</span><span class="p">(</span><span class="n">chid</span><span class="p">)]</span> <span class="o">=</span> <span class="n">val</span>
 </pre></div>
 </div>
-<p>The code here probably needs detailed explanation.  The first thing to
-notice is that this is using the <cite>ca</cite> level, not <cite>PV</cite> objects.  Second
-(Note 1), the <cite>connect=False</cite> and <cite>auto_cb=False</cite> options to
-<code class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></code>.  These respectively tell
-<code class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></code> to not wait for a connection before returning,
-and to not automatically assign a connection callback.  Normally, these are
-not what you want, as you want a connected channel and to know if the
-connection state changes.  But we’re aiming for maximum speed here, so we
-avoid these.</p>
-<p>We then explicitly call <code class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></code> for all the channels.
-Next (Note 2), we tell the CA library to request the data for the channel
-without waiting around to receive it.  The main point of not having
-<code class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></code> wait for the data for each channel as we go is that each
-data transfer takes time.  Instead we request data to be sent in a separate
-thread for all channels without waiting.  Then we do wait by calling
-<code class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></code> once and only once, (not len(channels) times!).  Finally,
-we use the <code class="xref py py-meth docutils literal"><span class="pre">ca.get_complete()</span></code> method to convert the data that has now
-been received by the companion thread to a python value.</p>
-<p>How much faster is the more explicit method?  In my tests, I used 20,000
-PVs, all scalar values, all actually connected, and all on the same subnet
-as the test client, though on a mixture of several vxWorks and linux IOCs.
-I found that the simplest, obvious approach as above took around 12 seconds
-to read all 20,000 PVs.  Using the <cite>ca</cite> layer with connection callbacks and
-a normal call to <code class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></code> also took about 12 seconds.  The method
-without connection callbacks and with delayed unpacking above took about 2
-seconds to read all 20,000 PVs.</p>
-<p>Is that performance boost from 12 to 2 seconds significant?  If you’re
-writing a script that is intended to run once, fetch a large number of PVs
-and get their values (say, an auto-save script that runs on demand), then
-the boost is definitely significant.  On the other hand, if you’re writing
-a long running process or a process that will retain the PV connections and
-get their values multiple times, the difference in start-up speed is less
-significant.  For a long running auto-save script that periodically writes
-out all the PV values, the “obvious” way using automatically monitored PVs
-may be much <em>better</em>, as the time for the initial connection is small, and
-the use of event callbacks will reduce network traffic for PVs that don’t
-change between writes.</p>
-<p>Note that the tests also show that, with the simplest approach, 1,000 PVs
-should connect and receive values in under 1 second.  Any application that
-is sure it needs to connect to PVs faster than that rate will want to do
-careful timing tests.  Finally, note also that the issues are not really a
-classic <em>python is slow compared to C</em> issue, but rather a matter of how
-much pausing with <code class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></code> one does to make sure values are
-immediately useful.</p>
+<p>The code here probably needs detailed explanation.  As mentioned above, it
+uses the <cite>ca</cite> level, not <cite>PV</cite> objects.  Second, the call to
+<code class="xref py py-meth docutils literal"><span class="pre">ca.create_channel()</span></code> (Note 1) uses <cite>connect=False</cite> and <cite>auto_cb=False</cite>
+which mean to not wait for a connection before returning, and to not
+automatically assign a connection callback.  Normally, these are not what
+you want, as you want a connected channel and to be informed if the
+connection state changes, but we’re aiming for maximum speed here.  We then
+use <code class="xref py py-meth docutils literal"><span class="pre">ca.connect_channel()</span></code> to connect all the channels.  Next (Note 2),
+we tell the CA library to request the data for the channel without waiting
+around to receive it.  The main point of not having <code class="xref py py-meth docutils literal"><span class="pre">ca.get()</span></code> wait for
+the data for each channel as we go is that each data transfer takes time.
+Instead we request data to be sent in a separate thread for all channels
+without waiting.  Then we do wait by calling <code class="xref py py-meth docutils literal"><span class="pre">ca.poll()</span></code> once and only
+once, (not <cite>len(pvnamelist)</cite> times!).  Finally, we use the
+<code class="xref py py-meth docutils literal"><span class="pre">ca.get_complete()</span></code> method to convert the data that has now been
+received by the companion thread to a python value.</p>
+<p>Method 2 and 3 have essentially the same runtime, which is somewhat faster
+than Method 1, and much faster than Method 0. Which method you should use
+depends on use case.  In fact, the test shown here only gets the PV values
+once.  If you’re writing a script to get 1000 PVs, write them to disk, and
+exit, then Method 2 (<a class="reference internal" href="overview.html#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal"><span class="pre">epics.caget_many()</span></code></a>) may be exactly what you
+want.  But if your script will get 1000 PVs and stay alive doing other
+work, or even if it runs a loop to get 1000 PVs and write them to disk once
+a minute, then Method 1 will actually be faster.  That is doing
+<a class="reference internal" href="overview.html#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal"><span class="pre">epics.caget_many()</span></code></a> in a loop, as with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># caget_many() 10 times</span>
+<span class="kn">import</span> <span class="nn">epics</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="n">pvnamelist</span> <span class="o">=</span> <span class="n">read_list_pvs</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">caget_many</span><span class="p">(</span><span class="n">pvlist</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will take around considerably <em>longer</em> than creating the PVs once and
+getting their values in a loop with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># pv.get() 10 times</span>
+<span class="kn">import</span> <span class="nn">epics</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="n">pvnamelist</span> <span class="o">=</span> <span class="n">read_list_pvs</span><span class="p">()</span>
+<span class="n">pvs</span> <span class="o">=</span> <span class="p">[</span><span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">pvnamelist</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pvs</span><span class="p">]</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In tests with 1000 PVs, looping with <a class="reference internal" href="overview.html#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal"><span class="pre">epics.caget_many()</span></code></a> took about
+1.5 seconds, while the version looping over <code class="xref py py-meth docutils literal"><span class="pre">PV.get()</span></code> took about 0.5
+seconds.</p>
+<p>To be clear, it is <strong>connecting</strong> to Epics PVs that is expensive, not the
+retreiving of data from connected PVs.  You can lower the connection
+expense by not retaining the connection or creating monitors on the PVs,
+but if you are going to re-use the PVs, that savings will be lost quickly.
+In short, use Method 1 over <code class="xref py py-func docutils literal"><span class="pre">caget_many()</span></code> unless you’ve benchmarked
+your use-case and have demonstrated that <code class="xref py py-func docutils literal"><span class="pre">caget_many()</span></code> is better for
+your needs.</p>
 </div>
 <div class="section" id="time-sleep-or-epics-poll">
 <span id="advanced-sleep-label"></span><h2>time.sleep() or epics.poll()?<a class="headerlink" href="#time-sleep-or-epics-poll" title="Permalink to this headline">¶</a></h2>
