@@ -32,10 +32,11 @@ def onChanges(pvname=None, value=None, **kws):
 def no_simulator_updates():
     '''Context manager which pauses and resumes simulator PV updating'''
     try:
-        caput(pvnames.pause_pv, 1)
+        caput(pvnames.pause_pv, 1, wait=True)
+        time.sleep(0.05)
         yield
     finally:
-        caput(pvnames.pause_pv, 0)
+        caput(pvnames.pause_pv, 0, wait=True)
 
 
 class PV_Tests(unittest.TestCase):
