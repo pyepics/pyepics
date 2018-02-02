@@ -125,7 +125,7 @@ def _find_lib(inp_lib_name):
     if dllpath is not None and inp_lib_name != 'ca':
         _parent, _name = os.path.split(dllpath)
         dllpath = os.path.join(_parent, _name.replace('ca', inp_lib_name))
-    
+
     if (dllpath is not None and os.path.exists(dllpath) and
             os.path.isfile(dllpath)):
         return dllpath
@@ -890,7 +890,6 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
               not callback in entry['callbacks']):
             entry['callbacks'].append(callback)
             callback(chid=entry['chid'], pvname=pvname, conn=entry['conn'])
-
     conncb = 0
     if auto_cb:
         conncb = _CB_CONNECT
@@ -903,16 +902,12 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
                                       ctypes.byref(chid))
         PySEVCHK('create_channel', ret)
         entry['chid'] = chid
-
     chid_key = chid
     if isinstance(chid_key, dbr.chid_t):
         chid_key = chid.value
     _namecache[chid_key] = BYTES2STR(pvn)
-    # print("CREATE Channel ", pvn, chid)
     if connect:
         connect_channel(chid)
-    if conncb != 0:
-        poll()
     return chid
 
 @withCHID
