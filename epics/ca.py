@@ -1550,6 +1550,8 @@ def get_timevars(chid, timeout=5.0, warn=True):
             out[attr] = getattr(tmpv, attr)
     if hasattr(tmpv, 'stamp'):
         out['timestamp'] = dbr.make_unixtime(tmpv.stamp)
+        out['posixseconds'] = tmpv.stamp.secs + dbr.EPICS2UNIX_EPOCH
+        out['nanoseconds'] = tmpv.stamp.nsec
 
     ncache['time_value'] = None
     return out
