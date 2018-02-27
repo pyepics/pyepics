@@ -7,13 +7,19 @@ try:
 except:
     PyDeadObjectError = Exception
 
+import six
 import time
 import sys
 import epics
 import wx.lib.buttons as buttons
 import wx.lib.agw.floatspin as floatspin
 
-from utils import Closure, FloatCtrl, set_float
+try:
+    from wx._core import PyDeadObjectError
+except:
+    PyDeadObjectError = Exception
+
+from .utils import Closure, FloatCtrl, set_float
 
 def EpicsFunction(f):
     """decorator to wrap function in a wx.CallAfter() so that
@@ -166,7 +172,7 @@ class PVMixin(object):
             return
         if isinstance(pv, epics.PV):
             self.pv = pv
-        elif isinstance(pv, (str, unicode)):
+        elif isinstance(pv, six.string_types):
             form = "ctrl" if len(self._fg_colour_alarms) > 0 or len(self._bg_colour_alarms) > 0 else "native"
             self.pv = epics.get_pv(pv, form=form)
             self.pv.connect()
@@ -603,7 +609,7 @@ class PVEnumButtons(wx.Panel, PVCtrlMixin):
             return
         if isinstance(pv, epics.PV):
             self.pv = pv
-        elif isinstance(pv, (str, unicode)):
+        elif isinstance(pv, six.string_types):
             self.pv = epics.get_pv(pv)
             self.pv.connect()
 
@@ -668,7 +674,7 @@ class PVEnumChoice(wx.Choice, PVCtrlMixin):
             return
         if isinstance(pv, epics.PV):
             self.pv = pv
-        elif isinstance(pv, (str, unicode)):
+        elif isinstance(pv, six.string_types):
             self.pv = epics.get_pv(pv)
             self.pv.connect()
 
@@ -752,7 +758,7 @@ class PVFloatCtrl(FloatCtrl, PVCtrlMixin):
         "set pv, either an epics.PV object or a pvname"
         if isinstance(pv, epics.PV):
             self.pv = pv
-        elif isinstance(pv, (str, unicode)):
+        elif isinstance(pv, six.string_types):
             self.pv = epics.get_pv(pv)
         if self.pv is None:
             return
@@ -1008,7 +1014,7 @@ class PVButton(wx.Button, PVCtrlMixin):
         PVCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.pushValue = pushValue
         self.Bind(wx.EVT_BUTTON, self.OnPress)
-        if isinstance(disablePV, (str, unicode)):
+        if isinstance(disablePV, six.string_types):
             disablePV = epics.get_pv(disablePV)
             disablePV.connect()
         self.disablePV = disablePV
