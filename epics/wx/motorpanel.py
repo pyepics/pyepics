@@ -10,6 +10,7 @@ provides two classes:
 """
 #  Aug 21 2004 M Newville:  initial working version.
 #
+import six
 import wx
 try:
     from wx._core import PyDeadObjectError
@@ -75,7 +76,7 @@ class MotorPanel(wx.Panel):
         except PyDeadObjectError:
             return
 
-        if isinstance(motor, (str, unicode)):
+        if isinstance(motor, six.string_types):
             self.motor = epics.Motor(motor)
         elif isinstance(motor, epics.Motor):
             self.motor = motor
