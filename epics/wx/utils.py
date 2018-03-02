@@ -9,9 +9,15 @@ import wx.lib.masked as masked
 
 import os
 import array
-from string import maketrans
+import six
+if six.PY3:
+    maketrans = str.maketrans
+else:
+    from string import maketrans
 
-import fpformat
+BAD_FILECHARS = ';~,`!%$@$&^?*#:"/|\'\\\t\r\n (){}[]<>'
+GOOD_FILECHARS = '_'*len(BAD_FILECHARS)
+TRANS_FILE = maketrans(BAD_FILECHARS, GOOD_FILECHARS)
 
 HAS_NUMPY = False
 try:
@@ -115,8 +121,7 @@ def fix_filename(fname):
     fix string to be a 'good' filename. This may be a more
     restrictive than the OS, but avoids nasty cases.
     """
-    bchars = ' <>:"\'\\\t\r\n/|?*!%$'
-    out = fname.translate(maketrans(bchars, '_'*len(bchars)))
+    out = str(s).translate(TRANS_FILE)
     if out[0] in '-,;[]{}()~`@#':
         out = '_%s' % out
     return out
@@ -366,7 +371,7 @@ class FloatCtrl(wx.TextCtrl):
 
     def GetValue(self):
         if self.__prec > 0:
-            return set_float(fpformat.fix(self.__val, self.__prec))
+            return set_float("%%.%ig" % (self.__prec) % (self.__val))
         else:
             return int(self.__val)
 

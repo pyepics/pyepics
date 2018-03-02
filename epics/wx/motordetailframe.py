@@ -11,7 +11,7 @@ from epics.wx.wxlib import (PVText, PVFloatCtrl, PVTextCtrl,
                             DelayedEpicsCallback, EpicsFunction)
 
 
-from utils import set_sizer, LCEN, RCEN, CEN, FileSave
+from .utils import set_sizer, LCEN, RCEN, CEN, FileSave
 
 TMPL_TOP = '''file "$(CARS)/CARSApp/Db/motor.db"
 {
@@ -38,7 +38,7 @@ class MotorDetailFrame(wx.Frame):
     __motor_fields = ('SET', 'LLM', 'HLM', 'LVIO', 'TWV', 'HLS', 'LLS')
 
     def __init__(self, parent=None, motor=None):
-        wx.Frame.__init__(self, parent, wx.ID_ANY, size=MAINSIZE, 
+        wx.Frame.__init__(self, parent, wx.ID_ANY, size=MAINSIZE,
                           style=wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
 
         self.motor = motor
@@ -101,12 +101,12 @@ class MotorDetailFrame(wx.Frame):
         wx.TheClipboard.Open()
         wx.TheClipboard.SetData(dat)
         wx.TheClipboard.Close()
-         
+
 
 class MotorDetailPanel(ScrolledPanel):
     """ Detailed Motor Setup Panel"""
     __motor_fields = ('SET', 'LLM', 'HLM', 'LVIO', 'TWV', 'HLS', 'LLS')
-    
+
     def __init__(self, parent=None, motor=None):
         ScrolledPanel.__init__(self, parent, size=MAINSIZE, name='',
                                style=wx.EXPAND|wx.GROW|wx.TAB_TRAVERSAL)
@@ -122,16 +122,16 @@ class MotorDetailPanel(ScrolledPanel):
         dp = wx.Panel(self)
 
         ds.Add(xLabel(dp, 'Label'), (0, 0), (1, 1), LCEN, 5)
-        ds.Add(self.MotorTextCtrl(dp, 'DESC',  size=(180, -1)), 
+        ds.Add(self.MotorTextCtrl(dp, 'DESC',  size=(180, -1)),
                (0, 1), (1, 1), LCEN, 5)
-        
+
         ds.Add(xLabel(dp, 'units'), (0, 2), (1, 1), LCEN, 5)
-        ds.Add(self.MotorTextCtrl(dp, 'EGU',  size=(90, -1)), 
+        ds.Add(self.MotorTextCtrl(dp, 'EGU',  size=(90, -1)),
                (0, 3), (1, 1), LCEN, 5)
         ds.Add(xLabel(dp, "Precision"),      (0, 4), (1, 1), LCEN, 5)
         ds.Add(self.MotorCtrl(dp, 'PREC', size=(30, -1)),  (0, 5), (1, 1), CEN)
 
-        set_sizer(dp, ds) 
+        set_sizer(dp, ds)
         sizer.Add(dp, 0)
 
         sizer.Add((3, 3), 0)
@@ -387,7 +387,7 @@ class MotorDetailPanel(ScrolledPanel):
 
     def MotorCtrl(self, panel, attr, size=(80, -1)):
         "PVFloatCtrl for a Motor attribute"
-        return PVFloatCtrl(panel, size=size, 
+        return PVFloatCtrl(panel, size=size,
                            precision= self.motor.PREC,
                            pv=self.motor.PV(attr),
                            style = wx.TE_RIGHT)

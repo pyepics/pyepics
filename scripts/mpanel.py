@@ -10,13 +10,13 @@ provides two classes:
 """
 #  Aug 21 2004 M Newville:  initial working version.
 #
-import six
 import wx
 try:
     from wx._core import PyDeadObjectError
 except:
     PyDeadObjectError = Exception
 
+import six
 import epics
 from epics.wx.wxlib import PVText, PVFloatCtrl, PVButton, PVComboBox, \
      DelayedEpicsCallback, EpicsFunction
@@ -24,6 +24,8 @@ from epics.wx.wxlib import PVText, PVFloatCtrl, PVButton, PVComboBox, \
 from epics.wx.motordetailframe  import MotorDetailFrame
 
 from epics.wx.utils import LCEN, RCEN, CEN, LTEXT, RIGHT, pack, add_button
+
+from larch.utils import debugtime
 
 class MotorPanel(wx.Panel):
     """ MotorPanel  a simple wx windows panel for controlling an Epics Motor
@@ -60,14 +62,12 @@ class MotorPanel(wx.Panel):
             except PyDeadObjectError:
                 pass
 
-
-
     @EpicsFunction
     def SelectMotor(self, motor):
         " set motor to a named motor PV"
         if motor is None:
             return
-
+        dt = debugtime()
         epics.poll()
         try:
             if self.motor is not None:
@@ -75,23 +75,31 @@ class MotorPanel(wx.Panel):
                     self.motor.clear_callback(attr=i)
         except PyDeadObjectError:
             return
+        dt.add('clear callbacks')
 
         if isinstance(motor, six.string_types):
             self.motor = epics.Motor(motor)
+            dt.add('create motor (name)')
         elif isinstance(motor, epics.Motor):
             self.motor = motor
+            dt.add('create motor (motor)')
         self.motor.get_info()
-
+        dt.add('get motor info')
 
         if self.format is None:
             self.format = "%%.%if" % self.motor.PREC
         self.FillPanel()
+        dt.add('fill panel')
         for attr in self.__motor_fields:
             self.motor.get_pv(attr).add_callback(self.OnMotorEvent,
                                                  wid=self.GetId(),
                                                  field=attr)
+        dt.add('add callbacks %i attrs ' % (len(self.__motor_fields)))
+
         if self._size == 'full':
             self.SetTweak(self.format % self.motor.TWV)
+        # dt.show()
+
 
     @EpicsFunction
     def FillPanelComponents(self):
@@ -178,6 +186,7 @@ class MotorPanel(wx.Panel):
                                   (self.morebtn,  0, CEN)])
 
         self.SetAutoLayout(1)
+        print("create ", self.motor)
         pack(self, self.__sizer)
 
     @EpicsFunction
