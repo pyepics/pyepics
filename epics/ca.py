@@ -1584,8 +1584,8 @@ def get_enum_strings(chid):
 # dbr.DBE_LOG for archive changes (ie exceeding ADEL)
 DEFAULT_SUBSCRIPTION_MASK = dbr.DBE_VALUE|dbr.DBE_ALARM
 
-@withConnectedCHID
-def create_subscription(chid, use_time=False, use_ctrl=False,
+@withCHID
+def create_subscription(chid, use_time=False, use_ctrl=False, ftype=None,
                         mask=None, callback=None, count=0):
     """create a *subscription to changes*. Sets up a user-supplied
     callback function to be called on any changes to the channel.
@@ -1598,6 +1598,10 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
         whether to use the TIME variant for the PV type
     use_ctrl : bool
         whether to use the CTRL variant for the PV type
+    ftype : integer or None
+       ftype to use, overriding native type, `use_time` or `use_ctrl`
+       if ``None``, the native type is looked up, which requires a
+       connected channel.
     mask : integer or None
        bitmask combination of :data:`dbr.DBE_ALARM`, :data:`dbr.DBE_LOG`, and
        :data:`dbr.DBE_VALUE`, to control which changes result in a callback.
@@ -1621,11 +1625,13 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     Keep the returned tuple in named variable!! if the return argument
     gets garbage collected, a coredump will occur.
 
+    If the channel is not connected, the ftype must be specified for a
+    successful subscription.
     """
 
     mask = mask or DEFAULT_SUBSCRIPTION_MASK
-
-    ftype = promote_type(chid, use_ctrl=use_ctrl, use_time=use_time)
+    if ftype is not None:
+        ftype = promote_type(chid, use_ctrl=use_ctrl, use_time=use_time)
 
     uarg  = ctypes.py_object(callback)
     evid  = ctypes.c_void_p()
