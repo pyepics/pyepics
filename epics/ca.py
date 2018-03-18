@@ -1631,7 +1631,7 @@ def create_subscription(chid, use_time=False, use_ctrl=False, ftype=None,
     """
 
     mask = mask or DEFAULT_SUBSCRIPTION_MASK
-    if ftype is not None:
+    if ftype is None:
         ftype = promote_type(chid, use_ctrl=use_ctrl, use_time=use_time)
 
     uarg  = ctypes.py_object(callback)
