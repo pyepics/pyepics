@@ -1592,7 +1592,7 @@ DEFAULT_SUBSCRIPTION_MASK = dbr.DBE_VALUE|dbr.DBE_ALARM
 
 @withCHID
 def create_subscription(chid, use_time=False, use_ctrl=False, ftype=None,
-                        mask=None, callback=None, count=0):
+                        mask=None, callback=None, count=0, timeout=None):
     """create a *subscription to changes*. Sets up a user-supplied
     callback function to be called on any changes to the channel.
 
@@ -1615,6 +1615,9 @@ def create_subscription(chid, use_time=False, use_ctrl=False, ftype=None,
 
     callback : ``None`` or callable
         user-supplied callback function to be called on changes
+
+    timeout : ``None`` or int
+        connection timeout used for unconnected channels.
 
     Returns
     -------
