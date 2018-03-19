@@ -1053,11 +1053,15 @@ def access(chid):
     acc = read_access(chid) + 2 * write_access(chid)
     return ('no access', 'read-only', 'write-only', 'read/write')[acc]
 
-@withConnectedCHID
+@withCHID
 def promote_type(chid, use_time=False, use_ctrl=False):
     """promotes the native field type of a ``chid`` to its TIME or CTRL variant.
     Returns the integer corresponding to the promoted field value."""
-    ftype = field_type(chid)
+    return promote_fieldtype( field_type(chid) )
+
+def promote_fieldtype(ftype, use_time=False, use_ctrl=False):
+    """promotes the native field type to its TIME or CTRL variant.
+    Returns the integer corresponding to the promoted field value."""
     if use_ctrl:
         ftype += dbr.CTRL_STRING
     elif use_time:
@@ -1065,6 +1069,7 @@ def promote_type(chid, use_time=False, use_ctrl=False):
     if ftype == dbr.CTRL_STRING:
         ftype = dbr.TIME_STRING
     return ftype
+
 
 def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     """unpacks raw data for a Channel ID `chid` returned by libca functions
@@ -1632,8 +1637,16 @@ def create_subscription(chid, use_time=False, use_ctrl=False, ftype=None,
 
     mask = mask or DEFAULT_SUBSCRIPTION_MASK
     if ftype is None:
-        ftype = promote_type(chid, use_ctrl=use_ctrl, use_time=use_time)
+        if not isConnected(chid):
+            if timeout is None:
+                timeout = DEFAULT_CONNECTION_TIMEOUT
+            fmt ="%s() timed out waiting '%s' to connect (%d seconds)"
+            if not connect_channel(chid, timeout=timeout):
+                raise ChannelAccessException(fmt % ("create_subscription",
+                                                    (chid), timeout))
+        ftype = field_type(chid)
 
+    ftype = promote_fieldtype(ftype, use_time=use_time, use_ctrl=use_ctrl)
     uarg  = ctypes.py_object(callback)
     evid  = ctypes.c_void_p()
     poll()
