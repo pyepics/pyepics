@@ -1057,7 +1057,7 @@ def access(chid):
 def promote_type(chid, use_time=False, use_ctrl=False):
     """promotes the native field type of a ``chid`` to its TIME or CTRL variant.
     Returns the integer corresponding to the promoted field value."""
-    return promote_fieldtype( field_type(chid) )
+    return promote_fieldtype( field_type(chid), use_time=use_time, use_ctrl=use_ctrl)
 
 def promote_fieldtype(ftype, use_time=False, use_ctrl=False):
     """promotes the native field type to its TIME or CTRL variant.
