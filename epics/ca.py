@@ -1053,10 +1053,15 @@ def access(chid):
     acc = read_access(chid) + 2 * write_access(chid)
     return ('no access', 'read-only', 'write-only', 'read/write')[acc]
 
+@withCHID
 def promote_type(chid, use_time=False, use_ctrl=False):
     """promotes the native field type of a ``chid`` to its TIME or CTRL variant.
     Returns the integer corresponding to the promoted field value."""
-    ftype = field_type(chid)
+    return promote_fieldtype( field_type(chid), use_time=use_time, use_ctrl=use_ctrl)
+
+def promote_fieldtype(ftype, use_time=False, use_ctrl=False):
+    """promotes the native field type to its TIME or CTRL variant.
+    Returns the integer corresponding to the promoted field value."""
     if use_ctrl:
         ftype += dbr.CTRL_STRING
     elif use_time:
@@ -1064,6 +1069,7 @@ def promote_type(chid, use_time=False, use_ctrl=False):
     if ftype == dbr.CTRL_STRING:
         ftype = dbr.TIME_STRING
     return ftype
+
 
 def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     """unpacks raw data for a Channel ID `chid` returned by libca functions
@@ -1584,9 +1590,9 @@ def get_enum_strings(chid):
 # dbr.DBE_LOG for archive changes (ie exceeding ADEL)
 DEFAULT_SUBSCRIPTION_MASK = dbr.DBE_VALUE|dbr.DBE_ALARM
 
-@withConnectedCHID
-def create_subscription(chid, use_time=False, use_ctrl=False,
-                        mask=None, callback=None, count=0):
+@withCHID
+def create_subscription(chid, use_time=False, use_ctrl=False, ftype=None,
+                        mask=None, callback=None, count=0, timeout=None):
     """create a *subscription to changes*. Sets up a user-supplied
     callback function to be called on any changes to the channel.
 
@@ -1598,6 +1604,10 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
         whether to use the TIME variant for the PV type
     use_ctrl : bool
         whether to use the CTRL variant for the PV type
+    ftype : integer or None
+       ftype to use, overriding native type, `use_time` or `use_ctrl`
+       if ``None``, the native type is looked up, which requires a
+       connected channel.
     mask : integer or None
        bitmask combination of :data:`dbr.DBE_ALARM`, :data:`dbr.DBE_LOG`, and
        :data:`dbr.DBE_VALUE`, to control which changes result in a callback.
@@ -1605,6 +1615,9 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
 
     callback : ``None`` or callable
         user-supplied callback function to be called on changes
+
+    timeout : ``None`` or int
+        connection timeout used for unconnected channels.
 
     Returns
     -------
@@ -1621,12 +1634,22 @@ def create_subscription(chid, use_time=False, use_ctrl=False,
     Keep the returned tuple in named variable!! if the return argument
     gets garbage collected, a coredump will occur.
 
+    If the channel is not connected, the ftype must be specified for a
+    successful subscription.
     """
 
     mask = mask or DEFAULT_SUBSCRIPTION_MASK
+    if ftype is None:
+        if not isConnected(chid):
+            if timeout is None:
+                timeout = DEFAULT_CONNECTION_TIMEOUT
+            fmt ="%s() timed out waiting '%s' to connect (%d seconds)"
+            if not connect_channel(chid, timeout=timeout):
+                raise ChannelAccessException(fmt % ("create_subscription",
+                                                    (chid), timeout))
+        ftype = field_type(chid)
 
-    ftype = promote_type(chid, use_ctrl=use_ctrl, use_time=use_time)
-
+    ftype = promote_fieldtype(ftype, use_time=use_time, use_ctrl=use_ctrl)
     uarg  = ctypes.py_object(callback)
     evid  = ctypes.c_void_p()
     poll()
