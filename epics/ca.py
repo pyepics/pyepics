@@ -212,9 +212,10 @@ def _find_lib(inp_lib_name):
         return dllpath
 
     # If we still didn't find it (which is likely in Python<3.6), use a method back-ported from Python 3.6.
-    dllpath = _findLib_ld(inp_lib_name)
-    if dllpath is not None:
-        return dllpath
+    if os.name == 'posix':
+        dllpath = _findLib_ld(inp_lib_name)
+        if dllpath is not None:
+            return dllpath
 
     raise ChannelAccessException('cannot find Epics CA DLL')
 
