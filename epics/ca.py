@@ -113,6 +113,40 @@ class CASeverityException(Exception):
     def __str__(self):
         return " %s returned '%s'" % (self.fcn, self.msg)
 
+def _findLib_ld(name):
+    """
+    Find dynamic library by asking the linker, then parsing the output, which
+    will list the location where it found the library.
+    
+    This code is based on a patch to the ctypes.find_library() method that
+    was applied in Python 3.6, to fix a problem where it wasn't searching
+    LD_LIBRARY_PATH.  See https://bugs.python.org/issue9998
+    """
+    import re
+    import subprocess
+    expr = r'[^\(\)\s]*lib%s\.[^\(\)\s]*' % re.escape(name)
+    cmd = ['ld', '-t']
+    libpath = os.environ.get('LD_LIBRARY_PATH')
+    if sys.platform == 'darwin':
+        dylibpath = os.environ.get('DYLD_LIBRARY_PATH')
+        if dylibpath is not None:
+            libpath += ":" + dylibpath
+    if libpath:
+        for d in libpath.split(':'):
+            cmd.extend(['-L', d])
+    cmd.extend(['-o', os.devnull, '-l%s' % name])
+    result = None
+    try:
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             universal_newlines=True)
+        out, _ = p.communicate()
+        res = re.search(expr, out)
+        if res:
+            result = res.group(0)
+    except Exception as e:
+        pass  # result will be None
+    return result
 
 def _find_lib(inp_lib_name):
     """
@@ -174,6 +208,11 @@ def _find_lib(inp_lib_name):
     # with PATH set above, the ctypes utility, find_library *should*
     # find the dll....
     dllpath = ctypes.util.find_library(inp_lib_name)
+    if dllpath is not None:
+        return dllpath
+
+    # If we still didn't find it (which is likely in Python<3.6), use a method back-ported from Python 3.6.
+    dllpath = _findLib_ld(inp_lib_name)
     if dllpath is not None:
         return dllpath
 
