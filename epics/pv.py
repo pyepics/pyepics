@@ -340,7 +340,7 @@ class PV(object):
                                          as_numpy=as_numpy)
         val = self._args['value']
         if as_string:
-            return self._set_charval(val)
+            return self._set_charval(val, as_string=as_string)
         if self.count <= 1 or val is None:
             return val
 
@@ -398,7 +398,7 @@ class PV(object):
         "null put-calback, so that the put_complete attribute is valid"
         pass
 
-    def _set_charval(self, val, call_ca=True):
+    def _set_charval(self, val, call_ca=True, as_string=False):
         """ sets the character representation of the value.
         intended only for internal use"""
         if val is None:
@@ -410,7 +410,8 @@ class PV(object):
             self._args['char_value'] = val
             return val
         # char waveform as string
-        if ntype == dbr.CHAR and self.count < ca.AUTOMONITOR_MAXLENGTH:
+        if ntype == dbr.CHAR and (self.count < ca.AUTOMONITOR_MAXLENGTH or
+                as_string is True):
             if ca.HAS_NUMPY and isinstance(val, ca.numpy.ndarray):
                 # a numpy array
                 val = val.tolist()
