@@ -227,8 +227,9 @@ class PV(object):
                 # (ie dbr.DBE_ALARM|dbr.DBE_LOG) by passing it as the
                 # auto_monitor arg, otherwise if you specify 'True' you'll
                 # just get the default set in ca.DEFAULT_SUBSCRIPTION_MASK
-                mask = None
-                if isinstance(self.auto_monitor, int):
+                if self.auto_monitor is True:
+                    mask = ca.DEFAULT_SUBSCRIPTION_MASK
+                else:
                     mask = self.auto_monitor
                 self._monref = ca.create_subscription(self.chid,
                                          use_ctrl=(self.form == 'ctrl'),
