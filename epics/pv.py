@@ -41,17 +41,12 @@ def get_pv(pvname, form='time',  connect=False,
             thispv = _PVcache_[(pvname, form, context)]
 
     start_time = time.time()
-    # not cached -- create pv (automaticall saved to cache)
+    # not cached -- create pv (automatically saved to cache)
     if thispv is None:
         thispv = PV(pvname, form=form, **kws)
 
     if connect:
-        thispv.wait_for_connection()
-        while not thispv.connected:
-            ca.poll()
-            if time.time()-start_time > timeout:
-                break
-        if not thispv.connected:
+        if not thispv.wait_for_connection(timeout=timeout):
             ca.write('cannot connect to %s' % pvname)
     return thispv
 
@@ -162,10 +157,10 @@ class PV(object):
         self._args['chid'] = self.chid = chid
         self.__on_connect(pvname=pvname, chid=chid, conn=conn, **kws)
 
-    def force_read_access_rights(self): 
-        """force a read of access rights, not relying 
+    def force_read_access_rights(self):
+        """force a read of access rights, not relying
         on last event callback.
-        Note: event callback seems to fail sometimes, 
+        Note: event callback seems to fail sometimes,
         at least on initial connection on Windows 64-bit.
         """
         self._args['access'] = ca.access(self.chid)
