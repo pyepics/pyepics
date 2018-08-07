@@ -256,7 +256,7 @@ class PV(object):
         if not self.connected:
             start_time = time.time()
             if not self._conn_started:
-                self.connect()
+                self.connect(timeout=timeout)
 
             if not self.connected:
                 if timeout is None:
