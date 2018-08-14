@@ -49,9 +49,14 @@ def clib_search_path(lib):
     try:
         import platform
         nbits = platform.architecture()[0]
+        mach = platform.machine()
     except:
         nbits = '32bit'
+        mach = 'x86_64'
+
     nbits = nbits.replace('bit', '')
+    if mach.startswith('arm'):
+        nbits = 'arm'
 
     libfmt = 'lib%s.so'
     if os.name == 'nt':
@@ -62,6 +67,7 @@ def clib_search_path(lib):
         libfmt = 'lib%s.dylib'
     elif sys.platform.startswith('linux'):
         libsrc = 'linux'
+
     else:
         return None
 
