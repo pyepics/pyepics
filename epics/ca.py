@@ -876,11 +876,11 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
         # already have or waiting on a chid
         chid = _cache[ctx][pvname]['chid']
     else:
-        chid = dbr.chid_t()
+        entry['chid'] = dbr.chid_t()
         ret = libca.ca_create_channel(ctypes.c_char_p(pvn), conncb, 0, 0,
-                                      ctypes.byref(chid))
+                                      ctypes.byref(entry['chid']))
         PySEVCHK('create_channel', ret)
-        entry['chid'] = chid
+        chid = entry['chid']
     chid_key = chid
     if isinstance(chid_key, dbr.chid_t):
         chid_key = chid.value
