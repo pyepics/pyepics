@@ -317,23 +317,35 @@ class PV(object):
         if not self.wait_for_connection(timeout=timeout):
             return None
         if with_ctrlvars and getattr(self, 'units', None) is None:
-            self.get_ctrlvars()
+            if self.form == 'ctrl':
+                # ctrlvars will be updated as the get completes, since this
+                # metadata comes bundled with our DBR_CTRL* request.
+                pass
+            else:
+                self.get_ctrlvars()
 
         if ((not use_monitor) or
-            (not self.auto_monitor) or
-            (self._args['value'] is None) or
-            (count is not None and count > len(self._args['value']))):
+                (not self.auto_monitor) or
+                (self._args['value'] is None) or
+                (count is not None and count > len(self._args['value']))):
 
             # respect count argument on subscription also for calls to get
             if count is None and self._args['count']!=self._args['nelm']:
                 count = self._args['count']
-            ca_get = ca.get
+            ca_get = ca.get_with_metadata
             if ca.get_cache(self.pvname)['value'] is not None:
-                ca_get = ca.get_complete
+                ca_get = ca.get_complete_with_metadata
 
-            self._args['value'] = ca_get(self.chid, ftype=self.ftype,
-                                         count=count, timeout=timeout,
-                                         as_numpy=as_numpy)
+            md = ca_get(self.chid, ftype=self.ftype, count=count,
+                        timeout=timeout, as_numpy=as_numpy)
+            if md is None:
+                # Get failed. Indicate with a `None` as the return value
+                self._args['value'] = None
+            else:
+                # Update value and all included metadata. Depending on the PV
+                # form, this could include timestamp, alarm information,
+                # ctrlvars, and so on.
+                self._args.update(**md)
         val = self._args['value']
         if as_string:
             return self._set_charval(val, force_long_string=as_string)

@@ -508,31 +508,10 @@ def _onMonitorEvent(args):
     # add kwds arguments for CTRL and TIME variants
     # this is in a try/except clause to avoid problems
     # caused by uninitialized waveform arrays
-    if args.type >= dbr.CTRL_STRING:
-        try:
-            tmpv = value[0]
-            for attr in dbr.ctrl_limits + ('precision', 'units', 'status', 'severity'):
-                if hasattr(tmpv, attr):
-                    kwds[attr] = getattr(tmpv, attr)
-                    if attr == 'units':
-                        kwds[attr] = BYTES2STR(getattr(tmpv, attr, None))
-
-            if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
-                tmpv.no_str > 0):
-                kwds['enum_strs'] = tuple([tmpv.strs[i].value for
-                                           i in range(tmpv.no_str)])
-        except IndexError:
-            pass
-    elif args.type >= dbr.TIME_STRING:
-        try:
-            tmpv = value[0]
-            kwds['status']    = tmpv.status
-            kwds['severity']  = tmpv.severity
-            kwds['timestamp'] = dbr.make_unixtime(tmpv.stamp)
-            kwds['posixseconds'] = tmpv.stamp.secs + dbr.EPICS2UNIX_EPOCH
-            kwds['nanoseconds'] = tmpv.stamp.nsec
-        except IndexError:
-            pass
+    try:
+        kwds.update(**_unpack_metadata(ftype=args.type, dbr_value=value[0]))
+    except IndexError:
+        pass
 
     value = _unpack(args.chid, value, count=args.count, ftype=args.type)
     if hasattr(args.usr, '__call__'):
@@ -1136,7 +1115,7 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
 
     # Grab the native-data-type data
     try:
-        data = data[1]
+        extended_data, data = data
     except (TypeError, IndexError):
         return None
 
@@ -1149,10 +1128,68 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
         ftype = field_type(chid)
     if ftype is None:
         ftype = dbr.INT
+
     ntype = native_type(ftype)
     elem_count = element_count(chid)
     use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and count != 1)
     return unpack(data, count, ntype, use_numpy, elem_count)
+
+
+def _unpack_metadata(ftype, dbr_value):
+    md = {}
+    if ftype >= dbr.CTRL_STRING:
+        for attr in dbr.ctrl_limits + ('precision', 'units', 'status',
+                                       'severity'):
+            if hasattr(dbr_value, attr):
+                md[attr] = getattr(dbr_value, attr)
+                if attr == 'units':
+                    md[attr] = BYTES2STR(getattr(dbr_value, attr, None))
+
+        if hasattr(dbr_value, 'strs') and getattr(dbr_value, 'no_str', 0) > 0:
+            md['enum_strs'] = tuple(BYTES2STR(dbr_value.strs[i].value)
+                                    for i in range(dbr_value.no_str))
+    elif ftype >= dbr.TIME_STRING:
+        md['status'] = dbr_value.status
+        md['severity'] = dbr_value.severity
+        md['timestamp'] = dbr.make_unixtime(dbr_value.stamp)
+        md['posixseconds'] = dbr_value.stamp.secs + dbr.EPICS2UNIX_EPOCH
+        md['nanoseconds'] = dbr_value.stamp.nsec
+
+    return md
+
+
+@withConnectedCHID
+def get_with_metadata(chid, ftype=None, count=None, wait=True, timeout=None,
+                      as_string=False, as_numpy=True):
+    global _cache
+
+    if ftype is None:
+        ftype = field_type(chid)
+    if ftype in (None, -1):
+        return None
+    if count is None:
+        count = 0
+        # count = element_count(chid)
+        # don't default to the element_count here - let EPICS tell us the size
+        # in the _onGetEvent callback
+    else:
+        count = min(count, element_count(chid))
+
+    ncache = _cache[current_context()][name(chid)]
+    # implementation note: cached value of
+    #   None        implies no value, no expected callback
+    #   GET_PENDING implies no value yet, callback expected.
+    if ncache.get('value', None) is None:
+        ncache['value'] = GET_PENDING
+        ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET,
+                                          ctypes.py_object('value'))
+        PySEVCHK('get', ret)
+
+    if wait:
+        return get_complete_with_metadata(chid, count=count, ftype=ftype,
+                                          timeout=timeout, as_string=as_string,
+                                          as_numpy=as_numpy)
+
 
 @withConnectedCHID
 def get(chid, ftype=None, count=None, wait=True, timeout=None,
@@ -1216,38 +1253,63 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     later with :func:`get_complete`.
 
     """
+    info = get_with_metadata(chid, ftype=ftype, count=count, wait=wait,
+                             timeout=timeout, as_string=as_string,
+                             as_numpy=as_numpy)
+    return (info['value'] if info is not None
+            else None)
+
+
+@withConnectedCHID
+def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
+                               as_string=False, as_numpy=True):
     global _cache
 
     if ftype is None:
         ftype = field_type(chid)
-    if ftype in (None, -1):
-        return None
     if count is None:
-        count = 0
-        # count = element_count(chid)
-        # don't default to the element_count here - let EPICS tell us the size
-        # in the _onGetEvent callback
+        count = element_count(chid)
     else:
         count = min(count, element_count(chid))
 
     ncache = _cache[current_context()][name(chid)]
-    # implementation note: cached value of
-    #   None        implies no value, no expected callback
-    #   GET_PENDING implies no value yet, callback expected.
-    if ncache.get('value', None) is None:
-        ncache['value'] = GET_PENDING
-        ret = libca.ca_array_get_callback(ftype, count, chid, _CB_GET,
-                                          ctypes.py_object('value'))
-        PySEVCHK('get', ret)
+    if ncache['value'] is None:
+        return None
 
-    if wait:
-        return get_complete(chid, count=count, ftype=ftype,
-                            timeout=timeout,
-                            as_string=as_string, as_numpy=as_numpy)
+    t0 = time.time()
+    if timeout is None:
+        timeout = 1.0 + log10(max(1, count))
+    while ncache['value'] is GET_PENDING:
+        poll()
+        if time.time()-t0 > timeout:
+            msg = "ca.get('%s') timed out after %.2f seconds."
+            warnings.warn(msg % (name(chid), timeout))
+            return None
+    # print("Get Complete> Unpack ", ncache['value'], count, ftype)
+    full_value = ncache['value']
+    if full_value is None:
+        return
+
+    extended_data, _ = full_value
+    metadata = _unpack_metadata(ftype=ftype, dbr_value=extended_data)
+    val = _unpack(chid, full_value, count=count,
+                  ftype=ftype, as_numpy=as_numpy)
+    # print("Get Complete unpacked to ", val)
+
+    if as_string:
+        val = _as_string(val, chid, count, ftype)
+    elif isinstance(val, ctypes.Array) and HAS_NUMPY and as_numpy:
+        val = numpy.ctypeslib.as_array(memcopy(val))
+
+    # value retrieved, clear cached value
+    ncache['value'] = None
+    metadata['value'] = val
+    return metadata
+
 
 @withConnectedCHID
-def get_complete(chid, ftype=None, count=None, timeout=None,
-                 as_string=False,  as_numpy=True):
+def get_complete(chid, ftype=None, count=None, timeout=None, as_string=False,
+                 as_numpy=True):
     """returns the current value for a Channel, completing an
     earlier incomplete :func:`get` that returned ``None``, either
     because `wait=False` was used or because the data transfer
@@ -1284,42 +1346,12 @@ def get_complete(chid, ftype=None, count=None, timeout=None,
     2. Consult the doc for :func:`get` for more information.
 
     """
-    global _cache
+    info = get_complete_with_metadata(chid, ftype=ftype, count=count,
+                                      timeout=timeout, as_string=as_string,
+                                      as_numpy=as_numpy)
+    return (info['value'] if info is not None
+            else None)
 
-    if ftype is None:
-        ftype = field_type(chid)
-    if count is None:
-        count = element_count(chid)
-    else:
-        count = min(count, element_count(chid))
-
-    ncache = _cache[current_context()][name(chid)]
-    if ncache['value'] is None:
-        return None
-
-    t0 = time.time()
-    if timeout is None:
-        timeout = 1.0 + log10(max(1, count))
-    while ncache['value'] is GET_PENDING:
-        poll()
-        if time.time()-t0 > timeout:
-            msg = "ca.get('%s') timed out after %.2f seconds."
-            warnings.warn(msg % (name(chid), timeout))
-            return None
-    #print("Get Complete> Unpack ", ncache['value'], count, ftype)
-
-    val = _unpack(chid, ncache['value'], count=count,
-                  ftype=ftype, as_numpy=as_numpy)
-    # print("Get Complete unpacked to ", val)
-
-    if as_string:
-        val = _as_string(val, chid, count, ftype)
-    elif isinstance(val, ctypes.Array) and HAS_NUMPY and as_numpy:
-        val = numpy.ctypeslib.as_array(memcopy(val))
-
-    # value retrieved, clear cached value
-    ncache['value'] = None
-    return val
 
 def _as_string(val, chid, count, ftype):
     "primitive conversion of value to a string"
@@ -1499,27 +1531,14 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
                 warnings.warn(msg % (name(chid), timeout))
             return {}
     try:
-        tmpv = ncache['ctrl_value'][0]
+        extended_data = ncache['ctrl_value'][0]
     except TypeError:
         return {}
 
-    out = {}
-    for attr in ('precision', 'units', 'severity', 'status',
-                 'upper_disp_limit', 'lower_disp_limit',
-                 'upper_alarm_limit', 'upper_warning_limit',
-                 'lower_warning_limit','lower_alarm_limit',
-                 'upper_ctrl_limit', 'lower_ctrl_limit'):
-        if hasattr(tmpv, attr):
-            out[attr] = getattr(tmpv, attr, None)
-            if attr == 'units':
-                out[attr] = BYTES2STR(getattr(tmpv, attr, None))
-
-    if (hasattr(tmpv, 'strs') and hasattr(tmpv, 'no_str') and
-        tmpv.no_str > 0):
-        out['enum_strs'] = tuple([BYTES2STR(tmpv.strs[i].value)
-                                  for i in range(tmpv.no_str)])
+    out = _unpack_metadata(ftype=ftype, dbr_value=extended_data)
     ncache['ctrl_value'] = None
     return out
+
 
 @withConnectedCHID
 def get_timevars(chid, timeout=5.0, warn=True):
