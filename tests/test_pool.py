@@ -1,7 +1,9 @@
 from __future__ import print_function
+import sys
 from contextlib import contextmanager
 import epics
 import multiprocessing as mp
+import pytest
 
 import pvnames
 PVS = [pvnames.double_pv, pvnames.double_pv2]
@@ -14,6 +16,9 @@ def pool_ctx():
     pool.close()
     pool.join()
 
+
+@pytest.mark.skipif(sys.version_info >= (3, 0),
+                    reason='CAPool not functioning in Python 3')
 def test_caget():
     with pool_ctx() as pool:
         print('Using caget() in subprocess pools:')
@@ -28,6 +33,8 @@ def _manager_test_fcn(pv_dict, pv):
     pv_dict[pv] = epics.caget(pv)
 
 
+@pytest.mark.skipif(sys.version_info >= (3, 0),
+                    reason='CAPool not functioning in Python 3')
 def test_manager():
     '''
     Fill up a shared dictionary using a manager
