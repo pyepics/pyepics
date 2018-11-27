@@ -276,9 +276,13 @@ keyword arguments can be used to specify such options.
    function.
 
 
+.. autofunction:: get_with_metadata(chid, ftype=None, count=None, as_string=False, as_numpy=True, wait=True, timeout=None)
+
 .. autofunction:: get_complete(chid, ftype=None, count=None, as_string=False, as_numpy=True, timeout=None)
 
    See :ref:`advanced-get-timeouts-label` for further discussion.
+
+.. autofunction:: get_complete_with_metadata(chid, ftype=None, count=None, as_string=False, as_numpy=True, timeout=None)
 
 .. autofunction::  put(chid, value, wait=False, timeout=30, callback=None, callback_data=None)
 

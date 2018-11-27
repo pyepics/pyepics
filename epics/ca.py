@@ -1070,8 +1070,6 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
         data type of channel (defaults to native type of chid)
     as_numpy : bool
         whether to convert to numpy array.
-
-
     """
 
     def scan_string(data, count):
@@ -1136,6 +1134,27 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
 
 
 def _unpack_metadata(ftype, dbr_value):
+    '''Unpack DBR metadata into a dictionary
+
+    Parameters
+    ----------
+    ftype : int
+        The field type for the respective DBR value
+    dbr_value : ctype.Structure
+        The structure holding the data to be unpacked
+
+    Returns
+    -------
+    md : dict
+        A dictionary containing zero or more of the following keys, depending
+        on ftype::
+
+           {'precision', 'units', 'status', 'severity', 'enum_strs', 'status',
+           'severity', 'timestamp', 'posixseconds', 'nanoseconds',
+           'upper_disp_limit', 'lower_disp_limit', 'upper_alarm_limit',
+           'upper_warning_limit', 'lower_warning_limit','lower_alarm_limit',
+           'upper_ctrl_limit', 'lower_ctrl_limit'}
+    '''
     md = {}
     if ftype >= dbr.CTRL_STRING:
         for attr in dbr.ctrl_limits + ('precision', 'units', 'status',
@@ -1161,6 +1180,45 @@ def _unpack_metadata(ftype, dbr_value):
 @withConnectedCHID
 def get_with_metadata(chid, ftype=None, count=None, wait=True, timeout=None,
                       as_string=False, as_numpy=True):
+    """Return the current value along with metadata for a Channel
+
+    Parameters
+    ----------
+    chid :  ctypes.c_long
+       Channel ID
+    ftype : int
+       field type to use (native type is default)
+    count : int
+       maximum element count to return (full data returned by default)
+    as_string : bool
+       whether to return the string representation of the value.  See notes.
+    as_numpy : bool
+       whether to return the Numerical Python representation for array /
+       waveform data.
+    wait : bool
+        whether to wait for the data to be received, or return immediately.
+    timeout : float
+        maximum time to wait for data before returning ``None``.
+
+    Returns
+    -------
+    data : dict or None
+       The dictionary of data, guaranteed to at least have the 'value' key.
+       Depending on ftype, other keys may also be present::
+
+           {'precision', 'units', 'status', 'severity', 'enum_strs', 'status',
+           'severity', 'timestamp', 'posixseconds', 'nanoseconds',
+           'upper_disp_limit', 'lower_disp_limit', 'upper_alarm_limit',
+           'upper_warning_limit', 'lower_warning_limit','lower_alarm_limit',
+           'upper_ctrl_limit', 'lower_ctrl_limit'}
+
+       Returns ``None`` if the channel is not connected, `wait=False` was used,
+       or the data transfer timed out.
+
+    See also
+    --------
+    See :func:`get` for additional usage notes.
+    """
     global _cache
 
     if ftype is None:
@@ -1263,6 +1321,38 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
 @withConnectedCHID
 def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
                                as_string=False, as_numpy=True):
+    """Returns the current value and associated metadata for a Channel
+
+    This completes an earlier incomplete :func:`get` that returned ``None``,
+    either because `wait=False` was used or because the data transfer did not
+    complete before the timeout passed.
+
+    Parameters
+    ----------
+    chid : ctypes.c_long
+        Channel ID
+    ftype :  int
+        field type to use (native type is default)
+    count : int
+        maximum element count to return (full data returned by default)
+    as_string : bool
+        whether to return the string representation of the value.
+    as_numpy :  bool
+        whether to return the Numerical Python representation
+        for array / waveform data.
+    timeout : float
+        maximum time to wait for data before returning ``None``.
+
+    Returns
+    -------
+    data : dict or None
+       This function will return ``None`` if the previous :func:`get` actually
+       completed, or if this data transfer also times out.
+
+    See also
+    --------
+    See :func:`get_complete` for additional usage notes.
+    """
     global _cache
 
     if ftype is None:
