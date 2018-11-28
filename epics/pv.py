@@ -437,7 +437,7 @@ class PV(object):
 
         # Update based on the requested type:
         md['value'] = val
-        return val
+        return md
 
     def put(self, value, wait=False, timeout=30.0,
             use_complete=False, callback=None, callback_data=None):
