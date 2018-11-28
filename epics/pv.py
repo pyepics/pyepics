@@ -365,11 +365,16 @@ class PV(object):
             else:
                 self.get_ctrlvars()
 
+        try:
+            cached_length = len(self._args['value'])
+        except TypeError:
+            cached_length = 1
+
         if ((not use_monitor) or
                 (not self.auto_monitor) or
                 (ftype != self.ftype) or
                 (self._args['value'] is None) or
-                (count is not None and count > len(self._args['value']))):
+                (count is not None and count > cached_length)):
 
             # respect count argument on subscription also for calls to get
             if count is None and self._args['count']!=self._args['nelm']:
