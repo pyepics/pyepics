@@ -384,12 +384,18 @@ class PV(object):
             if md is None:
                 # Get failed. Indicate with a `None` as the return value
                 return
-            else:
-                val = md['value']
-                # Update value and all included metadata. Depending on the PV
-                # form, this could include timestamp, alarm information,
-                # ctrlvars, and so on.
-                self._args.update(**md)
+
+            # Update value and all included metadata. Depending on the PV
+            # form, this could include timestamp, alarm information,
+            # ctrlvars, and so on.
+            self._args.update(**md)
+
+            if with_ctrlvars and form != 'ctrl':
+                # If the user requested ctrlvars and they were not included in
+                # the request, return all metadata.
+                md = self._args.copy()
+
+            val = md['value']
         else:
             md = self._args.copy()
             val = self._args['value']
