@@ -309,15 +309,56 @@ class PV(object):
                     monitor callback (True, default) or to make an
                     explicit CA call for the value.
 
-        >>> p.get('13BMD:m1.DIR')
+        >>> get_pv('13BMD:m1.DIR').get()
         0
-        >>> p.get('13BMD:m1.DIR', as_string=True)
+        >>> get_pv('13BMD:m1.DIR').get(as_string=True)
         'Pos'
+        """
+        data = self.get_with_metadata(count=count, as_string=as_string,
+                                      as_numpy=as_numpy, timeout=timeout,
+                                      with_ctrlvars=with_ctrlvars,
+                                      use_monitor=use_monitor)
+        return (data['value']
+                if data is not None
+                else None)
+
+    def get_with_metadata(self, count=None, as_string=False, as_numpy=True,
+                          timeout=None, with_ctrlvars=False, form=None,
+                          use_monitor=True):
+        """Returns a dictionary of the current value and associated metadata
+
+        count       explicitly limit count for array data
+        as_string   flag(True/False) to get a string representation
+                    of the value.
+        as_numpy    flag(True/False) to use numpy array as the
+                    return type for array data.
+        timeout     maximum time to wait for value to be received.
+                    (default = 0.5 + log10(count) seconds)
+        use_monitor flag(True/False) to use value from latest
+                    monitor callback (True, default) or to make an
+                    explicit CA call for the value.
+        form        flag(True/False) optionally change the requested PV form
+
+        >>> get_pv('13BMD:m1.DIR', form='time').get_with_metadata()
+        {'value': 0, 'status': 0, 'severity': 0}
+        >>> get_pv('13BMD:m1.DIR').get_with_metadata(form='ctrl')
+        {'value': 0, 'lower_ctrl_limit': 0, ...}
+        >>> get_pv('13BMD:m1.DIR').get_with_metadata(as_string=True)
+        {'value': 'Pos', 'status': 0, 'severity': 0}
         """
         if not self.wait_for_connection(timeout=timeout):
             return None
+
+        if form is None:
+            form = self.form
+            ftype = self.ftype
+        else:
+            ftype = ca.promote_type(self.chid,
+                                    use_ctrl=(form == 'ctrl'),
+                                    use_time=(form == 'time'))
+
         if with_ctrlvars and getattr(self, 'units', None) is None:
-            if self.form == 'ctrl':
+            if form != 'ctrl':
                 # ctrlvars will be updated as the get completes, since this
                 # metadata comes bundled with our DBR_CTRL* request.
                 pass
@@ -326,31 +367,39 @@ class PV(object):
 
         if ((not use_monitor) or
                 (not self.auto_monitor) or
+                (ftype != self.ftype) or
                 (self._args['value'] is None) or
                 (count is not None and count > len(self._args['value']))):
 
             # respect count argument on subscription also for calls to get
             if count is None and self._args['count']!=self._args['nelm']:
                 count = self._args['count']
+
             ca_get = ca.get_with_metadata
             if ca.get_cache(self.pvname)['value'] is not None:
                 ca_get = ca.get_complete_with_metadata
 
-            md = ca_get(self.chid, ftype=self.ftype, count=count,
+            md = ca_get(self.chid, ftype=ftype, count=count,
                         timeout=timeout, as_numpy=as_numpy)
             if md is None:
                 # Get failed. Indicate with a `None` as the return value
-                self._args['value'] = None
+                return
             else:
+                val = md['value']
                 # Update value and all included metadata. Depending on the PV
                 # form, this could include timestamp, alarm information,
                 # ctrlvars, and so on.
                 self._args.update(**md)
-        val = self._args['value']
+        else:
+            md = self._args.copy()
+            val = self._args['value']
+
         if as_string:
-            return self._set_charval(val, force_long_string=as_string)
-        if self.count <= 1 or val is None:
-            return val
+            char_value = self._set_charval(val, force_long_string=as_string)
+            md['value'] = char_value
+            return md
+        elif self.count <= 1 or val is None:
+            return md
 
         # After this point:
         #   * self.count is > 1
@@ -370,9 +419,13 @@ class PV(object):
         elif (not as_numpy and ca.HAS_NUMPY and
                 isinstance(val, ca.numpy.ndarray)):
             val = val.tolist()
+
         # allow asking for less data than actually exists in the cached value
         if count < len(val):
             val = val[:count]
+
+        # Update based on the requested type:
+        md['value'] = val
         return val
 
     def put(self, value, wait=False, timeout=30.0,
