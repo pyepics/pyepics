@@ -1659,17 +1659,15 @@ def get_timevars(chid, timeout=5.0, warn=True):
                 warnings.warn(msg % (name(chid), timeout))
             return {}
 
-    tmpv = ncache['time_value'][0]
-    for attr in ('status', 'severity'):
-        if hasattr(tmpv, attr):
-            out[attr] = getattr(tmpv, attr)
-    if hasattr(tmpv, 'stamp'):
-        out['timestamp'] = dbr.make_unixtime(tmpv.stamp)
-        out['posixseconds'] = tmpv.stamp.secs + dbr.EPICS2UNIX_EPOCH
-        out['nanoseconds'] = tmpv.stamp.nsec
+    try:
+        extended_data = ncache['time_value'][0]
+    except TypeError:
+        return {}
 
+    out = _unpack_metadata(ftype=ftype, dbr_value=extended_data)
     ncache['time_value'] = None
     return out
+
 
 def get_timestamp(chid):
     """return the timestamp of a Channel -- the time of last update."""
