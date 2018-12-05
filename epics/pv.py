@@ -9,6 +9,7 @@
 import time
 import ctypes
 import copy
+import types
 from math import log10
 
 from . import ca
@@ -324,20 +325,23 @@ class PV(object):
 
     def get_with_metadata(self, count=None, as_string=False, as_numpy=True,
                           timeout=None, with_ctrlvars=False, form=None,
-                          use_monitor=True):
+                          use_monitor=True, as_namespace=False):
         """Returns a dictionary of the current value and associated metadata
 
-        count       explicitly limit count for array data
-        as_string   flag(True/False) to get a string representation
-                    of the value.
-        as_numpy    flag(True/False) to use numpy array as the
-                    return type for array data.
-        timeout     maximum time to wait for value to be received.
-                    (default = 0.5 + log10(count) seconds)
-        use_monitor flag(True/False) to use value from latest
-                    monitor callback (True, default) or to make an
-                    explicit CA call for the value.
-        form        flag(True/False) optionally change the requested PV form
+        count         explicitly limit count for array data
+        as_string     flag(True/False) to get a string representation
+                      of the value.
+        as_numpy      flag(True/False) to use numpy array as the
+                      return type for array data.
+        timeout       maximum time to wait for value to be received.
+                      (default = 0.5 + log10(count) seconds)
+        use_monitor   flag(True/False) to use value from latest
+                      monitor callback (True, default) or to make an
+                      explicit CA call for the value.
+        form          {'time', 'ctrl', None} optionally change the type of the
+                      get request
+        as_namespace  Change the return type to that of a namespace with
+                      support for tab-completion
 
         >>> get_pv('13BMD:m1.DIR', form='time').get_with_metadata()
         {'value': 0, 'status': 0, 'severity': 0}
@@ -345,6 +349,12 @@ class PV(object):
         {'value': 0, 'lower_ctrl_limit': 0, ...}
         >>> get_pv('13BMD:m1.DIR').get_with_metadata(as_string=True)
         {'value': 'Pos', 'status': 0, 'severity': 0}
+        >>> ns = get_pv('13BMD:m1.DIR').get_with_metadata(as_string=True,
+                                                          as_namespace=True)
+        >>> ns
+        namespace(value='Pos', status=0, severity=0, ...)
+        >>> ns.status
+        0
         """
         if not self.wait_for_connection(timeout=timeout):
             return None
@@ -408,35 +418,37 @@ class PV(object):
         if as_string:
             char_value = self._set_charval(val, force_long_string=as_string)
             md['value'] = char_value
-            return md
         elif self.count <= 1 or val is None:
-            return md
+            pass
+        else:
+            # After this point:
+            #   * self.count is > 1
+            #   * val should be set and a sequence
+            try:
+                len(val)
+            except TypeError:
+                # Edge case where a scalar value leaks through ca.unpack()
+                val = [val]
 
-        # After this point:
-        #   * self.count is > 1
-        #   * val should be set and a sequence
-        try:
-            len(val)
-        except TypeError:
-            # Edge case where a scalar value leaks through ca.unpack()
-            val = [val]
+            if count is None:
+                count = len(val)
 
-        if count is None:
-            count = len(val)
+            if (as_numpy and ca.HAS_NUMPY and
+                    not isinstance(val, ca.numpy.ndarray)):
+                val = ca.numpy.asarray(val)
+            elif (not as_numpy and ca.HAS_NUMPY and
+                    isinstance(val, ca.numpy.ndarray)):
+                val = val.tolist()
 
-        if (as_numpy and ca.HAS_NUMPY and
-                not isinstance(val, ca.numpy.ndarray)):
-            val = ca.numpy.asarray(val)
-        elif (not as_numpy and ca.HAS_NUMPY and
-                isinstance(val, ca.numpy.ndarray)):
-            val = val.tolist()
+            # allow asking for less data than actually exists in the cached value
+            if count < len(val):
+                val = val[:count]
 
-        # allow asking for less data than actually exists in the cached value
-        if count < len(val):
-            val = val[:count]
+            # Update based on the requested type:
+            md['value'] = val
 
-        # Update based on the requested type:
-        md['value'] = val
+        if as_namespace:
+            return types.SimpleNamespace(**md)
         return md
 
     def put(self, value, wait=False, timeout=30.0,
