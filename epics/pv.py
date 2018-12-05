@@ -9,12 +9,16 @@
 import time
 import ctypes
 import copy
-import types
 from math import log10
 
 from . import ca
 from . import dbr
 from .utils import is_string
+
+try:
+    from types import SimpleNamespace as Namespace
+except ImportError:
+    from argparse import Namespace
 
 _PVcache_ = {}
 
@@ -448,7 +452,7 @@ class PV(object):
             md['value'] = val
 
         if as_namespace:
-            return types.SimpleNamespace(**md)
+            return Namespace(**md)
         return md
 
     def put(self, value, wait=False, timeout=30.0,
