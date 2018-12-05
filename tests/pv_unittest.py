@@ -139,6 +139,11 @@ class PV_Tests(unittest.TestCase):
             assert 'timestamp' in md
             assert 'lower_ctrl_limit' in md
 
+            # Get a namespace
+            ns = pv.get_with_metadata(use_monitor=True, as_namespace=True)
+            assert hasattr(ns, 'timestamp')
+            assert hasattr(ns, 'lower_ctrl_limit')
+
     def test_get_string_waveform(self):
         write('String Array: \n')
         with no_simulator_updates():
