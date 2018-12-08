@@ -85,7 +85,7 @@ callbacks to be executed when the PV changes.
 
 ..  _pv-get-label:
 
-.. method:: get([, count=None[, as_string=False[, as_numpy=True[, timeout=None[, use_monitor=True]]]]])
+.. method:: get([, count=None[, as_string=False[, as_numpy=True[, timeout=None[, use_monitor=True, [with_ctrlvars=False]]]]]])
 
    get and return the current value of the PV
 
@@ -120,9 +120,45 @@ callbacks to be executed when the PV changes.
    automatically monitored.   Otherwise, the most recently received value
    will be sent immediately.
 
+   The *with_ctrlvars* option requests DBR_CTRL data, including control limits,
+   precision, and so on, in addition to the value normally returned.  This metadata
+   will be available by accessing various attributes such as
+   ``lower_ctrl_limit``.
+
    See :ref:`pv-automonitor-label` for more on monitoring PVs and
    :ref:`advanced-get-timeouts-label` for more details on what happens when
    a :func:`pv.get` times out.
+
+
+.. method:: get_with_metadata([, form=None, [count=None[, as_string=False[, as_numpy=True[, timeout=None[, use_monitor=True, [with_ctrlvars=False]]]]]]])
+
+   Returns a dictionary of the current value and associated metadata
+
+   :param form:  EPICS *data type* to request:  the 'native', or the 'ctrl' (Control) or 'time' variant. Defaults to the PV instance attribute ``form``.
+   :type form:  {'native', 'time', 'ctrl', None}
+   :param count:  maximum number of array elements to return
+   :type count:  integer or ``None``
+   :param as_string:  whether to return the string representation of the  value.
+   :type as_string: ``True``/``False``
+   :param as_numpy:  whether to try to return a numpy array where appropriate.
+   :type as_string: ``True``/``False``
+   :param timeout:  maximum time to wait for data before returning ``None``.
+   :type  timeout:  float or ``None``
+   :param use_monitor:  whether to rely on monitor callbacks or explicitly get value now.
+   :type use_monitor: ``True``/``False``
+
+   See ``PV.get``, above, for further notes on each of these parameters.
+
+   Each request to EPICS can optionally contain additional metadata associated
+   with the value.  While ``PV.get`` updates the PV instance with any metadata,
+   ``get_with_metadata`` will return the requested metadata and value in a
+   dictionary. 
+
+   The exception is when the PV is set to auto-monitor and the `use_monitor`
+   parameter here is set.  This means that both the value and metadata will
+   used the cached values instead of making a new request.  Because of this,
+   the metadata and value returned here will be a full dictionary of all known
+   metadata for the PV instance.
 
 
 .. method:: put(value[, wait=False[, timeout=30.0[, use_complete=False[, callback=None[, callback_data=None]]]]])
@@ -800,6 +836,41 @@ or, equivalently
 
    >>> print p1.char_value
    '1.000'
+
+Requests including Metadata
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is also possible to get the metadata associated with a single Channel Access
+request using :func:`get_with_metadata`::
+
+   >>> from epics import PV
+   >>> p1 = PV('xxx.VAL', form='time')
+
+   >>> print(p1.get())
+   1.00
+   
+   >>> p1.get_with_metadata()
+   {'status': 0,
+    'severity': 0,
+    'timestamp': 1543429156.811018,
+    'posixseconds': 1543429156.0,
+    'nanoseconds': 811018603,
+    'value': 1.0}
+   
+   >>> print(p1.get_with_metadata(form='ctrl'))
+   {'upper_disp_limit': 100.0,
+    'lower_disp_limit': -100.0,
+    'upper_alarm_limit': 0.0,
+    'upper_warning_limit': 0.0,
+    'lower_warning_limit': 0.0,
+    'lower_alarm_limit': 0.0,
+    'upper_ctrl_limit': 100.0,
+    'lower_ctrl_limit': -100.0,
+    'precision': 3,
+    'units': 'deg',
+    'status': 0,
+    'severity': 0,
+    'value': 1.0}
 
 
 Example of using info and more properties examples

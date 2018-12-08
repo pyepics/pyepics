@@ -85,8 +85,8 @@ class PV_Tests(unittest.TestCase):
         self.assertEqual(success[0], 1)
         self.assertEqual(success[1], 1)
         self.failUnless(success[2] < 0)
-        
-    
+
+
     def test_caput_many_wait_each(self):
         write('Simple Test of caput_many() function, waiting for each.\n')
         pvs = [pvnames.double_pv, pvnames.enum_pv, 'ceci nest pas une PV']
@@ -119,6 +119,30 @@ class PV_Tests(unittest.TestCase):
             cval = pv.get(as_string=True)
 
             self.failUnless(int(cval)== val)
+
+    def test_get_with_metadata(self):
+        with no_simulator_updates():
+            pv = PV(pvnames.int_pv, form='native')
+
+            # Request time type
+            md = pv.get_with_metadata(use_monitor=False, form='time')
+            assert 'timestamp' in md
+            assert 'lower_ctrl_limit' not in md
+
+            # Request control type
+            md = pv.get_with_metadata(use_monitor=False, form='ctrl')
+            assert 'lower_ctrl_limit' in md
+            assert 'timestamp' not in md
+
+            # Use monitor: all metadata should come through
+            md = pv.get_with_metadata(use_monitor=True)
+            assert 'timestamp' in md
+            assert 'lower_ctrl_limit' in md
+
+            # Get a namespace
+            ns = pv.get_with_metadata(use_monitor=True, as_namespace=True)
+            assert hasattr(ns, 'timestamp')
+            assert hasattr(ns, 'lower_ctrl_limit')
 
     def test_get_string_waveform(self):
         write('String Array: \n')

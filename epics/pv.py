@@ -15,6 +15,11 @@ from . import ca
 from . import dbr
 from .utils import is_string
 
+try:
+    from types import SimpleNamespace as Namespace
+except ImportError:
+    from argparse import Namespace
+
 _PVcache_ = {}
 
 def get_pv(pvname, form='time',  connect=False,
@@ -309,59 +314,146 @@ class PV(object):
                     monitor callback (True, default) or to make an
                     explicit CA call for the value.
 
-        >>> p.get('13BMD:m1.DIR')
+        >>> get_pv('13BMD:m1.DIR').get()
         0
-        >>> p.get('13BMD:m1.DIR', as_string=True)
+        >>> get_pv('13BMD:m1.DIR').get(as_string=True)
         'Pos'
+        """
+        data = self.get_with_metadata(count=count, as_string=as_string,
+                                      as_numpy=as_numpy, timeout=timeout,
+                                      with_ctrlvars=with_ctrlvars,
+                                      use_monitor=use_monitor)
+        return (data['value']
+                if data is not None
+                else None)
+
+    def get_with_metadata(self, count=None, as_string=False, as_numpy=True,
+                          timeout=None, with_ctrlvars=False, form=None,
+                          use_monitor=True, as_namespace=False):
+        """Returns a dictionary of the current value and associated metadata
+
+        count         explicitly limit count for array data
+        as_string     flag(True/False) to get a string representation
+                      of the value.
+        as_numpy      flag(True/False) to use numpy array as the
+                      return type for array data.
+        timeout       maximum time to wait for value to be received.
+                      (default = 0.5 + log10(count) seconds)
+        use_monitor   flag(True/False) to use value from latest
+                      monitor callback (True, default) or to make an
+                      explicit CA call for the value.
+        form          {'time', 'ctrl', None} optionally change the type of the
+                      get request
+        as_namespace  Change the return type to that of a namespace with
+                      support for tab-completion
+
+        >>> get_pv('13BMD:m1.DIR', form='time').get_with_metadata()
+        {'value': 0, 'status': 0, 'severity': 0}
+        >>> get_pv('13BMD:m1.DIR').get_with_metadata(form='ctrl')
+        {'value': 0, 'lower_ctrl_limit': 0, ...}
+        >>> get_pv('13BMD:m1.DIR').get_with_metadata(as_string=True)
+        {'value': 'Pos', 'status': 0, 'severity': 0}
+        >>> ns = get_pv('13BMD:m1.DIR').get_with_metadata(as_string=True,
+                                                          as_namespace=True)
+        >>> ns
+        namespace(value='Pos', status=0, severity=0, ...)
+        >>> ns.status
+        0
         """
         if not self.wait_for_connection(timeout=timeout):
             return None
+
+        if form is None:
+            form = self.form
+            ftype = self.ftype
+        else:
+            ftype = ca.promote_type(self.chid,
+                                    use_ctrl=(form == 'ctrl'),
+                                    use_time=(form == 'time'))
+
         if with_ctrlvars and getattr(self, 'units', None) is None:
-            self.get_ctrlvars()
+            if form != 'ctrl':
+                # ctrlvars will be updated as the get completes, since this
+                # metadata comes bundled with our DBR_CTRL* request.
+                pass
+            else:
+                self.get_ctrlvars()
+
+        try:
+            cached_length = len(self._args['value'])
+        except TypeError:
+            cached_length = 1
 
         if ((not use_monitor) or
-            (not self.auto_monitor) or
-            (self._args['value'] is None) or
-            (count is not None and count > len(self._args['value']))):
+                (not self.auto_monitor) or
+                (ftype != self.ftype) or
+                (self._args['value'] is None) or
+                (count is not None and count > cached_length)):
 
             # respect count argument on subscription also for calls to get
             if count is None and self._args['count']!=self._args['nelm']:
                 count = self._args['count']
-            ca_get = ca.get
+
+            ca_get = ca.get_with_metadata
             if ca.get_cache(self.pvname)['value'] is not None:
-                ca_get = ca.get_complete
+                ca_get = ca.get_complete_with_metadata
 
-            self._args['value'] = ca_get(self.chid, ftype=self.ftype,
-                                         count=count, timeout=timeout,
-                                         as_numpy=as_numpy)
-        val = self._args['value']
+            md = ca_get(self.chid, ftype=ftype, count=count,
+                        timeout=timeout, as_numpy=as_numpy)
+            if md is None:
+                # Get failed. Indicate with a `None` as the return value
+                return
+
+            # Update value and all included metadata. Depending on the PV
+            # form, this could include timestamp, alarm information,
+            # ctrlvars, and so on.
+            self._args.update(**md)
+
+            if with_ctrlvars and form != 'ctrl':
+                # If the user requested ctrlvars and they were not included in
+                # the request, return all metadata.
+                md = self._args.copy()
+
+            val = md['value']
+        else:
+            md = self._args.copy()
+            val = self._args['value']
+
         if as_string:
-            return self._set_charval(val, force_long_string=as_string)
-        if self.count <= 1 or val is None:
-            return val
+            char_value = self._set_charval(val, force_long_string=as_string)
+            md['value'] = char_value
+        elif self.count <= 1 or val is None:
+            pass
+        else:
+            # After this point:
+            #   * self.count is > 1
+            #   * val should be set and a sequence
+            try:
+                len(val)
+            except TypeError:
+                # Edge case where a scalar value leaks through ca.unpack()
+                val = [val]
 
-        # After this point:
-        #   * self.count is > 1
-        #   * val should be set and a sequence
-        try:
-            len(val)
-        except TypeError:
-            # Edge case where a scalar value leaks through ca.unpack()
-            val = [val]
+            if count is None:
+                count = len(val)
 
-        if count is None:
-            count = len(val)
+            if (as_numpy and ca.HAS_NUMPY and
+                    not isinstance(val, ca.numpy.ndarray)):
+                val = ca.numpy.asarray(val)
+            elif (not as_numpy and ca.HAS_NUMPY and
+                    isinstance(val, ca.numpy.ndarray)):
+                val = val.tolist()
 
-        if (as_numpy and ca.HAS_NUMPY and
-                not isinstance(val, ca.numpy.ndarray)):
-            val = ca.numpy.asarray(val)
-        elif (not as_numpy and ca.HAS_NUMPY and
-                isinstance(val, ca.numpy.ndarray)):
-            val = val.tolist()
-        # allow asking for less data than actually exists in the cached value
-        if count < len(val):
-            val = val[:count]
-        return val
+            # allow asking for less data than actually exists in the cached value
+            if count < len(val):
+                val = val[:count]
+
+            # Update based on the requested type:
+            md['value'] = val
+
+        if as_namespace:
+            return Namespace(**md)
+        return md
 
     def put(self, value, wait=False, timeout=30.0,
             use_complete=False, callback=None, callback_data=None):
