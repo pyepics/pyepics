@@ -1,0 +1,23 @@
+These shared libraries were built using
+
+Epics Base 3.16.2 on Centos 6.9 with gcc 4.4.7, glibc 2.12
+
+and configure Epics to cross-compile for linux-86 host target
+in configure/CONFIG_SITE.
+
+Readline support was turned off by setting
+   COMMANDLINE_LIBRARY =
+
+in
+   CONFIG_SITE.Common.linux-x86
+
+
+The patchelf utility (from Anaconda Python) was used to make the shared
+libraries portable with the following commands:
+
+  mv libCom.so libComPYEPICS.so
+  patchelf --set-soname libca.so libca.so
+  patchelf --set-soname libComPYEPICS.so libComPYEPICS.so
+  patchelf --set-rpath '$ORIGIN' libca.so
+  patchelf --set-rpath '$ORIGIN' libComPYEPICS.so
+  patchelf --replace-needed libCom.so.3.16.2 libComPYEPICS.so libca.so
