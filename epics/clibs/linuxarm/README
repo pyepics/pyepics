@@ -1,0 +1,16 @@
+
+These shared libraries were built using
+
+Epics Base 3.16.2 on Raspbian GNU/Linux 9 (stretch) with
+gcc (Raspbian 6.3.0-18+rpi1) 6.3.0 20170516
+
+The patchelf utility (from Anaconda Python) was used to make the shared
+libraries portable with the following commands:
+
+  mv libCom.so libComPYEPICS.so
+  patchelf --set-soname libca.so libca.so
+  patchelf --set-soname libComPYEPICS.so libComPYEPICS.so
+  patchelf --set-rpath '$ORIGIN' libca.so
+  patchelf --set-rpath '$ORIGIN' libComPYEPICS.so
+  patchelf --replace-needed libCom.so.3.16.2 libComPYEPICS.so libca.so
+  patchelf --replace-needed libCom.so libComPYEPICS.so libca.so
