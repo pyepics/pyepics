@@ -207,13 +207,13 @@ class PV(object):
             maxcount = 0
             if self._args['count'] is not None:
                 maxcount = self._args['count']
-                count = min(count,self._args['count'])
+                count = min(count, self._args['count'])
 
-            self._args['count']  = count
-            self._args['host']   = ca.host_name(self.chid)
-            self.ftype  = ca.promote_type(self.chid,
-                                          use_ctrl= self.form == 'ctrl',
-                                          use_time= self.form == 'time')
+            self._args['count'] = count
+            self._args['host']  = ca.host_name(self.chid)
+            self.ftype = ca.promote_type(self.chid,
+                                         use_ctrl= self.form == 'ctrl',
+                                         use_time= self.form == 'time')
 
             _ftype_ = dbr.Name(self.ftype).lower()
             self._args['type'] = _ftype_
@@ -422,11 +422,11 @@ class PV(object):
         if as_string:
             char_value = self._set_charval(val, force_long_string=as_string)
             md['value'] = char_value
-        elif self.count <= 1 or val is None:
+        elif self.nelm <= 1 or val is None:
             pass
         else:
             # After this point:
-            #   * self.count is > 1
+            #   * self.nelm is > 1
             #   * val should be set and a sequence
             try:
                 len(val)
@@ -788,8 +788,8 @@ class PV(object):
         """native count (number of elements).
         For array data this will return the full array size (ie, the
         .NELM field).  See also 'count' property"""
-        if self._getarg('count') == 1:
-            return 1
+        # if self._getarg('count') == 1:
+        #    return 1
         return ca.element_count(self.chid)
 
     @property
