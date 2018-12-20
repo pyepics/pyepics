@@ -1116,6 +1116,8 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
         extended_data, data = data
     except (TypeError, IndexError):
         return None
+    except ValueError:
+        extended_data = None
 
     if count == 0 or count is None:
         count = len(data)
