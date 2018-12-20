@@ -5,24 +5,22 @@ Epics Channel Access for Python
 
 PyEpics is an interface for the Channel Access (CA) library of the `Epics
 Control System <http://www.aps.anl.gov/epics/>`_ to the Python Programming
-language.  The pyepics package provides a base :mod:`epics` module to
-python, with methods for reading from and writing to Epics Process
-Variables (PVs) via the CA protocol.  The package includes a fairly
-complete, thin layer over the low-level Channel Access library in the
-:mod:`ca` module, and higher-level abstractions built on top of this basic
-functionality.
+language.  The pyepics package provides a base :mod:`epics` module to python,
+with methods for reading from and writing to Epics Process Variables (PVs) via
+the CA protocol.  The package includes a thin and fairly complete layer over
+the low-level Channel Access library in the :mod:`ca` module, and higher level
+abstractions built on top of this basic functionality.
 
-The package includes a simple, functional approach to CA similar to EZCA
-and the Unix command-line tools with functions in the main :mod:`epics`
-package including :meth:`epics.caget`, :meth:`epics.caput`,
-:meth:`epics.cainfo`, and :meth:`epics.camonitor`.  There is also a
-:class:`pv.PV` object which represents an Epics Process Variable as an
-easy-to-use Python object. Additional modules provide even higher-level
-programming support to Epics.  These include groups of related PVs in
-:class:`device.Device`, a simple method to create alarms in
-:class:`alarm.Alarm`, and support for saving PVs values in the
-:mod:`autosave` module.  Finally, there is support for conveniently
-tying epics PVs to wxPython widgets in the :mod:`wx` module.
+The package includes a very simple interface to CA similar to the Unix
+command-line tools and EZCA library with functions :meth:`epics.caget`,
+:meth:`epics.caput`, :meth:`epics.cainfo`, and :meth:`epics.camonitor`.  These
+is also a :class:`pv.PV` class which represents an Epics Process Variable as a
+full-featured and easy-to-use Python object.  Additional modules provide
+higher-level programming support to CA, including grouping related PVs into a
+:class:`device.Device`, creating alarms in :class:`alarm.Alarm`, and saving
+PVs values in the :mod:`autosave` module.  There is also support for
+conveniently using epics PVs to wxPython widgets in the :mod:`wx` module, and
+some support for using PyQt widgets in the :mod:`qt` module.
 
 -----------
 
@@ -48,4 +46,3 @@ See
    autosave
    wx
    advanced
-

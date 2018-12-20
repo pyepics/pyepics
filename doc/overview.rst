@@ -65,7 +65,7 @@ You'll then be able to use Python's introspection tools and built-in help
 system, and the rest of this document as a reference and for detailed
 discussions.
 
-Functional Approach: caget(), caput()
+Procedural Approach: caget(), caput()
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To get values from PVs, you can use the :func:`caget` function:
