@@ -2,33 +2,27 @@
 ca: Low-level Channel Access module
 =================================================
 
-.. module:: ca
-   :synopsis: low-level Channel Access  module.
-
 .. module:: epics.ca
    :synopsis: low-level Channel Access  module.
 
-The :mod:`ca` module provides a low-level wrapping of the EPICS
-Channel Access (CA) library, using ctypes.  Most users of the `epics`
-module will not need to be concerned with most of the details here, and
-will instead use the simple functional interface (:func:`epics.caget`,
-:func:`epics.caput` and so on), or use the :class:`epics.PV` class to
-create and use epics PV objects.
+
+The :mod:`ca` module provides a low-level wrapping of the EPICS Channel Access
+(CA) library, using ctypes.  Most users of the `epics` module will not need to
+be concerned with most of the details here, and will instead use the simple
+procedural interface (:func:`epics.caget`, :func:`epics.caput` and so on), or
+use the :class:`epics.PV` class to create and use epics PV objects.
 
 
 General description, difference with C library
 =================================================
 
-The goal of the :mod:`ca` module is to provide a fairly complete
-mapping of the C interface to the CA library while also providing a
-pleasant Python experience.  It is expected that anyone looking
-into the details of this module is somewhat familiar with Channel
-Access and knows where to consult the `Channel Access Reference
-Documentation
-<http://www.aps.anl.gov/epics/base/R3-14/11-docs/CAref.html>`_.
-This document focuses on the differences with the C interface,
-assuming a general understanding of what the functions are meant to
-do.
+The :mod:`ca` module provides a fairly complete mapping of the C interface to
+the CA library while also providing a pleasant Python experience.  It is
+expected that anyone using this module is somewhat familiar with Channel
+Access and knows where to consult the `Channel Access Reference Documentation
+<https://epics.anl.gov/base/R3-14/8-docs/CAref.html>`_. Here, we focus on the
+differences with the C interface, and assume a general understanding of what
+the functions are meant to do.
 
 
 Name Mangling
@@ -146,15 +140,19 @@ Using the CA module
 Many general-purpose CA functions that deal with general communication and
 threading contexts are very close to the C library:
 
-.. autofunction:: initialize_libca
+.. autofunction:: initialize_libca()
 
-.. autofunction:: finalize_libca
+.. autofunction:: finalize_libca()
 
-.. function:: context_create()
-.. autofunction:: create_context
+.. autofunction:: pend_io(timeout=1.0)
 
-.. function:: context_destroy()
-.. autofunction:: destroy_context
+.. autofunction:: pend_event(timeout=1.e-5)
+
+.. autofunction:: poll(evt=1.e-5[, iot=1.0])
+
+.. autofunction:: create_context()
+
+.. autofunction:: destroy_context()
 
 .. autofunction:: current_context()
 
@@ -174,11 +172,15 @@ threading contexts are very close to the C library:
 
 .. autofunction:: replace_printf_handler(fcn=None)
 
-.. autofunction:: pend_io(timeout=1.0)
+.. warning::
 
-.. autofunction:: pend_event(timeout=1.e-5)
+    `replace_printf_handler()` appears to not actually work.
 
-.. autofunction:: poll(evt=1.e-5[, iot=1.0])
+    We think this is due to a real limitation of Python's `ctypes` module
+    not supporting the mapping of C *va_list* function arguments to Python.
+    If you are interested in this or have ideas of how to fix it, please
+    let us know.
+
 
 
 Creating and Connecting to Channels
@@ -193,7 +195,6 @@ a good idea to treat these as object instances.
 .. autofunction:: create_channel(pvname, connect=False, callback=None, auto_cb=True)
 
 .. autofunction:: connect_channel(chid, timeout=None, verbose=False)
-
 
 Many other functions require a valid Channel ID, but not necessarily a
 connected Channel.  These functions are essentially identical to the CA
@@ -213,7 +214,7 @@ library versions, and include:
 
 .. autofunction::   field_type(chid)
 
-   See the *ftype* column from :ref:`Table of DBR Types <dbrtype_table>`.
+See the *ftype* column from :ref:`Table of DBR Types <dbrtype_table>`.
 
 .. autofunction::   clear_channel(chid)
 
@@ -228,7 +229,7 @@ A few additional pythonic functions have been added:
 
 .. autofunction:: promote_type(chid, [use_time=False, [use_ctrl=False]])
 
-   See :ref:`Table of DBR Types <dbrtype_table>`.
+See :ref:`Table of DBR Types <dbrtype_table>`.
 
 .. data::  _cache
 
@@ -259,34 +260,29 @@ keyword arguments can be used to specify such options.
 
 .. autofunction:: get(chid, ftype=None, count=None, as_string=False, as_numpy=True, wait=True, timeout=None)
 
-   
-   See :ref:`Table of DBR Types <dbrtype_table>` for a listing of values of
-   *ftype*,
+See :ref:`Table of DBR Types <dbrtype_table>` for a listing of values of *ftype*,
 
+See :ref:`arrays-large-label` for a discussion of strategies  for how to best deal with very large arrays.
 
-   See :ref:`arrays-large-label` for a discussion of strategies
-   for how to best deal with very large arrays.
+See :ref:`advanced-connecting-many-label` for a discussion of when using `wait=False` can give a large performance boost.
 
+See :ref:`advanced-get-timeouts-label` for further discussion of the  *wait* and *timeout* options and the associated :func:`get_complete`  function.
 
-   See :ref:`advanced-connecting-many-label` for a discussion of when using
-   `wait=False` can give a large performance boost.
-
-   See :ref:`advanced-get-timeouts-label` for further discussion of the
-   *wait* and *timeout* options and the associated :func:`get_complete`
-   function.
-
+.. autofunction:: get_with_metadata(chid, ftype=None, count=None, as_string=False, as_numpy=True, wait=True, timeout=None)
 
 .. autofunction:: get_complete(chid, ftype=None, count=None, as_string=False, as_numpy=True, timeout=None)
 
-   See :ref:`advanced-get-timeouts-label` for further discussion.
+See :ref:`advanced-get-timeouts-label` for further discussion.
+
+.. autofunction:: get_complete_with_metadata(chid, ftype=None, count=None, as_string=False, as_numpy=True, timeout=None)
 
 .. autofunction::  put(chid, value, wait=False, timeout=30, callback=None, callback_data=None)
 
-   For more on this *put callback*, see :ref:`ca-callbacks-label` below.
+See :ref:`ca-callbacks-label` for more on this *put callback*,
 
 .. autofunction:: create_subscription(chid, use_time=False, use_ctrl=False, mask=None, callback=None)
 
-   For more on writing the user-supplied callback, see :ref:`ca-callbacks-label` below.
+See :ref:`ca-callbacks-label` for more on writing the user-supplied callback,
 
 .. warning::
 
@@ -325,17 +321,17 @@ keyword arguments can be used to specify such options.
 
 Several other functions are provided:
 
-.. autofunction::  get_timestamp(chid)
+.. autofunction:: get_timestamp(chid)
 
-.. autofunction::  get_severity(chid)
+.. autofunction:: get_severity(chid)
 
-.. autofunction::  get_precision(chid)
+.. autofunction:: get_precision(chid)
 
 .. autofunction:: get_enum_strings(chid)
 
 .. autofunction:: get_ctrlvars(chid)
 
-    See :ref:`Table of Control Attributes <ctrlvars_table>`
+See :ref:`Table of Control Attributes <ctrlvars_table>`
 
 .. _ctrlvars_table:
 
@@ -370,9 +366,17 @@ states.
 Synchronous Groups
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Synchronous Groups can be used to ensure that a set of Channel Access calls
-all happen together, as if in a *transaction*.  Synchronous Groups work in
-PyEpics as of version 3.0.10, but more testing is probably needed.
+.. warning::
+
+    Synchronous groups are simulated in pyepics, but are not recommended,
+    and probably don't really make sense for usage within pyepics and using
+    asynchronous i/o anyway.
+
+Synchronous Groups are can be used to ensure that a set of Channel Access
+calls all happen together, as if in a *transaction*.  Synchronous Groups
+should be avoided in pyepics, and are not well tested.  They probably make
+little sens in the context of asynchronous I/O.  The documentation here is
+given for historical purposes.
 
 The idea is to first create a synchronous group, then add a series of
 :func:`sg_put` and :func:`sg_get` which do not happen immediately, and
@@ -389,55 +393,12 @@ and :func:`sg_get` to execute.
 
 .. autofunction::  sg_get(gid, chid[, ftype=None[, as_string=False[, as_numpy=True]]])
 
-   See further example below.
-
 .. autofunction::  sg_put(gid, chid, value)
 
 .. autofunction::  sg_test(gid)
 
 .. autofunction::  sg_reset(gid)
 
-An example use of a synchronous group::
-
-    from epics import ca
-    import time
-
-    pvs = ('X1.VAL', 'X2.VAL', 'X3.VAL')
-    chids = [ca.create_channel(pvname) for pvname in pvs]
-
-    for chid in chids:
-        ca.connect_channel(chid)
-        ca.put(chid, 0)
-
-    # create synchronous group
-    sg = ca.sg_create()
-
-    # get data pointers from ca.sg_get
-    data = [ca.sg_get(sg, chid) for chid in chids]
-
-    print 'Now change these PVs for the next 10 seconds'
-    time.sleep(10.0)
-
-    print 'will now block for i/o'
-    ca.sg_block(sg)
-    #
-    # CALL ca._unpack with data points and chid to extract data
-    for pvname, dat, chid in zip(pvs, data, chids):
-        val = ca._unpack(dat, chid=chid)
-        print "%s = %s" % (pvname, str(val))
-
-    ca.sg_reset(sg)
-
-    #  Now a SG Put
-    print 'OK, now we will put everything back to 0 synchronously'
-
-    for chid in chids:
-        ca.sg_put(sg, chid, 0)
-
-    print 'sg_put done, but not blocked / committed. Sleep for 5 seconds '
-    time.sleep(5.0)
-    ca.sg_block(sg)
-    print 'done.'
 
 ..  _ca-implementation-label:
 
@@ -512,7 +473,7 @@ used heavily inside of ca.py or are available for your convenience.
 
 .. autofunction:: withInitialContext(fcn)
 
-    See :ref:`advanced-threads-label` for further discussion.
+See :ref:`advanced-threads-label` for further discussion.
 
 
 Unpacking Data from Callbacks
@@ -767,7 +728,7 @@ called immediately after successful installation::
 
     import epics
     import time
-    
+
     def on_access_rights_change(read_access, write_access):
         print 'read access = %s, write access = %s' % (read_access, write_access)
 

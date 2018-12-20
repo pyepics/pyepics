@@ -5,30 +5,20 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Alarms: respond when a PV goes out of range &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '3.3.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Auto-saving: simple save/restore of PVs" href="autosave.html" />
     <link rel="prev" title="Devices: collections of PVs" href="devices.html" /> 
-  </head>
-  <body>
+  </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -67,7 +57,7 @@
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Alarms: respond when a PV goes out of range</a><ul>
 <li><a class="reference internal" href="#module-alarm">Overview</a></li>
@@ -91,12 +81,14 @@
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -111,7 +103,7 @@
 <h1>Alarms: respond when a PV goes out of range<a class="headerlink" href="#alarms-respond-when-a-pv-goes-out-of-range" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-alarm">
 <span id="overview"></span><h2>Overview<a class="headerlink" href="#module-alarm" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="#module-alarm" title="alarm: respond when a PV goes out of range by running user-supplied code"><code class="xref py py-mod docutils literal"><span class="pre">alarm</span></code></a> module provides an Alarm object to specify an alarm
+<p>The <a class="reference internal" href="#module-alarm" title="alarm: respond when a PV goes out of range by running user-supplied code"><code class="xref py py-mod docutils literal notranslate"><span class="pre">alarm</span></code></a> module provides an Alarm object to specify an alarm
 condition and what to do when that condition is met.</p>
 <dl class="class">
 <dt id="alarm.Alarm">
@@ -151,7 +143,7 @@ then the user-supplied callback function is run.  This callback could be
 set do send a message or to take some other course of action.</p>
 <p>The comparison supplied can either be a string as listed in <a class="reference internal" href="#alarmops-table"><span class="std std-ref">Table of
 Alarm Operators</span></a> or a custom callable function which takes
-the two values (PV.value, trip_point) and returns <code class="docutils literal"><span class="pre">True</span></code> or <code class="docutils literal"><span class="pre">False</span></code>
+the two values (PV.value, trip_point) and returns <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>
 based on those values.</p>
 <blockquote id="alarmops-table">
 <div><p>Table of built-in Operators for Alarms:</p>
@@ -189,20 +181,20 @@ based on those values.</p>
 </table>
 </div></blockquote>
 </div></blockquote>
-<p>The <code class="xref py py-attr docutils literal"><span class="pre">alert_delay</span></code> prevents the alarm callback from being called too
+<p>The <code class="xref py py-attr docutils literal notranslate"><span class="pre">alert_delay</span></code> prevents the alarm callback from being called too
 many times. For PVs with floating point values, the value may
 fluctuate around the trip_point for a while.  If the value violates the
 trip_point, then momentarily goes back to an acceptable value, and back
 again to a violating value, it may not be desirable to send repeated,
 identical messages.   To prevent this situation, the alarm callback will be
 called when the alarm condition is met <strong>and</strong> the callback was not called
-within the time specified by  <code class="xref py py-attr docutils literal"><span class="pre">alert_delay</span></code>.</p>
+within the time specified by  <code class="xref py py-attr docutils literal notranslate"><span class="pre">alert_delay</span></code>.</p>
 </div>
 <div class="section" id="alarm-example">
 <h2>Alarm Example<a class="headerlink" href="#alarm-example" title="Permalink to this headline">¶</a></h2>
 <p>An epics Alarm is very easy to use.  Here is an alarm set to print a
 message when a PV’s value reaches a certain value:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">Alarm</span><span class="p">,</span> <span class="n">poll</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">Alarm</span><span class="p">,</span> <span class="n">poll</span>
 
 <span class="k">def</span> <span class="nf">alertMe</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
     <span class="nb">print</span> <span class="s2">&quot;Soup&#39;s on!   </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">)</span>
@@ -255,7 +247,7 @@ message when a PV’s value reaches a certain value:</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>

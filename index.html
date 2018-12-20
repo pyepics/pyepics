@@ -5,29 +5,19 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Epics Channel Access for Python &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '3.3.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Downloading and Installation" href="installation.html" /> 
-  </head>
-  <body>
+  </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="#">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -63,7 +53,7 @@
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper"><h3>Download</h3>
-<p>Current version: <b>3.3.1</b></p>
+<p>Current version: <b>3.3.2</b></p>
 <p>Download:
 <ul>
   <li>&nbsp; &nbsp; <a href="http://cars9.uchicago.edu/software/python/pyepics3/src/">cars.uchicago.edu</a>
@@ -80,12 +70,14 @@ Development version: <br> &nbsp; &nbsp; <a href="https://github.com/pyepics/pyep
 <p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -100,23 +92,21 @@ Development version: <br> &nbsp; &nbsp; <a href="https://github.com/pyepics/pyep
 <h1>Epics Channel Access for Python<a class="headerlink" href="#epics-channel-access-for-python" title="Permalink to this headline">¶</a></h1>
 <p>PyEpics is an interface for the Channel Access (CA) library of the <a class="reference external" href="http://www.aps.anl.gov/epics/">Epics
 Control System</a> to the Python Programming
-language.  The pyepics package provides a base <a class="reference internal" href="overview.html#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal"><span class="pre">epics</span></code></a> module to
-python, with methods for reading from and writing to Epics Process
-Variables (PVs) via the CA protocol.  The package includes a fairly
-complete, thin layer over the low-level Channel Access library in the
-<a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><code class="xref py py-mod docutils literal"><span class="pre">ca</span></code></a> module, and higher-level abstractions built on top of this basic
-functionality.</p>
-<p>The package includes a simple, functional approach to CA similar to EZCA
-and the Unix command-line tools with functions in the main <a class="reference internal" href="overview.html#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal"><span class="pre">epics</span></code></a>
-package including <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal"><span class="pre">epics.caget()</span></code></a>, <a class="reference internal" href="overview.html#epics.caput" title="epics.caput"><code class="xref py py-meth docutils literal"><span class="pre">epics.caput()</span></code></a>,
-<a class="reference internal" href="overview.html#epics.cainfo" title="epics.cainfo"><code class="xref py py-meth docutils literal"><span class="pre">epics.cainfo()</span></code></a>, and <a class="reference internal" href="overview.html#epics.camonitor" title="epics.camonitor"><code class="xref py py-meth docutils literal"><span class="pre">epics.camonitor()</span></code></a>.  There is also a
-<a class="reference internal" href="pv.html#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal"><span class="pre">pv.PV</span></code></a> object which represents an Epics Process Variable as an
-easy-to-use Python object. Additional modules provide even higher-level
-programming support to Epics.  These include groups of related PVs in
-<a class="reference internal" href="devices.html#device.Device" title="device.Device"><code class="xref py py-class docutils literal"><span class="pre">device.Device</span></code></a>, a simple method to create alarms in
-<a class="reference internal" href="alarm.html#alarm.Alarm" title="alarm.Alarm"><code class="xref py py-class docutils literal"><span class="pre">alarm.Alarm</span></code></a>, and support for saving PVs values in the
-<a class="reference internal" href="autosave.html#module-autosave" title="autosave: simple save/restore of PVs"><code class="xref py py-mod docutils literal"><span class="pre">autosave</span></code></a> module.  Finally, there is support for conveniently
-tying epics PVs to wxPython widgets in the <a class="reference internal" href="wx.html#module-wx" title="wx: wxPython Widgets for Epics"><code class="xref py py-mod docutils literal"><span class="pre">wx</span></code></a> module.</p>
+language.  The pyepics package provides a base <a class="reference internal" href="overview.html#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code></a> module to python,
+with methods for reading from and writing to Epics Process Variables (PVs) via
+the CA protocol.  The package includes a thin and fairly complete layer over
+the low-level Channel Access library in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module, and higher level
+abstractions built on top of this basic functionality.</p>
+<p>The package includes a very simple interface to CA similar to the Unix
+command-line tools and EZCA library with functions <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>,
+<a class="reference internal" href="overview.html#epics.caput" title="epics.caput"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caput()</span></code></a>, <a class="reference internal" href="overview.html#epics.cainfo" title="epics.cainfo"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.cainfo()</span></code></a>, and <a class="reference internal" href="overview.html#epics.camonitor" title="epics.camonitor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.camonitor()</span></code></a>.  These
+is also a <a class="reference internal" href="pv.html#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">pv.PV</span></code></a> class which represents an Epics Process Variable as a
+full-featured and easy-to-use Python object.  Additional modules provide
+higher-level programming support to CA, including grouping related PVs into a
+<a class="reference internal" href="devices.html#device.Device" title="device.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">device.Device</span></code></a>, creating alarms in <a class="reference internal" href="alarm.html#alarm.Alarm" title="alarm.Alarm"><code class="xref py py-class docutils literal notranslate"><span class="pre">alarm.Alarm</span></code></a>, and saving
+PVs values in the <a class="reference internal" href="autosave.html#module-autosave" title="autosave: simple save/restore of PVs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">autosave</span></code></a> module.  There is also support for
+conveniently using epics PVs to wxPython widgets in the <a class="reference internal" href="wx.html#module-wx" title="wx: wxPython Widgets for Epics"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wx</span></code></a> module, and
+some support for using PyQt widgets in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">qt</span></code> module.</p>
 <hr class="docutils" />
 <p>In addition to the Pyepics library described here, several applications
 built with pyepics are available at <a class="reference external" href="http://github.com/pyepics/epicsapps/">http://github.com/pyepics/epicsapps/</a>.
@@ -138,20 +128,20 @@ See
 </li>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">PyEpics Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#quick-start">Quick Start</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview.html#module-epics">Functions defined in <code class="docutils literal"><span class="pre">epics</span></code>: caget(), caput(), etc.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#module-epics">Functions defined in <code class="docutils literal notranslate"><span class="pre">epics</span></code>: caget(), caput(), etc.</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#motivation-and-design-concepts">Motivation and design concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#status-and-to-do-list">Status and to-do list</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pv.html">PV: Epics Process Variables</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pv.html#the-pv-class">The <code class="docutils literal"><span class="pre">PV</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pv.html#the-pv-class">The <code class="docutils literal notranslate"><span class="pre">PV</span></code> class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pv.html#string-representation-for-a-pv">String representation for a PV</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pv.html#automatic-monitoring-of-a-pv">Automatic Monitoring of a PV</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pv.html#user-supplied-callback-functions">User-supplied Callback functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pv.html#user-supplied-connection-callback-functions">User-supplied Connection Callback functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pv.html#user-supplied-access-rights-callback-functions">User-supplied Access Rights Callback functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pv.html#put-with-wait-put-callbacks-and-put-complete">Put with wait, put callbacks, and  put_complete</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pv.html#the-get-pv-function-and-pvcache-cache-of-pvs">The <code class="docutils literal"><span class="pre">get_pv()</span></code> function and <code class="docutils literal"><span class="pre">_PVcache_</span></code> cache of PVs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pv.html#the-get-pv-function-and-pvcache-cache-of-pvs">The <code class="docutils literal notranslate"><span class="pre">get_pv()</span></code> function and <code class="docutils literal notranslate"><span class="pre">_PVcache_</span></code> cache of PVs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pv.html#examples">Examples</a></li>
 </ul>
 </li>
@@ -162,7 +152,7 @@ See
 <li class="toctree-l2"><a class="reference internal" href="ca.html#implementation-details">Implementation details</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ca.html#user-supplied-callback-functions">User-supplied Callback functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ca.html#omissions">Omissions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ca.html#cathread-class"><code class="docutils literal"><span class="pre">CAThread</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca.html#cathread-class"><code class="docutils literal notranslate"><span class="pre">CAThread</span></code> class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ca.html#examples">Examples</a></li>
 </ul>
 </li>
@@ -185,7 +175,7 @@ See
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="autosave.html">Auto-saving: simple save/restore of PVs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="autosave.html#autosaver-class"><code class="docutils literal"><span class="pre">AutoSaver</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autosave.html#autosaver-class"><code class="docutils literal notranslate"><span class="pre">AutoSaver</span></code> class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="autosave.html#supported-data-types">Supported Data Types</a></li>
 </ul>
 </li>
@@ -241,7 +231,7 @@ See
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>

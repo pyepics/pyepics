@@ -5,30 +5,20 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Auto-saving: simple save/restore of PVs &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '3.3.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="wx: wxPython Widgets for Epics" href="wx.html" />
     <link rel="prev" title="Alarms: respond when a PV goes out of range" href="alarm.html" /> 
-  </head>
-  <body>
+  </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -67,10 +57,10 @@
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Auto-saving: simple save/restore of PVs</a><ul>
-<li><a class="reference internal" href="#autosaver-class"><code class="docutils literal"><span class="pre">AutoSaver</span></code> class</a></li>
+<li><a class="reference internal" href="#autosaver-class"><code class="docutils literal notranslate"><span class="pre">AutoSaver</span></code> class</a></li>
 <li><a class="reference internal" href="#supported-data-types">Supported Data Types</a><ul>
 <li><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
@@ -94,12 +84,14 @@
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -112,9 +104,9 @@
             
   <div class="section" id="module-autosave">
 <span id="auto-saving-simple-save-restore-of-pvs"></span><h1>Auto-saving: simple save/restore of PVs<a class="headerlink" href="#module-autosave" title="Permalink to this headline">¶</a></h1>
-<p>The <a class="reference internal" href="#module-autosave" title="autosave: simple save/restore of PVs"><code class="xref py py-mod docutils literal"><span class="pre">autosave</span></code></a> module provides simple save/restore functionality for
-PVs, with the functions <a class="reference internal" href="#autosave.save_pvs" title="autosave.save_pvs"><code class="xref py py-func docutils literal"><span class="pre">save_pvs()</span></code></a> and <a class="reference internal" href="#autosave.restore_pvs" title="autosave.restore_pvs"><code class="xref py py-func docutils literal"><span class="pre">restore_pvs()</span></code></a>, and an
-<a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal"><span class="pre">AutoSaver</span></code></a> class.  These are similar to the autosave module from
+<p>The <a class="reference internal" href="#module-autosave" title="autosave: simple save/restore of PVs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">autosave</span></code></a> module provides simple save/restore functionality for
+PVs, with the functions <a class="reference internal" href="#autosave.save_pvs" title="autosave.save_pvs"><code class="xref py py-func docutils literal notranslate"><span class="pre">save_pvs()</span></code></a> and <a class="reference internal" href="#autosave.restore_pvs" title="autosave.restore_pvs"><code class="xref py py-func docutils literal notranslate"><span class="pre">restore_pvs()</span></code></a>, and an
+<a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code></a> class.  These are similar to the autosave module from
 synApps for IOCs in that they use a compatible <em>request file</em> which
 describes the PVs to save, and a compatible <em>save file</em> which holds the
 saved values. Of course, the reading and writing is done here via Channel
@@ -126,12 +118,12 @@ installed with tools such as <em>easy_install</em> or <em>pip</em>, or downloade
 <p>Request and Save file formats are designed to be compatible with synApps
 autosave.  Notably, the <cite>file</cite> command with macro substitutions are
 supported, so that one can have a Request like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># My.req</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># My.req</span>
 <span class="n">file</span> <span class="s2">&quot;SimpleMotor.req&quot;</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="n">IOC</span><span class="p">:,</span> <span class="n">Q</span><span class="o">=</span><span class="n">m1</span>
 </pre></div>
 </div>
 <p>with a  <strong>SimpleMotor.req</strong> file of:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span># SimpleMotor.req
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># SimpleMotor.req
 $(P)$(Q).VAL
 $(P)$(Q).DIR
 $(P)$(Q).FOFF
@@ -141,22 +133,22 @@ $(P)$(Q).FOFF
 however, no automated mechanism for finding request files.  You will need
 to include these in the working directory or specify absolute paths.</p>
 <p>With such a file, simply using:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics.autosave</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics.autosave</span>
 <span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">save_pvs</span><span class="p">(</span><span class="s2">&quot;My.req&quot;</span><span class="p">,</span> <span class="s2">&quot;my_values.sav&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>will save the current values for the PVs to the file <strong>my_values.sav</strong>.  At
 a later time, these values can be restored with:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics.autosave</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics.autosave</span>
 <span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">restore_pvs</span><span class="p">(</span><span class="s2">&quot;my_values.sav&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The saved file will be of nearly identical format as that of the autosave
-mechanism, and the <a class="reference internal" href="#autosave.restore_pvs" title="autosave.restore_pvs"><code class="xref py py-func docutils literal"><span class="pre">restore_pvs()</span></code></a> function can read and restore values
+mechanism, and the <a class="reference internal" href="#autosave.restore_pvs" title="autosave.restore_pvs"><code class="xref py py-func docutils literal notranslate"><span class="pre">restore_pvs()</span></code></a> function can read and restore values
 using save files from autosave.  Note, however, that the purpose here is
 quite different from that of the standard autosave module (which is
 designed to save vales so that PVs can be <strong>initialized</strong> at IOC startup).
-Using the functions here will really do a <code class="xref py py-func docutils literal"><span class="pre">caput()</span></code> to the saved
+Using the functions here will really do a <code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code> to the saved
 values.</p>
 <dl class="function">
 <dt id="autosave.save_pvs">
@@ -190,19 +182,19 @@ autosave module from synApps.</p>
 </tr>
 </tbody>
 </table>
-<p>Note that <a class="reference internal" href="#autosave.restore_pvs" title="autosave.restore_pvs"><code class="xref py py-func docutils literal"><span class="pre">restore_pvs()</span></code></a> will restore all the values it can, skipping
+<p>Note that <a class="reference internal" href="#autosave.restore_pvs" title="autosave.restore_pvs"><code class="xref py py-func docutils literal notranslate"><span class="pre">restore_pvs()</span></code></a> will restore all the values it can, skipping
 over any values that it cannot restore.</p>
 </dd></dl>
 
 <div class="section" id="autosaver-class">
-<h2><a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal"><span class="pre">AutoSaver</span></code></a> class<a class="headerlink" href="#autosaver-class" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal"><span class="pre">AutoSaver</span></code></a> class provides a convenient way to repeatedly save
+<h2><a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code></a> class<a class="headerlink" href="#autosaver-class" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code></a> class provides a convenient way to repeatedly save
 PVs listed in a request file without having to re-connect all of the PVs.
-The <a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal"><span class="pre">AutoSaver</span></code></a> retains the PV connections, and provides a simple
-<a class="reference internal" href="#autosave.save" title="autosave.save"><code class="xref py py-meth docutils literal"><span class="pre">save()</span></code></a> method to save the current PV values to a file.  By default,
+The <a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code></a> retains the PV connections, and provides a simple
+<a class="reference internal" href="#autosave.save" title="autosave.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save()</span></code></a> method to save the current PV values to a file.  By default,
 that file will be named from the request file and the current time.  This
 allows you to do something like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># save PVs from a request file once per minute</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">epics.autosave</span> <span class="k">import</span> <span class="n">AutoSaver</span>
@@ -234,8 +226,8 @@ allows you to do something like this:</p>
 </table>
 </dd></dl>
 
-<p><a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal"><span class="pre">AutoSaver</span></code></a> has two methods: <a class="reference internal" href="#autosave.read_request_file" title="autosave.read_request_file"><code class="xref py py-meth docutils literal"><span class="pre">read_request_file()</span></code></a> to read a
-request file,  and <a class="reference internal" href="#autosave.save" title="autosave.save"><code class="xref py py-meth docutils literal"><span class="pre">save()</span></code></a> to save the results.</p>
+<p><a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code></a> has two methods: <a class="reference internal" href="#autosave.read_request_file" title="autosave.read_request_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_request_file()</span></code></a> to read a
+request file,  and <a class="reference internal" href="#autosave.save" title="autosave.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save()</span></code></a> to save the results.</p>
 <dl class="method">
 <dt id="autosave.read_request_file">
 <code class="descclassname">autosave.</code><code class="descname">read_request_file</code><span class="sig-paren">(</span><em>request_file</em><span class="sig-paren">)</span><a class="headerlink" href="#autosave.read_request_file" title="Permalink to this definition">¶</a></dt>
@@ -274,7 +266,7 @@ check for overwriting files.</li>
 </div>
 <div class="section" id="supported-data-types">
 <h2>Supported Data Types<a class="headerlink" href="#supported-data-types" title="Permalink to this headline">¶</a></h2>
-<p>All scalar PV values can be saved and restored with the <a class="reference internal" href="#module-autosave" title="autosave: simple save/restore of PVs"><code class="xref py py-mod docutils literal"><span class="pre">autosave</span></code></a>
+<p>All scalar PV values can be saved and restored with the <a class="reference internal" href="#module-autosave" title="autosave: simple save/restore of PVs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">autosave</span></code></a>
 routines.  There is some support for waveform (array) data.  For example,
 character waveforms containing for long strings can be saved and restored.
 In addition, numerical arrays in waveform can be saved and restored.  For
@@ -283,7 +275,7 @@ module.</p>
 <div class="section" id="examples">
 <h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
 <p>A simple example using the autosave module:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics.autosave</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics.autosave</span>
 <span class="c1"># save values</span>
 <span class="n">epics</span><span class="o">.</span><span class="n">autosave</span><span class="o">.</span><span class="n">save_pvs</span><span class="p">(</span><span class="s2">&quot;my_request_file.req&quot;</span><span class="p">,</span>
                         <span class="s2">&quot;/tmp/my_recent_save.sav&quot;</span><span class="p">)</span>
@@ -335,7 +327,7 @@ module.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>

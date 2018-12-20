@@ -5,30 +5,20 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>wx: wxPython Widgets for Epics &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '3.3.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Advanced Topic with Python Channel Access" href="advanced.html" />
     <link rel="prev" title="Auto-saving: simple save/restore of PVs" href="autosave.html" /> 
-  </head>
-  <body>
+  </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -67,7 +57,7 @@
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">wx: wxPython Widgets for Epics</a><ul>
 <li><a class="reference internal" href="#pv-aware-widgets">PV-aware Widgets</a><ul>
@@ -116,12 +106,14 @@
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -134,7 +126,7 @@
             
   <div class="section" id="module-wx">
 <span id="wx-wxpython-widgets-for-epics"></span><h1>wx: wxPython Widgets for Epics<a class="headerlink" href="#module-wx" title="Permalink to this headline">¶</a></h1>
-<p>The <a class="reference internal" href="#module-wx" title="wx: wxPython Widgets for Epics"><code class="xref py py-mod docutils literal"><span class="pre">wx</span></code></a> module of <a class="reference internal" href="overview.html#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal"><span class="pre">epics</span></code></a> (that is, <strong>epics.wx</strong>) provides a set
+<p>The <a class="reference internal" href="#module-wx" title="wx: wxPython Widgets for Epics"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wx</span></code></a> module of <a class="reference internal" href="overview.html#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code></a> (that is, <strong>epics.wx</strong>) provides a set
 of wxPython classes for epics PVs. Most of these are derived from wxPython
 widgets, with special support added for epics PVs, especially regarding
 when to automatically update the widget based on a changing value for a PV.</p>
@@ -146,7 +138,7 @@ there are a some full-fledged applications using Epics and wxPython at
 <span id="wx-functions-label"></span><h2>PV-aware Widgets<a class="headerlink" href="#pv-aware-widgets" title="Permalink to this headline">¶</a></h2>
 <p>Several basic wxPython widgets have been extended so as to connect the
 widget with a corresponding <cite>PV</cite>.  For example, setting the text value of a
-<code class="xref py py-mod docutils literal"><span class="pre">PVTextCtrl</span></code> will forward that value to the epics <cite>PV</cite>, and if the
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">PVTextCtrl</span></code> will forward that value to the epics <cite>PV</cite>, and if the
 <cite>PV</cite> is changed by externally, the value displayed in the widget will be
 automatically updated.</p>
 <div class="section" id="pvmixin">
@@ -243,7 +235,7 @@ whose value is set to the string representation of the value for the
 corresponding PV.</p>
 <p>By default, the text colour will be overridden when the PV enters an
 alarm state. These colours can be modified (or disabled by being set
-to <code class="docutils literal"><span class="pre">None</span></code>) as part of the constructor.</p>
+to <code class="docutils literal notranslate"><span class="pre">None</span></code>) as part of the constructor.</p>
 <p>“units” specifies a unit suffix (like ‘ A’ or ‘ mm’) to put after the text
 value whenever it is displayed.</p>
 <p>Alternatively, “auto_units” means the control will automatically display
@@ -427,7 +419,7 @@ arguments supported by wx.CollapsiblePane.</p>
 <p>By default, the foreground colour of the pane button will be overridden
 when the PV enters an alarm state. On GTK, this means the colour of the
 triangular drop-down button but not the label text. These colours can
-be modified (or disabled by being set to <code class="docutils literal"><span class="pre">None</span></code>) as part of the
+be modified (or disabled by being set to <code class="docutils literal notranslate"><span class="pre">None</span></code>) as part of the
 constructor.</p>
 <p>Supports the .SetTranslation() method, whose argument is a dictionary
 mapping PV values to display labels. If the PV value is not found in
@@ -461,7 +453,7 @@ Epics calls can be made in a separate thread, and asynchronously.</p>
 <dd></dd></dl>
 
 <p>This function will finalize epics, and close all Channel Access
-communication, by calling <a class="reference internal" href="ca.html#epics.ca.finalize_libca" title="epics.ca.finalize_libca"><code class="xref py py-meth docutils literal"><span class="pre">epics.ca.finalize_libca()</span></code></a>.  This may be
+communication, by calling <a class="reference internal" href="ca.html#epics.ca.finalize_libca" title="epics.ca.finalize_libca"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.ca.finalize_libca()</span></code></a>.  This may be
 useful when closing an application, as in a method bound to <cite>wx.EVT_CLOSE</cite>
 event from a top-level application window.  Be careful to <strong>not</strong> call this
 function when closing a Window if your application is not closing, and if
@@ -469,11 +461,11 @@ you are still doing any Channel Access work in the other windows.</p>
 </div>
 <div class="section" id="wxmotorpanel-widget">
 <h2>wxMotorPanel Widget<a class="headerlink" href="#wxmotorpanel-widget" title="Permalink to this headline">¶</a></h2>
-<p>A dedicated wx Widget for Epics Motors is included in the <a class="reference internal" href="#module-wx" title="wx: wxPython Widgets for Epics"><code class="xref py py-mod docutils literal"><span class="pre">wx</span></code></a> module
+<p>A dedicated wx Widget for Epics Motors is included in the <a class="reference internal" href="#module-wx" title="wx: wxPython Widgets for Epics"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wx</span></code></a> module
 that provides an easy-to-use Motor panel that is similar to the normal MEDM
 window, but with a few niceties from the more sophisticated wx
 toolkit. This widget can be used simply as:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">wx</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">wx</span>
 <span class="kn">from</span> <span class="nn">epics.wx</span> <span class="k">import</span> <span class="n">MotorPanel</span>
 <span class="o">....</span>
 <span class="n">mymotor</span> <span class="o">=</span> <span class="n">MotorPanel</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s1">&#39;XXX:m1&#39;</span><span class="p">)</span>
@@ -507,7 +499,7 @@ parameters that looks like:</p>
 <img alt="_images/wx_motordetail.png" src="_images/wx_motordetail.png" />
 <p>Many such MotorPanels can be put in a vertical stack, as generated from the
 ‘wx_motor.py’ script in the scripts folder of the source distribution as:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">~&gt;</span><span class="n">python</span> <span class="n">wx_motor</span><span class="o">.</span><span class="n">py</span> <span class="n">XXX</span><span class="p">:</span><span class="n">m1</span> <span class="n">XXX</span><span class="p">:</span><span class="n">m2</span> <span class="n">XXX</span><span class="p">:</span><span class="n">m3</span> <span class="n">XXX</span><span class="p">:</span><span class="n">m4</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">~&gt;</span><span class="n">python</span> <span class="n">wx_motor</span><span class="o">.</span><span class="n">py</span> <span class="n">XXX</span><span class="p">:</span><span class="n">m1</span> <span class="n">XXX</span><span class="p">:</span><span class="n">m2</span> <span class="n">XXX</span><span class="p">:</span><span class="n">m3</span> <span class="n">XXX</span><span class="p">:</span><span class="n">m4</span>
 </pre></div>
 </div>
 <p>will look like this:</p>
@@ -607,7 +599,7 @@ as it changes.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>

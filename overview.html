@@ -5,30 +5,20 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>PyEpics Overview &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '3.3.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PV: Epics Process Variables" href="pv.html" />
     <link rel="prev" title="Downloading and Installation" href="installation.html" /> 
-  </head>
-  <body>
+  </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -67,22 +57,22 @@
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">PyEpics Overview</a><ul>
 <li><a class="reference internal" href="#quick-start">Quick Start</a><ul>
-<li><a class="reference internal" href="#functional-approach-caget-caput">Functional Approach: caget(), caput()</a></li>
+<li><a class="reference internal" href="#procedural-approach-caget-caput">Procedural Approach: caget(), caput()</a></li>
 <li><a class="reference internal" href="#creating-and-using-pv-objects">Creating and Using PV Objects</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-epics">Functions defined in <code class="docutils literal"><span class="pre">epics</span></code>: caget(), caput(), etc.</a><ul>
-<li><a class="reference internal" href="#caget"><code class="docutils literal"><span class="pre">caget()</span></code></a></li>
-<li><a class="reference internal" href="#caput"><code class="docutils literal"><span class="pre">caput()</span></code></a></li>
-<li><a class="reference internal" href="#cainfo"><code class="docutils literal"><span class="pre">cainfo()</span></code></a></li>
-<li><a class="reference internal" href="#camonitor"><code class="docutils literal"><span class="pre">camonitor()</span></code></a></li>
-<li><a class="reference internal" href="#camonitor-clear"><code class="docutils literal"><span class="pre">camonitor_clear()</span></code></a></li>
-<li><a class="reference internal" href="#caget-many"><code class="docutils literal"><span class="pre">caget_many()</span></code></a></li>
-<li><a class="reference internal" href="#caput-many"><code class="docutils literal"><span class="pre">caput_many()</span></code></a></li>
+<li><a class="reference internal" href="#module-epics">Functions defined in <code class="docutils literal notranslate"><span class="pre">epics</span></code>: caget(), caput(), etc.</a><ul>
+<li><a class="reference internal" href="#caget"><code class="docutils literal notranslate"><span class="pre">caget()</span></code></a></li>
+<li><a class="reference internal" href="#caput"><code class="docutils literal notranslate"><span class="pre">caput()</span></code></a></li>
+<li><a class="reference internal" href="#cainfo"><code class="docutils literal notranslate"><span class="pre">cainfo()</span></code></a></li>
+<li><a class="reference internal" href="#camonitor"><code class="docutils literal notranslate"><span class="pre">camonitor()</span></code></a></li>
+<li><a class="reference internal" href="#camonitor-clear"><code class="docutils literal notranslate"><span class="pre">camonitor_clear()</span></code></a></li>
+<li><a class="reference internal" href="#caget-many"><code class="docutils literal notranslate"><span class="pre">caget_many()</span></code></a></li>
+<li><a class="reference internal" href="#caput-many"><code class="docutils literal notranslate"><span class="pre">caput_many()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#motivation-and-design-concepts">Motivation and design concepts</a></li>
@@ -106,12 +96,14 @@
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -124,46 +116,46 @@
             
   <div class="section" id="pyepics-overview">
 <h1>PyEpics Overview<a class="headerlink" href="#pyepics-overview" title="Permalink to this headline">¶</a></h1>
-<p>The python <a class="reference internal" href="#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal"><span class="pre">epics</span></code></a> package provides several function, modules, and
+<p>The python <a class="reference internal" href="#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code></a> package provides several function, modules, and
 classes to interact with EPICS Channel Access.  The simplest approach uses
-the functions <code class="xref py py-func docutils literal"><span class="pre">caget()</span></code>, <code class="xref py py-func docutils literal"><span class="pre">caput()</span></code>, and <code class="xref py py-func docutils literal"><span class="pre">cainfo()</span></code> within the
+the functions <code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code>, and <code class="xref py py-func docutils literal notranslate"><span class="pre">cainfo()</span></code> within the
 top-level <cite>epics</cite> module to get and put values of Epics Process Variables.
 These functions are similar to the standard command line utilities and the
 EZCA library interface, and are described in more detail below.</p>
-<p>To use the <a class="reference internal" href="#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal"><span class="pre">epics</span></code></a> package, import it with:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
+<p>To use the <a class="reference internal" href="#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code></a> package, import it with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
 </pre></div>
 </div>
 <p>The main components of this module include</p>
 <blockquote>
 <div><ul class="simple">
-<li>functions <code class="xref py py-func docutils literal"><span class="pre">caget()</span></code>, <code class="xref py py-func docutils literal"><span class="pre">caput()</span></code>, <code class="xref py py-func docutils literal"><span class="pre">cainfo()</span></code> and others
+<li>functions <code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">cainfo()</span></code> and others
 described in more detail below.</li>
-<li>a <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><code class="xref py py-mod docutils literal"><span class="pre">ca</span></code></a> module, providing the low-level library as a set of
+<li>a <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module, providing the low-level library as a set of
 functions, meant to be very close to the C library for Channel Access.</li>
-<li>a <code class="xref py py-class docutils literal"><span class="pre">PV</span></code> object, representing a Process Variable (PV) and giving
+<li>a <code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code> object, representing a Process Variable (PV) and giving
 a higher-level interface to Epics Channel Access.</li>
-<li>a <code class="xref py py-class docutils literal"><span class="pre">Device</span></code> object: a collection of related PVs, similar to an
+<li>a <code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code> object: a collection of related PVs, similar to an
 Epics Record.</li>
-<li>a <code class="xref py py-class docutils literal"><span class="pre">Motor</span></code> object: a Device that represents an Epics Motor.</li>
-<li>an <code class="xref py py-class docutils literal"><span class="pre">Alarm</span></code> object, which can be used to set up notifications
+<li>a <code class="xref py py-class docutils literal notranslate"><span class="pre">Motor</span></code> object: a Device that represents an Epics Motor.</li>
+<li>an <code class="xref py py-class docutils literal notranslate"><span class="pre">Alarm</span></code> object, which can be used to set up notifications
 when a PV’s values goes outside an acceptable bounds.</li>
-<li>an <code class="xref py py-mod docutils literal"><span class="pre">epics.wx</span></code> module that provides wxPython classes designed for
+<li>an <code class="xref py py-mod docutils literal notranslate"><span class="pre">epics.wx</span></code> module that provides wxPython classes designed for
 use with Epics PVs.</li>
 </ul>
 </div></blockquote>
 <p>If you’re looking to write quick scripts or a simple introduction to using
-Channel Access, the <code class="xref py py-func docutils literal"><span class="pre">caget()</span></code> and <code class="xref py py-func docutils literal"><span class="pre">caput()</span></code> functions are probably
+Channel Access, the <code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code> functions are probably
 where you want to start.</p>
-<p>If you’re building larger scripts and programs, using <code class="xref py py-class docutils literal"><span class="pre">PV</span></code> objects
-provided by the <a class="reference internal" href="pv.html#module-pv" title="pv: PV objects for Epics Channel Access"><code class="xref py py-mod docutils literal"><span class="pre">pv</span></code></a> module is recommended.  The <code class="xref py py-class docutils literal"><span class="pre">PV</span></code> class
+<p>If you’re building larger scripts and programs, using <code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code> objects
+provided by the <a class="reference internal" href="pv.html#module-pv" title="pv: PV objects for Epics Channel Access"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pv</span></code></a> module is recommended.  The <code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code> class
 provides a Process Variable (PV) object that has both methods (including
-<code class="xref py py-meth docutils literal"><span class="pre">get()</span></code> and <code class="xref py py-meth docutils literal"><span class="pre">put()</span></code>) to read and change the PV, and attributes that
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">put()</span></code>) to read and change the PV, and attributes that
 are kept automatically synchronized with the remote channel.  For larger
 applications where you find yourself working with sets of related PVs, you
-may find the <code class="xref py py-class docutils literal"><span class="pre">Device</span></code> class helpful.</p>
-<p>The lowest-level CA functionality is exposed in the <a class="reference internal" href="ca.html#module-ca" title="ca: low-level Channel Access  module."><code class="xref py py-mod docutils literal"><span class="pre">ca</span></code></a> module, and
-companion <code class="xref py py-mod docutils literal"><span class="pre">dbr</span></code> module.  While not necessary recommended for most use
+may find the <code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code> class helpful.</p>
+<p>The lowest-level CA functionality is exposed in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module, and
+companion <code class="xref py py-mod docutils literal notranslate"><span class="pre">dbr</span></code> module.  While not necessary recommended for most use
 cases, this module does provide a fairly complete wrapping of the basic
 EPICS CA library.  For people who have used CA from C or other languages,
 this module should be familiar and seem quite usable, if a little more
@@ -179,24 +171,24 @@ Windows with Python versions 2.7, and 3.5 and above.</p>
 You’ll then be able to use Python’s introspection tools and built-in help
 system, and the rest of this document as a reference and for detailed
 discussions.</p>
-<div class="section" id="functional-approach-caget-caput">
-<h3>Functional Approach: caget(), caput()<a class="headerlink" href="#functional-approach-caget-caput" title="Permalink to this headline">¶</a></h3>
-<p>To get values from PVs, you can use the <code class="xref py py-func docutils literal"><span class="pre">caget()</span></code> function:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
+<div class="section" id="procedural-approach-caget-caput">
+<h3>Procedural Approach: caget(), caput()<a class="headerlink" href="#procedural-approach-caget-caput" title="Permalink to this headline">¶</a></h3>
+<p>To get values from PVs, you can use the <code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code> function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">=</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">m1</span><span class="p">)</span>
 <span class="go">1.2001</span>
 </pre></div>
 </div>
-<p>To set PV values, you can use the <code class="xref py py-func docutils literal"><span class="pre">caput()</span></code> function:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span> <span class="mf">1.90</span><span class="p">)</span>
+<p>To set PV values, you can use the <code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code> function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span> <span class="mf">1.90</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">))</span>
 <span class="go">1.9000</span>
 </pre></div>
 </div>
-<p>To see more detailed information about a PV, use the <code class="xref py py-func docutils literal"><span class="pre">cainfo()</span></code>
+<p>To see more detailed information about a PV, use the <code class="xref py py-func docutils literal notranslate"><span class="pre">cainfo()</span></code>
 function:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cainfo</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cainfo</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="go">== XXX:m1.VAL  (time_double) ==</span>
 <span class="go">   value      = 1.9</span>
 <span class="go">   char_value = &#39;1.9000&#39;</span>
@@ -232,41 +224,41 @@ cases.</p>
 <p>If you are repeatedly referencing the same PV, you may find it more
 convenient to create a PV object and use it in a more object-oriented
 manner.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">PV</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">PV</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>PV objects have several methods and attributes.  The most important methods
-are  <code class="xref py py-meth docutils literal"><span class="pre">get()</span></code> and <code class="xref py py-meth docutils literal"><span class="pre">put()</span></code> to receive and send the PV’s value, and
-the <code class="xref py py-attr docutils literal"><span class="pre">value</span></code> attribute which stores the current value.  In analogy to
-the <code class="xref py py-func docutils literal"><span class="pre">caget()</span></code> and <code class="xref py py-func docutils literal"><span class="pre">caput()</span></code> examples above, the value of a PV can
+are  <code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">put()</span></code> to receive and send the PV’s value, and
+the <code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code> attribute which stores the current value.  In analogy to
+the <code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code> examples above, the value of a PV can
 be fetched either with</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pv1</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pv1</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
 <span class="go">1.90</span>
 </pre></div>
 </div>
 <p>or</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pv1</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pv1</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 <span class="go">1.90</span>
 </pre></div>
 </div>
 <p>To set a PV’s value, you can either use</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.9</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.9</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>or assign the <code class="xref py py-attr docutils literal"><span class="pre">value</span></code> attribute</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">1.9</span>
+<p>or assign the <code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code> attribute</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">1.9</span>
 </pre></div>
 </div>
 <p>You can see a few of the most important properties of a PV by simply
 printing it:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pv1</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pv1</span><span class="p">)</span>
 <span class="go">&lt;PV &#39;XXX:m1.VAL&#39;, count=1, type=time_double, access=read/write&gt;</span>
 </pre></div>
 </div>
-<p>Even more complete information can be seen by printing the PVs <code class="xref py py-attr docutils literal"><span class="pre">info</span></code>
+<p>Even more complete information can be seen by printing the PVs <code class="xref py py-attr docutils literal notranslate"><span class="pre">info</span></code>
 attribute:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pv1</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pv1</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
 <span class="go">== XXX:m1.VAL  (time_double) ==</span>
 <span class="go">   value      = 1.9</span>
 <span class="go">   char_value = &#39;1.9000&#39;</span>
@@ -297,15 +289,15 @@ attribute:</p>
 <p>PV objects have several additional methods related to monitoring changes to
 the PV values or connection state including user-defined functions to be
 run when the value changes.  There are also attributes associated with a
-PVs <em>Control Attributes</em>, like those shown above in the <code class="xref py py-attr docutils literal"><span class="pre">info</span></code>
+PVs <em>Control Attributes</em>, like those shown above in the <code class="xref py py-attr docutils literal notranslate"><span class="pre">info</span></code>
 attribute.  Further details are at <a class="reference internal" href="pv.html#pv-label"><span class="std std-ref">PV: Epics Process Variables</span></a>.</p>
 </div>
 </div>
 <div class="section" id="module-epics">
-<span id="functions-defined-in-epics-caget-caput-etc"></span><h2>Functions defined in <a class="reference internal" href="#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal"><span class="pre">epics</span></code></a>: caget(), caput(), etc.<a class="headerlink" href="#module-epics" title="Permalink to this headline">¶</a></h2>
+<span id="functions-defined-in-epics-caget-caput-etc"></span><h2>Functions defined in <a class="reference internal" href="#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code></a>: caget(), caput(), etc.<a class="headerlink" href="#module-epics" title="Permalink to this headline">¶</a></h2>
 <p>As shown above, the simplest interface to EPICS Channel Access is found
-with the functions <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal"><span class="pre">caget()</span></code></a>, <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal"><span class="pre">caput()</span></code></a>, and <a class="reference internal" href="#epics.cainfo" title="epics.cainfo"><code class="xref py py-func docutils literal"><span class="pre">cainfo()</span></code></a>.  There
-are also functions <a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal"><span class="pre">camonitor()</span></code></a> and <a class="reference internal" href="#epics.camonitor_clear" title="epics.camonitor_clear"><code class="xref py py-func docutils literal"><span class="pre">camonitor_clear()</span></code></a> to setup
+with the functions <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a>, <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a>, and <a class="reference internal" href="#epics.cainfo" title="epics.cainfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">cainfo()</span></code></a>.  There
+are also functions <a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a> and <a class="reference internal" href="#epics.camonitor_clear" title="epics.camonitor_clear"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor_clear()</span></code></a> to setup
 and clear a simple monitoring of changes to a PV.  These functions all take
 the name of an Epics Process Variable (PV) as the first argument and are
 similar to the EPICS command line utilities of the same names.</p>
@@ -314,10 +306,10 @@ using <cite>PV</cite> objects) so that repeated use of a PV name will not actual
 result in a new connection to the PV – see <a class="reference internal" href="pv.html#pv-cache-label"><span class="std std-ref">The get_pv() function and _PVcache_ cache of PVs</span></a> for more
 details.  Thus, though the functionality is simple and straightforward, the
 performance of using thes simple function can be quite good.  In addition,
-there are also functions <a class="reference internal" href="#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal"><span class="pre">caget_many()</span></code></a> and <a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal"><span class="pre">caput_many()</span></code></a> for
+there are also functions <a class="reference internal" href="#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget_many()</span></code></a> and <a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a> for
 getting and putting values for multiple PVs at a time.</p>
 <div class="section" id="caget">
-<h3><a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal"><span class="pre">caget()</span></code></a><a class="headerlink" href="#caget" title="Permalink to this headline">¶</a></h3>
+<h3><a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a><a class="headerlink" href="#caget" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="epics.caget">
 <code class="descclassname">epics.</code><code class="descname">caget</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">[</span>, <em>timeout=None</em><span class="optional">[</span>, <em>use_monitor=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget" title="Permalink to this definition">¶</a></dt>
@@ -328,11 +320,11 @@ getting and putting values for multiple PVs at a time.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>pvname</strong> – name of Epics Process Variable.</li>
-<li><strong>as_string</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to return string representation of the PV value.</li>
-<li><strong>count</strong> (integer or <code class="docutils literal"><span class="pre">None</span></code>) – number of elements to return for array data.</li>
-<li><strong>as_numpy</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to return the Numerical Python representation for array data.</li>
-<li><strong>timeout</strong> (float or <code class="docutils literal"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for value before returning None.</li>
-<li><strong>use_monitor</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to rely on monitor callbacks or explicitly get value now.</li>
+<li><strong>as_string</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to return string representation of the PV value.</li>
+<li><strong>count</strong> (integer or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – number of elements to return for array data.</li>
+<li><strong>as_numpy</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to return the Numerical Python representation for array data.</li>
+<li><strong>timeout</strong> (float or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for value before returning None.</li>
+<li><strong>use_monitor</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to rely on monitor callbacks or explicitly get value now.</li>
 </ul>
 </td>
 </tr>
@@ -346,17 +338,17 @@ a numpy array if available.  The <em>count</em> option can be used to explicitly
 limit the number of array elements returned, and <em>as_numpy</em> can turn on or
 off conversion to a numpy array.</p>
 <p>The <em>timeout</em> argument sets the maximum time to wait for a value to be
-fetched over the network.  If the timeout is exceeded, <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal"><span class="pre">caget()</span></code></a> will
-return <code class="docutils literal"><span class="pre">None</span></code>.  This might imply that the PV is not actually available,
+fetched over the network.  If the timeout is exceeded, <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> will
+return <code class="docutils literal notranslate"><span class="pre">None</span></code>.  This might imply that the PV is not actually available,
 but it might also mean that the data is large or network slow enough that
 the data just hasn’t been received yet, but may show up later.</p>
 <p>The <em>use_monitor</em> argument sets whether to rely on the monitors from the
-underlying PV.  The default is <code class="docutils literal"><span class="pre">False</span></code>, so that each <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal"><span class="pre">caget()</span></code></a> will
+underlying PV.  The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>, so that each <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> will
 explicitly ask the value to be sent instead of relying on the automatic
-monitoring normally used for persistent PVs.  This makes <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal"><span class="pre">caget()</span></code></a> act
+monitoring normally used for persistent PVs.  This makes <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> act
 more like command-line tools, and slightly less efficient than creating a
 PV and getting values with it.  If performance is a concern, using monitors
-is recommended.  For more details on making <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal"><span class="pre">caget()</span></code></a> more efficient,
+is recommended.  For more details on making <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> more efficient,
 see <a class="reference internal" href="pv.html#pv-automonitor-label"><span class="std std-ref">Automatic Monitoring of a PV</span></a> and <a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><span class="std std-ref">The wait and timeout options for get(), ca.get_complete()</span></a>.</p>
 <p>The <em>as_string</em> argument tells the function to return the <strong>string
 representation</strong> of the value.  The details of the string representation
@@ -365,7 +357,7 @@ string PVs, the string representation is pretty easy: 0 will become ‘0’,
 for example.  For float and doubles, the internal precision of the PV is
 used to format the string value.  For enum types, the name of the enum
 state is returned:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">))</span>     <span class="c1"># A double PV</span>
 <span class="go">0.10000000000000001</span>
 
@@ -379,7 +371,7 @@ state is returned:</p>
 returned, with the conversion method depending on the data type, for
 example using the precision field of a double PV to determine how to format
 the string, or using the names of the enumeration states for an enum PV:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 <span class="go">&#39;0.10000&#39;</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.FOFF&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
@@ -391,7 +383,7 @@ value will be a numpy array (or a python list if numpy is not installed).
 The string representation will be something like ‘&lt;array size=128,
 type=int&gt;’ depending on the size and type of the waveform.  An array of
 doubles might be:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:scan1.P1PA&#39;</span><span class="p">))</span>  <span class="c1"># A Double Waveform</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:scan1.P1PA&#39;</span><span class="p">))</span>  <span class="c1"># A Double Waveform</span>
 <span class="go">array([-0.08      , -0.078     , -0.076     , ...,</span>
 <span class="go">    1.99599814, 1.99799919,  2.     ])</span>
 
@@ -400,11 +392,11 @@ doubles might be:</p>
 </pre></div>
 </div>
 <p>As an important special case CHAR waveform records will be turned to Python
-strings when <em>as_string</em> is <code class="docutils literal"><span class="pre">True</span></code>.  This is useful to work around the
+strings when <em>as_string</em> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.  This is useful to work around the
 low limit of the maximum length (40 characters!) of EPICS strings which has
 inspired the fairly common usage of CHAR waveforms to represent longer
 strings:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="s1">&#39;MyAD:TIFF1:FilePath&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="s1">&#39;MyAD:TIFF1:FilePath&#39;</span><span class="p">)</span>
 <span class="go">array([ 47, 104, 111, 109, 101,  47, 101, 112, 105,  99, 115,  47, 115,</span>
 <span class="go">        99, 114,  97, 116,  99, 104,  47,   0], dtype=uint8)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="s1">&#39;MyAD:TIFF1:FilePath&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -415,7 +407,7 @@ strings:</p>
 also hold byte array data, such as comes from some detectors and devices.</p>
 </div>
 <div class="section" id="caput">
-<h3><a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal"><span class="pre">caput()</span></code></a><a class="headerlink" href="#caput" title="Permalink to this headline">¶</a></h3>
+<h3><a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a><a class="headerlink" href="#caput" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="epics.caput">
 <code class="descclassname">epics.</code><code class="descname">caput</code><span class="sig-paren">(</span><em>pvname</em>, <em>value</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=60</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caput" title="Permalink to this definition">¶</a></dt>
@@ -427,7 +419,7 @@ also hold byte array data, such as comes from some detectors and devices.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>pvname</strong> – name of Epics Process Variable</li>
 <li><strong>value</strong> – value to send.</li>
-<li><strong>wait</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to wait until the processing has completed.</li>
+<li><strong>wait</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to wait until the processing has completed.</li>
 <li><strong>timeout</strong> (<em>double</em>) – how long to wait (in seconds) for put to complete before giving up.</li>
 </ul>
 </td>
@@ -445,10 +437,10 @@ time to complete, either because it causes a physical device (motor, valve,
 etc) to move or because it triggers a complex calculation or data
 processing sequence.  The <em>timeout</em> argument gives the maximum time to
 wait, in seconds.  The function will return after this (approximate) time
-even if the <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal"><span class="pre">caput()</span></code></a> has not completed.</p>
+even if the <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a> has not completed.</p>
 <p>This function returns 1 on success, and a negative number if the timeout
 has been exceeded.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span><span class="mf">2.30</span><span class="p">)</span>
 <span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span><span class="o">-</span><span class="mf">2.30</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -458,7 +450,7 @@ has been exceeded.</p>
 </div>
 </div>
 <div class="section" id="cainfo">
-<h3><a class="reference internal" href="#epics.cainfo" title="epics.cainfo"><code class="xref py py-func docutils literal"><span class="pre">cainfo()</span></code></a><a class="headerlink" href="#cainfo" title="Permalink to this headline">¶</a></h3>
+<h3><a class="reference internal" href="#epics.cainfo" title="epics.cainfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">cainfo()</span></code></a><a class="headerlink" href="#cainfo" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="epics.cainfo">
 <code class="descclassname">epics.</code><code class="descname">cainfo</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>print_out=True</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.cainfo" title="Permalink to this definition">¶</a></dt>
@@ -481,7 +473,7 @@ including Control Settings.</p>
 
 </div>
 <div class="section" id="camonitor">
-<h3><a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal"><span class="pre">camonitor()</span></code></a><a class="headerlink" href="#camonitor" title="Permalink to this headline">¶</a></h3>
+<h3><a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a><a class="headerlink" href="#camonitor" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="epics.camonitor">
 <code class="descclassname">epics.</code><code class="descname">camonitor</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>writer=None</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.camonitor" title="Permalink to this definition">¶</a></dt>
@@ -495,8 +487,8 @@ but the action that actually happens can be customized.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>pvname</strong> – name of Epics Process Variable</li>
-<li><strong>writer</strong> (<code class="docutils literal"><span class="pre">None</span></code> or a callable function that takes a string argument.) – where to write results to standard output .</li>
-<li><strong>callback</strong> (<code class="docutils literal"><span class="pre">None</span></code> or callable function) – user-supplied function to receive result</li>
+<li><strong>writer</strong> (<code class="docutils literal notranslate"><span class="pre">None</span></code> or a callable function that takes a string argument.) – where to write results to standard output .</li>
+<li><strong>callback</strong> (<code class="docutils literal notranslate"><span class="pre">None</span></code> or callable function) – user-supplied function to receive result</li>
 </ul>
 </td>
 </tr>
@@ -505,14 +497,14 @@ but the action that actually happens can be customized.</p>
 </dd></dl>
 
 <p>One can specify any function that can take a string as <em>writer</em>, such as
-the <code class="xref py py-meth docutils literal"><span class="pre">write()</span></code> method of an open file that has been open for writing.
-If left as <code class="docutils literal"><span class="pre">None</span></code>, messages of changes will be sent to
-<code class="xref py py-func docutils literal"><span class="pre">sys.stdout.write()</span></code>. For more complete control, one can specify a
+the <code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code> method of an open file that has been open for writing.
+If left as <code class="docutils literal notranslate"><span class="pre">None</span></code>, messages of changes will be sent to
+<code class="xref py py-func docutils literal notranslate"><span class="pre">sys.stdout.write()</span></code>. For more complete control, one can specify a
 <em>callback</em> function to be called on each change event.  This callback
 should take keyword arguments for <em>pvname</em>, <em>value</em>, and <em>char_value</em>.  See
 <a class="reference internal" href="pv.html#pv-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a> for information on writing callback functions for
-<a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal"><span class="pre">camonitor()</span></code></a>.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">camonitor</span>
+<a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">camonitor</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">camonitor</span><span class="p">(</span><span class="s1">&#39;XXX.m1.VAL&#39;</span><span class="p">)</span>
 <span class="go">XXX.m1.VAL 2010-08-01 10:34:15.822452 1.3</span>
 <span class="go">XXX.m1.VAL 2010-08-01 10:34:16.823233 1.2</span>
@@ -522,11 +514,11 @@ should take keyword arguments for <em>pvname</em>, <em>value</em>, and <em>char_
 </div>
 </div>
 <div class="section" id="camonitor-clear">
-<h3><a class="reference internal" href="#epics.camonitor_clear" title="epics.camonitor_clear"><code class="xref py py-func docutils literal"><span class="pre">camonitor_clear()</span></code></a><a class="headerlink" href="#camonitor-clear" title="Permalink to this headline">¶</a></h3>
+<h3><a class="reference internal" href="#epics.camonitor_clear" title="epics.camonitor_clear"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor_clear()</span></code></a><a class="headerlink" href="#camonitor-clear" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="epics.camonitor_clear">
 <code class="descclassname">epics.</code><code class="descname">camonitor_clear</code><span class="sig-paren">(</span><em>pvname</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.camonitor_clear" title="Permalink to this definition">¶</a></dt>
-<dd><p>clears a monitor set on the named PV by <a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal"><span class="pre">camonitor()</span></code></a>.</p>
+<dd><p>clears a monitor set on the named PV by <a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -537,10 +529,10 @@ should take keyword arguments for <em>pvname</em>, <em>value</em>, and <em>char_
 </table>
 </dd></dl>
 
-<p>This simple example monitors a PV with <a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal"><span class="pre">camonitor()</span></code></a> for while, with
+<p>This simple example monitors a PV with <a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a> for while, with
 changes being saved to a log file.   After a while, the monitor is cleared
 and the log file is inspected:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fh</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;PV1.log&#39;</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">camonitor</span><span class="p">(</span><span class="s1">&#39;XXX:DMM1Ch2_calc.VAL&#39;</span><span class="p">,</span><span class="n">writer</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">....</span> <span class="n">wait</span> <span class="k">for</span> <span class="n">changes</span> <span class="o">...</span>
@@ -561,23 +553,23 @@ and the log file is inspected:</p>
 </div>
 </div>
 <div class="section" id="caget-many">
-<h3><a class="reference internal" href="#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal"><span class="pre">caget_many()</span></code></a><a class="headerlink" href="#caget-many" title="Permalink to this headline">¶</a></h3>
+<h3><a class="reference internal" href="#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget_many()</span></code></a><a class="headerlink" href="#caget-many" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="epics.caget_many">
 <code class="descclassname">epics.</code><code class="descname">caget_many</code><span class="sig-paren">(</span><em>pvlist</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">[</span>, <em>timeout=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget_many" title="Permalink to this definition">¶</a></dt>
 <dd><p>get a list of PVs as quickly as possible.  Returns a list of values for
-each PV in the list.  Unlike <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal"><span class="pre">caget()</span></code></a>, this method does not use
+each PV in the list.  Unlike <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a>, this method does not use
 automatic monitoring (see <a class="reference internal" href="pv.html#pv-automonitor-label"><span class="std std-ref">Automatic Monitoring of a PV</span></a>).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pvlist</strong> (<code class="docutils literal"><span class="pre">list</span></code> or <code class="docutils literal"><span class="pre">tuple</span></code> of <code class="docutils literal"><span class="pre">str</span></code>) – A list of process variable names.</li>
-<li><strong>as_string</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to return string representation of the PV values.</li>
-<li><strong>count</strong> (integer or <code class="docutils literal"><span class="pre">None</span></code>) – number of elements to return for array data.</li>
-<li><strong>as_numpy</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to return the Numerical Python representation for array data.</li>
-<li><strong>timeout</strong> (float or <code class="docutils literal"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for value before returning None.</li>
+<li><strong>pvlist</strong> (<code class="docutils literal notranslate"><span class="pre">list</span></code> or <code class="docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="docutils literal notranslate"><span class="pre">str</span></code>) – A list of process variable names.</li>
+<li><strong>as_string</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to return string representation of the PV values.</li>
+<li><strong>count</strong> (integer or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – number of elements to return for array data.</li>
+<li><strong>as_numpy</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to return the Numerical Python representation for array data.</li>
+<li><strong>timeout</strong> (float or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for value before returning None.</li>
 </ul>
 </td>
 </tr>
@@ -586,35 +578,35 @@ automatic monitoring (see <a class="reference internal" href="pv.html#pv-automon
 </dd></dl>
 
 <p>For detailed information about the arguments, see the documentation for
-<a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal"><span class="pre">caget()</span></code></a>. Also see <a class="reference internal" href="advanced.html#advanced-connecting-many-label"><span class="std std-ref">Strategies for connecting to a large number of PVs</span></a> for more
+<a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a>. Also see <a class="reference internal" href="advanced.html#advanced-connecting-many-label"><span class="std std-ref">Strategies for connecting to a large number of PVs</span></a> for more
 discussion.</p>
 </div>
 <div class="section" id="caput-many">
-<h3><a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal"><span class="pre">caput_many()</span></code></a><a class="headerlink" href="#caput-many" title="Permalink to this headline">¶</a></h3>
+<h3><a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a><a class="headerlink" href="#caput-many" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="epics.caput_many">
 <code class="descclassname">epics.</code><code class="descname">caput_many</code><span class="sig-paren">(</span><em>pvlist</em>, <em>values</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>connection_timeout=None</em><span class="optional">[</span>, <em>put_timeout=60</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caput_many" title="Permalink to this definition">¶</a></dt>
 <dd><p>put values to a list of PVs as quickly as possible.  Returns a list of ints
 for each PV in the list: 1 if the put was successful, -1 if it timed out.
-Unlike <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal"><span class="pre">caput()</span></code></a>, this method does not use automatic monitoring (see
+Unlike <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a>, this method does not use automatic monitoring (see
 <a class="reference internal" href="pv.html#pv-automonitor-label"><span class="std std-ref">Automatic Monitoring of a PV</span></a>).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pvlist</strong> (<code class="docutils literal"><span class="pre">list</span></code> or <code class="docutils literal"><span class="pre">tuple</span></code> of <code class="docutils literal"><span class="pre">str</span></code>) – A list of process variable names.</li>
-<li><strong>values</strong> (<code class="docutils literal"><span class="pre">list</span></code> or <code class="docutils literal"><span class="pre">tuple</span></code>) – values to put to each PV.</li>
-<li><strong>wait</strong> – if <code class="docutils literal"><span class="pre">'each'</span></code>, <a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal"><span class="pre">caput_many()</span></code></a> will wait for each
-PV to process before starting the next.  If <code class="docutils literal"><span class="pre">'all'</span></code>,
-<a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal"><span class="pre">caput_many()</span></code></a> will issue puts for all PVs immediately, then
+<li><strong>pvlist</strong> (<code class="docutils literal notranslate"><span class="pre">list</span></code> or <code class="docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="docutils literal notranslate"><span class="pre">str</span></code>) – A list of process variable names.</li>
+<li><strong>values</strong> (<code class="docutils literal notranslate"><span class="pre">list</span></code> or <code class="docutils literal notranslate"><span class="pre">tuple</span></code>) – values to put to each PV.</li>
+<li><strong>wait</strong> – if <code class="docutils literal notranslate"><span class="pre">'each'</span></code>, <a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a> will wait for each
+PV to process before starting the next.  If <code class="docutils literal notranslate"><span class="pre">'all'</span></code>,
+<a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a> will issue puts for all PVs immediately, then
 wait for all of them to complete.  If any other value,
-<a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal"><span class="pre">caput_many()</span></code></a> will not wait for put processing to complete.</li>
-<li><strong>connection_timeout</strong> (float or <code class="docutils literal"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for
+<a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a> will not wait for put processing to complete.</li>
+<li><strong>connection_timeout</strong> (float or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for
 a connection to be established to each PV.</li>
-<li><strong>put_timeout</strong> (float or <code class="docutils literal"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for processing
-to complete for each PV (if <code class="docutils literal"><span class="pre">wait</span></code> is <code class="docutils literal"><span class="pre">'each'</span></code>), or for processing
-to complete for all PVs (if <code class="docutils literal"><span class="pre">wait</span></code> is <code class="docutils literal"><span class="pre">'all'</span></code>).</li>
+<li><strong>put_timeout</strong> (float or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for processing
+to complete for each PV (if <code class="docutils literal notranslate"><span class="pre">wait</span></code> is <code class="docutils literal notranslate"><span class="pre">'each'</span></code>), or for processing
+to complete for all PVs (if <code class="docutils literal notranslate"><span class="pre">wait</span></code> is <code class="docutils literal notranslate"><span class="pre">'all'</span></code>).</li>
 </ul>
 </td>
 </tr>
@@ -718,7 +710,7 @@ contact the authors.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>

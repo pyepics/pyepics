@@ -5,30 +5,20 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Devices: collections of PVs &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '3.3.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Alarms: respond when a PV goes out of range" href="alarm.html" />
     <link rel="prev" title="Working with waveform / array data" href="arrays.html" /> 
-  </head>
-  <body>
+  </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
       <img src="_static/pyepics.png" height=50 border="0" alt="pyepics"/>
@@ -67,13 +57,13 @@
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Devices: collections of PVs</a><ul>
 <li><a class="reference internal" href="#module-device">Overview</a></li>
 <li><a class="reference internal" href="#module-motor">Epics Motor Device</a><ul>
-<li><a class="reference internal" href="#the-epics-motor-class">The <code class="docutils literal"><span class="pre">epics.Motor</span></code> class</a></li>
-<li><a class="reference internal" href="#methods-for-epics-motor">methods for <code class="docutils literal"><span class="pre">epics.Motor</span></code></a></li>
+<li><a class="reference internal" href="#the-epics-motor-class">The <code class="docutils literal notranslate"><span class="pre">epics.Motor</span></code> class</a></li>
+<li><a class="reference internal" href="#methods-for-epics-motor">methods for <code class="docutils literal notranslate"><span class="pre">epics.Motor</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#other-device-examples">Other Device Examples</a><ul>
@@ -102,12 +92,14 @@
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -122,15 +114,15 @@
 <h1>Devices: collections of PVs<a class="headerlink" href="#devices-collections-of-pvs" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-device">
 <span id="overview"></span><h2>Overview<a class="headerlink" href="#module-device" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="#module-device" title="device: collections of related PVs"><code class="xref py py-mod docutils literal"><span class="pre">device</span></code></a> module provides a simple interface to a collection of
-PVs.  Here an epics <a class="reference internal" href="#device.Device" title="device.Device"><code class="xref py py-class docutils literal"><span class="pre">device.Device</span></code></a> is an object holding a set of
+<p>The <a class="reference internal" href="#module-device" title="device: collections of related PVs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">device</span></code></a> module provides a simple interface to a collection of
+PVs.  Here an epics <a class="reference internal" href="#device.Device" title="device.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">device.Device</span></code></a> is an object holding a set of
 PVs, all sharing a prefix, but having many <em>attributes</em>.  Many PVs will
 have names made up of <em>prefix+attribute</em>, with a common prefix for several
 related PVs.  This almost describes an Epics Record, but as it is concerned
 only with PV names, the mapping to an Epics Record is not exact.  On the
 other hand, the concept of a <em>device</em> is more flexible than a predefined
 Epics Record as it can actually hold PVs from several different records.:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">motor1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="s1">&#39;XXX:motor1.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;VAL&#39;</span><span class="p">,</span> <span class="s1">&#39;RBV&#39;</span><span class="p">,</span> <span class="s1">&#39;DESC&#39;</span><span class="p">,</span> <span class="s1">&#39;RVAL&#39;</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">motor1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="s1">&#39;XXX:motor1.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;VAL&#39;</span><span class="p">,</span> <span class="s1">&#39;RBV&#39;</span><span class="p">,</span> <span class="s1">&#39;DESC&#39;</span><span class="p">,</span> <span class="s1">&#39;RVAL&#39;</span><span class="p">,</span>
                                            <span class="s1">&#39;LVIO&#39;</span><span class="p">,</span> <span class="s1">&#39;HLS&#39;</span><span class="p">,</span> <span class="s1">&#39;LLS&#39;</span><span class="p">))</span>
 <span class="n">motor1</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;VAL&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span> <span class="s1">&#39;Motor </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">motor1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DESC&#39;</span><span class="p">),</span> <span class="n">motor1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;RBV&#39;</span><span class="p">))</span>
@@ -148,7 +140,7 @@ sophisticated   Motor device described below at <a class="reference internal" hr
 <dd></dd></dl>
 
 <p>The attribute PVs are built as needed and held in an internal buffer
-<code class="xref py py-data docutils literal"><span class="pre">self._pvs</span></code>.  This class is kept intentionally simple so that it may
+<code class="xref py py-data docutils literal notranslate"><span class="pre">self._pvs</span></code>.  This class is kept intentionally simple so that it may
 be subclassed.</p>
 <p>To pre-load attribute names on initialization, provide a list or tuple of
 attributes with the <cite>attr</cite> option.</p>
@@ -156,12 +148,12 @@ attributes with the <cite>attr</cite> option.</p>
 used as an arbitrary container of PVs, or to turn any subclass into an
 epics Device.</p>
 <p>In general, PV names will be mapped as prefix+delim+attr.  See
-<a class="reference internal" href="#device.add_pv" title="device.add_pv"><code class="xref py py-meth docutils literal"><span class="pre">add_pv()</span></code></a> for details of how to override this.</p>
+<a class="reference internal" href="#device.add_pv" title="device.add_pv"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_pv()</span></code></a> for details of how to override this.</p>
 <dl class="method">
 <dt id="device.PV">
 <code class="descclassname">device.</code><code class="descname">PV</code><span class="sig-paren">(</span><em>attr[, connect=True[, **kw]]]</em><span class="sig-paren">)</span><a class="headerlink" href="#device.PV" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the <cite>PV</cite> object for a device attribute.  The connect argument
-and any other keyword arguments are passed to <code class="xref py py-meth docutils literal"><span class="pre">epics.PV()</span></code>.</p>
+and any other keyword arguments are passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.PV()</span></code>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -188,10 +180,10 @@ function will be run when the at tribute’s value changes</p>
 <dl class="method">
 <dt id="device.add_pv">
 <code class="descclassname">device.</code><code class="descname">add_pv</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>attr=None</em><span class="optional">[</span>, <em>**kw</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.add_pv" title="Permalink to this definition">¶</a></dt>
-<dd><p>adds an explicitly names <code class="xref py py-meth docutils literal"><span class="pre">epics.PV()</span></code> to the device even though it
+<dd><p>adds an explicitly names <code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.PV()</span></code> to the device even though it
 may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 <cite>epics.PV(prefix+delim+attr)</cite>.   That is, one can say:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
 <span class="n">m1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="s1">&#39;XXX:m1&#39;</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
 <span class="n">m1</span><span class="o">.</span><span class="n">add_pv</span><span class="p">(</span><span class="s1">&#39;XXX:m2.VAL&#39;</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;other&#39;</span><span class="p">)</span>
 <span class="nb">print</span> <span class="n">m1</span><span class="o">.</span><span class="n">VAL</span>     <span class="c1"># print value of XXX:m1.VAL</span>
@@ -209,7 +201,7 @@ may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 <dl class="method">
 <dt id="device.restore_state">
 <code class="descclassname">device.</code><code class="descname">restore_state</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="headerlink" href="#device.restore_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>restores a saved state, as saved with <a class="reference internal" href="#device.save_state" title="device.save_state"><code class="xref py py-meth docutils literal"><span class="pre">save_state()</span></code></a></p>
+<dd><p>restores a saved state, as saved with <a class="reference internal" href="#device.save_state" title="device.save_state"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_state()</span></code></a></p>
 </dd></dl>
 
 <dl class="method">
@@ -221,8 +213,8 @@ may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 <dl class="method">
 <dt id="device.read_state">
 <code class="descclassname">device.</code><code class="descname">read_state</code><span class="sig-paren">(</span><em>fname</em><span class="optional">[</span>, <em>restore=False</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.read_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>reads a state from a file, as written with <a class="reference internal" href="#device.write_state" title="device.write_state"><code class="xref py py-meth docutils literal"><span class="pre">write_state()</span></code></a>, and returns it.
-If ‘’restore’’ is <code class="docutils literal"><span class="pre">True</span></code>, the read state will be restored.</p>
+<dd><p>reads a state from a file, as written with <a class="reference internal" href="#device.write_state" title="device.write_state"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_state()</span></code></a>, and returns it.
+If ‘’restore’’ is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the read state will be restored.</p>
 </dd></dl>
 
 <dl class="data">
@@ -243,9 +235,9 @@ they are violated.  Thus, there is a fair amount of functionality for a
 Motor.  Typically, the user just wants to move the motor by setting its
 drive position, but a fully enabled Motor should allow the use to change
 and read many of the Motor parameters.</p>
-<p>The  <a class="reference internal" href="#motor.Motor" title="motor.Motor"><code class="xref py py-class docutils literal"><span class="pre">Motor</span></code></a> class helps the user create and use Epics motors.
+<p>The  <a class="reference internal" href="#motor.Motor" title="motor.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Motor</span></code></a> class helps the user create and use Epics motors.
 A simple example use would be:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
 <span class="n">m1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Motor</span><span class="p">(</span><span class="s1">&#39;XXX:m1&#39;</span><span class="p">)</span>
 
 <span class="nb">print</span> <span class="s1">&#39;Motor:  &#39;</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">DESC</span> <span class="p">,</span> <span class="s1">&#39; Currently at &#39;</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">RBV</span>
@@ -270,7 +262,7 @@ give the list of names that can be used.</p>
 coordinate system, and can wait for completion.</p>
 </div></blockquote>
 <div class="section" id="the-epics-motor-class">
-<h3>The <code class="xref py py-class docutils literal"><span class="pre">epics.Motor</span></code> class<a class="headerlink" href="#the-epics-motor-class" title="Permalink to this headline">¶</a></h3>
+<h3>The <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code> class<a class="headerlink" href="#the-epics-motor-class" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="motor.Motor">
 <em class="property">class </em><code class="descclassname">motor.</code><code class="descname">Motor</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>timeout=30.</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.Motor" title="Permalink to this definition">¶</a></dt>
@@ -290,7 +282,7 @@ coordinate system, and can wait for completion.</p>
 </dd></dl>
 
 <p>Once created, a Motor should be ready to use.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">Motor</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">Motor</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s1">&#39;XX:m1&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">m</span><span class="o">.</span><span class="n">drive</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">slew_speed</span>
 <span class="go">1.030 Fine X 5.0</span>
@@ -300,11 +292,11 @@ coordinate system, and can wait for completion.</p>
 </div>
 <p>A Motor has very many fields.  Only a few of them are created on
 initialization – the rest are retrieved as needed.  The motor fields can
-be retrieved either with an attribute or with the <a class="reference internal" href="#motor.get" title="motor.get"><code class="xref py py-meth docutils literal"><span class="pre">get()</span></code></a> method.
+be retrieved either with an attribute or with the <a class="reference internal" href="#motor.get" title="motor.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a> method.
 A full list of Motor attributes and their aliases for the motor
 record is given in <a class="reference internal" href="#motorattr-table"><span class="std std-ref">Table of Motor Attributes</span></a>.</p>
 <blockquote id="motorattr-table">
-<div>Table of Aliases for attributes for the epics <a class="reference internal" href="#motor.Motor" title="motor.Motor"><code class="xref py py-class docutils literal"><span class="pre">Motor</span></code></a> class, and the
+<div>Table of Aliases for attributes for the epics <a class="reference internal" href="#motor.Motor" title="motor.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Motor</span></code></a> class, and the
 corresponding attribute name of the Motor Record field.</div></blockquote>
 <table border="1" class="docutils">
 <colgroup>
@@ -591,7 +583,7 @@ corresponding attribute name of the Motor Record field.</div></blockquote>
 </table>
 </div>
 <div class="section" id="methods-for-epics-motor">
-<h3>methods for <code class="xref py py-class docutils literal"><span class="pre">epics.Motor</span></code><a class="headerlink" href="#methods-for-epics-motor" title="Permalink to this headline">¶</a></h3>
+<h3>methods for <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code><a class="headerlink" href="#methods-for-epics-motor" title="Permalink to this headline">¶</a></h3>
 <dl class="method">
 <dt id="motor.get">
 <code class="descclassname">motor.</code><code class="descname">get</code><span class="sig-paren">(</span><em>attr</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.get" title="Permalink to this definition">¶</a></dt>
@@ -602,7 +594,7 @@ corresponding attribute name of the Motor Record field.</div></blockquote>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>attr</strong> (<em>string</em><em> (</em><em>from table above</em><em>)</em>) – attribute name</li>
-<li><strong>as_string</strong> (<code class="docutils literal"><span class="pre">True</span></code>/ <code class="docutils literal"><span class="pre">False</span></code>) – whether to return string value.</li>
+<li><strong>as_string</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/ <code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to return string value.</li>
 </ul>
 </td>
 </tr>
@@ -610,9 +602,9 @@ corresponding attribute name of the Motor Record field.</div></blockquote>
 </table>
 </dd></dl>
 
-<p>Note that <a class="reference internal" href="#motor.get" title="motor.get"><code class="xref py py-meth docutils literal"><span class="pre">get()</span></code></a> can return the string value, while fetching the
+<p>Note that <a class="reference internal" href="#motor.get" title="motor.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a> can return the string value, while fetching the
 attribute cannot do so:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Motor</span><span class="p">(</span><span class="s1">&#39;XXX:m1&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Motor</span><span class="p">(</span><span class="s1">&#39;XXX:m1&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">m</span><span class="o">.</span><span class="n">device_type</span>
 <span class="go">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">m</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;device_type&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -630,7 +622,7 @@ attribute cannot do so:</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>attr</strong> (<em>string</em><em> (</em><em>from table above</em><em>)</em>) – attribute name</li>
 <li><strong>value</strong> – value for attribute</li>
-<li><strong>wait</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to wait for completion.</li>
+<li><strong>wait</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to wait for completion.</li>
 <li><strong>timeout</strong> (<em>float</em>) – time (in seconds) to wait before giving up trying to connect.</li>
 </ul>
 </td>
@@ -644,7 +636,7 @@ attribute cannot do so:</p>
 <code class="descclassname">motor.</code><code class="descname">check_limits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.check_limits" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks whether the current motor position is causing a motor limit
 violation, and raises a MotorLimitException if it is.</p>
-<p>returns <code class="docutils literal"><span class="pre">None</span></code> if there is no limit violation.</p>
+<p>returns <code class="docutils literal notranslate"><span class="pre">None</span></code> if there is no limit violation.</p>
 </dd></dl>
 
 <dl class="method">
@@ -661,7 +653,7 @@ violation, and raises a MotorLimitException if it is.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -701,7 +693,7 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 </dd></dl>
 
 <blockquote id="motor-move-return-vals-table">
-<div><p>Table of return values from <a class="reference internal" href="#motor.move" title="motor.move"><code class="xref py py-func docutils literal"><span class="pre">move()</span></code></a>.</p>
+<div><p>Table of return values from <a class="reference internal" href="#motor.move" title="motor.move"><code class="xref py py-func docutils literal notranslate"><span class="pre">move()</span></code></a>.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="19%" />
@@ -729,7 +721,7 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 <td>move started, timed-out, but appears done.</td>
 </tr>
 <tr class="row-odd"><td>-5</td>
-<td>move started, unexpected return value from <a class="reference internal" href="#motor.put" title="motor.put"><code class="xref py py-func docutils literal"><span class="pre">put()</span></code></a></td>
+<td>move started, unexpected return value from <a class="reference internal" href="#motor.put" title="motor.put"><code class="xref py py-func docutils literal notranslate"><span class="pre">put()</span></code></a></td>
 </tr>
 <tr class="row-even"><td>-4</td>
 <td>move-with-wait finished, soft limit violation seen.</td>
@@ -765,7 +757,7 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>direction</strong> (<em>string: 'forward'</em><em> (</em><em>default</em><em>) or </em><em>'reverse'</em>) – direction of motion</li>
-<li><strong>wait</strong> (<code class="docutils literal"><span class="pre">True</span></code>/<code class="docutils literal"><span class="pre">False</span></code>) – whether to wait for completion</li>
+<li><strong>wait</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to wait for completion</li>
 <li><strong>timeout</strong> (<em>float</em>) – max time for move to complete (in seconds) [default=300]</li>
 </ul>
 </td>
@@ -857,7 +849,7 @@ build your own device classes.</p>
 This is not much more than a collection of PVs.  Since there is no prefix
 given, all PVs in the device must be <em>fully qualified</em>.  Note that there is
 no requirement to share a common prefix in such a collection of PVs:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">Device</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">Device</span>
 <span class="n">dev</span> <span class="o">=</span> <span class="n">Device</span><span class="p">()</span>
 <span class="n">p1</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;13IDC:m1.VAL&#39;</span><span class="p">)</span>
 <span class="n">p2</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;13IDC:m2.VAL&#39;</span><span class="p">)</span>
@@ -877,7 +869,7 @@ start to get interesting.</p>
 <p>For a slightly more useful and typical example, the pyepics distribution
 includes a Device for an Epics ai (analog input record).  The full
 implementation of this device is:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="sd">&quot;&quot;&quot;Epics analog input record&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">Device</span>
 
@@ -896,19 +888,19 @@ implementation of this device is:</p>
 </pre></div>
 </div>
 <p>The code simply pre-defines the fields that are the <em>suffixes</em> of an Epics ai
-input record, and subclasses <code class="xref py py-class docutils literal"><span class="pre">Device</span></code> with these fields to create the
+input record, and subclasses <code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code> with these fields to create the
 corresponding PVs.  For most record suffixes, these will be available as
-attributes of the Device object.  For example, the <code class="xref py py-class docutils literal"><span class="pre">ai</span></code> class above can
+attributes of the Device object.  For example, the <code class="xref py py-class docutils literal notranslate"><span class="pre">ai</span></code> class above can
 be used simply and cleanly as:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics.devices</span> <span class="k">import</span> <span class="n">ai</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics.devices</span> <span class="k">import</span> <span class="n">ai</span>
 <span class="n">This_ai</span> <span class="o">=</span> <span class="n">ai</span><span class="p">(</span><span class="s1">&#39;XXX.PRES&#39;</span><span class="p">)</span>
 <span class="nb">print</span> <span class="s1">&#39;Value: &#39;</span><span class="p">,</span> <span class="n">This_ai</span><span class="o">.</span><span class="n">VAL</span>
 <span class="nb">print</span> <span class="s1">&#39;Units: &#39;</span><span class="p">,</span> <span class="n">This_ai</span><span class="o">.</span><span class="n">EGU</span>
 </pre></div>
 </div>
-<p>Of course, you can also use the <a class="reference internal" href="#motor.get" title="motor.get"><code class="xref py py-meth docutils literal"><span class="pre">get()</span></code></a>, <a class="reference internal" href="#motor.put" title="motor.put"><code class="xref py py-meth docutils literal"><span class="pre">put()</span></code></a> methods above for a
-basic <code class="xref py py-class docutils literal"><span class="pre">Device</span></code>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">This_ai</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;DESC&#39;</span><span class="p">,</span> <span class="s1">&#39;My Pump&#39;</span><span class="p">)</span>
+<p>Of course, you can also use the <a class="reference internal" href="#motor.get" title="motor.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a>, <a class="reference internal" href="#motor.put" title="motor.put"><code class="xref py py-meth docutils literal notranslate"><span class="pre">put()</span></code></a> methods above for a
+basic <code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">This_ai</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;DESC&#39;</span><span class="p">,</span> <span class="s1">&#39;My Pump&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Several of the other standard Epics records can easily be exposed as Devices in
@@ -921,7 +913,7 @@ synApps.</p>
 <p>For a slightly more complicated example: an incomplete, but very useful mapping
 of the Scaler Record from synApps, including methods for changing modes, and
 reading and writing data.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python </span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python </span>
 <span class="sd">&quot;&quot;&quot;Epics Scaler&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">poll</span>
 
@@ -994,10 +986,10 @@ reading and writing data.</p>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chans</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>Note that we can then create a <code class="xref py py-class docutils literal"><span class="pre">scaler</span></code> object from its base PV
-prefix, and use methods like <code class="xref py py-meth docutils literal"><span class="pre">Count()</span></code> and <code class="xref py py-meth docutils literal"><span class="pre">Read()</span></code> without
+<p>Note that we can then create a <code class="xref py py-class docutils literal notranslate"><span class="pre">scaler</span></code> object from its base PV
+prefix, and use methods like <code class="xref py py-meth docutils literal notranslate"><span class="pre">Count()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">Read()</span></code> without
 directly invoking epics calls:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">s1</span> <span class="o">=</span> <span class="n">Scaler</span><span class="p">(</span><span class="s1">&#39;XXX:scaler1&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s1</span> <span class="o">=</span> <span class="n">Scaler</span><span class="p">(</span><span class="s1">&#39;XXX:scaler1&#39;</span><span class="p">)</span>
 <span class="n">s1</span><span class="o">.</span><span class="n">setCalc</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;(B-2000*A/10000000.)&#39;</span><span class="p">)</span>
 <span class="n">s1</span><span class="o">.</span><span class="n">enableCalcs</span><span class="p">()</span>
 <span class="n">s1</span><span class="o">.</span><span class="n">OneShotMode</span><span class="p">()</span>
@@ -1148,7 +1140,7 @@ specific use of that Device.</div></blockquote>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>
