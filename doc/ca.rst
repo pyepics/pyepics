@@ -6,27 +6,23 @@ ca: Low-level Channel Access module
    :synopsis: low-level Channel Access  module.
 
 
-The :mod:`ca` module provides a low-level wrapping of the EPICS
-Channel Access (CA) library, using ctypes.  Most users of the `epics`
-module will not need to be concerned with most of the details here, and
-will instead use the simple functional interface (:func:`epics.caget`,
-:func:`epics.caput` and so on), or use the :class:`epics.PV` class to
-create and use epics PV objects.
+The :mod:`ca` module provides a low-level wrapping of the EPICS Channel Access
+(CA) library, using ctypes.  Most users of the `epics` module will not need to
+be concerned with most of the details here, and will instead use the simple
+procedural interface (:func:`epics.caget`, :func:`epics.caput` and so on), or
+use the :class:`epics.PV` class to create and use epics PV objects.
 
 
 General description, difference with C library
 =================================================
 
-The goal of the :mod:`ca` module is to provide a fairly complete
-mapping of the C interface to the CA library while also providing a
-pleasant Python experience.  It is expected that anyone looking
-into the details of this module is somewhat familiar with Channel
-Access and knows where to consult the `Channel Access Reference
-Documentation
-<http://www.aps.anl.gov/epics/base/R3-14/11-docs/CAref.html>`_.
-This document focuses on the differences with the C interface,
-assuming a general understanding of what the functions are meant to
-do.
+The :mod:`ca` module provides a fairly complete mapping of the C interface to
+the CA library while also providing a pleasant Python experience.  It is
+expected that anyone using this module is somewhat familiar with Channel
+Access and knows where to consult the `Channel Access Reference Documentation
+<https://epics.anl.gov/base/R3-14/8-docs/CAref.html>`_. Here, we focus on the
+differences with the C interface, and assume a general understanding of what
+the functions are meant to do.
 
 
 Name Mangling
@@ -325,11 +321,11 @@ See :ref:`ca-callbacks-label` for more on writing the user-supplied callback,
 
 Several other functions are provided:
 
-.. autofunction::  get_timestamp(chid)
+.. autofunction:: get_timestamp(chid)
 
-.. autofunction::  get_severity(chid)
+.. autofunction:: get_severity(chid)
 
-.. autofunction::  get_precision(chid)
+.. autofunction:: get_precision(chid)
 
 .. autofunction:: get_enum_strings(chid)
 
@@ -370,11 +366,17 @@ states.
 Synchronous Groups
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Synchronous Groups can be used to ensure that a set of Channel Access calls
-all happen together, as if in a *transaction*.  Synchronous Groups work,
-but are not very well tested, and probably not a great anyway in the
-context of asynchronous I/O.  These functions are mostly included for
-completeness.
+.. warning::
+
+    Synchronous groups are simulated in pyepics, but are not recommended,
+    and probably don't really make sense for usage within pyepics and using
+    asynchronous i/o anyway.
+
+Synchronous Groups are can be used to ensure that a set of Channel Access
+calls all happen together, as if in a *transaction*.  Synchronous Groups
+should be avoided in pyepics, and are not well tested.  They probably make
+little sens in the context of asynchronous I/O.  The documentation here is
+given for historical purposes.
 
 The idea is to first create a synchronous group, then add a series of
 :func:`sg_put` and :func:`sg_get` which do not happen immediately, and
@@ -391,55 +393,12 @@ and :func:`sg_get` to execute.
 
 .. autofunction::  sg_get(gid, chid[, ftype=None[, as_string=False[, as_numpy=True]]])
 
-See further example below.
-
 .. autofunction::  sg_put(gid, chid, value)
 
 .. autofunction::  sg_test(gid)
 
 .. autofunction::  sg_reset(gid)
 
-An example use of a synchronous group::
-
-    from epics import ca
-    import time
-
-    pvs = ('X1.VAL', 'X2.VAL', 'X3.VAL')
-    chids = [ca.create_channel(pvname) for pvname in pvs]
-
-    for chid in chids:
-        ca.connect_channel(chid)
-        ca.put(chid, 0)
-
-    # create synchronous group
-    sg = ca.sg_create()
-
-    # get data pointers from ca.sg_get
-    data = [ca.sg_get(sg, chid) for chid in chids]
-
-    print 'Now change these PVs for the next 10 seconds'
-    time.sleep(10.0)
-
-    print 'will now block for i/o'
-    ca.sg_block(sg)
-    #
-    # CALL ca._unpack with data points and chid to extract data
-    for pvname, dat, chid in zip(pvs, data, chids):
-        val = ca._unpack(dat, chid=chid)
-        print "%s = %s" % (pvname, str(val))
-
-    ca.sg_reset(sg)
-
-    #  Now a SG Put
-    print 'OK, now we will put everything back to 0 synchronously'
-
-    for chid in chids:
-        ca.sg_put(sg, chid, 0)
-
-    print 'sg_put done, but not blocked / committed. Sleep for 5 seconds '
-    time.sleep(5.0)
-    ca.sg_block(sg)
-    print 'done.'
 
 ..  _ca-implementation-label:
 
