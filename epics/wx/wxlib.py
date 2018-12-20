@@ -577,6 +577,11 @@ class PVStaticText(wx.StaticText, PVMixin):
         wx.StaticText.__init__(self, parent, wx.ID_ANY, label='',
                                style=wstyle, **kw)
         PVMixin.__init__(self, pv=pv)
+        self._fg_colour_alarms = {
+            epics.MINOR_ALARM : minor_alarm,
+            epics.MAJOR_ALARM : major_alarm,
+            epics.INVALID_ALARM : invalid_alarm }
+
 
     def _SetValue(self, value):
         "set widget label"
