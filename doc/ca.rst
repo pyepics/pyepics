@@ -213,7 +213,7 @@ library versions, and include:
 
 .. autofunction::   field_type(chid)
 
-   See the *ftype* column from :ref:`Table of DBR Types <dbrtype_table>`.
+See the *ftype* column from :ref:`Table of DBR Types <dbrtype_table>`.
 
 .. autofunction::   clear_channel(chid)
 
@@ -228,7 +228,7 @@ A few additional pythonic functions have been added:
 
 .. autofunction:: promote_type(chid, [use_time=False, [use_ctrl=False]])
 
-   See :ref:`Table of DBR Types <dbrtype_table>`.
+See :ref:`Table of DBR Types <dbrtype_table>`.
 
 .. data::  _cache
 
@@ -259,38 +259,29 @@ keyword arguments can be used to specify such options.
 
 .. autofunction:: get(chid, ftype=None, count=None, as_string=False, as_numpy=True, wait=True, timeout=None)
 
-   
-   See :ref:`Table of DBR Types <dbrtype_table>` for a listing of values of
-   *ftype*,
+See :ref:`Table of DBR Types <dbrtype_table>` for a listing of values of *ftype*,
 
+See :ref:`arrays-large-label` for a discussion of strategies  for how to best deal with very large arrays.
 
-   See :ref:`arrays-large-label` for a discussion of strategies
-   for how to best deal with very large arrays.
+See :ref:`advanced-connecting-many-label` for a discussion of when using `wait=False` can give a large performance boost.
 
-
-   See :ref:`advanced-connecting-many-label` for a discussion of when using
-   `wait=False` can give a large performance boost.
-
-   See :ref:`advanced-get-timeouts-label` for further discussion of the
-   *wait* and *timeout* options and the associated :func:`get_complete`
-   function.
-
+See :ref:`advanced-get-timeouts-label` for further discussion of the  *wait* and *timeout* options and the associated :func:`get_complete`  function.
 
 .. autofunction:: get_with_metadata(chid, ftype=None, count=None, as_string=False, as_numpy=True, wait=True, timeout=None)
 
 .. autofunction:: get_complete(chid, ftype=None, count=None, as_string=False, as_numpy=True, timeout=None)
 
-   See :ref:`advanced-get-timeouts-label` for further discussion.
+See :ref:`advanced-get-timeouts-label` for further discussion.
 
 .. autofunction:: get_complete_with_metadata(chid, ftype=None, count=None, as_string=False, as_numpy=True, timeout=None)
 
 .. autofunction::  put(chid, value, wait=False, timeout=30, callback=None, callback_data=None)
 
-   For more on this *put callback*, see :ref:`ca-callbacks-label` below.
+See :ref:`ca-callbacks-label` for more on this *put callback*,
 
 .. autofunction:: create_subscription(chid, use_time=False, use_ctrl=False, mask=None, callback=None)
 
-   For more on writing the user-supplied callback, see :ref:`ca-callbacks-label` below.
+See :ref:`ca-callbacks-label` for more on writing the user-supplied callback,
 
 .. warning::
 
@@ -339,7 +330,7 @@ Several other functions are provided:
 
 .. autofunction:: get_ctrlvars(chid)
 
-    See :ref:`Table of Control Attributes <ctrlvars_table>`
+See :ref:`Table of Control Attributes <ctrlvars_table>`
 
 .. _ctrlvars_table:
 
@@ -393,7 +384,7 @@ and :func:`sg_get` to execute.
 
 .. autofunction::  sg_get(gid, chid[, ftype=None[, as_string=False[, as_numpy=True]]])
 
-   See further example below.
+See further example below.
 
 .. autofunction::  sg_put(gid, chid, value)
 
@@ -516,7 +507,7 @@ used heavily inside of ca.py or are available for your convenience.
 
 .. autofunction:: withInitialContext(fcn)
 
-    See :ref:`advanced-threads-label` for further discussion.
+See :ref:`advanced-threads-label` for further discussion.
 
 
 Unpacking Data from Callbacks
@@ -771,7 +762,7 @@ called immediately after successful installation::
 
     import epics
     import time
-    
+
     def on_access_rights_change(read_access, write_access):
         print 'read access = %s, write access = %s' % (read_access, write_access)
 
