@@ -15,7 +15,7 @@ Arrays without Numpy
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you have numpy installed, and use the default *as_numpy=True* in
-:meth:`ca.get`, :meth:`pv.get` or :meth:`epics.caget`, you will get a
+:meth:`epics.ca.get`, :meth:`pv.get` or :meth:`epics.caget`, you will get a
 numpy array for the value of a waveform PV.  If you do *not* have numpy
 installed, or explicitly use *as_numpy=False* in a get request, you will
 get the raw C-like array reference from the Python
@@ -38,7 +38,7 @@ Variable Length Arrays:  NORD  and NELM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 While the maximum length of an array is fixed, the length of data you get
-back from a monitor, :meth:`ca.get`, :meth:`pv.get`, or :meth:`epics.caget`
+back from a monitor, :meth:`epics.ca.get`, :meth:`pv.get`, or :meth:`epics.caget`
 may be shorter than the maximum length, reflecting the most recent data
 put to that PV.  That is, if some process puts a smaller array to a PV than
 its maximum length, monitors on that PV may receive only the changed data.
@@ -56,9 +56,8 @@ For example::
 To be clear, the :meth:`pv.put` above could be done in a separate process
 -- the :meth:`pv.get` is not using a value cached from the :meth:`pv.put`.
 
-This feature seems to depend on the record definition, and requires version
-3.14.12.1 of Epics base or higher, and can be checked by comparing
-:meth:`ca.version` with the string '4.13'.
+This feature was introduced in Epics CA 3.14.12.1, and may not work for
+data from IOCs running extremely old versions of Epics base.
 
 Character Arrays
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -66,8 +65,8 @@ Character Arrays
 As noted in other sections, character waveforms can be used to hold strings
 longer than 40 characters, which is otherwise a fundamental limit for
 native Epics strings.  Character waveforms shorter than
-:data:`ca.AUTOMONITOR_MAXLENGTH` can be turned into strings with an
-optional *as_string=True* to :meth:`ca.get`, :meth:`pv.get` , or
+:data:`epics.ca.AUTOMONITOR_MAXLENGTH` can be turned into strings with an
+optional *as_string=True* to :meth:`epics.ca.get`, :meth:`pv.get` , or
 :meth:`epics.caget`.  If you've defined a Epics waveform record as::
 
 
@@ -94,7 +93,7 @@ Then you can use this record with:
     >>> print char_val
     'T:\\xas_user\\March2010\\FastMap'
 
-This example uses :meth:`pv.get` but :meth:`ca.get` is essentially
+This example uses :meth:`pv.get` but :meth:`epics.ca.get` is essentially
 equivalent, as its *as_string* parameter works exactly the same way.
 
 Note that Epics character waveforms as defined as above are really arrays
@@ -145,13 +144,13 @@ assured that the latest value is always available.  As arrays get larger
 automatic monitoring is desirable.
 
 The Python :mod:`epics.ca` module defines a variable
-:data:`ca.AUTOMONITOR_MAXLENGTH` which controls whether array PVs are
+:data:`epics.ca.AUTOMONITOR_MAXLENGTH` which controls whether array PVs are
 automatically monitored.  The default value for this variable is 65536, but
 can be changed at runtime.  Arrays with fewer elements than
-:data:`ca.AUTOMONITOR_MAXLENGTH` will be automatically monitored, unless
-explicitly set, and arrays larger than :data:`AUTOMONITOR_MAXLENGTH` will
-not be automatically monitored unless explicitly set. Auto-monitoring of
-PVs can be be explicitly set with
+:data:`epics.ca.AUTOMONITOR_MAXLENGTH` will be automatically monitored,
+unless explicitly set, and arrays larger than
+:data:`epics.ca.AUTOMONITOR_MAXLENGTH` will not be automatically monitored
+unless explicitly set. Auto-monitoring of PVs can be be explicitly set with
 
    >>> pv2 = epics.PV('ScalerPV', auto_monitor=True)
    >>> pv1 = epics.PV('LargeArrayPV', auto_monitor=False)
@@ -162,9 +161,10 @@ Example handling Large Arrays
 
 Here is an example reading data from an `EPICS areaDetector
 <http://cars9.uchicago.edu/software/epics/areaDetector.html>`_, as if it
-were an image from a digital camera.  This uses the `Python Imaging Library
-<http://www.pythonware.com/products/pil/>`_ for much of the image
-processing:
+were an image from a digital camera.  This uses the common third-party
+library called `Python Imaging Library` or `pillow` for much of the image
+processing.  This library can be installed with `pip install pillow` or
+`conda install pillow`:
 
 
     >>> import epics

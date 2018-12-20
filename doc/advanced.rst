@@ -13,13 +13,13 @@ pyepics module.
 The wait and timeout options for get(), ca.get_complete()
 ==============================================================
 
-The *get* functions, :func:`epics.caget`, :func:`pv.get` and :func:`ca.get`
+The *get* functions, :func:`epics.caget`, :func:`pv.get` and :func:`epics.ca.get`
 all ask for data to be transferred over the network.  For large data arrays
 or slow networks, this can can take a noticeable amount of time.  For PVs
 that have been disconnected, the *get* call will fail to return a value at
 all.  For this reason, these functions all take a `timeout` keyword option.
-The lowest level :func:`ca.get` also has a `wait` option, and a companion
-function :func:`ca.get_complete`.  This section describes the details of
+The lowest level :func:`epics.ca.get` also has a `wait` option, and a companion
+function :func:`epics.ca.get_complete`.  This section describes the details of
 these.
 
 If you're using :func:`epics.caget` or :func:`pv.get` you can supply a
@@ -39,32 +39,32 @@ a PV for a large waveform record reports that it is connected, but a
 
 
 At the lowest level (which :func:`pv.get` and :func:`epics.caget` use),
-:func:`ca.get` issues a get-request with an internal callback function.
+:func:`epics.ca.get` issues a get-request with an internal callback function.
 That is, it calls the CA library function
 :func:`libca.ca_array_get_callback` with a pre-defined callback function.
-With `wait=True` (the default), :func:`ca.get` then waits up to the timeout
+With `wait=True` (the default), :func:`epics.ca.get` then waits up to the timeout
 or until the CA library calls the specified callback function.  If the
 callback has been called, the value can then be converted and returned.
 
 If the callback is not called in time or if `wait=False` is used but the PV
 is connected, the callback will be called eventually, and simply waiting
-(or using :func:`ca.pend_event` if :data:`ca.PREEMPTIVE_CALLBACK` is
+(or using :func:`epics.ca.pend_event` if :data:`epics.ca.PREEMPTIVE_CALLBACK` is
 ``False``) may be sufficient for the data to arrive.  Under this condition,
-you can call :func:`ca.get_complete`, which will NOT issue a new request
+you can call :func:`epics.ca.get_complete`, which will NOT issue a new request
 for data to be sent, but wait (for up to a timeout time) for the previous
 get request to complete.
 
-:func:`ca.get_complete` will return ``None`` if the timeout is exceeded or
+:func:`epics.ca.get_complete` will return ``None`` if the timeout is exceeded or
 if there is not an "incomplete get" that it can wait to complete.  Thus,
-you should use the return value from :func:`ca.get_complete` with care.
+you should use the return value from :func:`epics.ca.get_complete` with care.
 
 Note that :func:`pv.get` (and so :func:`epics.caget`) will normally rely on
 the PV value to be filled in automatically by monitor callbacks.  If
 monitor callbacks are disabled (as is done for large arrays and can be
 turned off) or if the monitor hasn't been called yet, :func:`pv.get` will
-check whether it should can :func:`ca.get` or :func:`ca.get_complete`.
+check whether it should can :func:`epics.ca.get` or :func:`epics.ca.get_complete`.
 
-If not specified, the timeout for :func:`ca.get_complete` (and all other
+If not specified, the timeout for :func:`epics.ca.get_complete` (and all other
 get functions) will be set to::
 
    timeout = 0.5 + log10(count)
@@ -173,19 +173,19 @@ complete version of this looks like this::
 
 The code here probably needs detailed explanation.  As mentioned above, it
 uses the `ca` level, not `PV` objects.  Second, the call to
-:meth:`ca.create_channel` (Note 1) uses `connect=False` and `auto_cb=False`
+:meth:`epics.ca.create_channel` (Note 1) uses `connect=False` and `auto_cb=False`
 which mean to not wait for a connection before returning, and to not
 automatically assign a connection callback.  Normally, these are not what
 you want, as you want a connected channel and to be informed if the
 connection state changes, but we're aiming for maximum speed here.  We then
-use :meth:`ca.connect_channel` to connect all the channels.  Next (Note 2),
+use :meth:`epics.ca.connect_channel` to connect all the channels.  Next (Note 2),
 we tell the CA library to request the data for the channel without waiting
-around to receive it.  The main point of not having :meth:`ca.get` wait for
+around to receive it.  The main point of not having :meth:`epics.ca.get` wait for
 the data for each channel as we go is that each data transfer takes time.
 Instead we request data to be sent in a separate thread for all channels
-without waiting.  Then we do wait by calling :meth:`ca.poll` once and only
+without waiting.  Then we do wait by calling :meth:`epics.ca.poll` once and only
 once, (not `len(pvnamelist)` times!).  Finally, we use the
-:meth:`ca.get_complete` method to convert the data that has now been
+:meth:`epics.ca.get_complete` method to convert the data that has now been
 received by the companion thread to a python value.
 
 Method 2 and 3 have essentially the same runtime, which is somewhat faster
@@ -226,8 +226,8 @@ To be clear, it is **connecting** to Epics PVs that is expensive, not the
 retreiving of data from connected PVs.  You can lower the connection
 expense by not retaining the connection or creating monitors on the PVs,
 but if you are going to re-use the PVs, that savings will be lost quickly.
-In short, use Method 1 over :func:`caget_many` unless you've benchmarked
-your use-case and have demonstrated that :func:`caget_many` is better for
+In short, use Method 1 over :func:`epics.caget_many` unless you've benchmarked
+your use-case and have demonstrated that :func:`epics.caget_many` is better for
 your needs.
 
 .. _advanced-sleep-label:
@@ -237,9 +237,9 @@ time.sleep() or epics.poll()?
 
 In order for a program to communicate with Epics devices, it needs to allow
 some time for this communication to happen.   With
-:data:`ca.PREEMPTIVE_CALLBACK` set to  ``True``, this communication  will
+:data:`epics.ca.PREEMPTIVE_CALLBACK` set to  ``True``, this communication  will
 be handled in a thread separate from the main Python thread.  This means
-that CA events can happen at any time, and :meth:`ca.pend_event` does not
+that CA events can happen at any time, and :meth:`epics.ca.pend_event` does not
 need to be called to explicitly allow for event processing.
 
 Still, some time must be released from the main Python thread on occasion
@@ -252,8 +252,8 @@ in order for events to be processed.  The simplest way to do this is with
 Unfortunately, the :meth:`time.sleep` method is not a very high-resolution
 clock, with typical resolutions of 1 to 10 ms, depending on the system.
 Thus, even though events will be asynchronously generated and epics with
-pre-emptive callbacks does not *require* :meth:`ca.pend_event` or
-:meth:`ca.poll` to be run, better performance may be achieved with an event
+pre-emptive callbacks does not *require* :meth:`epics.ca.pend_event` or
+:meth:`epics.ca.poll` to be run, better performance may be achieved with an event
 loop of::
 
     >>> while True:
@@ -283,7 +283,7 @@ value, but if :data:`epics.ca.PREEMPTIVE_CALLBACK` has been set to
 ``False``, threading will not work.
 
 Second, if you are using :class:`PV` objects and not making heavy use of
-the :mod:`ca` module (that is, not making and passing around chids), then
+the :mod:`epics.ca` module (that is, not making and passing around chids), then
 the complications below are mostly hidden from you.   If you're writing
 threaded code, it's probably a good idea to read this just to understand
 what the issues are.
@@ -295,12 +295,12 @@ The Channel Access library uses a concept of *contexts* for its own thread
 model, with contexts holding sets of threads as well as Channels and
 Process Variables.  For non-threaded work, a process will use a single
 context that is initialized prior doing any real CA work (done in
-:meth:`ca.initialize_libca`).  In a threaded application, each new thread
+:meth:`epics.ca.initialize_libca`).  In a threaded application, each new thread
 begins with a new, uninitialized context that must be initialized or
 replaced.  Thus each new python thread that will interact with CA must
-either explicitly create its own context with :meth:`ca.create_context`
+either explicitly create its own context with :meth:`epics.ca.create_context`
 (and then, being a good citizen, destroy this context as the thread ends
-with :meth:`ca.destroy_context`) or attach to an existing context.
+with :meth:`epics.ca.destroy_context`) or attach to an existing context.
 
 The generally recommended approach is to use a single CA context throughout
 an entire process and have each thread attach to the first context created
@@ -332,7 +332,7 @@ you are writing a threaded application in which the first real CA calls are
 inside a child thread, it is recommended that you initialize CA in the main
 thread,
 
-As a convenience, the :class:`CAThread` in the :mod:`ca` module is
+As a convenience, the :class:`CAThread` in the :mod:`epics.ca` module is
 is a very thin wrapper around the standard :class:`threading.Thread` which
 adding a call of  :meth:`epics.ca.use_initial_context` just before your
 threaded function is run.  This allows your target functions to not

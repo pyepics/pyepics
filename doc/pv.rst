@@ -152,7 +152,7 @@ callbacks to be executed when the PV changes.
    Each request to EPICS can optionally contain additional metadata associated
    with the value.  While ``PV.get`` updates the PV instance with any metadata,
    ``get_with_metadata`` will return the requested metadata and value in a
-   dictionary. 
+   dictionary.
 
    The exception is when the PV is set to auto-monitor and the `use_monitor`
    parameter here is set.  This means that both the value and metadata will
@@ -197,11 +197,11 @@ completed.   See :ref:`pv-putwait-label` for more details.
 
 .. method:: poll([evt=1.e-4, [iot=1.0]])
 
-   poll for changes.  This simply calls :meth:`ca.poll`
+   poll for changes.  This simply calls :meth:`epics.ca.poll`
 
-   :param evt:  time to pass to :meth:`ca.pend_event`
+   :param evt:  time to pass to :meth:`epics.ca.pend_event`
    :type  evt:  float
-   :param iot:  time to pass to :meth:`ca.pend_io`
+   :param iot:  time to pass to :meth:`epics.ca.pend_io`
    :type  iot:  float
 
 .. method:: connect([timeout=None])
@@ -210,12 +210,12 @@ completed.   See :ref:`pv-putwait-label` for more details.
    successfully connected.  It is probably not that useful, as connection
    should happen automatically. See :meth:`wait_for_connection`.
 
-   :param timeout:  maximum connection time, passed to :meth:`ca.connect_channel`
+   :param timeout:  maximum connection time, passed to :meth:`epics.ca.connect_channel`
    :type  timeout:  float
    :rtype:    ``True``/``False``
 
    if timeout is ``None``, the PVs connection_timeout parameter will be used. If that is also ``None``,
-   :data:`ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
+   :data:`episc.ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
 
 .. method:: wait_for_connection([timeout=None])
 
@@ -227,7 +227,7 @@ completed.   See :ref:`pv-putwait-label` for more details.
    :rtype:    ``True``/``False``
 
    if timeout is ``None``, the PVs connection_timeout parameter will be used. If that is also ``None``,
-   :data:`ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
+   :data:`epics.ca.DEFAULT_CONNECTION_TIMEOUT`  will be used.
 
 .. method:: disconnect()
 
@@ -241,7 +241,7 @@ completed.   See :ref:`pv-putwait-label` for more details.
 
    turn off automatic monitoring of a PV.  Note that this will suspend
    all event callbacks on a PV at the CA level by calling
-   :func:`ca.clear_subscription`, but will not clear the list of PVs
+   :func:`epics.ca.clear_subscription`, but will not clear the list of PVs
    callbacks.  This means that doing :meth:`reconnect` will resume
    event processing including any callbacks or the PV.
 
@@ -485,7 +485,7 @@ String representation for a PV
 ================================
 
 The string representation for a `PV`, as returned either with the
-*as_string* argument to :meth:`ca.get` or from the :attr:`char_value`
+*as_string* argument to :meth:`epics.ca.get` or from the :attr:`char_value`
 attribute (they are equivalent) needs some further explanation.
 
 The value of the string representation (hereafter, the :attr:`char_value`),
@@ -546,7 +546,7 @@ Possible values for :attr:`auto_monitor` are:
 ``None``
   The default value for *auto_monitor* is ``None``, and is set to
   ``True`` if the element count for the PV is smaller than
-  :data:`ca.AUTOMONITOR_MAXLENGTH` (default of 65536).  To suppress
+  :data:`epics.ca.AUTOMONITOR_MAXLENGTH` (default of 65536).  To suppress
   monitoring of PVs with fewer array values, you will have to explicitly
   turn *auto_monitor* to ``False``. For waveform arrays with more elements,
   automatic monitoring will not be done unless you explicitly set
@@ -555,7 +555,7 @@ Possible values for :attr:`auto_monitor` are:
 
 ``True``
   When *auto_monitor* is set to ``True``, the value will be monitored using
-  the default subscription mask set at :data:`ca.DEFAULT_SUBSCRIPTION_MASK`.
+  the default subscription mask set at :data:`epics.ca.DEFAULT_SUBSCRIPTION_MASK`.
 
   This mask determines which kinds of changes cause the PV to update. By
   default, the subscription updates when the PV value changes by more
@@ -566,7 +566,7 @@ Possible values for :attr:`auto_monitor` are:
   It is also possible to request an explicit type of CA subscription by
   setting *auto_monitor* to a numeric subscription mask made up of
   dbr.DBE_ALARM, dbr.DBE_LOG and/or dbr.DBE_VALUE. This mask will be
-  passed directly to :meth:`ca.create_subscription` An example would be::
+  passed directly to :meth:`epics.ca.create_subscription` An example would be::
 
     pv1 = PV('AAA', auto_monitor=dbr.DBE_VALUE)
     pv2 = PV('BBB', auto_monitor=dbr.DBE_VALUE|dbr.DBE_ALARM)
@@ -848,7 +848,7 @@ request using :func:`get_with_metadata`::
 
    >>> print(p1.get())
    1.00
-   
+
    >>> p1.get_with_metadata()
    {'status': 0,
     'severity': 0,
@@ -856,7 +856,7 @@ request using :func:`get_with_metadata`::
     'posixseconds': 1543429156.0,
     'nanoseconds': 811018603,
     'value': 1.0}
-   
+
    >>> print(p1.get_with_metadata(form='ctrl'))
    {'upper_disp_limit': 100.0,
     'lower_disp_limit': -100.0,

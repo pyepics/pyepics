@@ -2,11 +2,9 @@
 ca: Low-level Channel Access module
 =================================================
 
-.. module:: ca
-   :synopsis: low-level Channel Access  module.
-
 .. module:: epics.ca
    :synopsis: low-level Channel Access  module.
+
 
 The :mod:`ca` module provides a low-level wrapping of the EPICS
 Channel Access (CA) library, using ctypes.  Most users of the `epics`
@@ -146,15 +144,19 @@ Using the CA module
 Many general-purpose CA functions that deal with general communication and
 threading contexts are very close to the C library:
 
-.. autofunction:: initialize_libca
+.. autofunction:: initialize_libca()
 
-.. autofunction:: finalize_libca
+.. autofunction:: finalize_libca()
 
-.. function:: context_create()
-.. autofunction:: create_context
+.. autofunction:: pend_io(timeout=1.0)
 
-.. function:: context_destroy()
-.. autofunction:: destroy_context
+.. autofunction:: pend_event(timeout=1.e-5)
+
+.. autofunction:: poll(evt=1.e-5[, iot=1.0])
+
+.. autofunction:: create_context()
+
+.. autofunction:: destroy_context()
 
 .. autofunction:: current_context()
 
@@ -174,11 +176,15 @@ threading contexts are very close to the C library:
 
 .. autofunction:: replace_printf_handler(fcn=None)
 
-.. autofunction:: pend_io(timeout=1.0)
+.. warning::
 
-.. autofunction:: pend_event(timeout=1.e-5)
+    `replace_printf_handler()` appears to not actually work.
 
-.. autofunction:: poll(evt=1.e-5[, iot=1.0])
+    We think this is due to a real limitation of Python's `ctypes` module
+    not supporting the mapping of C *va_list* function arguments to Python.
+    If you are interested in this or have ideas of how to fix it, please
+    let us know.
+
 
 
 Creating and Connecting to Channels
@@ -193,7 +199,6 @@ a good idea to treat these as object instances.
 .. autofunction:: create_channel(pvname, connect=False, callback=None, auto_cb=True)
 
 .. autofunction:: connect_channel(chid, timeout=None, verbose=False)
-
 
 Many other functions require a valid Channel ID, but not necessarily a
 connected Channel.  These functions are essentially identical to the CA
@@ -366,8 +371,10 @@ Synchronous Groups
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Synchronous Groups can be used to ensure that a set of Channel Access calls
-all happen together, as if in a *transaction*.  Synchronous Groups work in
-PyEpics as of version 3.0.10, but more testing is probably needed.
+all happen together, as if in a *transaction*.  Synchronous Groups work,
+but are not very well tested, and probably not a great anyway in the
+context of asynchronous I/O.  These functions are mostly included for
+completeness.
 
 The idea is to first create a synchronous group, then add a series of
 :func:`sg_put` and :func:`sg_get` which do not happen immediately, and

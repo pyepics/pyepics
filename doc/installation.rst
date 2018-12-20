@@ -7,11 +7,13 @@ Prerequisites
 ~~~~~~~~~~~~~~~
 
 PyEpics works with Python version 2.7, 3.5, or 3.6.  It is supported and
-regularly used and tested on 64-bit Linux, 64-bit Mac OSX, 64-bit Windows,
-and 32-bit Windows. It should still work on 32-bit Linux, and may work with
-older versions of Python, but these are rarely tested. For Windows, use of
-pyepics with IronPython (Python written with .NET) has been recently
-reported, but is not routinely tested.
+regularly used and tested on 64-bit Linux, 64-bit Mac OSX, 64-bit Windows.
+It should still work on 32-bit Windows, 32-bit Linux, and on Linux with ARM
+processors, such as raspberry Pi, but these are tested regularly.  It
+appears to work with Python 3.7, but this has tested much.  It may also
+work with older versions of Python (such as 3.4), but these are not
+tested. For Windows, pyepics has been reported to work with IronPython
+(Python written with .NET), but this is not routinely tested.
 
 The EPICS Channel Access library Version 3.14 or higher is required for
 pyepics to actually communicate with Epics variables.  Specifically, the
@@ -19,15 +21,21 @@ shared libraries libca and libCom (*libca.so* and *libCom.so* on Linux,
 *libca.dylib* and *libCom.dylib* on Mac OSX, or *ca.dll* and *Com.dll* on
 Windows) from *Epics Base* are required to use this module. Some features,
 including 'subarray records' will only work with version 3.14.12 and
-higher, and version 3.15 or higher is recommended.
+higher, and version 3.15 or higher is strongly recommended.
 
-For all supported operating systems, pre-built and recent versions of libca
-and libCom are provided, and will be installed within the python packages
-directory and used by default.  Though they will be found by default by
-pyepics, these libraries will be hard for other applications to find, and
-so should not cause conflicts with other CA client programs.  We regularly
-test with these libraries and recommend using them.  If you want to not use
-them or even install them, instructions for how to do this are given below.
+For all supported operating systems (linux-64, linux-32, linux-arm,
+windows-64, windows-32, and darwin-64), pre-built versions of libca and
+libCom built with 3.16.2 are provided, and will be installed within the
+python packages directory and used by default.  Though they will be found
+by default by pyepics, these libraries will be hard for other applications
+to find, and so should not cause conflicts with other CA client programs.
+We regularly test with these libraries and recommend using them.  If you
+want to not use these, instructions for how to do this
+are given below.
+To be clear, using a version of *libca* other than the
+distributed ones cannot be guaranteed to work with pyepics and requires an
+understanding of building and using Epics Channel Access that is beyond the
+scope of pyepics.
 
 The Python `numpy module <http://numpy.scipy.org/>`_ is highly
 recommended, though it is not required. If available, it will be used
@@ -64,41 +72,22 @@ You can also download the source package, unpack it, and install with::
 
      python setup.py install
 
-If you are certain that you will not want to use the default version of
-*libca* that pyepics provides and is tested with, you can suppress the
-installation of the default versions by setting the environmental variable
-`NOLIBCA` at install time, as with::
-
-    NOLIBCA=1 python setup.py install
-
-or::
-
-    NOLIBCA=1 pip install pyepics
-
-Note that this should be considered an expert-level option.
-
 
 Getting Started, Setting up the Epics Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As mentioned above, pyepics must be able to find and load the Channel
 Access dynamic library (*libca.so*, *libca.dylib*, or *ca.dll* depending on
-the system) at runtime in order to actually work.  By default, the provided
-versions of these libraries will be installed and used.
+the system) at runtime in order to actually work.  For the most commonly
+used operating systems and architectures, modern version of these libraries
+are provided, and will be installed and used with pyepics.
 
-If you wish to use a different version of *libca*, there are a few ways to
-specify how that will be found. First, you can set the environmental
-variable ``PYEPICS_LIBCA`` to the full path of the dynamic library, for
-example::
+If these do not work for you or you wish to use a different version of
+*libca*, there are a few ways to specify how that will be found. First, you
+can set the environmental variable ``PYEPICS_LIBCA`` to the full path of
+the dynamic library, for example::
 
    > export PYEPICS_LIBCA=/usr/local/epics/base-3.15.5/lib/linux-x86_64/libca.so
-
-For experts who want to never use the default version, installation of
-*libca* (and *libCom*) can be turned off by setting the environmental
-variable `NOLIBCA` at install time, as shown above.  If you do this, you
-will want to make sure that *libca.so* can be found in your `PATH`
-environmental variable, or in `LD_LIBRARY_PATH` or `DYLD_LIBRARY_PATH` on
-Mac OSX.
 
 To find out which CA library will be used by pyepics, use:
     >>> import epics
@@ -136,7 +125,6 @@ of::
 
    git clone http://github.com/pyepics/pyepics.git
    git clone git@github.com/pyepics/pyepics.git
-
 
 
 Getting Help
