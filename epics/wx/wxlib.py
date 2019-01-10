@@ -569,7 +569,9 @@ class PVStaticText(wx.StaticText, PVMixin):
         This can be overriden or disabled as constructor
         parameters
         """
-    def __init__(self, parent, pv=None, style=None, **kw):
+    def __init__(self, parent, pv=None, style=None,
+                 minor_alarm="DARKRED", major_alarm="RED",
+                 invalid_alarm="ORANGERED", **kw):
         wstyle = wx.ALIGN_LEFT
         if style is not None:
             wstyle = style
@@ -1208,7 +1210,8 @@ class PVCollapsiblePane(wx.CollapsiblePane, PVCtrlMixin):
     from a PV value
     """
 
-    def __init__(self, parent, pv=None, minor_alarm="DARKRED", major_alarm="RED", invalid_alarm="ORANGERED", **kw):
+    def __init__(self, parent, pv=None, minor_alarm="DARKRED", major_alarm="RED",
+                 invalid_alarm="ORANGERED", **kw):
         wx.CollapsiblePane.__init__(self, parent, **kw)
         PVCtrlMixin.__init__(self, pv=pv, font=None, fg=None, bg=None)
         self._fg_colour_alarms = {
