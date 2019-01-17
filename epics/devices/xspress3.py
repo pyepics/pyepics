@@ -2,7 +2,10 @@
 import sys
 import os
 import time
-from ConfigParser import ConfigParser
+if sys.version[0] == '2':
+    from ConfigParser import  ConfigParser
+elif sys.version[0] == '3':
+    from configparser import  ConfigParser
 
 from epics import Device, caget, caput, poll
 from epics.devices.mca import MCA, ROI, OrderedDict
