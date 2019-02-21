@@ -63,7 +63,8 @@ class CA_BasicTests(unittest.TestCase):
     def testA_GetNonExistentPV(self):
         write('Simple Test: get on a non-existent PV')
         chid = ca.create_channel('Definitely-Not-A-Real-PV')
-        self.assertRaises(ca.ChannelAccessException, ca.get, chid)
+        val = ca.get(chid)
+        self.assertEqual(val, None)
 
     def testA_CreateChid_CheckTypeCount(self):
         write('Simple Test: create chid, check count, type, host, and access')
