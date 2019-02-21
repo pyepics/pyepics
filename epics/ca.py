@@ -413,6 +413,7 @@ def withCHID(fcn):
     wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
+
 def withConnectedCHID(fcn):
     """decorator to ensure that the first argument of a function is a
     fully connected Channel ID, ``chid``.  This test is (intended to be)
@@ -431,11 +432,35 @@ def withConnectedCHID(fcn):
                                              (fcn.__name__))
             if not isConnected(chid):
                 timeout = kwds.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
-                fmt ="%s() timed out waiting '%s' to connect (%d seconds)"
-                if not connect_channel(chid, timeout=timeout):
+                connected =  connect_channel(chid, timeout=timeout)
+                if not connected and raise_on_unconnected:
+                    fmt ="%s() timed out waiting '%s' to connect (%d seconds)"
                     raise ChannelAccessException(fmt % (fcn.__name__,
-                                                        name(chid), timeout))
+                                                name(chid), timeout))
 
+        return fcn(*args, **kwds)
+    wrapper.__doc__ = fcn.__doc__
+    wrapper.__name__ = fcn.__name__
+    wrapper.__dict__.update(fcn.__dict__)
+    return wrapper
+
+def withMaybeConnectedCHID(fcn):
+    """decorator to **try** to ensure that the first argument of a function
+    is a connected Channel ID, ``chid``.
+    """
+    def wrapper(*args, **kwds):
+        "withMaybeConnectedCHID wrapper"
+        if len(args)>0:
+            chid = args[0]
+            args = list(args)
+            if isinstance(chid, int):
+                args[0] = chid = dbr.chid_t(chid)
+            if not isinstance(chid, dbr.chid_t):
+                raise ChannelAccessException("%s: not a valid chid!" % \
+                                             (fcn.__name__))
+            if not isConnected(chid):
+                timeout = kwds.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
+                connect_channel(chid, timeout=timeout)
         return fcn(*args, **kwds)
     wrapper.__doc__ = fcn.__doc__
     wrapper.__name__ = fcn.__name__
@@ -1179,7 +1204,7 @@ def _unpack_metadata(ftype, dbr_value):
     return md
 
 
-@withCHID
+@withMaybeConnectedCHID
 def get_with_metadata(chid, ftype=None, count=None, wait=True, timeout=None,
                       as_string=False, as_numpy=True):
     """Return the current value along with metadata for a Channel
@@ -1251,7 +1276,7 @@ def get_with_metadata(chid, ftype=None, count=None, wait=True, timeout=None,
                                           as_numpy=as_numpy)
 
 
-@withCHID
+@withMaybeConnectedCHID
 def get(chid, ftype=None, count=None, wait=True, timeout=None,
         as_string=False, as_numpy=True):
     """return the current value for a Channel.
@@ -1316,11 +1341,10 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
     info = get_with_metadata(chid, ftype=ftype, count=count, wait=wait,
                              timeout=timeout, as_string=as_string,
                              as_numpy=as_numpy)
-    return (info['value'] if info is not None
-            else None)
+    return (info['value'] if info is not None else None)
 
 
-@withCHID
+@withMaybeConnectedCHID
 def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
                                as_string=False, as_numpy=True):
     """Returns the current value and associated metadata for a Channel
@@ -1398,8 +1422,7 @@ def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
     metadata['value'] = val
     return metadata
 
-
-@withCHID
+@withMaybeConnectedCHID
 def get_complete(chid, ftype=None, count=None, timeout=None, as_string=False,
                  as_numpy=True):
     """returns the current value for a Channel, completing an
@@ -1585,7 +1608,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
             ret = -ret
     return ret
 
-@withConnectedCHID
+@withMaybeConnectedCHID
 def get_ctrlvars(chid, timeout=5.0, warn=True):
     """return the CTRL fields for a Channel.
 
@@ -1632,7 +1655,7 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
     return out
 
 
-@withConnectedCHID
+@withCHID
 def get_timevars(chid, timeout=5.0, warn=True):
     """returns a dictionary of TIME fields for a Channel.
     This will contain keys of  *status*, *severity*, and *timestamp*.
