@@ -1179,7 +1179,7 @@ def _unpack_metadata(ftype, dbr_value):
     return md
 
 
-@withConnectedCHID
+@withCHID
 def get_with_metadata(chid, ftype=None, count=None, wait=True, timeout=None,
                       as_string=False, as_numpy=True):
     """Return the current value along with metadata for a Channel
@@ -1251,7 +1251,7 @@ def get_with_metadata(chid, ftype=None, count=None, wait=True, timeout=None,
                                           as_numpy=as_numpy)
 
 
-@withConnectedCHID
+@withCHID
 def get(chid, ftype=None, count=None, wait=True, timeout=None,
         as_string=False, as_numpy=True):
     """return the current value for a Channel.
@@ -1320,7 +1320,7 @@ def get(chid, ftype=None, count=None, wait=True, timeout=None,
             else None)
 
 
-@withConnectedCHID
+@withCHID
 def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
                                as_string=False, as_numpy=True):
     """Returns the current value and associated metadata for a Channel
@@ -1399,7 +1399,7 @@ def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
     return metadata
 
 
-@withConnectedCHID
+@withCHID
 def get_complete(chid, ftype=None, count=None, timeout=None, as_string=False,
                  as_numpy=True):
     """returns the current value for a Channel, completing an
