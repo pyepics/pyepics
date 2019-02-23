@@ -86,7 +86,7 @@ def initialize_data():
 
     pause_pv.put(0)
     str_waves[0].put([" String %i" % (i+1) for i in range(128)])
-    print 'Data initialized'
+    print( 'Data initialized')
 
 text = '''line 1
 this is line 2
@@ -115,7 +115,7 @@ while True:
     time.sleep(SLEEP_TIME)
 
     count = count + 1
-    if count  == 3: print 'running'
+    if count  == 3: print( 'running')
     if count > 99999999: count = 1
 
     t0 = time.time()
