@@ -155,7 +155,7 @@ def _find_lib(inp_lib_name):
         plist = ['']
         try:
             plist = os.environ.get(envname, '').split(path_sep)
-        except AttributError:
+        except AttributeError:
             pass
         return plist
 
