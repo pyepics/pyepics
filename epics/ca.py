@@ -309,6 +309,7 @@ def get_cache(pvname):
     "return cache dictionary for a given pvname in the current context"
     return _cache[current_context()].get(pvname, None)
 
+
 def show_cache(print_out=True):
     """print out a listing of PVs in the current session to
     standard output.  Use the *print_out=False* option to be
@@ -1611,36 +1612,12 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
     enum_strs will be a list of strings for the names of ENUM states.
 
     """
-    global _cache
-
     ftype = promote_type(chid, use_ctrl=True)
-    ncache = _cache[current_context()][name(chid)]
-    if ncache.get('ctrl_value', None) is None:
-        ncache['ctrl_value'] = GET_PENDING
-        ret = libca.ca_array_get_callback(ftype, 1, chid, _CB_GET,
-                                          ctypes.py_object('ctrl_value'))
-
-        PySEVCHK('get_ctrlvars', ret)
-
-    if ncache.get('ctrl_value', None) is None:
-        return {}
-
-    t0 = time.time()
-    while ncache['ctrl_value'] is GET_PENDING:
-        poll()
-        if time.time()-t0 > timeout:
-            if warn:
-                msg = "ca.get_ctrlvars('%s') timed out after %.2f seconds."
-                warnings.warn(msg % (name(chid), timeout))
-            return {}
-    try:
-        extended_data = ncache['ctrl_value'][0]
-    except TypeError:
-        return {}
-
-    out = _unpack_metadata(ftype=ftype, dbr_value=extended_data)
-    ncache['ctrl_value'] = None
-    return out
+    metadata = get_with_metadata(chid, ftype=ftype, count=1, timeout=timeout,
+                                 wait=True)
+    # Ignore the value returned:
+    metadata.pop('value', None)
+    return metadata
 
 
 @withCHID
@@ -1648,38 +1625,12 @@ def get_timevars(chid, timeout=5.0, warn=True):
     """returns a dictionary of TIME fields for a Channel.
     This will contain keys of  *status*, *severity*, and *timestamp*.
     """
-    global _cache
-
     ftype = promote_type(chid, use_time=True)
-    ncache = _cache[current_context()][name(chid)]
-    if ncache.get('time_value', None) is None:
-        ncache['time_value'] = GET_PENDING
-        ret = libca.ca_array_get_callback(ftype, 1, chid, _CB_GET,
-                                          ctypes.py_object('time_value'))
-
-        PySEVCHK('get_timevars', ret)
-
-    out = {}
-    if ncache.get('time_value', None) is None:
-        return out
-
-    t0 = time.time()
-    while ncache['time_value'] is GET_PENDING:
-        poll()
-        if time.time()-t0 > timeout:
-            if warn:
-                msg = "ca.get_timevars('%s') timed out after %.2f seconds."
-                warnings.warn(msg % (name(chid), timeout))
-            return {}
-
-    try:
-        extended_data = ncache['time_value'][0]
-    except TypeError:
-        return {}
-
-    out = _unpack_metadata(ftype=ftype, dbr_value=extended_data)
-    ncache['time_value'] = None
-    return out
+    metadata = get_with_metadata(chid, ftype=ftype, count=1, timeout=timeout,
+                                 wait=True)
+    # Ignore the value returned:
+    metadata.pop('value', None)
+    return metadata
 
 
 def get_timestamp(chid):
