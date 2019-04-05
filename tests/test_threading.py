@@ -1,3 +1,5 @@
+import pytest
+
 import epics
 import threading
 import pvnames
@@ -69,3 +71,33 @@ def test_pv_from_main():
     t.join()
 
     assert len(result) and result[0] is not None
+
+
+@pytest.mark.parametrize('num_threads', [1, 100])
+def test_pv_multithreaded_get(num_threads):
+    def thread(thread_idx):
+        result[thread_idx] = (pv.get(),
+                              pv.get_with_metadata(form='ctrl')['value'],
+                              pv.get_with_metadata(form='time')['value'],
+                              )
+
+    result = {}
+    epics.ca.use_initial_context()
+    pv = epics.PV(pvnames.double_pv2)
+
+    threads = [epics.ca.CAThread(target=thread,
+                                 args=(i, ))
+               for i in range(num_threads)]
+
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    assert len(result) == num_threads
+    print(result)
+    values = set(result.values())
+    assert len(values) == 1
+
+    value, = values
+    assert value is not None
