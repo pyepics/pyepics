@@ -394,12 +394,12 @@ class PV(object):
             if count is None and self._args['count']!=self._args['nelm']:
                 count = self._args['count']
 
-            ca_get = ca.get_with_metadata
-            if ca.get_cache(self.pvname)['value'] is not None:
-                ca_get = ca.get_complete_with_metadata
-
-            md = ca_get(self.chid, ftype=ftype, count=count,
-                        timeout=timeout, as_numpy=as_numpy)
+            # ca.get_with_metadata will handle multiple requests for the same
+            # PV internally, so there is no need to change between
+            # `get_with_metadata` and `get_complete_with_metadata` here.
+            md = ca.get_with_metadata(
+                self.chid, ftype=ftype, count=count, timeout=timeout,
+                as_numpy=as_numpy)
             if md is None:
                 # Get failed. Indicate with a `None` as the return value
                 return
