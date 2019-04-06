@@ -101,6 +101,14 @@ class ChannelAccessException(Exception):
         if type_ is not None:
             sys.excepthook(type_, value, traceback)
 
+class ChannelAccessGetFailure(Exception):
+    """Channel Access Exception: _onGetEvent != ECA_NORMAL"""
+    def __init__(self, message, chid, status):
+        super(ChannelAccessGetFailure, self).__init__(message)
+        self.chid = chid
+        self.status = status
+
+
 class CASeverityException(Exception):
     """Channel Access Severity Check Exception:
     PySEVCHK got unexpected return value"""
@@ -666,18 +674,21 @@ def _onGetEvent(args, **kws):
     # print("GET EVENT: type, count ", args.type, args.count)
     # print("GET EVENT: status ",  args.status, dbr.ECA_NORMAL)
     entry = get_cache(name(args.chid))
+    ftype = (args.usr.value if dbr.IRON_PYTHON
+             else args.usr)
 
     if args.status != dbr.ECA_NORMAL:
-        warnings.warn('Get failed for chid %d' % args.chid)
-        return
-
-    if dbr.IRON_PYTHON:
-        ftype = args.usr.value
-        entry.get_results[ftype] = dbr.cast_args(args)
+        result = ChannelAccessGetFailure(
+            'Get failed; status code: %d' % args.status,
+            chid=args.chid,
+            status=args.status
+        )
+    elif dbr.IRON_PYTHON:
+        result = dbr.cast_args(args)
     else:
-        ftype = args.usr
-        entry.get_results[ftype] = memcopy(dbr.cast_args(args))
+        result = memcopy(dbr.cast_args(args))
 
+    entry.get_results[ftype] = result
 
 ## put event handler:
 def _onPutEvent(args, **kwds):
@@ -1469,6 +1480,10 @@ def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
         entry.requester_count[ftype] -= 1
         if entry.requester_count[ftype] == 0:
             entry.get_results[ftype] = None
+
+    if isinstance(full_value, Exception):
+        get_failure_reason = full_value
+        raise get_failure_reason
 
     # NOTE: unpacking happens for each requester; this could potentially be put
     # in the get callback itself. (different downside there...)
