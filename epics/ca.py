@@ -1155,7 +1155,7 @@ def promote_fieldtype(ftype, use_time=False, use_ctrl=False):
 
 def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     """unpacks raw data for a Channel ID `chid` returned by libca functions
-    including `ca_get_array_callback` or subscription callback, and returns
+    including `ca_array_get_callback` or subscription callback, and returns
     the corresponding Python data
 
     Normally, users are not expected to need to access this function, but
