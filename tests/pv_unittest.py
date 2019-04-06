@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # unit-tests for ca interface
 
-import os
 import sys
 import time
 import unittest
 import numpy
+import pytest
+
 from contextlib import contextmanager
 from epics import PV, caput, caget, caget_many, caput_many, ca
 
@@ -516,6 +517,36 @@ class PV_Tests(unittest.TestCase):
             print('val is', val, type(val))
             self.assertIsInstance(val, list)
             self.assertEqual(len(val), 1)
+
+
+@pytest.mark.parametrize('num_threads', [1, 10, 200])
+def test_multithreaded_get(num_threads):
+    def thread(thread_idx):
+        result[thread_idx] = (pv.get(),
+                              pv.get_with_metadata(form='ctrl')['value'],
+                              pv.get_with_metadata(form='time')['value'],
+                              )
+
+    result = {}
+    ca.use_initial_context()
+    pv = PV(pvnames.double_pv)
+
+    threads = [ca.CAThread(target=thread, args=(i, ))
+               for i in range(num_threads)]
+
+    with no_simulator_updates():
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+
+    assert len(result) == num_threads
+    print(result)
+    values = set(result.values())
+    assert len(values) == 1
+
+    value, = values
+    assert value is not None
 
 
 if __name__ == '__main__':
