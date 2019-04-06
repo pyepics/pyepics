@@ -85,13 +85,21 @@ _namecache = {}
 ## Cache of pvs waiting for put to be done.
 _put_done =  {}
 
-# get a unique python value that cannot be a value held by an
-# actual PV to signal "Get is incomplete, awaiting callback"
-class Empty:
-    """used to create a unique python value that cannot be
-    held as an actual PV value"""
-    pass
-GET_PENDING = Empty()
+class _GetPending:
+    """
+    _GetPending is used to create a unique python value that cannot be held as
+    an actual PV value.
+
+    A unique python value that cannot be a value held by an actual PV to signal
+    "Get is incomplete, awaiting callback"
+    """
+    def __repr__(self):
+        return 'GET_PENDING'
+
+
+Empty = _GetPending  # back-compat
+GET_PENDING = _GetPending()
+
 
 class ChannelAccessException(Exception):
     """Channel Access Exception: General Errors"""
