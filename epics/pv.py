@@ -485,12 +485,12 @@ class PV(object):
             if callback is not None:
                 callback(pvname=pvname, **kws)
 
-        if callback and not use_complete:
-            use_complete = True
+        if use_complete:
+            self._put_complete = False
 
         return ca.put(self.chid, value,
                       wait=wait, timeout=timeout,
-                      callback=_put_callback if use_complete else None,
+                      callback=_put_callback if use_complete or callback else None,
                       callback_data=callback_data)
 
     def _set_charval(self, val, call_ca=True, force_long_string=False):

@@ -1322,7 +1322,8 @@ def get_with_metadata(chid, ftype=None, count=None, wait=True, timeout=None,
     #   None        implies no value, no expected callback
     #   GET_PENDING implies no value yet, callback expected.
     with entry.lock:
-        if entry.get_results[ftype][0] is not GET_PENDING:
+        last_get, = entry.get_results[ftype]
+        if last_get is not GET_PENDING:
             entry.get_results[ftype] = [GET_PENDING]
             ret = libca.ca_array_get_callback(
                 ftype, count, chid, _CB_GET, ctypes.py_object(ftype))
