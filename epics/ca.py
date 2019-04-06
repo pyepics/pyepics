@@ -392,24 +392,6 @@ def get_cache(pvname):
     return _cache[current_context()].get(pvname, None)
 
 
-def _matching_cache_entries(pvname, chid=None):
-    "return all matching cache entries for a specific pvname, chid"
-    # TODO: This is as previously implemented - I'm not sure if it actually
-    # makes sense. Even if pvnames/chids are the same from different contexts,
-    # they are not _actually_ the same.
-    matching_pvnames = [
-        (context, cvals[pvname])
-        for context, cvals in _cache.items()
-        if pvname in cvals
-    ]
-    if chid is None:
-        return matching_pvnames
-    return [(context, entry)
-            for context, entry in matching_pvnames
-            if entry.chid == chid
-            ]
-
-
 def show_cache(print_out=True):
     """print out a listing of PVs in the current session to
     standard output.  Use the *print_out=False* option to be
@@ -639,27 +621,19 @@ def _onConnectionEvent(args):
     if dbr.PY64_WINDOWS:
         args = args.contents
 
-    ctx = current_context()
     conn = (args.op == dbr.OP_CONN_UP)
-
-    if ctx is None and len(_cache.keys()) > 0:
-        ctx = list(_cache.keys())[0]
 
     # search for PV in any context...
     pvname = name(args.chid)
-    chid = int(args.chid)
-    entries = _matching_cache_entries(pvname, None)
+    entry = get_cache(pvname)
 
     # logging.debug("ConnectionEvent %s/%i/%i " % (pvname, args.chid, conn))
     # print("ConnectionEvent %s/%i/%i " % (pvname, args.chid, conn))
-    if not entries:
-        entry = _CacheItem(chid=chid, pvname=pvname)
-        _cache[ctx][pvname] = entry
-        entries = [(ctx, entry)]
+    if entry is None:
+        entry = _CacheItem(chid=args.chid, pvname=pvname)
+        _cache[current_context()][pvname] = entry
 
-    # set connection time and run connection callbacks in all contexts
-    for context, entry in entries:
-        entry.run_connection_callbacks(conn=conn, timestamp=timestamp)
+    entry.run_connection_callbacks(conn=conn, timestamp=timestamp)
 
 
 ## get event handler:
@@ -724,8 +698,10 @@ def _onAccessRightsEvent(args):
 
     # Getting bunk result from ca.current_context on channel disconnect
     # Do this the long way...
-    for context, entry in _matching_cache_entries(pvname, chid):
+    entry = get_cache(pvname)
+    if entry is not None:
         entry.run_access_event_callbacks(ra, wa)
+
 
 # create global reference to these callbacks
 _CB_CONNECT = dbr.make_callback(_onConnectionEvent, dbr.connection_args)
