@@ -319,6 +319,9 @@ class PV(object):
         0
         >>> get_pv('13BMD:m1.DIR').get(as_string=True)
         'Pos'
+
+        If the Channel Access status code sent by the IOC indicates a failure,
+        this method will raise the exception ChannelAccessGetFailure.
         """
         data = self.get_with_metadata(count=count, as_string=as_string,
                                       as_numpy=as_numpy, timeout=timeout,
