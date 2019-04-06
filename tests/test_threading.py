@@ -73,7 +73,7 @@ def test_pv_from_main():
     assert len(result) and result[0] is not None
 
 
-@pytest.mark.parametrize('num_threads', [1, 100])
+@pytest.mark.parametrize('num_threads', [1, 200])
 def test_pv_multithreaded_get(num_threads):
     def thread(thread_idx):
         result[thread_idx] = (pv.get(),
