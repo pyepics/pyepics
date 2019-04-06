@@ -706,7 +706,9 @@ def _onGetEvent(args, **kws):
     else:
         result = memcopy(dbr.cast_args(args))
 
-    entry.get_results[ftype] = result
+    with entry.lock:
+        entry.get_results[ftype] = result
+
 
 ## put event handler:
 def _onPutEvent(args, **kwds):
