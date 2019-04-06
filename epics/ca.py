@@ -139,10 +139,6 @@ class _CacheItem:
         The connection timestamp (or last failed attempt)
     failures : int
         Number of failed connection attempts
-    requester_count : dict
-        The number of active requests (i.e., those that have yet to call
-        get_complete) associated with a single get request.
-        Keyed on the requested field type -> integer count
     get_results : dict
         Keyed on the requested field type -> requested value
         This is cleared when no further requesters exist.
@@ -161,8 +157,7 @@ class _CacheItem:
         self.ts = ts
         self.failures = 0
 
-        self.requester_count = collections.defaultdict(lambda: 0)
-        self.get_results = collections.defaultdict(lambda: None)
+        self.get_results = collections.defaultdict(lambda: [None])
 
         if callbacks is None:
             callbacks = []
@@ -681,7 +676,7 @@ def _onGetEvent(args, **kws):
         result = memcopy(dbr.cast_args(args))
 
     with entry.lock:
-        entry.get_results[ftype] = result
+        entry.get_results[ftype][0] = result
 
 
 ## put event handler:
@@ -1319,10 +1314,8 @@ def get_with_metadata(chid, ftype=None, count=None, wait=True, timeout=None,
     #   None        implies no value, no expected callback
     #   GET_PENDING implies no value yet, callback expected.
     with entry.lock:
-        entry.requester_count[ftype] += 1
-        request_pending = entry.get_results[ftype] is GET_PENDING
-        if not request_pending:
-            entry.get_results[ftype] = GET_PENDING
+        if entry.get_results[ftype][0] is not GET_PENDING:
+            entry.get_results[ftype] = [GET_PENDING]
             ret = libca.ca_array_get_callback(
                 ftype, count, chid, _CB_GET, ctypes.py_object(ftype))
             PySEVCHK('get', ret)
@@ -1444,7 +1437,9 @@ def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
         count = min(count, element_count(chid))
 
     entry = get_cache(name(chid))
-    if entry.get_results[ftype] is None:
+    get_result = entry.get_results[ftype]
+
+    if get_result[0] is None:
         warnings.warn('get_complete without initial get() call')
         return None
 
@@ -1452,22 +1447,17 @@ def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
     if timeout is None:
         timeout = 1.0 + log10(max(1, count))
 
-    while True:
+    while get_result[0] is GET_PENDING:
         poll()
-        full_value = entry.get_results[ftype]
-        if full_value is not GET_PENDING:
-            break
 
         if time.time()-t0 > timeout:
             msg = "ca.get('%s') timed out after %.2f seconds."
             warnings.warn(msg % (name(chid), timeout))
             return None
 
+    full_value, = get_result
+
     # print("Get Complete> Unpack ", ncache['value'], count, ftype)
-    with entry.lock:
-        entry.requester_count[ftype] -= 1
-        if entry.requester_count[ftype] == 0:
-            entry.get_results[ftype] = None
 
     if isinstance(full_value, Exception):
         get_failure_reason = full_value
