@@ -1,5 +1,3 @@
-import pytest
-
 import epics
 import threading
 import pvnames
