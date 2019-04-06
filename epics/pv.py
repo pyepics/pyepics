@@ -108,6 +108,7 @@ class PV(object):
         self.ftype      = None
         self.connected  = False
         self.connection_timeout = connection_timeout
+        self._put_complete = False
         if self.connection_timeout is None:
             self.connection_timeout = ca.DEFAULT_CONNECTION_TIMEOUT
         self._args      = {}.fromkeys(self._fields)
@@ -475,16 +476,19 @@ class PV(object):
                     if val == value:
                         value = ival
                         break
-        if use_complete and callback is None:
-            callback = self.__putCallbackStub
+
+        def _put_callback(pvname=None, **kws):
+            self._put_complete = True
+            if callback is not None:
+                callback(pvname=pvname, **kws)
+
+        if callback and not use_complete:
+            use_complete = True
+
         return ca.put(self.chid, value,
                       wait=wait, timeout=timeout,
-                      callback=callback,
+                      callback=_put_callback if use_complete else None,
                       callback_data=callback_data)
-
-    def __putCallbackStub(self, pvname=None, **kws):
-        "null put-calback, so that the put_complete attribute is valid"
-        pass
 
     def _set_charval(self, val, call_ca=True, force_long_string=False):
         """ sets the character representation of the value.
@@ -890,11 +894,8 @@ class PV(object):
 
     @property
     def put_complete(self):
-        "returns True if a put-with-wait has completed"
-        putdone_data = ca._put_done.get(self.pvname, None)
-        if putdone_data is not None:
-            return putdone_data[0]
-        return True
+        "returns True if the last put-with-wait has completed"
+        return self._put_complete
 
     def __repr__(self):
         "string representation"

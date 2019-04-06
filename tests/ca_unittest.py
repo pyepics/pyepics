@@ -439,6 +439,11 @@ class CA_BasicTests(unittest.TestCase):
         self.assertEqual(conv, char_val)
 
 
+def test_smoke_show_cache():
+    ca.show_cache(print_out=True)
+    assert ca.show_cache(print_out=False) is not None
+
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase( CA_BasicTests)
     unittest.TextTestRunner(verbosity=1).run(suite)

@@ -79,10 +79,9 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 # Keyed on context, then on pv name (e.g., _cache[ctx][pvname])
 _cache = collections.defaultdict(dict)
 _namecache = {}
+_put_completes = []
 
 # logging.basicConfig(filename='ca.log',level=logging.DEBUG)
-## Cache of pvs waiting for put to be done.
-_put_done =  {}
 
 # get a unique python value that cannot be a value held by an
 # actual PV to signal "Get is incomplete, awaiting callback"
@@ -169,14 +168,35 @@ class _CacheItem:
 
     @property
     def chid_int(self):
+        'The channel id, as an integer'
         return _chid_to_int(self.chid)
 
     def run_access_event_callbacks(self, ra, wa):
+        '''
+        Run all access event callbacks
+
+        Parameters
+        ----------
+        ra : bool
+            Read-access
+        wa : bool
+            Write-access
+        '''
         for callback in list(self.access_event_callback):
             if callable(callback):
                 callback(ra, wa)
 
     def run_connection_callbacks(self, conn, timestamp):
+        '''
+        Run all connection callbacks
+
+        Parameters
+        ----------
+        conn : bool
+            Connected (True) or disconnected
+        timestamp : float
+            The event timestamp
+        '''
         self.conn = conn
         self.timestamp = timestamp
         self.failures = 0
@@ -433,7 +453,6 @@ def clear_cache():
 
     # Clear global state variables
     _cache.clear()
-    _put_done.clear()
 
     # Clear the cache of PVs used by epics.caget()-like functions
     from . import pv
@@ -617,7 +636,7 @@ def _onMonitorEvent(args):
         pass
 
     value = _unpack(args.chid, value, count=args.count, ftype=args.type)
-    if hasattr(args.usr, '__call__'):
+    if callable(args.usr):
         args.usr(value=value, **kwds)
 
 ## connection event handler:
@@ -686,16 +705,9 @@ def _onPutEvent(args, **kwds):
     if dbr.PY64_WINDOWS:
         args = args.contents
 
-    pvname = name(args.chid)
-    fcn  = _put_done[pvname][1]
-    data = _put_done[pvname][2]
-    _put_done[pvname] = (True, None, None)
-    if hasattr(fcn, '__call__'):
-        if isinstance(data, dict):
-            kwds.update(data)
-        elif data is not None:
-            kwds['data'] = data
-        fcn(pvname=pvname, **kwds)
+    fcn = args.usr
+    if callable(fcn):
+        fcn()
 
 
 def _onAccessRightsEvent(args):
@@ -1003,7 +1015,6 @@ def connect_channel(chid, timeout=None, verbose=False):
         # not connected yet, either indicating a slow network
         # or a truly un-connnectable channel.
         start_time = time.time()
-        ctx = current_context()
         pvname = name(chid)
         if timeout is None:
             timeout = DEFAULT_CONNECTION_TIMEOUT
@@ -1012,7 +1023,7 @@ def connect_channel(chid, timeout=None, verbose=False):
             poll()
             conn = (state(chid) == dbr.CS_CONN)
         if not conn:
-            entry = _cache[ctx][pvname]
+            entry = get_cache(pvname)
             with entry.lock:
                 entry.ts = time.time()
                 entry.failures += 1
@@ -1650,27 +1661,45 @@ def put(chid, value, wait=False, timeout=30, callback=None,
             raise ChannelAccessException(errmsg % (repr(value)))
 
     # simple put, without wait or callback
-    if not (wait or hasattr(callback, '__call__')):
+    if not (wait or callable(callback)):
         ret = libca.ca_array_put(ftype, count, chid, data)
         PySEVCHK('put', ret)
         poll()
         return ret
+
     # wait with callback (or put_complete)
     pvname = name(chid)
-    _put_done[pvname] = (False, callback, callback_data)
     start_time = time.time()
+    completed = dict(status=False)
 
-    ret = libca.ca_array_put_callback(ftype, count, chid,
-                                      data, _CB_PUTWAIT, 0)
+    def put_completed():
+        completed['status'] = True
+        _put_completes.remove(put_completed)
+        if not callable(callback):
+            return
+
+        if isinstance(callback_data, dict):
+            kwargs = callback_data
+        else:
+            kwargs = dict(data=callback_data)
+
+        callback(pvname=pvname, **kwargs)
+
+    _put_completes.append(put_completed)
+
+    ret = libca.ca_array_put_callback(ftype, count, chid, data, _CB_PUTWAIT,
+                                      ctypes.py_object(put_completed))
+
     PySEVCHK('put', ret)
     poll(evt=1.e-4, iot=0.05)
     if wait:
-        while not (_put_done[pvname][0] or
+        while not (completed['status'] or
                    (time.time()-start_time) > timeout):
             poll()
-        if not _put_done[pvname][0]:
+        if not completed['status']:
             ret = -ret
     return ret
+
 
 @withMaybeConnectedCHID
 def get_ctrlvars(chid, timeout=5.0, warn=True):
