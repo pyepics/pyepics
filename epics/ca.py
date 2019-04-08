@@ -18,7 +18,6 @@ import ctypes.util
 import atexit
 import collections
 import functools
-import logging
 import os
 import sys
 import threading
@@ -181,14 +180,35 @@ class _CacheItem:
 
     @property
     def chid_int(self):
+        'The channel id, as an integer'
         return _chid_to_int(self.chid)
 
     def run_access_event_callbacks(self, ra, wa):
+        '''
+        Run all access event callbacks
+
+        Parameters
+        ----------
+        ra : bool
+            Read-access
+        wa : bool
+            Write-access
+        '''
         for callback in list(self.access_event_callback):
             if callable(callback):
                 callback(ra, wa)
 
     def run_connection_callbacks(self, conn, timestamp):
+        '''
+        Run all connection callbacks
+
+        Parameters
+        ----------
+        conn : bool
+            Connected (True) or disconnected
+        timestamp : float
+            The event timestamp
+        '''
         self.conn = conn
         self.timestamp = timestamp
         self.failures = 0
@@ -611,7 +631,7 @@ def _onMonitorEvent(args):
         pass
 
     value = _unpack(args.chid, value, count=args.count, ftype=args.type)
-    if hasattr(args.usr, '__call__'):
+    if callable(args.usr):
         args.usr(value=value, **kwds)
 
 ## connection event handler:
@@ -1312,7 +1332,8 @@ def get_with_metadata(chid, ftype=None, count=None, wait=True, timeout=None,
     #   None        implies no value, no expected callback
     #   GET_PENDING implies no value yet, callback expected.
     with entry.lock:
-        if entry.get_results[ftype][0] is not GET_PENDING:
+        last_get, = entry.get_results[ftype]
+        if last_get is not GET_PENDING:
             entry.get_results[ftype] = [GET_PENDING]
             ret = libca.ca_array_get_callback(
                 ftype, count, chid, _CB_GET, ctypes.py_object(ftype))
