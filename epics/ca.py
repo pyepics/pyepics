@@ -82,6 +82,7 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 #                  change (accumulated in the cache)
 _cache  = {}
 _namecache = {}
+_put_completes = []
 
 # logging.basicConfig(filename='ca.log',level=logging.DEBUG)
 ## Cache of pvs waiting for put to be done.
@@ -626,16 +627,9 @@ def _onPutEvent(args, **kwds):
     if dbr.PY64_WINDOWS:
         args = args.contents
 
-    pvname = name(args.chid)
-    fcn  = _put_done[pvname][1]
-    data = _put_done[pvname][2]
-    _put_done[pvname] = (True, None, None)
-    if hasattr(fcn, '__call__'):
-        if isinstance(data, dict):
-            kwds.update(data)
-        elif data is not None:
-            kwds['data'] = data
-        fcn(pvname=pvname, **kwds)
+    fcn = args.usr
+    if callable(fcn):
+        fcn()
 
 
 def _onAccessRightsEvent(args):
@@ -1586,27 +1580,45 @@ def put(chid, value, wait=False, timeout=30, callback=None,
             raise ChannelAccessException(errmsg % (repr(value)))
 
     # simple put, without wait or callback
-    if not (wait or hasattr(callback, '__call__')):
+    if not (wait or callable(callback)):
         ret = libca.ca_array_put(ftype, count, chid, data)
         PySEVCHK('put', ret)
         poll()
         return ret
+
     # wait with callback (or put_complete)
     pvname = name(chid)
-    _put_done[pvname] = (False, callback, callback_data)
     start_time = time.time()
+    completed = dict(status=False)
 
-    ret = libca.ca_array_put_callback(ftype, count, chid,
-                                      data, _CB_PUTWAIT, 0)
+    def put_completed():
+        completed['status'] = True
+        _put_completes.remove(put_completed)
+        if not callable(callback):
+            return
+
+        if isinstance(callback_data, dict):
+            kwargs = callback_data
+        else:
+            kwargs = dict(data=callback_data)
+
+        callback(pvname=pvname, **kwargs)
+
+    _put_completes.append(put_completed)
+
+    ret = libca.ca_array_put_callback(ftype, count, chid, data, _CB_PUTWAIT,
+                                      ctypes.py_object(put_completed))
+
     PySEVCHK('put', ret)
     poll(evt=1.e-4, iot=0.05)
     if wait:
-        while not (_put_done[pvname][0] or
+        while not (completed['status'] or
                    (time.time()-start_time) > timeout):
             poll()
-        if not _put_done[pvname][0]:
+        if not completed['status']:
             ret = -ret
     return ret
+
 
 @withMaybeConnectedCHID
 def get_ctrlvars(chid, timeout=5.0, warn=True):
