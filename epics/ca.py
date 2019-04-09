@@ -15,11 +15,11 @@ documentation here is developer documentation.
 import ctypes
 import ctypes.util
 
+import functools
 import os
 import sys
 import time
-import logging
-from  math import log10
+from math import log10
 import atexit
 import warnings
 from threading import Thread
@@ -375,15 +375,13 @@ def withCA(fcn):
     Note that CA functions that take a Channel ID (chid) as an
     argument are  NOT wrapped by this: to get a chid, the
     library must have been initialized already."""
+    @functools.wraps(fcn)
     def wrapper(*args, **kwds):
         "withCA wrapper"
         global libca
         if libca is None:
             initialize_libca()
         return fcn(*args, **kwds)
-    wrapper.__doc__ = fcn.__doc__
-    wrapper.__name__ = fcn.__name__
-    wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
 def withCHID(fcn):
@@ -395,6 +393,7 @@ def withCHID(fcn):
     # It may be worth making a chid class (which could hold connection
     # data of _cache) that could be tested here.  For now, that
     # seems slightly 'not low-level' for this module.
+    @functools.wraps(fcn)
     def wrapper(*args, **kwds):
         "withCHID wrapper"
         if len(args)>0:
@@ -408,9 +407,6 @@ def withCHID(fcn):
                 raise ChannelAccessException(msg)
 
         return fcn(*args, **kwds)
-    wrapper.__doc__ = fcn.__doc__
-    wrapper.__name__ = fcn.__name__
-    wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
 
@@ -420,6 +416,7 @@ def withConnectedCHID(fcn):
     robust, and will try to make sure a ``chid`` is actually connected
     before calling the decorated function.
     """
+    @functools.wraps(fcn)
     def wrapper(*args, **kwds):
         "withConnectedCHID wrapper"
         if len(args)>0:
@@ -439,15 +436,13 @@ def withConnectedCHID(fcn):
                                                 name(chid), timeout))
 
         return fcn(*args, **kwds)
-    wrapper.__doc__ = fcn.__doc__
-    wrapper.__name__ = fcn.__name__
-    wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
 def withMaybeConnectedCHID(fcn):
     """decorator to **try** to ensure that the first argument of a function
     is a connected Channel ID, ``chid``.
     """
+    @functools.wraps(fcn)
     def wrapper(*args, **kwds):
         "withMaybeConnectedCHID wrapper"
         if len(args)>0:
@@ -462,22 +457,17 @@ def withMaybeConnectedCHID(fcn):
                 timeout = kwds.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
                 connect_channel(chid, timeout=timeout)
         return fcn(*args, **kwds)
-    wrapper.__doc__ = fcn.__doc__
-    wrapper.__name__ = fcn.__name__
-    wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
 def withInitialContext(fcn):
     """decorator to ensure that the wrapped function uses the
     initial threading context created at initialization of CA
     """
+    @functools.wraps(fcn)
     def wrapper(*args, **kwds):
         "withInitialContext wrapper"
         use_initial_context()
         return fcn(*args, **kwds)
-    wrapper.__doc__ = fcn.__doc__
-    wrapper.__name__ = fcn.__name__
-    wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
 def PySEVCHK(func_name, status, expected=dbr.ECA_NORMAL):
@@ -499,13 +489,11 @@ def withSEVCHK(fcn):
     function whose return value is from a corresponding libca function
     and whose return value should be ``dbr.ECA_NORMAL``.
     """
+    @functools.wraps(fcn)
     def wrapper(*args, **kwds):
         "withSEVCHK wrapper"
         status = fcn(*args, **kwds)
         return PySEVCHK( fcn.__name__, status)
-    wrapper.__doc__ = fcn.__doc__
-    wrapper.__name__ = fcn.__name__
-    wrapper.__dict__.update(fcn.__dict__)
     return wrapper
 
 ##
