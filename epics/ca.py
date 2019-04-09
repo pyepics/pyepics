@@ -719,8 +719,6 @@ def _onAccessRightsEvent(args):
     ra = bool(args.read_access)
     wa = bool(args.write_access)
 
-    # Getting bunk result from ca.current_context on channel disconnect
-    # Do this the long way...
     entry = get_cache(pvname)
     if entry is not None:
         entry.run_access_event_callbacks(ra, wa)
