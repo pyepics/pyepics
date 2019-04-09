@@ -127,6 +127,7 @@ class PV(object):
             self.access_callbacks = [access_callback]
 
         self.callbacks  = {}
+        self._put_complete = None
         self._monref = None  # holder of data returned from create_subscription
         self._conn_started = False
         if isinstance(callback, (tuple, list)):
@@ -481,8 +482,9 @@ class PV(object):
             if callback is not None:
                 callback(pvname=pvname, **kws)
 
-        if use_complete:
-            self._put_complete = False
+        self._put_complete = (False
+                              if use_complete
+                              else None)
 
         return ca.put(self.chid, value,
                       wait=wait, timeout=timeout,

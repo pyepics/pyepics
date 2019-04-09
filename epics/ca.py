@@ -82,11 +82,11 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 #                  change (accumulated in the cache)
 _cache  = {}
 _namecache = {}
+
+# Puts with completion in progress:
 _put_completes = []
 
 # logging.basicConfig(filename='ca.log',level=logging.DEBUG)
-## Cache of pvs waiting for put to be done.
-_put_done =  {}
 
 # get a unique python value that cannot be a value held by an
 # actual PV to signal "Get is incomplete, awaiting callback"
@@ -344,7 +344,6 @@ def clear_cache():
     # Clear global state variables
     global _cache
     _cache.clear()
-    _put_done.clear()
 
     # Clear the cache of PVs used by epics.caget()-like functions
     from . import pv
