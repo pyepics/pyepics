@@ -638,10 +638,6 @@ def _onMonitorEvent(args):
     # callback to get informed of connection loss, so we just ignore any
     # bad status codes.
 
-    # for 64-bit python on Windows!
-    if dbr.PY64_WINDOWS:
-        args = args.contents
-
     if args.status != dbr.ECA_NORMAL:
         return
 
@@ -664,27 +660,16 @@ def _onMonitorEvent(args):
 
 ## connection event handler:
 def _onConnectionEvent(args):
-    """set flag in cache holding whteher channel is
-    connected. if provided, run a user-function"""
-    timestamp = time.time()
-
-    # for 64-bit python on Windows!
-    if dbr.PY64_WINDOWS:
-        args = args.contents
-
+    "Connection notification - run user callbacks"
     entry = _get_or_create_cache_item(args.chid)
     entry.run_connection_callbacks(conn=(args.op == dbr.OP_CONN_UP),
-                                   timestamp=timestamp)
+                                   timestamp=time.time())
 
 
 ## get event handler:
 def _onGetEvent(args, **kws):
     """get_callback event: simply store data contents which
     will need conversion to python data with _unpack()."""
-    # for 64-bit python on Windows!
-    if dbr.PY64_WINDOWS:
-        args = args.contents
-
     # print("GET EVENT: chid, user ", args.chid, args.usr)
     # print("GET EVENT: type, count ", args.type, args.count)
     # print("GET EVENT: status ",  args.status, dbr.ECA_NORMAL)
@@ -712,25 +697,35 @@ def _onGetEvent(args, **kws):
 
 ## put event handler:
 def _onPutEvent(args, **kwds):
-    """set put-has-completed for this channel,
-    call optional user-supplied callback"""
-    # for 64-bit python on Windows!
-    if dbr.PY64_WINDOWS:
-        args = args.contents
-
+    'Put completion notification - run specified callback'
     fcn = args.usr
     if callable(fcn):
         fcn()
 
 
 def _onAccessRightsEvent(args):
-    # for 64-bit python on Windows!
-    if dbr.PY64_WINDOWS:
-        args = args.contents
-
+    'Access rights callback'
     entry = _get_or_create_cache_item(args.chid)
-    entry.run_access_event_callbacks(bool(args.read_access),
-                                     bool(args.write_access))
+    entry.run_access_event_callbacks(
+        bool(args.read_access), bool(args.write_access))
+
+
+if dbr.PY64_WINDOWS:
+    def _py64_wrapper(func):
+        @functools.wraps(func)
+        def wrapped(arg, **kwargs):
+            # On 64-bit Windows, `arg.contents` seems to be equivalent to other
+            # platforms' `arg`
+            if hasattr(arg, 'contents'):
+                return func(arg.contents, **kwargs)
+            return func(arg, **kwargs)
+        return wrapped
+
+    _onConnectionEvent = _py64_wrapper(_onConnectionEvent)
+    _onPutEvent = _py64_wrapper(_onPutEvent)
+    _onGetEvent = _py64_wrapper(_onGetEvent)
+    _onMonitorEvent = _py64_wrapper(_onMonitorEvent)
+    _onAccessRightsEvent = _py64_wrapper(_onAccessRightsEvent)
 
 
 # create global reference to these callbacks
