@@ -27,7 +27,7 @@ import warnings
 from math import log10
 from pkg_resources import resource_filename
 
-from .utils import (STR2BYTES, BYTES2STR, NULLCHAR, NULLCHAR_2,
+from .utils import (STR2BYTES, BYTES2STR, NULLCHAR_2,
                     strjoin, memcopy, is_string, is_string_or_bytes,
                     ascii_string, clib_search_path)
 
@@ -78,7 +78,6 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 ## Cache of existing channel IDs:
 # Keyed on context, then on pv name (e.g., _cache[ctx][pvname])
 _cache = collections.defaultdict(dict)
-_namecache = {}
 
 # Puts with completion in progress:
 _put_completes = []
@@ -958,7 +957,6 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
                                           ctypes.byref(chid))
             PySEVCHK('create_channel', ret)
 
-    _namecache[_chid_to_int(chid)] = BYTES2STR(pvn)
     if connect:
         connect_channel(chid)
     return chid
@@ -1053,16 +1051,7 @@ def _chid_to_int(chid):
 @withCHID
 def name(chid):
     "return PV name for channel name"
-    # sys.stdout.write("NAME %s %s\n" % (repr(chid), repr(chid.value in _namecache)))
-    # sys.stdout.flush()
-
-    chid = _chid_to_int(chid)
-    try:
-        return _namecache[chid]
-    except KeyError:
-        name = BYTES2STR(libca.ca_name(chid))
-        _namecache[chid] = name
-        return name
+    return BYTES2STR(libca.ca_name(chid))
 
 @withCHID
 def host_name(chid):
