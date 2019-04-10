@@ -415,6 +415,35 @@ def get_cache(pvname):
     return _cache[current_context()].get(pvname, None)
 
 
+def _get_or_create_cache_item(chid, pvname=None):
+    '''
+    Return the current _CacheItem for a given chid, or create a new one
+
+    Parameters
+    ----------
+    chid : ctypes.c_long or None
+        Channel ID, if known
+    pvname : str, optional
+        PV name, if known
+
+    Returns
+    -------
+    item : _CacheItem
+        The _CacheItem for the chid
+    '''
+    context_cache = _cache[current_context()]
+
+    if chid is not None:
+        chid = _chid_to_int(chid)
+        pvname = name(chid)
+
+    try:
+        return context_cache[pvname]
+    except KeyError:
+        context_cache[pvname] = _CacheItem(chid=chid, pvname=pvname)
+        return context_cache[pvname]
+
+
 def show_cache(print_out=True):
     """print out a listing of PVs in the current session to
     standard output.  Use the *print_out=False* option to be
@@ -643,19 +672,9 @@ def _onConnectionEvent(args):
     if dbr.PY64_WINDOWS:
         args = args.contents
 
-    conn = (args.op == dbr.OP_CONN_UP)
-
-    # search for PV in any context...
-    pvname = name(args.chid)
-    entry = get_cache(pvname)
-
-    # logging.debug("ConnectionEvent %s/%i/%i " % (pvname, args.chid, conn))
-    # print("ConnectionEvent %s/%i/%i " % (pvname, args.chid, conn))
-    if entry is None:
-        entry = _CacheItem(chid=args.chid, pvname=pvname)
-        _cache[current_context()][pvname] = entry
-
-    entry.run_connection_callbacks(conn=conn, timestamp=timestamp)
+    entry = _get_or_create_cache_item(args.chid)
+    entry.run_connection_callbacks(conn=(args.op == dbr.OP_CONN_UP),
+                                   timestamp=timestamp)
 
 
 ## get event handler:
@@ -670,6 +689,9 @@ def _onGetEvent(args, **kws):
     # print("GET EVENT: type, count ", args.type, args.count)
     # print("GET EVENT: status ",  args.status, dbr.ECA_NORMAL)
     entry = get_cache(name(args.chid))
+    if not entry:
+        return
+
     ftype = (args.usr.value if dbr.IRON_PYTHON
              else args.usr)
 
@@ -706,14 +728,9 @@ def _onAccessRightsEvent(args):
     if dbr.PY64_WINDOWS:
         args = args.contents
 
-    chid = args.chid
-    pvname = name(chid)
-    ra = bool(args.read_access)
-    wa = bool(args.write_access)
-
-    entry = get_cache(pvname)
-    if entry is not None:
-        entry.run_access_event_callbacks(ra, wa)
+    entry = _get_or_create_cache_item(args.chid)
+    entry.run_access_event_callbacks(bool(args.read_access),
+                                     bool(args.write_access))
 
 
 # create global reference to these callbacks
@@ -927,34 +944,23 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
     # a reference to _onConnectionEvent:  This is really the connection
     # callback that is run -- the callack here is stored in the _cache
     # and called by _onConnectionEvent.
-    pvn = STR2BYTES(pvname)
-    ctx_cache = _cache[current_context()]
-    try:
-        entry = ctx_cache[pvname]
-    except KeyError:
-        # New entry for this context
-        entry = _CacheItem(chid=None, pvname=pvname, callbacks=[callback])
-        ctx_cache[pvname] = entry
-        # logging.debug("Create Channel %s " % pvname)
-    else:
-        if not entry.conn and callback is not None: # pending connection
-            entry.callbacks.append(callback)
-        elif callable(callback) and callback not in entry.callbacks:
-            entry.callbacks.append(callback)
+    entry = _get_or_create_cache_item(None, pvname=pvname)
+    if callable(callback) and callback not in entry.callbacks:
+        entry.callbacks.append(callback)
+        if entry.chid is not None and entry.conn:
             callback(chid=_chid_to_int(entry.chid), pvname=pvname,
                      conn=entry.conn)
-
-    conncb = 0
-    if auto_cb:
-        conncb = _CB_CONNECT
 
     with entry.lock:
         chid = entry.chid
         if chid is None:
+            conncb = (_CB_CONNECT if auto_cb
+                      else 0)
+
             chid = dbr.chid_t()
             entry.chid = chid
-            ret = libca.ca_create_channel(ctypes.c_char_p(pvn), conncb, 0, 0,
-                                          ctypes.byref(chid))
+            ret = libca.ca_create_channel(ctypes.c_char_p(STR2BYTES(pvname)),
+                                          conncb, 0, 0, ctypes.byref(chid))
             PySEVCHK('create_channel', ret)
 
     if connect:
