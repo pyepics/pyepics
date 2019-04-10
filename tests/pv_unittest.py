@@ -549,6 +549,35 @@ def test_multithreaded_get(num_threads):
     assert value is not None
 
 
+@pytest.mark.parametrize('num_threads', [1, 10, 100])
+def test_multithreaded_put_complete(num_threads):
+    def callback(pvname, data):
+        result.append(data)
+
+    def thread(thread_idx):
+        pv.put(thread_idx, callback=callback,
+               callback_data=dict(data=thread_idx),
+               wait=True)
+        time.sleep(0.1)
+
+    result = []
+    ca.use_initial_context()
+    pv = PV(pvnames.double_pv)
+
+    threads = [ca.CAThread(target=thread, args=(i, ))
+               for i in range(num_threads)]
+
+    with no_simulator_updates():
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+
+    assert len(result) == num_threads
+    print(result)
+    assert set(result) == set(range(num_threads))
+
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase( PV_Tests)
     unittest.TextTestRunner(verbosity=1).run(suite)
