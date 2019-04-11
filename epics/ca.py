@@ -86,11 +86,8 @@ _put_completes = []
 
 class _GetPending:
     """
-    _GetPending is used to create a unique python value that cannot be held as
-    an actual PV value.
-
-    A unique python value that cannot be a value held by an actual PV to signal
-    "Get is incomplete, awaiting callback"
+    A unique python object that cannot be a value held by an actual PV to
+    signal "Get is incomplete, awaiting callback"
     """
     def __repr__(self):
         return 'GET_PENDING'
@@ -150,10 +147,8 @@ class _CacheItem:
         Number of failed connection attempts
     get_results : dict
         Keyed on the requested field type -> requested value
-        This is cleared when no further requesters exist.
     callbacks : list
-        One or more user functions to be called on change (accumulated in the
-        cache)
+        One or more user functions to be called on change of value
     access_event_callbacks : list
         One or more user functions to be called on change of access rights
     '''
