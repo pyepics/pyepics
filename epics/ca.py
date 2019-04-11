@@ -710,24 +710,6 @@ def _onAccessRightsEvent(args):
         bool(args.read_access), bool(args.write_access))
 
 
-if dbr.PY64_WINDOWS:
-    def _py64_wrapper(func):
-        @functools.wraps(func)
-        def wrapped(arg, **kwargs):
-            # On 64-bit Windows, `arg.contents` seems to be equivalent to other
-            # platforms' `arg`
-            if hasattr(arg, 'contents'):
-                return func(arg.contents, **kwargs)
-            return func(arg, **kwargs)
-        return wrapped
-
-    _onConnectionEvent = _py64_wrapper(_onConnectionEvent)
-    _onPutEvent = _py64_wrapper(_onPutEvent)
-    _onGetEvent = _py64_wrapper(_onGetEvent)
-    _onMonitorEvent = _py64_wrapper(_onMonitorEvent)
-    _onAccessRightsEvent = _py64_wrapper(_onAccessRightsEvent)
-
-
 # create global reference to these callbacks
 _CB_CONNECT = dbr.make_callback(_onConnectionEvent, dbr.connection_args)
 _CB_PUTWAIT = dbr.make_callback(_onPutEvent,        dbr.event_handler_args)

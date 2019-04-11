@@ -10,6 +10,7 @@
 This is mostly copied from CA header files
 """
 import ctypes
+import functools
 import os
 import sys
 import platform
@@ -317,12 +318,25 @@ def cast_args(args):
                 ctypes.cast(args.raw_dbr,
                             ctypes.POINTER(args.count * Map[ftype])).contents
                 ]
-def make_callback(func, args):
-    """ make callback function"""
-    # note that ctypes.POINTER is needed for 64-bit Python on Windows
-    if PY64_WINDOWS:
-        args = ctypes.POINTER(args)
-    return ctypes.CFUNCTYPE(None, args)(func)
+
+
+if PY64_WINDOWS:
+    def make_callback(func, args):
+        """ make callback function"""
+        # note that ctypes.POINTER is needed for 64-bit Python on Windows
+        @functools.wraps(func)
+        def wrapped(arg, **kwargs):
+            # On 64-bit Windows, `arg.contents` seems to be equivalent to other
+            # platforms' `arg`
+            if hasattr(arg, 'contents'):
+                return func(arg.contents, **kwargs)
+            return func(arg, **kwargs)
+
+        return ctypes.CFUNCTYPE(None, ctypes.POINTER(args))(wrapped)
+else:
+    def make_callback(func, args):
+        """ make callback function"""
+        return ctypes.CFUNCTYPE(None, args)(func)
 
 
 class event_handler_args(ctypes.Structure):
