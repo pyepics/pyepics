@@ -205,7 +205,7 @@ class _CacheItem:
             The event timestamp
         '''
         self.conn = conn
-        self.timestamp = timestamp
+        self.ts = timestamp
         self.failures = 0
 
         chid_int = self.chid_int
