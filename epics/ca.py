@@ -1008,7 +1008,7 @@ def connect_channel(chid, timeout=None, verbose=False):
 def replace_access_rights_event(chid, callback=None):
     ch = get_cache(name(chid))
 
-    if callback is not None:
+    if ch and callback is not None:
         ch.access_event_callback.append(callback)
 
     ret = libca.ca_replace_access_rights_event(chid, _CB_ACCESS)
@@ -1291,6 +1291,9 @@ def get_with_metadata(chid, ftype=None, count=None, wait=True, timeout=None,
         count = min(count, element_count(chid))
 
     entry = get_cache(name(chid))
+    if not entry:
+        return
+
     # implementation note: cached value of
     #   None        implies no value, no expected callback
     #   GET_PENDING implies no value yet, callback expected.
@@ -1419,6 +1422,9 @@ def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
         count = min(count, element_count(chid))
 
     entry = get_cache(name(chid))
+    if not entry:
+        return
+
     get_result = entry.get_results[ftype]
 
     if get_result[0] is None:
