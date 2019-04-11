@@ -415,33 +415,34 @@ def get_cache(pvname):
     return _cache[current_context()].get(pvname, None)
 
 
-def _get_or_create_cache_item(chid, pvname=None):
+def _get_or_create_cache_item_by_pvname(pvname, chid=None):
+    '''
+    Return the current _CacheItem for a given pvname, or create a new one
+    '''
+    context_cache = _cache[current_context()]
+    try:
+        return context_cache[pvname]
+    except KeyError:
+        context_cache[pvname] = _CacheItem(chid=_chid_to_int(chid),
+                                           pvname=pvname)
+        return context_cache[pvname]
+
+
+def _get_or_create_cache_item_by_chid(chid):
     '''
     Return the current _CacheItem for a given chid, or create a new one
 
     Parameters
     ----------
-    chid : ctypes.c_long or None
-        Channel ID, if known
-    pvname : str, optional
-        PV name, if known
+    chid : ctypes.c_long
+        Channel ID
 
     Returns
     -------
     item : _CacheItem
         The _CacheItem for the chid
     '''
-    context_cache = _cache[current_context()]
-
-    if chid is not None:
-        chid = _chid_to_int(chid)
-        pvname = name(chid)
-
-    try:
-        return context_cache[pvname]
-    except KeyError:
-        context_cache[pvname] = _CacheItem(chid=chid, pvname=pvname)
-        return context_cache[pvname]
+    return _get_or_create_cache_item_by_pvname(name(chid), chid=chid)
 
 
 def show_cache(print_out=True):
@@ -661,7 +662,7 @@ def _onMonitorEvent(args):
 ## connection event handler:
 def _onConnectionEvent(args):
     "Connection notification - run user callbacks"
-    entry = _get_or_create_cache_item(args.chid)
+    entry = _get_or_create_cache_item_by_chid(args.chid)
     entry.run_connection_callbacks(conn=(args.op == dbr.OP_CONN_UP),
                                    timestamp=time.time())
 
@@ -705,7 +706,7 @@ def _onPutEvent(args, **kwds):
 
 def _onAccessRightsEvent(args):
     'Access rights callback'
-    entry = _get_or_create_cache_item(args.chid)
+    entry = _get_or_create_cache_item_by_chid(args.chid)
     entry.run_access_event_callbacks(
         bool(args.read_access), bool(args.write_access))
 
@@ -921,7 +922,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
     # a reference to _onConnectionEvent:  This is really the connection
     # callback that is run -- the callack here is stored in the _cache
     # and called by _onConnectionEvent.
-    entry = _get_or_create_cache_item(None, pvname=pvname)
+    entry = _get_or_create_cache_item_by_pvname(pvname=pvname, chid=None)
     if callable(callback) and callback not in entry.callbacks:
         entry.callbacks.append(callback)
         if entry.chid is not None and entry.conn:
