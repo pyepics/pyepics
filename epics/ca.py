@@ -558,7 +558,7 @@ def withConnectedCHID(fcn):
             if not isConnected(chid):
                 timeout = kwds.get('timeout', DEFAULT_CONNECTION_TIMEOUT)
                 connected =  connect_channel(chid, timeout=timeout)
-                if not connected and raise_on_unconnected:
+                if not connected:
                     fmt ="%s() timed out waiting '%s' to connect (%d seconds)"
                     raise ChannelAccessException(fmt % (fcn.__name__,
                                                 name(chid), timeout))
