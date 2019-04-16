@@ -195,6 +195,7 @@ class PV(object):
         if pvid not in _PVcache_:
             _PVcache_[pvid] = self
 
+    @_ensure_context
     def force_connect(self, pvname=None, chid=None, conn=True, **kws):
         if chid is None: chid = self.chid
         if isinstance(chid, ctypes.c_long):
@@ -213,6 +214,7 @@ class PV(object):
         self._args['read_access'] = (1 == ca.read_access(self.chid))
         self._args['write_access'] = (1 == ca.write_access(self.chid))
 
+    @_ensure_context
     def __on_access_rights_event(self, read_access, write_access):
         self._args['read_access'] = read_access
         self._args['write_access'] = write_access
@@ -225,6 +227,7 @@ class PV(object):
             if callable(cb):
                 cb(read_access, write_access, pv=self)
 
+    @_ensure_context
     def __on_connect(self, pvname=None, chid=None, conn=True):
         "callback for connection events"
         # occassionally chid is still None (ie if a second PV is created
@@ -649,6 +652,7 @@ class PV(object):
                                      self._args['char_value'], now))
         self.run_callbacks()
 
+    @_ensure_context
     def run_callbacks(self):
         """run all user-defined callbacks with the current data
 
@@ -659,6 +663,7 @@ class PV(object):
         for index in sorted(list(self.callbacks.keys())):
             self.run_callback(index)
 
+    @_ensure_context
     def run_callback(self, index):
         """run a specific user-defined callback, specified by index,
         with the current data
@@ -705,6 +710,7 @@ class PV(object):
                 self.run_callback(index)
         return index
 
+    @_ensure_context
     def remove_callback(self, index=None):
         """remove a callback by index"""
         if index in self.callbacks:
