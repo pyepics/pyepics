@@ -578,6 +578,36 @@ def test_multithreaded_put_complete(num_threads):
     assert set(result) == set(range(num_threads))
 
 
+def test_force_connect():
+    pv = PV(pvnames.double_arrays[0], auto_monitor=True)
+
+    print("Connecting")
+    assert pv.wait_for_connection(5.0)
+
+    print("SUM", pv.get().sum())
+
+    time.sleep(3)
+
+    print("Disconnecting")
+    pv.disconnect()
+    print("Reconnecting")
+
+    pv.force_connect()
+    assert pv.wait_for_connection(5.0)
+
+    called = {'called': False}
+
+    def callback(value=None, **kwargs):
+        called['called'] = True
+        print("update", value.sum())
+
+    pv.add_callback(callback)
+
+    time.sleep(1)
+    assert pv.get() is not None
+    assert called['called']
+
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase( PV_Tests)
     unittest.TextTestRunner(verbosity=1).run(suite)
