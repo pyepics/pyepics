@@ -571,7 +571,8 @@ class PV(object):
         if not self.wait_for_connection():
             return None
         kwds = ca.get_ctrlvars(self.chid, timeout=timeout, warn=warn)
-        self._args.update(kwds)
+        if kwds is not None:
+            self._args.update(kwds)
         self.force_read_access_rights()
         return kwds
 
@@ -580,7 +581,8 @@ class PV(object):
         if not self.wait_for_connection():
             return None
         kwds = ca.get_timevars(self.chid, timeout=timeout, warn=warn)
-        self._args.update(kwds)
+        if kwds is not None:
+            self._args.update(kwds)
         return kwds
 
 
