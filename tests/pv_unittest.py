@@ -5,6 +5,7 @@ import sys
 import time
 import unittest
 import numpy
+import threading
 import pytest
 
 from contextlib import contextmanager
@@ -520,7 +521,8 @@ class PV_Tests(unittest.TestCase):
 
 
 @pytest.mark.parametrize('num_threads', [1, 10, 200])
-def test_multithreaded_get(num_threads):
+@pytest.mark.parametrize('thread_class', [ca.CAThread, threading.Thread])
+def test_multithreaded_get(num_threads, thread_class):
     def thread(thread_idx):
         result[thread_idx] = (pv.get(),
                               pv.get_with_metadata(form='ctrl')['value'],
@@ -531,7 +533,7 @@ def test_multithreaded_get(num_threads):
     ca.use_initial_context()
     pv = PV(pvnames.double_pv)
 
-    threads = [ca.CAThread(target=thread, args=(i, ))
+    threads = [thread_class(target=thread, args=(i, ))
                for i in range(num_threads)]
 
     with no_simulator_updates():

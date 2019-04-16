@@ -9,6 +9,7 @@
 import time
 import ctypes
 import copy
+import functools
 from math import log10
 
 from . import ca
@@ -21,6 +22,44 @@ except ImportError:
     from argparse import Namespace
 
 _PVcache_ = {}
+
+
+def _ensure_context(func):
+    '''
+    Wrapper that ensures a method is called in the correct CA context
+
+    Assumes the instance has a `context` attribute
+
+    Raises
+    ------
+    RuntimeError
+        If the expected context (self.context) is unset (None), or the current
+        thread cannot get a valid context.  Both conditions would normally
+        result in a segmentation fault if left unchecked.
+    '''
+    @functools.wraps(func)
+    def wrapped(self, *args, **kwargs):
+        initial_context = ca.current_context()
+        expected_context = self.context
+        if expected_context is None:
+            raise RuntimeError('Expected CA context is unset')
+        elif expected_context == initial_context:
+            return func(self, *args, **kwargs)
+
+        # If not using the expected context, switch to it here:
+        if initial_context is not None:
+            ca.detach_context()
+        ca.attach_context(expected_context)
+        try:
+            return func(self, *args, **kwargs)
+        finally:
+            # Then revert back to the initial calling context
+            if initial_context is not None:
+                ca.detach_context()
+                ca.attach_context(initial_context)
+
+    return wrapped
+
 
 def get_pv(pvname, form='time',  connect=False,
            context=None, timeout=5.0, **kws):
@@ -163,6 +202,7 @@ class PV(object):
         self._args['chid'] = self.chid = chid
         self.__on_connect(pvname=pvname, chid=chid, conn=conn, **kws)
 
+    @_ensure_context
     def force_read_access_rights(self):
         """force a read of access rights, not relying
         on last event callback.
@@ -253,12 +293,11 @@ class PV(object):
         self.connected = conn
         return
 
+    @_ensure_context
     def wait_for_connection(self, timeout=None):
         """wait for a connection that started with connect() to finish"""
 
         # make sure we're in the CA context used to create this PV
-        if self.context != ca.current_context():
-            ca.attach_context(self.context)
         if not self.connected:
             start_time = time.time()
             if not self._conn_started:
@@ -271,6 +310,7 @@ class PV(object):
                     ca.poll()
         return self.connected
 
+    @_ensure_context
     def connect(self, timeout=None):
         "check that a PV is connected, forcing a connection if needed"
         if not self.connected:
@@ -280,6 +320,7 @@ class PV(object):
         self._conn_started = True
         return self.connected and self.ftype is not None
 
+    @_ensure_context
     def clear_auto_monitor(self):
         """turn off auto-monitoring: must reconnect to re-enable monitoring"""
         self.auto_monitor = False
@@ -297,6 +338,7 @@ class PV(object):
         self.force_connect()
         return self.wait_for_connection()
 
+    @_ensure_context
     def poll(self, evt=1.e-4, iot=1.0):
         "poll for changes"
         ca.poll(evt=evt, iot=iot)
@@ -331,6 +373,7 @@ class PV(object):
                 if data is not None
                 else None)
 
+    @_ensure_context
     def get_with_metadata(self, count=None, as_string=False, as_numpy=True,
                           timeout=None, with_ctrlvars=False, form=None,
                           use_monitor=True, as_namespace=False):
@@ -459,6 +502,7 @@ class PV(object):
             return Namespace(**md)
         return md
 
+    @_ensure_context
     def put(self, value, wait=False, timeout=30.0,
             use_complete=False, callback=None, callback_data=None):
         """set value for PV, optionally waiting until the processing is
@@ -566,6 +610,7 @@ class PV(object):
         self._args['char_value'] = cval
         return cval
 
+    @_ensure_context
     def get_ctrlvars(self, timeout=5, warn=True):
         "get control values for variable"
         if not self.wait_for_connection():
@@ -576,6 +621,7 @@ class PV(object):
         self.force_read_access_rights()
         return kwds
 
+    @_ensure_context
     def get_timevars(self, timeout=5, warn=True):
         "get time values for variable"
         if not self.wait_for_connection():
@@ -794,6 +840,7 @@ class PV(object):
             return self._getarg('count')
 
     @property
+    @_ensure_context
     def nelm(self):
         """native count (number of elements).
         For array data this will return the full array size (ie, the
@@ -921,6 +968,7 @@ class PV(object):
         except AttributeError:
             return False
 
+    @_ensure_context
     def disconnect(self):
         "disconnect PV"
         self.connected = False
@@ -932,7 +980,6 @@ class PV(object):
 
         if self._monref is not None:
             cback, uarg, evid = self._monref
-            ctx = ca.current_context()
             if self.pvname in ca._cache[ctx]:
                 # atexit may have already cleared the subscription
                 ca.clear_subscription(evid)
