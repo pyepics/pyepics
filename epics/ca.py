@@ -1686,8 +1686,9 @@ def get_ctrlvars(chid, timeout=5.0, warn=True):
     ftype = promote_type(chid, use_ctrl=True)
     metadata = get_with_metadata(chid, ftype=ftype, count=1, timeout=timeout,
                                  wait=True)
-    # Ignore the value returned:
-    metadata.pop('value', None)
+    if metadata is not None:
+        # Ignore the value returned:
+        metadata.pop('value', None)
     return metadata
 
 
@@ -1699,8 +1700,9 @@ def get_timevars(chid, timeout=5.0, warn=True):
     ftype = promote_type(chid, use_time=True)
     metadata = get_with_metadata(chid, ftype=ftype, count=1, timeout=timeout,
                                  wait=True)
-    # Ignore the value returned:
-    metadata.pop('value', None)
+    if metadata is not None:
+        # Ignore the value returned:
+        metadata.pop('value', None)
     return metadata
 
 
