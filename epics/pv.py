@@ -299,8 +299,6 @@ class PV(object):
     @_ensure_context
     def wait_for_connection(self, timeout=None):
         """wait for a connection that started with connect() to finish"""
-
-        # make sure we're in the CA context used to create this PV
         if not self.connected:
             start_time = time.time()
             if not self._conn_started:
