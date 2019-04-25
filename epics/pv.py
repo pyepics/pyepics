@@ -766,7 +766,7 @@ class PV(object):
 
     def clear_callbacks(self):
         "clear all callbacks"
-        self.callbacks = {}
+        self.callbacks.clear()
 
     def _getinfo(self):
         "get information paragraph"
@@ -1042,7 +1042,7 @@ class PV(object):
             self._args = {}.fromkeys(self._fields)
 
         ca.poll(evt=1.e-3, iot=1.0)
-        self.callbacks = {}
+        self.clear_callbacks()
 
     def __del__(self):
         if getattr(ca, 'libca', None) is None:
