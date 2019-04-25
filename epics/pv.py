@@ -1031,18 +1031,20 @@ class PV(object):
         if pvid in _PVcache_:
             _PVcache_.pop(pvid)
 
-        if self._monref is not None:
-            cache_item = ca._cache[ctx].pop(self.pvname, None)
-            if cache_item is not None:
+        cache_item = ca._cache[ctx].pop(self.pvname, None)
+        if cache_item is not None:
+            if self._monref is not None:
                 # atexit may have already cleared the subscription
                 self._clear_auto_monitor_subscription()
 
-            self._monref = None
-            self._monref_mask = None
-            self._args = {}.fromkeys(self._fields)
+            # TODO: clear channel should be called as well
+            # ca.clear_channel(cache_item.chid)
 
-        ca.poll(evt=1.e-3, iot=1.0)
+        self._monref = None
+        self._monref_mask = None
         self.clear_callbacks()
+        self._args = {}.fromkeys(self._fields)
+        ca.poll(evt=1.e-3, iot=1.0)
 
     def __del__(self):
         if getattr(ca, 'libca', None) is None:
