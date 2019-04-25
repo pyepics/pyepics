@@ -323,6 +323,7 @@ class PV(object):
     @_ensure_context
     def clear_auto_monitor(self):
         """turn off auto-monitoring: must reconnect to re-enable monitoring"""
+        self.auto_monitor = False
         if self._monref is not None:
             evid = self._monref[2]
             ca.clear_subscription(evid)
