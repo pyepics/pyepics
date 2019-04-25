@@ -290,7 +290,11 @@ class PV(object):
 
     @_ensure_context
     def _check_auto_monitor(self):
-        ''
+        '''
+        Check the auto-monitor status
+
+        Clears or adds monitor, if necessary.
+        '''
         count = self.count
         chid = self.chid
 
