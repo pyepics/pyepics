@@ -148,7 +148,7 @@ class _CacheItem:
     get_results : dict
         Keyed on the requested field type -> requested value
     callbacks : list
-        One or more user functions to be called on change of value
+        One or more user functions to be called on change of connection status
     access_event_callbacks : list
         One or more user functions to be called on change of access rights
     '''
