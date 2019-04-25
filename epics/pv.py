@@ -233,7 +233,6 @@ class PV(object):
         # occassionally chid is still None (ie if a second PV is created
         # while __on_connect is still pending for the first one.)
         # Just return here, and connection will happen later
-        t0 = time.time()
         if self.chid is None and chid is None:
             ca.poll(5.e-4)
             return
