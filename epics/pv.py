@@ -143,10 +143,12 @@ class PV(object):
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
-        self.auto_monitor = auto_monitor
+        self._auto_monitor = auto_monitor
         self.ftype      = None
         self.connected  = False
         self.connection_timeout = connection_timeout
+        self._user_max_count = count
+
         if self.connection_timeout is None:
             self.connection_timeout = ca.DEFAULT_CONNECTION_TIMEOUT
         self._args      = {}.fromkeys(self._fields)
@@ -168,6 +170,7 @@ class PV(object):
         self.callbacks  = {}
         self._put_complete = None
         self._monref = None  # holder of data returned from create_subscription
+        self._monref_mask = None
         self._conn_started = False
         if isinstance(callback, (tuple, list)):
             for i, thiscb in enumerate(callback):
@@ -233,7 +236,6 @@ class PV(object):
         # occassionally chid is still None (ie if a second PV is created
         # while __on_connect is still pending for the first one.)
         # Just return here, and connection will happen later
-        t0 = time.time()
         if self.chid is None and chid is None:
             ca.poll(5.e-4)
             return
@@ -248,12 +250,7 @@ class PV(object):
             self._args['nelm']  = count
 
             # allow reduction of elements, via count argument
-            maxcount = 0
-            if self._args['count'] is not None:
-                maxcount = self._args['count']
-                count = min(count, self._args['count'])
-
-            self._args['count'] = count
+            self._args['count'] = min(count, self._user_max_count or count)
             self._args['host']  = ca.host_name(self.chid)
             self.ftype = ca.promote_type(self.chid,
                                          use_ctrl= self.form == 'ctrl',
@@ -263,23 +260,7 @@ class PV(object):
             self._args['type'] = _ftype_
             self._args['typefull'] = _ftype_
             self._args['ftype'] = dbr.Name(_ftype_, reverse=True)
-
-            if self.auto_monitor is None:
-                self.auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
-            if self._monref is None and self.auto_monitor:
-                # you can explicitly request a subscription mask
-                # (ie dbr.DBE_ALARM|dbr.DBE_LOG) by passing it as the
-                # auto_monitor arg, otherwise if you specify 'True' you'll
-                # just get the default set in ca.DEFAULT_SUBSCRIPTION_MASK
-                if self.auto_monitor is True:
-                    mask = ca.DEFAULT_SUBSCRIPTION_MASK
-                else:
-                    mask = self.auto_monitor
-                self._monref = ca.create_subscription(self.chid,
-                                         use_ctrl=(self.form == 'ctrl'),
-                                         use_time=(self.form == 'time'),
-                                         callback=self.__on_changes,
-                                                      mask=mask, count=maxcount)
+            self._check_auto_monitor()
 
         for conn_cb in self.connection_callbacks:
             if hasattr(conn_cb, '__call__'):
@@ -294,7 +275,84 @@ class PV(object):
         # threads from thinking a connection is complete when it is actually
         # still in progress.
         self.connected = conn
-        return
+
+    @_ensure_context
+    def _clear_auto_monitor_subscription(self):
+        'Clear an auto-monitor subscription, if set'
+        if self._monref is None:
+            return
+
+        cback, uarg, evid = self._monref
+
+        self._monref = None
+        self._monref_mask = None
+        ca.clear_subscription(evid)
+
+    @_ensure_context
+    def _check_auto_monitor(self):
+        '''
+        Check the auto-monitor status
+
+        Clears or adds monitor, if necessary.
+        '''
+        count = self.count
+        chid = self.chid
+
+        if count is None or chid is None:
+            return
+
+        if self._auto_monitor is None:
+            self._auto_monitor = count < ca.AUTOMONITOR_MAXLENGTH
+
+        if not self._auto_monitor:
+            # Turn off auto-monitoring, if necessary:
+            return self._clear_auto_monitor_subscription()
+
+        mask = (ca.DEFAULT_SUBSCRIPTION_MASK
+                if self._auto_monitor is True
+                else self._auto_monitor)
+
+        if self._monref is not None:
+            if self._monref_mask == mask:
+                # Same mask; no need to redo subscription
+                return
+
+            # New mask.
+            self._clear_auto_monitor_subscription()
+
+        self._monref_mask = mask
+        self._monref = ca.create_subscription(
+            self.chid,
+            use_ctrl=(self.form == 'ctrl'),
+            use_time=(self.form == 'time'),
+            callback=self.__on_changes,
+            mask=mask,
+            count=self._user_max_count or 0
+        )
+
+    @property
+    def auto_monitor(self):
+        '''
+        Whether auto_monitor is enabled or not. May be one of the following::
+
+            None: auto-monitor if count < ca.AUTOMONITOR_MAXLENGTH
+            False: do not auto-monitor
+            True: auto-monitor using ca.DEFAULT_SUBSCRIPTION_MASK
+            dbr.DBE_*: auto-monitor using this event mask. For example:
+                       `epics.dbr.DBE_ALARM|epics.dbr.DBE_LOG`
+        '''
+        return self._auto_monitor
+
+    @auto_monitor.setter
+    @_ensure_context
+    def auto_monitor(self, value):
+        self._auto_monitor = value
+        self._check_auto_monitor()
+
+    @property
+    def auto_monitor_mask(self):
+        'The current mask in use for auto-monitoring'
+        return self._monref_mask
 
     @_ensure_context
     def wait_for_connection(self, timeout=None):
@@ -323,17 +381,12 @@ class PV(object):
 
     @_ensure_context
     def clear_auto_monitor(self):
-        """turn off auto-monitoring: must reconnect to re-enable monitoring"""
+        """turn off auto-monitoring"""
         self.auto_monitor = False
-        if self._monref is not None:
-            evid = self._monref[2]
-            ca.clear_subscription(evid)
-            self._monref = None
 
     def reconnect(self):
         "try to reconnect PV"
-        self.auto_monitor = None
-        self._monref = None
+        self._clear_auto_monitor_subscription()
         self.connected = False
         self._conn_started = False
         self.force_connect()
@@ -717,7 +770,7 @@ class PV(object):
 
     def clear_callbacks(self):
         "clear all callbacks"
-        self.callbacks = {}
+        self.callbacks.clear()
 
     def _getinfo(self):
         "get information paragraph"
@@ -982,23 +1035,20 @@ class PV(object):
         if pvid in _PVcache_:
             _PVcache_.pop(pvid)
 
-        if self._monref is not None:
-            cback, uarg, evid = self._monref
-            if self.pvname in ca._cache[ctx]:
+        cache_item = ca._cache[ctx].pop(self.pvname, None)
+        if cache_item is not None:
+            if self._monref is not None:
                 # atexit may have already cleared the subscription
-                ca.clear_subscription(evid)
-                ca._cache[ctx].pop(self.pvname)
-            del cback
-            del uarg
-            del evid
-            try:
-                self._monref = None
-                self._args   = {}.fromkeys(self._fields)
-            except:
-                pass
+                self._clear_auto_monitor_subscription()
 
+            # TODO: clear channel should be called as well
+            # ca.clear_channel(cache_item.chid)
+
+        self._monref = None
+        self._monref_mask = None
+        self.clear_callbacks()
+        self._args = {}.fromkeys(self._fields)
         ca.poll(evt=1.e-3, iot=1.0)
-        self.callbacks = {}
 
     def __del__(self):
         if getattr(ca, 'libca', None) is None:
