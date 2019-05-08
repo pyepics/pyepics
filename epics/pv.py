@@ -61,16 +61,30 @@ def _ensure_context(func):
     return wrapped
 
 
-def get_pv(pvname, form='time',  connect=False,
-           context=None, timeout=5.0, **kws):
-    """get PV from PV cache or create one if needed.
+def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
+           connection_callback=None, access_callback=None, callback=None,
+           **kwargs):
+    """
+    Get a PV from PV cache or create one if needed.
 
-    Arguments
-    =========
-    form      PV form: one of 'native' (default), 'time', 'ctrl'
-    connect   whether to wait for connection (default False)
-    context   PV threading context (default None)
-    timeout   connection timeout, in seconds (default 5.0)
+    Parameters
+    ---------
+    form : str, optional
+        PV form: one of 'native', 'time' (default), 'ctrl'
+    connect : bool, optional
+        whether to wait for connection (default False)
+    context : int, optional
+        PV threading context (defaults to current context)
+    timeout : float, optional
+        connection timeout, in seconds (default 5.0)
+    connection_callback : callable, optional
+        Called upon connection with keyword arguments: pvname, conn, pv
+    access_callback : callable, optional
+        Called upon update to access rights with the following signature:
+        access_callback(read_access, write_access, pv=epics.PV)
+    callback : callable, optional
+        Called upon update to change of value.  See `epics.PV.run_callback` for
+        further information regarding the signature.
     """
 
     if form not in ('native', 'time', 'ctrl'):
@@ -81,18 +95,37 @@ def get_pv(pvname, form='time',  connect=False,
         context = ca.initial_context
         if context is None:
             context = ca.current_context()
-        if (pvname, form, context) in _PVcache_:
-            thispv = _PVcache_[(pvname, form, context)]
 
-    start_time = time.time()
-    # not cached -- create pv (automatically saved to cache)
+    thispv = _PVcache_.get((pvname, form, context), None)
+
     if thispv is None:
-        thispv = PV(pvname, form=form, **kws)
+        # not cached -- create pv (automatically saved to cache)
+        thispv = PV(pvname, form=form, callback=callback,
+                    connection_callback=connection_callback,
+                    access_callback=access_callback,
+                    connection_timeout=timeout, **kwargs)
+    else:
+        if connection_callback is not None:
+            if thispv.connected:
+                connection_callback(pvname=thispv.pvname,
+                                    conn=thispv.connected, pv=thispv)
+            thispv.connection_callbacks.append(connection_callback)
+
+        if access_callback is not None:
+            if thispv.connected:
+                access_callback(thispv.read_access, thispv.write_access,
+                                pv=thispv)
+            thispv.access_callbacks.append(access_callback)
+
+        if callback is not None:
+            idx = thispv.add_callback(callback)
+            thispv.run_callback(idx)
 
     if connect:
         if not thispv.wait_for_connection(timeout=timeout):
             ca.write('cannot connect to %s' % pvname)
     return thispv
+
 
 def fmt_time(tstamp=None):
     "simple formatter for time values"
