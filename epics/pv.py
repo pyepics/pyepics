@@ -132,6 +132,10 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
             idx = thispv.add_callback(callback)
             thispv.run_callback(idx)
 
+        if auto_monitor and not thispv.auto_monitor:
+            # Start auto-monitoring, if not previously auto-monitoring:
+            thispv.auto_monitor = auto_monitor
+
     if connect:
         if not thispv.wait_for_connection(timeout=timeout):
             ca.write('cannot connect to %s' % pvname)
