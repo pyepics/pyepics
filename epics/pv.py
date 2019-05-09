@@ -95,6 +95,10 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
         True: auto-monitor using ca.DEFAULT_SUBSCRIPTION_MASK
         dbr.DBE_*: auto-monitor using this event mask. For example:
                    `epics.dbr.DBE_ALARM|epics.dbr.DBE_LOG`
+
+    Returns
+    -------
+    pv : epics.PV
     """
 
     if form not in ('native', 'time', 'ctrl'):
@@ -110,11 +114,11 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
 
     if thispv is None:
         # not cached -- create pv (automatically saved to cache)
-        thispv = PV(pvname, form=form, callback=callback,
-                    connection_callback=connection_callback,
-                    access_callback=access_callback,
-                    connection_timeout=timeout, count=count, verbose=verbose,
-                    auto_monitor=auto_monitor)
+        thispv = default_pv_class(
+            pvname, form=form, callback=callback,
+            connection_callback=connection_callback,
+            access_callback=access_callback, connection_timeout=timeout,
+            count=count, verbose=verbose, auto_monitor=auto_monitor)
     else:
         if connection_callback is not None:
             if thispv.connected:
@@ -1106,3 +1110,7 @@ class PV(object):
             self.disconnect()
         except:
             pass
+
+
+# Allow advanced users to customize the class of PV that `get_pv` would return:
+default_pv_class = PV
