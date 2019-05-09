@@ -110,15 +110,18 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
         if context is None:
             context = ca.current_context()
 
-    thispv = _PVcache_.get((pvname, form, context), None)
+    pvid = (pvname, form, context)
+    thispv = _PVcache_.get(pvid, None)
 
     if thispv is None:
-        # not cached -- create pv (automatically saved to cache)
         thispv = default_pv_class(
             pvname, form=form, callback=callback,
             connection_callback=connection_callback,
             access_callback=access_callback, connection_timeout=timeout,
             count=count, verbose=verbose, auto_monitor=auto_monitor)
+
+        # Update the cache with this new instance:
+        _PVcache_[pvid] = thispv
     else:
         if connection_callback is not None:
             if thispv.connected:
@@ -245,10 +248,6 @@ class PV(object):
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
         self._args['type'] = dbr.Name(self.ftype).lower()
-
-        pvid = (self.pvname, self.form, self.context)
-        if pvid not in _PVcache_:
-            _PVcache_[pvid] = self
 
     @_ensure_context
     def force_connect(self, pvname=None, chid=None, conn=True, **kws):
