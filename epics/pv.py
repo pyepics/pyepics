@@ -63,7 +63,7 @@ def _ensure_context(func):
 
 def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
            connection_callback=None, access_callback=None, callback=None,
-           **kwargs):
+           verbose=False, count=None, auto_monitor=None):
     """
     Get a PV from PV cache or create one if needed.
 
@@ -85,6 +85,16 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
     callback : callable, optional
         Called upon update to change of value.  See `epics.PV.run_callback` for
         further information regarding the signature.
+    count : int, optional
+        Number of values to request (0 or None means all available values)
+    verbose : bool, optional
+        Print additional messages relating to PV state
+    auto_monitor : bool or epics.dbr.DBE_ flags, optional
+        None: auto-monitor if count < ca.AUTOMONITOR_MAXLENGTH
+        False: do not auto-monitor
+        True: auto-monitor using ca.DEFAULT_SUBSCRIPTION_MASK
+        dbr.DBE_*: auto-monitor using this event mask. For example:
+                   `epics.dbr.DBE_ALARM|epics.dbr.DBE_LOG`
     """
 
     if form not in ('native', 'time', 'ctrl'):
@@ -103,7 +113,8 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
         thispv = PV(pvname, form=form, callback=callback,
                     connection_callback=connection_callback,
                     access_callback=access_callback,
-                    connection_timeout=timeout, **kwargs)
+                    connection_timeout=timeout, count=count, verbose=verbose,
+                    auto_monitor=auto_monitor)
     else:
         if connection_callback is not None:
             if thispv.connected:
