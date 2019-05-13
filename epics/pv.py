@@ -10,6 +10,7 @@ import time
 import ctypes
 import copy
 import functools
+import warnings
 from math import log10
 
 from . import ca
@@ -105,15 +106,23 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
         form = 'native'
 
     thispv = None
-    if context is None:
-        context = ca.initial_context
-        if context is None:
-            context = ca.current_context()
+    if context is not None:
+        warnings.warn(
+            'The `context` kwarg for epics.get_pv() is deprecated. New PVs '
+            'will _not_ be created in the requested context.'
+        )
+    else:
+        if ca.current_context() is None:
+            ca.use_initial_context()
+        context = ca.current_context()
 
     pvid = (pvname, form, context)
     thispv = _PVcache_.get(pvid, None)
 
     if thispv is None:
+        if context != ca.current_context():
+            raise RuntimeError('PV is not in cache for user-requested context')
+
         thispv = default_pv_class(
             pvname, form=form, callback=callback,
             connection_callback=connection_callback,
