@@ -10,6 +10,7 @@ import time
 import ctypes
 import copy
 import functools
+import warnings
 from math import log10
 
 from . import ca
@@ -61,38 +62,100 @@ def _ensure_context(func):
     return wrapped
 
 
-def get_pv(pvname, form='time',  connect=False,
-           context=None, timeout=5.0, **kws):
-    """get PV from PV cache or create one if needed.
+def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
+           connection_callback=None, access_callback=None, callback=None,
+           verbose=False, count=None, auto_monitor=None):
+    """
+    Get a PV from PV cache or create one if needed.
 
-    Arguments
-    =========
-    form      PV form: one of 'native' (default), 'time', 'ctrl'
-    connect   whether to wait for connection (default False)
-    context   PV threading context (default None)
-    timeout   connection timeout, in seconds (default 5.0)
+    Parameters
+    ---------
+    form : str, optional
+        PV form: one of 'native', 'time' (default), 'ctrl'
+    connect : bool, optional
+        whether to wait for connection (default False)
+    context : int, optional
+        PV threading context (defaults to current context)
+    timeout : float, optional
+        connection timeout, in seconds (default 5.0)
+    connection_callback : callable, optional
+        Called upon connection with keyword arguments: pvname, conn, pv
+    access_callback : callable, optional
+        Called upon update to access rights with the following signature:
+        access_callback(read_access, write_access, pv=epics.PV)
+    callback : callable, optional
+        Called upon update to change of value.  See `epics.PV.run_callback` for
+        further information regarding the signature.
+    count : int, optional
+        Number of values to request (0 or None means all available values)
+    verbose : bool, optional
+        Print additional messages relating to PV state
+    auto_monitor : bool or epics.dbr.DBE_ flags, optional
+        None: auto-monitor if count < ca.AUTOMONITOR_MAXLENGTH
+        False: do not auto-monitor
+        True: auto-monitor using ca.DEFAULT_SUBSCRIPTION_MASK
+        dbr.DBE_*: auto-monitor using this event mask. For example:
+                   `epics.dbr.DBE_ALARM|epics.dbr.DBE_LOG`
+
+    Returns
+    -------
+    pv : epics.PV
     """
 
     if form not in ('native', 'time', 'ctrl'):
         form = 'native'
 
-    thispv = None
-    if context is None:
-        context = ca.initial_context
-        if context is None:
-            context = ca.current_context()
-        if (pvname, form, context) in _PVcache_:
-            thispv = _PVcache_[(pvname, form, context)]
+    if context is not None:
+        warnings.warn(
+            'The `context` kwarg for epics.get_pv() is deprecated. New PVs '
+            'will _not_ be created in the requested context.'
+        )
+    else:
+        if ca.current_context() is None:
+            ca.use_initial_context()
+        context = ca.current_context()
 
-    start_time = time.time()
-    # not cached -- create pv (automatically saved to cache)
+    pvid = (pvname, form, context)
+    thispv = _PVcache_.get(pvid, None)
+
     if thispv is None:
-        thispv = PV(pvname, form=form, **kws)
+        if context != ca.current_context():
+            raise RuntimeError('PV is not in cache for user-requested context')
+
+        thispv = default_pv_class(
+            pvname, form=form, callback=callback,
+            connection_callback=connection_callback,
+            access_callback=access_callback, connection_timeout=timeout,
+            count=count, verbose=verbose, auto_monitor=auto_monitor)
+
+        # Update the cache with this new instance:
+        _PVcache_[pvid] = thispv
+    else:
+        if connection_callback is not None:
+            if thispv.connected:
+                connection_callback(pvname=thispv.pvname,
+                                    conn=thispv.connected, pv=thispv)
+            thispv.connection_callbacks.append(connection_callback)
+
+        if access_callback is not None:
+            if thispv.connected:
+                access_callback(thispv.read_access, thispv.write_access,
+                                pv=thispv)
+            thispv.access_callbacks.append(access_callback)
+
+        if callback is not None:
+            idx = thispv.add_callback(callback)
+            thispv.run_callback(idx)
+
+        if auto_monitor and not thispv.auto_monitor:
+            # Start auto-monitoring, if not previously auto-monitoring:
+            thispv.auto_monitor = auto_monitor
 
     if connect:
         if not thispv.wait_for_connection(timeout=timeout):
             ca.write('cannot connect to %s' % pvname)
     return thispv
+
 
 def fmt_time(tstamp=None):
     "simple formatter for time values"
@@ -193,10 +256,6 @@ class PV(object):
                                       use_ctrl= self.form == 'ctrl',
                                       use_time= self.form == 'time')
         self._args['type'] = dbr.Name(self.ftype).lower()
-
-        pvid = (self.pvname, self.form, self.context)
-        if pvid not in _PVcache_:
-            _PVcache_[pvid] = self
 
     @_ensure_context
     def force_connect(self, pvname=None, chid=None, conn=True, **kws):
@@ -1058,3 +1117,7 @@ class PV(object):
             self.disconnect()
         except:
             pass
+
+
+# Allow advanced users to customize the class of PV that `get_pv` would return:
+default_pv_class = PV
