@@ -105,7 +105,6 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
     if form not in ('native', 'time', 'ctrl'):
         form = 'native'
 
-    thispv = None
     if context is not None:
         warnings.warn(
             'The `context` kwarg for epics.get_pv() is deprecated. New PVs '
