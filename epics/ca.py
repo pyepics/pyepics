@@ -232,11 +232,15 @@ def _find_lib(inp_lib_name):
             os.path.isfile(dllpath)):
         return dllpath
 
-    # Test 2: look in installed python location for dll
-    dllpath = resource_filename('epics.clibs', clib_search_path(inp_lib_name))
+    try:
+        # Test 2: look in installed python location for dll
+        dllpath = resource_filename('epics.clibs',
+                                    clib_search_path(inp_lib_name))
 
-    if (os.path.exists(dllpath) and os.path.isfile(dllpath)):
-        return dllpath
+        if (os.path.exists(dllpath) and os.path.isfile(dllpath)):
+            return dllpath
+    except ModuleNotFoundError:
+        pass
 
     # Test 3: look through Python path and PATH env var for dll
     path_sep = ':'

@@ -46,8 +46,10 @@ nolibca = os.environ.get('NOLIBCA', None)
 if nolibca is None:
     pkg_data = {'epics.clibs': ['darwin64/*', 'linux64/*', 'linux32/*',
                                 'linuxarm/*', 'win32/*', 'win64/*']}
+    extra_pkgs = ['epics.clibs']
 else:
     pkg_data = dict()
+    extra_pkgs = []
 
 PY_MAJOR, PY_MINOR = sys.version_info[:2]
 if PY_MAJOR == 2 and PY_MINOR < 6:
@@ -72,7 +74,7 @@ setup(name = 'pyepics',
                       'Programming Language :: Python',
                       'Topic :: Scientific/Engineering'],
       packages = ['epics','epics.wx','epics.devices', 'epics.compat',
-                  'epics.autosave', 'epics.clibs'],
+                  'epics.autosave'] + extra_pkgs,
       package_data = pkg_data,
      )
 
