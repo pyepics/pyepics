@@ -169,6 +169,18 @@ class _CacheItem:
         self.callbacks = callbacks
         self.access_event_callback = []
 
+    def __repr__(self):
+        return (
+            '<{} {!r} {} failures={} callbacks={} access_callbacks={}>'
+            ''.format(self.__class__.__name__,
+                      repr(self.pvname),
+                      'connected' if self.conn else 'disconnected',
+                      self.failures,
+                      len(self.callbacks),
+                      len(self.access_event_callback)
+                      )
+        )
+
     def __getitem__(self, key):
         # back-compat
         return getattr(self, key)
