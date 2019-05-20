@@ -401,7 +401,7 @@ def finalize_libca(maxtime=10.0):
         for ctxid, ctx in _cache.items():
             for pvname, info in ctx.items():
                 if info.chid is not None:
-                    libca.ca_clear_channel(chid)
+                    libca.ca_clear_channel(info.chid)
             ctx.clear()
         _cache.clear()
         flush_count = 0
