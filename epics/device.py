@@ -124,14 +124,12 @@ class Device(object):
 
         if attrs is not None:
             for attr in attrs:
-                self.PV(attr, connect=False,
-                        connection_timeout=timeout)
+                self.PV(attr, connect=False, timeout=timeout)
 
         if aliases:
             for attr in aliases.values():
                 if attrs is None or attr not in attrs:
-                    self.PV(attr, connect=False,
-                            connection_timeout=timeout)
+                    self.PV(attr, connect=False, timeout=timeout)
 
         if with_poll:
             poll()
@@ -306,7 +304,7 @@ class Device(object):
     def __dir__(self):
         # there's no cleaner method to do this until Python 3.3
         all_attrs = set(self._aliases.keys() + self._pvs.keys() +
-                        list(self._nonpvs) + 
+                        list(self._nonpvs) +
                         self.__dict__.keys() + dir(Device))
         return list(sorted(all_attrs))
 
