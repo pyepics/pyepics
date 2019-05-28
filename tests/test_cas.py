@@ -65,7 +65,7 @@ def softioc():
         df.write(cas_test_db)
         df.flush()
 
-        proc = subprocess.Popen(['softIoc', '-D', 
+        proc = subprocess.Popen(['softIoc', '-D',
                                  '/home/travis/mc/envs/testenv/epics/dbd/softIoc.dbd',
                                  '-m', 'P=test', '-a', cf.name,
                                  '-d', df.name],
@@ -82,7 +82,7 @@ def pvs():
               'test:permit']
     pvs = dict()
     for name in pvlist:
-        pv = epics.PV(name)
+        pv = epics.get_pv(name)
         pv.wait_for_connection()
         pvs[pv.pvname] = pv
 
@@ -126,7 +126,7 @@ def test_pv_access_event_callback(softioc, pvs):
         assert pv.write_access == write_access
         pv.flag = True
 
-    bo = epics.PV('test:bo', access_callback=lcb)
+    bo = epics.get_pv('test:bo', access_callback=lcb)
     bo.flag = False
 
     # set the run-permit to trigger an access rights event
