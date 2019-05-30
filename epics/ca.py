@@ -442,38 +442,6 @@ def get_cache(pvname):
     return _cache[current_context()].get(pvname, None)
 
 
-def _get_or_create_cache_item_by_chid(chid):
-    '''
-    Return the current _CacheItem for a given chid, or create a new one
-
-    Parameters
-    ----------
-    chid : ctypes.c_long
-        Channel ID
-
-    Returns
-    -------
-    item : _CacheItem
-        The _CacheItem for the chid
-
-    Raises
-    ------
-    ChannelAccessException
-        If chid is invalid or there is no context
-    '''
-    context = current_context()
-    if context is None:
-        raise ChannelAccessException('No CA context')
-
-    pvname = name(chid)
-    context_cache = _cache[context]
-    try:
-        return context_cache[pvname]
-    except KeyError:
-        context_cache[pvname] = _CacheItem(chid=chid, pvname=pvname)
-        return context_cache[pvname]
-
-
 def show_cache(print_out=True):
     """print out a listing of PVs in the current session to
     standard output.  Use the *print_out=False* option to be
@@ -693,15 +661,11 @@ def _onMonitorEvent(args):
 ## connection event handler:
 def _onConnectionEvent(args):
     "Connection notification - run user callbacks"
-    try:
-        entry = _get_or_create_cache_item_by_chid(args.chid)
-    except ChannelAccessException:
-        # During teardown, disconnection callbacks may try to create a new
-        # cache item
-        return
-
-    entry.run_connection_callbacks(conn=(args.op == dbr.OP_CONN_UP),
-                                   timestamp=time.time())
+    pvname = BYTES2STR(libca.ca_name(dbr.chid_t(args.chid)))
+    entry = get_cache(pvname)
+    if entry is not None:
+        entry.run_connection_callbacks(conn=(args.op == dbr.OP_CONN_UP),
+                                       timestamp=time.time())
 
 
 ## get event handler:
