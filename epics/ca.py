@@ -78,6 +78,7 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 ## Cache of existing channel IDs:
 # Keyed on context, then on pv name (e.g., _cache[ctx][pvname])
 _cache = collections.defaultdict(dict)
+_chid_cache = {}
 
 # Puts with completion in progress:
 _put_completes = []
@@ -154,9 +155,10 @@ class _CacheItem:
     '''
 
     def __init__(self, chid, pvname, callbacks=None, ts=0):
+        self._chid = None
+        self.context = current_context()
         self.lock = threading.RLock()
         self.conn = False
-        self.chid = chid
         self.pvname = pvname
         self.ts = ts
         self.failures = 0
@@ -168,16 +170,29 @@ class _CacheItem:
 
         self.callbacks = callbacks
         self.access_event_callback = []
+        self.chid = chid
+
+    @property
+    def chid(self):
+        return self._chid
+
+    @chid.setter
+    def chid(self, chid):
+        if not isinstance(chid, dbr.chid_t):
+            chid = dbr.chid_t(chid)
+
+        self._chid = chid
 
     def __repr__(self):
         return (
-            '<{} {!r} {} failures={} callbacks={} access_callbacks={}>'
+            '<{} {!r} {} failures={} callbacks={} access_callbacks={} chid={}>'
             ''.format(self.__class__.__name__,
                       repr(self.pvname),
                       'connected' if self.conn else 'disconnected',
                       self.failures,
                       len(self.callbacks),
-                      len(self.access_event_callback)
+                      len(self.access_event_callback),
+                      self.chid_int,
                       )
         )
 
@@ -205,7 +220,7 @@ class _CacheItem:
             if callable(callback):
                 callback(ra, wa)
 
-    def run_connection_callbacks(self, conn, timestamp):
+    def run_connection_callbacks(self, chid, conn, timestamp):
         '''
         Run all connection callbacks
 
@@ -216,9 +231,11 @@ class _CacheItem:
         timestamp : float
             The event timestamp
         '''
-        self.conn = conn
-        self.ts = timestamp
-        self.failures = 0
+        # Lock here, as create_channel may be setting the chid
+        with self.lock:
+            self.conn = conn
+            self.ts = timestamp
+            self.failures = 0
 
         chid_int = self.chid_int
         for callback in list(self.callbacks):
@@ -398,12 +415,16 @@ def finalize_libca(maxtime=10.0):
         start_time = time.time()
         flush_io()
         poll()
-        for ctxid, ctx in _cache.items():
-            for pvname, info in ctx.items():
-                if info.chid is not None:
-                    libca.ca_clear_channel(info.chid)
-            ctx.clear()
+        for chid, entry in list(_chid_cache.items()):
+            try:
+                print('clearing chid', chid, name(chid))
+                clear_channel(chid)
+            except ChannelAccessException:
+                pass
+
+        _chid_cache.clear()
         _cache.clear()
+
         flush_count = 0
         while (flush_count < 5 and
                time.time()-start_time < maxtime):
@@ -412,7 +433,8 @@ def finalize_libca(maxtime=10.0):
             flush_count += 1
         context_destroy()
         libca = None
-    except Exception:
+    except:
+        print('catch-all for exceptions', sys.exc_info())
         pass
     time.sleep(0.01)
 
@@ -420,19 +442,6 @@ def finalize_libca(maxtime=10.0):
 def get_cache(pvname):
     "return cache dictionary for a given pvname in the current context"
     return _cache[current_context()].get(pvname, None)
-
-
-def _get_or_create_cache_item_by_pvname(pvname, chid=None):
-    '''
-    Return the current _CacheItem for a given pvname, or create a new one
-    '''
-    context_cache = _cache[current_context()]
-    try:
-        return context_cache[pvname]
-    except KeyError:
-        context_cache[pvname] = _CacheItem(chid=_chid_to_int(chid),
-                                           pvname=pvname)
-        return context_cache[pvname]
 
 
 def _get_or_create_cache_item_by_chid(chid):
@@ -448,8 +457,23 @@ def _get_or_create_cache_item_by_chid(chid):
     -------
     item : _CacheItem
         The _CacheItem for the chid
+
+    Raises
+    ------
+    ChannelAccessException
+        If chid is invalid or there is no context
     '''
-    return _get_or_create_cache_item_by_pvname(name(chid), chid=chid)
+    context = current_context()
+    if context is None:
+        raise ChannelAccessException('No CA context')
+
+    pvname = name(chid)
+    context_cache = _cache[context]
+    try:
+        return context_cache[pvname]
+    except KeyError:
+        context_cache[pvname] = _CacheItem(chid=chid, pvname=pvname)
+        return context_cache[pvname]
 
 
 def show_cache(print_out=True):
@@ -462,6 +486,9 @@ def show_cache(print_out=True):
     out.append('#--------------------------------------------')
     for context, context_chids in  list(_cache.items()):
         for vname, val in list(context_chids.items()):
+            if isinstance(vname, int):
+                continue
+
             chid = val.chid
             if len(vname) < 15:
                 vname = (vname + ' '*15)[:15]
@@ -484,6 +511,7 @@ def clear_cache():
 
     # Clear global state variables
     _cache.clear()
+    _chid_cache.clear()
 
     # Clear the cache of PVs used by epics.caget()-like functions
     from . import pv
@@ -545,7 +573,10 @@ def withCHID(fcn):
                 msg = "%s: not a valid chid %s %s args %s kwargs %s!" % (
                     (fcn.__name__, chid, type(chid), args, kwds))
                 raise ChannelAccessException(msg)
-
+            cache = _cache[current_context()]
+            if chid.value not in _chid_cache:
+                print('unexpected chid', chid.value, chid, cache)
+                raise ChannelAccessException('Unexpected channel ID')
         return fcn(*args, **kwds)
     return wrapper
 
@@ -669,8 +700,15 @@ def _onMonitorEvent(args):
 ## connection event handler:
 def _onConnectionEvent(args):
     "Connection notification - run user callbacks"
-    entry = _get_or_create_cache_item_by_chid(args.chid)
-    entry.run_connection_callbacks(conn=(args.op == dbr.OP_CONN_UP),
+    try:
+        entry = _get_or_create_cache_item_by_chid(args.chid)
+    except ChannelAccessException:
+        # During teardown, disconnection callbacks may try to create a new
+        # cache item
+        return
+
+    entry.run_connection_callbacks(dbr.chid_t(args.chid),
+                                   conn=(args.op == dbr.OP_CONN_UP),
                                    timestamp=time.time())
 
 
@@ -713,9 +751,13 @@ def _onPutEvent(args, **kwds):
 
 def _onAccessRightsEvent(args):
     'Access rights callback'
-    entry = _get_or_create_cache_item_by_chid(args.chid)
-    entry.run_access_event_callbacks(
-        bool(args.read_access), bool(args.write_access))
+    # NOTE: Access rights events may not happen in a CA context
+    # This means get_cache(name(chid)) will not work, as the pv name cache is
+    # first keyed on context.
+    entry = _chid_cache.get(_chid_to_int(args.chid), None)
+    if entry is not None:
+        entry.run_access_event_callbacks(
+            bool(args.read_access), bool(args.write_access))
 
 
 # create global reference to these callbacks
@@ -929,28 +971,31 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
     # a reference to _onConnectionEvent:  This is really the connection
     # callback that is run -- the callack here is stored in the _cache
     # and called by _onConnectionEvent.
-    entry = _get_or_create_cache_item_by_pvname(pvname=pvname, chid=None)
-    if callable(callback) and callback not in entry.callbacks:
+    entry = get_cache(pvname)
+    if entry is None:
+        entry = _CacheItem(chid=None, pvname=pvname, callbacks=[callback])
+        context_cache = _cache[current_context()]
+        context_cache[pvname] = entry
+
+        with entry.lock:
+            chid = dbr.chid_t()
+            ret = libca.ca_create_channel(ctypes.c_char_p(STR2BYTES(pvname)),
+                                          _CB_CONNECT, 0, 0, ctypes.byref(chid)
+                                          )
+            PySEVCHK('create_channel', ret)
+
+            entry.chid = chid
+            _chid_cache[chid.value] = entry
+
+    elif callable(callback) and callback not in entry.callbacks:
         entry.callbacks.append(callback)
         if entry.chid is not None and entry.conn:
             callback(chid=_chid_to_int(entry.chid), pvname=pvname,
                      conn=entry.conn)
 
-    with entry.lock:
-        chid = entry.chid
-        if chid is None:
-            conncb = (_CB_CONNECT if auto_cb
-                      else 0)
-
-            chid = dbr.chid_t()
-            entry.chid = chid
-            ret = libca.ca_create_channel(ctypes.c_char_p(STR2BYTES(pvname)),
-                                          conncb, 0, 0, ctypes.byref(chid))
-            PySEVCHK('create_channel', ret)
-
     if connect:
-        connect_channel(chid)
-    return chid
+        connect_channel(entry.chid)
+    return entry.chid
 
 @withCHID
 def connect_channel(chid, timeout=None, verbose=False):
@@ -1074,7 +1119,9 @@ def field_type(chid):
 @withCHID
 def clear_channel(chid):
     "clear the channel"
-    _cache[current_context()].pop(name(chid), None)
+    context_cache = _cache[current_context()]
+    context_cache.pop(name(chid), None)
+    _chid_cache.pop(chid.value, None)
     return libca.ca_clear_channel(chid)
 
 @withCHID
