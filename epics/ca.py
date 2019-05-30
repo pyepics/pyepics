@@ -573,9 +573,7 @@ def withCHID(fcn):
                 msg = "%s: not a valid chid %s %s args %s kwargs %s!" % (
                     (fcn.__name__, chid, type(chid), args, kwds))
                 raise ChannelAccessException(msg)
-            cache = _cache[current_context()]
             if chid.value not in _chid_cache:
-                print('unexpected chid', chid.value, chid, cache)
                 raise ChannelAccessException('Unexpected channel ID')
         return fcn(*args, **kwds)
     return wrapper
