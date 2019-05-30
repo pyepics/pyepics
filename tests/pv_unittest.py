@@ -403,7 +403,7 @@ class PV_Tests(unittest.TestCase):
         without using auto_monitor
         '''
         with no_simulator_updates():
-            zerostr = get_pv(pvnames.char_arr_pv, auto_monitor=False)
+            zerostr = PV(pvnames.char_arr_pv, auto_monitor=False)
             zerostr.wait_for_connection()
 
             # elem_count = 128, requested count = None, libca returns count = 1
@@ -419,13 +419,14 @@ class PV_Tests(unittest.TestCase):
             numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0, 0])
             self.assertEquals(zerostr.get(as_string=True, as_numpy=False), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False, as_numpy=False), [0, 0])
+            zerostr.disconnect()
 
     def test_emptyish_char_waveform_monitor(self):
         '''a test of a char waveform of length 1 (NORD=1): value "\0"
         with using auto_monitor
         '''
         with no_simulator_updates():
-            zerostr = get_pv(pvnames.char_arr_pv, auto_monitor=True)
+            zerostr = PV(pvnames.char_arr_pv, auto_monitor=True)
             zerostr.wait_for_connection()
 
             zerostr.put([0], wait=True)
@@ -443,6 +444,7 @@ class PV_Tests(unittest.TestCase):
             numpy.testing.assert_array_equal(zerostr.get(as_string=False), [0, 0])
             self.assertEquals(zerostr.get(as_string=True, as_numpy=False), '')
             numpy.testing.assert_array_equal(zerostr.get(as_string=False, as_numpy=False), [0, 0])
+            zerostr.disconnect()
 
     def testEnumPut(self):
         pv = get_pv(pvnames.enum_pv)
