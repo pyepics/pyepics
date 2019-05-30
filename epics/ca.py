@@ -187,7 +187,7 @@ class _CacheItem:
         return (
             '<{} {!r} {} failures={} callbacks={} access_callbacks={} chid={}>'
             ''.format(self.__class__.__name__,
-                      repr(self.pvname),
+                      self.pvname,
                       'connected' if self.conn else 'disconnected',
                       self.failures,
                       len(self.callbacks),
