@@ -220,7 +220,7 @@ class _CacheItem:
             if callable(callback):
                 callback(ra, wa)
 
-    def run_connection_callbacks(self, chid, conn, timestamp):
+    def run_connection_callbacks(self, conn, timestamp):
         '''
         Run all connection callbacks
 
@@ -700,8 +700,7 @@ def _onConnectionEvent(args):
         # cache item
         return
 
-    entry.run_connection_callbacks(dbr.chid_t(args.chid),
-                                   conn=(args.op == dbr.OP_CONN_UP),
+    entry.run_connection_callbacks(conn=(args.op == dbr.OP_CONN_UP),
                                    timestamp=time.time())
 
 
