@@ -74,8 +74,12 @@ def softioc():
                                  stdout=subprocess.PIPE)
         yield proc
 
-        proc.kill()
-        proc.wait()
+        try:
+            proc.kill()
+            proc.wait()
+        except OSError:
+            pass
+
 
 @pytest.yield_fixture(scope='module')
 def pvs():
