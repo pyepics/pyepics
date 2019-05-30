@@ -671,9 +671,8 @@ def _onConnectionEvent(args):
     except KeyError:
         return
 
-    if entry is not None:
-        entry.run_connection_callbacks(conn=(args.op == dbr.OP_CONN_UP),
-                                       timestamp=time.time())
+    entry.run_connection_callbacks(conn=(args.op == dbr.OP_CONN_UP),
+                                   timestamp=time.time())
 
 
 ## get event handler:
