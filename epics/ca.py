@@ -484,9 +484,6 @@ def show_cache(print_out=True):
     out.append('#--------------------------------------------')
     for context, context_chids in  list(_cache.items()):
         for vname, val in list(context_chids.items()):
-            if isinstance(vname, int):
-                continue
-
             chid = val.chid
             if len(vname) < 15:
                 vname = (vname + ' '*15)[:15]
