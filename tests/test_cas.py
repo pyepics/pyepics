@@ -134,6 +134,8 @@ def test_pv_access_event_callback(softioc, pvs):
     assert pvs['test:permit'].get(as_string=True, use_monitor=False) == 'ENABLED'
 
     assert bo.flag is True
+    bo.access_callbacks = []
+
 
 def test_ca_access_event_callback(softioc, pvs):
     # clear the run-permit
