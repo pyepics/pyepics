@@ -178,7 +178,7 @@ class _CacheItem:
 
     @chid.setter
     def chid(self, chid):
-        if not isinstance(chid, dbr.chid_t):
+        if chid is not None and not isinstance(chid, dbr.chid_t):
             chid = dbr.chid_t(chid)
 
         self._chid = chid
