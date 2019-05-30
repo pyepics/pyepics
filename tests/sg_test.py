@@ -25,7 +25,7 @@ print('Synchronous block:')
 epics.ca.sg_block(sg)
 print('Done.  Values')
 for pvname, dat, chid in zip(pvs, data, chids):
-    print("%s = %s" % (pvname, str( epics.ca._unpack(dat, chid=chid))))
+    print("%s = %s" % (pvname, str( epics.ca._unpack(chid, dat))))
 
 epics.ca.sg_reset(sg)
 
@@ -38,6 +38,3 @@ time.sleep(5.0)
 print('Now Go: ')
 epics.ca.sg_block(sg)
 print('done.')
-
-
-          
