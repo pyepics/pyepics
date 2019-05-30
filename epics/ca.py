@@ -417,7 +417,6 @@ def finalize_libca(maxtime=10.0):
         poll()
         for chid, entry in list(_chid_cache.items()):
             try:
-                print('clearing chid', chid, name(chid))
                 clear_channel(chid)
             except ChannelAccessException:
                 pass
@@ -434,7 +433,6 @@ def finalize_libca(maxtime=10.0):
         context_destroy()
         libca = None
     except:
-        print('catch-all for exceptions', sys.exc_info())
         pass
     time.sleep(0.01)
 
