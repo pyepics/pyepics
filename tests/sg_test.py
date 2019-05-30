@@ -5,36 +5,38 @@ import epics
 import pvnames
 print('== Test get/put for synchronous groups')
 
-pvs = pvnames.motor_list
 
-chids = [epics.ca.create_channel(pvname) for pvname in pvs]
+def test_smoke():
+    pvs = pvnames.motor_list
 
-for chid in chids:
-    epics.ca.connect_channel(chid)
-    epics.ca.put(chid, 0)
+    chids = [epics.ca.create_channel(pvname) for pvname in pvs]
 
-print('Now create synch group ')
-sg = epics.ca.sg_create()
+    for chid in chids:
+        epics.ca.connect_channel(chid)
+        epics.ca.put(chid, 0)
 
-data = [epics.ca.sg_get(sg, chid) for chid in chids]
+    print('Now create synch group ')
+    sg = epics.ca.sg_create()
 
-print('Now change these PVs for the next 10 seconds')
-time.sleep(10.0)
+    data = [epics.ca.sg_get(sg, chid) for chid in chids]
 
-print('Synchronous block:')
-epics.ca.sg_block(sg)
-print('Done.  Values')
-for pvname, dat, chid in zip(pvs, data, chids):
-    print("%s = %s" % (pvname, str( epics.ca._unpack(chid, dat))))
+    print('Now change these PVs for the next 10 seconds')
+    time.sleep(10.0)
 
-epics.ca.sg_reset(sg)
+    print('Synchronous block:')
+    epics.ca.sg_block(sg)
+    print('Done.  Values')
+    for pvname, dat, chid in zip(pvs, data, chids):
+        print("%s = %s" % (pvname, str( epics.ca._unpack(chid, dat))))
 
-print('OK, now we will put everything back to 0 synchronously')
+    epics.ca.sg_reset(sg)
 
-for chid in chids:
-    epics.ca.sg_put(sg, chid, 0)
-print('sg_put done, but not blocked / commited. Sleep for 5 seconds ')
-time.sleep(5.0)
-print('Now Go: ')
-epics.ca.sg_block(sg)
-print('done.')
+    print('OK, now we will put everything back to 0 synchronously')
+
+    for chid in chids:
+        epics.ca.sg_put(sg, chid, 0)
+    print('sg_put done, but not blocked / commited. Sleep for 5 seconds ')
+    time.sleep(5.0)
+    print('Now Go: ')
+    epics.ca.sg_block(sg)
+    print('done.')
