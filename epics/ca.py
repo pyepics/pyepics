@@ -632,6 +632,11 @@ def withSEVCHK(fcn):
 ## Event Handler for monitor event callbacks
 def _onMonitorEvent(args):
     """Event Handler for monitor events: not intended for use"""
+    try:
+        _chid_cache[_chid_to_int(args.chid)]
+    except KeyError:
+        # In case the chid is no longer in our cache, exit now.
+        return
 
     # If read access to a process variable is lost, this callback is invoked
     # indicating the loss in the status argument. Users can use the connection
@@ -661,8 +666,11 @@ def _onMonitorEvent(args):
 ## connection event handler:
 def _onConnectionEvent(args):
     "Connection notification - run user callbacks"
-    pvname = BYTES2STR(libca.ca_name(dbr.chid_t(args.chid)))
-    entry = get_cache(pvname)
+    try:
+        entry = _chid_cache[_chid_to_int(args.chid)]
+    except KeyError:
+        return
+
     if entry is not None:
         entry.run_connection_callbacks(conn=(args.op == dbr.OP_CONN_UP),
                                        timestamp=time.time())
@@ -675,8 +683,9 @@ def _onGetEvent(args, **kws):
     # print("GET EVENT: chid, user ", args.chid, args.usr)
     # print("GET EVENT: type, count ", args.type, args.count)
     # print("GET EVENT: status ",  args.status, dbr.ECA_NORMAL)
-    entry = get_cache(name(args.chid))
-    if not entry:
+    try:
+        entry = _chid_cache[_chid_to_int(args.chid)]
+    except KeyError:
         return
 
     ftype = (args.usr.value if dbr.IRON_PYTHON
@@ -707,13 +716,13 @@ def _onPutEvent(args, **kwds):
 
 def _onAccessRightsEvent(args):
     'Access rights callback'
-    # NOTE: Access rights events may not happen in a CA context
-    # This means get_cache(name(chid)) will not work, as the pv name cache is
-    # first keyed on context.
-    entry = _chid_cache.get(_chid_to_int(args.chid), None)
-    if entry is not None:
-        entry.run_access_event_callbacks(
-            bool(args.read_access), bool(args.write_access))
+    try:
+        entry = _chid_cache[_chid_to_int(args.chid)]
+    except KeyError:
+        return
+
+    entry.run_access_event_callbacks(
+        bool(args.read_access), bool(args.write_access))
 
 
 # create global reference to these callbacks
