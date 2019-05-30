@@ -9,7 +9,7 @@ import threading
 import pytest
 
 from contextlib import contextmanager
-from epics import get_pv, caput, caget, caget_many, caput_many, ca
+from epics import PV, get_pv, caput, caget, caget_many, caput_many, ca
 
 import pvnames
 
@@ -362,7 +362,9 @@ class PV_Tests(unittest.TestCase):
 
     def test_waveform_get_with_count_arg(self):
         with no_simulator_updates():
-            wf = get_pv(pvnames.char_arr_pv, count=32)
+            # NOTE: do not use get_pv() here, as `count` is incompatible with
+            # the cache
+            wf = PV(pvnames.char_arr_pv, count=32)
             val=wf.get()
             self.assertEquals(len(val), 32)
 
@@ -373,7 +375,9 @@ class PV_Tests(unittest.TestCase):
     def test_waveform_callback_with_count_arg(self):
         values = []
 
-        wf = get_pv(pvnames.char_arr_pv, count=32)
+        # NOTE: do not use get_pv() here, as `count` is incompatible with
+        # the cache
+        wf = PV(pvnames.char_arr_pv, count=32)
         def onChanges(pvname=None, value=None, char_value=None, **kw):
             write( 'PV %s %s, %s Changed!\n' % (pvname, repr(value), char_value))
             values.append( value)
