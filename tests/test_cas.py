@@ -1,3 +1,4 @@
+import time
 import pytest
 import subprocess
 from tempfile import NamedTemporaryFile as NTF
@@ -142,7 +143,6 @@ def test_ca_access_event_callback(softioc, pvs):
     pvs['test:permit'].put(0, wait=True)
     assert pvs['test:permit'].get(as_string=True, use_monitor=False) == 'DISABLED'
 
-    bo_id = None
     bo_id = epics.ca.create_channel('test:bo')
     assert bo_id is not None
 
@@ -154,3 +154,23 @@ def test_ca_access_event_callback(softioc, pvs):
     epics.ca.replace_access_rights_event(bo_id, callback=lcb)
 
     assert lcb.sentinal is True
+    epics.ca.clear_channel(bo_id)
+
+
+def test_connection_callback(softioc, pvs):
+    results = []
+
+    def callback(conn, **kwargs):
+        results.append(conn)
+
+    pv = epics.PV('test:ao', connection_callback=callback)
+    pv.wait_for_connection()
+    softioc.kill()
+    softioc.wait()
+
+    t0 = time.time()
+    while pv.connected and (time.time() - t0) < 5:
+        time.sleep(0.1)
+
+    assert True in results
+    assert False in results
