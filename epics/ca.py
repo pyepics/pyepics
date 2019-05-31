@@ -98,6 +98,18 @@ Empty = _GetPending  # back-compat
 GET_PENDING = _GetPending()
 
 
+class _SentinelWithLock:
+    """
+    Used in create_channel, this sentinel ensures that two threads in the same
+    CA context do not conflict if they call `create_channel` with the same
+    pvname at the exact same time.
+    """
+    def __init__(self):
+        self.lock = threading.Lock()
+
+_create_channel_sentinel = _SentinelWithLock()
+
+
 class ChannelAccessException(Exception):
     """Channel Access Exception: General Errors"""
     def __init__(self, *args):
@@ -945,30 +957,40 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
 
 
     """
-    #
     # Note that _CB_CONNECT (defined above) is a global variable, holding
     # a reference to _onConnectionEvent:  This is really the connection
     # callback that is run -- the callack here is stored in the _cache
     # and called by _onConnectionEvent.
-    entry = get_cache(pvname)
-    if entry is None:
-        entry = _CacheItem(chid=None, pvname=pvname, callbacks=[callback])
-        context_cache = _cache[current_context()]
-        context_cache[pvname] = entry
 
-        with entry.lock:
+    context_cache = _cache[current_context()]
+
+    # {}.setdefault is an atomic operation, so we are guaranteed to never
+    # create the same channel twice here:
+    entry = context_cache.setdefault(pvname, _create_channel_sentinel)
+
+    with entry.lock:
+        is_new_channel = entry is _create_channel_sentinel
+        if is_new_channel:
+            callbacks = [callback] if callable(callback) else None
+            entry = _CacheItem(chid=None, pvname=pvname, callbacks=callbacks)
+            context_cache[pvname] = entry
+
             chid = dbr.chid_t()
-            ret = libca.ca_create_channel(ctypes.c_char_p(STR2BYTES(pvname)),
-                                          _CB_CONNECT, 0, 0, ctypes.byref(chid)
-                                          )
-            PySEVCHK('create_channel', ret)
+            with entry.lock:
+                ret = libca.ca_create_channel(
+                    ctypes.c_char_p(STR2BYTES(pvname)), _CB_CONNECT, 0, 0,
+                    ctypes.byref(chid)
+                )
+                PySEVCHK('create_channel', ret)
 
-            entry.chid = chid
-            _chid_cache[chid.value] = entry
+                entry.chid = chid
+                _chid_cache[chid.value] = entry
 
-    elif callable(callback) and callback not in entry.callbacks:
+    if (not is_new_channel and callable(callback) and
+            callback not in entry.callbacks):
         entry.callbacks.append(callback)
         if entry.chid is not None and entry.conn:
+            # Run the connection callback if already connected:
             callback(chid=_chid_to_int(entry.chid), pvname=pvname,
                      conn=entry.conn)
 
