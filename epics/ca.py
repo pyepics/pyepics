@@ -138,6 +138,8 @@ class _CacheItem:
         A lock for modifying the state
     conn : bool
         The connection status
+    context : int
+        The context in which this is CacheItem was created in
     chid : ctypes.c_long
         The channel ID
     pvname : str
