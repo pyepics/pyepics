@@ -1085,12 +1085,11 @@ def field_type(chid):
 @withCHID
 def clear_channel(chid):
     "clear the channel"
-    pvname = name(chid)
     ret = libca.ca_clear_channel(chid)
     entry = _chid_cache.pop(chid.value, None)
-    context_cache = _cache[current_context()]
-    context_cache.pop(pvname, None)
     if entry is not None:
+        context_cache = _cache[entry.context]
+        context_cache.pop(entry.pvname, None)
         with entry.lock:
             entry.chid = None
     return ret
