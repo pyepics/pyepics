@@ -440,8 +440,22 @@ def finalize_libca(maxtime=10.0):
 
 
 def get_cache(pvname):
-    "return cache dictionary for a given pvname in the current context"
+    "return _CacheItem for a given pvname in the current context"
     return _cache[current_context()].get(pvname, None)
+
+
+def _get_cache_by_chid(chid):
+    'return _CacheItem for a given channel id'
+    try:
+        return _chid_cache[chid]
+    except KeyError:
+        # It's possible that the channel id cache is not yet ready; check the
+        # context cache before giving up. This branch should not happen often.
+        context = current_context()
+        if context is not None:
+            pvname = BYTES2STR(libca.ca_name(dbr.chid_t(chid)))
+            return _cache[context][pvname]
+        raise
 
 
 def show_cache(print_out=True):
