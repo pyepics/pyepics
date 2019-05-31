@@ -10,7 +10,7 @@ PVN2 = pvnames.double_pv2 # 'Py:ao3'
 
 def subprocess(*args):
     print('==subprocess==', args)
-    mypvs = [epics.PV(pvname) for pvname in args]
+    mypvs = [epics.get_pv(pvname) for pvname in args]
 
     for i in range(10):
         time.sleep(0.750)
@@ -23,7 +23,7 @@ def main_process():
         print('--main:monitor %s=%s' % (pvname, char_value))
 
     print('--main:')
-    pv1 = epics.PV(PVN1)
+    pv1 = epics.get_pv(PVN1)
     print('--main:init %s=%s' % (PVN1, pv1.get()))
     pv1.add_callback(callback=monitor)
 
