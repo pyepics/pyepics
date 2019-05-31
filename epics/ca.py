@@ -969,6 +969,9 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
     entry = context_cache.setdefault(pvname, _create_channel_sentinel)
 
     with entry.lock:
+        # Grab the entry again from the cache. Between the time the lock was
+        # attempted and acquired, the cache may have changed.
+        entry = context_cache[pvname]
         is_new_channel = entry is _create_channel_sentinel
         if is_new_channel:
             callbacks = [callback] if callable(callback) else None
