@@ -649,7 +649,7 @@ def withSEVCHK(fcn):
 def _onMonitorEvent(args):
     """Event Handler for monitor events: not intended for use"""
     try:
-        _chid_cache[_chid_to_int(args.chid)]
+        entry = _get_cache_by_chid(args.chid)
     except KeyError:
         # In case the chid is no longer in our cache, exit now.
         return
@@ -663,9 +663,8 @@ def _onMonitorEvent(args):
         return
 
     value = dbr.cast_args(args)
-    pvname = name(args.chid)
     kwds = {'ftype':args.type, 'count':args.count,
-            'chid':args.chid, 'pvname': pvname}
+            'chid': args.chid, 'pvname': entry.pvname}
 
     # add kwds arguments for CTRL and TIME variants
     # this is in a try/except clause to avoid problems
@@ -683,7 +682,7 @@ def _onMonitorEvent(args):
 def _onConnectionEvent(args):
     "Connection notification - run user callbacks"
     try:
-        entry = _chid_cache[_chid_to_int(args.chid)]
+        entry = _get_cache_by_chid(args.chid)
     except KeyError:
         return
 
@@ -699,7 +698,7 @@ def _onGetEvent(args, **kws):
     # print("GET EVENT: type, count ", args.type, args.count)
     # print("GET EVENT: status ",  args.status, dbr.ECA_NORMAL)
     try:
-        entry = _chid_cache[_chid_to_int(args.chid)]
+        entry = _get_cache_by_chid(args.chid)
     except KeyError:
         return
 
