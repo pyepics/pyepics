@@ -7,7 +7,7 @@ def test_basic_thread():
     result = []
     def thread():
         epics.ca.use_initial_context()
-        pv = epics.PV(pvnames.double_pv)
+        pv = epics.get_pv(pvnames.double_pv)
         result.append(pv.get())
 
     epics.ca.use_initial_context()
@@ -21,7 +21,7 @@ def test_basic_thread():
 def test_basic_cathread():
     result = []
     def thread():
-        pv = epics.PV(pvnames.double_pv)
+        pv = epics.get_pv(pvnames.double_pv)
         result.append(pv.get())
 
     epics.ca.use_initial_context()
@@ -36,13 +36,13 @@ def test_attach_context():
     result = []
     def thread():
         epics.ca.create_context()
-        pv = epics.PV(pvnames.double_pv2)
+        pv = epics.get_pv(pvnames.double_pv2)
         assert pv.wait_for_connection()
         result.append(pv.get())
         epics.ca.detach_context()
 
         epics.ca.attach_context(ctx)
-        pv = epics.PV(pvnames.double_pv)
+        pv = epics.get_pv(pvnames.double_pv)
         assert pv.wait_for_connection()
         result.append(pv.get())
 
@@ -62,7 +62,7 @@ def test_pv_from_main():
         result.append(pv.get())
 
     epics.ca.use_initial_context()
-    pv = epics.PV(pvnames.double_pv2)
+    pv = epics.get_pv(pvnames.double_pv2)
 
     t = epics.ca.CAThread(target=thread)
     t.start()

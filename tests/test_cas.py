@@ -1,3 +1,4 @@
+import time
 import pytest
 import subprocess
 from tempfile import NamedTemporaryFile as NTF
@@ -65,7 +66,7 @@ def softioc():
         df.write(cas_test_db)
         df.flush()
 
-        proc = subprocess.Popen(['softIoc', '-D', 
+        proc = subprocess.Popen(['softIoc', '-D',
                                  '/home/travis/mc/envs/testenv/epics/dbd/softIoc.dbd',
                                  '-m', 'P=test', '-a', cf.name,
                                  '-d', df.name],
@@ -73,8 +74,12 @@ def softioc():
                                  stdout=subprocess.PIPE)
         yield proc
 
-        proc.kill()
-        proc.wait()
+        try:
+            proc.kill()
+            proc.wait()
+        except OSError:
+            pass
+
 
 @pytest.yield_fixture(scope='module')
 def pvs():
@@ -82,7 +87,7 @@ def pvs():
               'test:permit']
     pvs = dict()
     for name in pvlist:
-        pv = epics.PV(name)
+        pv = epics.get_pv(name)
         pv.wait_for_connection()
         pvs[pv.pvname] = pv
 
@@ -126,7 +131,7 @@ def test_pv_access_event_callback(softioc, pvs):
         assert pv.write_access == write_access
         pv.flag = True
 
-    bo = epics.PV('test:bo', access_callback=lcb)
+    bo = epics.get_pv('test:bo', access_callback=lcb)
     bo.flag = False
 
     # set the run-permit to trigger an access rights event
@@ -134,13 +139,14 @@ def test_pv_access_event_callback(softioc, pvs):
     assert pvs['test:permit'].get(as_string=True, use_monitor=False) == 'ENABLED'
 
     assert bo.flag is True
+    bo.access_callbacks = []
+
 
 def test_ca_access_event_callback(softioc, pvs):
     # clear the run-permit
     pvs['test:permit'].put(0, wait=True)
     assert pvs['test:permit'].get(as_string=True, use_monitor=False) == 'DISABLED'
 
-    bo_id = None
     bo_id = epics.ca.create_channel('test:bo')
     assert bo_id is not None
 
@@ -152,3 +158,23 @@ def test_ca_access_event_callback(softioc, pvs):
     epics.ca.replace_access_rights_event(bo_id, callback=lcb)
 
     assert lcb.sentinal is True
+    epics.ca.clear_channel(bo_id)
+
+
+def test_connection_callback(softioc, pvs):
+    results = []
+
+    def callback(conn, **kwargs):
+        results.append(conn)
+
+    pv = epics.PV('test:ao', connection_callback=callback)
+    pv.wait_for_connection()
+    softioc.kill()
+    softioc.wait()
+
+    t0 = time.time()
+    while pv.connected and (time.time() - t0) < 5:
+        time.sleep(0.1)
+
+    assert True in results
+    assert False in results

@@ -260,7 +260,7 @@ class PV(object):
     @_ensure_context
     def force_connect(self, pvname=None, chid=None, conn=True, **kws):
         if chid is None: chid = self.chid
-        if isinstance(chid, ctypes.c_long):
+        if hasattr(chid, 'value'):
             chid = chid.value
         self._args['chid'] = self.chid = chid
         self.__on_connect(pvname=pvname, chid=chid, conn=conn, **kws)
