@@ -521,7 +521,7 @@ class PVText(wx.StaticText, PVCtrlMixin):
         parameters
         """
     def __init__(self, parent, pv=None, as_string=True,
-                 font=None, fg=None, bg=None, style=None,
+                 font=None, fg=None, bg=None, style=None, precision = None,
                  minor_alarm="DARKRED", major_alarm="RED",
                  invalid_alarm="ORANGERED", auto_units=False, units="", **kw):
         """
@@ -558,8 +558,71 @@ class PVText(wx.StaticText, PVCtrlMixin):
         if self.auto_units and self.pv.units:
             self.units = " " + self.pv.units
         if value is not None:
+            #debug('PVText:_SetValue:%r' %value)
             self.SetLabel("%s%s" % (value, self.units))
 
+class PVFloatText(wx.StaticText, PVCtrlMixin):
+    """ Static text for displaying a numerical PV value,
+        with callback for automatic updates.
+
+        Options:
+           pv         epics pv to use for value
+           precision  number of digits past decimal point to display
+                      (default to 0)
+
+        By default the text colour will change on alarm states.
+        This can be overriden or disabled as constructor
+        parameters
+        """
+    def __init__(self, parent, pv=None, as_string=True,
+                 font=None, fg=None, bg=None, style=None, precision = None,
+                 minor_alarm="DARKRED", major_alarm="RED",
+                 invalid_alarm="ORANGERED", auto_units=False, units="", **kw):
+        """
+        Create a new pvFloatText
+
+        minor_alarm, major_alarm & invalid_alarm are all text colours
+        that will be set depending no the alarm state of the target
+        PV. Set to None if you want no highlighting in that alarm state.
+
+        auto_units means the PV value will be displayed with the EGU
+        "engineering units" as a suffix. Alternately, you can specify
+        an explicit unit string.
+        """
+        self.precision = precision
+        wstyle = wx.ALIGN_LEFT
+        if style is not None:
+            wstyle = style
+
+        wx.StaticText.__init__(self, parent, wx.ID_ANY, label='',
+                               style=wstyle, **kw)
+        PVCtrlMixin.__init__(self, pv=pv, font=font, fg=fg, bg=bg)
+
+        self.as_string = as_string
+        self.auto_units = auto_units
+        self.units = units
+
+        self._fg_colour_alarms = {
+            epics.MINOR_ALARM : minor_alarm,
+            epics.MAJOR_ALARM : major_alarm,
+            epics.INVALID_ALARM : invalid_alarm }
+
+    def _SetValue(self, value):
+        "set widget label"
+        from numpy import nan
+        if self.auto_units and self.pv.units:
+            self.units = " " + self.pv.units
+        if value is not None:
+            try:
+                value = float(value)
+            except:
+                warning('set value (%r) for the PVFloatText filed is not a number')
+                value = nan
+            if self.precision is None:
+                precision = 0
+            else:
+                precision = self.precision
+        self.SetLabel("{}{}".format(round(value,precision),self.units))
 
 class PVStaticText(wx.StaticText, PVMixin):
     """ Static text for displaying a PV value,
@@ -569,7 +632,7 @@ class PVStaticText(wx.StaticText, PVMixin):
         This can be overriden or disabled as constructor
         parameters
         """
-    def __init__(self, parent, pv=None, style=None,
+    def __init__(self, parent, pv=None, style=None, precision = None,
                  minor_alarm="DARKRED", major_alarm="RED",
                  invalid_alarm="ORANGERED", **kw):
         wstyle = wx.ALIGN_LEFT
