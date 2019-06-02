@@ -521,7 +521,7 @@ class PVText(wx.StaticText, PVCtrlMixin):
         parameters
         """
     def __init__(self, parent, pv=None, as_string=True,
-                 font=None, fg=None, bg=None, style=None, precision = None,
+                 font=None, fg=None, bg=None, style=None, 
                  minor_alarm="DARKRED", major_alarm="RED",
                  invalid_alarm="ORANGERED", auto_units=False, units="", **kw):
         """
