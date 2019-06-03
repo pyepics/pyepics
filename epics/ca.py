@@ -107,8 +107,6 @@ class _SentinelWithLock:
     def __init__(self):
         self.lock = threading.Lock()
 
-_create_channel_sentinel = _SentinelWithLock()
-
 
 class ChannelAccessException(Exception):
     """Channel Access Exception: General Errors"""
@@ -966,13 +964,11 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
 
     # {}.setdefault is an atomic operation, so we are guaranteed to never
     # create the same channel twice here:
-    entry = context_cache.setdefault(pvname, _create_channel_sentinel)
-
-    with entry.lock:
+    with context_cache.setdefault(pvname, _SentinelWithLock()).lock:
         # Grab the entry again from the cache. Between the time the lock was
         # attempted and acquired, the cache may have changed.
         entry = context_cache[pvname]
-        is_new_channel = entry is _create_channel_sentinel
+        is_new_channel = isinstance(entry, _SentinelWithLock)
         if is_new_channel:
             callbacks = [callback] if callable(callback) else None
             entry = _CacheItem(chid=None, pvname=pvname, callbacks=callbacks)
