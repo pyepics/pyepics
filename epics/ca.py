@@ -252,7 +252,10 @@ class _CacheItem:
         chid_int = self.chid_int
         for callback in list(self.callbacks):
             if callable(callback):
-                poll()
+                # The following sleep is here only to allow other threads the
+                # opportunity to grab the Python GIL. (see pyepics/pyepics#171)
+                time.sleep(0)
+
                 # print( ' ==> connection callback ', callback, conn)
                 callback(pvname=self.pvname, chid=chid_int, conn=self.conn)
 
