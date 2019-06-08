@@ -35,12 +35,12 @@ Channel Access, the :func:`caget` and :func:`caput` functions are probably
 where you want to start.
 
 If you're building larger scripts and programs, using :class:`PV` objects
-provided by the :mod:`pv` module is recommended.  The :class:`PV` class
-provides a Process Variable (PV) object that has both methods (including
-:meth:`get` and :meth:`put`) to read and change the PV, and attributes that
-are kept automatically synchronized with the remote channel.  For larger
-applications where you find yourself working with sets of related PVs, you
-may find the :class:`Device` class helpful.
+is recommended.  The :class:`PV` class provides a Process Variable (PV)
+object that has methods (including :meth:`get` and :meth:`put`) to read and
+change the PV, and attributes that are kept automatically synchronized with
+the remote channel.  For larger applications where you find yourself
+working with sets of related PVs, you may find the :class:`Device` class
+helpful.
 
 The lowest-level CA functionality is exposed in the :mod:`ca` module, and
 companion :mod:`dbr` module.  While not necessary recommended for most use
@@ -112,9 +112,7 @@ function:
     =============================
 
 The simplicity and clarity of these functions make them ideal for many
-cases.
-
-
+uses.
 
 Creating and Using PV Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,7 +152,7 @@ printing it:
     >>> print(pv1)
     <PV 'XXX:m1.VAL', count=1, type=time_double, access=read/write>
 
-Even more complete information can be seen by printing the PVs :attr:`info`
+More complete information can be seen by printing the PVs :attr:`info`
 attribute::
 
     >>> print(pv1.info)
