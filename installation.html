@@ -14,6 +14,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PyEpics Overview" href="overview.html" />
@@ -109,28 +110,28 @@
 <h1>Downloading and Installation<a class="headerlink" href="#downloading-and-installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>PyEpics works with Python version 2.7, 3.5, or 3.6.  It is supported and
-regularly used and tested on 64-bit Linux, 64-bit Mac OSX, 64-bit Windows.
-It should still work on 32-bit Windows, 32-bit Linux, and on Linux with ARM
-processors, such as raspberry Pi, but these are tested regularly.  It
-appears to work with Python 3.7, but this has tested much.  It may also
-work with older versions of Python (such as 3.4), but these are not
-tested. For Windows, pyepics has been reported to work with IronPython
-(Python written with .NET), but this is not routinely tested.</p>
-<p>The EPICS Channel Access library Version 3.14 or higher is required for
-pyepics to actually communicate with Epics variables.  Specifically, the
-shared libraries libca and libCom (<em>libca.so</em> and <em>libCom.so</em> on Linux,
-<em>libca.dylib</em> and <em>libCom.dylib</em> on Mac OSX, or <em>ca.dll</em> and <em>Com.dll</em> on
-Windows) from <em>Epics Base</em> are required to use this module. Some features,
-including ‘subarray records’ will only work with version 3.14.12 and
-higher, and version 3.15 or higher is strongly recommended.</p>
-<p>For all supported operating systems (linux-64, linux-32, linux-arm,
-windows-64, windows-32, and darwin-64), pre-built versions of <em>libca</em> (and
-<em>libCom</em>) built with 3.16.2 are provided, and will be installed within the
-python packages directory and used by default.  That means that you do not
-need to install Epics base libraries or any other packages to use pyepics.
-For Epics experts who may want to use their own versions the <em>libca</em> from
-Epics base, instructions for how to do this are given below.</p>
+<p>PyEpics works with Python version 2.7, 3.5, 3.6, and 3.7.  It is supported
+and regularly used and tested on 64-bit Linux, 64-bit Mac OSX, and 64-bit
+Windows.  It is known to work on Linux with ARM processors including
+raspberry Pi, though this is not part of the automated testing set.
+Pyepics may still work on 32-bit Windows and Linux, but these systems are
+not tested regularly. It may also work with older versions of Python (such
+as 3.4), but these are no longer tested or supported. For Windows, pyepics
+has been reported to work with IronPython (that is, Python written in the
+.NET framework), but this is not routinely tested.</p>
+<p>The EPICS Channel Access library Version 3.14.12 or higher is required for
+pyepics and 3.15 or higher are strongly recommended.  More specifically,
+pyepics requires e shared libraries libca and libCom (<em>libca.so</em> and
+<em>libCom.so</em> on Linux, <em>libca.dylib</em> and <em>libCom.dylib</em> on Mac OSX, or
+<em>ca.dll</em> and <em>Com.dll</em> on Windows) from <em>Epics Base</em>.</p>
+<p>For all supported operating systems and some less-well-tested systems (all
+of linux-64, linux-32,linux-arm, windows-64, windows-32, and darwin-64),
+pre-built versions of <em>libca</em> (and <em>libCom</em>) built with 3.16.2 are
+provided, and will be installed within the python packages directory and
+used by default.  This means that you do not need to install Epics base
+libraries or any other packages to use pyepics.  For Epics experts who may
+want to use their own versions the <em>libca</em> from Epics base, instructions
+for how to do this are given below.</p>
 <p>The Python <a class="reference external" href="http://numpy.scipy.org/">numpy module</a> is highly
 recommended, though it is not required. If available, it will be used
 to automatically convert between EPICS waveforms and numpy arrays.</p>
@@ -141,7 +142,7 @@ requires <cite>PyQt</cite> or <cite>PySide</cite>.</p>
 </div>
 <div class="section" id="downloads-and-installation">
 <h2>Downloads and Installation<a class="headerlink" href="#downloads-and-installation" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the pyepics package is 3.3.3.  Source code
+<p>The latest stable version of the pyepics package is 3.4.0.  Source code
 kits and Windows installers can be found at <a class="reference external" href="https://pypi.python.org/pypi/pyepics/">pyepics PyPI</a>, and can be
 installed with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyepics</span>
@@ -178,7 +179,8 @@ that the <em>libca</em> you are pointing to can find the required <em>libCom</em
 methods for telling shared libraries (or executable files) how to find other
 shared libraries varies with system, but you may need to set other
 environmental variables such as <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> or <code class="docutils literal notranslate"><span class="pre">DYLIB_LIBRARY_PATH</span></code>
-or use <cite>ldconfig</cite>.</p>
+or use <cite>ldconfig</cite>.  If you’re having trouble with any of these things,
+ask your local Epics gurus or contact the authors.</p>
 <dl class="docutils">
 <dt>To find out which CA library will be used by pyepics, use:</dt>
 <dd><div class="first last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
@@ -192,9 +194,9 @@ or use <cite>ldconfig</cite>.</p>
 Process Variables. Generally, these variables are provided by Epics I/O
 controllers (IOCs) that are processes running on some device on the
 network.  If you are connecting to PVs provided by IOCs on your local
-subnet, you should have no trouble.  If trying to reach further network,
-you may need to set the environmental variable <code class="docutils literal notranslate"><span class="pre">EPICS_CA_ADDR_LIST</span></code> to
-specify which networks to search for PVs.</p>
+subnet, you should have no trouble.  If trying to reach IOCs outside of
+your immediate subnet, you may need to set the environmental variable
+<code class="docutils literal notranslate"><span class="pre">EPICS_CA_ADDR_LIST</span></code> to specify which networks to search for PVs.</p>
 </div>
 <div class="section" id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
@@ -209,10 +211,8 @@ Windows.</p>
 <div class="section" id="development-version">
 <h2>Development Version<a class="headerlink" href="#development-version" title="Permalink to this headline">¶</a></h2>
 <p>Development of pyepics is done through the <a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github
-repository</a>.  To get a read-only copy of the latest version, use one
-of:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pyepics</span><span class="o">/</span><span class="n">pyepics</span><span class="o">.</span><span class="n">git</span>
-<span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pyepics</span><span class="o">/</span><span class="n">pyepics</span><span class="o">.</span><span class="n">git</span>
+repository</a>.  To get a copy of the latest version do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pyepics</span><span class="o">/</span><span class="n">pyepics</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 </div>
@@ -372,7 +372,7 @@ Vigder, Steve Wasserman, and Glen Wright.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

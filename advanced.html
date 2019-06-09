@@ -14,6 +14,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="wx: wxPython Widgets for Epics" href="wx.html" /> 
@@ -572,7 +573,7 @@ process.</p>
 
 <span class="k">def</span> <span class="nf">subprocess</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==subprocess==&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
-    <span class="n">mypvs</span> <span class="o">=</span> <span class="p">[</span><span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span> <span class="k">for</span> <span class="n">pvname</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+    <span class="n">mypvs</span> <span class="o">=</span> <span class="p">[</span><span class="n">epics</span><span class="o">.</span><span class="n">get_pv</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span> <span class="k">for</span> <span class="n">pvname</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.750</span><span class="p">)</span>
@@ -585,7 +586,7 @@ process.</p>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--main:monitor </span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">))</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--main:&#39;</span><span class="p">)</span>
-    <span class="n">pv1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">PVN1</span><span class="p">)</span>
+    <span class="n">pv1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">get_pv</span><span class="p">(</span><span class="n">PVN1</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--main:init </span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">PVN1</span><span class="p">,</span> <span class="n">pv1</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
     <span class="n">pv1</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">callback</span><span class="o">=</span><span class="n">monitor</span><span class="p">)</span>
 
@@ -648,7 +649,7 @@ been done on using multiprocessing Managers.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

@@ -13,21 +13,21 @@ abstractions built on top of this basic functionality.
 
 The package includes a very simple interface to CA similar to the Unix
 command-line tools and EZCA library with functions :meth:`epics.caget`,
-:meth:`epics.caput`, :meth:`epics.cainfo`, and :meth:`epics.camonitor`.  These
-is also a :class:`pv.PV` class which represents an Epics Process Variable as a
-full-featured and easy-to-use Python object.  Additional modules provide
-higher-level programming support to CA, including grouping related PVs into a
+:meth:`epics.caput`, :meth:`epics.cainfo`, and :meth:`epics.camonitor`.
+For an object-oriented interface, there is also a :class:`pv.PV` class
+which represents an Epics Process Variable as a full-featured and
+easy-to-use Python object.  Additional modules provide higher-level
+programming support to CA, including grouping related PVs into a
 :class:`device.Device`, creating alarms in :class:`alarm.Alarm`, and saving
 PVs values in the :mod:`autosave` module.  There is also support for
-conveniently using epics PVs to wxPython widgets in the :mod:`wx` module, and
-some support for using PyQt widgets in the :mod:`qt` module.
+conveniently using epics PVs to wxPython widgets in the :mod:`wx` module,
+and some support for using PyQt widgets in the :mod:`qt` module.
 
 -----------
 
 In addition to the Pyepics library described here, several applications
 built with pyepics are available at `http://github.com/pyepics/epicsapps/
-<http://github.com/pyepics/epicsapps/>`_.
-See
+<http://github.com/pyepics/epicsapps/>`_.  See
 `http://pyepics.github.com/epicsapps/
 <http://pyepics.github.com/epicsapps/>`_ for further details.
 

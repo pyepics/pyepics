@@ -14,6 +14,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PV: Epics Process Variables" href="pv.html" />
@@ -148,12 +149,12 @@ use with Epics PVs.</li>
 Channel Access, the <code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code> functions are probably
 where you want to start.</p>
 <p>If you’re building larger scripts and programs, using <code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code> objects
-provided by the <a class="reference internal" href="pv.html#module-pv" title="pv: PV objects for Epics Channel Access"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pv</span></code></a> module is recommended.  The <code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code> class
-provides a Process Variable (PV) object that has both methods (including
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">put()</span></code>) to read and change the PV, and attributes that
-are kept automatically synchronized with the remote channel.  For larger
-applications where you find yourself working with sets of related PVs, you
-may find the <code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code> class helpful.</p>
+is recommended.  The <code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code> class provides a Process Variable (PV)
+object that has methods (including <code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">put()</span></code>) to read and
+change the PV, and attributes that are kept automatically synchronized with
+the remote channel.  For larger applications where you find yourself
+working with sets of related PVs, you may find the <code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code> class
+helpful.</p>
 <p>The lowest-level CA functionality is exposed in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module, and
 companion <code class="xref py py-mod docutils literal notranslate"><span class="pre">dbr</span></code> module.  While not necessary recommended for most use
 cases, this module does provide a fairly complete wrapping of the basic
@@ -217,7 +218,7 @@ function:</p>
 </pre></div>
 </div>
 <p>The simplicity and clarity of these functions make them ideal for many
-cases.</p>
+uses.</p>
 </div>
 <div class="section" id="creating-and-using-pv-objects">
 <h3>Creating and Using PV Objects<a class="headerlink" href="#creating-and-using-pv-objects" title="Permalink to this headline">¶</a></h3>
@@ -256,7 +257,7 @@ printing it:</p>
 <span class="go">&lt;PV &#39;XXX:m1.VAL&#39;, count=1, type=time_double, access=read/write&gt;</span>
 </pre></div>
 </div>
-<p>Even more complete information can be seen by printing the PVs <code class="xref py py-attr docutils literal notranslate"><span class="pre">info</span></code>
+<p>More complete information can be seen by printing the PVs <code class="xref py py-attr docutils literal notranslate"><span class="pre">info</span></code>
 attribute:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pv1</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
 <span class="go">== XXX:m1.VAL  (time_double) ==</span>
@@ -710,7 +711,7 @@ contact the authors.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>
