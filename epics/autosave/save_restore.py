@@ -181,7 +181,7 @@ float_number = Combine( integer +
 # (originally I had pyparsing pulling out the $(Macro) references from inside names
 # as well, but the framework doesn't work especially well without whitespace delimiters between
 # tokens so we just do simple find/replace in a second pass
-pv_name = Word(alphanums+":._$()")
+pv_name = Word(alphanums+":._$()-")
 
 pv_value = (float_number | Word(alphanums))
 pv_assignment = pv_name + pv_value
