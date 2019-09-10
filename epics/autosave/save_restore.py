@@ -21,9 +21,9 @@ Web site is http://pyparsing.wikispaces.com/
 
 """
 
-from pyparsing import Literal, Optional, Word, Combine, Regex, Group, \
-    ZeroOrMore, OneOrMore, LineEnd, LineStart, StringEnd, \
-    alphanums, alphas, nums
+from pyparsing import (Literal, Optional, Word, Combine, Regex, Group,
+                       ZeroOrMore, OneOrMore, LineEnd, LineStart, StringEnd,
+                       alphanums, alphas, nums, printables)
 
 import sys
 import os
@@ -178,12 +178,12 @@ float_number = Combine( integer +
                         Optional( point + Optional(number) )
                         ).setParseAction(lambda t:float(t[0]))
 
-# (originally I had pyparsing pulling out the $(Macro) references from inside names
-# as well, but the framework doesn't work especially well without whitespace delimiters between
-# tokens so we just do simple find/replace in a second pass
-pv_name = Word(alphanums+":._$()")
+# PV names according to app developer guide and tech-talk email thread at:
+# https://epics.anl.gov/tech-talk/2019/msg01429.php
+pv_name = Combine(Word(alphanums+'_-+:[]<>;{}')
+                  + Optional(Combine('.') + Word(printables)))
+pv_value = (float_number | Word(printables))
 
-pv_value = (float_number | Word(alphanums))
 pv_assignment = pv_name + pv_value
 
 comment = Literal("#") + Regex(r".*")

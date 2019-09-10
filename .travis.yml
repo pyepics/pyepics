@@ -53,7 +53,7 @@ before_install:
   - conda config --add channels lightsource2-tag
 
   # MAKE THE CONDA RECIPE
-  - conda create -n $CONDA_ENV python=$TRAVIS_PYTHON_VERSION epics-base
+  - conda create -n $CONDA_ENV python=$TRAVIS_PYTHON_VERSION epics-base=3.14.12.6
   - source activate $CONDA_ENV
 
 install:
