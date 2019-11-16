@@ -33,7 +33,7 @@ def EpicsFunction(f):
         try:
             wx.CallAfter(f, *args, **kwargs)
         except PyDeadObjectError:
-            pass
+            print(traceback.format_exc())
     return wrapper
 
 def DelayedEpicsCallback(fcn):
@@ -459,6 +459,65 @@ class PVCtrlMixin(PVMixin):
         except PyDeadObjectError:
             pass
 
+class PVImage(wx.StaticBitmap, PVMixin):
+    """ Static text for displaying a PV value,
+        with callback for automatic updates
+        By default the text colour will change on alarm states.
+        This can be overriden or disabled as constructor
+        parameters
+        """
+    def __init__(self, parent, pv=None, style=None, im_size = None,
+                 minor_alarm="DARKRED", major_alarm="RED",
+                 invalid_alarm="ORANGERED", **kw):
+        self.im_size = im_size
+        wstyle = wx.ALIGN_LEFT
+        if style is not None:
+            wstyle = style
+
+        wx.StaticBitmap.__init__(self, parent, wx.ID_ANY,
+                               style=wstyle, **kw)
+        PVMixin.__init__(self, pv=pv)
+        self._fg_colour_alarms = {
+            epics.MINOR_ALARM : minor_alarm,
+            epics.MAJOR_ALARM : major_alarm,
+            epics.INVALID_ALARM : invalid_alarm }
+
+    def _SetValue(self, value):
+        "set widget label"
+        print('_SetValue value = ',value)
+        from PIL import Image
+        import io
+        if value is not None:
+            raw_image = value
+            im_mode = 'RGB'
+            im_size = self.im_size
+            img = Image.frombuffer(im_mode, im_size, raw_image,
+                                    'raw', im_mode, 0, 1)
+            buf = io.BytesIO()
+            img.save(buf, format='PNG')
+            buf.seek(0)
+            image = Image.open(buf)
+            width, height = image.size
+            bit_img = wx.Bitmap.FromBuffer(width, height, image.tobytes())
+            self.SetBitmap(bit_img)
+        else:
+            print('_SetValue',value)
+
+    @EpicsFunction
+    def OnPVChange(self, value):
+        "called by PV callback"
+        import traceback
+        from numpy import array
+        try:
+            print('Try OnPVChange')
+            print('value OnPVChange = ',value,type(value))
+            print('self.pv = ',self.pv)
+            print('self.pv.get()',self.pv.get())
+            if self.pv is not None:
+                value = array(self.pv.get(), dtype = 'int8')
+                self._SetValue(value)
+        except:
+            print(traceback.format_exc())
 
 class PVTextCtrl(wx.TextCtrl, PVCtrlMixin):
     """
@@ -1108,8 +1167,13 @@ class PVButton(wx.Button, PVCtrlMixin):
         if self.disablePV is not None and \
            (self.disablePV.get() == self.disableValue):
             enableValue = False
-        if self.pv is not None and (self.pv.get() == self.pushValue):
-            enableValue = False
+        from numpy import array_equal, ndarray, generic
+        if isinstance(self.pushValue, (ndarray, generic)):
+            if self.pv is not None and (array_equal(self.pv.get(),self.pushValue)):
+                enableValue = False
+        else:
+            if self.pv is not None and (self.pv.get() is self.pushValue):
+                enableValue = False
         wx.Button.Enable(self, enableValue)
 
     @DelayedEpicsCallback

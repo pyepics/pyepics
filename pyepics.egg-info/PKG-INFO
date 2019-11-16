@@ -1,0 +1,34 @@
+Metadata-Version: 1.1
+Name: pyepics
+Version: 3.4.0rc3+6.g5daae04
+Summary: Epics Channel Access for Python
+Home-page: http://pyepics.github.io/pyepics/
+Author: Matthew Newville
+Author-email: newville@cars.uchicago.edu
+License: Epics Open License
+Download-URL: http://pyepics.github.io/pyepics/
+Description: Python Interface to the Epics Channel Access protocol
+        of the Epics control system.   PyEpics provides 3 layers of access to
+        Channel Access (CA):
+          1. a light wrapping of the CA C library calls, using ctypes. This
+             provides a procedural CA library in which the user is expected
+             to manage Channel IDs. It is mostly provided as a foundation
+             upon which higher-level access is built.
+          2. PV() (Process Variable) objects, which represent the basic object
+             in CA, allowing one to keep a persistent connection to a remote
+             Process Variable.
+          3. A simple set of functions caget(), caput() and so on to mimic
+             the CA command-line tools and give the simplest access to CA.
+        
+        In addition, the library includes convenience classes to define
+        Devices -- collections of PVs that might represent an Epics Record
+        or physical device (say, a camera, amplifier, or power supply), and
+        to help write GUIs for CA.
+        
+Platform: Windows
+Platform: Linux
+Platform: Mac OS X
+Classifier: Intended Audience :: Science/Research
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Scientific/Engineering

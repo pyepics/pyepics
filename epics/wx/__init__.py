@@ -16,6 +16,7 @@ PVFloatCtrl   = pvFloatCtrl   = wxlib.PVFloatCtrl
 PVTextCtrl    = pvTextCtrl    = wxlib.PVTextCtrl
 PVStaticText  = pvStaticText  = wxlib.PVStaticText
 PVFloatText   = pvFloatText   = wxlib.PVFloatText
+PVImage       = pvImage       = wxlib.PVImage
 PVEnumButtons = pvEnumButtons = wxlib.PVEnumButtons
 PVEnumChoice  = pvEnumChoice  = wxlib.PVEnumChoice
 PVBitmap      = pvBitmap      = wxlib.PVBitmap
@@ -42,4 +43,3 @@ DelayedEpicsCallback = wxlib.DelayedEpicsCallback
 EpicsFunction  = wxlib.EpicsFunction
 finalize_epics  = wxlib.finalize_epics
 EpicsTimer      = wxlib.EpicsTimer
-
