@@ -511,9 +511,12 @@ class PVImage(wx.StaticBitmap, PVMixin):
         from numpy import array
         try:
             print('Try OnPVChange')
-            print('value OnPVChange = ',value,type(value))
             print('self.pv = ',self.pv)
             print('self.pv.get()',self.pv.get())
+            print('value OnPVChange = ',value,len(value),type(value))
+            # I don't know how to work with value correctly.
+            # the value of value is <array size=30000, type=ctrl_long>
+            # the type of value is <class 'str'>
             if self.pv is not None:
                 value = array(self.pv.get(), dtype = 'int8')
                 self._SetValue(value)
