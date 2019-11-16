@@ -484,22 +484,19 @@ class PVImage(wx.StaticBitmap, PVMixin):
 
     def _SetValue(self, value):
         "set widget label"
-        print('_SetValue value = ',value)
         from PIL import Image
+        from time import time
         import io
         if value is not None:
             # I do all the stuff below to convert the array to the right format. It seems to be transmitted as 32bit instead of 8, even though i tried created it as 8 on the server. This needs to be investigated.
+
             raw_image = value
             im_mode = 'RGB'
             im_size = self.im_size
-            img = Image.frombuffer(im_mode, im_size, raw_image,
-                                    'raw', im_mode, 0, 1)
-            buf = io.BytesIO()
-            img.save(buf, format='PNG')
-            buf.seek(0)
-            image = Image.open(buf)
-            width, height = image.size
-            bit_img = wx.Bitmap.FromBuffer(width, height, image.tobytes())
+            img = Image.frombuffer(im_mode, im_size, raw_image, 'raw', im_mode, 0, 1)
+            width, height = img.size
+            bit_img = wx.Bitmap.FromBuffer(width, height, img.tobytes())
+            t1 = time()
             self.SetBitmap(bit_img)
         else:
             print('_SetValue',value)
@@ -509,11 +506,8 @@ class PVImage(wx.StaticBitmap, PVMixin):
         "called by PV callback"
         import traceback
         from numpy import array
+        self.pv.auto_monitor = True
         try:
-            print('Try OnPVChange')
-            print('self.pv = ',self.pv)
-            print('self.pv.get()',self.pv.get())
-            print('value OnPVChange = ',value,len(value),type(value))
             # I don't know how to work with value correctly.
             # the value of value is <array size=30000, type=ctrl_long>
             # the type of value is <class 'str'>
