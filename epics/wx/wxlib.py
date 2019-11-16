@@ -488,6 +488,7 @@ class PVImage(wx.StaticBitmap, PVMixin):
         from PIL import Image
         import io
         if value is not None:
+            # I do all the stuff below to convert the array to the right format. It seems to be transmitted as 32bit instead of 8, even though i tried created it as 8 on the server. This needs to be investigated.
             raw_image = value
             im_mode = 'RGB'
             im_size = self.im_size
