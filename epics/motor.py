@@ -298,6 +298,26 @@ class Motor(device.Device):
             except:
                 raise MotorException("EpicsMotor has no attribute %s" % attr)
 
+    def put(self, attr, value, wait=False, use_complete=False, timeout=10):
+        """put a Motor attribute value,
+        optionally wait for completion or
+        up to a supplied timeout value
+        """
+        if attr in self._alias:
+            attr = self._alias[attr]
+        thispv = self.PV(attr)
+        thispv.wait_for_connection()
+        return thispv.put(value, wait=wait, use_complete=use_complete,
+                          timeout=timeout)
+
+    def get(self, attr, as_string=False, count=None):
+        """get a Motor attribute value,
+        option as_string returns a string representation
+        """
+        if attr in self._alias:
+            attr = self._alias[attr]
+        return self.PV(attr).get(as_string=as_string, count=count)
+
     def check_limits(self):
         """ check motor limits:
         returns None if no limits are violated
