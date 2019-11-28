@@ -40,7 +40,7 @@ class MotorPanel(wx.Panel):
         wx.Panel.__init__(self, parent, style=wx.TAB_TRAVERSAL)
         self.parent = parent
 
-        if hasattr(messenger, '__call__'):
+        if callable(messenger):
             self.__messenger = messenger
 
         self.format = None

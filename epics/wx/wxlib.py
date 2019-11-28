@@ -886,7 +886,7 @@ class PVCheckBox(wx.CheckBox, PVCtrlMixin):
             self.Value = (value == self.on_value)
         else:
             self.Value = bool(self.pv.get())
-        if hasattr(self.OnChange, '__call__'):
+        if callable(self.OnChange):
             self.OnChange(self)
 
     @EpicsFunction

@@ -237,9 +237,9 @@ class PV(object):
         self._conn_started = False
         if isinstance(callback, (tuple, list)):
             for i, thiscb in enumerate(callback):
-                if hasattr(thiscb, '__call__'):
+                if callable(thiscb):
                     self.callbacks[i] = (thiscb, {})
-        elif hasattr(callback, '__call__'):
+        elif callable(callback):
             self.callbacks[0] = (callback, {})
 
         self.chid = None
@@ -322,7 +322,7 @@ class PV(object):
             self._check_auto_monitor()
 
         for conn_cb in self.connection_callbacks:
-            if hasattr(conn_cb, '__call__'):
+            if callable(conn_cb):
                 conn_cb(pvname=self.pvname, conn=conn, pv=self)
             elif not conn and self.verbose:
                 ca.write("PV '%s' disconnected." % pvname)
@@ -793,7 +793,7 @@ class PV(object):
         kwd = copy.copy(self._args)
         kwd.update(kwargs)
         kwd['cb_info'] = (index, self)
-        if hasattr(fcn, '__call__'):
+        if callable(fcn):
             fcn(**kwd)
 
     def add_callback(self, callback=None, index=None, run_now=False,
@@ -805,7 +805,7 @@ class PV(object):
         Note that a PV may have multiple callbacks, so that each
         has a unique index (small integer) that is returned by
         add_callback.  This index is needed to remove a callback."""
-        if hasattr(callback, '__call__'):
+        if callable(callback):
             if index is None:
                 index = 1
                 if len(self.callbacks) > 0:
