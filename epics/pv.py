@@ -892,8 +892,14 @@ class PV(object):
             if len(self.callbacks) > 0:
                 for nam in sorted(self.callbacks.keys()):
                     cback = self.callbacks[nam][0]
-                    out.append('      %s in file %s' % (cback.func_name,
-                                        cback.func_code.co_filename))
+                    cbname = getattr(cback, 'func_name', None)
+                    if cbname is None:
+                        cbname = getattr(cback, '__name__', repr(cback))
+                    cbcode = getattr(cback, 'func_code', None)
+                    if cbcode is None:
+                        cbcode = getattr(cback, '__code__', None)
+                    cbfile = getattr(cbcode, 'co_filename', '?')
+                    out.append('      %s in file %s' % (cbname, cbfile))
         else:
             out.append('   PV is NOT internally monitored')
         out.append('=============================')
