@@ -237,9 +237,9 @@ class PV(object):
         self._conn_started = False
         if isinstance(callback, (tuple, list)):
             for i, thiscb in enumerate(callback):
-                if hasattr(thiscb, '__call__'):
+                if callable(thiscb):
                     self.callbacks[i] = (thiscb, {})
-        elif hasattr(callback, '__call__'):
+        elif callable(callback):
             self.callbacks[0] = (callback, {})
 
         self.chid = None
@@ -322,7 +322,7 @@ class PV(object):
             self._check_auto_monitor()
 
         for conn_cb in self.connection_callbacks:
-            if hasattr(conn_cb, '__call__'):
+            if callable(conn_cb):
                 conn_cb(pvname=self.pvname, conn=conn, pv=self)
             elif not conn and self.verbose:
                 ca.write("PV '%s' disconnected." % pvname)
@@ -793,7 +793,7 @@ class PV(object):
         kwd = copy.copy(self._args)
         kwd.update(kwargs)
         kwd['cb_info'] = (index, self)
-        if hasattr(fcn, '__call__'):
+        if callable(fcn):
             fcn(**kwd)
 
     def add_callback(self, callback=None, index=None, run_now=False,
@@ -805,7 +805,7 @@ class PV(object):
         Note that a PV may have multiple callbacks, so that each
         has a unique index (small integer) that is returned by
         add_callback.  This index is needed to remove a callback."""
-        if hasattr(callback, '__call__'):
+        if callable(callback):
             if index is None:
                 index = 1
                 if len(self.callbacks) > 0:
@@ -892,8 +892,14 @@ class PV(object):
             if len(self.callbacks) > 0:
                 for nam in sorted(self.callbacks.keys()):
                     cback = self.callbacks[nam][0]
-                    out.append('      %s in file %s' % (cback.func_name,
-                                        cback.func_code.co_filename))
+                    cbname = getattr(cback, 'func_name', None)
+                    if cbname is None:
+                        cbname = getattr(cback, '__name__', repr(cback))
+                    cbcode = getattr(cback, 'func_code', None)
+                    if cbcode is None:
+                        cbcode = getattr(cback, '__code__', None)
+                    cbfile = getattr(cbcode, 'co_filename', '?')
+                    out.append('      %s in file %s' % (cbname, cbfile))
         else:
             out.append('   PV is NOT internally monitored')
         out.append('=============================')
