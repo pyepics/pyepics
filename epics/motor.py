@@ -310,13 +310,14 @@ class Motor(device.Device):
         return thispv.put(value, wait=wait, use_complete=use_complete,
                           timeout=timeout)
 
-    def get(self, attr, as_string=False, count=None):
+    def get(self, attr, as_string=False, count=None, timeout=None):
         """get a Motor attribute value,
         option as_string returns a string representation
         """
         if attr in self._alias:
             attr = self._alias[attr]
-        return self.PV(attr).get(as_string=as_string, count=count)
+        return self.PV(attr).get(as_string=as_string, count=count,
+                                 timeout=timeout)
 
     def check_limits(self):
         """ check motor limits:

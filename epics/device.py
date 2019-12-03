@@ -8,6 +8,7 @@ basic device object defined
 from .ca import poll
 from .pv  import get_pv
 import time
+
 class Device(object):
     """A simple collection of related PVs, sharing a common prefix
     string for their names, but having many 'attributes'.
@@ -181,10 +182,11 @@ class Device(object):
         return thispv.put(value, wait=wait, use_complete=use_complete,
                           timeout=timeout)
 
-    def get(self, attr, as_string=False, count=None):
+    def get(self, attr, as_string=False, count=None, timeout=None):
         """get an attribute value,
         option as_string returns a string representation"""
-        return self.PV(attr).get(as_string=as_string, count=count)
+        return self.PV(attr).get(as_string=as_string, count=count,
+                                 timeout=timeout)
 
     def save_state(self):
         """return a dictionary of the values of all
