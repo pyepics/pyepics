@@ -747,9 +747,9 @@ def _onAccessRightsEvent(args):
         entry = _chid_cache[_chid_to_int(args.chid)]
     except KeyError:
         return
-
-    entry.run_access_event_callbacks(
-        bool(args.read_access), bool(args.write_access))
+    read = bool(args.access & 1)
+    write = bool((args.access >> 1) & 1)
+    entry.run_access_event_callbacks(read, write)
 
 
 # create global reference to these callbacks

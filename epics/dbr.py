@@ -353,11 +353,11 @@ class connection_args(ctypes.Structure):
     _fields_ = [('chid', chid_t),
                 ('op', long_t)]
 
+
 class access_rights_handler_args(ctypes.Structure):
     "access rights arguments"
     _fields_ = [('chid', chid_t),
-                ('read_access', ctypes.c_bool),
-                ('write_access', ctypes.c_bool)]
+                ('access', ctypes.c_ubyte)]
 
 if PY64_WINDOWS and PY_MAJOR == 2:
     # need to add padding on 64-bit Windows for Python2 -- yuck!
