@@ -747,9 +747,9 @@ def _onAccessRightsEvent(args):
         entry = _chid_cache[_chid_to_int(args.chid)]
     except KeyError:
         return
-
-    entry.run_access_event_callbacks(
-        bool(args.read_access), bool(args.write_access))
+    read = bool(args.access % 2)
+    write = bool(args.access>=2)
+    entry.run_access_event_callbacks(read, write)
 
 
 # create global reference to these callbacks
@@ -757,8 +757,7 @@ _CB_CONNECT = dbr.make_callback(_onConnectionEvent, dbr.connection_args)
 _CB_PUTWAIT = dbr.make_callback(_onPutEvent,        dbr.event_handler_args)
 _CB_GET     = dbr.make_callback(_onGetEvent,        dbr.event_handler_args)
 _CB_EVENT   = dbr.make_callback(_onMonitorEvent,    dbr.event_handler_args)
-_CB_ACCESS  = dbr.make_callback(_onAccessRightsEvent,
-                                dbr.access_rights_handler_args)
+_CB_ACCESS  = dbr.make_callback(_onAccessRightsEvent,  dbr.access_rights_handler_args)
 
 # Now we're ready to wrap libca functions
 #
