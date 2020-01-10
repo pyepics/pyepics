@@ -13,16 +13,14 @@ cache:
 matrix:
   include:
     # do not install libca / libcom from pyepics
-    - python: 2.7
-      env: NOLIBCA=1
     - python: 3.5
       env: NOLIBCA=1
     - python: 3.6
       env: NOLIBCA=1
     # install libca / libcom from pyepics
-    - python: 2.7
     - python: 3.5
     - python: 3.6
+    - python: 3.7
 
 before_install:
   - export DOCKER0_IP=$(/sbin/ifconfig docker0 |grep 'inet addr' | sed -e 's/.*addr:\([^ ]*\).*/\1/')
