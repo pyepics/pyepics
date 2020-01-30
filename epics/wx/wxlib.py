@@ -1063,6 +1063,41 @@ class PVButton(wx.Button, PVCtrlMixin):
         "button press event handler"
         self.pv.put(self.pushValue)
 
+class PVBitmap(wx.StaticBitmap, PVCtrlMixin):
+    """
+    Static Bitmap where image is based on PV value,
+    with callback for automatic updates
+
+    """
+    def __init__(self, parent,  pv=None, bitmaps=None,
+                 defaultBitmap=None, **kw):
+        """
+        bitmaps - a dict of Value->Bitmap mappings, to automatically change
+        the shown bitmap based on the PV value.
+
+        defaultBitmap - the bitmap to show if the PV value doesn't match any
+        of the values in the bitmaps dict.
+
+        """
+        wx.StaticBitmap.__init__(self, parent, wx.ID_ANY,
+                                 bitmap=defaultBitmap, **kw)
+        PVCtrlMixin.__init__(self, pv=pv)
+
+        self.defaultBitmap = defaultBitmap
+        if bitmaps is None:
+            bitmaps = {}
+        self.bitmaps = bitmaps
+
+
+    def _SetValue(self, value):
+        "set widget value"
+        if value in self.bitmaps:
+            nextBitmap = self.bitmaps[value]
+        else:
+            nextBitmap = self.defaultBitmap
+        if nextBitmap != self.GetBitmap():
+            self.SetBitmap(nextBitmap)
+            
 class PVRadioButton(wx.RadioButton, PVCtrlMixin):
     """A pvRadioButton is a radio button associated with a particular PV
     and one particular value.
