@@ -459,6 +459,7 @@ class PVCtrlMixin(PVMixin):
         except PyDeadObjectError:
             pass
 
+
 class PVTextCtrl(wx.TextCtrl, PVCtrlMixin):
     """
     Text control (ie textbox) for PV display (as normal string),
