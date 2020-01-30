@@ -33,7 +33,7 @@ def EpicsFunction(f):
         try:
             wx.CallAfter(f, *args, **kwargs)
         except PyDeadObjectError:
-            print(traceback.format_exc())
+            pass
     return wrapper
 
 def DelayedEpicsCallback(fcn):
@@ -459,64 +459,6 @@ class PVCtrlMixin(PVMixin):
         except PyDeadObjectError:
             pass
 
-class PVImage(wx.StaticBitmap, PVMixin):
-    """ Static text for displaying a PV value,
-        with callback for automatic updates
-        By default the text colour will change on alarm states.
-        This can be overriden or disabled as constructor
-        parameters
-        """
-    def __init__(self, parent, pv=None, style=None, im_size = None,
-                 minor_alarm="DARKRED", major_alarm="RED",
-                 invalid_alarm="ORANGERED", **kw):
-        self.im_size = im_size
-        wstyle = wx.ALIGN_LEFT
-        if style is not None:
-            wstyle = style
-
-        wx.StaticBitmap.__init__(self, parent, wx.ID_ANY,
-                               style=wstyle, **kw)
-        PVMixin.__init__(self, pv=pv)
-        self._fg_colour_alarms = {
-            epics.MINOR_ALARM : minor_alarm,
-            epics.MAJOR_ALARM : major_alarm,
-            epics.INVALID_ALARM : invalid_alarm }
-
-    def _SetValue(self, value):
-        "set widget label"
-        from PIL import Image
-        from time import time
-        import io
-        if value is not None:
-            # I do all the stuff below to convert the array to the right format. It seems to be transmitted as 32bit instead of 8, even though i tried created it as 8 on the server. This needs to be investigated.
-
-            raw_image = value
-            im_mode = 'RGB'
-            im_size = self.im_size
-            img = Image.frombuffer(im_mode, im_size, raw_image, 'raw', im_mode, 0, 1)
-            width, height = img.size
-            bit_img = wx.Bitmap.FromBuffer(width, height, img.tobytes())
-            t1 = time()
-            self.SetBitmap(bit_img)
-        else:
-            print('_SetValue',value)
-
-    @EpicsFunction
-    def OnPVChange(self, value):
-        "called by PV callback"
-        import traceback
-        from numpy import array
-        self.pv.auto_monitor = True
-        try:
-            # I don't know how to work with value correctly.
-            # the value of value is <array size=30000, type=ctrl_long>
-            # the type of value is <class 'str'>
-            if self.pv is not None:
-                value = array(self.pv.get(), dtype = 'int8')
-                self._SetValue(value)
-        except:
-            print(traceback.format_exc())
-
 class PVTextCtrl(wx.TextCtrl, PVCtrlMixin):
     """
     Text control (ie textbox) for PV display (as normal string),
@@ -615,71 +557,7 @@ class PVText(wx.StaticText, PVCtrlMixin):
         if self.auto_units and self.pv.units:
             self.units = " " + self.pv.units
         if value is not None:
-            #debug('PVText:_SetValue:%r' %value)
             self.SetLabel("%s%s" % (value, self.units))
-
-class PVFloatText(wx.StaticText, PVCtrlMixin):
-    """ Static text for displaying a numerical PV value,
-        with callback for automatic updates.
-
-        Options:
-           pv         epics pv to use for value
-           precision  number of digits past decimal point to display
-                      (default to 0)
-
-        By default the text colour will change on alarm states.
-        This can be overriden or disabled as constructor
-        parameters
-        """
-    def __init__(self, parent, pv=None, as_string=True,
-                 font=None, fg=None, bg=None, style=None, precision = None,
-                 minor_alarm="DARKRED", major_alarm="RED",
-                 invalid_alarm="ORANGERED", auto_units=False, units="", **kw):
-        """
-        Create a new pvFloatText
-
-        minor_alarm, major_alarm & invalid_alarm are all text colours
-        that will be set depending no the alarm state of the target
-        PV. Set to None if you want no highlighting in that alarm state.
-
-        auto_units means the PV value will be displayed with the EGU
-        "engineering units" as a suffix. Alternately, you can specify
-        an explicit unit string.
-        """
-        self.precision = precision
-        wstyle = wx.ALIGN_LEFT
-        if style is not None:
-            wstyle = style
-
-        wx.StaticText.__init__(self, parent, wx.ID_ANY, label='',
-                               style=wstyle, **kw)
-        PVCtrlMixin.__init__(self, pv=pv, font=font, fg=fg, bg=bg)
-
-        self.as_string = as_string
-        self.auto_units = auto_units
-        self.units = units
-
-        self._fg_colour_alarms = {
-            epics.MINOR_ALARM : minor_alarm,
-            epics.MAJOR_ALARM : major_alarm,
-            epics.INVALID_ALARM : invalid_alarm }
-
-    def _SetValue(self, value):
-        "set widget label"
-        from numpy import nan
-        if self.auto_units and self.pv.units:
-            self.units = " " + self.pv.units
-        if value is not None:
-            try:
-                value = float(value)
-            except:
-                warning('set value (%r) for the PVFloatText filed is not a number')
-                value = nan
-            if self.precision is None:
-                precision = 0
-            else:
-                precision = self.precision
-        self.SetLabel("{}{}".format(round(value,precision),self.units))
 
 class PVStaticText(wx.StaticText, PVMixin):
     """ Static text for displaying a PV value,
@@ -1165,13 +1043,8 @@ class PVButton(wx.Button, PVCtrlMixin):
         if self.disablePV is not None and \
            (self.disablePV.get() == self.disableValue):
             enableValue = False
-        from numpy import array_equal, ndarray, generic
-        if isinstance(self.pushValue, (ndarray, generic)):
-            if self.pv is not None and (array_equal(self.pv.get(),self.pushValue)):
-                enableValue = False
-        else:
-            if self.pv is not None and (self.pv.get() is self.pushValue):
-                enableValue = False
+        if self.pv is not None and (self.pv.get() == self.pushValue):
+            enableValue = False
         wx.Button.Enable(self, enableValue)
 
     @DelayedEpicsCallback
