@@ -1131,6 +1131,71 @@ class PVBitmapButton(wx.BitmapButton, PVCtrlMixin):
         "button press event handler"
         self.pv.put(self.pushValue)
 
+class PVBitmapButton(wx.BitmapButton, PVCtrlMixin):
+    """ A Button linked to a PV. When the button is pressed, a certain value
+        is written to the PV (useful for momentary PVs with HIGH= set.)
+
+    """
+    def __init__(self, parent, pv=None, pushValue=1,
+                 disablePV=None, disableValue=1, bitmap = None, **kw):
+        """
+        pv = pv to write back to
+        pushValue = value to write when button is pressed
+        disablePV = read this PV in order to disable the button
+        disableValue = disable the button if/when the disablePV has this value
+
+        """
+        wx.Button.__init__(self, parent, **kw)
+        PVCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
+        self.pushValue = pushValue
+        self.Bind(wx.EVT_BUTTON, self.OnPress)
+        if isinstance(disablePV, six.string_types):
+            disablePV = epics.get_pv(disablePV)
+            disablePV.connect()
+        self.disablePV = disablePV
+        self.disableValue = disableValue
+        if disablePV is not None:
+            ncback = len(self.disablePV.callbacks) + 1
+            self.disablePV.add_callback(self._disableEvent, wid=self.GetId(),
+                                        cb_info=ncback)
+        self.maskedEnabled = True
+
+    def Enable(self, value=None):
+        "enable button"
+        if value is not None:
+            self.maskedEnabled = value
+        self._UpdateEnabled()
+
+    @EpicsFunction
+    def _UpdateEnabled(self):
+        "epics function, called by event handler"
+        enableValue = self.maskedEnabled
+        if self.disablePV is not None and \
+           (self.disablePV.get() == self.disableValue):
+            enableValue = False
+        from numpy import array_equal, ndarray, generic
+        if isinstance(self.pushValue, (ndarray, generic)):
+            if self.pv is not None and (array_equal(self.pv.get(),self.pushValue)):
+                enableValue = False
+        else:
+            if self.pv is not None and (self.pv.get() is self.pushValue):
+                enableValue = False
+        wx.Button.Enable(self, enableValue)
+
+    @DelayedEpicsCallback
+    def _disableEvent(self, **kw):
+        "disable event handler"
+        self._UpdateEnabled()
+
+    def _SetValue(self, event):
+        "set value"
+        self._UpdateEnabled()
+
+    @EpicsFunction
+    def OnPress(self, event):
+        "button press event handler"
+        self.pv.put(self.pushValue)
+
 class PVRadioButton(wx.RadioButton, PVCtrlMixin):
     """A pvRadioButton is a radio button associated with a particular PV
     and one particular value.
