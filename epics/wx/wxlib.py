@@ -816,8 +816,8 @@ class PVEnumChoice(wx.Choice, PVCtrlMixin):
 
         self.Bind(wx.EVT_CHOICE, self._onChoice)
 
-        pv_value = pv.get(as_string=True)
-        enum_strings = pv.enum_strs
+        pv_value = self.pv.get(as_string=True)
+        enum_strings = self.pv.enum_strs
 
         self.Clear()
         self.AppendItems(enum_strings)
@@ -1203,8 +1203,9 @@ class PVBitmapButton(wx.BitmapButton, PVCtrlMixin):
         bitmap = filename of the image
 
         """
-        bmp = wx.Bitmap(bitmap, wx.BITMAP_TYPE_ANY)
-        wx.BitmapButton.__init__(self, parent, bitmap = bmp, **kw)
+        bmp = wx.Image(bitmap,  wx.BITMAP_TYPE_ANY)
+        bmp.Rescale( width = kw['size'][0], height = kw['size'][1])
+        wx.BitmapButton.__init__(self, parent, bitmap = bmp.ConvertToBitmap(), **kw)
         PVCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.pushValue = pushValue
         self.Bind(wx.EVT_BUTTON, self.OnPress)
