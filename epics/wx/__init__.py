@@ -15,7 +15,6 @@ PVAlarm       = pvAlarm       = wxlib.PVAlarm
 PVFloatCtrl   = pvFloatCtrl   = wxlib.PVFloatCtrl
 PVTextCtrl    = pvTextCtrl    = wxlib.PVTextCtrl
 PVStaticText  = pvStaticText  = wxlib.PVStaticText
-PVImage       = pvImage       = wxlib.PVImage
 PVEnumButtons = pvEnumButtons = wxlib.PVEnumButtons
 PVEnumChoice  = pvEnumChoice  = wxlib.PVEnumChoice
 PVBitmap      = pvBitmap      = wxlib.PVBitmap
