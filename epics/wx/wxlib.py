@@ -560,6 +560,7 @@ class PVText(wx.StaticText, PVCtrlMixin):
         if value is not None:
             self.SetLabel("%s%s" % (value, self.units))
 
+
 class PVStaticText(wx.StaticText, PVMixin):
     """ Static text for displaying a PV value,
         with callback for automatic updates
