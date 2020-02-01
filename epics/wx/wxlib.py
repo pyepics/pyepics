@@ -1075,12 +1075,10 @@ class PVBitmapButton(wx.BitmapButton, PVCtrlMixin):
         pushValue = value to write when button is pressed
         disablePV = read this PV in order to disable the button
         disableValue = disable the button if/when the disablePV has this value
-        bitmap = filename of the image
+        bitmap = in image from the wx.ArtProvider library
 
         """
-        bmp = wx.Image(bitmap,  wx.BITMAP_TYPE_ANY)
-        bmp.Rescale( width = kw['size'][0], height = kw['size'][1])
-        wx.BitmapButton.__init__(self, parent, bitmap = bmp.ConvertToBitmap(), **kw)
+        wx.BitmapButton.__init__(self, parent, bitmap = bitmap, **kw)
         PVCtrlMixin.__init__(self, pv=pv, font="", fg=None, bg=None)
         self.pushValue = pushValue
         self.Bind(wx.EVT_BUTTON, self.OnPress)
