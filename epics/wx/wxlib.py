@@ -696,8 +696,8 @@ class PVEnumChoice(wx.Choice, PVCtrlMixin):
 
         self.Bind(wx.EVT_CHOICE, self._onChoice)
 
-        pv_value = pv.get(as_string=True)
-        enum_strings = pv.enum_strs
+        pv_value = self.pv.get(as_string=True)
+        enum_strings = self.pv.enum_strs
 
         self.Clear()
         self.AppendItems(enum_strings)
