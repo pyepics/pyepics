@@ -66,6 +66,8 @@ def caput(pvname, value, wait=False, timeout=60):
     if thispv.connected:
         timeout -= (time.time() - start_time)
         return thispv.put(value, wait=wait, timeout=timeout)
+    else:
+        return -1
 
 def caget(pvname, as_string=False, count=None, as_numpy=True,
           use_monitor=False, timeout=5.0):
