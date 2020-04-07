@@ -163,10 +163,6 @@ def caget_many(pvlist, as_string=False, count=None, as_numpy=True, timeout=5.0, 
     This does not maintain PV objects, and works as fast
     as possible to fetch many values.
     """
-    """get values for a list of PVs
-    This does not maintain PV objects, and works as fast
-    as possible to fetch many values.
-    """
     chids, out = [], []
     for name in pvlist: chids.append(ca.create_channel(name,
                                                        auto_cb=False,
