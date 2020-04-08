@@ -158,7 +158,7 @@ def camonitor(pvname, writer=None, callback=None):
         thispv.add_callback(callback, index=-999, with_ctrlvars=True)
         _PVmonitors_[pvname] = thispv
 
-def caget_many(pvlist, as_string=False, count=None, as_numpy=True, timeout=5.0):
+def caget_many(pvlist, as_string=False, count=None, as_numpy=True, timeout=5.0, conn_timeout=0.4):
     """get values for a list of PVs
     This does not maintain PV objects, and works as fast
     as possible to fetch many values.
@@ -167,13 +167,33 @@ def caget_many(pvlist, as_string=False, count=None, as_numpy=True, timeout=5.0):
     for name in pvlist: chids.append(ca.create_channel(name,
                                                        auto_cb=False,
                                                        connect=False))
-    for chid in chids: ca.connect_channel(chid)
-    for chid in chids: ca.get(chid, count=count, as_string=as_string, as_numpy=as_numpy, wait=False)
-    for chid in chids: out.append(ca.get_complete(chid,
-                                                  count=count,
-                                                  as_string=as_string,
-                                                  as_numpy=as_numpy,
-                                                  timeout=timeout))
+    connected = [False for chid in chids]
+    elapsed_conn_time = 0.0
+    poll_time = 0.02
+    while True:
+        if elapsed_conn_time > conn_timeout:
+            break
+        connected = [ca.isConnected(chid) for chid in chids]
+        if not all(connected):
+            elapsed_conn_time += poll_time
+            ca.poll(poll_time)
+        else:
+            break
+    
+    for (chid, conn) in zip(chids, connected):
+        if conn:
+            ca.get(chid, count=count, as_string=as_string, as_numpy=as_numpy, wait=False)
+    
+    for (chid, conn) in zip(chids, connected):
+        if conn:
+            out.append(ca.get_complete(chid,
+                                        count=count,
+                                        as_string=as_string,
+                                        as_numpy=as_numpy,
+                                        timeout=timeout))
+        else:
+            out.append(None)
+
     return out
 
 def caput_many(pvlist, values, wait=False, connection_timeout=None, put_timeout=60):
