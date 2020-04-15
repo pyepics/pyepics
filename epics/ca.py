@@ -65,6 +65,9 @@ PREEMPTIVE_CALLBACK = True
 
 AUTO_CLEANUP = True
 
+# A sentinel to mark libca as going through the shutdown process
+_LIBCA_FINALIZED = object()
+
 ##
 # maximum element count for auto-monitoring of PVs in epics.pv
 # and for automatic conversion of numerical array data to numpy arrays
@@ -424,7 +427,7 @@ def finalize_libca(maxtime=10.0):
 
     """
     global libca
-    if libca is None:
+    if libca is None or libca is _LIBCA_FINALIZED:
         return
     try:
         start_time = time.time()
@@ -446,7 +449,7 @@ def finalize_libca(maxtime=10.0):
             poll()
             flush_count += 1
         context_destroy()
-        libca = None
+        libca = _LIBCA_FINALIZED
     except:
         pass
     time.sleep(0.01)
@@ -541,6 +544,10 @@ def withCA(fcn):
         global libca
         if libca is None:
             initialize_libca()
+        elif libca is _LIBCA_FINALIZED:
+            # See what happens if you uncomment this instead:
+            # initialize_libca()
+            raise RuntimeError('libca shutting down')
         return fcn(*args, **kwds)
     return wrapper
 
