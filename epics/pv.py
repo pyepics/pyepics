@@ -930,7 +930,8 @@ class PV(object):
     @property
     def char_value(self):
         "character string representation of value"
-        return self._getarg('char_value')
+        self._getarg('char_value')  # forces lookup of CTRL vars
+        return self._set_charval(self._getarg('value'))
 
     @property
     def status(self):
