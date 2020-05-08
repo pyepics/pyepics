@@ -354,10 +354,13 @@ class PV(object):
 
         Clears or adds monitor, if necessary.
         '''
-        count = self.count
-        chid = self.chid
+        if not self.connected or self.chid is None:
+            # Auto-monitor will be enabled (or toggled based on count) upon the
+            # next connection callback.
+            return
 
-        if count is None or chid is None:
+        count = self.count
+        if count is None:
             return
 
         if self._auto_monitor is None:
