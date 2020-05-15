@@ -333,7 +333,8 @@ class PV(object):
         # threads from thinking a connection is complete when it is actually
         # still in progress.
         self.connected = conn
-        self._check_auto_monitor()
+        if conn:
+            self._check_auto_monitor()
 
     @_ensure_context
     def _clear_auto_monitor_subscription(self):
