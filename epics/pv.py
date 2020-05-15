@@ -319,7 +319,6 @@ class PV(object):
             self._args['type'] = _ftype_
             self._args['typefull'] = _ftype_
             self._args['ftype'] = dbr.Name(_ftype_, reverse=True)
-            self._check_auto_monitor()
 
         for conn_cb in self.connection_callbacks:
             if callable(conn_cb):
@@ -334,6 +333,8 @@ class PV(object):
         # threads from thinking a connection is complete when it is actually
         # still in progress.
         self.connected = conn
+        if conn:
+            self._check_auto_monitor()
 
     @_ensure_context
     def _clear_auto_monitor_subscription(self):
@@ -354,10 +355,13 @@ class PV(object):
 
         Clears or adds monitor, if necessary.
         '''
-        count = self.count
-        chid = self.chid
+        if not self.connected or self.chid is None:
+            # Auto-monitor will be enabled (or toggled based on count) upon the
+            # next connection callback.
+            return
 
-        if count is None or chid is None:
+        count = self.count
+        if count is None:
             return
 
         if self._auto_monitor is None:
