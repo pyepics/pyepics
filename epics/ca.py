@@ -545,9 +545,7 @@ def withCA(fcn):
         if libca is None:
             initialize_libca()
         elif libca is _LIBCA_FINALIZED:
-            # See what happens if you uncomment this instead:
-            # initialize_libca()
-            raise RuntimeError('libca shutting down')
+            return  # Avoid raising exceptions when Python shutting down
         return fcn(*args, **kwds)
     return wrapper
 
@@ -563,6 +561,10 @@ def withCHID(fcn):
     @functools.wraps(fcn)
     def wrapper(*args, **kwds):
         "withCHID wrapper"
+        global libca
+        if libca is _LIBCA_FINALIZED:
+            return  # Avoid raising exceptions when Python shutting down
+
         if len(args)>0:
             chid = args[0]
             args = list(args)
@@ -587,6 +589,10 @@ def withConnectedCHID(fcn):
     @functools.wraps(fcn)
     def wrapper(*args, **kwds):
         "withConnectedCHID wrapper"
+        global libca
+        if libca is _LIBCA_FINALIZED:
+            return  # Avoid raising exceptions when Python shutting down
+
         if len(args)>0:
             chid = args[0]
             args = list(args)
@@ -613,6 +619,10 @@ def withMaybeConnectedCHID(fcn):
     @functools.wraps(fcn)
     def wrapper(*args, **kwds):
         "withMaybeConnectedCHID wrapper"
+        global libca
+        if libca is _LIBCA_FINALIZED:
+            return  # Avoid raising exceptions when Python shutting down
+
         if len(args)>0:
             chid = args[0]
             args = list(args)
