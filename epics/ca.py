@@ -65,6 +65,9 @@ PREEMPTIVE_CALLBACK = True
 
 AUTO_CLEANUP = True
 
+# A sentinel to mark libca as going through the shutdown process
+_LIBCA_FINALIZED = object()
+
 ##
 # maximum element count for auto-monitoring of PVs in epics.pv
 # and for automatic conversion of numerical array data to numpy arrays
@@ -424,7 +427,7 @@ def finalize_libca(maxtime=10.0):
 
     """
     global libca
-    if libca is None:
+    if libca is None or libca is _LIBCA_FINALIZED:
         return
     try:
         start_time = time.time()
@@ -446,7 +449,7 @@ def finalize_libca(maxtime=10.0):
             poll()
             flush_count += 1
         context_destroy()
-        libca = None
+        libca = _LIBCA_FINALIZED
     except:
         pass
     time.sleep(0.01)
@@ -541,6 +544,8 @@ def withCA(fcn):
         global libca
         if libca is None:
             initialize_libca()
+        elif libca is _LIBCA_FINALIZED:
+            return  # Avoid raising exceptions when Python shutting down
         return fcn(*args, **kwds)
     return wrapper
 
@@ -556,6 +561,10 @@ def withCHID(fcn):
     @functools.wraps(fcn)
     def wrapper(*args, **kwds):
         "withCHID wrapper"
+        global libca
+        if libca is _LIBCA_FINALIZED:
+            return  # Avoid raising exceptions when Python shutting down
+
         if len(args)>0:
             chid = args[0]
             args = list(args)
@@ -580,6 +589,10 @@ def withConnectedCHID(fcn):
     @functools.wraps(fcn)
     def wrapper(*args, **kwds):
         "withConnectedCHID wrapper"
+        global libca
+        if libca is _LIBCA_FINALIZED:
+            return  # Avoid raising exceptions when Python shutting down
+
         if len(args)>0:
             chid = args[0]
             args = list(args)
@@ -606,6 +619,10 @@ def withMaybeConnectedCHID(fcn):
     @functools.wraps(fcn)
     def wrapper(*args, **kwds):
         "withMaybeConnectedCHID wrapper"
+        global libca
+        if libca is _LIBCA_FINALIZED:
+            return  # Avoid raising exceptions when Python shutting down
+
         if len(args)>0:
             chid = args[0]
             args = list(args)
