@@ -834,8 +834,8 @@ class PV(object):
     def clear_callbacks(self):
         "clear all callbacks"
         self.callbacks.clear()
-        self.access_callbacks.clear()
-        self.connection_callbacks.clear()
+        self.access_callbacks = []
+        self.connection_callbacks = []
 
     def _getinfo(self):
         "get information paragraph"
