@@ -831,9 +831,13 @@ class PV(object):
             self.callbacks.pop(index)
             ca.poll()
 
-    def clear_callbacks(self):
+    def clear_callbacks(self, with_access_callback=False, with_connect_callback=False):
         "clear all callbacks"
         self.callbacks.clear()
+        if with_access_callback:
+            self.access_callbacks = []
+        if with_connect_callback:
+            self.connection_callbacks = []
 
     def _getinfo(self):
         "get information paragraph"
@@ -1116,7 +1120,7 @@ class PV(object):
 
         self._monref = None
         self._monref_mask = None
-        self.clear_callbacks()
+        self.clear_callbacks(True, True)
         self._args = {}.fromkeys(self._fields)
         ca.poll(evt=1.e-3, iot=1.0)
 
