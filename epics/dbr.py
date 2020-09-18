@@ -14,6 +14,7 @@ import functools
 import os
 import sys
 import platform
+import enum
 
 HAS_NUMPY = False
 try:
@@ -354,4 +355,49 @@ class access_rights_handler_args(ctypes.Structure):
     "access rights arguments"
     _fields_ = [('chid', chid_t),
                 ('access', ubyte_t)]
+
+
+class DefaultIntEnum(enum.IntEnum):
+
+    @classmethod
+    def _missing_(cls, value):
+        unknown = int.__new__(cls)
+        unknown._name_ = "UNKNOWN"
+        unknown._value_ = value
+        return unknown
+
+    def __repr__(self):
+        return self.name
+
+
+class AlarmStatus(DefaultIntEnum):
+    NO_ALARM = 0
+    READ = 1
+    WRITE = 2
+    HIHI = 3
+    HIGH = 4
+    LOLO = 5
+    LOW = 6
+    STATE = 7
+    COS = 8
+    COMM = 9
+    TIMEOUT = 10
+    HW_LIMIT = 11
+    CALC = 12
+    SCAN = 13
+    LINK = 14
+    SOFT = 15
+    BAD_SUB = 16
+    UDF = 17
+    DISABLE = 18
+    SIMM = 19
+    READ_ACCESS = 20
+    WRITE_ACCESS = 21
+
+class AlarmSeverity(DefaultIntEnum):
+    NO_ALARM = 0
+    MINOR = 1
+    MAJOR = 2
+    INVALID = 3
+
 
