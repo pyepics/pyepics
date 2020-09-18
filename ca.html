@@ -1,20 +1,19 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ca: Low-level Channel Access module &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Working with waveform / array data" href="arrays.html" />
@@ -52,7 +51,8 @@
    <li>|<a href="autosave.html">autosave</a></li>
    <li>|<a href="wx.html">wx</a></li>
    <li>|<a href="advanced.html">advanced</a>]</li>
- 
+
+        <li class="nav-item nav-item-this"><a href="">ca: Low-level Channel Access module</a></li> 
       </ul>
     </div>
 
@@ -82,7 +82,7 @@
 </li>
 <li><a class="reference internal" href="#user-supplied-callback-functions">User-supplied Callback functions</a></li>
 <li><a class="reference internal" href="#omissions">Omissions</a></li>
-<li><a class="reference internal" href="#cathread-class"><code class="docutils literal notranslate"><span class="pre">CAThread</span></code> class</a></li>
+<li><a class="reference internal" href="#cathread-class"><code class="xref py py-class docutils literal notranslate"><span class="pre">CAThread</span></code> class</a></li>
 <li><a class="reference internal" href="#examples">Examples</a><ul>
 <li><a class="reference internal" href="#create-connect-get-value-of-channel">Create, Connect, Get Value of Channel</a></li>
 <li><a class="reference internal" href="#put-waiting-for-completion">Put, waiting for completion</a></li>
@@ -109,17 +109,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
 
@@ -148,7 +146,7 @@ the functions are meant to do.</p>
 <p>As a general rule, a CA function named <cite>ca_XXX</cite> in the C library will have the
 equivalent function called <cite>XXX</cite> in the <cite>ca</cite> module.  This is because the
 intention is that one will import the <cite>ca</cite> module with</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">ca</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
 </pre></div>
 </div>
 <p>so that the Python function <code class="xref py py-func docutils literal notranslate"><span class="pre">ca.XXX()</span></code> will corresponds to the C
@@ -199,24 +197,24 @@ finalization process, the detailed steps will be described here.  These
 initialization and finalization tasks are handled in the following way:</p>
 <blockquote>
 <div><ul class="simple">
-<li>The <code class="xref py py-data docutils literal notranslate"><span class="pre">libca</span></code> variable in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module holds a permanent,
-global reference to the CA shared object library (DLL).</li>
-<li>the function <a class="reference internal" href="#epics.ca.initialize_libca" title="epics.ca.initialize_libca"><code class="xref py py-func docutils literal notranslate"><span class="pre">initialize_libca()</span></code></a> is called to initialize libca.
+<li><p>The <code class="xref py py-data docutils literal notranslate"><span class="pre">libca</span></code> variable in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module holds a permanent,
+global reference to the CA shared object library (DLL).</p></li>
+<li><p>the function <a class="reference internal" href="#epics.ca.initialize_libca" title="epics.ca.initialize_libca"><code class="xref py py-func docutils literal notranslate"><span class="pre">initialize_libca()</span></code></a> is called to initialize libca.
 This function takes no arguments, but does use the global Boolean
 <a class="reference internal" href="#epics.ca.PREEMPTIVE_CALLBACK" title="epics.ca.PREEMPTIVE_CALLBACK"><code class="xref py py-data docutils literal notranslate"><span class="pre">PREEMPTIVE_CALLBACK</span></code></a> (default value of <code class="docutils literal notranslate"><span class="pre">True</span></code>) to control
-whether preemptive callbacks are used.</li>
-<li>the function <a class="reference internal" href="#epics.ca.finalize_libca" title="epics.ca.finalize_libca"><code class="xref py py-func docutils literal notranslate"><span class="pre">finalize_libca()</span></code></a> is used to finalize libca.
+whether preemptive callbacks are used.</p></li>
+<li><p>the function <a class="reference internal" href="#epics.ca.finalize_libca" title="epics.ca.finalize_libca"><code class="xref py py-func docutils literal notranslate"><span class="pre">finalize_libca()</span></code></a> is used to finalize libca.
 Normally, this is function is registered to be called when a program
 ends with <code class="xref py py-func docutils literal notranslate"><span class="pre">atexit.register()</span></code>.  Note that this only gets called on
 a graceful shutdown. If the program crashes (for a non-CA related
 reason, for example), this finalization may not be done, and
 connections to Epics Variables may not be closed completely on the
-Channel Access server.</li>
+Channel Access server.</p></li>
 </ul>
 </div></blockquote>
-<dl class="data">
+<dl class="py data">
 <dt id="epics.ca.PREEMPTIVE_CALLBACK">
-<code class="descclassname">epics.ca.</code><code class="descname">PREEMPTIVE_CALLBACK</code><a class="headerlink" href="#epics.ca.PREEMPTIVE_CALLBACK" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">PREEMPTIVE_CALLBACK</code><a class="headerlink" href="#epics.ca.PREEMPTIVE_CALLBACK" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets whether preemptive callbacks will be used.  The default value is
 <code class="docutils literal notranslate"><span class="pre">True</span></code>.  If you wish to run without preemptive callbacks this variable
 <em>MUST</em> be set before any other use of the CA library.  With preemptive
@@ -226,16 +224,16 @@ will need to frequently poll epics with <a class="reference internal" href="#epi
 func:<cite>pend_event</cite>.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="epics.ca.DEFAULT_CONNECTION_TIMEOUT">
-<code class="descclassname">epics.ca.</code><code class="descname">DEFAULT_CONNECTION_TIMEOUT</code><a class="headerlink" href="#epics.ca.DEFAULT_CONNECTION_TIMEOUT" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">DEFAULT_CONNECTION_TIMEOUT</code><a class="headerlink" href="#epics.ca.DEFAULT_CONNECTION_TIMEOUT" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets the default <cite>timeout</cite> value (in seconds) for
 <a class="reference internal" href="#epics.ca.connect_channel" title="epics.ca.connect_channel"><code class="xref py py-func docutils literal notranslate"><span class="pre">connect_channel()</span></code></a>.  The default value is <cite>2.0</cite></p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="epics.ca.AUTOMONITOR_MAXLENGTH">
-<code class="descclassname">epics.ca.</code><code class="descname">AUTOMONITOR_MAXLENGTH</code><a class="headerlink" href="#epics.ca.AUTOMONITOR_MAXLENGTH" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">AUTOMONITOR_MAXLENGTH</code><a class="headerlink" href="#epics.ca.AUTOMONITOR_MAXLENGTH" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets the default array length (ie, how many elements an array has) above
 which automatic conversion to numpy arrays <em>and</em> automatic monitoring
 for PV variables is suppressed.  The default value is 65536.  To be
@@ -251,181 +249,155 @@ monitored.</p>
 <h2>Using the CA module<a class="headerlink" href="#using-the-ca-module" title="Permalink to this headline">¶</a></h2>
 <p>Many general-purpose CA functions that deal with general communication and
 threading contexts are very close to the C library:</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.initialize_libca">
-<code class="descclassname">epics.ca.</code><code class="descname">initialize_libca</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.initialize_libca" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">initialize_libca</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.initialize_libca" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the Channel Access library.</p>
 <blockquote>
-<div>This loads the shared object library (DLL) to establish Channel Access
+<div><p>This loads the shared object library (DLL) to establish Channel Access
 Connection. The value of <a class="reference internal" href="#epics.ca.PREEMPTIVE_CALLBACK" title="epics.ca.PREEMPTIVE_CALLBACK"><code class="xref py py-data docutils literal notranslate"><span class="pre">PREEMPTIVE_CALLBACK</span></code></a> sets the pre-emptive
-callback model.</div></blockquote>
-<dl class="docutils">
-<dt>This <strong>must</strong> be called prior to any actual use of the CA library, but</dt>
-<dd>will be called automatically by the the <a class="reference internal" href="#epics.ca.withCA" title="epics.ca.withCA"><code class="xref py py-func docutils literal notranslate"><span class="pre">withCA()</span></code></a> decorator, so
-you should not need to call this directly from most real programs.</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>libca</strong> <span class="classifier-delimiter">:</span> <span class="classifier">object</span></dt>
-<dd><p class="first last">ca library object, used for all subsequent ca calls</p>
+callback model.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>This <strong>must</strong> be called prior to any actual use of the CA library, but</dt><dd><p>will be called automatically by the the <a class="reference internal" href="#epics.ca.withCA" title="epics.ca.withCA"><code class="xref py py-func docutils literal notranslate"><span class="pre">withCA()</span></code></a> decorator, so
+you should not need to call this directly from most real programs.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>libca</strong><span class="classifier">object</span></dt><dd><p>ca library object, used for all subsequent ca calls</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#epics.ca.withCA" title="epics.ca.withCA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">withCA</span></code></a></dt>
-<dd>decorator to ensure CA is initialized</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#epics.ca.withCA" title="epics.ca.withCA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">withCA</span></code></a></dt><dd><p>decorator to ensure CA is initialized</p>
+</dd>
 </dl>
 </div>
 <p class="rubric">Notes</p>
 <p>This function must be called prior to any real CA calls.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.finalize_libca">
-<code class="descclassname">epics.ca.</code><code class="descname">finalize_libca</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.finalize_libca" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">finalize_libca</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.finalize_libca" title="Permalink to this definition">¶</a></dt>
 <dd><p>shutdown channel access:</p>
 <p>run <a class="reference internal" href="#epics.ca.clear_channel" title="epics.ca.clear_channel"><code class="xref py py-func docutils literal notranslate"><span class="pre">clear_channel()</span></code></a> for all chids in <a class="reference internal" href="#epics.ca._cache" title="epics.ca._cache"><code class="xref py py-data docutils literal notranslate"><span class="pre">_cache</span></code></a>,
 then calls <a class="reference internal" href="#epics.ca.flush_io" title="epics.ca.flush_io"><code class="xref py py-func docutils literal notranslate"><span class="pre">flush_io()</span></code></a> and <a class="reference internal" href="#epics.ca.poll" title="epics.ca.poll"><code class="xref py py-func docutils literal notranslate"><span class="pre">poll()</span></code></a> a few times.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>maxtime</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">maximimum time (in seconds) to wait for <a class="reference internal" href="#epics.ca.flush_io" title="epics.ca.flush_io"><code class="xref py py-func docutils literal notranslate"><span class="pre">flush_io()</span></code></a> and <a class="reference internal" href="#epics.ca.poll" title="epics.ca.poll"><code class="xref py py-func docutils literal notranslate"><span class="pre">poll()</span></code></a> to complete.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>maxtime</strong><span class="classifier">float</span></dt><dd><p>maximimum time (in seconds) to wait for <a class="reference internal" href="#epics.ca.flush_io" title="epics.ca.flush_io"><code class="xref py py-func docutils literal notranslate"><span class="pre">flush_io()</span></code></a> and <a class="reference internal" href="#epics.ca.poll" title="epics.ca.poll"><code class="xref py py-func docutils literal notranslate"><span class="pre">poll()</span></code></a> to complete.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.pend_io">
-<code class="descclassname">epics.ca.</code><code class="descname">pend_io</code><span class="sig-paren">(</span><em>timeout=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.pend_io" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">pend_io</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.pend_io" title="Permalink to this definition">¶</a></dt>
 <dd><p>polls CA for i/o.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.pend_event">
-<code class="descclassname">epics.ca.</code><code class="descname">pend_event</code><span class="sig-paren">(</span><em>timeout=1.e-5</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.pend_event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">pend_event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">1e-05</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.pend_event" title="Permalink to this definition">¶</a></dt>
 <dd><p>polls CA for events</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.poll">
-<code class="descclassname">epics.ca.</code><code class="descname">poll</code><span class="sig-paren">(</span><em>evt=1.e-5</em><span class="optional">[</span>, <em>iot=1.0</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.poll" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">poll</code><span class="sig-paren">(</span><em class="sig-param">evt=1.e-5</em><span class="optional">[</span>, <em class="sig-param">iot=1.0</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.poll" title="Permalink to this definition">¶</a></dt>
 <dd><p>a convenience function which is equivalent to::
 pend_event(evt)
 pend_io_(iot)</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.create_context">
-<code class="descclassname">epics.ca.</code><code class="descname">create_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.create_context" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">create_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.create_context" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new context, using the value of <a class="reference internal" href="#epics.ca.PREEMPTIVE_CALLBACK" title="epics.ca.PREEMPTIVE_CALLBACK"><code class="xref py py-data docutils literal notranslate"><span class="pre">PREEMPTIVE_CALLBACK</span></code></a>
 to set the context type. Note that both <em>context_create</em> and
 <em>create_context</em> (which is more consistent with the Verb_Object of
 the rest of the CA library) are supported.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>ctx</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">0 – No preemptive callbacks,
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ctx</strong><span class="classifier">int</span></dt><dd><p>0 – No preemptive callbacks,
 1 – use use preemptive callbacks,
 None – use value of <a class="reference internal" href="#epics.ca.PREEMPTIVE_CALLBACK" title="epics.ca.PREEMPTIVE_CALLBACK"><code class="xref py py-data docutils literal notranslate"><span class="pre">PREEMPTIVE_CALLBACK</span></code></a></p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.destroy_context">
-<code class="descclassname">epics.ca.</code><code class="descname">destroy_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.destroy_context" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">destroy_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.destroy_context" title="Permalink to this definition">¶</a></dt>
 <dd><p>destroy current context</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.current_context">
-<code class="descclassname">epics.ca.</code><code class="descname">current_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.current_context" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">current_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.current_context" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the current context</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.attach_context">
-<code class="descclassname">epics.ca.</code><code class="descname">attach_context</code><span class="sig-paren">(</span><em>context</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.attach_context" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">attach_context</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.attach_context" title="Permalink to this definition">¶</a></dt>
 <dd><p>attach to the supplied context</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.detach_context">
-<code class="descclassname">epics.ca.</code><code class="descname">detach_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.detach_context" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">detach_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.detach_context" title="Permalink to this definition">¶</a></dt>
 <dd><p>detach context</p>
 </dd></dl>
 
-<dl class="function">
-<dt id="epics.ca.use_initial_context">
-<code class="descclassname">epics.ca.</code><code class="descname">use_initial_context</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.use_initial_context" title="Permalink to this definition">¶</a></dt>
-<dd><p>Attaches to the context created when libca is initialized.
-Using this function is recommended when writing threaded programs that
-using CA.</p>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="advanced.html#advanced-threads-label"><span class="std std-ref">Using Python Threads</span></a></p>
-</div>
-</dd></dl>
-
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.client_status">
-<code class="descclassname">epics.ca.</code><code class="descname">client_status</code><span class="sig-paren">(</span><em>context</em>, <em>level</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.client_status" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">client_status</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">level</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.client_status" title="Permalink to this definition">¶</a></dt>
 <dd><p>print (to stderr) information about Channel Access status,
 including status for each channel, and search and connection statistics.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.version">
-<code class="descclassname">epics.ca.</code><code class="descname">version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.version" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print Channel Access version string.
 Currently, this should report ‘4.13’</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.message">
-<code class="descclassname">epics.ca.</code><code class="descname">message</code><span class="sig-paren">(</span><em>status</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.message" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">message</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">status</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Print a message corresponding to a Channel Access status return value.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.flush_io">
-<code class="descclassname">epics.ca.</code><code class="descname">flush_io</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.flush_io" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">flush_io</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.flush_io" title="Permalink to this definition">¶</a></dt>
 <dd><p>flush i/o</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.replace_printf_handler">
-<code class="descclassname">epics.ca.</code><code class="descname">replace_printf_handler</code><span class="sig-paren">(</span><em>fcn=None</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.replace_printf_handler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">replace_printf_handler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fcn</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.replace_printf_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>replace the normal printf() output handler
 with the supplied function (defaults to <code class="xref py py-func docutils literal notranslate"><span class="pre">sys.stderr.write()</span></code>)</p>
 </dd></dl>
 
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
+<p class="admonition-title">Warning</p>
 <p><cite>replace_printf_handler()</cite> appears to not actually work.</p>
-<p class="last">We think this is due to a real limitation of Python’s <cite>ctypes</cite> module
+<p>We think this is due to a real limitation of Python’s <cite>ctypes</cite> module
 not supporting the mapping of C <em>va_list</em> function arguments to Python.
 If you are interested in this or have ideas of how to fix it, please
 let us know.</p>
@@ -437,65 +409,56 @@ library (and <code class="docutils literal notranslate"><span class="pre">ca</sp
 These are simply <code class="xref py py-data docutils literal notranslate"><span class="pre">ctypes.c_long</span></code> (C long integers) that hold the
 memory address of the C representation of the channel, but it is probably
 a good idea to treat these as object instances.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.create_channel">
-<code class="descclassname">epics.ca.</code><code class="descname">create_channel</code><span class="sig-paren">(</span><em>pvname</em>, <em>connect=False</em>, <em>callback=None</em>, <em>auto_cb=True</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.create_channel" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">create_channel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pvname</span></em>, <em class="sig-param"><span class="n">connect</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">auto_cb</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.create_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>create a Channel for a given pvname</p>
 <p>creates a channel, returning the Channel ID <code class="docutils literal notranslate"><span class="pre">chid</span></code> used by other
 functions to identify this channel.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>pvname</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
-<dd><p class="first last">the name of the PV for which a channel should be created.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>pvname</strong><span class="classifier">string</span></dt><dd><p>the name of the PV for which a channel should be created.</p>
 </dd>
-<dt><strong>connect</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to (try to) connect to PV as soon as possible.</p>
+<dt><strong>connect</strong><span class="classifier">bool</span></dt><dd><p>whether to (try to) connect to PV as soon as possible.</p>
 </dd>
-<dt><strong>auto_cb</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to automatically use an internal connection callback.</p>
+<dt><strong>auto_cb</strong><span class="classifier">bool</span></dt><dd><p>whether to automatically use an internal connection callback.</p>
 </dd>
-<dt><strong>callback</strong> <span class="classifier-delimiter">:</span> <span class="classifier">callable or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt>
-<dd><p class="first last">user-defined Python function to be called when the connection
+<dt><strong>callback</strong><span class="classifier">callable or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>user-defined Python function to be called when the connection
 state change s.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>chid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ctypes.c_long</span></dt>
-<dd><p class="first last">channel ID.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>channel ID.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>1. The user-defined connection callback function should be prepared to accept
 keyword arguments of</p>
 <blockquote>
-<div><table border="1" class="docutils">
+<div><table class="docutils align-default">
 <colgroup>
-<col width="28%" />
-<col width="73%" />
+<col style="width: 28%" />
+<col style="width: 73%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">keyword</th>
-<th class="head">meaning</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>keyword</p></th>
+<th class="head"><p>meaning</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td><cite>pvname</cite></td>
-<td>name of PV</td>
+<tbody>
+<tr class="row-even"><td><p><cite>pvname</cite></p></td>
+<td><p>name of PV</p></td>
 </tr>
-<tr class="row-odd"><td><cite>chid</cite></td>
-<td>Channel ID</td>
+<tr class="row-odd"><td><p><cite>chid</cite></p></td>
+<td><p>Channel ID</p></td>
 </tr>
-<tr class="row-even"><td><cite>conn</cite></td>
-<td>whether channel is connected</td>
+<tr class="row-even"><td><p><cite>conn</cite></p></td>
+<td><p>whether channel is connected</p></td>
 </tr>
 </tbody>
 </table>
@@ -507,43 +470,35 @@ are having difficulty with dropped connections.</p>
 will be called immediately.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.connect_channel">
-<code class="descclassname">epics.ca.</code><code class="descname">connect_channel</code><span class="sig-paren">(</span><em>chid</em>, <em>timeout=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.connect_channel" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">connect_channel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.connect_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>connect to a channel, waiting up to timeout for a
 channel to connect.  It returns the connection state,
 <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 <p>This is usually not needed, as implicit connection will be done
 when needed in most cases.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>chid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ctypes.c_long</span></dt>
-<dd><p class="first last">Channel ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>Channel ID</p>
 </dd>
-<dt><strong>timeout</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">maximum time to wait for connection.</p>
+<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time to wait for connection.</p>
 </dd>
-<dt><strong>verbose</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to print out debugging information</p>
+<dt><strong>verbose</strong><span class="classifier">bool</span></dt><dd><p>whether to print out debugging information</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>connection_state</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">that is, whether the Channel is connected</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>connection_state</strong><span class="classifier">bool</span></dt><dd><p>that is, whether the Channel is connected</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <ol class="arabic simple">
-<li>If <em>timeout</em> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, the value of <a class="reference internal" href="#epics.ca.DEFAULT_CONNECTION_TIMEOUT" title="epics.ca.DEFAULT_CONNECTION_TIMEOUT"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEFAULT_CONNECTION_TIMEOUT</span></code></a> is used (defaults to 2.0 seconds).</li>
+<li><p>If <em>timeout</em> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, the value of <a class="reference internal" href="#epics.ca.DEFAULT_CONNECTION_TIMEOUT" title="epics.ca.DEFAULT_CONNECTION_TIMEOUT"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEFAULT_CONNECTION_TIMEOUT</span></code></a> is used (defaults to 2.0 seconds).</p></li>
 </ol>
 <p>2. Normally, channels will connect in milliseconds, and the connection
 callback will succeed on the first attempt.</p>
@@ -556,103 +511,103 @@ spending too much time waiting for a connection that may never happen.</p>
 <p>Many other functions require a valid Channel ID, but not necessarily a
 connected Channel.  These functions are essentially identical to the CA
 library versions, and include:</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.name">
-<code class="descclassname">epics.ca.</code><code class="descname">name</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>return PV name for channel name</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.host_name">
-<code class="descclassname">epics.ca.</code><code class="descname">host_name</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.host_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">host_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.host_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>return host name and port serving Channel</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.element_count">
-<code class="descclassname">epics.ca.</code><code class="descname">element_count</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.element_count" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">element_count</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.element_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>return number of elements in Channel’s data.
 1 for most Channels, &gt; 1 for waveform Channels</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.replace_access_rights_event">
-<code class="descclassname">epics.ca.</code><code class="descname">replace_access_rights_event</code><span class="sig-paren">(</span><em>chid</em>, <em>callback=None</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.replace_access_rights_event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">replace_access_rights_event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.replace_access_rights_event" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.read_access">
-<code class="descclassname">epics.ca.</code><code class="descname">read_access</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.read_access" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">read_access</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.read_access" title="Permalink to this definition">¶</a></dt>
 <dd><p>return <em>read access</em> for a Channel: 1 for <code class="docutils literal notranslate"><span class="pre">True</span></code>, 0 for <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.write_access">
-<code class="descclassname">epics.ca.</code><code class="descname">write_access</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.write_access" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">write_access</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.write_access" title="Permalink to this definition">¶</a></dt>
 <dd><p>return <em>write access</em> for a channel: 1 for <code class="docutils literal notranslate"><span class="pre">True</span></code>, 0 for <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.field_type">
-<code class="descclassname">epics.ca.</code><code class="descname">field_type</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.field_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">field_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.field_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the integer DBR field type.</p>
 </dd></dl>
 
 <p>See the <em>ftype</em> column from <a class="reference internal" href="#dbrtype-table"><span class="std std-ref">Table of DBR Types</span></a>.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.clear_channel">
-<code class="descclassname">epics.ca.</code><code class="descname">clear_channel</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.clear_channel" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">clear_channel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.clear_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>clear the channel</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.state">
-<code class="descclassname">epics.ca.</code><code class="descname">state</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.state" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.state" title="Permalink to this definition">¶</a></dt>
 <dd><p>return state (that is, attachment state) for channel</p>
 </dd></dl>
 
 <p>A few additional pythonic functions have been added:</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.isConnected">
-<code class="descclassname">epics.ca.</code><code class="descname">isConnected</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.isConnected" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">isConnected</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.isConnected" title="Permalink to this definition">¶</a></dt>
 <dd><p>return whether channel is connected:  <cite>dbr.CS_CONN==state(chid)</cite></p>
 <p>This is <code class="docutils literal notranslate"><span class="pre">True</span></code> for a connected channel, <code class="docutils literal notranslate"><span class="pre">False</span></code> for an unconnected channel.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.access">
-<code class="descclassname">epics.ca.</code><code class="descname">access</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.access" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">access</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.access" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a string describing read/write access: one of
 <cite>no access</cite>, <cite>read-only</cite>, <cite>write-only</cite>, or <cite>read/write</cite></p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.promote_type">
-<code class="descclassname">epics.ca.</code><code class="descname">promote_type</code><span class="sig-paren">(</span><em>chid</em><span class="optional">[</span>, <em>use_time=False</em><span class="optional">[</span>, <em>use_ctrl=False</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.promote_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">promote_type</code><span class="sig-paren">(</span><em class="sig-param">chid</em><span class="optional">[</span>, <em class="sig-param">use_time=False</em><span class="optional">[</span>, <em class="sig-param">use_ctrl=False</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.promote_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>promotes the native field type of a <code class="docutils literal notranslate"><span class="pre">chid</span></code> to its TIME or CTRL variant.
 Returns the integer corresponding to the promoted field value.</p>
 </dd></dl>
 
 <p>See <a class="reference internal" href="#dbrtype-table"><span class="std std-ref">Table of DBR Types</span></a>.</p>
-<dl class="data">
+<dl class="py data">
 <dt id="epics.ca._cache">
-<code class="descclassname">epics.ca.</code><code class="descname">_cache</code><a class="headerlink" href="#epics.ca._cache" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">_cache</code><a class="headerlink" href="#epics.ca._cache" title="Permalink to this definition">¶</a></dt>
 <dd><p>The ca module keeps a global cache of Channels that holds connection
 status and a bit of internal information for all known PVs.  This cache
 is not intended for general use.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.show_cache">
-<code class="descclassname">epics.ca.</code><code class="descname">show_cache</code><span class="sig-paren">(</span><em>print_out=True</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.show_cache" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">show_cache</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">print_out</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.show_cache" title="Permalink to this definition">¶</a></dt>
 <dd><p>print out a listing of PVs in the current session to
 standard output.  Use the <em>print_out=False</em> option to be
 returned the listing instead of having it printed out.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.clear_cache">
-<code class="descclassname">epics.ca.</code><code class="descname">clear_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.clear_cache" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">clear_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.clear_cache" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clears global caches of Epics CA connections, and fully
 detaches from the CA context.  This is important when doing
 multiprocessing (and is done internally by CAProcess),
@@ -671,56 +626,44 @@ underlying CA library, and this is mostly due to the underlying CA function
 requiring the user to supply DBR TYPE and count as well as <code class="docutils literal notranslate"><span class="pre">chid</span></code> and
 allocated space for the data.  In python none of these is needed, and
 keyword arguments can be used to specify such options.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.get">
-<code class="descclassname">epics.ca.</code><code class="descname">get</code><span class="sig-paren">(</span><em>chid</em>, <em>ftype=None</em>, <em>count=None</em>, <em>as_string=False</em>, <em>as_numpy=True</em>, <em>wait=True</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em>, <em class="sig-param"><span class="n">ftype</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">count</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">as_string</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">as_numpy</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">wait</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the current value for a Channel.
 Note that there is not a separate form for array data.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>chid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ctypes.c_long</span></dt>
-<dd><p class="first last">Channel ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>Channel ID</p>
 </dd>
-<dt><strong>ftype</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">field type to use (native type is default)</p>
+<dt><strong>ftype</strong><span class="classifier">int</span></dt><dd><p>field type to use (native type is default)</p>
 </dd>
-<dt><strong>count</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">maximum element count to return (full data returned by default)</p>
+<dt><strong>count</strong><span class="classifier">int</span></dt><dd><p>maximum element count to return (full data returned by default)</p>
 </dd>
-<dt><strong>as_string</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to return the string representation of the value.
+<dt><strong>as_string</strong><span class="classifier">bool</span></dt><dd><p>whether to return the string representation of the value.
 See notes below.</p>
 </dd>
-<dt><strong>as_numpy</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to return the Numerical Python representation
+<dt><strong>as_numpy</strong><span class="classifier">bool</span></dt><dd><p>whether to return the Numerical Python representation
 for array / waveform data.</p>
 </dd>
-<dt><strong>wait</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to wait for the data to be received, or return immediately.</p>
+<dt><strong>wait</strong><span class="classifier">bool</span></dt><dd><p>whether to wait for the data to be received, or return immediately.</p>
 </dd>
-<dt><strong>timeout</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">object</span></dt>
-<dd><p class="first last">Normally, the value of the data.  Will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">object</span></dt><dd><p>Normally, the value of the data.  Will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the
 channel is not connected, <cite>wait=False</cite> was used, or the data
 transfer timed out.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <ol class="arabic simple">
-<li>Returning <code class="docutils literal notranslate"><span class="pre">None</span></code> indicates an <em>incomplete get</em></li>
+<li><p>Returning <code class="docutils literal notranslate"><span class="pre">None</span></code> indicates an <em>incomplete get</em></p></li>
 </ol>
 <p>2. The <em>as_string</em> option is not as complete as the <em>as_string</em>
 argument for <code class="xref py py-meth docutils literal notranslate"><span class="pre">PV.get()</span></code>.  For Enum types, the name of the Enum
@@ -749,276 +692,128 @@ later with <a class="reference internal" href="#epics.ca.get_complete" title="ep
 <p>See <a class="reference internal" href="arrays.html#arrays-large-label"><span class="std std-ref">Strategies for working with large arrays</span></a> for a discussion of strategies  for how to best deal with very large arrays.</p>
 <p>See <a class="reference internal" href="advanced.html#advanced-connecting-many-label"><span class="std std-ref">Strategies for connecting to a large number of PVs</span></a> for a discussion of when using <cite>wait=False</cite> can give a large performance boost.</p>
 <p>See <a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><span class="std std-ref">The wait and timeout options for get(), ca.get_complete()</span></a> for further discussion of the  <em>wait</em> and <em>timeout</em> options and the associated <a class="reference internal" href="#epics.ca.get_complete" title="epics.ca.get_complete"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_complete()</span></code></a>  function.</p>
-<dl class="function">
-<dt id="epics.ca.get_with_metadata">
-<code class="descclassname">epics.ca.</code><code class="descname">get_with_metadata</code><span class="sig-paren">(</span><em>chid</em>, <em>ftype=None</em>, <em>count=None</em>, <em>as_string=False</em>, <em>as_numpy=True</em>, <em>wait=True</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_with_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the current value along with metadata for a Channel</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>chid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ctypes.c_long</span></dt>
-<dd><p class="first last">Channel ID</p>
-</dd>
-<dt><strong>ftype</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">field type to use (native type is default)</p>
-</dd>
-<dt><strong>count</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">maximum element count to return (full data returned by default)</p>
-</dd>
-<dt><strong>as_string</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to return the string representation of the value.  See notes.</p>
-</dd>
-<dt><strong>as_numpy</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to return the Numerical Python representation for array /
-waveform data.</p>
-</dd>
-<dt><strong>wait</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to wait for the data to be received, or return immediately.</p>
-</dd>
-<dt><strong>timeout</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict or None</span></dt>
-<dd><p class="first">The dictionary of data, guaranteed to at least have the ‘value’ key.
-Depending on ftype, other keys may also be present:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;severity&#39;</span><span class="p">,</span> <span class="s1">&#39;enum_strs&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">,</span>
-<span class="s1">&#39;severity&#39;</span><span class="p">,</span> <span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="s1">&#39;posixseconds&#39;</span><span class="p">,</span> <span class="s1">&#39;nanoseconds&#39;</span><span class="p">,</span>
-<span class="s1">&#39;upper_disp_limit&#39;</span><span class="p">,</span> <span class="s1">&#39;lower_disp_limit&#39;</span><span class="p">,</span> <span class="s1">&#39;upper_alarm_limit&#39;</span><span class="p">,</span>
-<span class="s1">&#39;upper_warning_limit&#39;</span><span class="p">,</span> <span class="s1">&#39;lower_warning_limit&#39;</span><span class="p">,</span><span class="s1">&#39;lower_alarm_limit&#39;</span><span class="p">,</span>
-<span class="s1">&#39;upper_ctrl_limit&#39;</span><span class="p">,</span> <span class="s1">&#39;lower_ctrl_limit&#39;</span><span class="p">}</span>
-</pre></div>
-</div>
-<p class="last">Returns <code class="docutils literal notranslate"><span class="pre">None</span></code> if the channel is not connected, <cite>wait=False</cite> was used,
-or the data transfer timed out.</p>
-</dd>
-</dl>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">See</span></code></dt>
-<dd>func:<cite>get</cite> for additional usage notes.</dd>
-</dl>
-</div>
-</dd></dl>
-
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.get_complete">
-<code class="descclassname">epics.ca.</code><code class="descname">get_complete</code><span class="sig-paren">(</span><em>chid</em>, <em>ftype=None</em>, <em>count=None</em>, <em>as_string=False</em>, <em>as_numpy=True</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_complete" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">get_complete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em>, <em class="sig-param"><span class="n">ftype</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">count</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">as_string</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">as_numpy</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_complete" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the current value for a Channel, completing an
 earlier incomplete <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">get()</span></code></a> that returned <code class="docutils literal notranslate"><span class="pre">None</span></code>, either
 because <cite>wait=False</cite> was used or because the data transfer
 did not complete before the timeout passed.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>chid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ctypes.c_long</span></dt>
-<dd><p class="first last">Channel ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>Channel ID</p>
 </dd>
-<dt><strong>ftype</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">field type to use (native type is default)</p>
+<dt><strong>ftype</strong><span class="classifier">int</span></dt><dd><p>field type to use (native type is default)</p>
 </dd>
-<dt><strong>count</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">maximum element count to return (full data returned by default)</p>
+<dt><strong>count</strong><span class="classifier">int</span></dt><dd><p>maximum element count to return (full data returned by default)</p>
 </dd>
-<dt><strong>as_string</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to return the string representation of the value.</p>
+<dt><strong>as_string</strong><span class="classifier">bool</span></dt><dd><p>whether to return the string representation of the value.</p>
 </dd>
-<dt><strong>as_numpy</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to return the Numerical Python representation
+<dt><strong>as_numpy</strong><span class="classifier">bool</span></dt><dd><p>whether to return the Numerical Python representation
 for array / waveform data.</p>
 </dd>
-<dt><strong>timeout</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">object</span></dt>
-<dd><p class="first last">This function will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the previous <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">get()</span></code></a>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">object</span></dt><dd><p>This function will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the previous <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">get()</span></code></a>
 actually completed, or if this data transfer also times out.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>1. The default timeout is dependent on the element count::
 default_timout = 1.0 + log10(count)  (in seconds)</p>
 <ol class="arabic simple" start="2">
-<li>Consult the doc for <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">get()</span></code></a> for more information.</li>
+<li><p>Consult the doc for <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">get()</span></code></a> for more information.</p></li>
 </ol>
 </dd></dl>
 
 <p>See <a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><span class="std std-ref">The wait and timeout options for get(), ca.get_complete()</span></a> for further discussion.</p>
-<dl class="function">
-<dt id="epics.ca.get_complete_with_metadata">
-<code class="descclassname">epics.ca.</code><code class="descname">get_complete_with_metadata</code><span class="sig-paren">(</span><em>chid</em>, <em>ftype=None</em>, <em>count=None</em>, <em>as_string=False</em>, <em>as_numpy=True</em>, <em>timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_complete_with_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the current value and associated metadata for a Channel</p>
-<p>This completes an earlier incomplete <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">get()</span></code></a> that returned <code class="docutils literal notranslate"><span class="pre">None</span></code>,
-either because <cite>wait=False</cite> was used or because the data transfer did not
-complete before the timeout passed.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>chid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ctypes.c_long</span></dt>
-<dd><p class="first last">Channel ID</p>
-</dd>
-<dt><strong>ftype</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">field type to use (native type is default)</p>
-</dd>
-<dt><strong>count</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">maximum element count to return (full data returned by default)</p>
-</dd>
-<dt><strong>as_string</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to return the string representation of the value.</p>
-</dd>
-<dt><strong>as_numpy</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to return the Numerical Python representation
-for array / waveform data.</p>
-</dd>
-<dt><strong>timeout</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict or None</span></dt>
-<dd><p class="first last">This function will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the previous <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">get()</span></code></a> actually
-completed, or if this data transfer also times out.</p>
-</dd>
-</dl>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">See</span></code></dt>
-<dd>func:<cite>get_complete</cite> for additional usage notes.</dd>
-</dl>
-</div>
-</dd></dl>
-
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.put">
-<code class="descclassname">epics.ca.</code><code class="descname">put</code><span class="sig-paren">(</span><em>chid</em>, <em>value</em>, <em>wait=False</em>, <em>timeout=30</em>, <em>callback=None</em>, <em>callback_data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.put" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">put</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">wait</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">30</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">callback_data</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets the Channel to a value, with options to either wait
 (block) for the processing to complete, or to execute a
 supplied callback function when the process has completed.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>chid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ctypes.c_long</span></dt>
-<dd><p class="first last">Channel ID</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>Channel ID</p>
 </dd>
-<dt><strong>wait</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to wait for processing to complete (or time-out)
+<dt><strong>wait</strong><span class="classifier">bool</span></dt><dd><p>whether to wait for processing to complete (or time-out)
 before returning.</p>
 </dd>
-<dt><strong>timeout</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">maximum time to wait for processing to complete before returning anyway.</p>
+<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time to wait for processing to complete before returning anyway.</p>
 </dd>
-<dt><strong>callback</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="docutils literal notranslate"><span class="pre">None</span></code> or callable</span></dt>
-<dd><p class="first last">user-supplied function to run when processing has completed.</p>
+<dt><strong>callback</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">None</span></code> or callable</span></dt><dd><p>user-supplied function to run when processing has completed.</p>
 </dd>
-<dt><strong>callback_data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">object</span></dt>
-<dd><p class="first last">extra data to pass on to a user-supplied callback function.</p>
+<dt><strong>callback_data</strong><span class="classifier">object</span></dt><dd><p>extra data to pass on to a user-supplied callback function.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>status</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">1  for success, -1 on time-out</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>status</strong><span class="classifier">int</span></dt><dd><p>1  for success, -1 on time-out</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <ol class="arabic simple">
-<li>Specifying a callback will override setting <cite>wait=True</cite>.</li>
-<li><dl class="first docutils">
-<dt>A put-callback function will be called with keyword arguments</dt>
-<dd>pvname=pvname, data=callback_data</dd>
+<li><p>Specifying a callback will override setting <cite>wait=True</cite>.</p></li>
+<li><dl class="simple">
+<dt>A put-callback function will be called with keyword arguments</dt><dd><p>pvname=pvname, data=callback_data</p>
+</dd>
 </dl>
 </li>
 </ol>
 </dd></dl>
 
 <p>See <a class="reference internal" href="#ca-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a> for more on this <em>put callback</em>,</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.create_subscription">
-<code class="descclassname">epics.ca.</code><code class="descname">create_subscription</code><span class="sig-paren">(</span><em>chid</em>, <em>use_time=False</em>, <em>use_ctrl=False</em>, <em>mask=None</em>, <em>callback=None</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.create_subscription" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">create_subscription</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em>, <em class="sig-param"><span class="n">use_time</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_ctrl</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">callback</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.create_subscription" title="Permalink to this definition">¶</a></dt>
 <dd><p>create a <em>subscription to changes</em>. Sets up a user-supplied
 callback function to be called on any changes to the channel.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>chid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ctypes.c_long</span></dt>
-<dd><p class="first last">channel ID</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>channel ID</p>
 </dd>
-<dt><strong>use_time</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to use the TIME variant for the PV type</p>
+<dt><strong>use_time</strong><span class="classifier">bool</span></dt><dd><p>whether to use the TIME variant for the PV type</p>
 </dd>
-<dt><strong>use_ctrl</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to use the CTRL variant for the PV type</p>
+<dt><strong>use_ctrl</strong><span class="classifier">bool</span></dt><dd><p>whether to use the CTRL variant for the PV type</p>
 </dd>
-<dt><strong>ftype</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer or None</span></dt>
-<dd><p class="first last">ftype to use, overriding native type, <cite>use_time</cite> or <cite>use_ctrl</cite>
+<dt><strong>ftype</strong><span class="classifier">integer or None</span></dt><dd><p>ftype to use, overriding native type, <cite>use_time</cite> or <cite>use_ctrl</cite>
 if <code class="docutils literal notranslate"><span class="pre">None</span></code>, the native type is looked up, which requires a
 connected channel.</p>
 </dd>
-<dt><strong>mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer or None</span></dt>
-<dd><p class="first last">bitmask combination of <code class="xref py py-data docutils literal notranslate"><span class="pre">dbr.DBE_ALARM</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">dbr.DBE_LOG</span></code>, and
+<dt><strong>mask</strong><span class="classifier">integer or None</span></dt><dd><p>bitmask combination of <code class="xref py py-data docutils literal notranslate"><span class="pre">dbr.DBE_ALARM</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">dbr.DBE_LOG</span></code>, and
 <code class="xref py py-data docutils literal notranslate"><span class="pre">dbr.DBE_VALUE</span></code>, to control which changes result in a callback.
 If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to <a class="reference internal" href="#epics.ca.DEFAULT_SUBSCRIPTION_MASK" title="epics.ca.DEFAULT_SUBSCRIPTION_MASK"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEFAULT_SUBSCRIPTION_MASK</span></code></a>.</p>
 </dd>
-<dt><strong>callback</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="docutils literal notranslate"><span class="pre">None</span></code> or callable</span></dt>
-<dd><p class="first last">user-supplied callback function to be called on changes</p>
+<dt><strong>callback</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">None</span></code> or callable</span></dt><dd><p>user-supplied callback function to be called on changes</p>
 </dd>
-<dt><strong>timeout</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="docutils literal notranslate"><span class="pre">None</span></code> or int</span></dt>
-<dd><p class="first last">connection timeout used for unconnected channels.</p>
+<dt><strong>timeout</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">None</span></code> or int</span></dt><dd><p>connection timeout used for unconnected channels.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>(callback_ref, user_arg_ref, event_id)</strong></dt>
-<dd><p class="first last">The returned tuple contains <em>callback_ref</em> an <em>user_arg_ref</em> which
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>(callback_ref, user_arg_ref, event_id)</dt><dd><p>The returned tuple contains <em>callback_ref</em> an <em>user_arg_ref</em> which
 are references that should be kept for as long as the subscription
 lives (otherwise they may be garbage collected, causing no end of
 trouble).  <em>event_id</em> is the id for the event (useful for clearing
 a subscription).</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Keep the returned tuple in named variable!! if the return argument
 gets garbage collected, a coredump will occur.</p>
@@ -1028,7 +823,7 @@ successful subscription.</p>
 
 <p>See <a class="reference internal" href="#ca-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a> for more on writing the user-supplied callback,</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
+<p class="admonition-title">Warning</p>
 <p><em>event_id</em> is the id for the event (useful for clearing a subscription).
 You <strong>must</strong> keep the returned tuple in active variables, either as a
 global variable or as data in an encompassing class.
@@ -1040,11 +835,11 @@ will see coredumps.</p>
 <span class="n">Abort</span> <span class="p">(</span><span class="n">core</span> <span class="n">dumped</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="last">is a hint that you have <em>not</em> kept this data.</p>
+<p>is a hint that you have <em>not</em> kept this data.</p>
 </div>
-<dl class="data">
+<dl class="py data">
 <dt id="epics.ca.DEFAULT_SUBSCRIPTION_MASK">
-<code class="descclassname">epics.ca.</code><code class="descname">DEFAULT_SUBSCRIPTION_MASK</code><a class="headerlink" href="#epics.ca.DEFAULT_SUBSCRIPTION_MASK" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">DEFAULT_SUBSCRIPTION_MASK</code><a class="headerlink" href="#epics.ca.DEFAULT_SUBSCRIPTION_MASK" title="Permalink to this definition">¶</a></dt>
 <dd><p>This value is the default subscription type used when calling
 <a class="reference internal" href="#epics.ca.create_subscription" title="epics.ca.create_subscription"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_subscription()</span></code></a> with <cite>mask=None</cite>. It is also used by
 default when creating a <code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code> object with auto_monitor is set
@@ -1058,49 +853,49 @@ subsequent calls to <a class="reference internal" href="#epics.ca.create_subscri
 change any existing subscriptions.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.clear_subscription">
-<code class="descclassname">epics.ca.</code><code class="descname">clear_subscription</code><span class="sig-paren">(</span><em>event_id</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.clear_subscription" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">clear_subscription</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.clear_subscription" title="Permalink to this definition">¶</a></dt>
 <dd><p>cancel subscription given its <em>event_id</em></p>
 </dd></dl>
 
 <p>Several other functions are provided:</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.get_timestamp">
-<code class="descclassname">epics.ca.</code><code class="descname">get_timestamp</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_timestamp" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">get_timestamp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_timestamp" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the timestamp of a Channel – the time of last update.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.get_severity">
-<code class="descclassname">epics.ca.</code><code class="descname">get_severity</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_severity" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">get_severity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_severity" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the severity of a Channel.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.get_precision">
-<code class="descclassname">epics.ca.</code><code class="descname">get_precision</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_precision" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">get_precision</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_precision" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the precision of a Channel.  For Channels with
 native type other than FLOAT or DOUBLE, this will be 0</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.get_enum_strings">
-<code class="descclassname">epics.ca.</code><code class="descname">get_enum_strings</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_enum_strings" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">get_enum_strings</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_enum_strings" title="Permalink to this definition">¶</a></dt>
 <dd><p>return list of names for ENUM states of a Channel.  Returns
 None for non-ENUM Channels</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.get_ctrlvars">
-<code class="descclassname">epics.ca.</code><code class="descname">get_ctrlvars</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_ctrlvars" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">get_ctrlvars</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_ctrlvars" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the CTRL fields for a Channel.</p>
-<dl class="docutils">
-<dt>Depending on the native type, the keys may include</dt>
-<dd><em>status</em>, <em>severity</em>, <em>precision</em>, <em>units</em>, enum_strs*,
+<dl class="simple">
+<dt>Depending on the native type, the keys may include</dt><dd><p><em>status</em>, <em>severity</em>, <em>precision</em>, <em>units</em>, enum_strs*,
 <em>upper_disp_limit</em>, <em>lower_disp_limit</em>, upper_alarm_limit*,
 <em>lower_alarm_limit</em>, upper_warning_limit*, <em>lower_warning_limit</em>,
-<em>upper_ctrl_limit</em>, <em>lower_ctrl_limit</em></dd>
+<em>upper_ctrl_limit</em>, <em>lower_ctrl_limit</em></p>
+</dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>enum_strs will be a list of strings for the names of ENUM states.</p>
@@ -1110,55 +905,55 @@ None for non-ENUM Channels</p>
 <blockquote id="ctrlvars-table">
 <div><p>Table of Control Attributes</p>
 <blockquote>
-<div><table border="1" class="docutils">
+<div><table class="docutils align-default">
 <colgroup>
-<col width="40%" />
-<col width="60%" />
+<col style="width: 40%" />
+<col style="width: 60%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head"><em>attribute</em></th>
-<th class="head"><em>data types</em></th>
+<thead>
+<tr class="row-odd"><th class="head"><p><em>attribute</em></p></th>
+<th class="head"><p><em>data types</em></p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>status</td>
-<td>&#160;</td>
+<tbody>
+<tr class="row-even"><td><p>status</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>severity</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>severity</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>precision</td>
-<td>0 for all but double, float</td>
+<tr class="row-even"><td><p>precision</p></td>
+<td><p>0 for all but double, float</p></td>
 </tr>
-<tr class="row-odd"><td>units</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>units</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>enum_strs</td>
-<td>enum only</td>
+<tr class="row-even"><td><p>enum_strs</p></td>
+<td><p>enum only</p></td>
 </tr>
-<tr class="row-odd"><td>upper_disp_limit</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>upper_disp_limit</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>lower_disp_limit</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>lower_disp_limit</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>upper_alarm_limit</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>upper_alarm_limit</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>lower_alarm_limit</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>lower_alarm_limit</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>upper_warning_limit</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>upper_warning_limit</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>lower_warning_limit</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>lower_warning_limit</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>upper_ctrl_limit</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>upper_ctrl_limit</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>lower_ctrl_limit</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>lower_ctrl_limit</p></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -1166,9 +961,9 @@ None for non-ENUM Channels</p>
 </div></blockquote>
 <p>Note that <em>enum_strs</em> will be a tuple of strings for the names of ENUM
 states.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.get_timevars">
-<code class="descclassname">epics.ca.</code><code class="descname">get_timevars</code><span class="sig-paren">(</span><em>chid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_timevars" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">get_timevars</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_timevars" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a dictionary of TIME fields for a Channel.
 This will contain keys of  <em>status</em>, <em>severity</em>, and <em>timestamp</em>.</p>
 </dd></dl>
@@ -1177,8 +972,8 @@ This will contain keys of  <em>status</em>, <em>severity</em>, and <em>timestamp
 <div class="section" id="synchronous-groups">
 <span id="ca-sg-label"></span><h3>Synchronous Groups<a class="headerlink" href="#synchronous-groups" title="Permalink to this headline">¶</a></h3>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Synchronous groups are simulated in pyepics, but are not recommended,
+<p class="admonition-title">Warning</p>
+<p>Synchronous groups are simulated in pyepics, but are not recommended,
 and probably don’t really make sense for usage within pyepics and using
 asynchronous i/o anyway.</p>
 </div>
@@ -1193,29 +988,29 @@ finally block while all the channel access communication is done for the
 group as a unit.  It is important to <em>not</em> issue <a class="reference internal" href="#epics.ca.pend_io" title="epics.ca.pend_io"><code class="xref py py-func docutils literal notranslate"><span class="pre">pend_io()</span></code></a> during the
 building of a synchronous group, as this will cause pending <a class="reference internal" href="#epics.ca.sg_put" title="epics.ca.sg_put"><code class="xref py py-func docutils literal notranslate"><span class="pre">sg_put()</span></code></a>
 and <a class="reference internal" href="#epics.ca.sg_get" title="epics.ca.sg_get"><code class="xref py py-func docutils literal notranslate"><span class="pre">sg_get()</span></code></a> to execute.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.sg_create">
-<code class="descclassname">epics.ca.</code><code class="descname">sg_create</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_create" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">sg_create</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_create" title="Permalink to this definition">¶</a></dt>
 <dd><p>create synchronous group.
 Returns a <em>group id</em>, <cite>gid</cite>, which is used to identify this group and
 to be passed to all other synchronous group commands.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.sg_delete">
-<code class="descclassname">epics.ca.</code><code class="descname">sg_delete</code><span class="sig-paren">(</span><em>gid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_delete" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">sg_delete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>delete a synchronous group</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.sg_block">
-<code class="descclassname">epics.ca.</code><code class="descname">sg_block</code><span class="sig-paren">(</span><em>gid</em><span class="optional">[</span>, <em>timeout=10.0</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_block" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">sg_block</code><span class="sig-paren">(</span><em class="sig-param">gid</em><span class="optional">[</span>, <em class="sig-param">timeout=10.0</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>block for a synchronous group to complete processing</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.sg_get">
-<code class="descclassname">epics.ca.</code><code class="descname">sg_get</code><span class="sig-paren">(</span><em>gid</em>, <em>chid</em><span class="optional">[</span>, <em>ftype=None</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">[</span>, <em>as_numpy=True</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">sg_get</code><span class="sig-paren">(</span><em class="sig-param">gid</em>, <em class="sig-param">chid</em><span class="optional">[</span>, <em class="sig-param">ftype=None</em><span class="optional">[</span>, <em class="sig-param">as_string=False</em><span class="optional">[</span>, <em class="sig-param">as_numpy=True</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_get" title="Permalink to this definition">¶</a></dt>
 <dd><p>synchronous-group get of the current value for a Channel.
 same options as get()</p>
 <p>This function will not immediately return the value, of course, but the
@@ -1223,7 +1018,7 @@ address of the underlying data.</p>
 <p>After the <a class="reference internal" href="#epics.ca.sg_block" title="epics.ca.sg_block"><code class="xref py py-func docutils literal notranslate"><span class="pre">sg_block()</span></code></a> has completed, you must use <a class="reference internal" href="#epics.ca._unpack" title="epics.ca._unpack"><code class="xref py py-func docutils literal notranslate"><span class="pre">_unpack()</span></code></a>
 to convert this data address to the actual value(s).</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chid</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">PV_Name</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chid</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">PV_Name</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">connect_channel</span><span class="p">(</span><span class="n">chid1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">sg_create</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">sg_get</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span> <span class="n">chid</span><span class="p">)</span>
@@ -1233,22 +1028,22 @@ to convert this data address to the actual value(s).</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.sg_put">
-<code class="descclassname">epics.ca.</code><code class="descname">sg_put</code><span class="sig-paren">(</span><em>gid</em>, <em>chid</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_put" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">sg_put</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span></em>, <em class="sig-param"><span class="n">chid</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_put" title="Permalink to this definition">¶</a></dt>
 <dd><p>perform a <cite>put</cite> within a synchronous group.</p>
 <p>This <cite>put</cite> cannot wait for completion or for a a callback to complete.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.sg_test">
-<code class="descclassname">epics.ca.</code><code class="descname">sg_test</code><span class="sig-paren">(</span><em>gid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_test" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">sg_test</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>test whether a synchronous group has completed.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.sg_reset">
-<code class="descclassname">epics.ca.</code><code class="descname">sg_reset</code><span class="sig-paren">(</span><em>gid</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_reset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">sg_reset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>resets a synchronous group</p>
 </dd></dl>
 
@@ -1264,114 +1059,114 @@ those looking to translate lower-level C or Python code to this module.</p>
 <blockquote id="dbrtype-table">
 <div><p>Table of DBR Types</p>
 <blockquote>
-<div><table border="1" class="docutils">
+<div><table class="docutils align-default">
 <colgroup>
-<col width="25%" />
-<col width="33%" />
-<col width="42%" />
+<col style="width: 25%" />
+<col style="width: 33%" />
+<col style="width: 42%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head"><em>CA type</em></th>
-<th class="head"><em>integer ftype</em></th>
-<th class="head"><em>Python ctypes type</em></th>
+<thead>
+<tr class="row-odd"><th class="head"><p><em>CA type</em></p></th>
+<th class="head"><p><em>integer ftype</em></p></th>
+<th class="head"><p><em>Python ctypes type</em></p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>string</td>
-<td>0</td>
-<td>string</td>
+<tbody>
+<tr class="row-even"><td><p>string</p></td>
+<td><p>0</p></td>
+<td><p>string</p></td>
 </tr>
-<tr class="row-odd"><td>int</td>
-<td>1</td>
-<td>integer</td>
+<tr class="row-odd"><td><p>int</p></td>
+<td><p>1</p></td>
+<td><p>integer</p></td>
 </tr>
-<tr class="row-even"><td>short</td>
-<td>1</td>
-<td>integer</td>
+<tr class="row-even"><td><p>short</p></td>
+<td><p>1</p></td>
+<td><p>integer</p></td>
 </tr>
-<tr class="row-odd"><td>float</td>
-<td>2</td>
-<td>double</td>
+<tr class="row-odd"><td><p>float</p></td>
+<td><p>2</p></td>
+<td><p>double</p></td>
 </tr>
-<tr class="row-even"><td>enum</td>
-<td>3</td>
-<td>integer</td>
+<tr class="row-even"><td><p>enum</p></td>
+<td><p>3</p></td>
+<td><p>integer</p></td>
 </tr>
-<tr class="row-odd"><td>char</td>
-<td>4</td>
-<td>byte</td>
+<tr class="row-odd"><td><p>char</p></td>
+<td><p>4</p></td>
+<td><p>byte</p></td>
 </tr>
-<tr class="row-even"><td>long</td>
-<td>5</td>
-<td>integer</td>
+<tr class="row-even"><td><p>long</p></td>
+<td><p>5</p></td>
+<td><p>integer</p></td>
 </tr>
-<tr class="row-odd"><td>double</td>
-<td>6</td>
-<td>double</td>
+<tr class="row-odd"><td><p>double</p></td>
+<td><p>6</p></td>
+<td><p>double</p></td>
 </tr>
-<tr class="row-even"><td>time_string</td>
-<td>14</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>time_string</p></td>
+<td><p>14</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>time_int</td>
-<td>15</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>time_int</p></td>
+<td><p>15</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>time_short</td>
-<td>15</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>time_short</p></td>
+<td><p>15</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>time_float</td>
-<td>16</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>time_float</p></td>
+<td><p>16</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>time_enum</td>
-<td>17</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>time_enum</p></td>
+<td><p>17</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>time_char</td>
-<td>18</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>time_char</p></td>
+<td><p>18</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>time_long</td>
-<td>19</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>time_long</p></td>
+<td><p>19</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>time_double</td>
-<td>20</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>time_double</p></td>
+<td><p>20</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>ctrl_string</td>
-<td>28</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>ctrl_string</p></td>
+<td><p>28</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>ctrl_int</td>
-<td>29</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>ctrl_int</p></td>
+<td><p>29</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>ctrl_short</td>
-<td>29</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>ctrl_short</p></td>
+<td><p>29</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>ctrl_float</td>
-<td>30</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>ctrl_float</p></td>
+<td><p>30</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>ctrl_enum</td>
-<td>31</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>ctrl_enum</p></td>
+<td><p>31</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>ctrl_char</td>
-<td>32</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>ctrl_char</p></td>
+<td><p>32</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>ctrl_long</td>
-<td>33</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>ctrl_long</p></td>
+<td><p>33</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>ctrl_double</td>
-<td>34</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>ctrl_double</p></td>
+<td><p>34</p></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -1380,16 +1175,16 @@ those looking to translate lower-level C or Python code to this module.</p>
 </div>
 <div class="section" id="pysevchk-and-channelaccessexcepction-checking-ca-return-codes">
 <h3><cite>PySEVCHK</cite> and ChannelAccessExcepction: checking CA return codes<a class="headerlink" href="#pysevchk-and-channelaccessexcepction-checking-ca-return-codes" title="Permalink to this headline">¶</a></h3>
-<dl class="exception">
+<dl class="py exception">
 <dt id="epics.ca.ChannelAccessException">
-<em class="property">exception </em><code class="descclassname">epics.ca.</code><code class="descname">ChannelAccessException</code><a class="headerlink" href="#epics.ca.ChannelAccessException" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">ChannelAccessException</code><a class="headerlink" href="#epics.ca.ChannelAccessException" title="Permalink to this definition">¶</a></dt>
 <dd><p>This exception is raised when the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module experiences
 unexpected behavior and must raise an exception</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.PySEVCHK">
-<code class="descclassname">epics.ca.</code><code class="descname">PySEVCHK</code><span class="sig-paren">(</span><em>func_name</em>, <em>status</em><span class="optional">[</span>, <em>expected=dbr.ECA_NORMAL</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.PySEVCHK" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">PySEVCHK</code><span class="sig-paren">(</span><em class="sig-param">func_name</em>, <em class="sig-param">status</em><span class="optional">[</span>, <em class="sig-param">expected=dbr.ECA_NORMAL</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.PySEVCHK" title="Permalink to this definition">¶</a></dt>
 <dd><p>This checks the return <em>status</em> returned from a <cite>libca.ca_***</cite> and
 raises a <a class="reference internal" href="#epics.ca.ChannelAccessException" title="epics.ca.ChannelAccessException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ChannelAccessException</span></code></a> if the value does not match the
 <em>expected</em> value (which is nornmally <code class="docutils literal notranslate"><span class="pre">dbr.ECA_NORMAL</span></code>.</p>
@@ -1397,9 +1192,9 @@ raises a <a class="reference internal" href="#epics.ca.ChannelAccessException" t
 the Python function) and the CA message from <a class="reference internal" href="#epics.ca.message" title="epics.ca.message"><code class="xref py py-func docutils literal notranslate"><span class="pre">message()</span></code></a>.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.withSEVCHK">
-<code class="descclassname">epics.ca.</code><code class="descname">withSEVCHK</code><span class="sig-paren">(</span><em>fcn</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.withSEVCHK" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">withSEVCHK</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fcn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.withSEVCHK" title="Permalink to this definition">¶</a></dt>
 <dd><p>decorator to raise a ChannelAccessException if the wrapped
 ca function does not return status = dbr.ECA_NORMAL.  This
 handles the common case of running <a class="reference internal" href="#epics.ca.PySEVCHK" title="epics.ca.PySEVCHK"><code class="xref py py-func docutils literal notranslate"><span class="pre">PySEVCHK()</span></code></a> for a
@@ -1412,9 +1207,9 @@ and whose return value should be <code class="docutils literal notranslate"><spa
 <h3>Function Decorators<a class="headerlink" href="#function-decorators" title="Permalink to this headline">¶</a></h3>
 <p>In addition to <a class="reference internal" href="#epics.ca.withSEVCHK" title="epics.ca.withSEVCHK"><code class="xref py py-func docutils literal notranslate"><span class="pre">withSEVCHK()</span></code></a>, several other decorator functions are
 used heavily inside of ca.py or are available for your convenience.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.withCA">
-<code class="descclassname">epics.ca.</code><code class="descname">withCA</code><span class="sig-paren">(</span><em>fcn</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.withCA" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">withCA</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fcn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.withCA" title="Permalink to this definition">¶</a></dt>
 <dd><p>decorator to ensure that libca and a context are created
 prior to function calls to the channel access library. This is
 intended for functions that need CA started to work, such as
@@ -1424,27 +1219,27 @@ argument are  NOT wrapped by this: to get a chid, the
 library must have been initialized already.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.withCHID">
-<code class="descclassname">epics.ca.</code><code class="descname">withCHID</code><span class="sig-paren">(</span><em>fcn</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.withCHID" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">withCHID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fcn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.withCHID" title="Permalink to this definition">¶</a></dt>
 <dd><p>decorator to ensure that first argument to a function is a Channel
 ID, <code class="docutils literal notranslate"><span class="pre">chid</span></code>.  The test performed is very weak, as any ctypes long or
 python int will pass, but it is useful enough to catch most accidental
 errors before they would cause a crash of the CA library.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.withConnectedCHID">
-<code class="descclassname">epics.ca.</code><code class="descname">withConnectedCHID</code><span class="sig-paren">(</span><em>fcn</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.withConnectedCHID" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">withConnectedCHID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fcn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.withConnectedCHID" title="Permalink to this definition">¶</a></dt>
 <dd><p>decorator to ensure that the first argument of a function is a
 fully connected Channel ID, <code class="docutils literal notranslate"><span class="pre">chid</span></code>.  This test is (intended to be)
 robust, and will try to make sure a <code class="docutils literal notranslate"><span class="pre">chid</span></code> is actually connected
 before calling the decorated function.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.withInitialContext">
-<code class="descclassname">epics.ca.</code><code class="descname">withInitialContext</code><span class="sig-paren">(</span><em>fcn</em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.withInitialContext" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">withInitialContext</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fcn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.withInitialContext" title="Permalink to this definition">¶</a></dt>
 <dd><p>decorator to ensure that the wrapped function uses the
 initial threading context created at initialization of CA</p>
 </dd></dl>
@@ -1459,39 +1254,30 @@ is encapsulated in the <a class="reference internal" href="#epics.ca._unpack" ti
 have to run this code, but there is one exception:  when using
 <a class="reference internal" href="#epics.ca.sg_get" title="epics.ca.sg_get"><code class="xref py py-func docutils literal notranslate"><span class="pre">sg_get()</span></code></a>, the values returned will have to be unpacked with this
 function.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca._unpack">
-<code class="descclassname">epics.ca.</code><code class="descname">_unpack</code><span class="sig-paren">(</span><em>chid</em>, <em>data</em><span class="optional">[</span>, <em>count=None</em><span class="optional">[</span>, <em>ftype=None</em><span class="optional">[</span>, <em>as_numpy=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca._unpack" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">_unpack</code><span class="sig-paren">(</span><em class="sig-param">chid</em>, <em class="sig-param">data</em><span class="optional">[</span>, <em class="sig-param">count=None</em><span class="optional">[</span>, <em class="sig-param">ftype=None</em><span class="optional">[</span>, <em class="sig-param">as_numpy=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca._unpack" title="Permalink to this definition">¶</a></dt>
 <dd><p>unpacks raw data for a Channel ID <cite>chid</cite> returned by libca functions
 including <cite>ca_array_get_callback</cite> or subscription callback, and returns
 the corresponding Python data</p>
 <p>Normally, users are not expected to need to access this function, but
 it will be necessary why using <a class="reference internal" href="#epics.ca.sg_get" title="epics.ca.sg_get"><code class="xref py py-func docutils literal notranslate"><span class="pre">sg_get()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>chid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ctypes.c_long or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt>
-<dd><p class="first last">channel ID (if not None, used for determining count and ftype)</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>chid</strong><span class="classifier">ctypes.c_long or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>channel ID (if not None, used for determining count and ftype)</p>
 </dd>
-<dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">object</span></dt>
-<dd><p class="first last">raw data as returned by internal libca functions.</p>
+<dt><strong>data</strong><span class="classifier">object</span></dt><dd><p>raw data as returned by internal libca functions.</p>
 </dd>
-<dt><strong>count</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
-<dd><p class="first last">number of elements to fetch (defaults to element count of chid  or 1)</p>
+<dt><strong>count</strong><span class="classifier">integer</span></dt><dd><p>number of elements to fetch (defaults to element count of chid  or 1)</p>
 </dd>
-<dt><strong>ftype</strong> <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
-<dd><p class="first last">data type of channel (defaults to native type of chid)</p>
+<dt><strong>ftype</strong><span class="classifier">integer</span></dt><dd><p>data type of channel (defaults to native type of chid)</p>
 </dd>
-<dt><strong>as_numpy</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">whether to convert to numpy array.</p>
+<dt><strong>as_numpy</strong><span class="classifier">bool</span></dt><dd><p>whether to convert to numpy array.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -1508,8 +1294,8 @@ read/write permissions change from <a class="reference internal" href="#epics.ca
 important to know two things:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>how your function will be called.</li>
-<li>what is permissible to do inside your callback function.</li>
+<li><p>how your function will be called.</p></li>
+<li><p>what is permissible to do inside your callback function.</p></li>
 </ol>
 </div></blockquote>
 <p>Callbacks will be called with keyword arguments for <a class="reference internal" href="#epics.ca.put" title="epics.ca.put"><code class="xref py py-func docutils literal notranslate"><span class="pre">put()</span></code></a> and for
@@ -1520,40 +1306,40 @@ will be passed.</p>
 <p>For callbacks sent when a <a class="reference internal" href="#epics.ca.put" title="epics.ca.put"><code class="xref py py-func docutils literal notranslate"><span class="pre">put()</span></code></a> completes, your function will be passed these:</p>
 <blockquote>
 <div><ul class="simple">
-<li><cite>pvname</cite> : the name of the pv</li>
-<li><cite>data</cite>:  the user-supplied callback_data (defaulting to <code class="docutils literal notranslate"><span class="pre">None</span></code>).</li>
+<li><p><cite>pvname</cite> : the name of the pv</p></li>
+<li><p><cite>data</cite>:  the user-supplied callback_data (defaulting to <code class="docutils literal notranslate"><span class="pre">None</span></code>).</p></li>
 </ul>
 </div></blockquote>
 <p>For subscription callbacks, your function will be called with keyword/value
 pairs that will include:</p>
 <blockquote>
 <div><ul class="simple">
-<li><cite>pvname</cite>: the name of the pv</li>
-<li><cite>value</cite>: the latest value</li>
-<li><cite>count</cite>: the number of data elements</li>
-<li><cite>ftype</cite>: the numerical CA type indicating the data type</li>
-<li><cite>status</cite>: the status of the PV (1 for OK)</li>
-<li><cite>chid</cite>:   the integer address for the channel ID.</li>
+<li><p><cite>pvname</cite>: the name of the pv</p></li>
+<li><p><cite>value</cite>: the latest value</p></li>
+<li><p><cite>count</cite>: the number of data elements</p></li>
+<li><p><cite>ftype</cite>: the numerical CA type indicating the data type</p></li>
+<li><p><cite>status</cite>: the status of the PV (0 for OK)</p></li>
+<li><p><cite>chid</cite>:   the integer address for the channel ID.</p></li>
 </ul>
 </div></blockquote>
 <p>For access rights event callbacks, your function will be passed:</p>
 <blockquote>
 <div><ul class="simple">
-<li><cite>read_access</cite>: boolean indicating read access status</li>
-<li><cite>write_access</cite>: boolean indicating write access status</li>
+<li><p><cite>read_access</cite>: boolean indicating read access status</p></li>
+<li><p><cite>write_access</cite>: boolean indicating write access status</p></li>
 </ul>
 </div></blockquote>
 <p>Depending on the data type, and whether the CTRL or TIME variant was used,
 the callback function may also include some of these as keyword arguments:</p>
 <blockquote>
 <div><ul class="simple">
-<li><cite>enum_strs</cite>: the list of enumeration strings</li>
-<li><cite>precision</cite>: number of decimal places of precision.</li>
-<li><cite>units</cite>:  string for PV units</li>
-<li><cite>severity</cite>: PV severity</li>
-<li><cite>timestamp</cite>: timestamp from CA server.</li>
-<li><cite>posixseconds</cite>: integer seconds since POSIX epoch of timestamp from CA server.</li>
-<li><cite>nanoseconds</cite>: integer nanoseconds of timestamp from CA server.</li>
+<li><p><cite>enum_strs</cite>: the list of enumeration strings</p></li>
+<li><p><cite>precision</cite>: number of decimal places of precision.</p></li>
+<li><p><cite>units</cite>:  string for PV units</p></li>
+<li><p><cite>severity</cite>: PV severity</p></li>
+<li><p><cite>timestamp</cite>: timestamp from CA server.</p></li>
+<li><p><cite>posixseconds</cite>: integer seconds since POSIX epoch of timestamp from CA server.</p></li>
+<li><p><cite>nanoseconds</cite>: integer nanoseconds of timestamp from CA server.</p></li>
 </ul>
 </div></blockquote>
 <p>Note that a the user-supplied callback will be run <em>inside</em> a CA function,
@@ -1570,62 +1356,62 @@ after <a class="reference internal" href="#epics.ca.pend_event" title="epics.ca.
 <p>Several parts of the CA library are not implemented in the Python module.
 These are currently seen as unneeded (with notes where appropriate for
 alternatives), though they could be added on request.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.ca_add_exception_event">
-<code class="descclassname">epics.ca.</code><code class="descname">ca_add_exception_event</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_add_exception_event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">ca_add_exception_event</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_add_exception_event" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>Not implemented</em>: Python exceptions are raised where appropriate and
 can be used in user code.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.ca_add_fd_registration">
-<code class="descclassname">epics.ca.</code><code class="descname">ca_add_fd_registration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_add_fd_registration" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">ca_add_fd_registration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_add_fd_registration" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>Not implemented</em></p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.ca_client_status">
-<code class="descclassname">epics.ca.</code><code class="descname">ca_client_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_client_status" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">ca_client_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_client_status" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>Not implemented</em></p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.ca_set_puser">
-<code class="descclassname">epics.ca.</code><code class="descname">ca_set_puser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_set_puser" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">ca_set_puser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_set_puser" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>Not implemented</em> : it is easy to pass user-defined data to callbacks as needed.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.ca_puser">
-<code class="descclassname">epics.ca.</code><code class="descname">ca_puser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_puser" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">ca_puser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_puser" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>Not implemented</em>: it is easy to pass user-defined data to callbacks as needed.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.ca_SEVCHK">
-<code class="descclassname">epics.ca.</code><code class="descname">ca_SEVCHK</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_SEVCHK" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">ca_SEVCHK</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_SEVCHK" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>Not implemented</em>: the Python function <a class="reference internal" href="#epics.ca.PySEVCHK" title="epics.ca.PySEVCHK"><code class="xref py py-func docutils literal notranslate"><span class="pre">PySEVCHK()</span></code></a> is
 approximately the same.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.ca_signal">
-<code class="descclassname">epics.ca.</code><code class="descname">ca_signal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_signal" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">ca_signal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_signal" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>Not implemented</em>: the Python function <a class="reference internal" href="#epics.ca.PySEVCHK" title="epics.ca.PySEVCHK"><code class="xref py py-func docutils literal notranslate"><span class="pre">PySEVCHK()</span></code></a> is
 approximately the same.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.ca_test_event">
-<code class="descclassname">epics.ca.</code><code class="descname">ca_test_event</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_test_event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">ca_test_event</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_test_event" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>Not implemented</em>:  this appears to be a function for debugging events.
 These are easy enough to simulate by directly calling Python callback
 functions.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="epics.ca.ca_dump_dbr">
-<code class="descclassname">epics.ca.</code><code class="descname">ca_dump_dbr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_dump_dbr" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">ca_dump_dbr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.ca_dump_dbr" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>Not implemented</em></p>
 </dd></dl>
 
@@ -1636,13 +1422,13 @@ not supported, as they are needed only to dynamically allocate memory.</p>
 </div>
 <div class="section" id="cathread-class">
 <h2><a class="reference internal" href="#epics.ca.CAThread" title="epics.ca.CAThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">CAThread</span></code></a> class<a class="headerlink" href="#cathread-class" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="epics.ca.CAThread">
-<em class="property">class </em><code class="descclassname">epics.ca.</code><code class="descname">CAThread</code><span class="sig-paren">(</span><em>group=None</em><span class="optional">[</span>, <em>target=None</em><span class="optional">[</span>, <em>name=None</em><span class="optional">[</span>, <em>args=()</em><span class="optional">[</span>, <em>kwargs={}</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.CAThread" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">epics.ca.</code><code class="sig-name descname">CAThread</code><span class="sig-paren">(</span><em class="sig-param">group=None</em><span class="optional">[</span>, <em class="sig-param">target=None</em><span class="optional">[</span>, <em class="sig-param">name=None</em><span class="optional">[</span>, <em class="sig-param">args=()</em><span class="optional">[</span>, <em class="sig-param">kwargs={}</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.CAThread" title="Permalink to this definition">¶</a></dt>
 <dd><p>create a CA-aware subclass of a standard Python <code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code>.  See the
 standard library documentation for further information on how to use Thread objects.</p>
-<p>A <cite>CAThread</cite> simply runs <a class="reference internal" href="#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">use_initial_context()</span></code></a> prior to running each target
-function, so that <a class="reference internal" href="#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">use_initial_context()</span></code></a> does not have to be explicitly put inside
+<p>A <cite>CAThread</cite> simply runs <code class="xref py py-func docutils literal notranslate"><span class="pre">use_initial_context()</span></code> prior to running each target
+function, so that <code class="xref py py-func docutils literal notranslate"><span class="pre">use_initial_context()</span></code> does not have to be explicitly put inside
 the target function.</p>
 <p>The See <a class="reference internal" href="advanced.html#advanced-threads-label"><span class="std std-ref">Using Python Threads</span></a> for further discussion.</p>
 </dd></dl>
@@ -1656,7 +1442,7 @@ the target function.</p>
 <p>Note here that several things have been simplified compare to using CA in C:
 initialization and creating a main-thread context are handled, and connection
 of channels is handled in the background:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">ca</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
 <span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="n">count</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">element_count</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
 <span class="n">ftype</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">field_type</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
@@ -1669,7 +1455,7 @@ of channels is handled in the background:</p>
 <div class="section" id="put-waiting-for-completion">
 <h3>Put, waiting for completion<a class="headerlink" href="#put-waiting-for-completion" title="Permalink to this headline">¶</a></h3>
 <p>Here we set a PVs value, waiting for it to complete:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">ca</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
 <span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -1683,7 +1469,7 @@ complete.</p>
 callback function to be called whenever the PV value changes.   In the case
 below, the function to be called will simply write the latest value out to
 standard output:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">ca</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 
@@ -1769,6 +1555,7 @@ called immediately after successful installation:</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -1799,12 +1586,13 @@ called immediately after successful installation:</p>
    <li>|<a href="autosave.html">autosave</a></li>
    <li>|<a href="wx.html">wx</a></li>
    <li>|<a href="advanced.html">advanced</a>]</li>
- 
+
+        <li class="nav-item nav-item-this"><a href="">ca: Low-level Channel Access module</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
     </div>
   </body>
 </html>

@@ -337,7 +337,7 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
 .. attribute:: status
 
-   The PV status, which will be 1 for a Normal, connected PV.
+   The PV status, which will be 0 for a normal, connected PV.
 
 .. attribute:: type
 
@@ -615,7 +615,7 @@ following keyword parameters:
     * `count`: the number of data elements
     * `ftype`: the numerical CA type indicating the data type
     * `type`: the python type for the data
-    * `status`: the status of the PV (1 for OK)
+    * `status`: the status of the PV (0 for OK)
     * `precision`: number of decimal places of precision for floating point values
     * `units`:  string for PV units
     * `severity`: PV severity

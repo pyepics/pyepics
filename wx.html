@@ -1,20 +1,19 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>wx: wxPython Widgets for Epics &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Advanced Topic with Python Channel Access" href="advanced.html" />
@@ -52,7 +51,8 @@
    <li>|<a href="autosave.html">autosave</a></li>
    <li>|<a href="#">wx</a></li>
    <li>|<a href="advanced.html">advanced</a>]</li>
- 
+
+        <li class="nav-item nav-item-this"><a href="">wx: wxPython Widgets for Epics</a></li> 
       </ul>
     </div>
 
@@ -106,17 +106,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
 
@@ -144,93 +142,90 @@ widget with a corresponding <cite>PV</cite>.  For example, setting the text valu
 automatically updated.</p>
 <div class="section" id="pvmixin">
 <h3>PVMixin<a class="headerlink" href="#pvmixin" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVMixin">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVMixin</code><span class="sig-paren">(</span><span class="optional">[</span><em>pv=None</em><span class="optional">[</span>, <em>pvname=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVMixin" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVMixin</code><span class="sig-paren">(</span><span class="optional">[</span><em class="sig-param">pv=None</em><span class="optional">[</span>, <em class="sig-param">pvname=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVMixin" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a mixin class for wx Controls with epics PVs:  This connects to
 PV, and manages connection and callback events for the PV.  It provides
 the following basic methods used by most of the PV&lt;-&gt;widget classes
 below.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="wx.SetPV">
-<code class="descclassname">wx.</code><code class="descname">SetPV</code><span class="sig-paren">(</span><em>pv=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.SetPV" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">wx.</code><code class="sig-name descname">SetPV</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.SetPV" title="Permalink to this definition">¶</a></dt>
 <dd><p>set the PV corresponding to the widget.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="wx.Update">
-<code class="descclassname">wx.</code><code class="descname">Update</code><span class="sig-paren">(</span><em>value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.Update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">wx.</code><code class="sig-name descname">Update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.Update" title="Permalink to this definition">¶</a></dt>
 <dd><p>set the widgets value from the PV’s value.   If value=``None``, the current
 value for the PV is used.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="wx.GetValue">
-<code class="descclassname">wx.</code><code class="descname">GetValue</code><span class="sig-paren">(</span><em>as_string=True</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.GetValue" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">wx.</code><code class="sig-name descname">GetValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">as_string</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.GetValue" title="Permalink to this definition">¶</a></dt>
 <dd><p>return the PVs value.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="wx.OnEpicsConnect">
-<code class="descclassname">wx.</code><code class="descname">OnEpicsConnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.OnEpicsConnect" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">wx.</code><code class="sig-name descname">OnEpicsConnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.OnEpicsConnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>PV connection event handler.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="wx.OnPVChange">
-<code class="descclassname">wx.</code><code class="descname">OnPVChange</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.OnPVChange" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">wx.</code><code class="sig-name descname">OnPVChange</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.OnPVChange" title="Permalink to this definition">¶</a></dt>
 <dd><p>PV monitor (subscription) event handler.  Must be overwritten for each
 widget type.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="wx.GetEnumStrings">
-<code class="descclassname">wx.</code><code class="descname">GetEnumStrings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.GetEnumStrings" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">wx.</code><code class="sig-name descname">GetEnumStrings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.GetEnumStrings" title="Permalink to this definition">¶</a></dt>
 <dd><p>return enumeration strings for the PV</p>
 </dd></dl>
 
 </div>
 <div class="section" id="pvctrlmixin">
 <h3>PVCtrlMixin<a class="headerlink" href="#pvctrlmixin" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVCtrlMixin">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVCtrlMixin</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCtrlMixin" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVCtrlMixin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">font</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCtrlMixin" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
-<div>This is a mixin class for wx Controls with epics PVs:  This subclasses
+<div><p>This is a mixin class for wx Controls with epics PVs:  This subclasses
 PVCtrlMixin and adds colour translations
-PV, and manages callback events for the PV.</div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>parent</strong> – wx parent widget</li>
-<li><strong>pv</strong> – epics.PV</li>
-<li><strong>font</strong> – wx.Font for display</li>
-<li><strong>fg</strong> – foreground colour</li>
-<li><strong>bg</strong> – <p>background colour</p>
+PV, and manages callback events for the PV.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parent</strong> – wx parent widget</p></li>
+<li><p><strong>pv</strong> – epics.PV</p></li>
+<li><p><strong>font</strong> – wx.Font for display</p></li>
+<li><p><strong>fg</strong> – foreground colour</p></li>
+<li><p><strong>bg</strong> – <p>background colour</p>
 <p>A class that inherits from this class <strong>must</strong> provide a method called
 <cite>_SetValue</cite>, which will set the contents of the corresponding widget
 when the PV’s value changes.</p>
 <p>In general, the widgets will automatically update when the PV
 changes. Where appropriate, setting the value with the widget will set
 the PV value.</p>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
 <div class="section" id="pvtext">
 <h3>PVText<a class="headerlink" href="#pvtext" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVText">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVText</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>minor_alarm=&quot;DARKRED&quot;</em>, <em>major_alarm=&quot;RED&quot;</em>, <em>invalid_alarm=&quot;ORANGERED&quot;</em>, <em>auto_units=False</em>, <em>units=&quot;&quot;</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVText" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVText</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">font</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">minor_alarm</span><span class="o">=</span><span class="default_value">'DARKRED'</span></em>, <em class="sig-param"><span class="n">major_alarm</span><span class="o">=</span><span class="default_value">'RED'</span></em>, <em class="sig-param"><span class="n">invalid_alarm</span><span class="o">=</span><span class="default_value">'ORANGERED'</span></em>, <em class="sig-param"><span class="n">auto_units</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">units</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVText" title="Permalink to this definition">¶</a></dt>
 <dd><p>derived from wx.StaticText and PVCtrlMixin, this is a StaticText widget
 whose value is set to the string representation of the value for the
 corresponding PV.</p>
@@ -248,25 +243,26 @@ unit.</p>
 </div>
 <div class="section" id="pvtextctrl">
 <h3>PVTextCtrl<a class="headerlink" href="#pvtextctrl" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVTextCtrl">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVTextCtrl</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>dirty_timeout=2500</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVTextCtrl" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVTextCtrl</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">font</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dirty_timeout</span><span class="o">=</span><span class="default_value">2500</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVTextCtrl" title="Permalink to this definition">¶</a></dt>
 <dd><p>derived from wx.TextCtrl and PVCtrlMixin, this is a TextCtrl widget
 whose value is set to the string representation of the value for the
 corresponding PV.</p>
 <blockquote>
-<div>Setting the value (hitting Return or Enter) or changing focus away
+<div><p>Setting the value (hitting Return or Enter) or changing focus away
 from the widget will set the PV value immediately. Otherwise, the
 widget will wait for ‘dirty_timeout’ milliseconds after the last
-keypress and then set the PV value to whatever is written in the field.</div></blockquote>
+keypress and then set the PV value to whatever is written in the field.</p>
+</div></blockquote>
 </dd></dl>
 
 </div>
 <div class="section" id="pvfloatctrl">
 <h3>PVFloatCtrl<a class="headerlink" href="#pvfloatctrl" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVFloatCtrl">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVFloatCtrl</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVFloatCtrl" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVFloatCtrl</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">font</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVFloatCtrl" title="Permalink to this definition">¶</a></dt>
 <dd><p>A special variation of a wx.TextCtrl that allows only floating point
 numbers, as associated with a double, float, or integer PV.  Trying to
 type in a non-numerical value will be ignored.  Furthermore, if a PV’s
@@ -279,11 +275,12 @@ a different color.</p>
 </div>
 <div class="section" id="pvbitmap">
 <h3>PVBitmap<a class="headerlink" href="#pvbitmap" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVBitmap">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVBitmap</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>bitmaps={}</em>, <em>defaultBitmap=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVBitmap" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVBitmap</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bitmaps</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">defaultBitmap</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVBitmap" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
-<div>A Static Bitmap where the image is based on PV value.</div></blockquote>
+<div><p>A Static Bitmap where the image is based on PV value.</p>
+</div></blockquote>
 <p>If the bitmaps dictionary is set, it should be set as PV.Value(Bitmap)
 where particular bitmaps will be shown if the PV takes those certain values.</p>
 <p>If you need to do any more complex or dynamic drawing, you may want to look at the OGL PV controls.</p>
@@ -292,29 +289,29 @@ where particular bitmaps will be shown if the PV takes those certain values.</p>
 </div>
 <div class="section" id="pvcheckbox">
 <h3>PVCheckBox<a class="headerlink" href="#pvcheckbox" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVCheckBox">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVCheckBox</code><span class="sig-paren">(</span><em>self</em>, <em>parent</em>, <em>pv=None</em>, <em>on_value=1</em>, <em>off_value=0</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCheckBox" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVCheckBox</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">on_value</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">off_value</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCheckBox" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checkbox based on a binary PV value, both reads/writes the PV on
 changes.  on_value and off_value are the specific values that are
 mapped to the checkbox.</p>
 <p>There are multiple options for translating PV values to checkbox
 settings (from least to most complex):</p>
 <ul class="simple">
-<li>Use a PV with values 0 and 1</li>
-<li>Use a PV with values that convert via Python’s own bool(x)</li>
-<li>Set on_value and off_value in the constructor</li>
-<li>Use SetTranslations() to set a dictionary for converting various
-PV values to booleans.</li>
+<li><p>Use a PV with values 0 and 1</p></li>
+<li><p>Use a PV with values that convert via Python’s own bool(x)</p></li>
+<li><p>Set on_value and off_value in the constructor</p></li>
+<li><p>Use SetTranslations() to set a dictionary for converting various
+PV values to booleans.</p></li>
 </ul>
 </dd></dl>
 
 </div>
 <div class="section" id="pvfloatspin">
 <h3>PVFloatSpin<a class="headerlink" href="#pvfloatspin" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVFloatSpin">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVFloatSpin</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>deadTime=500</em>, <em>min_val=None</em>, <em>max_val=None</em>, <em>increment=1.0</em>, <em>digits=-1</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVFloatSpin" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVFloatSpin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">deadTime</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">min_val</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max_val</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">increment</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">digits</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVFloatSpin" title="Permalink to this definition">¶</a></dt>
 <dd><p>A FloatSpin is a floating point spin control with buttons to increase
 and decrease the value by a particular increment. Arrow keys and page
 up/down can also be used (the latter changes the value by 10x the
@@ -328,11 +325,11 @@ half-typed numeric values being set.)</p>
 </div>
 <div class="section" id="pvbutton">
 <h3>PVButton<a class="headerlink" href="#pvbutton" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt>
-<code class="descname">PVButton(parent, pv=None, pushValue=1, disablePV=None,</code></dt>
+<code class="sig-name descname">PVButton(parent, pv=None, pushValue=1, disablePV=None,</code></dt>
 <dt>
-<code class="descname">disableValue=1, **kw)</code></dt>
+<code class="sig-name descname">disableValue=1, **kw)</code></dt>
 <dd><p>A wx.Button linked to a PV. When the button is pressed, ‘pushValue’ is
 written to the PV (useful for momentary PVs with HIGH= set.)  Setting
 disablePV and disableValue will automatically cause the button to
@@ -342,9 +339,9 @@ disable when that PV has a certain value.</p>
 </div>
 <div class="section" id="pvradiobutton">
 <h3>PVRadioButton<a class="headerlink" href="#pvradiobutton" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVRadioButton">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVRadioButton</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>pvValue=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVRadioButton" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVRadioButton</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pvValue</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVRadioButton" title="Permalink to this definition">¶</a></dt>
 <dd><p>A PVRadioButton is a radio button associated with a particular PV and
 one particular value.</p>
 <p>Suggested for use in a group where all radio buttons are
@@ -354,9 +351,9 @@ PVRadioButtons, and they all have a discrete value set.</p>
 </div>
 <div class="section" id="pvcombobox">
 <h3>PVComboBox<a class="headerlink" href="#pvcombobox" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVComboBox">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVComboBox</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVComboBox" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVComboBox</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVComboBox" title="Permalink to this definition">¶</a></dt>
 <dd><p>A ComboBox linked to a PV. Both reads/writes the combo value on
 changes.</p>
 </dd></dl>
@@ -364,14 +361,13 @@ changes.</p>
 </div>
 <div class="section" id="pvenumcombobox">
 <h3>PVEnumComboBox<a class="headerlink" href="#pvenumcombobox" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVEnumComboBox">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVEnumComboBox</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVEnumComboBox" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>A ComboBox linked to an “enum” type PV (such as bi,bo,mbbi,mbbo.) The ComboBox</dt>
-<dd><p class="first">is automatically populated with a non-editable list of the PV enum values, allowing
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVEnumComboBox</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVEnumComboBox" title="Permalink to this definition">¶</a></dt>
+<dd><dl>
+<dt>A ComboBox linked to an “enum” type PV (such as bi,bo,mbbi,mbbo.) The ComboBox</dt><dd><p>is automatically populated with a non-editable list of the PV enum values, allowing
 the user to select them from the dropdown.</p>
-<p class="last">Both reads/writes the combo value on changes.</p>
+<p>Both reads/writes the combo value on changes.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -379,9 +375,9 @@ the user to select them from the dropdown.</p>
 </div>
 <div class="section" id="pvenumbuttons">
 <h3>PVEnumButtons<a class="headerlink" href="#pvenumbuttons" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVEnumButtons">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVEnumButtons</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVEnumButtons" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVEnumButtons</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">font</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVEnumButtons" title="Permalink to this definition">¶</a></dt>
 <dd><p>This will create a wx.Panel of buttons (a button bar), 1 for each
 enumeration state of an enum PV.  The set of buttons will correspond to
 the current state of the PV</p>
@@ -390,9 +386,9 @@ the current state of the PV</p>
 </div>
 <div class="section" id="pvenumchoice">
 <h3>PVEnumChoice<a class="headerlink" href="#pvenumchoice" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVEnumChoice">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVEnumChoice</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVEnumChoice" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVEnumChoice</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">font</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVEnumChoice" title="Permalink to this definition">¶</a></dt>
 <dd><p>This will create a dropdown list (a wx.Choice) with a list of
 enumeration states for an enum PV.</p>
 </dd></dl>
@@ -400,9 +396,9 @@ enumeration states for an enum PV.</p>
 </div>
 <div class="section" id="pvalarm">
 <h3>PVAlarm<a class="headerlink" href="#pvalarm" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVAlarm">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVAlarm</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>font=None</em>, <em>fg=None</em>, <em>bg=None</em>, <em>trip_point=None</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVAlarm" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVAlarm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">font</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">trip_point</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVAlarm" title="Permalink to this definition">¶</a></dt>
 <dd><p>This will create a pop-up message (wx.MessageDialog) that is shown when
 the corresponding PV trips the alarm level.</p>
 </dd></dl>
@@ -410,9 +406,9 @@ the corresponding PV trips the alarm level.</p>
 </div>
 <div class="section" id="pvcollapsiblepane">
 <h3>PVCollapsiblePane<a class="headerlink" href="#pvcollapsiblepane" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVCollapsiblePane">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVCollapsiblePane</code><span class="sig-paren">(</span><em>parent</em>, <em>pv=None</em>, <em>minor_alarm=&quot;DARKRED&quot;</em>, <em>major_alarm=&quot;RED&quot;</em>, <em>invalid_alarm=&quot;ORANGERED&quot;</em>, <em>**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCollapsiblePane" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVCollapsiblePane</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">minor_alarm</span><span class="o">=</span><span class="default_value">'DARKRED'</span></em>, <em class="sig-param"><span class="n">major_alarm</span><span class="o">=</span><span class="default_value">'RED'</span></em>, <em class="sig-param"><span class="n">invalid_alarm</span><span class="o">=</span><span class="default_value">'ORANGERED'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCollapsiblePane" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is equivalent to wx.CollapsiblePane, except the label shown
 on the pane’s “expansion button” comes from a PV.</p>
 <p>The additional keyword arguments can be any of the other constructor
@@ -431,26 +427,26 @@ the dictionary, it will displayed verbatim as the label.</p>
 </div>
 <div class="section" id="decorators-and-other-utility-functions">
 <h2>Decorators and other Utility Functions<a class="headerlink" href="#decorators-and-other-utility-functions" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="wx.DelayedEpicsCallback">
-<code class="descclassname">wx.</code><code class="descname">DelayedEpicsCallback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.DelayedEpicsCallback" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">wx.</code><code class="sig-name descname">DelayedEpicsCallback</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.DelayedEpicsCallback" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>decorator to wrap an Epics callback in a wx.CallAfter,
 so that the wx and epics ca threads do not clash
 This also checks for dead wxPython objects (say, from a
 closed window), and remove callbacks to them.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="wx.EpicsFunction">
-<code class="descclassname">wx.</code><code class="descname">EpicsFunction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.EpicsFunction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">wx.</code><code class="sig-name descname">EpicsFunction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.EpicsFunction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>decorator to wrap function in a wx.CallAfter() so that
 Epics calls can be made in a separate thread, and asynchronously.</p>
 <p>This decorator should be used for all code that mix calls to wx and epics</p>
-<dl class="function">
+<dl class="py function">
 <dt id="wx.finalize_epics">
-<code class="descclassname">wx.</code><code class="descname">finalize_epics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.finalize_epics" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">wx.</code><code class="sig-name descname">finalize_epics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#wx.finalize_epics" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>This function will finalize epics, and close all Channel Access
@@ -467,7 +463,7 @@ that provides an easy-to-use Motor panel that is similar to the normal MEDM
 window, but with a few niceties from the more sophisticated wx
 toolkit. This widget can be used simply as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">wx</span>
-<span class="kn">from</span> <span class="nn">epics.wx</span> <span class="k">import</span> <span class="n">MotorPanel</span>
+<span class="kn">from</span> <span class="nn">epics.wx</span> <span class="kn">import</span> <span class="n">MotorPanel</span>
 <span class="o">....</span>
 <span class="n">mymotor</span> <span class="o">=</span> <span class="n">MotorPanel</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s1">&#39;XXX:m1&#39;</span><span class="p">)</span>
 </pre></div>
@@ -480,19 +476,19 @@ arrows to tweak the motor, and a drop-down combobox for tweak values, a
 “Stop” button and a “More” button.  The panel has the following features:</p>
 <blockquote>
 <div><ul class="simple">
-<li>All controls are “live” and will respond to changes from other source.</li>
-<li>The values for the tweak values in the ComboBox are automatically
-generated from the precision and travel range of the motor.</li>
-<li>The entry box for the drive value will <em>only</em> accept numeric input,
-and will only set the drive value when hitting Enter or Return.</li>
-<li>The drive value  will change to Red text on a Yellow background when
+<li><p>All controls are “live” and will respond to changes from other source.</p></li>
+<li><p>The values for the tweak values in the ComboBox are automatically
+generated from the precision and travel range of the motor.</p></li>
+<li><p>The entry box for the drive value will <em>only</em> accept numeric input,
+and will only set the drive value when hitting Enter or Return.</p></li>
+<li><p>The drive value  will change to Red text on a Yellow background when
 the value in the box violates the motors (user) limits.  If Enter or
 Return when the the displayed value violates the limit, the motor
 will not be moved, but the displayed value will be changed to the
-closest limit value.</li>
-<li>Pressing the “Stop” button will stop the motor (with the <cite>.SPMG</cite>
+closest limit value.</p></li>
+<li><p>Pressing the “Stop” button will stop the motor (with the <cite>.SPMG</cite>
 field), and set the Info field to “Stopped”.  The button label will
-change to “Go”, and the motor will not move until this button is pressed.</li>
+change to “Go”, and the motor will not move until this button is pressed.</p></li>
 </ul>
 </div></blockquote>
 <p>Finally, the “More” button will bring up a more complete form of Motor
@@ -520,9 +516,9 @@ overlay of shapes which appear/disappear/resize/change colour based on
 the PV values.</p>
 <div class="section" id="pvshapemixin">
 <h3>PVShapeMixin<a class="headerlink" href="#pvshapemixin" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVShapeMixin">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVShapeMixin</code><span class="sig-paren">(</span><em>self</em>, <em>pv=None</em>, <em>pvname=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVShapeMixin" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVShapeMixin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pvname</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVShapeMixin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Similar to PVMixin, this mixin should be added to any
 ogl.Shape subclass that needs PV callback support.</p>
 <p>The main method is PVChanged(self, raw_value), which should be
@@ -545,18 +541,18 @@ as it changes.</p>
 </div>
 <div class="section" id="pvrectangle">
 <h3>PVRectangle<a class="headerlink" href="#pvrectangle" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVRectangle">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVRectangle</code><span class="sig-paren">(</span><em>self</em>, <em>w</em>, <em>h</em>, <em>pv=None</em>, <em>pvname=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVRectangle" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVRectangle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">w</span></em>, <em class="sig-param"><span class="n">h</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pvname</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVRectangle" title="Permalink to this definition">¶</a></dt>
 <dd><p>A PVCtrlMixin for the Rectangle shape class.</p>
 </dd></dl>
 
 </div>
 <div class="section" id="pvcircle">
 <h3>PVCircle<a class="headerlink" href="#pvcircle" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="wx.PVCircle">
-<em class="property">class </em><code class="descclassname">wx.</code><code class="descname">PVCircle</code><span class="sig-paren">(</span><em>self</em>, <em>diameter</em>, <em>pv=None</em>, <em>pvname=None</em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCircle" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">wx.</code><code class="sig-name descname">PVCircle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">diameter</span></em>, <em class="sig-param"><span class="n">pv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pvname</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVCircle" title="Permalink to this definition">¶</a></dt>
 <dd><p>A PVCtrlMixin for the Circle shape class.</p>
 </dd></dl>
 
@@ -565,6 +561,7 @@ as it changes.</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -595,12 +592,13 @@ as it changes.</p>
    <li>|<a href="autosave.html">autosave</a></li>
    <li>|<a href="#">wx</a></li>
    <li>|<a href="advanced.html">advanced</a>]</li>
- 
+
+        <li class="nav-item nav-item-this"><a href="">wx: wxPython Widgets for Epics</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
     </div>
   </body>
 </html>

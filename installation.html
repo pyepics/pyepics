@@ -1,20 +1,19 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Downloading and Installation &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PyEpics Overview" href="overview.html" />
@@ -52,7 +51,8 @@
    <li>|<a href="autosave.html">autosave</a></li>
    <li>|<a href="wx.html">wx</a></li>
    <li>|<a href="advanced.html">advanced</a>]</li>
- 
+
+        <li class="nav-item nav-item-this"><a href="">Downloading and Installation</a></li> 
       </ul>
     </div>
 
@@ -87,17 +87,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
 
@@ -110,15 +108,15 @@
 <h1>Downloading and Installation<a class="headerlink" href="#downloading-and-installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>PyEpics works with Python version 2.7, 3.5, 3.6, and 3.7.  It is supported
-and regularly used and tested on 64-bit Linux, 64-bit Mac OSX, and 64-bit
-Windows.  It is known to work on Linux with ARM processors including
-raspberry Pi, though this is not part of the automated testing set.
-Pyepics may still work on 32-bit Windows and Linux, but these systems are
-not tested regularly. It may also work with older versions of Python (such
-as 3.4), but these are no longer tested or supported. For Windows, pyepics
-has been reported to work with IronPython (that is, Python written in the
-.NET framework), but this is not routinely tested.</p>
+<p>PyEpics currently works with Python version 2.7, 3.5, 3.6, 3.7, and 3.8.
+We expect it to work with Python 3.9 as well.  Pyepics version 3.4.3 is the
+final version to work with Python 2.7 or Python 3.5, and version 3.5.0 and
+later will require Python 3.6 or later.</p>
+<p>Pyepics is supported and regularly used and tested on 64-bit Linux, 64-bit
+Mac OSX, and 64-bit Windows.  It is known to work on Linux with ARM
+processors including raspberry Pi, though this is not part of the automated
+testing set.  Pyepics may still work on 32-bit Windows and Linux, but these
+systems are not tested regularly.</p>
 <p>The EPICS Channel Access library Version 3.14.12 or higher is required for
 pyepics and 3.15 or higher are strongly recommended.  More specifically,
 pyepics requires e shared libraries libca and libCom (<em>libca.so</em> and
@@ -142,9 +140,10 @@ requires <cite>PyQt</cite> or <cite>PySide</cite>.</p>
 </div>
 <div class="section" id="downloads-and-installation">
 <h2>Downloads and Installation<a class="headerlink" href="#downloads-and-installation" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the pyepics package is 3.4.0.  Source code
-kits and Windows installers can be found at <a class="reference external" href="https://pypi.python.org/pypi/pyepics/">pyepics PyPI</a>, and can be
-installed with:</p>
+<p>The latest stable version of the pyepics package is 3.4.3.  This is the
+final release that will support Python versions 3.5 and below (including
+Python 2).  Source code kits and Windows installers can be found at
+<a class="reference external" href="https://pypi.python.org/pypi/pyepics/">pyepics PyPI</a>, and can be installed with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyepics</span>
 </pre></div>
 </div>
@@ -181,9 +180,8 @@ shared libraries varies with system, but you may need to set other
 environmental variables such as <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> or <code class="docutils literal notranslate"><span class="pre">DYLIB_LIBRARY_PATH</span></code>
 or use <cite>ldconfig</cite>.  If you’re having trouble with any of these things,
 ask your local Epics gurus or contact the authors.</p>
-<dl class="docutils">
-<dt>To find out which CA library will be used by pyepics, use:</dt>
-<dd><div class="first last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<dl>
+<dt>To find out which CA library will be used by pyepics, use:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">find_libca</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -222,19 +220,19 @@ repository</a>.  To get a copy of the latest version do:</p>
 following methods:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>Send email to the Epics Tech Talk mailing list.  You can send mail
+<li><p>Send email to the Epics Tech Talk mailing list.  You can send mail
 directly to Matt Newville &lt;<a class="reference external" href="mailto:newville&#37;&#52;&#48;cars&#46;uchicago&#46;ed">newville<span>&#64;</span>cars<span>&#46;</span>uchicago<span>&#46;</span>ed</a>&gt;, but the mailing
 list has many Epics experts reading it, so someone else interested or
 knowledgeable about the topic might provide an answer. Since the
 mailing list is archived and the main mailing list for Epics work, a
 question to the mailing list has a better chance of helping someone
-else.</li>
-<li>Create an Issue on <a class="reference external" href="http://github.com/pyepics/pyepics">http://github.com/pyepics/pyepics</a>.  Though the
+else.</p></li>
+<li><p>Create an Issue on <a class="reference external" href="http://github.com/pyepics/pyepics">http://github.com/pyepics/pyepics</a>.  Though the
 github Issues seem to be intended for bug tracking, they are a fine
-way to catalog various kinds of questions and feature requests.</li>
-<li>If you are sure you have found a bug in existing code, or have
+way to catalog various kinds of questions and feature requests.</p></li>
+<li><p>If you are sure you have found a bug in existing code, or have
 some code you think would be useful to add to pyepics, consider
-making a Pull Request on <a class="reference external" href="http://github.com/pyepics/pyepics">http://github.com/pyepics/pyepics</a>.</li>
+making a Pull Request on <a class="reference external" href="http://github.com/pyepics/pyepics">http://github.com/pyepics/pyepics</a>.</p></li>
 </ol>
 </div></blockquote>
 </div>
@@ -244,8 +242,9 @@ making a Pull Request on <a class="reference external" href="http://github.com/p
 associated with it are distributed under the Epics Open License:</p>
 <p>The epics python module was orignally written by</p>
 <blockquote>
-<div>Matthew Newville &lt;<a class="reference external" href="mailto:newville&#37;&#52;&#48;cars&#46;uchicago&#46;edu">newville<span>&#64;</span>cars<span>&#46;</span>uchicago<span>&#46;</span>edu</a>&gt;
-CARS, University of Chicago</div></blockquote>
+<div><p>Matthew Newville &lt;<a class="reference external" href="mailto:newville&#37;&#52;&#48;cars&#46;uchicago&#46;edu">newville<span>&#64;</span>cars<span>&#46;</span>uchicago<span>&#46;</span>edu</a>&gt;
+CARS, University of Chicago</p>
+</div></blockquote>
 <p>There have been several contributions from many others, notably Angus
 Gratton &lt;<a class="reference external" href="mailto:angus&#46;gratton&#37;&#52;&#48;anu&#46;edu&#46;au">angus<span>&#46;</span>gratton<span>&#64;</span>anu<span>&#46;</span>edu<span>&#46;</span>au</a>&gt;.  See the Acknowledgements section of
 the documentation for a list of more contributors.</p>
@@ -337,6 +336,7 @@ Vigder, Steve Wasserman, and Glen Wright.</p>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -367,12 +367,13 @@ Vigder, Steve Wasserman, and Glen Wright.</p>
    <li>|<a href="autosave.html">autosave</a></li>
    <li>|<a href="wx.html">wx</a></li>
    <li>|<a href="advanced.html">advanced</a>]</li>
- 
+
+        <li class="nav-item nav-item-this"><a href="">Downloading and Installation</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
     </div>
   </body>
 </html>

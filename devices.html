@@ -1,20 +1,19 @@
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Devices: collections of PVs &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Alarms: respond when a PV goes out of range" href="alarm.html" />
@@ -52,7 +51,8 @@
    <li>|<a href="autosave.html">autosave</a></li>
    <li>|<a href="wx.html">wx</a></li>
    <li>|<a href="advanced.html">advanced</a>]</li>
- 
+
+        <li class="nav-item nav-item-this"><a href="">Devices: collections of PVs</a></li> 
       </ul>
     </div>
 
@@ -63,8 +63,8 @@
 <li><a class="reference internal" href="#">Devices: collections of PVs</a><ul>
 <li><a class="reference internal" href="#module-device">Overview</a></li>
 <li><a class="reference internal" href="#module-motor">Epics Motor Device</a><ul>
-<li><a class="reference internal" href="#the-epics-motor-class">The <code class="docutils literal notranslate"><span class="pre">epics.Motor</span></code> class</a></li>
-<li><a class="reference internal" href="#methods-for-epics-motor">methods for <code class="docutils literal notranslate"><span class="pre">epics.Motor</span></code></a></li>
+<li><a class="reference internal" href="#the-epics-motor-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code> class</a></li>
+<li><a class="reference internal" href="#methods-for-epics-motor">methods for <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#other-device-examples">Other Device Examples</a><ul>
@@ -92,17 +92,15 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
 
@@ -135,9 +133,9 @@ Epics Record as it can actually hold PVs from several different records.:</p>
 <p>While useful on its own like this, the real point of a <em>device</em> is as a
 base class, to be inherited and extended.  In fact, there is a more
 sophisticated   Motor device described below at <a class="reference internal" href="#device-motor-label"><span class="std std-ref">Epics Motor Device</span></a></p>
-<dl class="class">
+<dl class="py class">
 <dt id="device.Device">
-<em class="property">class </em><code class="descclassname">device.</code><code class="descname">Device</code><span class="sig-paren">(</span><em>prefix=None</em><span class="optional">[</span>, <em>delim=''</em><span class="optional">[</span>, <em>attrs=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.Device" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">device.</code><code class="sig-name descname">Device</code><span class="sig-paren">(</span><em class="sig-param">prefix=None</em><span class="optional">[</span>, <em class="sig-param">delim=''</em><span class="optional">[</span>, <em class="sig-param">attrs=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.Device" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>The attribute PVs are built as needed and held in an internal buffer
@@ -150,37 +148,37 @@ used as an arbitrary container of PVs, or to turn any subclass into an
 epics Device.</p>
 <p>In general, PV names will be mapped as prefix+delim+attr.  See
 <a class="reference internal" href="#device.add_pv" title="device.add_pv"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_pv()</span></code></a> for details of how to override this.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="device.PV">
-<code class="descclassname">device.</code><code class="descname">PV</code><span class="sig-paren">(</span><em>attr[, connect=True[, **kw]]]</em><span class="sig-paren">)</span><a class="headerlink" href="#device.PV" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">device.</code><code class="sig-name descname">PV</code><span class="sig-paren">(</span><em class="sig-param">attr[, connect=True[, **kw]]]</em><span class="sig-paren">)</span><a class="headerlink" href="#device.PV" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the <cite>PV</cite> object for a device attribute.  The connect argument
 and any other keyword arguments are passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.PV()</span></code>.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="device.put">
-<code class="descclassname">device.</code><code class="descname">put</code><span class="sig-paren">(</span><em>attr</em>, <em>value</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=10.0</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.put" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">device.</code><code class="sig-name descname">put</code><span class="sig-paren">(</span><em class="sig-param">attr</em>, <em class="sig-param">value</em><span class="optional">[</span>, <em class="sig-param">wait=False</em><span class="optional">[</span>, <em class="sig-param">timeout=10.0</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>put an attribute value, optionally wait for completion or up to a
 supplied timeout value</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="device.get">
-<code class="descclassname">device.</code><code class="descname">get</code><span class="sig-paren">(</span><em>attr</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">device.</code><code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">attr</em><span class="optional">[</span>, <em class="sig-param">as_string=False</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>get an attribute value, option as_string returns a string
 representation</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="device.add_callback">
-<code class="descclassname">device.</code><code class="descname">add_callback</code><span class="sig-paren">(</span><em>attr</em>, <em>callback</em><span class="sig-paren">)</span><a class="headerlink" href="#device.add_callback" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">device.</code><code class="sig-name descname">add_callback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attr</span></em>, <em class="sig-param"><span class="n">callback</span></em><span class="sig-paren">)</span><a class="headerlink" href="#device.add_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>add a callback function to an attribute PV, so that the callback
 function will be run when the at tribute’s value changes</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="device.add_pv">
-<code class="descclassname">device.</code><code class="descname">add_pv</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>attr=None</em><span class="optional">[</span>, <em>**kw</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.add_pv" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">device.</code><code class="sig-name descname">add_pv</code><span class="sig-paren">(</span><em class="sig-param">pvname</em><span class="optional">[</span>, <em class="sig-param">attr=None</em><span class="optional">[</span>, <em class="sig-param">**kw</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.add_pv" title="Permalink to this definition">¶</a></dt>
 <dd><p>adds an explicitly names <code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.PV()</span></code> to the device even though it
 may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 <cite>epics.PV(prefix+delim+attr)</cite>.   That is, one can say:</p>
@@ -193,34 +191,34 @@ may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="device.save_state">
-<code class="descclassname">device.</code><code class="descname">save_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#device.save_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>return a dictionary of all current values – the ‘’current state’‘.</p>
+<code class="sig-prename descclassname">device.</code><code class="sig-name descname">save_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#device.save_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a dictionary of all current values – the ‘’current state’’.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="device.restore_state">
-<code class="descclassname">device.</code><code class="descname">restore_state</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="headerlink" href="#device.restore_state" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">device.</code><code class="sig-name descname">restore_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#device.restore_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>restores a saved state, as saved with <a class="reference internal" href="#device.save_state" title="device.save_state"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_state()</span></code></a></p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="device.write_state">
-<code class="descclassname">device.</code><code class="descname">write_state</code><span class="sig-paren">(</span><em>fname</em><span class="optional">[</span>, <em>state=None</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.write_state" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">device.</code><code class="sig-name descname">write_state</code><span class="sig-paren">(</span><em class="sig-param">fname</em><span class="optional">[</span>, <em class="sig-param">state=None</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.write_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>write a saved state to a file.   If no state is provide, the current state is written.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="device.read_state">
-<code class="descclassname">device.</code><code class="descname">read_state</code><span class="sig-paren">(</span><em>fname</em><span class="optional">[</span>, <em>restore=False</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.read_state" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">device.</code><code class="sig-name descname">read_state</code><span class="sig-paren">(</span><em class="sig-param">fname</em><span class="optional">[</span>, <em class="sig-param">restore=False</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.read_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>reads a state from a file, as written with <a class="reference internal" href="#device.write_state" title="device.write_state"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_state()</span></code></a>, and returns it.
 If ‘’restore’’ is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the read state will be restored.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="device._pvs">
-<code class="descclassname">device.</code><code class="descname">_pvs</code><a class="headerlink" href="#device._pvs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">device.</code><code class="sig-name descname">_pvs</code><a class="headerlink" href="#device._pvs" title="Permalink to this definition">¶</a></dt>
 <dd><p>a dictionary of PVs making up the device.</p>
 </dd></dl>
 
@@ -264,26 +262,22 @@ coordinate system, and can wait for completion.</p>
 </div></blockquote>
 <div class="section" id="the-epics-motor-class">
 <h3>The <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code> class<a class="headerlink" href="#the-epics-motor-class" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="motor.Motor">
-<em class="property">class </em><code class="descclassname">motor.</code><code class="descname">Motor</code><span class="sig-paren">(</span><em>pvname</em><span class="optional">[</span>, <em>timeout=30.</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.Motor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">motor.</code><code class="sig-name descname">Motor</code><span class="sig-paren">(</span><em class="sig-param">pvname</em><span class="optional">[</span>, <em class="sig-param">timeout=30.</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.Motor" title="Permalink to this definition">¶</a></dt>
 <dd><p>create a Motor object for a named Epics Process Variable.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pvname</strong> (<em>string</em>) – prefix name (no ‘.VAL’ needed!) of Epics Process Variable  for a Motor</li>
-<li><strong>timeout</strong> (<em>float</em>) – time (in seconds) to wait before giving up trying to connect.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pvname</strong> (<em>string</em>) – prefix name (no ‘.VAL’ needed!) of Epics Process Variable  for a Motor</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – time (in seconds) to wait before giving up trying to connect.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <p>Once created, a Motor should be ready to use.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">Motor</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">Motor</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s1">&#39;XX:m1&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">m</span><span class="o">.</span><span class="n">drive</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">slew_speed</span>
 <span class="go">1.030 Fine X 5.0</span>
@@ -297,310 +291,307 @@ be retrieved either with an attribute or with the <a class="reference internal" 
 A full list of Motor attributes and their aliases for the motor
 record is given in <a class="reference internal" href="#motorattr-table"><span class="std std-ref">Table of Motor Attributes</span></a>.</p>
 <blockquote id="motorattr-table">
-<div>Table of Aliases for attributes for the epics <a class="reference internal" href="#motor.Motor" title="motor.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Motor</span></code></a> class, and the
-corresponding attribute name of the Motor Record field.</div></blockquote>
-<table border="1" class="docutils">
+<div><p>Table of Aliases for attributes for the epics <a class="reference internal" href="#motor.Motor" title="motor.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Motor</span></code></a> class, and the
+corresponding attribute name of the Motor Record field.</p>
+</div></blockquote>
+<table class="docutils align-default">
 <colgroup>
-<col width="21%" />
-<col width="27%" />
-<col width="3%" />
-<col width="21%" />
-<col width="27%" />
+<col style="width: 21%" />
+<col style="width: 27%" />
+<col style="width: 3%" />
+<col style="width: 21%" />
+<col style="width: 27%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head"><strong>alias</strong></th>
-<th class="head"><em>Motor Record field</em></th>
-<th class="head">&#160;</th>
-<th class="head"><strong>alias</strong></th>
-<th class="head"><em>Motor Record field</em></th>
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>alias</strong></p></th>
+<th class="head"><p><em>Motor Record field</em></p></th>
+<th class="head"></th>
+<th class="head"><p><strong>alias</strong></p></th>
+<th class="head"><p><em>Motor Record field</em></p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>disabled</td>
-<td>_able.VAL</td>
-<td>&#160;</td>
-<td>moving</td>
-<td>MOVN</td>
+<tbody>
+<tr class="row-even"><td><p>disabled</p></td>
+<td><p>_able.VAL</p></td>
+<td></td>
+<td><p>moving</p></td>
+<td><p>MOVN</p></td>
 </tr>
-<tr class="row-odd"><td>acceleration</td>
-<td>ACCL</td>
-<td>&#160;</td>
-<td>resolution</td>
-<td>MRES</td>
+<tr class="row-odd"><td><p>acceleration</p></td>
+<td><p>ACCL</p></td>
+<td></td>
+<td><p>resolution</p></td>
+<td><p>MRES</p></td>
 </tr>
-<tr class="row-even"><td>back_accel</td>
-<td>BACC</td>
-<td>&#160;</td>
-<td>motor_status</td>
-<td>MSTA</td>
+<tr class="row-even"><td><p>back_accel</p></td>
+<td><p>BACC</p></td>
+<td></td>
+<td><p>motor_status</p></td>
+<td><p>MSTA</p></td>
 </tr>
-<tr class="row-odd"><td>backlash</td>
-<td>BDST</td>
-<td>&#160;</td>
-<td>offset</td>
-<td>OFF</td>
+<tr class="row-odd"><td><p>backlash</p></td>
+<td><p>BDST</p></td>
+<td></td>
+<td><p>offset</p></td>
+<td><p>OFF</p></td>
 </tr>
-<tr class="row-even"><td>back_speed</td>
-<td>BVEL</td>
-<td>&#160;</td>
-<td>output_mode</td>
-<td>OMSL</td>
+<tr class="row-even"><td><p>back_speed</p></td>
+<td><p>BVEL</p></td>
+<td></td>
+<td><p>output_mode</p></td>
+<td><p>OMSL</p></td>
 </tr>
-<tr class="row-odd"><td>card</td>
-<td>CARD</td>
-<td>&#160;</td>
-<td>output</td>
-<td>OUT</td>
+<tr class="row-odd"><td><p>card</p></td>
+<td><p>CARD</p></td>
+<td></td>
+<td><p>output</p></td>
+<td><p>OUT</p></td>
 </tr>
-<tr class="row-even"><td>dial_high_limit</td>
-<td>DHLM</td>
-<td>&#160;</td>
-<td>prop_gain</td>
-<td>PCOF</td>
+<tr class="row-even"><td><p>dial_high_limit</p></td>
+<td><p>DHLM</p></td>
+<td></td>
+<td><p>prop_gain</p></td>
+<td><p>PCOF</p></td>
 </tr>
-<tr class="row-odd"><td>direction</td>
-<td>DIR</td>
-<td>&#160;</td>
-<td>precision</td>
-<td>PREC</td>
+<tr class="row-odd"><td><p>direction</p></td>
+<td><p>DIR</p></td>
+<td></td>
+<td><p>precision</p></td>
+<td><p>PREC</p></td>
 </tr>
-<tr class="row-even"><td>dial_low_limit</td>
-<td>DLLM</td>
-<td>&#160;</td>
-<td>readback</td>
-<td>RBV</td>
+<tr class="row-even"><td><p>dial_low_limit</p></td>
+<td><p>DLLM</p></td>
+<td></td>
+<td><p>readback</p></td>
+<td><p>RBV</p></td>
 </tr>
-<tr class="row-odd"><td>settle_time</td>
-<td>DLY</td>
-<td>&#160;</td>
-<td>retry_max</td>
-<td>RTRY</td>
+<tr class="row-odd"><td><p>settle_time</p></td>
+<td><p>DLY</p></td>
+<td></td>
+<td><p>retry_max</p></td>
+<td><p>RTRY</p></td>
 </tr>
-<tr class="row-even"><td>done_moving</td>
-<td>DMOV</td>
-<td>&#160;</td>
-<td>retry_count</td>
-<td>RCNT</td>
+<tr class="row-even"><td><p>done_moving</p></td>
+<td><p>DMOV</p></td>
+<td></td>
+<td><p>retry_count</p></td>
+<td><p>RCNT</p></td>
 </tr>
-<tr class="row-odd"><td>dial_readback</td>
-<td>DRBV</td>
-<td>&#160;</td>
-<td>retry_deadband</td>
-<td>RDBD</td>
+<tr class="row-odd"><td><p>dial_readback</p></td>
+<td><p>DRBV</p></td>
+<td></td>
+<td><p>retry_deadband</p></td>
+<td><p>RDBD</p></td>
 </tr>
-<tr class="row-even"><td>description</td>
-<td>DESC</td>
-<td>&#160;</td>
-<td>dial_difference</td>
-<td>RDIF</td>
+<tr class="row-even"><td><p>description</p></td>
+<td><p>DESC</p></td>
+<td></td>
+<td><p>dial_difference</p></td>
+<td><p>RDIF</p></td>
 </tr>
-<tr class="row-odd"><td>dial_drive</td>
-<td>DVAL</td>
-<td>&#160;</td>
-<td>raw_encoder_pos</td>
-<td>REP</td>
+<tr class="row-odd"><td><p>dial_drive</p></td>
+<td><p>DVAL</p></td>
+<td></td>
+<td><p>raw_encoder_pos</p></td>
+<td><p>REP</p></td>
 </tr>
-<tr class="row-even"><td>units</td>
-<td>EGU</td>
-<td>&#160;</td>
-<td>raw_high_limit</td>
-<td>RHLS</td>
+<tr class="row-even"><td><p>units</p></td>
+<td><p>EGU</p></td>
+<td></td>
+<td><p>raw_high_limit</p></td>
+<td><p>RHLS</p></td>
 </tr>
-<tr class="row-odd"><td>encoder_step</td>
-<td>ERES</td>
-<td>&#160;</td>
-<td>raw_low_limit</td>
-<td>RLLS</td>
+<tr class="row-odd"><td><p>encoder_step</p></td>
+<td><p>ERES</p></td>
+<td></td>
+<td><p>raw_low_limit</p></td>
+<td><p>RLLS</p></td>
 </tr>
-<tr class="row-even"><td>freeze_offset</td>
-<td>FOFF</td>
-<td>&#160;</td>
-<td>relative_value</td>
-<td>RLV</td>
+<tr class="row-even"><td><p>freeze_offset</p></td>
+<td><p>FOFF</p></td>
+<td></td>
+<td><p>relative_value</p></td>
+<td><p>RLV</p></td>
 </tr>
-<tr class="row-odd"><td>move_fraction</td>
-<td>FRAC</td>
-<td>&#160;</td>
-<td>raw_motor_pos</td>
-<td>RMP</td>
+<tr class="row-odd"><td><p>move_fraction</p></td>
+<td><p>FRAC</p></td>
+<td></td>
+<td><p>raw_motor_pos</p></td>
+<td><p>RMP</p></td>
 </tr>
-<tr class="row-even"><td>hi_severity</td>
-<td>HHSV</td>
-<td>&#160;</td>
-<td>raw_readback</td>
-<td>RRBV</td>
+<tr class="row-even"><td><p>hi_severity</p></td>
+<td><p>HHSV</p></td>
+<td></td>
+<td><p>raw_readback</p></td>
+<td><p>RRBV</p></td>
 </tr>
-<tr class="row-odd"><td>hi_alarm</td>
-<td>HIGH</td>
-<td>&#160;</td>
-<td>readback_res</td>
-<td>RRES</td>
+<tr class="row-odd"><td><p>hi_alarm</p></td>
+<td><p>HIGH</p></td>
+<td></td>
+<td><p>readback_res</p></td>
+<td><p>RRES</p></td>
 </tr>
-<tr class="row-even"><td>hihi_alarm</td>
-<td>HIHI</td>
-<td>&#160;</td>
-<td>raw_drive</td>
-<td>RVAL</td>
+<tr class="row-even"><td><p>hihi_alarm</p></td>
+<td><p>HIHI</p></td>
+<td></td>
+<td><p>raw_drive</p></td>
+<td><p>RVAL</p></td>
 </tr>
-<tr class="row-odd"><td>high_limit</td>
-<td>HLM</td>
-<td>&#160;</td>
-<td>dial_speed</td>
-<td>RVEL</td>
+<tr class="row-odd"><td><p>high_limit</p></td>
+<td><p>HLM</p></td>
+<td></td>
+<td><p>dial_speed</p></td>
+<td><p>RVEL</p></td>
 </tr>
-<tr class="row-even"><td>high_limit_set</td>
-<td>HLS</td>
-<td>&#160;</td>
-<td>s_speed</td>
-<td>S</td>
+<tr class="row-even"><td><p>high_limit_set</p></td>
+<td><p>HLS</p></td>
+<td></td>
+<td><p>s_speed</p></td>
+<td><p>S</p></td>
 </tr>
-<tr class="row-odd"><td>hw_limit</td>
-<td>HLSV</td>
-<td>&#160;</td>
-<td>s_back_speed</td>
-<td>SBAK</td>
+<tr class="row-odd"><td><p>hw_limit</p></td>
+<td><p>HLSV</p></td>
+<td></td>
+<td><p>s_back_speed</p></td>
+<td><p>SBAK</p></td>
 </tr>
-<tr class="row-even"><td>home_forward</td>
-<td>HOMF</td>
-<td>&#160;</td>
-<td>s_base_speed</td>
-<td>SBAS</td>
+<tr class="row-even"><td><p>home_forward</p></td>
+<td><p>HOMF</p></td>
+<td></td>
+<td><p>s_base_speed</p></td>
+<td><p>SBAS</p></td>
 </tr>
-<tr class="row-odd"><td>home_reverse</td>
-<td>HOMR</td>
-<td>&#160;</td>
-<td>s_max_speed</td>
-<td>SMAX</td>
+<tr class="row-odd"><td><p>home_reverse</p></td>
+<td><p>HOMR</p></td>
+<td></td>
+<td><p>s_max_speed</p></td>
+<td><p>SMAX</p></td>
 </tr>
-<tr class="row-even"><td>high_op_range</td>
-<td>HOPR</td>
-<td>&#160;</td>
-<td>set</td>
-<td>SET</td>
+<tr class="row-even"><td><p>high_op_range</p></td>
+<td><p>HOPR</p></td>
+<td></td>
+<td><p>set</p></td>
+<td><p>SET</p></td>
 </tr>
-<tr class="row-odd"><td>high_severity</td>
-<td>HSV</td>
-<td>&#160;</td>
-<td>stop_go</td>
-<td>SPMG</td>
+<tr class="row-odd"><td><p>high_severity</p></td>
+<td><p>HSV</p></td>
+<td></td>
+<td><p>stop_go</p></td>
+<td><p>SPMG</p></td>
 </tr>
-<tr class="row-even"><td>integral_gain</td>
-<td>ICOF</td>
-<td>&#160;</td>
-<td>s_revolutions</td>
-<td>SREV</td>
+<tr class="row-even"><td><p>integral_gain</p></td>
+<td><p>ICOF</p></td>
+<td></td>
+<td><p>s_revolutions</p></td>
+<td><p>SREV</p></td>
 </tr>
-<tr class="row-odd"><td>jog_accel</td>
-<td>JAR</td>
-<td>&#160;</td>
-<td>stop</td>
-<td>STOP</td>
+<tr class="row-odd"><td><p>jog_accel</p></td>
+<td><p>JAR</p></td>
+<td></td>
+<td><p>stop</p></td>
+<td><p>STOP</p></td>
 </tr>
-<tr class="row-even"><td>jog_forward</td>
-<td>JOGF</td>
-<td>&#160;</td>
-<td>t_direction</td>
-<td>TDIR</td>
+<tr class="row-even"><td><p>jog_forward</p></td>
+<td><p>JOGF</p></td>
+<td></td>
+<td><p>t_direction</p></td>
+<td><p>TDIR</p></td>
 </tr>
-<tr class="row-odd"><td>jog_reverse</td>
-<td>JOGR</td>
-<td>&#160;</td>
-<td>tweak_forward</td>
-<td>TWF</td>
+<tr class="row-odd"><td><p>jog_reverse</p></td>
+<td><p>JOGR</p></td>
+<td></td>
+<td><p>tweak_forward</p></td>
+<td><p>TWF</p></td>
 </tr>
-<tr class="row-even"><td>jog_speed</td>
-<td>JVEL</td>
-<td>&#160;</td>
-<td>tweak_reverse</td>
-<td>TWR</td>
+<tr class="row-even"><td><p>jog_speed</p></td>
+<td><p>JVEL</p></td>
+<td></td>
+<td><p>tweak_reverse</p></td>
+<td><p>TWR</p></td>
 </tr>
-<tr class="row-odd"><td>last_dial_val</td>
-<td>LDVL</td>
-<td>&#160;</td>
-<td>tweak_val</td>
-<td>TWV</td>
+<tr class="row-odd"><td><p>last_dial_val</p></td>
+<td><p>LDVL</p></td>
+<td></td>
+<td><p>tweak_val</p></td>
+<td><p>TWV</p></td>
 </tr>
-<tr class="row-even"><td>low_limit</td>
-<td>LLM</td>
-<td>&#160;</td>
-<td>use_encoder</td>
-<td>UEIP</td>
+<tr class="row-even"><td><p>low_limit</p></td>
+<td><p>LLM</p></td>
+<td></td>
+<td><p>use_encoder</p></td>
+<td><p>UEIP</p></td>
 </tr>
-<tr class="row-odd"><td>low_limit_set</td>
-<td>LLS</td>
-<td>&#160;</td>
-<td>u_revolutions</td>
-<td>UREV</td>
+<tr class="row-odd"><td><p>low_limit_set</p></td>
+<td><p>LLS</p></td>
+<td></td>
+<td><p>u_revolutions</p></td>
+<td><p>UREV</p></td>
 </tr>
-<tr class="row-even"><td>lo_severity</td>
-<td>LLSV</td>
-<td>&#160;</td>
-<td>use_rdbl</td>
-<td>URIP</td>
+<tr class="row-even"><td><p>lo_severity</p></td>
+<td><p>LLSV</p></td>
+<td></td>
+<td><p>use_rdbl</p></td>
+<td><p>URIP</p></td>
 </tr>
-<tr class="row-odd"><td>lolo_alarm</td>
-<td>LOLO</td>
-<td>&#160;</td>
-<td>drive</td>
-<td>VAL</td>
+<tr class="row-odd"><td><p>lolo_alarm</p></td>
+<td><p>LOLO</p></td>
+<td></td>
+<td><p>drive</p></td>
+<td><p>VAL</p></td>
 </tr>
-<tr class="row-even"><td>low_op_range</td>
-<td>LOPR</td>
-<td>&#160;</td>
-<td>base_speed</td>
-<td>VBAS</td>
+<tr class="row-even"><td><p>low_op_range</p></td>
+<td><p>LOPR</p></td>
+<td></td>
+<td><p>base_speed</p></td>
+<td><p>VBAS</p></td>
 </tr>
-<tr class="row-odd"><td>low_alarm</td>
-<td>LOW</td>
-<td>&#160;</td>
-<td>slew_speed</td>
-<td>VELO</td>
+<tr class="row-odd"><td><p>low_alarm</p></td>
+<td><p>LOW</p></td>
+<td></td>
+<td><p>slew_speed</p></td>
+<td><p>VELO</p></td>
 </tr>
-<tr class="row-even"><td>last_rel_val</td>
-<td>LRLV</td>
-<td>&#160;</td>
-<td>version</td>
-<td>VERS</td>
+<tr class="row-even"><td><p>last_rel_val</p></td>
+<td><p>LRLV</p></td>
+<td></td>
+<td><p>version</p></td>
+<td><p>VERS</p></td>
 </tr>
-<tr class="row-odd"><td>last_dial_drive</td>
-<td>LRVL</td>
-<td>&#160;</td>
-<td>max_speed</td>
-<td>VMAX</td>
+<tr class="row-odd"><td><p>last_dial_drive</p></td>
+<td><p>LRVL</p></td>
+<td></td>
+<td><p>max_speed</p></td>
+<td><p>VMAX</p></td>
 </tr>
-<tr class="row-even"><td>last_SPMG</td>
-<td>LSPG</td>
-<td>&#160;</td>
-<td>use_home</td>
-<td>ATHM</td>
+<tr class="row-even"><td><p>last_SPMG</p></td>
+<td><p>LSPG</p></td>
+<td></td>
+<td><p>use_home</p></td>
+<td><p>ATHM</p></td>
 </tr>
-<tr class="row-odd"><td>low_severity</td>
-<td>LSV</td>
-<td>&#160;</td>
-<td>deriv_gain</td>
-<td>DCOF</td>
+<tr class="row-odd"><td><p>low_severity</p></td>
+<td><p>LSV</p></td>
+<td></td>
+<td><p>deriv_gain</p></td>
+<td><p>DCOF</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="methods-for-epics-motor">
 <h3>methods for <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code><a class="headerlink" href="#methods-for-epics-motor" title="Permalink to this headline">¶</a></h3>
-<dl class="method">
+<dl class="py method">
 <dt id="motor.get">
-<code class="descclassname">motor.</code><code class="descname">get</code><span class="sig-paren">(</span><em>attr</em><span class="optional">[</span>, <em>as_string=False</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.get" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">motor.</code><code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">attr</em><span class="optional">[</span>, <em class="sig-param">as_string=False</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets a field attribute for the motor.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>attr</strong> (<em>string</em><em> (</em><em>from table above</em><em>)</em>) – attribute name</li>
-<li><strong>as_string</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/ <code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to return string value.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>attr</strong> (<em>string</em><em> (</em><em>from table above</em><em>)</em>) – attribute name</p></li>
+<li><p><strong>as_string</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/ <code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to return string value.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <p>Note that <a class="reference internal" href="#motor.get" title="motor.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a> can return the string value, while fetching the
@@ -612,80 +603,68 @@ attribute cannot do so:</p>
 <span class="go">&#39;asynMotor&#39;</span>
 </pre></div>
 </div>
-<dl class="method">
+<dl class="py method">
 <dt id="motor.put">
-<code class="descclassname">motor.</code><code class="descname">put</code><span class="sig-paren">(</span><em>attr</em>, <em>value</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=30</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.put" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">motor.</code><code class="sig-name descname">put</code><span class="sig-paren">(</span><em class="sig-param">attr</em>, <em class="sig-param">value</em><span class="optional">[</span>, <em class="sig-param">wait=False</em><span class="optional">[</span>, <em class="sig-param">timeout=30</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets a field attribute for the motor.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>attr</strong> (<em>string</em><em> (</em><em>from table above</em><em>)</em>) – attribute name</li>
-<li><strong>value</strong> – value for attribute</li>
-<li><strong>wait</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to wait for completion.</li>
-<li><strong>timeout</strong> (<em>float</em>) – time (in seconds) to wait before giving up trying to connect.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>attr</strong> (<em>string</em><em> (</em><em>from table above</em><em>)</em>) – attribute name</p></li>
+<li><p><strong>value</strong> – value for attribute</p></li>
+<li><p><strong>wait</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to wait for completion.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – time (in seconds) to wait before giving up trying to connect.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="motor.check_limits">
-<code class="descclassname">motor.</code><code class="descname">check_limits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.check_limits" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">motor.</code><code class="sig-name descname">check_limits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.check_limits" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks whether the current motor position is causing a motor limit
 violation, and raises a MotorLimitException if it is.</p>
 <p>returns <code class="docutils literal notranslate"><span class="pre">None</span></code> if there is no limit violation.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="motor.within_limits">
-<code class="descclassname">motor.</code><code class="descname">within_limits</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>limits='user'</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.within_limits" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">motor.</code><code class="sig-name descname">within_limits</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="optional">[</span>, <em class="sig-param">limits='user'</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.within_limits" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks whether a target value <strong>would be</strong> a limit violation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>value</strong> – target value</li>
-<li><strong>limits</strong> (<em>string</em>) – one of ‘user’, ‘dial’, or ‘raw’ for which limits to consider</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – target value</p></li>
+<li><p><strong>limits</strong> (<em>string</em>) – one of ‘user’, ‘dial’, or ‘raw’ for which limits to consider</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="motor.move">
-<code class="descclassname">motor.</code><code class="descname">move</code><span class="sig-paren">(</span><em>val=None</em><span class="optional">[</span>, <em>relative=None</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=300.0</em><span class="optional">[</span>, <em>dial=False</em><span class="optional">[</span>, <em>raw=False</em><span class="optional">[</span>, <em>ignore_limits=False</em><span class="optional">[</span>, <em>confirm_move=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.move" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">motor.</code><code class="sig-name descname">move</code><span class="sig-paren">(</span><em class="sig-param">val=None</em><span class="optional">[</span>, <em class="sig-param">relative=None</em><span class="optional">[</span>, <em class="sig-param">wait=False</em><span class="optional">[</span>, <em class="sig-param">timeout=300.0</em><span class="optional">[</span>, <em class="sig-param">dial=False</em><span class="optional">[</span>, <em class="sig-param">raw=False</em><span class="optional">[</span>, <em class="sig-param">ignore_limits=False</em><span class="optional">[</span>, <em class="sig-param">confirm_move=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.move" title="Permalink to this definition">¶</a></dt>
 <dd><p>moves motor to specified drive position.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>val</strong> – value to move to (float) [Must be provided]</li>
-<li><strong>relative</strong> – move relative to current position    (T/F) [F]</li>
-<li><strong>wait</strong> – whether to wait for move to complete (T/F) [F]</li>
-<li><strong>timeout</strong> – max time for move to complete (in seconds) [300]</li>
-<li><strong>dial</strong> – use dial coordinates                 (T/F) [F]</li>
-<li><strong>raw</strong> – use raw coordinates                  (T/F) [F]</li>
-<li><strong>ignore_limits</strong> – try move without regard to limits    (T/F) [F]</li>
-<li><strong>confirm_move</strong> – try to confirm that move has begun (when wait=False) (T/F) [F]</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>val</strong> – value to move to (float) [Must be provided]</p></li>
+<li><p><strong>relative</strong> – move relative to current position    (T/F) [F]</p></li>
+<li><p><strong>wait</strong> – whether to wait for move to complete (T/F) [F]</p></li>
+<li><p><strong>timeout</strong> – max time for move to complete (in seconds) [300]</p></li>
+<li><p><strong>dial</strong> – use dial coordinates                 (T/F) [F]</p></li>
+<li><p><strong>raw</strong> – use raw coordinates                  (T/F) [F]</p></li>
+<li><p><strong>ignore_limits</strong> – try move without regard to limits    (T/F) [F]</p></li>
+<li><p><strong>confirm_move</strong> – try to confirm that move has begun (when wait=False) (T/F) [F]</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">integer</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>integer</p>
+</dd>
+</dl>
 <p>Returns an integer value, according the table below.  Note that a return
 value of 0 with <cite>wait=False</cite> does not really guarantee a successful
 move, just that a move request was issued.  If you’re interested in
@@ -695,145 +674,133 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 
 <blockquote id="motor-move-return-vals-table">
 <div><p>Table of return values from <a class="reference internal" href="#motor.move" title="motor.move"><code class="xref py py-func docutils literal notranslate"><span class="pre">move()</span></code></a>.</p>
-<table border="1" class="docutils">
+<table class="docutils align-default">
 <colgroup>
-<col width="19%" />
-<col width="81%" />
+<col style="width: 19%" />
+<col style="width: 81%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">return value</th>
-<th class="head">meaning</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>return value</p></th>
+<th class="head"><p>meaning</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>-13</td>
-<td>invalid value (cannot convert to float).  Move not attempted.</td>
+<tbody>
+<tr class="row-even"><td><p>-13</p></td>
+<td><p>invalid value (cannot convert to float).  Move not attempted.</p></td>
 </tr>
-<tr class="row-odd"><td>-12</td>
-<td>target value outside soft limits.         Move not attempted.</td>
+<tr class="row-odd"><td><p>-12</p></td>
+<td><p>target value outside soft limits.         Move not attempted.</p></td>
 </tr>
-<tr class="row-even"><td>-11</td>
-<td>drive PV is not connected:                Move not attempted.</td>
+<tr class="row-even"><td><p>-11</p></td>
+<td><p>drive PV is not connected:                Move not attempted.</p></td>
 </tr>
-<tr class="row-odd"><td>-8</td>
-<td>move started, but timed-out.</td>
+<tr class="row-odd"><td><p>-8</p></td>
+<td><p>move started, but timed-out.</p></td>
 </tr>
-<tr class="row-even"><td>-7</td>
-<td>move started, timed-out, but appears done.</td>
+<tr class="row-even"><td><p>-7</p></td>
+<td><p>move started, timed-out, but appears done.</p></td>
 </tr>
-<tr class="row-odd"><td>-5</td>
-<td>move started, unexpected return value from <a class="reference internal" href="#motor.put" title="motor.put"><code class="xref py py-func docutils literal notranslate"><span class="pre">put()</span></code></a></td>
+<tr class="row-odd"><td><p>-5</p></td>
+<td><p>move started, unexpected return value from <a class="reference internal" href="#motor.put" title="motor.put"><code class="xref py py-func docutils literal notranslate"><span class="pre">put()</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td>-4</td>
-<td>move-with-wait finished, soft limit violation seen.</td>
+<tr class="row-even"><td><p>-4</p></td>
+<td><p>move-with-wait finished, soft limit violation seen.</p></td>
 </tr>
-<tr class="row-odd"><td>-3</td>
-<td>move-with-wait finished, hard limit violation seen.</td>
+<tr class="row-odd"><td><p>-3</p></td>
+<td><p>move-with-wait finished, hard limit violation seen.</p></td>
 </tr>
-<tr class="row-even"><td>0</td>
-<td>move-with-wait finish OK.</td>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>move-with-wait finish OK.</p></td>
 </tr>
-<tr class="row-odd"><td>0</td>
-<td>move-without-wait executed, not confirmed.</td>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>move-without-wait executed, not confirmed.</p></td>
 </tr>
-<tr class="row-even"><td>1</td>
-<td>move-without-wait executed, move confirmed.</td>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>move-without-wait executed, move confirmed.</p></td>
 </tr>
-<tr class="row-odd"><td>3</td>
-<td>move-without-wait finished, hard limit violation seen.</td>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>move-without-wait finished, hard limit violation seen.</p></td>
 </tr>
-<tr class="row-even"><td>4</td>
-<td>move-without-wait finished, soft limit violation seen.</td>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>move-without-wait finished, soft limit violation seen.</p></td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
-<dl class="method">
+<dl class="py method">
 <dt id="motor.tweak">
-<code class="descclassname">motor.</code><code class="descname">tweak</code><span class="sig-paren">(</span><em>direction='forward'</em><span class="optional">[</span>, <em>wait=False</em><span class="optional">[</span>, <em>timeout=300.</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.tweak" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">motor.</code><code class="sig-name descname">tweak</code><span class="sig-paren">(</span><em class="sig-param">direction='forward'</em><span class="optional">[</span>, <em class="sig-param">wait=False</em><span class="optional">[</span>, <em class="sig-param">timeout=300.</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.tweak" title="Permalink to this definition">¶</a></dt>
 <dd><p>move the motor by the current <em>tweak value</em></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>direction</strong> (<em>string: 'forward'</em><em> (</em><em>default</em><em>) or </em><em>'reverse'</em>) – direction of motion</li>
-<li><strong>wait</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to wait for completion</li>
-<li><strong>timeout</strong> (<em>float</em>) – max time for move to complete (in seconds) [default=300]</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>direction</strong> (<em>string: 'forward'</em><em> (</em><em>default</em><em>) or </em><em>'reverse'</em>) – direction of motion</p></li>
+<li><p><strong>wait</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to wait for completion</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – max time for move to complete (in seconds) [default=300]</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="motor.get_position">
-<code class="descclassname">motor.</code><code class="descname">get_position</code><span class="sig-paren">(</span><em>readback=False</em><span class="optional">[</span>, <em>dial=False</em><span class="optional">[</span>, <em>raw=False</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.get_position" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">motor.</code><code class="sig-name descname">get_position</code><span class="sig-paren">(</span><em class="sig-param">readback=False</em><span class="optional">[</span>, <em class="sig-param">dial=False</em><span class="optional">[</span>, <em class="sig-param">raw=False</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.get_position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the motor position in user, dial or raw coordinates.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>readback</strong> – whether to return the readback position in the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>readback</strong> – whether to return the readback position in the
 desired coordinate system.  The default is to return the
-drive position of the motor.</li>
-<li><strong>dial</strong> – whether to return the position in dial coordinates.
-The default is user coordinates.</li>
-<li><strong>raw</strong> – whether to return the raw position.
-The default is user coordinates.</li>
+drive position of the motor.</p></li>
+<li><p><strong>dial</strong> – whether to return the position in dial coordinates.
+The default is user coordinates.</p></li>
+<li><p><strong>raw</strong> – whether to return the raw position.
+The default is user coordinates.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p>The “raw” and “dial” keywords are mutually exclusive.
 The “readback” keyword can be used in user, dial or raw coordinates.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="motor.set_position">
-<code class="descclassname">motor.</code><code class="descname">set_position</code><span class="sig-paren">(</span><em>position[ dial=False[, raw=False]]</em><span class="sig-paren">)</span><a class="headerlink" href="#motor.set_position" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">motor.</code><code class="sig-name descname">set_position</code><span class="sig-paren">(</span><em class="sig-param">position[ dial=False[, raw=False]]</em><span class="sig-paren">)</span><a class="headerlink" href="#motor.set_position" title="Permalink to this definition">¶</a></dt>
 <dd><p>set (that is, redefine) the current position to supplied value.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>position</strong> – The new motor position</li>
-<li><strong>dial</strong> – whether to set in dial coordinates. The default is user coordinates.</li>
-<li><strong>raw</strong> – <p>whether to set in raw coordinates. The default is user  coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>position</strong> – The new motor position</p></li>
+<li><p><strong>dial</strong> – whether to set in dial coordinates. The default is user coordinates.</p></li>
+<li><p><strong>raw</strong> – <p>whether to set in raw coordinates. The default is user  coordinates.</p>
 <p>The ‘raw’ and ‘dial’ keywords are mutually exclusive.</p>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="motor.get_pv">
-<code class="descclassname">motor.</code><code class="descname">get_pv</code><span class="sig-paren">(</span><em>attr</em><span class="sig-paren">)</span><a class="headerlink" href="#motor.get_pv" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">motor.</code><code class="sig-name descname">get_pv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attr</span></em><span class="sig-paren">)</span><a class="headerlink" href="#motor.get_pv" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the <cite>PV</cite> for the corresponding attribute.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="motor.set_callback">
-<code class="descclassname">motor.</code><code class="descname">set_callback</code><span class="sig-paren">(</span><em>attr='drive'</em><span class="optional">[</span>, <em>callback=None</em><span class="optional">[</span>, <em>kw=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.set_callback" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">motor.</code><code class="sig-name descname">set_callback</code><span class="sig-paren">(</span><em class="sig-param">attr='drive'</em><span class="optional">[</span>, <em class="sig-param">callback=None</em><span class="optional">[</span>, <em class="sig-param">kw=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.set_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets a callback on the <cite>PV</cite> for a particular attribute.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="motor.clear_callback">
-<code class="descclassname">motor.</code><code class="descname">clear_callback</code><span class="sig-paren">(</span><em>attr='drive'</em><span class="sig-paren">)</span><a class="headerlink" href="#motor.clear_callback" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">motor.</code><code class="sig-name descname">clear_callback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attr</span><span class="o">=</span><span class="default_value">'drive'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#motor.clear_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>clears a callback on the <cite>PV</cite> for a particular attribute.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="motor.show_info">
-<code class="descclassname">motor.</code><code class="descname">show_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.show_info" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">motor.</code><code class="sig-name descname">show_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.show_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>prints out a table of attributes and their current values.</p>
 </dd></dl>
 
@@ -850,7 +817,7 @@ build your own device classes.</p>
 This is not much more than a collection of PVs.  Since there is no prefix
 given, all PVs in the device must be <em>fully qualified</em>.  Note that there is
 no requirement to share a common prefix in such a collection of PVs:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="k">import</span> <span class="n">Device</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">Device</span>
 <span class="n">dev</span> <span class="o">=</span> <span class="n">Device</span><span class="p">()</span>
 <span class="n">p1</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;13IDC:m1.VAL&#39;</span><span class="p">)</span>
 <span class="n">p2</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;13IDC:m2.VAL&#39;</span><span class="p">)</span>
@@ -872,7 +839,7 @@ includes a Device for an Epics ai (analog input record).  The full
 implementation of this device is:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="sd">&quot;&quot;&quot;Epics analog input record&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">Device</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">Device</span>
 
 <span class="k">class</span> <span class="nc">ai</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="s2">&quot;Simple analog input device&quot;</span>
@@ -882,7 +849,7 @@ implementation of this device is:</p>
              <span class="s1">&#39;AOFF&#39;</span><span class="p">,</span> <span class="s1">&#39;ASLO&#39;</span><span class="p">,</span> <span class="s1">&#39;ESLO&#39;</span><span class="p">,</span> <span class="s1">&#39;EOFF&#39;</span><span class="p">,</span> <span class="s1">&#39;SMOO&#39;</span><span class="p">,</span> <span class="s1">&#39;HIHI&#39;</span><span class="p">,</span> <span class="s1">&#39;LOLO&#39;</span><span class="p">,</span>
              <span class="s1">&#39;HIGH&#39;</span><span class="p">,</span> <span class="s1">&#39;LOW&#39;</span><span class="p">,</span> <span class="s1">&#39;HHSV&#39;</span><span class="p">,</span> <span class="s1">&#39;LLSV&#39;</span><span class="p">,</span> <span class="s1">&#39;HSV&#39;</span><span class="p">,</span> <span class="s1">&#39;LSV&#39;</span><span class="p">,</span> <span class="s1">&#39;HYST&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">prefix</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
             <span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">Device</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -893,7 +860,7 @@ input record, and subclasses <code class="xref py py-class docutils literal notr
 corresponding PVs.  For most record suffixes, these will be available as
 attributes of the Device object.  For example, the <code class="xref py py-class docutils literal notranslate"><span class="pre">ai</span></code> class above can
 be used simply and cleanly as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics.devices</span> <span class="k">import</span> <span class="n">ai</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics.devices</span> <span class="kn">import</span> <span class="n">ai</span>
 <span class="n">This_ai</span> <span class="o">=</span> <span class="n">ai</span><span class="p">(</span><span class="s1">&#39;XXX.PRES&#39;</span><span class="p">)</span>
 <span class="nb">print</span> <span class="s1">&#39;Value: &#39;</span><span class="p">,</span> <span class="n">This_ai</span><span class="o">.</span><span class="n">VAL</span>
 <span class="nb">print</span> <span class="s1">&#39;Units: &#39;</span><span class="p">,</span> <span class="n">This_ai</span><span class="o">.</span><span class="n">EGU</span>
@@ -916,7 +883,7 @@ of the Scaler Record from synApps, including methods for changing modes, and
 reading and writing data.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python </span>
 <span class="sd">&quot;&quot;&quot;Epics Scaler&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">poll</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">poll</span>
 
 <span class="k">class</span> <span class="nc">Scaler</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; </span>
@@ -928,7 +895,7 @@ reading and writing data.</p>
     <span class="n">calc_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;calc</span><span class="si">%i</span><span class="s1">&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_calc</span><span class="si">%i</span><span class="s1">.VAL&#39;</span><span class="p">,</span> <span class="s1">&#39;expr</span><span class="si">%i</span><span class="s1">&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_calc</span><span class="si">%i</span><span class="s1">.CALC&#39;</span><span class="p">}</span>
     <span class="n">_nonpvs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_prefix&#39;</span><span class="p">,</span> <span class="s1">&#39;_pvs&#39;</span><span class="p">,</span> <span class="s1">&#39;_delim&#39;</span><span class="p">,</span> <span class="s1">&#39;_nchan&#39;</span><span class="p">,</span> <span class="s1">&#39;_chans&#39;</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nchan</span>  <span class="o">=</span> <span class="n">nchan</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_chans</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nchan</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
         
@@ -1010,94 +977,95 @@ A table of current Devices are listed in the <a class="reference internal" href=
 Devices</span></a> table below.  For further details, consult the source
 code for these modules.</p>
 <blockquote id="devices-table">
-<div>Table of Epics Devices Included in the PyEpics distribution.  For those
+<div><p>Table of Epics Devices Included in the PyEpics distribution.  For those
 described as “pretty basic”, there are generally only PV suffixes to
 attributes mapped.  Many of the others include one or more methods for
-specific use of that Device.</div></blockquote>
-<table border="1" class="docutils">
+specific use of that Device.</p>
+</div></blockquote>
+<table class="docutils align-default">
 <colgroup>
-<col width="20%" />
-<col width="21%" />
-<col width="59%" />
+<col style="width: 20%" />
+<col style="width: 21%" />
+<col style="width: 59%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head"><strong>module</strong></th>
-<th class="head"><strong>class</strong></th>
-<th class="head">description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>module</strong></p></th>
+<th class="head"><p><strong>class</strong></p></th>
+<th class="head"><p>description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>ad_base</td>
-<td>AD_Camera</td>
-<td>areaDetector Camera, pretty basic</td>
+<tbody>
+<tr class="row-even"><td><p>ad_base</p></td>
+<td><p>AD_Camera</p></td>
+<td><p>areaDetector Camera, pretty basic</p></td>
 </tr>
-<tr class="row-odd"><td>ad_fileplugin</td>
-<td>AD_FilePlugin</td>
-<td>areaDetector File Plugin, many methods</td>
+<tr class="row-odd"><td><p>ad_fileplugin</p></td>
+<td><p>AD_FilePlugin</p></td>
+<td><p>areaDetector File Plugin, many methods</p></td>
 </tr>
-<tr class="row-even"><td>ad_image</td>
-<td>AD_ImagePlugin</td>
-<td>areaDetector Image, with ArrayData attribute</td>
+<tr class="row-even"><td><p>ad_image</p></td>
+<td><p>AD_ImagePlugin</p></td>
+<td><p>areaDetector Image, with ArrayData attribute</p></td>
 </tr>
-<tr class="row-odd"><td>ad_overlay</td>
-<td>AD_OverlayPlugin</td>
-<td>areaDetector Overlay, pretty basic</td>
+<tr class="row-odd"><td><p>ad_overlay</p></td>
+<td><p>AD_OverlayPlugin</p></td>
+<td><p>areaDetector Overlay, pretty basic</p></td>
 </tr>
-<tr class="row-even"><td>ad_perkinelmer</td>
-<td>AD_PerkinElmer</td>
-<td>PerkinElmer(xrd1600) detector, several methods</td>
+<tr class="row-even"><td><p>ad_perkinelmer</p></td>
+<td><p>AD_PerkinElmer</p></td>
+<td><p>PerkinElmer(xrd1600) detector, several methods</p></td>
 </tr>
-<tr class="row-odd"><td>ai</td>
-<td>ai</td>
-<td>analog input, pretty basic (as above)</td>
+<tr class="row-odd"><td><p>ai</p></td>
+<td><p>ai</p></td>
+<td><p>analog input, pretty basic (as above)</p></td>
 </tr>
-<tr class="row-even"><td>ao</td>
-<td>ao</td>
-<td>analog output, pretty basic</td>
+<tr class="row-even"><td><p>ao</p></td>
+<td><p>ao</p></td>
+<td><p>analog output, pretty basic</p></td>
 </tr>
-<tr class="row-odd"><td>bi</td>
-<td>bi</td>
-<td>binary input, pretty basic</td>
+<tr class="row-odd"><td><p>bi</p></td>
+<td><p>bi</p></td>
+<td><p>binary input, pretty basic</p></td>
 </tr>
-<tr class="row-even"><td>bo</td>
-<td>bo</td>
-<td>binary output, pretty basic</td>
+<tr class="row-even"><td><p>bo</p></td>
+<td><p>bo</p></td>
+<td><p>binary output, pretty basic</p></td>
 </tr>
-<tr class="row-odd"><td>mca</td>
-<td>MCA</td>
-<td>epics DXP record, pretty basic</td>
+<tr class="row-odd"><td><p>mca</p></td>
+<td><p>MCA</p></td>
+<td><p>epics DXP record, pretty basic</p></td>
 </tr>
-<tr class="row-even"><td>mca</td>
-<td>DXP</td>
-<td>epics MCA record, get_rois()/get_calib()</td>
+<tr class="row-even"><td><p>mca</p></td>
+<td><p>DXP</p></td>
+<td><p>epics MCA record, get_rois()/get_calib()</p></td>
 </tr>
-<tr class="row-odd"><td>mca</td>
-<td>MultiXMAP</td>
-<td>Multiple XIA XMaps, several methods</td>
+<tr class="row-odd"><td><p>mca</p></td>
+<td><p>MultiXMAP</p></td>
+<td><p>Multiple XIA XMaps, several methods</p></td>
 </tr>
-<tr class="row-even"><td>scaler</td>
-<td>Scaler</td>
-<td>epics Scaler record, many methods</td>
+<tr class="row-even"><td><p>scaler</p></td>
+<td><p>Scaler</p></td>
+<td><p>epics Scaler record, many methods</p></td>
 </tr>
-<tr class="row-odd"><td>scan</td>
-<td>Scan</td>
-<td>epics SScan record, some methods</td>
+<tr class="row-odd"><td><p>scan</p></td>
+<td><p>Scan</p></td>
+<td><p>epics SScan record, some methods</p></td>
 </tr>
-<tr class="row-even"><td>srs570</td>
-<td>SRS570</td>
-<td>SRS570 Amplifier</td>
+<tr class="row-even"><td><p>srs570</p></td>
+<td><p>SRS570</p></td>
+<td><p>SRS570 Amplifier</p></td>
 </tr>
-<tr class="row-odd"><td>struck</td>
-<td>Struck</td>
-<td>SIS Multichannel Scaler, many methods</td>
+<tr class="row-odd"><td><p>struck</p></td>
+<td><p>Struck</p></td>
+<td><p>SIS Multichannel Scaler, many methods</p></td>
 </tr>
-<tr class="row-even"><td>transform</td>
-<td>Transform</td>
-<td>epics userTransform record</td>
+<tr class="row-even"><td><p>transform</p></td>
+<td><p>Transform</p></td>
+<td><p>epics userTransform record</p></td>
 </tr>
-<tr class="row-odd"><td>xspress3</td>
-<td>Xspress3</td>
-<td>Quantum Electronics Xspress3 Multi-MCA</td>
+<tr class="row-odd"><td><p>xspress3</p></td>
+<td><p>Xspress3</p></td>
+<td><p>Quantum Electronics Xspress3 Multi-MCA</p></td>
 </tr>
 </tbody>
 </table>
@@ -1106,6 +1074,7 @@ specific use of that Device.</div></blockquote>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -1136,12 +1105,13 @@ specific use of that Device.</div></blockquote>
    <li>|<a href="autosave.html">autosave</a></li>
    <li>|<a href="wx.html">wx</a></li>
    <li>|<a href="advanced.html">advanced</a>]</li>
- 
+
+        <li class="nav-item nav-item-this"><a href="">Devices: collections of PVs</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
     </div>
   </body>
 </html>

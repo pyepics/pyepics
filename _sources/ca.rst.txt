@@ -524,7 +524,7 @@ pairs that will include:
     * `value`: the latest value
     * `count`: the number of data elements
     * `ftype`: the numerical CA type indicating the data type
-    * `status`: the status of the PV (1 for OK)
+    * `status`: the status of the PV (0 for OK)
     * `chid`:   the integer address for the channel ID.
 
 For access rights event callbacks, your function will be passed:
