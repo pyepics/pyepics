@@ -870,8 +870,8 @@ class PV(object):
             out.append("   value      = array  [%s%s]" % (",".join(aval), ext))
         for nam in ('char_value', 'count', 'nelm', 'type', 'units',
                     'precision', 'host', 'access',
-                    'status', 'severity', 'timestamp',
-                    'posixseconds', 'nanoseconds',
+                    'status', 'char_status', 'severity', 'char_severity',
+                    'timestamp', 'posixseconds', 'nanoseconds',
                     'upper_ctrl_limit', 'lower_ctrl_limit',
                     'upper_disp_limit', 'lower_disp_limit',
                     'upper_alarm_limit', 'lower_alarm_limit',
@@ -946,6 +946,11 @@ class PV(object):
         return self._getarg('status')
 
     @property
+    def char_status(self):
+        "character string representation of the pv status"
+        return dbr.AlarmStatus(self.status).name
+
+    @property
     def type(self):
         "pv type"
         return self._args['type']
@@ -998,6 +1003,11 @@ class PV(object):
     def severity(self):
         "pv severity"
         return self._getarg('severity')
+
+    @property
+    def char_severity(self):
+        "character string representation of the pv severity"
+        return dbr.AlarmSeverity(self.severity).name
 
     @property
     def timestamp(self):
