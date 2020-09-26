@@ -2,29 +2,49 @@
 String and data utils, where implementation differs between Python 2 & 3
 """
 import sys
-from copy import deepcopy
 import os
 
-PY_MAJOR, PY_MINOR = sys.version_info[:2]
+EPICS_STR_ENCODING = os.environ.get('PYTHONIOENCODING', 'utf-8')
 
-if PY_MAJOR >= 3:
-    from . import utils3 as utils_mod
-else:
-    from . import utils2 as utils_mod
+def str2bytes(st1):
+    'string to byte conversion'
+    if isinstance(st1, bytes):
+        return st1
+    return bytes(st1, EPICS_STR_ENCODING)
 
-STR2BYTES = utils_mod.STR2BYTES
-BYTES2STR = utils_mod.BYTES2STR
-NULLCHAR = utils_mod.NULLCHAR
-NULLCHAR_2 = utils_mod.NULLCHAR_2
-strjoin = utils_mod.strjoin
-is_string = utils_mod.is_string
-is_string_or_bytes = utils_mod.is_string_or_bytes
-ascii_string = utils_mod.ascii_string
+def bytes2str(st1):
+    'byte to string conversion'
+    if isinstance(st1, str):
+        return st1
+    elif isinstance(st1, bytes):
+        return str(st1, EPICS_STR_ENCODING)
+    else:
+        return str(st1)
 
-memcopy = deepcopy
-if PY_MAJOR == 2 and PY_MINOR == 5:
-    def memcopy(a):
-        return a
+def strjoin(sep, seq):
+    "join string sequence with a separator"
+    if isinstance(sep, bytes):
+        sep = BYTES2STR(sep)
+    if len(seq) == 0:
+        seq = ''
+    elif isinstance(seq[0], bytes):
+        tmp =[]
+        for i in seq:
+            if i == b'\x00':
+                break
+            tmp.append(BYTES2STR(i))
+        seq = tmp
+    return sep.join(seq)
+
+def is_string(s):
+    return isinstance(s, str)
+
+def is_string_or_bytes(s):
+    return isinstance(s, str) or isinstance(s, bytes)
+
+def ascii_string(s):
+    return bytes(str(s), EPICS_STR_ENCODING)
+
 
 def clib_search_path(lib):
     '''Assemble path to c library.
