@@ -28,8 +28,8 @@ from math import log10
 from pkg_resources import resource_filename
 from copy import deepcopy
 
-from .utils import (str2bytes, bytese2str, strjoin, is_string,
-                    is_string_or_bytes, ascii_string, clib_search_path)
+from .utils import (str2bytes, bytes2str, strjoin,
+                    EPICS_STR_ENCODING, clib_search_path)
 
 # ignore warning about item size... for now??
 warnings.filterwarnings('ignore',
@@ -1650,7 +1650,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     if count > 1:
         # check that data for array PVS is a list, array, or string
         try:
-            if ftype == dbr.STRING and is_string_or_bytes(value):
+            if ftype == dbr.STRING and isinstance(value, (str, bytes)):
                 # len('abc') --> 3, however this is one element for dbr.STRING ftype
                 count = 1
             else:
@@ -1661,24 +1661,24 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         except TypeError:
             write('''PyEpics Warning:
      value put() to array PV must be an array or sequence''')
-    if ftype == dbr.CHAR and nativecount > 1 and is_string_or_bytes(value):
+    if ftype == dbr.CHAR and nativecount > 1 and isinstance(value, (str, bytes)):
         count += 1
         count = min(count, nativecount)
 
-    # if needed (python3, especially) convert to basic string/bytes form
-    if is_string(value):
-        value = ascii_string(value)
+    # if needed convert to basic string/bytes git stform
+    if isinstance(value, str):
+        value = bytes(value, EPICS_STR_ENCODING)
 
     data = (count*dbr.Map[ftype])()
     if ftype == dbr.STRING:
-        if is_string_or_bytes(value):
+        if isinstance(value, (str, bytes)):
             data[0].value = value
         else:
             for elem in range(min(count, len(value))):
-                data[elem].value = ascii_string(value[elem])
+                data[elem].value = bytes(str(value[elem]), EPICS_STR_ENCODING)
     elif nativecount == 1:
         if ftype == dbr.CHAR:
-            if is_string_or_bytes(value):
+            if isinstance(value, (str, bytes)):
                 if isinstance(value, bytes):
                     value = value.decode('ascii', 'replace')
                 value = [ord(i) for i in value] + [0, ]
@@ -1686,7 +1686,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
                 data[0] = value
         else:
             # allow strings (even bits/hex) to be put to integer types
-            if is_string(value) and isinstance(data[0], (int, )):
+            if isinstance(value, (str, bytes)) and isinstance(data[0], (int, )):
                 value = int(value, base=0)
             try:
                 data[0] = value
@@ -1698,7 +1698,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
                 raise ChannelAccessException(errmsg % (repr(value), tname))
 
     else:
-        if ftype == dbr.CHAR and is_string_or_bytes(value):
+        if ftype == dbr.CHAR and isinstance(value, (str, bytes)):
             if isinstance(value, bytes):
                 value = value.decode('ascii', 'replace')
             value = [ord(i) for i in value] + [0, ]
@@ -2002,7 +2002,7 @@ def sg_put(gid, chid, value):
         # could consider using
         # numpy.fromstring(("%s%s" % (s, pythonb'\x00'*maxlen))[:maxlen],
         #                  dtype=numpy.uint8)
-        if ftype == dbr.CHAR and is_string_or_bytes(value):
+        if ftype == dbr.CHAR and isinstance(value, (str, bytes)):
             pad = [0]*(1+count-len(value))
             if isinstance(value, bytes):
                 value = value.decode('ascii', 'replace')

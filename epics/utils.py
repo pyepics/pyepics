@@ -1,5 +1,5 @@
 """
-String and data utils, where implementation differs between Python 2 & 3
+String and data utils
 """
 import sys
 import os
@@ -24,7 +24,7 @@ def bytes2str(st1):
 def strjoin(sep, seq):
     "join string sequence with a separator"
     if isinstance(sep, bytes):
-        sep = BYTES2STR(sep)
+        sep = bytes2str(sep)
     if len(seq) == 0:
         seq = ''
     elif isinstance(seq[0], bytes):
@@ -32,19 +32,9 @@ def strjoin(sep, seq):
         for i in seq:
             if i == b'\x00':
                 break
-            tmp.append(BYTES2STR(i))
+            tmp.append(bytes2str(i))
         seq = tmp
     return sep.join(seq)
-
-def is_string(s):
-    return isinstance(s, str)
-
-def is_string_or_bytes(s):
-    return isinstance(s, str) or isinstance(s, bytes)
-
-def ascii_string(s):
-    return bytes(str(s), EPICS_STR_ENCODING)
-
 
 def clib_search_path(lib):
     '''Assemble path to c library.
