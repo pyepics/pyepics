@@ -89,7 +89,7 @@ from copy import deepcopy
 memcopy = deepcopy
 
 STR2BYTES = str2bytes
-BYTES2STR = byte2srt
+BYTES2STR = bytes2str
 NULLCHAR = b'\x00'
 NULLCHAR_2 = '\x00'
 
