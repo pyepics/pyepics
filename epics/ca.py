@@ -401,13 +401,7 @@ def initialize_libca():
     # save value offests used for unpacking
     # TIME and CTRL data as an array in dbr module
 
-    # in_dll is not available for arrays in IronPython, so use a reference to the first element
-    if dbr.IRON_PYTHON:
-        value_offset0 = ctypes.c_short.in_dll(libca,'dbr_value_offset')
-        dbr.value_offset = ctypes.cast(ctypes.addressof(value_offset0),
-                                       (39*ctypes.c_short))
-    else:
-        dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
+    dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
 
     initial_context = current_context()
     if AUTO_CLEANUP:
@@ -732,17 +726,13 @@ def _onGetEvent(args, **kws):
     except KeyError:
         return
 
-    ftype = (args.usr.value if dbr.IRON_PYTHON
-             else args.usr)
-
+    ftype = args.usr
     if args.status != dbr.ECA_NORMAL:
         result = ChannelAccessGetFailure(
             'Get failed; status code: %d' % args.status,
             chid=args.chid,
             status=args.status
         )
-    elif dbr.IRON_PYTHON:
-        result = dbr.cast_args(args)
     else:
         result = deepcopy(dbr.cast_args(args))
 
