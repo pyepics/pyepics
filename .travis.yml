@@ -17,8 +17,6 @@ matrix:
       env: NOLIBCA=1
     # install libca / libcom from pyepics
     - python: 3.6
-    - python: 3.7
-    - python: 3.8
 
 before_install:
   - export DOCKER0_IP=$(/sbin/ifconfig docker0 |grep 'inet addr' | sed -e 's/.*addr:\([^ ]*\).*/\1/')
