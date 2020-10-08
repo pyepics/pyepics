@@ -28,8 +28,12 @@ from math import log10
 from pkg_resources import resource_filename
 from copy import deepcopy
 
-from .utils import (str2bytes, bytes2str, strjoin,
-                    EPICS_STR_ENCODING, clib_search_path)
+from .utils import (str2bytes, bytes2str, strjoin, EPICS_STR_ENCODING,
+                    clib_search_path)
+
+# legacy imports in case someone was importing them from here..
+from .utils import (STR2BYTES, BYTES2STR, NULLCHAR_2, memcopy, is_string,
+                    is_string_or_bytes, ascii_string)
 
 # ignore warning about item size... for now??
 warnings.filterwarnings('ignore',

@@ -36,6 +36,7 @@ def strjoin(sep, seq):
         seq = tmp
     return sep.join(seq)
 
+                    
 def clib_search_path(lib):
     '''Assemble path to c library.
 
@@ -82,3 +83,21 @@ def clib_search_path(lib):
         return None
 
     return os.path.join("%s%s" % (libsrc, nbits), libfmt % lib)
+
+# for legacy and backward-compatibiilty
+from copy import deepcopy
+memcopy = deepcopy
+
+STR2BYTES = str2bytes
+BYTES2STR = byte2srt
+NULLCHAR = b'\x00'
+NULLCHAR_2 = '\x00'
+
+def is_string(s):
+    return isinstance(s, str)
+
+def is_string_or_bytes(s):
+    return isinstance(s, (str, bytes))
+
+def ascii_string(s):
+    return bytes(str(s), EPICS_STR_ENCODING)
