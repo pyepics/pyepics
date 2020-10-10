@@ -9,7 +9,6 @@ import sys
 import time
 import operator
 from . import pv
-from .utils import is_string
 
 class Alarm(object):
     """ alarm class for a PV:
@@ -88,7 +87,7 @@ class Alarm(object):
 
         if isinstance(pvname, pv.PV):
             self.pv = pvname
-        elif is_string(pvname):
+        elif isinstance(pvname, str):
             self.pv = pv.get_pv(pvname)
             self.pv.connect()
 

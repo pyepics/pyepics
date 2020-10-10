@@ -148,7 +148,7 @@ class CA_BasicTests(unittest.TestCase):
         prec = ca.get_precision(chid)
         self.assertEqual(prec, pvnames.double_pv_prec)
 
-        units= ca.BYTES2STR(ca.get_ctrlvars(chid)['units'])
+        units= ca.bytes2str(ca.get_ctrlvars(chid)['units'])
         self.assertEqual(units, pvnames.double_pv_units)
 
         rwacc= ca.access(chid)

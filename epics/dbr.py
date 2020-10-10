@@ -22,9 +22,7 @@ try:
 except ImportError:
     pass
 
-PY64_WINDOWS =  (os.name == 'nt' and platform.architecture()[0].startswith('64'))
-IRON_PYTHON = platform.python_implementation() == 'IronPython'
-PY_MAJOR, PY_MINOR = sys.version_info[:2]
+PY64_WINDOWS = (os.name == 'nt' and platform.architecture()[0].startswith('64'))
 
 # EPICS Constants
 ECA_NORMAL = 1
@@ -84,10 +82,8 @@ DBE_PROPERTY = 8
 
 chid_t   = ctypes.c_long
 
-# Note that Windows needs to be told that chid is 8 bytes for 64-bit,
-# except that Python2 is very weird -- using a 4byte chid for 64-bit,
-# but needing a 1 byte padding!
-if PY64_WINDOWS and PY_MAJOR > 2:
+# Note that Windows needs to be told that chid is 8 bytes for 64-bit
+if PY64_WINDOWS:
     chid_t = ctypes.c_int64
 
 short_t  = ctypes.c_short
@@ -359,27 +355,3 @@ class access_rights_handler_args(ctypes.Structure):
     _fields_ = [('chid', chid_t),
                 ('access', ubyte_t)]
 
-if PY64_WINDOWS and PY_MAJOR == 2:
-    # need to add padding on 64-bit Windows for Python2 -- yuck!
-    class event_handler_args(ctypes.Structure):
-        "event handler arguments"
-        _fields_ = [('usr',     ctypes.py_object),
-                    ('chid',    chid_t),
-                    ('_pad_',   ctypes.c_int8),
-                    ('type',    ctypes.c_int32),
-                    ('count',   ctypes.c_int32),
-                    ('raw_dbr', void_p),
-                    ('status',  ctypes.c_int32)]
-
-    class connection_args(ctypes.Structure):
-        "connection arguments"
-        _fields_ = [('chid', chid_t),
-                    ('_pad_',ctypes.c_int8),
-                    ('op',   long_t)]
-
-
-    class access_rights_handler_args(ctypes.Structure):
-        "access rights arguments"
-        _fields_ = [('chid', chid_t),
-                    ('_pad_',ctypes.c_int8),
-                    ('access', ubyte_t)]
