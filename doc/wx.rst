@@ -202,6 +202,15 @@ PVButton
     disablePV and disableValue will automatically cause the button to
     disable when that PV has a certain value.
 
+PVBitmapButton
+~~~~~~~~~~~
+
+.. class:: PVBitmapButton(parent, pv=None, bitmap = 'image.png', pushValue=1, disablePV=None,
+                    disableValue=1, **kw)
+
+    A wx.BitmapButton linked to a PV. When the button is pressed, 'pushValue' is written to the PV (useful for momentary PVs with HIGH= set.)  Setting
+    disablePV and disableValue will automatically cause the button to
+    disable when that PV has a certain value. A bitmap from file is loaded and displayed instead of a label. 
 
 PVRadioButton
 ~~~~~~~~~~~~~
