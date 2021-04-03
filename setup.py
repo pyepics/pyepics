@@ -5,7 +5,6 @@ from setuptools import setup
 import os
 import sys
 import epics
-import shutil
 
 import versioneer
 
@@ -49,13 +48,6 @@ if nolibca is None:
                                 'linuxarm/*', 'win32/*', 'win64/*']}
 else:
     pkg_data = dict()
-
-PY_MAJOR, PY_MINOR = sys.version_info[:2]
-if PY_MAJOR == 2 and PY_MINOR < 6:
-    shutil.copy(pjoin('epics', 'utils3.py'),
-                pjoin('epics', 'utils3_save_py.txt'))
-    shutil.copy(pjoin('epics', 'utils2.py'),
-                pjoin('epics', 'utils3.py'))
 
 setup(name = 'pyepics',
       version = versioneer.get_version(),

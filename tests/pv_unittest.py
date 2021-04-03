@@ -465,7 +465,7 @@ class PV_Tests(unittest.TestCase):
         self.failUnless(len(pv.host) > 1)
         self.assertEqual(pv.count,1)
         self.assertEqual(pv.precision, pvnames.double_pv_prec)
-        units= ca.BYTES2STR(pv.units)
+        units= ca.bytes2str(pv.units)
         self.assertEqual(units, pvnames.double_pv_units)
         self.failUnless(pv.access.startswith('read'))
 

@@ -6,15 +6,16 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-PyEpics works with Python version 2.7, 3.5, 3.6, and 3.7.  It is supported
-and regularly used and tested on 64-bit Linux, 64-bit Mac OSX, and 64-bit
-Windows.  It is known to work on Linux with ARM processors including
-raspberry Pi, though this is not part of the automated testing set.
-Pyepics may still work on 32-bit Windows and Linux, but these systems are
-not tested regularly. It may also work with older versions of Python (such
-as 3.4), but these are no longer tested or supported. For Windows, pyepics
-has been reported to work with IronPython (that is, Python written in the
-.NET framework), but this is not routinely tested.
+PyEpics currently works with Python version 2.7, 3.5, 3.6, 3.7, and 3.8.
+We expect it to work with Python 3.9 as well.  Pyepics version 3.4.3 is the
+final version to work with Python 2.7 or Python 3.5, and version 3.5.0 and
+later will require Python 3.6 or later.
+
+Pyepics is supported and regularly used and tested on 64-bit Linux, 64-bit
+Mac OSX, and 64-bit Windows.  It is known to work on Linux with ARM
+processors including raspberry Pi, though this is not part of the automated
+testing set.  Pyepics may still work on 32-bit Windows and Linux, but these
+systems are not tested regularly.
 
 The EPICS Channel Access library Version 3.14.12 or higher is required for
 pyepics and 3.15 or higher are strongly recommended.  More specifically,
@@ -50,9 +51,10 @@ Downloads and Installation
 .. _pyepics CARS downloads:       http://cars9.uchicago.edu/software/python/pyepics3/src/
 
 
-The latest stable version of the pyepics package is |release|.  Source code
-kits and Windows installers can be found at `pyepics PyPI`_, and can be
-installed with::
+The latest stable version of the pyepics package is |release|.  This is the
+final release that will support Python versions 3.5 and below (including
+Python 2).  Source code kits and Windows installers can be found at
+`pyepics PyPI`_, and can be installed with::
 
      pip install pyepics
 

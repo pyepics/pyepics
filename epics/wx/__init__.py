@@ -22,6 +22,7 @@ PVCheckBox    = pvCheckBox    = wxlib.PVCheckBox
 PVFloatSpin   = pvFloatSpin   = wxlib.PVFloatSpin
 PVSpinCtrl    = pvSpinCtrl    = wxlib.PVSpinCtrl
 PVButton      = pvButton      = wxlib.PVButton
+PVBitmapButton = pvBitmapButton = wxlib.PVBitmapButton
 PVRadioButton = pvRadioButton = wxlib.PVRadioButton
 PVComboBox    = pvComboBox    = wxlib.PVComboBox
 PVEnumComboBox = pvEnumComboBox = wxlib.PVEnumComboBox
@@ -41,4 +42,3 @@ DelayedEpicsCallback = wxlib.DelayedEpicsCallback
 EpicsFunction  = wxlib.EpicsFunction
 finalize_epics  = wxlib.finalize_epics
 EpicsTimer      = wxlib.EpicsTimer
-

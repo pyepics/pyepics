@@ -15,7 +15,6 @@ from math import log10
 
 from . import ca
 from . import dbr
-from .utils import is_string
 
 try:
     from types import SimpleNamespace as Namespace
@@ -630,7 +629,7 @@ class PV(object):
             return None
 
         if (self.ftype in (dbr.ENUM, dbr.TIME_ENUM, dbr.CTRL_ENUM) and
-            is_string(value)):
+            isinstance(value, str)):
             if self._args['enum_strs'] is None:
                 self.get_ctrlvars()
             if value in self._args['enum_strs']:
@@ -831,9 +830,13 @@ class PV(object):
             self.callbacks.pop(index)
             ca.poll()
 
-    def clear_callbacks(self):
+    def clear_callbacks(self, with_access_callback=False, with_connect_callback=False):
         "clear all callbacks"
         self.callbacks.clear()
+        if with_access_callback:
+            self.access_callbacks = []
+        if with_connect_callback:
+            self.connection_callbacks = []
 
     def _getinfo(self):
         "get information paragraph"
@@ -867,8 +870,8 @@ class PV(object):
             out.append("   value      = array  [%s%s]" % (",".join(aval), ext))
         for nam in ('char_value', 'count', 'nelm', 'type', 'units',
                     'precision', 'host', 'access',
-                    'status', 'severity', 'timestamp',
-                    'posixseconds', 'nanoseconds',
+                    'status', 'char_status', 'severity', 'char_severity',
+                    'timestamp', 'posixseconds', 'nanoseconds',
                     'upper_ctrl_limit', 'lower_ctrl_limit',
                     'upper_disp_limit', 'lower_disp_limit',
                     'upper_alarm_limit', 'lower_alarm_limit',
@@ -943,6 +946,11 @@ class PV(object):
         return self._getarg('status')
 
     @property
+    def char_status(self):
+        "character string representation of the pv status"
+        return dbr.AlarmStatus(self.status).name
+
+    @property
     def type(self):
         "pv type"
         return self._args['type']
@@ -995,6 +1003,11 @@ class PV(object):
     def severity(self):
         "pv severity"
         return self._getarg('severity')
+
+    @property
+    def char_severity(self):
+        "character string representation of the pv severity"
+        return dbr.AlarmSeverity(self.severity).name
 
     @property
     def timestamp(self):
@@ -1116,7 +1129,7 @@ class PV(object):
 
         self._monref = None
         self._monref_mask = None
-        self.clear_callbacks()
+        self.clear_callbacks(True, True)
         self._args = {}.fromkeys(self._fields)
         ca.poll(evt=1.e-3, iot=1.0)
 

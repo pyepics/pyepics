@@ -26,10 +26,14 @@ import warnings
 
 from math import log10
 from pkg_resources import resource_filename
+from copy import deepcopy
 
-from .utils import (STR2BYTES, BYTES2STR, NULLCHAR_2,
-                    strjoin, memcopy, is_string, is_string_or_bytes,
-                    ascii_string, clib_search_path)
+from .utils import (str2bytes, bytes2str, strjoin, EPICS_STR_ENCODING,
+                    clib_search_path)
+
+# legacy imports in case someone was importing them from here..
+from .utils import (STR2BYTES, BYTES2STR, NULLCHAR_2, memcopy, is_string,
+                    is_string_or_bytes, ascii_string)
 
 # ignore warning about item size... for now??
 warnings.filterwarnings('ignore',
@@ -401,13 +405,7 @@ def initialize_libca():
     # save value offests used for unpacking
     # TIME and CTRL data as an array in dbr module
 
-    # in_dll is not available for arrays in IronPython, so use a reference to the first element
-    if dbr.IRON_PYTHON:
-        value_offset0 = ctypes.c_short.in_dll(libca,'dbr_value_offset')
-        dbr.value_offset = ctypes.cast(ctypes.addressof(value_offset0),
-                                       (39*ctypes.c_short))
-    else:
-        dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
+    dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
 
     initial_context = current_context()
     if AUTO_CLEANUP:
@@ -469,7 +467,7 @@ def _get_cache_by_chid(chid):
         # context cache before giving up. This branch should not happen often.
         context = current_context()
         if context is not None:
-            pvname = BYTES2STR(libca.ca_name(dbr.chid_t(chid)))
+            pvname = bytes2str(libca.ca_name(dbr.chid_t(chid)))
             return _cache[context][pvname]
         raise
 
@@ -732,19 +730,15 @@ def _onGetEvent(args, **kws):
     except KeyError:
         return
 
-    ftype = (args.usr.value if dbr.IRON_PYTHON
-             else args.usr)
-
+    ftype = args.usr
     if args.status != dbr.ECA_NORMAL:
         result = ChannelAccessGetFailure(
             'Get failed; status code: %d' % args.status,
             chid=args.chid,
             status=args.status
         )
-    elif dbr.IRON_PYTHON:
-        result = dbr.cast_args(args)
     else:
-        result = memcopy(dbr.cast_args(args))
+        result = deepcopy(dbr.cast_args(args))
 
     with entry.lock:
         entry.get_results[ftype][0] = result
@@ -885,13 +879,13 @@ def flush_io():
 def message(status):
     """Print a message corresponding to a Channel Access status return value.
     """
-    return BYTES2STR(libca.ca_message(status))
+    return bytes2str(libca.ca_message(status))
 
 @withCA
 def version():
     """   Print Channel Access version string.
     Currently, this should report '4.13' """
-    return BYTES2STR(libca.ca_version())
+    return bytes2str(libca.ca_version())
 
 @withCA
 def pend_io(timeout=1.0):
@@ -997,7 +991,7 @@ def create_channel(pvname, connect=False, auto_cb=True, callback=None):
             chid = dbr.chid_t()
             with entry.lock:
                 ret = libca.ca_create_channel(
-                    ctypes.c_char_p(STR2BYTES(pvname)), _CB_CONNECT, 0, 0,
+                    ctypes.c_char_p(str2bytes(pvname)), _CB_CONNECT, 0, 0,
                     ctypes.byref(chid)
                 )
                 PySEVCHK('create_channel', ret)
@@ -1107,12 +1101,12 @@ def _chid_to_int(chid):
 @withCHID
 def name(chid):
     "return PV name for channel name"
-    return BYTES2STR(libca.ca_name(chid))
+    return bytes2str(libca.ca_name(chid))
 
 @withCHID
 def host_name(chid):
     "return host name and port serving Channel"
-    return BYTES2STR(libca.ca_host_name(chid))
+    return bytes2str(libca.ca_host_name(chid))
 
 @withCHID
 def element_count(chid):
@@ -1214,9 +1208,9 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
         """ Scan a string, or an array of strings as a list, depending on content """
         out = []
         for elem in range(min(count, len(data))):
-            this = strjoin('', BYTES2STR(data[elem].value)).rstrip()
-            if NULLCHAR_2 in this:
-                this = this[:this.index(NULLCHAR_2)]
+            this = strjoin('', bytes2str(data[elem].value)).rstrip()
+            if '\x00' in this:
+                this = this[:this.index('\x00')]
             out.append(this)
         if len(out) == 1:
             out = out[0]
@@ -1230,9 +1224,9 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
                 out = numpy.empty(shape=(count,), dtype=dbr.NP_Map[ntype])
                 ctypes.memmove(out.ctypes.data, data, out.nbytes)
             else:
-                out = numpy.ctypeslib.as_array(memcopy(data))
+                out = numpy.ctypeslib.as_array(deepcopy(data))
         else:
-            out = memcopy(data)
+            out = deepcopy(data)
         return out
 
     def unpack(data, count, ntype, use_numpy, elem_count):
@@ -1302,10 +1296,10 @@ def _unpack_metadata(ftype, dbr_value):
             if hasattr(dbr_value, attr):
                 md[attr] = getattr(dbr_value, attr)
                 if attr == 'units':
-                    md[attr] = BYTES2STR(getattr(dbr_value, attr, None))
+                    md[attr] = bytes2str(getattr(dbr_value, attr, None))
 
         if hasattr(dbr_value, 'strs') and getattr(dbr_value, 'no_str', 0) > 0:
-            md['enum_strs'] = tuple(BYTES2STR(dbr_value.strs[i].value)
+            md['enum_strs'] = tuple(bytes2str(dbr_value.strs[i].value)
                                     for i in range(dbr_value.no_str))
     elif ftype >= dbr.TIME_STRING:
         md['status'] = dbr_value.status
@@ -1543,7 +1537,7 @@ def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
     if as_string:
         val = _as_string(val, chid, count, ftype)
     elif isinstance(val, ctypes.Array) and HAS_NUMPY and as_numpy:
-        val = numpy.ctypeslib.as_array(memcopy(val))
+        val = numpy.ctypeslib.as_array(deepcopy(val))
 
     # value retrieved, clear cached value
     metadata['value'] = val
@@ -1650,7 +1644,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     if count > 1:
         # check that data for array PVS is a list, array, or string
         try:
-            if ftype == dbr.STRING and is_string_or_bytes(value):
+            if ftype == dbr.STRING and isinstance(value, (str, bytes)):
                 # len('abc') --> 3, however this is one element for dbr.STRING ftype
                 count = 1
             else:
@@ -1661,24 +1655,24 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         except TypeError:
             write('''PyEpics Warning:
      value put() to array PV must be an array or sequence''')
-    if ftype == dbr.CHAR and nativecount > 1 and is_string_or_bytes(value):
+    if ftype == dbr.CHAR and nativecount > 1 and isinstance(value, (str, bytes)):
         count += 1
         count = min(count, nativecount)
 
-    # if needed (python3, especially) convert to basic string/bytes form
-    if is_string(value):
-        value = ascii_string(value)
+    # if needed convert to basic string/bytes git stform
+    if isinstance(value, str):
+        value = bytes(value, EPICS_STR_ENCODING)
 
     data = (count*dbr.Map[ftype])()
     if ftype == dbr.STRING:
-        if is_string_or_bytes(value):
+        if isinstance(value, (str, bytes)):
             data[0].value = value
         else:
             for elem in range(min(count, len(value))):
-                data[elem].value = ascii_string(value[elem])
+                data[elem].value = bytes(str(value[elem]), EPICS_STR_ENCODING)
     elif nativecount == 1:
         if ftype == dbr.CHAR:
-            if is_string_or_bytes(value):
+            if isinstance(value, (str, bytes)):
                 if isinstance(value, bytes):
                     value = value.decode('ascii', 'replace')
                 value = [ord(i) for i in value] + [0, ]
@@ -1686,7 +1680,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
                 data[0] = value
         else:
             # allow strings (even bits/hex) to be put to integer types
-            if is_string(value) and isinstance(data[0], (int, )):
+            if isinstance(value, (str, bytes)) and isinstance(data[0], (int, )):
                 value = int(value, base=0)
             try:
                 data[0] = value
@@ -1698,7 +1692,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
                 raise ChannelAccessException(errmsg % (repr(value), tname))
 
     else:
-        if ftype == dbr.CHAR and is_string_or_bytes(value):
+        if ftype == dbr.CHAR and isinstance(value, (str, bytes)):
             if isinstance(value, bytes):
                 value = value.decode('ascii', 'replace')
             value = [ord(i) for i in value] + [0, ]
@@ -2000,9 +1994,9 @@ def sg_put(gid, chid, value):
     else:
         # auto-convert strings to arrays for character waveforms
         # could consider using
-        # numpy.fromstring(("%s%s" % (s,NULLCHAR*maxlen))[:maxlen],
+        # numpy.fromstring(("%s%s" % (s, pythonb'\x00'*maxlen))[:maxlen],
         #                  dtype=numpy.uint8)
-        if ftype == dbr.CHAR and is_string_or_bytes(value):
+        if ftype == dbr.CHAR and isinstance(value, (str, bytes)):
             pad = [0]*(1+count-len(value))
             if isinstance(value, bytes):
                 value = value.decode('ascii', 'replace')
