@@ -4,7 +4,7 @@ import time
 from epics import PV, caget, caput, poll, Device, get_pv
 
 MAX_CHAN = 4096
-MAX_ROIS = 32
+MAX_ROIS = 48
 TOOMANY_ROIS = 'Too many ROIS, only %i ROIS allowed.' % (MAX_ROIS)
 
 class ADMCAROI(Device):
