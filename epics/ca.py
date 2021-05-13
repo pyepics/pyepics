@@ -691,6 +691,10 @@ def _onMonitorEvent(args):
         return
 
     value = dbr.cast_args(args)
+    if value[1] is None:
+        # Cannot process the input becaue casting failed.
+        return
+
     kwds = {'ftype':args.type, 'count':args.count,
             'chid': args.chid, 'pvname': entry.pvname}
 
@@ -739,6 +743,12 @@ def _onGetEvent(args, **kws):
         )
     else:
         result = deepcopy(dbr.cast_args(args))
+        if result[1] is None:
+            result = ChannelAccessGetFailure(
+                'Get failed; unknown type: %d' % args.type,
+                chid=args.chid,
+                status=args.status
+            )
 
     with entry.lock:
         entry.get_results[ftype][0] = result
