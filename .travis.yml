@@ -83,7 +83,16 @@ script:
   - caget Py:long1
 
   # running tests
-  - py.test -vv -rsx --cov=epics --cov-report term-missing test_install.py ca_unittest.py pv_unittest.py test_pool.py test_threading.py test_cas.py || RESULT=$?
+  - >
+    py.test -vv -rsx --cov=epics --cov-report term-missing
+    test_install.py
+    ca_unittest.py
+    pv_unittest.py
+    test_pool.py
+    test_threading.py
+    test_cas.py
+    test_dbr.py
+    || RESULT=$?
   - if [[ ${RESULT} != 0 ]]; then gdb python core* -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
   - if [[ ${RESULT} != 0 ]]; then exit $RESULT ; fi;
 
