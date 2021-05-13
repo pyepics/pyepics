@@ -1,5 +1,3 @@
-from copy import deepcopy
-import pytest
 import ctypes
 import epics.dbr as dbr
 
