@@ -18,7 +18,7 @@ def onChanges(pvname=None, value=None, char_value=None, **kw):
     write( 'PV %s %s, %s Changed!\n' % (pvname, repr(value), char_value))
 
 def test_pv_callback():
-    mypv = epics.PV(pvname)
+    mypv = epics.get_pv(pvname)
     global change_count
     mypv.get_ctrlvars()
     mypv.add_callback(onChanges)
