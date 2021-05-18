@@ -1,6 +1,6 @@
 This folder contains several tests of the Epics Channel Access Module.
 
-Most of tthese tests require a set of working Epics Channels to run,
+Most of these tests require a set of working Epics Channels to run,
 and assume that the epics database 'pyepics.db' (in Setup/) is being
 run in some local IOC.
 
@@ -19,8 +19,8 @@ to customize in order to properly run these tests.
 The tests are not (yet?) very automated, and the results should be
 inspected for correctness.
 
-Tests using "low level" channel access   
-    ca_unittest1.py               a "unit test" test 
+Tests using "low level" channel access
+    ca_unittest1.py               a "unit test" test
     ca_type_conversion.py
     ca_connection_callback.py
     ca_simpletest.py
@@ -33,7 +33,7 @@ Tests using PV:
     pv_multiple_callbacks.py
     pv_simpletest.py
     pv_type_conversion.py
-    no_monitor.py 
+    no_monitor.py
 
 Connection Tests:
     caget_simple.py

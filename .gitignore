@@ -7,4 +7,7 @@ tests/.coverage*
 build
 dist
 NonGit
+venv
+.vscode
+pyepics.egg-info
 

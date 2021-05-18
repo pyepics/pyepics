@@ -297,10 +297,17 @@ def cast_args(args):
 
     If data is already of a native_type, the first
     value in the list will be None.
+
+    If type is not known, both the first and the second
+    value in the list will be None.
     """
     ftype = args.type
     if ftype not in Map:
-        ftype = double_t
+        # Type was not found in the map.
+        # As a consequence, the code cannot
+        # interpret the pointer properly without
+        # a risk of accessing invalid memory area.
+        return [None, None]
 
     ntype = native_type(ftype)
     if ftype != ntype:
