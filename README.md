@@ -2,7 +2,6 @@
 
 # PyEpics 3:  Epics Channel Access for Python
 
-
 PyEpics is a Python interface to the EPICS Channel Access (CA) library
 for the EPICS control system.
 
@@ -15,15 +14,13 @@ thread-safety, and easier installation on multiple platforms.
 
 ## Installation
 
-This package requires python2.6 or higher.  The EPICS Channel Access
-library v 3.14.8 or higher is also required, with v 3.14.12 or higher being
-recommended. Specifically, the shared libraries libCom.so and libca.so
-(or Com.dll and ca.dll on Windows, or libca.dylib and libCom.dylib on macOS)
-are required to use this module.
+This package requires python3.6 or higher.  The EPICS Channel Access
+library v 3.14.8 or higher is also required. Shared libraries are provided
+for Windows, MacOS, and Linux.
 
-To support this requirement, suitably recent versions of the libraries are
-included here (version 3.15.3), and the OS-appropriate library will be
-installed alongside the python packages. To install from source:
+To install the package, use `pip install pyepics`.
+
+To install from source, use
 
 ```
 > python setup.py install
@@ -33,20 +30,6 @@ Or,
 
 ```
 > pip install .
-```
-
-If it is desirable to forgo installation of the pre-packaged EPICS libraries,
-(i.e. suitable libraries already exist on the target system), then simply
-define the `NOLIBCA` environment variable prior to installation:
-
-```
-> NOLIBCA=1 python setup.py install
-```
-
-Or,
-
-```
-> NOLIBCA=1 pip install .
 ```
 
 For additional installation details, see the INSTALL file. Binary installers
@@ -73,7 +56,7 @@ Process Variable as the first argument.
 
 ```python
 >>> from epics import caget, caput, cainfo
->>> print caget('XXX:m1.VAL')
+>>> print(caget('XXX:m1.VAL'))
 1.200
 >>> caput('XXX:m1.VAL',2.30)
 1
