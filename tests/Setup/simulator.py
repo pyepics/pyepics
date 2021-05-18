@@ -12,7 +12,7 @@ import time
 import random
 import numpy
 
-prefix = 'Py:'
+prefix = 'PyTest:'
 
 global NEEDS_INIT
 
@@ -63,12 +63,10 @@ def initialize_data():
 
     for i, p in enumerate(analogs):   p.put((i+1)*1.7135000 )
 
-    epics.caput('Py:ao1.EGU', 'microns')
-    epics.caput('Py:ao1.PREC', 4)
-    epics.caput('Py:ai1.PREC', 2)
-    epics.caput('Py:ao2.PREC', 3)
-
-
+    epics.caput('%sao1.EGU' % prefix, 'microns')
+    epics.caput('%sao1.PREC' % prefix, 4)
+    epics.caput('%sai1.PREC' % prefix, 2)
+    epics.caput('%sao2.PREC' % prefix, 3)
 
     char_waves[0].put([60+random.randrange(30) for i in range(128)])
     char_waves[1].put([random.randrange(256) for i in range(256)])
