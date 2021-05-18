@@ -19,25 +19,25 @@ strategy:
     Python39:
       python.version: '3.9'
 
-  steps:
-  - bash: echo "##vso[task.prependpath]$CONDA/bin"
-    displayName: Add conda to PATH
-
-  - bash: conda create --yes --quiet --name peenv
-    displayName: Create Anaconda environment
-
-  - bash: |
-      source activate penv
-      conda install --yes --quiet --name penv python=$PYTHON_VERSION numpy pytest coverage pyparsing
-      conda install --yes --quiet conda-forge epics-base
-      conda install --yes --quiet lcls-ii procserv
-    displayName: Install Anaconda packages
-
 steps:
+
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(python.version)'
   displayName: 'Use Python $(python.version)'
+
+- bash: echo "##vso[task.prependpath]$CONDA/bin"
+  displayName: Add conda to PATH
+
+- bash: conda create --yes --quiet --name peenv
+  displayName: Create Anaconda environment
+
+- bash: |
+    source activate penv
+    conda install --yes --quiet --name penv python=$PYTHON_VERSION numpy pytest coverage pyparsing
+    conda install --yes --quiet conda-forge epics-base
+    conda install --yes --quiet lcls-ii procserv
+  displayName: Install Anaconda packages
 
 - script: |
     python -m pip install --upgrade pip
