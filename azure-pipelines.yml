@@ -10,14 +10,28 @@ pool:
   vmImage: ubuntu-latest
 strategy:
   matrix:
-    Python27:
-      python.version: '2.7'
-    Python35:
-      python.version: '3.5'
     Python36:
       python.version: '3.6'
     Python37:
       python.version: '3.7'
+    Python38:
+      python.version: '3.8'
+    Python39:
+      python.version: '3.9'
+
+  steps:
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+
+  - bash: conda create --yes --quiet --name peenv
+    displayName: Create Anaconda environment
+
+  - bash: |
+      source activate penv
+      conda install --yes --quiet --name penv python=$PYTHON_VERSION numpy pytest coverage pyparsing
+      conda install --yes --quiet conda-forge epics-base
+      conda install --yes --quiet lcls-ii procserv
+    displayName: Install Anaconda packages
 
 steps:
 - task: UsePythonVersion@0
@@ -27,10 +41,33 @@ steps:
 
 - script: |
     python -m pip install --upgrade pip
-    pip install -r requirements.txt
-  displayName: 'Install dependencies'
+    python setup.py install
+  displayName: 'install package'
 
 - script: |
-    pip install pytest pytest-azurepipelines
-    pytest
+    cd tests/Setup
+    export EPICS_CA_ADDR_LIST=localhost
+    export EPICS_CA_AUTO_ADDR_LIST=NO
+    export EPICS_CA_MAX_ARRAY_BYTES=20100300
+    sh start_ioc.sh
+    sleep 1
+    python simulator.py &
+    sleep 1
+    coverage erase
+    coverage run --source=epics -a -p --timid  test_camonitor_func.py
+    coverage run --source=epics -a -p --timid  test_ca_subscribe.py
+    coverage run --source=epics -a -p --timid  test_cathread.py
+    coverage run --source=epics -a -p --timid  test_ca_typeconversion.py
+    coverage run --source=epics -a -p --timid  test_ca_unittests.py
+    coverage run --source=epics -a -p --timid  test_multiprocessing.py
+    coverage run --source=epics -a -p --timid  test_aodevice.py
+    coverage run --source=epics -a -p --timid  test_pv_callback.py
+    coverage run --source=epics -a -p --timid  test_pv_initcallbacks.py
+    coverage run --source=epics -a -p --timid  test_pvsubarray.py
+    coverage run --source=epics -a -p --timid  test_pv_typeconversion.py
+    coverage run --source=epics -a -p --timid  test_pv_unittests.py
+    coverage run --source=epics -a -p --timid  test_threading.py
+    coverage combine
+    coverage report -m
+    bash <(curl -s https://codecov.io/bash)
   displayName: 'pytest'
