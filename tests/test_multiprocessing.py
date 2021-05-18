@@ -18,7 +18,7 @@ def subprocess(*args):
         out = ', '.join(["%s=%s" % o for o in out])
         print('==sub (%d): %s' % (i, out))
 
-def main_process():
+def test_mpprocess():
     def monitor(pvname=None, char_value=None, **kwargs):
         print('--main:monitor %s=%s' % (pvname, char_value))
 
@@ -37,8 +37,5 @@ def main_process():
         proc1.terminate()
 
     print('--main: subprocess complete')
-    time.sleep(0.9)
+    time.sleep(0.5)
     print('--main:final %s=%s' % (PVN1, pv1.get()))
-
-if __name__ == '__main__':
-    main_process()

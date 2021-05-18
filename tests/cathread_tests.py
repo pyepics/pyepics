@@ -5,7 +5,7 @@
 
   modified MN, 22-April-2011 (1 year later!)
   to support new context-switching modes
-  
+
 """
 
 import time
@@ -17,7 +17,16 @@ from  pvnames import updating_pvlist
 write = sys.stdout.write
 flush = sys.stdout.flush
 
-epics.ca.PREEMPTIVE_CALLBACK=True
+
+pvs_b = []
+names_b = []
+for pvname in updating_pvlist:
+    names_b.append(pvname)
+
+names_a = names_b[1:]
+pvs_a   = pvs_b[1:]
+
+epics.ca.create_context()
 
 def wait_for_changes(pvnames, runtime, runname):
     """basic test procedure called by other tests
@@ -42,69 +51,45 @@ def wait_for_changes(pvnames, runtime, runname):
     for p in pvs:
         p.clear_callbacks()
 
-def test_initcontext(pvnames, runtime, run_name):
+def run_initcontext(pvnames, runtime, run_name):
     write(' -> force inital ca context: thread=%s will run for %.3f sec\n' % (run_name, runtime))
-
-
     epics.ca.use_initial_context()
     wait_for_changes(pvnames, runtime, run_name)
-    
     write( 'Done with Thread  %s\n' % ( run_name))
 
 @withInitialContext
-def test_decorator(pvnames, runtime, run_name):
+def run_decorator(pvnames, runtime, run_name):
     write(' -> use withInitialContext decorator: thread=%s will run for %.3f sec\n' % (run_name, runtime))
-
     wait_for_changes(pvnames, runtime, run_name)
-   
     write( 'Done with Thread  %s\n' % ( run_name))
 
-def test_CAThread(pvnames, runtime, run_name):
+def run_CAThread(pvnames, runtime, run_name):
     write(' -> used with CAThread: thread=%s will run for %.3f sec\n' % (run_name, runtime))
-
     wait_for_changes(pvnames, runtime, run_name)
     write( 'Done with Thread  %s\n' % ( run_name))
 
 def run_threads(threadlist):
     for th in threadlist:
-        th.start() 
+        th.start()
     time.sleep(0.01)
     for th in threadlist:
-        th.join() 
+        th.join()
     time.sleep(0.01)
 
-# MAIN
-write("Connecting to PVs\n")
-pvs_b = []
-names_b = []
-for pvname in updating_pvlist:
-    ###pvs_b.append(epics.PV(pvname))
-    # pvs_b.append(pvname)
-    names_b.append(pvname)
-
-names_a = names_b[1:]
-pvs_a   = pvs_b[1:]
-
-epics.ca.create_context()
-
-styles = ('decorator', 'init', 'cathread')
-style = styles[2]
-
-if style == 'init':
+def test_initcontext():
     write( 'Test use plain threading.Thread, force use of initial CA Context \n')
-    th1 = Thread(target=test_initcontext, args=(names_a, 2, 'A'))
-    th2 = Thread(target=test_initcontext, args=(names_b, 3, 'B'))
+    th1 = Thread(target=run_initcontext, args=(names_a, 2, 'A'))
+    th2 = Thread(target=run_initcontext, args=(names_b, 3, 'B'))
     run_threads((th1, th2))
 
-elif style == 'decorator':
+def test_decorator():
     write( 'Test use plain threading.Thread, withInitialContext decorator\n')
-    th1 = Thread(target=test_decorator, args=(names_a, 3, 'A'))
-    th2 = Thread(target=test_decorator, args=(names_b, 5, 'B'))
-    run_threads((th1, th2))
-elif style == 'cathread':
-    write( 'Test use CAThread\n')
-    th1 = CAThread(target=test_CAThread, args=(names_a, 3, 'A'))
-    th2 = CAThread(target=test_CAThread, args=(names_b, 5, 'B'))
+    th1 = Thread(target=run_decorator, args=(names_a, 3, 'A'))
+    th2 = Thread(target=run_decorator, args=(names_b, 5, 'B'))
     run_threads((th1, th2))
 
-write('Test Done\n---------------------\n')
+def test_cathread():
+    write( 'Test use CAThread\n')
+    th1 = CAThread(target=run_CAThread, args=(names_a, 3, 'A'))
+    th2 = CAThread(target=run_CAThread, args=(names_b, 5, 'B'))
+    run_threads((th1, th2))
