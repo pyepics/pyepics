@@ -6,37 +6,37 @@
 # this pv should be a DOUBLE.  It will NOT be set, but
 # you should provide the host_name, units, and precision.  It
 # is assumed to have count=1
-double_pv = 'Py:ao1'
+double_pv = 'PyTest:ao1'
 double_pv_units = 'microns'
 double_pv_prec = 4
 
-double_pv2 = 'Py:ao2'
+double_pv2 = 'PyTest:ao2'
 
-pause_pv  = 'Py:pause'
+pause_pv  = 'PyTest:pause'
 #### 2
 # this pv should be an ENUM. It will NOT be set.
 # provide the names of the ENUM states
 
 #### Theae are PVs of the various native types
 ###  They will NOT be set.
-str_pv   = 'Py:ao1.DESC'
-int_pv   = 'Py:long2'
-long_pv  = 'Py:long2'
-float_pv = 'Py:ao3'
-enum_pv  = 'Py:mbbo1'
+str_pv   = 'PyTest:ao1.DESC'
+int_pv   = 'PyTest:long2'
+long_pv  = 'PyTest:long2'
+float_pv = 'PyTest:ao3'
+enum_pv  = 'PyTest:mbbo1'
 enum_pv_strs = ['Stop', 'Start', 'Pause', 'Resume']
 
-proc_pv = 'Py:ao1.PROC'
+proc_pv = 'PyTest:ao1.PROC'
 
 ## Here are some waveform / array data PVs
-long_arr_pv   = 'Py:long2k'
-double_arr_pv = 'Py:double2k'
-string_arr_pv = 'Py:string128'
+long_arr_pv   = 'PyTest:long2k'
+double_arr_pv = 'PyTest:double2k'
+string_arr_pv = 'PyTest:string128'
 # char / byte array
-char_arr_pv   = 'Py:char128'
-char_arrays   = ['Py:char128', 'Py:char2k', 'Py:char64k']
-long_arrays   = ['Py:long128', 'Py:long2k', 'Py:long64k']
-double_arrays   = ['Py:double128', 'Py:double2k', 'Py:double64k']
+char_arr_pv   = 'PyTest:char128'
+char_arrays   = ['PyTest:char128', 'PyTest:char2k', 'PyTest:char64k']
+long_arrays   = ['PyTest:long128', 'PyTest:long2k', 'PyTest:long64k']
+double_arrays   = ['PyTest:double128', 'PyTest:double2k', 'PyTest:double64k']
 
 
 ####
@@ -48,25 +48,25 @@ motor2 = motor_list[1]
 
 ####
 #  Here, provide a PV that changes at least once very 10 seconds
-updating_pv1  = 'Py:ao1'
-updating_str1 = 'Py:char256'
+updating_pv1  = 'PyTest:ao1'
+updating_str1 = 'PyTest:char256'
 
 ####
 #  Here, provide a list of PVs that  change at least once very 10 seconds
-updating_pvlist = ['Py:ao1', 'Py:ai1', 'Py:long1', 'Py:ao2']
+updating_pvlist = ['PyTest:ao1', 'PyTest:ai1', 'PyTest:long1', 'PyTest:ao2']
 #### alarm test
 
-non_updating_pv = 'Py:ao4'
+non_updating_pv = 'PyTest:ao4'
 
-alarm_pv = 'Py:long1'
+alarm_pv = 'PyTest:long1'
 alarm_comp='ge'
 alarm_trippoint = 7
 
 
 #### subarray test
-subarr_driver = 'Py:wave_test'
-subarr1       = 'Py:subArr1'
-subarr2       = 'Py:subArr2'
-subarr3       = 'Py:subArr3'
-subarr4       = 'Py:subArr4'
-zero_len_subarr1 = 'Py:ZeroLenSubArr1'
+subarr_driver = 'PyTest:wave_test'
+subarr1       = 'PyTest:subArr1'
+subarr2       = 'PyTest:subArr2'
+subarr3       = 'PyTest:subArr3'
+subarr4       = 'PyTest:subArr4'
+zero_len_subarr1 = 'PyTest:ZeroLenSubArr1'
