@@ -1,0 +1,15 @@
+channels:
+  - conda-forge
+  - lcls-ii
+  - defaults
+dependencies:
+  - python>=3.6
+  - numpy
+  - pyparsing
+  - pytest
+  - pytest-cov
+  - coverage
+  - epics-core
+  - procserv
+  
+  
