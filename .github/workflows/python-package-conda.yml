@@ -1,0 +1,57 @@
+name: Python Package using Conda
+
+on: [push]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Add conda to system path
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
+    - name: Install conda and dependencies
+      run: |
+        conda env update --name base
+        conda install --yes --quiet --name penv python=$PYTHON_VERSION numpy pytest coverage pyparsing
+        conda install --yes --quiet conda-forge epics-base
+        conda install --yes --quiet lcls-ii procserv
+    - name: Install pyepics
+      run: |
+        python -m pip install --upgrade pip
+        python setup.py install
+    - name: Run test suite
+      run: |
+        cd tests/Setup
+        export EPICS_CA_ADDR_LIST=localhost
+        export EPICS_CA_AUTO_ADDR_LIST=NO
+        export EPICS_CA_MAX_ARRAY_BYTES=20100300
+        sh start_ioc.sh
+        sleep 1
+        python simulator.py &
+        sleep 1
+        cd ..
+        coverage erase
+        coverage run --source=epics -a --timid  -m pytest test_camonitor_func.py
+        coverage run --source=epics -a --timid  -m pytest test_ca_typeconversion.py
+        coverage run --source=epics -a --timid  -m pytest test_pv_callback.py
+        coverage run --source=epics -a --timid  -m pytest test_pv_initcallbacks.py
+        coverage run --source=epics -a --timid  -m pytest test_pvsubarray.py
+        coverage run --source=epics -a --timid  -m pytest test_cathread.py
+        coverage run --source=epics -a --timid  -m pytest test_multiprocessing.py
+        coverage run --source=epics -a --timid  -m pytest test_threading.py
+        coverage run --source=epics -a --timid  -m pytest test_aodevice.py
+        coverage run --source=epics -a --timid  -m pytest test_ca_unittests.py
+        coverage run --source=epics -a --timid  -m pytest test_ca_subscribe.py
+        coverage run --source=epics -a --timid  -m pytest test_pv_unittests.py
+        coverage run --source=epics -a --timid  -m pytest test_pv_typeconversion.py
+        coverage combine
+        coverage report -m
