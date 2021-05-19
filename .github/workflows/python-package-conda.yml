@@ -21,7 +21,8 @@ jobs:
     - name: Install conda and dependencies
       run: |
         conda create -y -n penv python=$PYTHON_VERSION numpy pyparsing coverage pytest
-        source activae penv
+	conda update -n base -c defaults conda
+        conda activae penv
         conda install --yes --quiet conda-forge epics-base
         conda install --yes --quiet lcls-ii procserv
     - name: Install pyepics
