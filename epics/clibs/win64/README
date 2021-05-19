@@ -1,2 +1,5 @@
 These shared libraries were taken from the automated nightly
-build of Epics base 3.16, done on 12-Dec-2018.
+build of epics-base-7.0-win64, run on 2021-May-17
+
+The DLLs use the Microsoft VCRUNTIME140.dll series, and so should 
+work with all supported versions of Python 3 on Windows 10.
