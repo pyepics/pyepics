@@ -15,7 +15,10 @@ change_count = 0
 def onChanges(pvname=None, value=None, char_value=None, **kw):
     global change_count
     change_count += 1
-    write( 'PV %s %s, %s Changed!\n' % (pvname, repr(value), char_value))
+    try:
+        write( 'PV %s %s, %s Changed!\n' % (pvname, repr(value), char_value))
+    except:
+        pass
 
 def test_pv_callback():
     mypv = epics.get_pv(pvname)
