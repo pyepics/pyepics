@@ -36,6 +36,7 @@ jobs:
         export EPICS_CA_ADDR_LIST=localhost
         export EPICS_CA_AUTO_ADDR_LIST=NO
         export EPICS_CA_MAX_ARRAY_BYTES=20100300
+        printenv
         sh start_ioc.sh
         sleep 1
         python simulator.py &
