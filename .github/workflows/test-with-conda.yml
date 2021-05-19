@@ -1,4 +1,4 @@
-name: Python Package using Conda
+name: Test with Conda
 
 on: [push]
 
@@ -7,13 +7,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 5
-
+      fail-fast: false
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+	
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
+    - name: Set up Python 
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: ${{ matrix.python-version }}
     - name: Add conda to system path
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
