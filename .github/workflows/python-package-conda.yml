@@ -20,8 +20,9 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Install conda and dependencies
       run: |
+        conda install -y -c conda-forge epics-base
+        conda install -y -c lcls-ii procserv
         conda update -n base -c defaults conda
-        conda env update -f tests/requirements.txt
         conda info
         conda list
     - name: Install pyepics
