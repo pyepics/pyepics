@@ -20,8 +20,8 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Install conda and dependencies
       run: |
-        conda env update --name base
-        conda install --yes --quiet --name penv python=$PYTHON_VERSION numpy pytest coverage pyparsing
+        conda create -y -n penv python=$PYTHON_VERSION numpy pyparsing coverage pytest
+        source activae penv
         conda install --yes --quiet conda-forge epics-base
         conda install --yes --quiet lcls-ii procserv
     - name: Install pyepics
