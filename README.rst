@@ -1,8 +1,8 @@
 PyEpics:  Epics Channel Access for Python
 ================================
 
-.. image:: https://github.com/pyepics/pyepics/actions/workflows/python-package-conda.yml/badge.svg
-   :target: https://github.com/pyepics/pyepics/actions/workflows/python-package-conda.ym/
+.. image:: https://github.com/pyepics/pyepics/actions/workflows/test-with-conda.yml/badge.svg
+   :target: https://github.com/pyepics/pyepics/actions/workflows/test-with-conda.yml/
 
 .. image:: https://img.shields.io/pypi/v/pyepics.svg
    :target: https://pypi.org/project/pyepics
@@ -12,7 +12,6 @@ PyEpics:  Epics Channel Access for Python
 
 .. image:: https://zenodo.org/badge/4185/pyepics/pyepics.svg
    :target: https://zenodo.org/badge/latestdoi/4185/pyepics/pyepics
-
 
 
 
@@ -61,39 +60,6 @@ caget(), caput() and cainfo()
 The simplest interface to EPICS Channel Access provides functions caget(),
 caput(), and cainfo(), similar to the EZCA interface and to the
 EPICS-supplied command line utilities.  These all take the name of an Epics
-Process Variable as the first argument::
-
-     ~> python
-     >>> from epics import caget, caput, cainfo
-     >>> print(caget('XXX:m1.VAL'))
-    1.200
-    >>> caput('XXX:m1.VAL',2.30)
-    1
-    >>> cainfo('XXX.m1.VAL')
-		== XXX:m1.VAL  (double) ==
-		   value      = 2.3
-		   char_value = 2.3000
-		   count      = 1
-		   units      = mm
-		   precision  = 4
-		   host       = xxx.aps.anl.gov:5064
-		   access     = read/write
-		   status     = 1
-		   severity   = 0
-		   timestamp  = 1265996455.417 (2010-Feb-12 11:40:55.417)
-		   upper_ctrl_limit    = 200.0
-		   lower_ctrl_limit    = -200.0
-		   upper_disp_limit    = 200.0
-		   lower_disp_limit    = -200.0
-		   upper_alarm_limit   = 0.0
-		   lower_alarm_limit   = 0.0
-		   upper_warning_limit = 0.0
-		   lower_warning       = 0.0
-		   PV is monitored internally
-		   no user callbacks defined.
-		=============================
-
-
 
 PV: Object Oriented CA interface
 ------------------------------
@@ -101,14 +67,13 @@ PV: Object Oriented CA interface
 The general concept is that an Epics Process Variable is implemented as a
 Python PV object, which provides a natural way to interact with EPICS.
 
-	>>> import epics
-
-	>>> pv = epics.PV('PVName')
-	>>> pv.connected
-	True
-	>>> pv.get()
-	3.14
-	>>> pv.put(2.71)
+   >>> import epics
+   >>> pv = epics.PV('PVName')
+   >>> pv.connected
+   True
+   >>> pv.get()
+   3.14
+   >>> pv.put(2.71)
 
 
 Channel Access features that are included here:
