@@ -56,5 +56,5 @@ jobs:
         coverage run --source=epics -a --timid  -m pytest test_ca_subscribe.py
         coverage run --source=epics -a --timid  -m pytest test_pv_unittests.py
         coverage run --source=epics -a --timid  -m pytest test_pv_typeconversion.py
-        coverage combine
         coverage report -m
+        bash <(curl -s https://codecov.io/bash)
