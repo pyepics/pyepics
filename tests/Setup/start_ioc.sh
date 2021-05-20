@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 SOFTIOC=softIoc
 if ! command -v $SOFTIOC &> /dev/null ; then
