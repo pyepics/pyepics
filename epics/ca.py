@@ -355,14 +355,14 @@ def initialize_libca():
     libca : object
         ca library object, used for all subsequent ca calls
 
-    See Also
-    --------
-    withCA :  decorator to ensure CA is initialized
+
 
     Notes
     -----
     This function must be called prior to any real CA calls.
 
+    See the `withCA`  decorator to ensure CA is initialized
+    
     """
     if 'EPICS_CA_MAX_ARRAY_BYTES' not in os.environ:
         os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = "%i" %  2**24
@@ -837,14 +837,12 @@ def attach_context(context):
 @withCA
 @withSEVCHK
 def use_initial_context():
-    """Attaches to the context created when libca is initialized.
+    """
+    Attaches to the context created when libca is initialized.
     Using this function is recommended when writing threaded programs that
     using CA.
 
-    See Also
-    --------
-    :ref:`advanced-threads-label` in doc for further discussion.
-
+    See the advanced section in doc for further discussion.
     """
     global initial_context
     ret = dbr.ECA_NORMAL
@@ -1359,9 +1357,7 @@ def get_with_metadata(chid, ftype=None, count=None, wait=True, timeout=None,
        Returns ``None`` if the channel is not connected, `wait=False` was used,
        or the data transfer timed out.
 
-    See also
-    --------
-    See :func:`get` for additional usage notes.
+    See `get()` for additional usage notes.
     """
     if ftype is None:
         ftype = field_type(chid)
@@ -1495,9 +1491,7 @@ def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
        This function will return ``None`` if the previous :func:`get` actually
        completed, or if this data transfer also times out.
 
-    See also
-    --------
-    See :func:`get_complete` for additional usage notes.
+    See `get_complete()` for additional usage notes.
     """
     if ftype is None:
         ftype = field_type(chid)

@@ -113,22 +113,20 @@ on the same machine or different machines on your network as long as all
 processes can see all the PVs (all using a prefix of `PyTest:`).  The
 softIoc cannot be run in a separate terminal process or using the
 `procServ` program.  To setup the testing environment, first start the
-testing softIoc in one shell, with:
+testing softIoc in one shell, with::
 
      ~> cd tests/Setup
      ~> softIoc ./st.cmd
 
-If you have `procServ` installed, you can do
+If you have `procServ` installed, you can do::
 
      ~> cd tests/Setup
      ~> bash ./start_ioc.sh
 
-which will put the IOC properly as a background process.
+which will put the IOC properly as a background process. Second, run the
+simulator (also in `tests/Setup`) so that Epics channels are changing::
 
-Second, run the simulator (also in `tests/Setup) so that Epics channels are
-changing: 
-
-     ~> python simulator.py &
+     ~> python simulator.py 
 
 Again, these do not have to be run on the same machine as your tests, but
 the PVs here will need to be discoverable
@@ -136,7 +134,7 @@ the PVs here will need to be discoverable
 Now, you are ready to run the tests in the `tests` folder.  In many
 scenarios for Python libraries, one would be able to run all the tests, and
 measure the testing coverage with a single command.  Because the pyepics
-test will change underlying threading contexts, a simple 
+test will change underlying threading contexts, a simple ::
 
      ~> cd ..
      ~> pytest test_*.py

@@ -383,7 +383,7 @@ they change.  Two threads are created and run concurrently, with
 overlapping PV lists, though one thread is run for a shorter time than the
 other.
 
-.. literalinclude:: ../tests/thread_test.py
+.. literalinclude:: ../tests/test_threading.py
 
 In light of the long discussion above, a few remarks are in order: This
 code uses the standard Thread library and explicitly calls

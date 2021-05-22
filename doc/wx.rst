@@ -67,7 +67,7 @@ PVMixin
 
 
 PVCtrlMixin
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 .. class:: PVCtrlMixin(parent, pv=None, font=None, fg=None, bg=None, **kw)
 
@@ -203,7 +203,7 @@ PVButton
     disable when that PV has a certain value.
 
 PVBitmapButton
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. class:: PVBitmapButton(parent, pv=None, bitmap = 'image.png', pushValue=1, disablePV=None,
                     disableValue=1, **kw)
