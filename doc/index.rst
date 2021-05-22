@@ -25,11 +25,10 @@ and some support for using PyQt widgets in the :mod:`qt` module.
 
 -----------
 
-In addition to the Pyepics library described here, several applications
-built with pyepics are available at `http://github.com/pyepics/epicsapps/
-<http://github.com/pyepics/epicsapps/>`_.  See
-`http://pyepics.github.com/epicsapps/
-<http://pyepics.github.com/epicsapps/>`_ for further details.
+See also: Some `applications <https://pyepics.github.io/epicsapps/>`_ built
+with pyepics that are available at `http://github.com/pyepics/epicsapps/
+<https://github.com/pyepics/epicsapps/>`_.
+
 
 -----------
 
