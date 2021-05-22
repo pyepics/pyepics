@@ -8,8 +8,9 @@ jobs:
     strategy:
       max-parallel: 5
       fail-fast: false
+      uses: actions/setup-python@v2      
       matrix:
-        python-version: [3.7.10, 3.8.10, 3.9.5, 3.10.0-beta1]
+        python-version: ['3.7.10', '3.8.10', '3.9.4', '3.10.0-beta1']
 
     steps:
     - uses: actions/checkout@v2
