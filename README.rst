@@ -32,9 +32,15 @@ Installation
 
 This package requires python3.6 or higher.  The EPICS Channel Access
 library v 3.14.8 or higher is also required. Shared libraries are provided
-for Windows, MacOS, and Linux.
+and will be installed for Windows, MacOS, and Linux, and used by default.
 
-To install the package, use `pip install pyepics`.  To install from source, use::
+To install the package, use::
+
+    pip install pyepics
+
+To install from source, download the source kit for the latest release from
+PyPI (https://pypi.org/project/pyepics/) or Github
+(https://github.com/pyepics/pyepics/releases), unpack that and use::
 
     python setup.py install
 
@@ -45,12 +51,12 @@ for Windows are available.
 License
 ----------
 
-This code is distributed under the  Epics Open License
+This code is distributed under the Epics Open License
 
 Overview
 =================
 
-Py-Epics3 provides two principle modules: ca, and pv, and functions
+Pyepics provides two principle modules: ca, and pv, and functions
 caget(), caput(), and cainfo() for the simplest of interaction with EPICS.
 In addition, there are modules for Epics Motors and Alarms, autosave support
 via CA, and special widget classes for using EPICS PVs with wxPython.
@@ -96,13 +102,12 @@ Process Variable as the first argument::
 
 
 PV: Object Oriented CA interface
-------------------------------
+-----------------------------------
 
 The general concept is that an Epics Process Variable is implemented as a
 Python PV object, which provides a natural way to interact with EPICS.
 
    >>> import epics
-
    >>> pv = epics.PV('PVName')
    >>> pv.connected
    True
@@ -110,7 +115,7 @@ Python PV object, which provides a natural way to interact with EPICS.
    3.14
    >>> pv.put(2.71)
 
-
+   
 Channel Access features that are included here:
 
 * user callbacks - user-supplied Python function(s) that are run when a PV's

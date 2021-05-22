@@ -1,67 +1,61 @@
-xInstallation instructions for Py-Epics3
+Installation instructions for PyEpics3
 =======================================
 
-To install the epics module from source, use
+To install the epics module, use
+
+   pip install pyepics
+
+Or download the source kit from PyPI or Github, unpack that, and use
 
    python setup.py install
 
-Or,
-
-   pip install .
-
-This assumes that Python 2.5 or higher is installed and is the
-enviroment you wish to istall pyepics in to.
-
-By default the object libraries for Epics Channel Access (libCom.so
-and libca.so for linux, libCom.dylib and libca.dylib for Mac OS X and
-Com.dll and ca.dll for windows) are included with this distribution
-and installed for you.  To prevent the installation of the binaries use
-
-   NOLIBCA=1 python setup.py install
-
-The code is tested via continuation integration on linux for
-python 2.7, 3.5, and 3.6.  It is also extensively used on
-on windows and OSX machine.
+PyEpics requires Python 3.6 or higher.  
 
 
-Locating CA shared libraries
-============================
+Epics CA Shared Libraries, and using alternate versions of these
+=====================================================================
 
-On Unix systems, the shared libraries for Epics Channel Access (libca.so,
-libCom.so) must be found by Python at runtime.  Since Epics installations
-generally leaves these in an architecture-specific location (and not
-"installed" into normal system-wide library directories), you will probably
-need to set this up once per machine.  There are a few ways to do this:
+Pyepics needs to find and load shared object libraries (DLLs) for Epics
+Channel Access (libca and libCom) at runtime.  Recently-compiled versions of
+these shared object libraries are included with this distribution for
+Windows64, MacOS, Linux64, and LinuxArm and will be installed into the
+pyepics installation folder and used by default.  These are located under the
+epics/clibs folder of the source folder.  Legacy DLLs for 32-bit Windows and
+Linux are also included, but should be used with caution.
 
-  1. set the environmental variable LD_LIBRARY_PATH (or DYLD_LIBRARY_PATH)
-     to point to the directory with the shared object libraries:
+By providing and using these shared libraries, pyepics will work "out of the
+box" on most OSes and systems without any other Epics libraries installed.
 
-       export LD_LIBRARY_PATH=/usr/local/epics/base/lib/linux-x86
+There may be some OSes used or some situations for which you will want to use
+different versions of libca and libCom, especially on systems already using
+Epics for other applications.  One notable example is if you are using
+pyepics within a Python program or application that has already loaded a
+version of libca, as a single process can load only one version of a shared
+library.  If you are using the `pcaspy` library or running a python script
+that loads pyepics from within an epics IOC, you will need to ensure that all
+libraries loading libca load exactly the same version.
 
-       setenv LD_LIBRARY_PATH /usr/local/epics/base/lib/linux-x86
+To accommodate this situation, pyepics loads libca as late as possible and
+allows you to set the PYEPICS_LIBCA environmental variable, either globally
+for the shell running the application or within the python program itself
+before any real Channel Access is done -- this can be set after importing the
+pyepics module.   So, for example, you could do
 
-  2. set the PATH environmental variable to make sure that the location of
-     libca is in the PATH.
 
-Both options may need to be set for each user shell that uses CA, and so
-should probably be put in a shell startup script.
+    >>> import pyepics
+    >>> import os
+    >>> os.environ['PYEPCICS_LIBCA']='/usr/local/epics/base-7.0.4/lib/linux-x86_64/libca.so'
+    >>> print( epics.caget('XXX:m1'))
+    -0.2500
 
-Testing the Location of CA shared library
-==========================================
+You can also test which exact 'libca' was used.  For the example above
 
-The setup.py script will test where libca might be found and print a
-prominent warning if libca.so cannot be found.
+    >>> print(epics.ca.find_libca())
+    '/usr/local/epics/base-7.0.4/lib/linux-x86_64/libca.so'
 
-To test this yourself,  run python from the current directory and
-type:
-    >>> import lib as epics
-    >>> epics.ca.find_libca()
-
-This should report the full name of dynamic CA library (libca.so, ca.dll,
-or libca.dylib).   It it does not, or reports an error, you should
-locate libca.so and set PATH or LD_LIBRARY_PATH  to include the path
-containing this file.
+whereas by default this will point to something like
+    '../site-packages/pyepics-3.4.3-py3.8.egg/epics/clibs/linux64/libca.so'
 
 
 Matt Newville <newville@cars.uchicago.edu>
-Last Update:  2017-05-01
+Last Update:  2021-05-22
