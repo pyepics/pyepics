@@ -6,26 +6,26 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-PyEpics currently works with Python version 2.7, 3.5, 3.6, 3.7, and 3.8.
-We expect it to work with Python 3.9 as well.  Pyepics version 3.4.3 is the
-final version to work with Python 2.7 or Python 3.5, and version 3.5.0 and
-later will require Python 3.6 or later.
+PyEpics currently works with Python version 3.6, 3.7, 3.8, and 3.9.  We
+expect it to work with Python 3.10, but no testing has been done.  Pyepics
+version 3.4.3 was the final version to work with Python 2.7 or Python 3.5,
+and version 3.5.0 and later require Python 3.6 or later.
 
 Pyepics is supported and regularly used and tested on 64-bit Linux, 64-bit
 Mac OSX, and 64-bit Windows.  It is known to work on Linux with ARM
-processors including raspberry Pi, though this is not part of the automated
-testing set.  Pyepics may still work on 32-bit Windows and Linux, but these
-systems are not tested regularly.
+processors including raspberry Pi. As of this writing, automated testing is
+done only for Linux64.  Pyepics may still work on 32-bit Windows and Linux,
+but these systems are not tested regularly.
 
 The EPICS Channel Access library Version 3.14.12 or higher is required for
-pyepics and 3.15 or higher are strongly recommended.  More specifically,
-pyepics requires e shared libraries libca and libCom (*libca.so* and
-*libCom.so* on Linux, *libca.dylib* and *libCom.dylib* on Mac OSX, or
-*ca.dll* and *Com.dll* on Windows) from *Epics Base*.
+pyepics, and versions 3.15 or 7.0 or higher are strongly recommended.  More
+specifically, pyepics requires e shared libraries libca and libCom
+(*libca.so* and *libCom.so* on Linux, *libca.dylib* and *libCom.dylib* on
+Mac OSX, or *ca.dll* and *Com.dll* on Windows) from *Epics Base*.
 
 For all supported operating systems and some less-well-tested systems (all
-of linux-64, linux-32,linux-arm, windows-64, windows-32, and darwin-64),
-pre-built versions of *libca* (and *libCom*) built with 3.16.2 are
+of linux-64, linux-32, linux-arm, windows-64, windows-32, and darwin-64),
+pre-built versions of *libca* (and *libCom*) built with 3.16.2 or 7.0.4 are
 provided, and will be installed within the python packages directory and
 used by default.  This means that you do not need to install Epics base
 libraries or any other packages to use pyepics.  For Epics experts who may
@@ -51,19 +51,15 @@ Downloads and Installation
 .. _pyepics CARS downloads:       http://cars9.uchicago.edu/software/python/pyepics3/src/
 
 
-The latest stable version of the pyepics package is |release|.  This is the
-final release that will support Python versions 3.5 and below (including
-Python 2).  Source code kits and Windows installers can be found at
-`pyepics PyPI`_, and can be installed with::
+The latest stable version of the pyepics package is |release| which can be
+installed with::
 
      pip install pyepics
 
-If you're using Anaconda Python, there are a few conda channels for pyepics,
-including::
-
-     conda install -c GSECARS pyepics
-
-You can also download the source package, unpack it, and install with::
+If you're using Anaconda Python, there are a few conda channels that
+provide the latest versions, but the version on `PyPI` should be considered
+the definitive version.  You can also download the source package, unpack
+it, and install with::
 
      python setup.py install
 
@@ -83,18 +79,13 @@ If you need to or wish to use a different version of *libca*, you can set the
 environmental variable ``PYEPICS_LIBCA`` to the full path of the dynamic
 library to use as *libca*, for example::
 
-   > export PYEPICS_LIBCA=/usr/local/epics/base-3.15.5/lib/linux-x86_64/libca.so
+   > export PYEPICS_LIBCA=/usr/local/epics/base-7.0.4/lib/linux-x86_64/libca.so
 
 Note that *libca* will need to find another Epics CA library *libCom*.  This
 is almost always in the same folder as *libca*, but you may need to make sure
-that the *libca* you are pointing to can find the required *libCom*.  The
-methods for telling shared libraries (or executable files) how to find other
-shared libraries varies with system, but you may need to set other
-environmental variables such as ``LD_LIBRARY_PATH`` or ``DYLIB_LIBRARY_PATH``
-or use `ldconfig`.  If you're having trouble with any of these things,
-ask your local Epics gurus or contact the authors.
+that the *libca* you are pointing to can find the required *libCom*. To
+find out which CA library will be used by pyepics, use:
 
-To find out which CA library will be used by pyepics, use:
     >>> import epics
     >>> epics.ca.find_libca()
 
@@ -112,13 +103,49 @@ your immediate subnet, you may need to set the environmental variable
 Testing
 ~~~~~~~~~~~~~
 
-Automated and continuous unit-testing is done with the TravisCI
-(https://travis-ci.org/pyepics/pyepics) for Python 2.7, 3.5, and 3.6 using
-an Epics IOC running in a Docker image.  Many tests located in the `tests`
-folder can also be run using the script ``tests/simulator.py`` as long as
-the Epics database in ``tests/pydebug.db`` is loaded in a local IOC.  In
-addition, tests are regularly run on Mac OSX, and 32-bit and 64-bit
-Windows.
+Automated and continuous unit-testing is done with the Github actions,
+for Python 3.6, 3.7. 3.8, and 3.9.  This uses an ubuntu-linux enviroment.
+
+To run these tests yourself, you will need the `pytest` python module. You
+will also need to run an Epics softIOC as a separate process, and a
+simulator that updates PV values as a separate process.  These can all run
+on the same machine or different machines on your network as long as all
+processes can see all the PVs (all using a prefix of `PyTest:`).  The
+softIoc cannot be run in a separate terminal process or using the
+`procServ` program.  To setup the testing environment, first start the
+testing softIoc in one shell, with:
+
+     ~> cd tests/Setup
+     ~> softIoc ./st.cmd
+
+If you have `procServ` installed, you can do
+
+     ~> cd tests/Setup
+     ~> bash ./start_ioc.sh
+
+which will put the IOC properly as a background process.
+
+Second, run the simulator (also in `tests/Setup) so that Epics channels are
+changing: 
+
+     ~> python simulator.py &
+
+Again, these do not have to be run on the same machine as your tests, but
+the PVs here will need to be discoverable
+
+Now, you are ready to run the tests in the `tests` folder.  In many
+scenarios for Python libraries, one would be able to run all the tests, and
+measure the testing coverage with a single command.  Because the pyepics
+test will change underlying threading contexts, a simple 
+
+     ~> cd ..
+     ~> pytest test_*.py
+
+ will show many failures.  Instead you should run each test as a separate
+ run of `pytest`:
+ 
+     ~> for testfile in test_*.py; do  pytest $testfile ; done
+     
 
 
 Development Version
