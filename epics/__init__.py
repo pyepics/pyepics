@@ -105,9 +105,9 @@ def caput(pvname, value, wait=False, timeout=60.0, connection_timeout=5.0):
         return thispv.put(value, wait=wait, timeout=timeout)
 
 def caget(pvname, as_string=False, count=None, as_numpy=True,
-          use_monitor=False, timeout=5.0, connection_timeout=5.0):
+          use_monitor=True, timeout=5.0, connection_timeout=5.0):
     """caget(pvname, as_string=False, count=None, as_numpy=True,
-             use_monitor=False, timeout=5.0, connection_timeout=5.0)
+             use_monitor=True, timeout=5.0, connection_timeout=5.0)
 
     get the current value to an epics Process Variable (PV).
 
@@ -116,7 +116,7 @@ def caget(pvname, as_string=False, count=None, as_numpy=True,
      pvname (str):   name of PV
      as_string (bool): whether to get the string representation [False]
      count (int or None): maximum number of elements of array values [None]
-     use_monitor (bool): whether to use the value cached by the monitor [False]
+     use_monitor (bool): whether to use the value cached by the monitor [True]
      timeout (float):  maximum time to wait for the processing to complete [60]
      connection_timeout (float): maximum time to wait for connection [5]
 
@@ -134,13 +134,13 @@ def caget(pvname, as_string=False, count=None, as_numpy=True,
          according to the PVs precision, enum values will return the approriate
          enum string, etc.
       3. count can be used to limit the number of elements fetched for array PVs.
-      4. `use_monitor=True` will return the most recently cached value from the
+      4. `use_monitor=False` will return the most recently cached value from the
          internal monitor placed on the PV. This will be the latest value unless
          the value is changing very rapidly. `use_monitor=False` will ignore the
          cached value and ask for an explicit value.  Of course, if a PV is
          changing rapidly enough for that to make a difference, it may also
          change between getting the value and downstream code using it.
-      5. All time in seconds.
+      5. All time values are in seconds.
 
 
     Examples
