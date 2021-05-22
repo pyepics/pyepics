@@ -66,7 +66,7 @@
 <li><a class="reference internal" href="#creating-and-using-pv-objects">Creating and Using PV Objects</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-epics">Functions defined in <code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code>: caget(), caput(), etc.</a><ul>
+<li><a class="reference internal" href="#module-epics">Simple <code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code> functions: caget(), caput(), etc.</a><ul>
 <li><a class="reference internal" href="#caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a></li>
 <li><a class="reference internal" href="#caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a></li>
 <li><a class="reference internal" href="#cainfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">cainfo()</span></code></a></li>
@@ -77,7 +77,7 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#motivation-and-design-concepts">Motivation and design concepts</a></li>
-<li><a class="reference internal" href="#status-and-to-do-list">Status and to-do list</a></li>
+<li><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 </ul>
@@ -293,7 +293,7 @@ attribute.  Further details are at <a class="reference internal" href="pv.html#p
 </section>
 </section>
 <section id="module-epics">
-<span id="functions-defined-in-epics-caget-caput-etc"></span><h2>Functions defined in <a class="reference internal" href="#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code></a>: caget(), caput(), etc.<a class="headerlink" href="#module-epics" title="Permalink to this headline">¶</a></h2>
+<span id="simple-epics-functions-caget-caput-etc"></span><h2>Simple <a class="reference internal" href="#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code></a> functions: caget(), caput(), etc.<a class="headerlink" href="#module-epics" title="Permalink to this headline">¶</a></h2>
 <p>As shown above, the simplest interface to EPICS Channel Access is found
 with the functions <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a>, <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a>, and <a class="reference internal" href="#epics.cainfo" title="epics.cainfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">cainfo()</span></code></a>.  There
 are also functions <a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a> and <a class="reference internal" href="#epics.camonitor_clear" title="epics.camonitor_clear"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor_clear()</span></code></a> to setup
@@ -311,7 +311,7 @@ getting and putting values for multiple PVs at a time.</p>
 <h3><a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a><a class="headerlink" href="#caget" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.caget">
-<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">as_string=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">count=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">as_numpy=True</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">use_monitor=False</span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">as_string=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">count=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">as_numpy=True</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">use_monitor=True</span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves and returns the value of the named PV.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -338,13 +338,14 @@ return <code class="docutils literal notranslate"><span class="pre">None</span><
 but it might also mean that the data is large or network slow enough that
 the data just hasn’t been received yet, but may show up later.</p>
 <p>The <em>use_monitor</em> argument sets whether to rely on the monitors from the
-underlying PV.  The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>, so that each <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> will
-explicitly ask the value to be sent instead of relying on the automatic
-monitoring normally used for persistent PVs.  This makes <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> act
-more like command-line tools, and slightly less efficient than creating a
-PV and getting values with it.  If performance is a concern, using monitors
-is recommended.  For more details on making <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> more efficient,
-see <a class="reference internal" href="pv.html#pv-automonitor-label"><span class="std std-ref">Automatic Monitoring of a PV</span></a> and <a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><span class="std std-ref">The wait and timeout options for get(), ca.get_complete()</span></a>.</p>
+underlying PV.  The default is <code class="docutils literal notranslate"><span class="pre">True</span></code>, so that cached values will be
+used.  Using <code class="docutils literal notranslate"><span class="pre">False</span></code> will make the each <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> explicitly ask the
+value to be sent instead of relying on the automatic monitoring normally
+used for persistent PVs.  This will make <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> act more like
+command-line tools, and slightly less efficient than creating a PV and
+getting values with it.  If performance is a concern, using monitors is
+recommended.  For more details on making <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> more efficient, see
+<a class="reference internal" href="pv.html#pv-automonitor-label"><span class="std std-ref">Automatic Monitoring of a PV</span></a> and <a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><span class="std std-ref">The wait and timeout options for get(), ca.get_complete()</span></a>.</p>
 <p>The <em>as_string</em> argument tells the function to return the <strong>string
 representation</strong> of the value.  The details of the string representation
 depends on the variable type of the PV.  For integer (short or long) and
@@ -399,7 +400,8 @@ strings:</p>
 </pre></div>
 </div>
 <p>Of course,character waveforms are not always used for long strings, but can
-also hold byte array data, such as comes from some detectors and devices.</p>
+also hold byte array data, such as may come from some detectors and
+devices.</p>
 </section>
 <section id="caput">
 <h3><a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a><a class="headerlink" href="#caput" title="Permalink to this headline">¶</a></h3>
@@ -601,10 +603,10 @@ included:</p>
 <div><ol class="arabic simple">
 <li><p>providing both low-level (C-like) and higher-level access (Python
 objects) to the EPICS Channel Access protocol.</p></li>
-<li><p>supporting as many features of Epics 3.14 as possible, including
-preemptive callbacks and thread support.</p></li>
+<li><p>supporting as many features of Epics 3.14 and greater as possible,
+including preemptive callbacks and thread support.</p></li>
 <li><p>easy support and distribution for Windows and Unix-like systems.</p></li>
-<li><p>support for both Python 2 and Python 3.</p></li>
+<li><p>support for both Python 2 (now no longer supported) and Python 3.</p></li>
 <li><p>using Python’s ctypes library.</p></li>
 </ol>
 </div></blockquote>
@@ -622,26 +624,14 @@ underlying C library is automatically made thread-aware without explicit
 code.  Finally, by avoiding the C API altogether, supporting both Python2
 and Python3 is greatly simplified.</p>
 </section>
-<section id="status-and-to-do-list">
-<h2>Status and to-do list<a class="headerlink" href="#status-and-to-do-list" title="Permalink to this headline">¶</a></h2>
+<section id="status">
+<h2>Status<a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
 <p>The PyEpics package is actively maintained, but the core library is
 reasonably stable and ready to use in production code.  Features are being
 added slowly, and testing is integrated into development so that the chance
 of introducing bugs into existing codes is minimized.  The package is
-targeted and tested to work with Python 2.7 and Python 3 simultaneously.</p>
-<p>There are several desired features are left unfinished or could use
-improvement:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>add more Epics Devices, including low-level epics records and more
-suport for Area Detectors.</p></li>
-<li><p>build and improve applications using PyEpics, especially for common data
-acquisition needs.</p></li>
-<li><p>improve and extend the use of PyQt widgets with PyEpics.</p></li>
-</ul>
-</div></blockquote>
-<p>If you are interested in working on any of these or other topics, please
-contact the authors.</p>
+targeted and tested to work on all supported versions of Python, currently
+Python 3.6 and higher.</p>
 </section>
 </section>
 
@@ -682,7 +672,7 @@ contact the authors.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014, Matthew Newville.
+        &#169; Copyright 2021, Matthew Newville.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
     </div>
   </body>

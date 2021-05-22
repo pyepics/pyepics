@@ -108,11 +108,10 @@
 <h1>Downloading and Installation<a class="headerlink" href="#downloading-and-installation" title="Permalink to this headline">¶</a></h1>
 <section id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>PyEpics currently works with Python version 3.6 and higher.  At this
-writing, automated testing is done with versions 3.7, 3.8, 3.9, and
-3.10.0-beta.1, though no problems are expected for Python 3.6.  Pyepics
-version 3.4.3 was the final version to work with Python 2.7 or Python 3.5,
-and version 3.5.0 and later require Python 3.6 or later.</p>
+<p>PyEpics works with Python version 3.6 and higher.  At this writing,
+automated testing is done with versions 3.7, 3.8, 3.9, and 3.10.0-beta.1,
+though no problems are expected for Python 3.6.  Pyepics version 3.4.3 was
+the final version to work with Python 2.7 or Python 3.5.</p>
 <p>Pyepics is supported and regularly used on 64-bit Linux, 64-bit Mac OSX,
 and 64-bit Windows.  It is known to work on Linux with ARM processors
 including raspberry Pi. As of this writing, automated testing is done only
@@ -125,12 +124,13 @@ specifically, pyepics requires the shared libraries <em>libca</em> and <em>libCo
 Mac OSX, or <em>ca.dll</em> and <em>Com.dll</em> on Windows) from <em>Epics Base</em>.</p>
 <p>For Linux64, Linux32, LinuxArm, Windows64, Windows32, and Darwin64 (MacOS),
 pre-built versions of <em>libca</em> (and <em>libCom</em>) built with 3.16.2 or 7.0.4 are
-provided, and will be installed into the python packages directory and used
-by default.  This means that you do not need to install Epics base
+provided (details of how these were built are in the <cite>clibs</cite> folder of the
+source kit), and will be installed into the python packages directory and
+used by default.  This means that you do not need to install Epics base
 libraries or any other packages to use pyepics.  For Epics experts who may
 want to use their own versions the <em>libca</em> from Epics base, instructions
 for how to do this are given below.</p>
-<p>The Python <a class="reference external" href="http://numpy.scipy.org/">numpy module</a> is highly
+<p>The Python <a class="reference external" href="https://numpy.scipy.org/">numpy</a> module is highly
 recommended. and will be used to automatically convert between EPICS
 waveforms and numpy arrays if available.</p>
 <p>The <cite>autosave</cite> module requires the <cite>pyparsing</cite> package, which is widely
@@ -212,24 +212,29 @@ simulator (also in <cite>tests/Setup</cite>) so that Epics channels are changing
 </pre></div>
 </div>
 <p>Again, these do not have to be run on the same machine as your tests, but
-the PVs here will need to be discoverable</p>
+the PVs here will need to be discoverable by all the processes involved.</p>
 <p>Now, you are ready to run the tests in the <cite>tests</cite> folder.  In many
 scenarios for Python libraries, one would be able to run all the tests, and
 measure the testing coverage with a single command.  Because the pyepics
 test will change underlying threading contexts, a simple</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    ~&gt; cd ..
-    ~&gt; pytest test_*.py
-
-will show many failures.  Instead you should run each test as a separate
-run of `pytest`:
-
-    ~&gt; for testfile in test_*.py; do  pytest $testfile ; done
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">~&gt;</span> <span class="n">cd</span> <span class="o">..</span>
+<span class="o">~&gt;</span> <span class="n">pytest</span> <span class="n">test_</span><span class="o">*.</span><span class="n">py</span>
 </pre></div>
 </div>
+<p>will show many failures.  Instead you should run each test as a separate
+run of <cite>pytest</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>~&gt; for testfile in test_*.py; do  pytest $testfile ; done
+</pre></div>
+</div>
+<p>The automated testing process also uses the <cite>coverage</cite> tool to help
+identify which parts of the code is actually run by the tests.
+Unfortunately, the code for using GUI are not easily tested by the
+automated procedures.  In addition, a softIoc would need to support all of
+the subclasses of Device, which cannot be gauranteed.</p>
 </section>
 <section id="development-version">
 <h2>Development Version<a class="headerlink" href="#development-version" title="Permalink to this headline">¶</a></h2>
-<p>Development of pyepics is done through the <a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github
+<p>Development of pyepics is done through the <a class="reference external" href="https://github.com/pyepics/pyepics">pyepics github
 repository</a>.  To get a copy of the latest version do:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pyepics</span><span class="o">/</span><span class="n">pyepics</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
@@ -248,12 +253,12 @@ knowledgeable about the topic might provide an answer. Since the
 mailing list is archived and the main mailing list for Epics work, a
 question to the mailing list has a better chance of helping someone
 else.</p></li>
-<li><p>Create an Issue on <a class="reference external" href="http://github.com/pyepics/pyepics">http://github.com/pyepics/pyepics</a>.  Though the
+<li><p>Create an Issue on <a class="reference external" href="https://github.com/pyepics/pyepics">https://github.com/pyepics/pyepics</a>.  Though the
 github Issues seem to be intended for bug tracking, they are a fine
 way to catalog various kinds of questions and feature requests.</p></li>
 <li><p>If you are sure you have found a bug in existing code, or have
 some code you think would be useful to add to pyepics, consider
-making a Pull Request on <a class="reference external" href="http://github.com/pyepics/pyepics">http://github.com/pyepics/pyepics</a>.</p></li>
+making a Pull Request on <a class="reference external" href="https://github.com/pyepics/pyepics">https://github.com/pyepics/pyepics</a>.</p></li>
 </ol>
 </div></blockquote>
 </section>
@@ -393,7 +398,7 @@ Vigder, Steve Wasserman, and Glen Wright.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014, Matthew Newville.
+        &#169; Copyright 2021, Matthew Newville.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
     </div>
   </body>

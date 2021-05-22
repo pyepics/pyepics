@@ -109,7 +109,7 @@
 data from EPICS waveform records.  These are always data of a homogenous
 data type, and have a fixed maximum element count (defined when the
 waveform is created from the host EPICS process).  Epics waveforms are
-most naturally mapped to Arrays from the <a class="reference external" href="http://numpy.scipy.org/">numpy module</a>, and this is strongly encouraged.</p>
+most naturally mapped to Arrays from the <a class="reference external" href="https://numpy.scipy.org/">numpy module</a>, and this is strongly encouraged.</p>
 <section id="arrays-without-numpy">
 <h2>Arrays without Numpy<a class="headerlink" href="#arrays-without-numpy" title="Permalink to this headline">¶</a></h2>
 <p>If you have numpy installed, and use the default <em>as_numpy=True</em> in
@@ -117,7 +117,7 @@ most naturally mapped to Arrays from the <a class="reference external" href="htt
 numpy array for the value of a waveform PV.  If you do <em>not</em> have numpy
 installed, or explicitly use <em>as_numpy=False</em> in a get request, you will
 get the raw C-like array reference from the Python
-<a class="reference external" href="http://docs.python.org/library/ctypes.html#arrays">ctypes module</a>.
+<a class="reference external" href="https://docs.python.org/library/ctypes.html#arrays">ctypes module</a>.
 These objects are not normally meant for casual use, but are not too
 difficult to work with either.  They can be easily converted to a simple
 Python list with something like:</p>
@@ -243,7 +243,7 @@ unless explicitly set. Auto-monitoring of PVs can be be explicitly set with</p>
 </section>
 <section id="example-handling-large-arrays">
 <h2>Example handling Large Arrays<a class="headerlink" href="#example-handling-large-arrays" title="Permalink to this headline">¶</a></h2>
-<p>Here is an example reading data from an <a class="reference external" href="http://cars9.uchicago.edu/software/epics/areaDetector.html">EPICS areaDetector</a>, as if it
+<p>Here is an example reading data from an <a class="reference external" href="https://millenia.cars.aps.anl.gov/software/epics/areaDetector.html">EPICS areaDetector</a>, as if it
 were an image from a digital camera.  This uses the common third-party
 library called <cite>Python Imaging Library</cite> or <cite>pillow</cite> for much of the image
 processing.  This library can be installed with <cite>pip install pillow</cite> or
@@ -264,7 +264,7 @@ processing.  This library can be installed with <cite>pip install pillow</cite> 
 <p>The result looks like this (taken with a Prosilica GigE camera):</p>
 <img alt="_images/AreaDetector1.png" src="_images/AreaDetector1.png" />
 <p>A more complete application for reading and displaying image from Epics
-Area Detectors is included  at <a class="reference external" href="http://github.com/pyepics/epicsapps/">http://github.com/pyepics/epicsapps/</a>.</p>
+Area Detectors is included  at <a class="reference external" href="https://github.com/pyepics/epicsapps/">https://github.com/pyepics/epicsapps/</a>.</p>
 </section>
 </section>
 
@@ -305,7 +305,7 @@ Area Detectors is included  at <a class="reference external" href="http://github
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014, Matthew Newville.
+        &#169; Copyright 2021, Matthew Newville.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
     </div>
   </body>

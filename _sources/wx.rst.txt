@@ -10,7 +10,7 @@ of wxPython classes for epics PVs. Most of these are derived from wxPython
 widgets, with special support added for epics PVs, especially regarding
 when to automatically update the widget based on a changing value for a PV.
 
-.. _pyepics applications:    http://github.com/pyepics/epicsapps
+.. _pyepics applications:    https://github.com/pyepics/epicsapps
 
 Some examples of code that uses pyepics and wxPython are included in the
 *scripts* folder of the pyepics source distribution kit.  In addition,

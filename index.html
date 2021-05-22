@@ -89,28 +89,28 @@ Development version: <br> &nbsp; &nbsp; <a href="https://github.com/pyepics/pyep
             
   <section id="epics-channel-access-for-python">
 <h1>Epics Channel Access for Python<a class="headerlink" href="#epics-channel-access-for-python" title="Permalink to this headline">¶</a></h1>
-<p>PyEpics is an interface for the Channel Access (CA) library of the <a class="reference external" href="http://www.aps.anl.gov/epics/">Epics
+<p>PyEpics is an interface for the Channel Access (CA) library of the <a class="reference external" href="https://www.aps.anl.gov/epics/">Epics
 Control System</a> to the Python Programming
-language.  The pyepics package provides a base <a class="reference internal" href="overview.html#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code></a> module to python,
-with methods for reading from and writing to Epics Process Variables (PVs) via
-the CA protocol.  The package includes a thin and fairly complete layer over
-the low-level Channel Access library in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module, and higher level
-abstractions built on top of this basic functionality.</p>
+language.  The pyepics package provides an <a class="reference internal" href="overview.html#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code></a> module to python,
+with methods for reading from and writing to Epics Process Variables (PVs)
+via the CA protocol.  The package includes a thin and fairly complete layer
+over the lowest-level Channel Access library in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module, and
+higher level abstractions built on top of this basic functionality.</p>
 <p>The package includes a very simple interface to CA similar to the Unix
-command-line tools and EZCA library with functions <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>,
-<a class="reference internal" href="overview.html#epics.caput" title="epics.caput"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caput()</span></code></a>, <a class="reference internal" href="overview.html#epics.cainfo" title="epics.cainfo"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.cainfo()</span></code></a>, and <a class="reference internal" href="overview.html#epics.camonitor" title="epics.camonitor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.camonitor()</span></code></a>.
-For an object-oriented interface, there is also a <a class="reference internal" href="pv.html#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">pv.PV</span></code></a> class
-which represents an Epics Process Variable as a full-featured and
-easy-to-use Python object.  Additional modules provide higher-level
-programming support to CA, including grouping related PVs into a
-<a class="reference internal" href="devices.html#device.Device" title="device.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">device.Device</span></code></a>, creating alarms in <a class="reference internal" href="alarm.html#alarm.Alarm" title="alarm.Alarm"><code class="xref py py-class docutils literal notranslate"><span class="pre">alarm.Alarm</span></code></a>, and saving
-PVs values in the <a class="reference internal" href="autosave.html#module-autosave" title="autosave: simple save/restore of PVs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">autosave</span></code></a> module.  There is also support for
-conveniently using epics PVs to wxPython widgets in the <a class="reference internal" href="wx.html#module-wx" title="wx: wxPython Widgets for Epics"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wx</span></code></a> module,
-and some support for using PyQt widgets in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">qt</span></code> module.</p>
+command-line tools with functions <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>, <a class="reference internal" href="overview.html#epics.caput" title="epics.caput"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caput()</span></code></a>,
+<a class="reference internal" href="overview.html#epics.cainfo" title="epics.cainfo"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.cainfo()</span></code></a>, and <a class="reference internal" href="overview.html#epics.camonitor" title="epics.camonitor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.camonitor()</span></code></a>.  For an object-oriented
+interface, there is also a <a class="reference internal" href="pv.html#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">pv.PV</span></code></a> class which represents an Epics
+Process Variable as a full-featured and easy-to-use Python object.
+Additional modules provide higher-level programming support to CA,
+including grouping related PVs into a <a class="reference internal" href="devices.html#device.Device" title="device.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">device.Device</span></code></a> (with a number
+of predefined devices ready to use), for creating alarms in
+<a class="reference internal" href="alarm.html#alarm.Alarm" title="alarm.Alarm"><code class="xref py py-class docutils literal notranslate"><span class="pre">alarm.Alarm</span></code></a>, and for saving PVs values in the <a class="reference internal" href="autosave.html#module-autosave" title="autosave: simple save/restore of PVs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">autosave</span></code></a>
+module.  There is also support for conveniently using epics PVs to wxPython
+widgets in the <a class="reference internal" href="wx.html#module-wx" title="wx: wxPython Widgets for Epics"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wx</span></code></a> module, and some support for using PyQt widgets in
+the <code class="xref py py-mod docutils literal notranslate"><span class="pre">qt</span></code> module.</p>
 <hr class="docutils" />
-<p>In addition to the Pyepics library described here, several applications
-built with pyepics are available at <a class="reference external" href="http://github.com/pyepics/epicsapps/">http://github.com/pyepics/epicsapps/</a>.  See
-<a class="reference external" href="http://pyepics.github.com/epicsapps/">http://pyepics.github.com/epicsapps/</a> for further details.</p>
+<p>See also: Some <a class="reference external" href="https://pyepics.github.io/epicsapps/">applications</a> built
+with pyepics that are available at <a class="reference external" href="https://github.com/pyepics/epicsapps/">https://github.com/pyepics/epicsapps/</a>.</p>
 <hr class="docutils" />
 <div class="toctree-wrapper compound">
 <ul>
@@ -127,9 +127,9 @@ built with pyepics are available at <a class="reference external" href="http://g
 </li>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">PyEpics Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#quick-start">Quick Start</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview.html#module-epics">Functions defined in <code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code>: caget(), caput(), etc.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#module-epics">Simple <code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code> functions: caget(), caput(), etc.</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#motivation-and-design-concepts">Motivation and design concepts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview.html#status-and-to-do-list">Status and to-do list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pv.html">PV: Epics Process Variables</a><ul>
@@ -231,7 +231,7 @@ built with pyepics are available at <a class="reference external" href="http://g
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2014, Matthew Newville.
+        &#169; Copyright 2021, Matthew Newville.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
     </div>
   </body>
