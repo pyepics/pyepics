@@ -189,7 +189,7 @@ PVs *Control Attributes*, like those shown above in the :attr:`info`
 attribute.  Further details are at :ref:`pv-label`.
 
 
-Functions defined in :mod:`epics`: caget(), caput(), etc.
+Simple :mod:`epics` functions: caget(), caput(), etc.
 ========================================================================
 
 .. module:: epics
@@ -214,7 +214,7 @@ getting and putting values for multiple PVs at a time.
 :func:`caget`
 ~~~~~~~~~~~~~
 
-..  function:: caget(pvname[, as_string=False[, count=None[, as_numpy=True[, timeout=None[, use_monitor=False]]]]])
+..  function:: caget(pvname[, as_string=False[, count=None[, as_numpy=True[, timeout=None[, use_monitor=True]]]]])
 
   retrieves and returns the value of the named PV.
 
@@ -243,13 +243,14 @@ but it might also mean that the data is large or network slow enough that
 the data just hasn't been received yet, but may show up later.
 
 The *use_monitor* argument sets whether to rely on the monitors from the
-underlying PV.  The default is ``False``, so that each :func:`caget` will
-explicitly ask the value to be sent instead of relying on the automatic
-monitoring normally used for persistent PVs.  This makes :func:`caget` act
-more like command-line tools, and slightly less efficient than creating a
-PV and getting values with it.  If performance is a concern, using monitors
-is recommended.  For more details on making :func:`caget` more efficient,
-see :ref:`pv-automonitor-label` and :ref:`advanced-get-timeouts-label`.
+underlying PV.  The default is ``True``, so that cached values will be
+used.  Using ``False`` will make the each :func:`caget` explicitly ask the
+value to be sent instead of relying on the automatic monitoring normally
+used for persistent PVs.  This will make :func:`caget` act more like
+command-line tools, and slightly less efficient than creating a PV and
+getting values with it.  If performance is a concern, using monitors is
+recommended.  For more details on making :func:`caget` more efficient, see
+:ref:`pv-automonitor-label` and :ref:`advanced-get-timeouts-label`.
 
 The *as_string* argument tells the function to return the **string
 representation** of the value.  The details of the string representation
@@ -305,7 +306,8 @@ strings::
     '/home/epics/scratch/'
 
 Of course,character waveforms are not always used for long strings, but can
-also hold byte array data, such as comes from some detectors and devices.
+also hold byte array data, such as may come from some detectors and
+devices.
 
 :func:`caput`
 ~~~~~~~~~~~~~~~~
@@ -510,10 +512,10 @@ included:
 
    1) providing both low-level (C-like) and higher-level access (Python
       objects) to the EPICS Channel Access protocol.
-   2) supporting as many features of Epics 3.14 as possible, including
-      preemptive callbacks and thread support.
+   2) supporting as many features of Epics 3.14 and greater as possible,
+      including preemptive callbacks and thread support.
    3) easy support and distribution for Windows and Unix-like systems.
-   4) support for both Python 2 and Python 3.
+   4) support for both Python 2 (now no longer supported) and Python 3.
    5) using Python's ctypes library.
 
 The idea is to provide both a low-level interface to Epics Channel Access
@@ -530,25 +532,13 @@ underlying C library is automatically made thread-aware without explicit
 code.  Finally, by avoiding the C API altogether, supporting both Python2
 and Python3 is greatly simplified.
 
-Status and to-do list
-=======================
+Status 
+==============
 
 The PyEpics package is actively maintained, but the core library is
 reasonably stable and ready to use in production code.  Features are being
 added slowly, and testing is integrated into development so that the chance
 of introducing bugs into existing codes is minimized.  The package is
-targeted and tested to work with Python 2.7 and Python 3 simultaneously.
+targeted and tested to work on all supported versions of Python, currently
+Python 3.6 and higher.
 
-There are several desired features are left unfinished or could use
-improvement:
-
- * add more Epics Devices, including low-level epics records and more
-   suport for Area Detectors.
-
- * build and improve applications using PyEpics, especially for common data
-   acquisition needs.
-
- * improve and extend the use of PyQt widgets with PyEpics.
-
-If you are interested in working on any of these or other topics, please
-contact the authors.

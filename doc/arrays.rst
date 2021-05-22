@@ -9,7 +9,7 @@ data from EPICS waveform records.  These are always data of a homogenous
 data type, and have a fixed maximum element count (defined when the
 waveform is created from the host EPICS process).  Epics waveforms are
 most naturally mapped to Arrays from the `numpy module
-<http://numpy.scipy.org/>`_, and this is strongly encouraged.
+<https://numpy.scipy.org/>`_, and this is strongly encouraged.
 
 Arrays without Numpy
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -19,7 +19,7 @@ If you have numpy installed, and use the default *as_numpy=True* in
 numpy array for the value of a waveform PV.  If you do *not* have numpy
 installed, or explicitly use *as_numpy=False* in a get request, you will
 get the raw C-like array reference from the Python
-`ctypes module <http://docs.python.org/library/ctypes.html#arrays>`_.
+`ctypes module <https://docs.python.org/library/ctypes.html#arrays>`_.
 These objects are not normally meant for casual use, but are not too
 difficult to work with either.  They can be easily converted to a simple
 Python list with something like::
@@ -160,7 +160,7 @@ Example handling Large Arrays
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is an example reading data from an `EPICS areaDetector
-<http://cars9.uchicago.edu/software/epics/areaDetector.html>`_, as if it
+<https://millenia.cars.aps.anl.gov/software/epics/areaDetector.html>`_, as if it
 were an image from a digital camera.  This uses the common third-party
 library called `Python Imaging Library` or `pillow` for much of the image
 processing.  This library can be installed with `pip install pillow` or
@@ -185,5 +185,5 @@ The result looks like this (taken with a Prosilica GigE camera):
 
 
 A more complete application for reading and displaying image from Epics
-Area Detectors is included  at `http://github.com/pyepics/epicsapps/
-<http://github.com/pyepics/epicsapps/>`_.
+Area Detectors is included  at `https://github.com/pyepics/epicsapps/
+<https://github.com/pyepics/epicsapps/>`_.

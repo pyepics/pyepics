@@ -39,7 +39,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'epics'
-copyright = u'2014, Matthew Newville'
+copyright = u'2021, Matthew Newville'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

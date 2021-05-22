@@ -6,11 +6,10 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-PyEpics currently works with Python version 3.6 and higher.  At this
-writing, automated testing is done with versions 3.7, 3.8, 3.9, and
-3.10.0-beta.1, though no problems are expected for Python 3.6.  Pyepics
-version 3.4.3 was the final version to work with Python 2.7 or Python 3.5,
-and version 3.5.0 and later require Python 3.6 or later.
+PyEpics works with Python version 3.6 and higher.  At this writing,
+automated testing is done with versions 3.7, 3.8, 3.9, and 3.10.0-beta.1,
+though no problems are expected for Python 3.6.  Pyepics version 3.4.3 was
+the final version to work with Python 2.7 or Python 3.5.
 
 Pyepics is supported and regularly used on 64-bit Linux, 64-bit Mac OSX,
 and 64-bit Windows.  It is known to work on Linux with ARM processors
@@ -26,13 +25,14 @@ Mac OSX, or *ca.dll* and *Com.dll* on Windows) from *Epics Base*.
 
 For Linux64, Linux32, LinuxArm, Windows64, Windows32, and Darwin64 (MacOS),
 pre-built versions of *libca* (and *libCom*) built with 3.16.2 or 7.0.4 are
-provided, and will be installed into the python packages directory and used
-by default.  This means that you do not need to install Epics base
+provided (details of how these were built are in the `clibs` folder of the
+source kit), and will be installed into the python packages directory and
+used by default.  This means that you do not need to install Epics base
 libraries or any other packages to use pyepics.  For Epics experts who may
 want to use their own versions the *libca* from Epics base, instructions
 for how to do this are given below.
 
-The Python `numpy module <http://numpy.scipy.org/>`_ is highly
+The Python `numpy <https://numpy.scipy.org/>`_ module is highly
 recommended. and will be used to automatically convert between EPICS
 waveforms and numpy arrays if available.
 
@@ -45,11 +45,9 @@ requires `PyQt` or `PySide`.
 Downloads and Installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _pyepics github repository:    http://github.com/pyepics/pyepics
-.. _Python Setup Tools:           http://pypi.python.org/pypi/setuptools
+.. _pyepics github repository:    https://github.com/pyepics/pyepics
+.. _Python Setup Tools:           https://pypi.python.org/pypi/setuptools
 .. _pyepics PyPi:                 https://pypi.python.org/pypi/pyepics/
-.. _pyepics CARS downloads:       http://cars9.uchicago.edu/software/python/pyepics3/src/
-
 
 The latest stable version of the pyepics package is |release| which can be
 installed with::
@@ -129,7 +127,7 @@ simulator (also in `tests/Setup`) so that Epics channels are changing::
      ~> python simulator.py 
 
 Again, these do not have to be run on the same machine as your tests, but
-the PVs here will need to be discoverable
+the PVs here will need to be discoverable by all the processes involved.
 
 Now, you are ready to run the tests in the `tests` folder.  In many
 scenarios for Python libraries, one would be able to run all the tests, and
@@ -139,12 +137,17 @@ test will change underlying threading contexts, a simple ::
      ~> cd ..
      ~> pytest test_*.py
 
- will show many failures.  Instead you should run each test as a separate
- run of `pytest`:
+will show many failures.  Instead you should run each test as a separate
+run of `pytest`::
  
      ~> for testfile in test_*.py; do  pytest $testfile ; done
      
 
+The automated testing process also uses the `coverage` tool to help
+identify which parts of the code is actually run by the tests.
+Unfortunately, the code for using GUI are not easily tested by the
+automated procedures.  In addition, a softIoc would need to support all of
+the subclasses of Device, which cannot be gauranteed.  
 
 Development Version
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -169,13 +172,13 @@ following methods:
      question to the mailing list has a better chance of helping someone
      else.
 
- 2.  Create an Issue on http://github.com/pyepics/pyepics.  Though the
+ 2.  Create an Issue on https://github.com/pyepics/pyepics.  Though the
      github Issues seem to be intended for bug tracking, they are a fine
      way to catalog various kinds of questions and feature requests.
 
  3.  If you are sure you have found a bug in existing code, or have
      some code you think would be useful to add to pyepics, consider
-     making a Pull Request on http://github.com/pyepics/pyepics.
+     making a Pull Request on https://github.com/pyepics/pyepics.
 
 
 License
