@@ -838,7 +838,7 @@ or, equivalently
    '1.000'
 
 Requests including Metadata
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is also possible to get the metadata associated with a single Channel Access
 request using :func:`get_with_metadata`::
@@ -986,7 +986,7 @@ Example of connection callback
 
 A connection callback:
 
-.. literalinclude:: ../tests/pv_connection_callback.py
+.. literalinclude:: ../tests/UnsortedTests/pv_connection_callback.py
 
 Example of an access rights callback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

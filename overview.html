@@ -5,15 +5,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>PyEpics Overview &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PV: Epics Process Variables" href="pv.html" />
@@ -113,7 +113,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="pyepics-overview">
+  <section id="pyepics-overview">
 <h1>PyEpics Overview<a class="headerlink" href="#pyepics-overview" title="Permalink to this headline">¶</a></h1>
 <p>The python <a class="reference internal" href="#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code></a> package provides several function, modules, and
 classes to interact with EPICS Channel Access.  The simplest approach uses
@@ -164,13 +164,13 @@ alarms, Epics motors, and several other <em>devices</em> (collections of PVs), a
 a set of wxPython widget classes for using EPICS PVs with wxPython.</p>
 <p>The <cite>epics</cite> package is supported and well-tested on Linux, Mac OS X, and
 Windows with Python versions 2.7, and 3.5 and above.</p>
-<div class="section" id="quick-start">
+<section id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
 <p>Whether you’re familiar with Epics Channel Access or not, start here.
 You’ll then be able to use Python’s introspection tools and built-in help
 system, and the rest of this document as a reference and for detailed
 discussions.</p>
-<div class="section" id="procedural-approach-caget-caput">
+<section id="procedural-approach-caget-caput">
 <h3>Procedural Approach: caget(), caput()<a class="headerlink" href="#procedural-approach-caget-caput" title="Permalink to this headline">¶</a></h3>
 <p>To get values from PVs, you can use the <code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code> function:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
@@ -217,8 +217,8 @@ function:</p>
 </div>
 <p>The simplicity and clarity of these functions make them ideal for many
 uses.</p>
-</div>
-<div class="section" id="creating-and-using-pv-objects">
+</section>
+<section id="creating-and-using-pv-objects">
 <h3>Creating and Using PV Objects<a class="headerlink" href="#creating-and-using-pv-objects" title="Permalink to this headline">¶</a></h3>
 <p>If you are repeatedly referencing the same PV, you may find it more
 convenient to create a PV object and use it in a more object-oriented
@@ -290,9 +290,9 @@ the PV values or connection state including user-defined functions to be
 run when the value changes.  There are also attributes associated with a
 PVs <em>Control Attributes</em>, like those shown above in the <code class="xref py py-attr docutils literal notranslate"><span class="pre">info</span></code>
 attribute.  Further details are at <a class="reference internal" href="pv.html#pv-label"><span class="std std-ref">PV: Epics Process Variables</span></a>.</p>
-</div>
-</div>
-<div class="section" id="module-epics">
+</section>
+</section>
+<section id="module-epics">
 <span id="functions-defined-in-epics-caget-caput-etc"></span><h2>Functions defined in <a class="reference internal" href="#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code></a>: caget(), caput(), etc.<a class="headerlink" href="#module-epics" title="Permalink to this headline">¶</a></h2>
 <p>As shown above, the simplest interface to EPICS Channel Access is found
 with the functions <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a>, <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a>, and <a class="reference internal" href="#epics.cainfo" title="epics.cainfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">cainfo()</span></code></a>.  There
@@ -307,11 +307,11 @@ details.  Thus, though the functionality is simple and straightforward, the
 performance of using thes simple function can be quite good.  In addition,
 there are also functions <a class="reference internal" href="#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget_many()</span></code></a> and <a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a> for
 getting and putting values for multiple PVs at a time.</p>
-<div class="section" id="caget">
+<section id="caget">
 <h3><a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a><a class="headerlink" href="#caget" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
-<dt id="epics.caget">
-<code class="sig-prename descclassname">epics.</code><code class="sig-name descname">caget</code><span class="sig-paren">(</span><em class="sig-param">pvname</em><span class="optional">[</span>, <em class="sig-param">as_string=False</em><span class="optional">[</span>, <em class="sig-param">count=None</em><span class="optional">[</span>, <em class="sig-param">as_numpy=True</em><span class="optional">[</span>, <em class="sig-param">timeout=None</em><span class="optional">[</span>, <em class="sig-param">use_monitor=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="epics.caget">
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">as_string=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">count=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">as_numpy=True</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">use_monitor=False</span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves and returns the value of the named PV.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -400,12 +400,12 @@ strings:</p>
 </div>
 <p>Of course,character waveforms are not always used for long strings, but can
 also hold byte array data, such as comes from some detectors and devices.</p>
-</div>
-<div class="section" id="caput">
+</section>
+<section id="caput">
 <h3><a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a><a class="headerlink" href="#caput" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
-<dt id="epics.caput">
-<code class="sig-prename descclassname">epics.</code><code class="sig-name descname">caput</code><span class="sig-paren">(</span><em class="sig-param">pvname</em>, <em class="sig-param">value</em><span class="optional">[</span>, <em class="sig-param">wait=False</em><span class="optional">[</span>, <em class="sig-param">timeout=60</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caput" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="epics.caput">
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvname</span></em>, <em class="sig-param"><span class="pre">value</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">wait=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=60</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caput" title="Permalink to this definition">¶</a></dt>
 <dd><p>set the value of the named PV.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -429,22 +429,21 @@ etc) to move or because it triggers a complex calculation or data
 processing sequence.  The <em>timeout</em> argument gives the maximum time to
 wait, in seconds.  The function will return after this (approximate) time
 even if the <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a> has not completed.</p>
-<p>This function returns 1 on success, and a negative number if the timeout
+<p>This function returns 1 on success.  It will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the timeout
 has been exceeded.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span><span class="mf">2.30</span><span class="p">)</span>
 <span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span><span class="o">-</span><span class="mf">2.30</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">... </span><span class="n">waits</span> <span class="n">a</span> <span class="n">few</span> <span class="n">seconds</span> <span class="o">...</span>
-<span class="go">1</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="cainfo">
+</section>
+<section id="cainfo">
 <h3><a class="reference internal" href="#epics.cainfo" title="epics.cainfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">cainfo()</span></code></a><a class="headerlink" href="#cainfo" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
-<dt id="epics.cainfo">
-<code class="sig-prename descclassname">epics.</code><code class="sig-name descname">cainfo</code><span class="sig-paren">(</span><em class="sig-param">pvname</em><span class="optional">[</span>, <em class="sig-param">print_out=True</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.cainfo" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="epics.cainfo">
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">cainfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">print_out=True</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.cainfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>prints (or returns as a string) an informational paragraph about the PV,
 including Control Settings.</p>
 <dl class="field-list simple">
@@ -458,12 +457,12 @@ including Control Settings.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="camonitor">
+</section>
+<section id="camonitor">
 <h3><a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a><a class="headerlink" href="#camonitor" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
-<dt id="epics.camonitor">
-<code class="sig-prename descclassname">epics.</code><code class="sig-name descname">camonitor</code><span class="sig-paren">(</span><em class="sig-param">pvname</em><span class="optional">[</span>, <em class="sig-param">writer=None</em><span class="optional">[</span>, <em class="sig-param">callback=None</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.camonitor" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="epics.camonitor">
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">camonitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">writer=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">callback=None</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.camonitor" title="Permalink to this definition">¶</a></dt>
 <dd><p>This <cite>sets a monitor</cite> on the named PV, which will cause <em>something</em> to be
 done each time the value changes.  By default the PV name, time, and
 value will be printed out (to standard output) when the value changes,
@@ -495,12 +494,12 @@ should take keyword arguments for <em>pvname</em>, <em>value</em>, and <em>char_
 <span class="go">XXX.m1.VAL 2010-08-01 10:34:18.823233 1.0</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="camonitor-clear">
+</section>
+<section id="camonitor-clear">
 <h3><a class="reference internal" href="#epics.camonitor_clear" title="epics.camonitor_clear"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor_clear()</span></code></a><a class="headerlink" href="#camonitor-clear" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
-<dt id="epics.camonitor_clear">
-<code class="sig-prename descclassname">epics.</code><code class="sig-name descname">camonitor_clear</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pvname</span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.camonitor_clear" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="epics.camonitor_clear">
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">camonitor_clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.camonitor_clear" title="Permalink to this definition">¶</a></dt>
 <dd><p>clears a monitor set on the named PV by <a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -531,12 +530,12 @@ and the log file is inspected:</p>
 <span class="go"> XXX:DMM1Ch2_calc.VAL 2010-03-24 11:56:48.536434 -183.6832</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="caget-many">
+</section>
+<section id="caget-many">
 <h3><a class="reference internal" href="#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget_many()</span></code></a><a class="headerlink" href="#caget-many" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
-<dt id="epics.caget_many">
-<code class="sig-prename descclassname">epics.</code><code class="sig-name descname">caget_many</code><span class="sig-paren">(</span><em class="sig-param">pvlist</em><span class="optional">[</span>, <em class="sig-param">as_string=False</em><span class="optional">[</span>, <em class="sig-param">count=None</em><span class="optional">[</span>, <em class="sig-param">as_numpy=True</em><span class="optional">[</span>, <em class="sig-param">timeout=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget_many" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="epics.caget_many">
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caget_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvlist</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">as_string=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">count=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">as_numpy=True</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=None</span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget_many" title="Permalink to this definition">¶</a></dt>
 <dd><p>get a list of PVs as quickly as possible.  Returns a list of values for
 each PV in the list.  Unlike <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a>, this method does not use
 automatic monitoring (see <a class="reference internal" href="pv.html#pv-automonitor-label"><span class="std std-ref">Automatic Monitoring of a PV</span></a>).</p>
@@ -556,12 +555,12 @@ automatic monitoring (see <a class="reference internal" href="pv.html#pv-automon
 <p>For detailed information about the arguments, see the documentation for
 <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a>. Also see <a class="reference internal" href="advanced.html#advanced-connecting-many-label"><span class="std std-ref">Strategies for connecting to a large number of PVs</span></a> for more
 discussion.</p>
-</div>
-<div class="section" id="caput-many">
+</section>
+<section id="caput-many">
 <h3><a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a><a class="headerlink" href="#caput-many" title="Permalink to this headline">¶</a></h3>
 <dl class="py function">
-<dt id="epics.caput_many">
-<code class="sig-prename descclassname">epics.</code><code class="sig-name descname">caput_many</code><span class="sig-paren">(</span><em class="sig-param">pvlist</em>, <em class="sig-param">values</em><span class="optional">[</span>, <em class="sig-param">wait=False</em><span class="optional">[</span>, <em class="sig-param">connection_timeout=None</em><span class="optional">[</span>, <em class="sig-param">put_timeout=60</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caput_many" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="epics.caput_many">
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caput_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvlist</span></em>, <em class="sig-param"><span class="pre">values</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">wait=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">connection_timeout=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">put_timeout=60</span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caput_many" title="Permalink to this definition">¶</a></dt>
 <dd><p>put values to a list of PVs as quickly as possible.  Returns a list of ints
 for each PV in the list: 1 if the put was successful, -1 if it timed out.
 Unlike <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a>, this method does not use automatic monitoring (see
@@ -591,9 +590,9 @@ second), but processing a put may take a significant amount of time (due to
 a physical device moving, or due to complex calculations or data processing
 sequences), a separate timeout duration can be specified for connections and
 processing puts.</p>
-</div>
-</div>
-<div class="section" id="motivation-and-design-concepts">
+</section>
+</section>
+<section id="motivation-and-design-concepts">
 <h2>Motivation and design concepts<a class="headerlink" href="#motivation-and-design-concepts" title="Permalink to this headline">¶</a></h2>
 <p>There are other Python wrappings for Epics Channel Access, so it it useful
 to outline the design goals for PyEpics. The motivations for PyEpics3
@@ -622,8 +621,8 @@ provides the most reliable thread-safety available, as each call to the
 underlying C library is automatically made thread-aware without explicit
 code.  Finally, by avoiding the C API altogether, supporting both Python2
 and Python3 is greatly simplified.</p>
-</div>
-<div class="section" id="status-and-to-do-list">
+</section>
+<section id="status-and-to-do-list">
 <h2>Status and to-do list<a class="headerlink" href="#status-and-to-do-list" title="Permalink to this headline">¶</a></h2>
 <p>The PyEpics package is actively maintained, but the core library is
 reasonably stable and ready to use in production code.  Features are being
@@ -643,8 +642,8 @@ acquisition needs.</p></li>
 </div></blockquote>
 <p>If you are interested in working on any of these or other topics, please
 contact the authors.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -684,7 +683,7 @@ contact the authors.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
     </div>
   </body>
 </html>

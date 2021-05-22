@@ -5,15 +5,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Downloading and Installation &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PyEpics Overview" href="overview.html" />
@@ -104,117 +104,138 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="downloading-and-installation">
+  <section id="downloading-and-installation">
 <h1>Downloading and Installation<a class="headerlink" href="#downloading-and-installation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="prerequisites">
+<section id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>PyEpics currently works with Python version 2.7, 3.5, 3.6, 3.7, and 3.8.
-We expect it to work with Python 3.9 as well.  Pyepics version 3.4.3 is the
-final version to work with Python 2.7 or Python 3.5, and version 3.5.0 and
-later will require Python 3.6 or later.</p>
-<p>Pyepics is supported and regularly used and tested on 64-bit Linux, 64-bit
-Mac OSX, and 64-bit Windows.  It is known to work on Linux with ARM
-processors including raspberry Pi, though this is not part of the automated
-testing set.  Pyepics may still work on 32-bit Windows and Linux, but these
+<p>PyEpics currently works with Python version 3.6 and higher.  At this
+writing, automated testing is done with versions 3.7, 3.8, 3.9, and
+3.10.0-beta.1, though no problems are expected for Python 3.6.  Pyepics
+version 3.4.3 was the final version to work with Python 2.7 or Python 3.5,
+and version 3.5.0 and later require Python 3.6 or later.</p>
+<p>Pyepics is supported and regularly used on 64-bit Linux, 64-bit Mac OSX,
+and 64-bit Windows.  It is known to work on Linux with ARM processors
+including raspberry Pi. As of this writing, automated testing is done only
+for Linux64.  Pyepics may still work on 32-bit Windows and Linux, but these
 systems are not tested regularly.</p>
 <p>The EPICS Channel Access library Version 3.14.12 or higher is required for
-pyepics and 3.15 or higher are strongly recommended.  More specifically,
-pyepics requires e shared libraries libca and libCom (<em>libca.so</em> and
-<em>libCom.so</em> on Linux, <em>libca.dylib</em> and <em>libCom.dylib</em> on Mac OSX, or
-<em>ca.dll</em> and <em>Com.dll</em> on Windows) from <em>Epics Base</em>.</p>
-<p>For all supported operating systems and some less-well-tested systems (all
-of linux-64, linux-32,linux-arm, windows-64, windows-32, and darwin-64),
-pre-built versions of <em>libca</em> (and <em>libCom</em>) built with 3.16.2 are
-provided, and will be installed within the python packages directory and
-used by default.  This means that you do not need to install Epics base
+pyepics, and versions 3.15 or 7.0 or higher are strongly recommended.  More
+specifically, pyepics requires the shared libraries <em>libca</em> and <em>libCom</em>
+(<em>libca.so</em> and <em>libCom.so</em> on Linux, <em>libca.dylib</em> and <em>libCom.dylib</em> on
+Mac OSX, or <em>ca.dll</em> and <em>Com.dll</em> on Windows) from <em>Epics Base</em>.</p>
+<p>For Linux64, Linux32, LinuxArm, Windows64, Windows32, and Darwin64 (MacOS),
+pre-built versions of <em>libca</em> (and <em>libCom</em>) built with 3.16.2 or 7.0.4 are
+provided, and will be installed into the python packages directory and used
+by default.  This means that you do not need to install Epics base
 libraries or any other packages to use pyepics.  For Epics experts who may
 want to use their own versions the <em>libca</em> from Epics base, instructions
 for how to do this are given below.</p>
 <p>The Python <a class="reference external" href="http://numpy.scipy.org/">numpy module</a> is highly
-recommended, though it is not required. If available, it will be used
-to automatically convert between EPICS waveforms and numpy arrays.</p>
+recommended. and will be used to automatically convert between EPICS
+waveforms and numpy arrays if available.</p>
 <p>The <cite>autosave</cite> module requires the <cite>pyparsing</cite> package, which is widely
 available and often installed by default with many Python distributions.
 The <cite>wx</cite> module requires the <cite>wxPython</cite> package, and the <cite>qt</cite> module
 requires <cite>PyQt</cite> or <cite>PySide</cite>.</p>
-</div>
-<div class="section" id="downloads-and-installation">
+</section>
+<section id="downloads-and-installation">
 <h2>Downloads and Installation<a class="headerlink" href="#downloads-and-installation" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the pyepics package is 3.4.3.  This is the
-final release that will support Python versions 3.5 and below (including
-Python 2).  Source code kits and Windows installers can be found at
-<a class="reference external" href="https://pypi.python.org/pypi/pyepics/">pyepics PyPI</a>, and can be installed with:</p>
+<p>The latest stable version of the pyepics package is 3.5.0.rc1 which can be
+installed with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyepics</span>
 </pre></div>
 </div>
-<p>If you’re using Anaconda Python, there are a few conda channels for pyepics,
-including:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">GSECARS</span> <span class="n">pyepics</span>
-</pre></div>
-</div>
-<p>You can also download the source package, unpack it, and install with:</p>
+<p>If you’re using Anaconda Python, there are a few conda channels that
+provide the latest versions, but the version on <cite>PyPI</cite> should be considered
+the reference version.  You can also download the source package, unpack
+it, and install with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="getting-started-setting-up-the-epics-environment">
+</section>
+<section id="getting-started-setting-up-the-epics-environment">
 <h2>Getting Started, Setting up the Epics Environment<a class="headerlink" href="#getting-started-setting-up-the-epics-environment" title="Permalink to this headline">¶</a></h2>
-<p>As mentioned above, pyepics must be able to find and load the Channel
-Access dynamic library (<em>libca.so</em>, <em>libca.dylib</em>, or <em>ca.dll</em> depending on
-the system) at runtime in order to actually work.  For the most commonly
-used operating systems and architectures, modern version of these libraries
-are provided, and will be installed and used with pyepics.  We strongly
-recommend using these.</p>
+<p>Pyepics will find and load the Channel Access dynamic library (<em>libca.so</em>,
+<em>libca.dylib</em>, or <em>ca.dll</em> depending on the system) at runtime in order to
+actually work.  For the most commonly used operating systems and
+architectures, modern version of these libraries are provided, and will be
+installed and used with pyepics.  We strongly recommend using these.</p>
 <p>If these provided versions of <em>libca</em> do not work for you, please let us know.
 If you need to or wish to use a different version of <em>libca</em>, you can set the
 environmental variable <code class="docutils literal notranslate"><span class="pre">PYEPICS_LIBCA</span></code> to the full path of the dynamic
 library to use as <em>libca</em>, for example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">export</span> <span class="n">PYEPICS_LIBCA</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">epics</span><span class="o">/</span><span class="n">base</span><span class="o">-</span><span class="mf">3.15</span><span class="o">.</span><span class="mi">5</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">x86_64</span><span class="o">/</span><span class="n">libca</span><span class="o">.</span><span class="n">so</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">export</span> <span class="n">PYEPICS_LIBCA</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">epics</span><span class="o">/</span><span class="n">base</span><span class="o">-</span><span class="mf">7.0.4</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="n">x86_64</span><span class="o">/</span><span class="n">libca</span><span class="o">.</span><span class="n">so</span>
 </pre></div>
 </div>
 <p>Note that <em>libca</em> will need to find another Epics CA library <em>libCom</em>.  This
 is almost always in the same folder as <em>libca</em>, but you may need to make sure
-that the <em>libca</em> you are pointing to can find the required <em>libCom</em>.  The
-methods for telling shared libraries (or executable files) how to find other
-shared libraries varies with system, but you may need to set other
-environmental variables such as <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> or <code class="docutils literal notranslate"><span class="pre">DYLIB_LIBRARY_PATH</span></code>
-or use <cite>ldconfig</cite>.  If you’re having trouble with any of these things,
-ask your local Epics gurus or contact the authors.</p>
-<dl>
-<dt>To find out which CA library will be used by pyepics, use:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+that the <em>libca</em> you are pointing to can find the required <em>libCom</em>. To
+find out which CA library will be used by pyepics, use:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">find_libca</span><span class="p">()</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 <p>which will print out the full path of the CA dynamic library that will be used.</p>
-<p>With the Epics library loaded, you will need to be able to connect to Epics
-Process Variables. Generally, these variables are provided by Epics I/O
-controllers (IOCs) that are processes running on some device on the
+<p>With the Epics CA library loaded, you will need to be able to connect to
+Epics Process Variables. Generally, these variables are provided by Epics
+I/O controllers (IOCs) that are processes running on some device on the
 network.  If you are connecting to PVs provided by IOCs on your local
 subnet, you should have no trouble.  If trying to reach IOCs outside of
 your immediate subnet, you may need to set the environmental variable
 <code class="docutils literal notranslate"><span class="pre">EPICS_CA_ADDR_LIST</span></code> to specify which networks to search for PVs.</p>
-</div>
-<div class="section" id="testing">
+</section>
+<section id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
-<p>Automated and continuous unit-testing is done with the TravisCI
-(<a class="reference external" href="https://travis-ci.org/pyepics/pyepics">https://travis-ci.org/pyepics/pyepics</a>) for Python 2.7, 3.5, and 3.6 using
-an Epics IOC running in a Docker image.  Many tests located in the <cite>tests</cite>
-folder can also be run using the script <code class="docutils literal notranslate"><span class="pre">tests/simulator.py</span></code> as long as
-the Epics database in <code class="docutils literal notranslate"><span class="pre">tests/pydebug.db</span></code> is loaded in a local IOC.  In
-addition, tests are regularly run on Mac OSX, and 32-bit and 64-bit
-Windows.</p>
+<p>Automated and continuous unit-testing is done with the Github actions, for
+Python 3.7. 3.8, 3.9, and 3.10.0-beta.1.  This uses an ubuntu-linux
+enviroment.</p>
+<p>To run these tests yourself, you will need the <cite>pytest</cite> python module. You
+will also need to run an Epics softIOC as a separate process, and a
+simulator that updates PV values as a separate process.  These can all run
+on the same machine or different machines on your network as long as all
+processes can see all the PVs (all using a prefix of <cite>PyTest:</cite>).  The
+softIoc cannot be run in a separate terminal process or using the
+<cite>procServ</cite> program.  To setup the testing environment, first start the
+testing softIoc in one shell, with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">~&gt;</span> <span class="n">cd</span> <span class="n">tests</span><span class="o">/</span><span class="n">Setup</span>
+<span class="o">~&gt;</span> <span class="n">softIoc</span> <span class="o">./</span><span class="n">st</span><span class="o">.</span><span class="n">cmd</span>
+</pre></div>
 </div>
-<div class="section" id="development-version">
+<p>If you have <cite>procServ</cite> installed, you can do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">~&gt;</span> <span class="n">cd</span> <span class="n">tests</span><span class="o">/</span><span class="n">Setup</span>
+<span class="o">~&gt;</span> <span class="n">bash</span> <span class="o">./</span><span class="n">start_ioc</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>which will put the IOC properly as a background process. Second, run the
+simulator (also in <cite>tests/Setup</cite>) so that Epics channels are changing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">~&gt;</span> <span class="n">python</span> <span class="n">simulator</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>Again, these do not have to be run on the same machine as your tests, but
+the PVs here will need to be discoverable</p>
+<p>Now, you are ready to run the tests in the <cite>tests</cite> folder.  In many
+scenarios for Python libraries, one would be able to run all the tests, and
+measure the testing coverage with a single command.  Because the pyepics
+test will change underlying threading contexts, a simple</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    ~&gt; cd ..
+    ~&gt; pytest test_*.py
+
+will show many failures.  Instead you should run each test as a separate
+run of `pytest`:
+
+    ~&gt; for testfile in test_*.py; do  pytest $testfile ; done
+</pre></div>
+</div>
+</section>
+<section id="development-version">
 <h2>Development Version<a class="headerlink" href="#development-version" title="Permalink to this headline">¶</a></h2>
 <p>Development of pyepics is done through the <a class="reference external" href="http://github.com/pyepics/pyepics">pyepics github
 repository</a>.  To get a copy of the latest version do:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pyepics</span><span class="o">/</span><span class="n">pyepics</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="getting-help">
+</section>
+<section id="getting-help">
 <h2>Getting Help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h2>
 <p>For questions, bug reports, feature request, please consider using the
 following methods:</p>
@@ -235,8 +256,8 @@ some code you think would be useful to add to pyepics, consider
 making a Pull Request on <a class="reference external" href="http://github.com/pyepics/pyepics">http://github.com/pyepics/pyepics</a>.</p></li>
 </ol>
 </div></blockquote>
-</div>
-<div class="section" id="license">
+</section>
+<section id="license">
 <h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
 <p>The pyepics source code, this documentation, and all material
 associated with it are distributed under the Epics Open License:</p>
@@ -318,8 +339,8 @@ code will actually work, but you can do anything you like with this code
 except a) claim that you wrote it or b) claim that the people who did write
 it endorse your use of the code. Unless you’re the US government, in which
 case you can probably do whatever you want.</p>
-</div>
-<div class="section" id="acknowledgments">
+</section>
+<section id="acknowledgments">
 <h2>Acknowledgments<a class="headerlink" href="#acknowledgments" title="Permalink to this headline">¶</a></h2>
 <p>pyepics was originally written and is maintained by Matt Newville
 &lt;<a class="reference external" href="mailto:newville&#37;&#52;&#48;cars&#46;uchicago&#46;ed">newville<span>&#64;</span>cars<span>&#46;</span>uchicago<span>&#46;</span>ed</a>&gt;.  Many important contributions to the library
@@ -332,8 +353,8 @@ Georg Brandl, Niklas Claesson, Jon Brinkmann, Marco Cammarata, Craig
 Haskins, David Vine, Pete Jemian, Andrew Johnson, Janko Kolar, Irina
 Kosheleva, Tim Mooney, Eric Norum, Mark Rivers, Friedrich Schotte, Mark
 Vigder, Steve Wasserman, and Glen Wright.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -373,7 +394,7 @@ Vigder, Steve Wasserman, and Glen Wright.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
     </div>
   </body>
 </html>

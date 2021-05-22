@@ -5,15 +5,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Working with waveform / array data &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Devices: collections of PVs" href="devices.html" />
@@ -103,14 +103,14 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="working-with-waveform-array-data">
+  <section id="working-with-waveform-array-data">
 <span id="arrays-label"></span><h1>Working with waveform / array data<a class="headerlink" href="#working-with-waveform-array-data" title="Permalink to this headline">¶</a></h1>
 <p>Though most EPICS Process Variables hold single values, PVs can hold array
 data from EPICS waveform records.  These are always data of a homogenous
 data type, and have a fixed maximum element count (defined when the
 waveform is created from the host EPICS process).  Epics waveforms are
 most naturally mapped to Arrays from the <a class="reference external" href="http://numpy.scipy.org/">numpy module</a>, and this is strongly encouraged.</p>
-<div class="section" id="arrays-without-numpy">
+<section id="arrays-without-numpy">
 <h2>Arrays without Numpy<a class="headerlink" href="#arrays-without-numpy" title="Permalink to this headline">¶</a></h2>
 <p>If you have numpy installed, and use the default <em>as_numpy=True</em> in
 <a class="reference internal" href="ca.html#epics.ca.get" title="epics.ca.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.ca.get()</span></code></a>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pv.get()</span></code></a> or <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>, you will get a
@@ -130,8 +130,8 @@ Python list with something like:</p>
 </pre></div>
 </div>
 <p>Note that this conversion to a list can be very slow for large arrays.</p>
-</div>
-<div class="section" id="variable-length-arrays-nord-and-nelm">
+</section>
+<section id="variable-length-arrays-nord-and-nelm">
 <h2>Variable Length Arrays:  NORD  and NELM<a class="headerlink" href="#variable-length-arrays-nord-and-nelm" title="Permalink to this headline">¶</a></h2>
 <p>While the maximum length of an array is fixed, the length of data you get
 back from a monitor, <a class="reference internal" href="ca.html#epics.ca.get" title="epics.ca.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.ca.get()</span></code></a>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pv.get()</span></code></a>, or <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>
@@ -153,8 +153,8 @@ For example:</p>
 – the <a class="reference internal" href="pv.html#pv.get" title="pv.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pv.get()</span></code></a> is not using a value cached from the <a class="reference internal" href="pv.html#pv.put" title="pv.put"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pv.put()</span></code></a>.</p>
 <p>This feature was introduced in Epics CA 3.14.12.1, and may not work for
 data from IOCs running extremely old versions of Epics base.</p>
-</div>
-<div class="section" id="character-arrays">
+</section>
+<section id="character-arrays">
 <h2>Character Arrays<a class="headerlink" href="#character-arrays" title="Permalink to this headline">¶</a></h2>
 <p>As noted in other sections, character waveforms can be used to hold strings
 longer than 40 characters, which is otherwise a fundamental limit for
@@ -198,7 +198,7 @@ Python3):</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arr_string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">arr_bytes</span><span class="p">,</span> <span class="s1">&#39;LATIN-1&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="strategies-for-working-with-large-arrays">
+<section id="strategies-for-working-with-large-arrays">
 <span id="arrays-large-label"></span><h3>Strategies for working with large arrays<a class="headerlink" href="#strategies-for-working-with-large-arrays" title="Permalink to this headline">¶</a></h3>
 <p>EPICS Channels / Process Variables usually have values that can be stored
 with a small number of bytes.  This means that their storage and transfer
@@ -239,9 +239,9 @@ unless explicitly set. Auto-monitoring of PVs can be be explicitly set with</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;LargeArrayPV&#39;</span><span class="p">,</span> <span class="n">auto_monitor</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="example-handling-large-arrays">
+</section>
+</section>
+<section id="example-handling-large-arrays">
 <h2>Example handling Large Arrays<a class="headerlink" href="#example-handling-large-arrays" title="Permalink to this headline">¶</a></h2>
 <p>Here is an example reading data from an <a class="reference external" href="http://cars9.uchicago.edu/software/epics/areaDetector.html">EPICS areaDetector</a>, as if it
 were an image from a digital camera.  This uses the common third-party
@@ -265,8 +265,8 @@ processing.  This library can be installed with <cite>pip install pillow</cite> 
 <img alt="_images/AreaDetector1.png" src="_images/AreaDetector1.png" />
 <p>A more complete application for reading and displaying image from Epics
 Area Detectors is included  at <a class="reference external" href="http://github.com/pyepics/epicsapps/">http://github.com/pyepics/epicsapps/</a>.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -306,7 +306,7 @@ Area Detectors is included  at <a class="reference external" href="http://github
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
     </div>
   </body>
 </html>

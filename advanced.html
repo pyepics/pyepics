@@ -5,15 +5,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Advanced Topic with Python Channel Access &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="wx: wxPython Widgets for Epics" href="wx.html" /> 
@@ -99,12 +99,12 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="advanced-topic-with-python-channel-access">
+  <section id="advanced-topic-with-python-channel-access">
 <h1>Advanced Topic with Python Channel Access<a class="headerlink" href="#advanced-topic-with-python-channel-access" title="Permalink to this headline">¶</a></h1>
 <p>This chapter contains a variety of “usage notes” and implementation
 details that may help in getting the best performance from the
 pyepics module.</p>
-<div class="section" id="the-wait-and-timeout-options-for-get-ca-get-complete">
+<section id="the-wait-and-timeout-options-for-get-ca-get-complete">
 <span id="advanced-get-timeouts-label"></span><h2>The wait and timeout options for get(), ca.get_complete()<a class="headerlink" href="#the-wait-and-timeout-options-for-get-ca-get-complete" title="Permalink to this headline">¶</a></h2>
 <p>The <em>get</em> functions, <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">pv.get()</span></code></a> and <a class="reference internal" href="ca.html#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.ca.get()</span></code></a>
 all ask for data to be transferred over the network.  For large data arrays
@@ -158,8 +158,8 @@ get functions) will be set to:</p>
 </div>
 <p>Again, that’s the maximum time that will be waited, and if the data is
 received faster than that, the <em>get</em> will return as soon as it can.</p>
-</div>
-<div class="section" id="strategies-for-connecting-to-a-large-number-of-pvs">
+</section>
+<section id="strategies-for-connecting-to-a-large-number-of-pvs">
 <span id="advanced-connecting-many-label"></span><h2>Strategies for connecting to a large number of PVs<a class="headerlink" href="#strategies-for-connecting-to-a-large-number-of-pvs" title="Permalink to this headline">¶</a></h2>
 <p>Occasionally, you may find that you need to quickly connect to a large
 number of PVs, say to write values to disk.  The most straightforward way
@@ -305,8 +305,8 @@ but if you are going to re-use the PVs, that savings will be lost quickly.
 In short, use Method 1 over <a class="reference internal" href="overview.html#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.caget_many()</span></code></a> unless you’ve benchmarked
 your use-case and have demonstrated that <a class="reference internal" href="overview.html#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.caget_many()</span></code></a> is better for
 your needs.</p>
-</div>
-<div class="section" id="time-sleep-or-epics-poll">
+</section>
+<section id="time-sleep-or-epics-poll">
 <span id="advanced-sleep-label"></span><h2>time.sleep() or epics.poll()?<a class="headerlink" href="#time-sleep-or-epics-poll" title="Permalink to this headline">¶</a></h2>
 <p>In order for a program to communicate with Epics devices, it needs to allow
 some time for this communication to happen.   With
@@ -332,8 +332,8 @@ loop of:</p>
 </pre></div>
 </div>
 <p>as the loop will be run more often than using <code class="xref py py-meth docutils literal notranslate"><span class="pre">time.sleep()</span></code>.</p>
-</div>
-<div class="section" id="using-python-threads">
+</section>
+<section id="using-python-threads">
 <span id="advanced-threads-label"></span><span id="index-0"></span><h2>Using Python Threads<a class="headerlink" href="#using-python-threads" title="Permalink to this headline">¶</a></h2>
 <p>An important feature of the PyEpics package is that it can be used with
 Python threads, as Epics 3.14 supports threads for client code.  Even in
@@ -351,7 +351,7 @@ the <a class="reference internal" href="ca.html#module-epics.ca" title="epics.ca
 the complications below are mostly hidden from you.   If you’re writing
 threaded code, it’s probably a good idea to read this just to understand
 what the issues are.</p>
-<div class="section" id="channel-access-contexts">
+<section id="channel-access-contexts">
 <h3>Channel Access Contexts<a class="headerlink" href="#channel-access-contexts" title="Permalink to this headline">¶</a></h3>
 <p>The Channel Access library uses a concept of <em>contexts</em> for its own thread
 model, with contexts holding sets of threads as well as Channels and
@@ -374,7 +374,7 @@ at the start of each function call as a thread target, and
 cause all the activity in that thread to be done in its own context.  This
 works, but means more care is needed, and so is not the recommended.</p>
 <p>The best way to attach to the initially created context is to call
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.ca.use_initial_context()</span></code> before any other CA calls in each
+<a class="reference internal" href="ca.html#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.ca.use_initial_context()</span></code></a> before any other CA calls in each
 function that will be called by <code class="xref py py-meth docutils literal notranslate"><span class="pre">Thread.run()</span></code>.  Equivalently, you can
 add a <code class="xref py py-func docutils literal notranslate"><span class="pre">withInitialContext()</span></code> decorator to the function.  Creating a PV
 object will implicitly do this for you, as long as it is your first CA
@@ -390,12 +390,12 @@ inside a child thread, it is recommended that you initialize CA in the main
 thread,</p>
 <p>As a convenience, the <code class="xref py py-class docutils literal notranslate"><span class="pre">CAThread</span></code> in the <a class="reference internal" href="ca.html#module-epics.ca" title="epics.ca: low-level Channel Access  module."><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics.ca</span></code></a> module is
 is a very thin wrapper around the standard <code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code> which
-adding a call of  <code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.ca.use_initial_context()</span></code> just before your
+adding a call of  <a class="reference internal" href="ca.html#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.ca.use_initial_context()</span></code></a> just before your
 threaded function is run.  This allows your target functions to not
 explicitly set the context, but still ensures that the initial context is
 used in all functions.</p>
-</div>
-<div class="section" id="how-to-work-with-ca-and-threads">
+</section>
+<section id="how-to-work-with-ca-and-threads">
 <h3>How to work with CA and Threads<a class="headerlink" href="#how-to-work-with-ca-and-threads" title="Permalink to this headline">¶</a></h3>
 <p>Summarizing the discussion above, to use threads you must use run in
 PREEMPTIVE_CALLBACK mode.  Furthermore, it is recommended that you use a
@@ -409,7 +409,7 @@ easily using the lower-level ca interface.  The options for using threads
 single CA context.</p>
 <p>2. use <code class="xref py py-class docutils literal notranslate"><span class="pre">CAThread</span></code> instead of <code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code> for threads that
 will use CA calls.</p>
-<p>3. put <code class="xref py py-func docutils literal notranslate"><span class="pre">epics.ca.use_initial_context()</span></code> at the top of all
+<p>3. put <a class="reference internal" href="ca.html#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.ca.use_initial_context()</span></code></a> at the top of all
 functions that might be a Thread target function, or decorate them with
 <code class="xref py py-func docutils literal notranslate"><span class="pre">withInitialContext()</span></code> decorator, <em>&#64;withInitialContext</em>.</p>
 <p>4. use <a class="reference internal" href="ca.html#epics.ca.create_context" title="epics.ca.create_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.ca.create_context()</span></code></a> at the top of all functions
@@ -420,8 +420,8 @@ new PVs and only reading values of PVs created in the main thread
 inside a child thread, you may not see a problems, at least not until
 you try to do something fancier.</p>
 </div></blockquote>
-</div>
-<div class="section" id="thread-examples">
+</section>
+<section id="thread-examples">
 <h3>Thread Examples<a class="headerlink" href="#thread-examples" title="Permalink to this headline">¶</a></h3>
 <p>This is a simplified version of test code using Python threads.  It is
 based on code originally from Friedrich Schotte, NIH, and included as
@@ -431,58 +431,85 @@ from a supplied list, and monitor these PVs, printing out the values when
 they change.  Two threads are created and run concurrently, with
 overlapping PV lists, though one thread is run for a shorter time than the
 other.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;This script tests using EPICS CA and Python threads together</span>
-<span class="sd">Based on code from  Friedrich Schotte, NIH, modified by Matt Newville</span>
-<span class="sd">19-Apr-2010</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span>  <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stdout</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
-<span class="kn">import</span> <span class="nn">epics</span>
-<span class="kn">from</span> <span class="nn">epics.ca</span> <span class="kn">import</span> <span class="n">CAThread</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">pvnames</span>
 
-<span class="kn">from</span>  <span class="nn">pvnames</span> <span class="kn">import</span> <span class="n">updating_pvlist</span>
-<span class="n">pvlist_a</span> <span class="o">=</span> <span class="n">updating_pvlist</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">pvlist_b</span> <span class="o">=</span> <span class="n">updating_pvlist</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 
-<span class="k">def</span> <span class="nf">run_test</span><span class="p">(</span><span class="n">runtime</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pvnames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="n">run_name</span><span class="o">=</span><span class="s1">&#39;thread c&#39;</span><span class="p">):</span>
-    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;-&gt; thread &quot;</span><span class="si">%s</span><span class="s1">&quot; will run for </span><span class="si">%.3f</span><span class="s1"> sec, monitoring </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="p">(</span><span class="n">run_name</span><span class="p">,</span> <span class="n">runtime</span><span class="p">,</span> <span class="n">pvnames</span><span class="p">))</span>
-    <span class="k">def</span> <span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
-        <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;   </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">,</span> <span class="n">run_name</span><span class="p">))</span>
-        <span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">test_basic_thread</span><span class="p">():</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">def</span> <span class="nf">thread</span><span class="p">():</span>
+        <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">use_initial_context</span><span class="p">()</span>
+        <span class="n">pv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">get_pv</span><span class="p">(</span><span class="n">pvnames</span><span class="o">.</span><span class="n">double_pv</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
 
-    <span class="c1"># epics.ca.use_initial_context()   #  epics.ca.create_context()</span>
-    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">pvs</span> <span class="o">=</span> <span class="p">[</span><span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvn</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onChanges</span><span class="p">)</span> <span class="k">for</span> <span class="n">pvn</span> <span class="ow">in</span> <span class="n">pvnames</span><span class="p">]</span>
+    <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">use_initial_context</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">thread</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 
-    <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">start_time</span> <span class="o">&lt;</span> <span class="n">runtime</span><span class="p">:</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-    <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">clear_callbacks</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pvs</span><span class="p">]</span>
-    <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;Completed Thread  </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">run_name</span><span class="p">))</span>
 
-<span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s2">&quot;First, create a PV in the main thread:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">updating_pvlist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_basic_cathread</span><span class="p">():</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">def</span> <span class="nf">thread</span><span class="p">():</span>
+        <span class="n">pv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">get_pv</span><span class="p">(</span><span class="n">pvnames</span><span class="o">.</span><span class="n">double_pv</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
 
-<span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Run 2 Background Threads simultaneously:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="n">th1</span> <span class="o">=</span> <span class="n">CAThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_test</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">pvlist_a</span><span class="p">,</span>  <span class="s1">&#39;A&#39;</span><span class="p">))</span>
-<span class="n">th1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">use_initial_context</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">CAThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">thread</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 
-<span class="n">th2</span> <span class="o">=</span> <span class="n">CAThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run_test</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">pvlist_b</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">))</span>
-<span class="n">th2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-<span class="n">th2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-<span class="n">th1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-<span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Done</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">test_attach_context</span><span class="p">():</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">def</span> <span class="nf">thread</span><span class="p">():</span>
+        <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">create_context</span><span class="p">()</span>
+        <span class="n">pv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">get_pv</span><span class="p">(</span><span class="n">pvnames</span><span class="o">.</span><span class="n">double_pv2</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">pv</span><span class="o">.</span><span class="n">wait_for_connection</span><span class="p">()</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">detach_context</span><span class="p">()</span>
+
+        <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">attach_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
+        <span class="n">pv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">get_pv</span><span class="p">(</span><span class="n">pvnames</span><span class="o">.</span><span class="n">double_pv</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">pv</span><span class="o">.</span><span class="n">wait_for_connection</span><span class="p">()</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+
+    <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">use_initial_context</span><span class="p">()</span>
+    <span class="n">ctx</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">current_context</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">thread</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">test_pv_from_main</span><span class="p">():</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">def</span> <span class="nf">thread</span><span class="p">():</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+
+    <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">use_initial_context</span><span class="p">()</span>
+    <span class="n">pv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">get_pv</span><span class="p">(</span><span class="n">pvnames</span><span class="o">.</span><span class="n">double_pv2</span><span class="p">)</span>
+
+    <span class="n">t</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">CAThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">thread</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 </pre></div>
 </div>
 <p>In light of the long discussion above, a few remarks are in order: This
 code uses the standard Thread library and explicitly calls
-<code class="xref py py-func docutils literal notranslate"><span class="pre">epics.ca.use_initial_context()</span></code> prior to any CA calls in the target
+<a class="reference internal" href="ca.html#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.ca.use_initial_context()</span></code></a> prior to any CA calls in the target
 function.  Also note that the <code class="xref py py-func docutils literal notranslate"><span class="pre">run_test()</span></code> function is first called
 from the main thread, so that the initial CA context does belong to the
-main thread.  Finally, the <code class="xref py py-func docutils literal notranslate"><span class="pre">epics.ca.use_initial_context()</span></code> call in
+main thread.  Finally, the <a class="reference internal" href="ca.html#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.ca.use_initial_context()</span></code></a> call in
 <code class="xref py py-func docutils literal notranslate"><span class="pre">run_test()</span></code> above could be replaced with
 <a class="reference internal" href="ca.html#epics.ca.create_context" title="epics.ca.create_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.ca.create_context()</span></code></a>, and run OK.</p>
 <p>The output from this will look like:</p>
@@ -526,9 +553,9 @@ PV <cite>Py:ai1</cite> is generated in each thread.</p>
 </div>
 <p>Without this, the callbacks for thread <em>A</em>  will persist even after the
 thread has completed!</p>
-</div>
-</div>
-<div class="section" id="using-multiprocessing-with-pyepics">
+</section>
+</section>
+<section id="using-multiprocessing-with-pyepics">
 <span id="advanced-multiprocessing-label"></span><span id="index-1"></span><h2>Using Multiprocessing with PyEpics<a class="headerlink" href="#using-multiprocessing-with-pyepics" title="Permalink to this headline">¶</a></h2>
 <p>An alternative to Python threads that has some very interesting and
 important features is to use multiple <em>processes</em>, as with the standard
@@ -544,16 +571,16 @@ processes.</p>
 between processes.  This means that you will have to create PV objects for
 each process (even if they point to the same PV).</p>
 <dl class="py class">
-<dt id="CAProcess">
-<em class="property">class </em><code class="sig-name descname">CAProcess</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">group</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">target</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">args</span><span class="o">=</span><span class="default_value">()</span></em>, <em class="sig-param"><span class="n">kwargs</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#CAProcess" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="CAProcess">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">CAProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CAProcess" title="Permalink to this definition">¶</a></dt>
 <dd><p>a subclass of <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.Process</span></code> that clears the global
 Channel Access context before running you target function in its own
 process.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="CAPool">
-<em class="property">class </em><code class="sig-name descname">CAPool</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">processes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">initializer</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">initargs</span><span class="o">=</span><span class="default_value">()</span></em>, <em class="sig-param"><span class="n">maxtasksperchild</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#CAPool" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="CAPool">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">CAPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxtasksperchild</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CAPool" title="Permalink to this definition">¶</a></dt>
 <dd><p>a subclass of <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.pool.Pool</span></code>, creating a Pool of
 <a class="reference internal" href="#CAProcess" title="CAProcess"><code class="xref py py-class docutils literal notranslate"><span class="pre">CAProcess</span></code></a> instances.</p>
 </dd></dl>
@@ -579,7 +606,7 @@ process.</p>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">out</span><span class="p">])</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==sub (</span><span class="si">%d</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">out</span><span class="p">))</span>
 
-<span class="k">def</span> <span class="nf">main_process</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">test_mpprocess</span><span class="p">():</span>
     <span class="k">def</span> <span class="nf">monitor</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--main:monitor </span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">))</span>
 
@@ -598,11 +625,8 @@ process.</p>
         <span class="n">proc1</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--main: subprocess complete&#39;</span><span class="p">)</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.9</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--main:final </span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">PVN1</span><span class="p">,</span> <span class="n">pv1</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">main_process</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>here, the main process and the subprocess can each interact with the same
@@ -611,8 +635,8 @@ in each process.</p>
 <p>Note that different <a class="reference internal" href="#CAProcess" title="CAProcess"><code class="xref py py-class docutils literal notranslate"><span class="pre">CAProcess</span></code></a> instances can communicate via
 standard <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.Queue</span></code>.   At this writing,  no testing has
 been done on using multiprocessing Managers.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -649,7 +673,7 @@ been done on using multiprocessing Managers.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
     </div>
   </body>
 </html>

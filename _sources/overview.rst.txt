@@ -330,7 +330,7 @@ processing sequence.  The *timeout* argument gives the maximum time to
 wait, in seconds.  The function will return after this (approximate) time
 even if the :func:`caput` has not completed.
 
-This function returns 1 on success, and a negative number if the timeout
+This function returns 1 on success.  It will return ``None`` if the timeout
 has been exceeded.
 
     >>> from epics import caget, caput, cainfo
@@ -338,7 +338,7 @@ has been exceeded.
     1
     >>> caput('XXX:m1.VAL',-2.30, wait=True)
     ... waits a few seconds ...
-    1
+    
 
 :func:`cainfo`
 ~~~~~~~~~~~~~~
