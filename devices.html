@@ -5,12 +5,11 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Devices: collections of PVs &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -109,9 +108,9 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="devices-collections-of-pvs">
+  <div class="section" id="devices-collections-of-pvs">
 <h1>Devices: collections of PVs<a class="headerlink" href="#devices-collections-of-pvs" title="Permalink to this headline">¶</a></h1>
-<section id="module-device">
+<div class="section" id="module-device">
 <span id="overview"></span><h2>Overview<a class="headerlink" href="#module-device" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference internal" href="#module-device" title="device: collections of related PVs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">device</span></code></a> module provides a simple interface to a collection of
 PVs.  Here an epics <a class="reference internal" href="#device.Device" title="device.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">device.Device</span></code></a> is an object holding a set of
@@ -134,8 +133,8 @@ Epics Record as it can actually hold PVs from several different records.:</p>
 base class, to be inherited and extended.  In fact, there is a more
 sophisticated   Motor device described below at <a class="reference internal" href="#device-motor-label"><span class="std std-ref">Epics Motor Device</span></a></p>
 <dl class="py class">
-<dt class="sig sig-object py" id="device.Device">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">Device</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">prefix=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">delim=''</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">attrs=None</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.Device" title="Permalink to this definition">¶</a></dt>
+<dt id="device.Device">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">device.</span></code><code class="sig-name descname"><span class="pre">Device</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">prefix=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">delim=''</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">attrs=None</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.Device" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>The attribute PVs are built as needed and held in an internal buffer
@@ -149,36 +148,36 @@ epics Device.</p>
 <p>In general, PV names will be mapped as prefix+delim+attr.  See
 <a class="reference internal" href="#device.add_pv" title="device.add_pv"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_pv()</span></code></a> for details of how to override this.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="device.PV">
-<span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">PV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">attr[,</span> <span class="pre">connect=True[,</span> <span class="pre">**kw]]]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#device.PV" title="Permalink to this definition">¶</a></dt>
+<dt id="device.PV">
+<code class="sig-prename descclassname"><span class="pre">device.</span></code><code class="sig-name descname"><span class="pre">PV</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">attr[,</span> <span class="pre">connect=True[,</span> <span class="pre">**kw]]]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#device.PV" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the <cite>PV</cite> object for a device attribute.  The connect argument
 and any other keyword arguments are passed to <code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.PV()</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="device.put">
-<span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">attr</span></em>, <em class="sig-param"><span class="pre">value</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">wait=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=10.0</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.put" title="Permalink to this definition">¶</a></dt>
+<dt id="device.put">
+<code class="sig-prename descclassname"><span class="pre">device.</span></code><code class="sig-name descname"><span class="pre">put</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">attr</span></em>, <em class="sig-param"><span class="pre">value</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">wait=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=10.0</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>put an attribute value, optionally wait for completion or up to a
 supplied timeout value</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="device.get">
-<span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">attr</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">as_string=False</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.get" title="Permalink to this definition">¶</a></dt>
+<dt id="device.get">
+<code class="sig-prename descclassname"><span class="pre">device.</span></code><code class="sig-name descname"><span class="pre">get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">attr</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">as_string=False</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>get an attribute value, option as_string returns a string
 representation</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="device.add_callback">
-<span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">add_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#device.add_callback" title="Permalink to this definition">¶</a></dt>
+<dt id="device.add_callback">
+<code class="sig-prename descclassname"><span class="pre">device.</span></code><code class="sig-name descname"><span class="pre">add_callback</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#device.add_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>add a callback function to an attribute PV, so that the callback
 function will be run when the at tribute’s value changes</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="device.add_pv">
-<span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">add_pv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">attr=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">**kw</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.add_pv" title="Permalink to this definition">¶</a></dt>
+<dt id="device.add_pv">
+<code class="sig-prename descclassname"><span class="pre">device.</span></code><code class="sig-name descname"><span class="pre">add_pv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">attr=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">**kw</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.add_pv" title="Permalink to this definition">¶</a></dt>
 <dd><p>adds an explicitly names <code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.PV()</span></code> to the device even though it
 may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 <cite>epics.PV(prefix+delim+attr)</cite>.   That is, one can say:</p>
@@ -192,38 +191,38 @@ may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="device.save_state">
-<span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">save_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#device.save_state" title="Permalink to this definition">¶</a></dt>
+<dt id="device.save_state">
+<code class="sig-prename descclassname"><span class="pre">device.</span></code><code class="sig-name descname"><span class="pre">save_state</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#device.save_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>return a dictionary of all current values – the ‘’current state’’.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="device.restore_state">
-<span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">restore_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#device.restore_state" title="Permalink to this definition">¶</a></dt>
+<dt id="device.restore_state">
+<code class="sig-prename descclassname"><span class="pre">device.</span></code><code class="sig-name descname"><span class="pre">restore_state</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#device.restore_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>restores a saved state, as saved with <a class="reference internal" href="#device.save_state" title="device.save_state"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_state()</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="device.write_state">
-<span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">write_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">fname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">state=None</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.write_state" title="Permalink to this definition">¶</a></dt>
+<dt id="device.write_state">
+<code class="sig-prename descclassname"><span class="pre">device.</span></code><code class="sig-name descname"><span class="pre">write_state</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">fname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">state=None</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.write_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>write a saved state to a file.   If no state is provide, the current state is written.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="device.read_state">
-<span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">read_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">fname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">restore=False</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.read_state" title="Permalink to this definition">¶</a></dt>
+<dt id="device.read_state">
+<code class="sig-prename descclassname"><span class="pre">device.</span></code><code class="sig-name descname"><span class="pre">read_state</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">fname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">restore=False</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.read_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>reads a state from a file, as written with <a class="reference internal" href="#device.write_state" title="device.write_state"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_state()</span></code></a>, and returns it.
 If ‘’restore’’ is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the read state will be restored.</p>
 </dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="device._pvs">
-<span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">_pvs</span></span><a class="headerlink" href="#device._pvs" title="Permalink to this definition">¶</a></dt>
+<dt id="device._pvs">
+<code class="sig-prename descclassname"><span class="pre">device.</span></code><code class="sig-name descname"><span class="pre">_pvs</span></code><a class="headerlink" href="#device._pvs" title="Permalink to this definition">¶</a></dt>
 <dd><p>a dictionary of PVs making up the device.</p>
 </dd></dl>
 
-</section>
-<section id="module-motor">
+</div>
+<div class="section" id="module-motor">
 <span id="epics-motor-device"></span><span id="device-motor-label"></span><h2>Epics Motor Device<a class="headerlink" href="#module-motor" title="Permalink to this headline">¶</a></h2>
 <p>The Epics Motor record has over 100 fields associated with it.  Of course,
 it is often preferable to think of 1 Motor with many attributes than 100
@@ -260,11 +259,11 @@ give the list of names that can be used.</p>
 <p>2.  The methods for setting positions can use the User, Dial, or Step
 coordinate system, and can wait for completion.</p>
 </div></blockquote>
-<section id="the-epics-motor-class">
+<div class="section" id="the-epics-motor-class">
 <h3>The <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code> class<a class="headerlink" href="#the-epics-motor-class" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
-<dt class="sig sig-object py" id="motor.Motor">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">Motor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=30.</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.Motor" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.Motor">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">Motor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=30.</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.Motor" title="Permalink to this definition">¶</a></dt>
 <dd><p>create a Motor object for a named Epics Process Variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -577,12 +576,12 @@ corresponding attribute name of the Motor Record field.</p>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="methods-for-epics-motor">
+</div>
+<div class="section" id="methods-for-epics-motor">
 <h3>methods for <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code><a class="headerlink" href="#methods-for-epics-motor" title="Permalink to this headline">¶</a></h3>
 <dl class="py method">
-<dt class="sig sig-object py" id="motor.get">
-<span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">attr</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">as_string=False</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.get" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.get">
+<code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">attr</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">as_string=False</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets a field attribute for the motor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -604,8 +603,8 @@ attribute cannot do so:</p>
 </pre></div>
 </div>
 <dl class="py method">
-<dt class="sig sig-object py" id="motor.put">
-<span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">attr</span></em>, <em class="sig-param"><span class="pre">value</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">wait=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=30</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.put" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.put">
+<code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">put</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">attr</span></em>, <em class="sig-param"><span class="pre">value</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">wait=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=30</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets a field attribute for the motor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -620,16 +619,16 @@ attribute cannot do so:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="motor.check_limits">
-<span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">check_limits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.check_limits" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.check_limits">
+<code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">check_limits</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.check_limits" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks whether the current motor position is causing a motor limit
 violation, and raises a MotorLimitException if it is.</p>
 <p>returns <code class="docutils literal notranslate"><span class="pre">None</span></code> if there is no limit violation.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="motor.within_limits">
-<span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">within_limits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">value</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">limits='user'</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.within_limits" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.within_limits">
+<code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">within_limits</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">value</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">limits='user'</span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.within_limits" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks whether a target value <strong>would be</strong> a limit violation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -645,8 +644,8 @@ violation, and raises a MotorLimitException if it is.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="motor.move">
-<span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">val=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">relative=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">wait=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=300.0</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">dial=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">raw=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">ignore_limits=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">confirm_move=False</span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.move" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.move">
+<code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">move</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">val=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">relative=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">wait=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=300.0</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">dial=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">raw=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">ignore_limits=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">confirm_move=False</span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.move" title="Permalink to this definition">¶</a></dt>
 <dd><p>moves motor to specified drive position.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -728,8 +727,8 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 </table>
 </div></blockquote>
 <dl class="py method">
-<dt class="sig sig-object py" id="motor.tweak">
-<span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">tweak</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">direction='forward'</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">wait=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=300.</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.tweak" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.tweak">
+<code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">tweak</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">direction='forward'</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">wait=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">timeout=300.</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.tweak" title="Permalink to this definition">¶</a></dt>
 <dd><p>move the motor by the current <em>tweak value</em></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -743,8 +742,8 @@ move to complete, you may want to use the <cite>confirm_move=True</cite> option.
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="motor.get_position">
-<span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">get_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">readback=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">dial=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">raw=False</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.get_position" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.get_position">
+<code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">get_position</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">readback=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">dial=False</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">raw=False</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.get_position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the motor position in user, dial or raw coordinates.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -764,8 +763,8 @@ The “readback” keyword can be used in user, dial or raw coordinates.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="motor.set_position">
-<span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">set_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">position[</span> <span class="pre">dial=False[,</span> <span class="pre">raw=False]]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#motor.set_position" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.set_position">
+<code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">set_position</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">position[</span> <span class="pre">dial=False[,</span> <span class="pre">raw=False]]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#motor.set_position" title="Permalink to this definition">¶</a></dt>
 <dd><p>set (that is, redefine) the current position to supplied value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -781,37 +780,37 @@ The “readback” keyword can be used in user, dial or raw coordinates.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="motor.get_pv">
-<span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">get_pv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#motor.get_pv" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.get_pv">
+<code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">get_pv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#motor.get_pv" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the <cite>PV</cite> for the corresponding attribute.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="motor.set_callback">
-<span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">set_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">attr='drive'</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">callback=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">kw=None</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.set_callback" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.set_callback">
+<code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">set_callback</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">attr='drive'</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">callback=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">kw=None</span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.set_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>sets a callback on the <cite>PV</cite> for a particular attribute.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="motor.clear_callback">
-<span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">clear_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'drive'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#motor.clear_callback" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.clear_callback">
+<code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">clear_callback</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'drive'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#motor.clear_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>clears a callback on the <cite>PV</cite> for a particular attribute.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="motor.show_info">
-<span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">show_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.show_info" title="Permalink to this definition">¶</a></dt>
+<dt id="motor.show_info">
+<code class="sig-prename descclassname"><span class="pre">motor.</span></code><code class="sig-name descname"><span class="pre">show_info</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.show_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>prints out a table of attributes and their current values.</p>
 </dd></dl>
 
-</section>
-</section>
-<section id="other-device-examples">
+</div>
+</div>
+<div class="section" id="other-device-examples">
 <h2>Other Device Examples<a class="headerlink" href="#other-device-examples" title="Permalink to this headline">¶</a></h2>
 <p>An epics Device provides a general way to group together a set of PVs.  The
 examples below show how to build on this generality, and may inspire you to
 build your own device classes.</p>
-<section id="a-basic-device-without-a-prefix">
+<div class="section" id="a-basic-device-without-a-prefix">
 <h3>A basic Device without a prefix<a class="headerlink" href="#a-basic-device-without-a-prefix" title="Permalink to this headline">¶</a></h3>
 <p>Here, we define a very simple device that does not even define a prefix.
 This is not much more than a collection of PVs.  Since there is no prefix
@@ -831,8 +830,8 @@ no requirement to share a common prefix in such a collection of PVs:</p>
 ou consider <cite>Device</cite> to be a starting point for building more complicated
 objects by subclassing <cite>Device</cite> and adding specialized methods, then it can
 start to get interesting.</p>
-</section>
-<section id="epics-ai-record-as-device">
+</div>
+<div class="section" id="epics-ai-record-as-device">
 <h3>Epics ai record as Device<a class="headerlink" href="#epics-ai-record-as-device" title="Permalink to this headline">¶</a></h3>
 <p>For a slightly more useful and typical example, the pyepics distribution
 includes a Device for an Epics ai (analog input record).  The full
@@ -875,8 +874,8 @@ basic <code class="xref py py-class docutils literal notranslate"><span class="p
 this way, and the pyepics distribution includes such simple wrappings for the
 Epics ao, bi, and bo records, as well as several more complex records from
 synApps.</p>
-</section>
-<section id="epics-scaler-record-as-device">
+</div>
+<div class="section" id="epics-scaler-record-as-device">
 <h3>Epics Scaler Record as Device<a class="headerlink" href="#epics-scaler-record-as-device" title="Permalink to this headline">¶</a></h3>
 <p>For a slightly more complicated example: an incomplete, but very useful mapping
 of the Scaler Record from synApps, including methods for changing modes, and
@@ -967,8 +966,8 @@ directly invoking epics calls:</p>
 <span class="nb">print</span> <span class="s1">&#39;Calc values: &#39;</span><span class="p">,</span> <span class="n">s1</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">use_calc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="other-devices-included-in-pyepics">
+</div>
+<div class="section" id="other-devices-included-in-pyepics">
 <h3>Other Devices included in PyEpics<a class="headerlink" href="#other-devices-included-in-pyepics" title="Permalink to this headline">¶</a></h3>
 <p>Several other Epics Records have been exposed as Devices, and included in
 PyEpics distribution.  These vary some in how complete and feature-rich they
@@ -1069,9 +1068,9 @@ specific use of that Device.</p>
 </tr>
 </tbody>
 </table>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
             <div class="clearer"></div>
@@ -1111,7 +1110,7 @@ specific use of that Device.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
     </div>
   </body>
 </html>
