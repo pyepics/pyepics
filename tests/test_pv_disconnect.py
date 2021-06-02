@@ -1,11 +1,12 @@
 #!/usr/bin/python
 
 # test of simplest device
-from epics import PV, caget
+from epics import PV, caget, camonitor, camonitor_clear
 
 import os
 import psutil
 import pytest
+import time
 
 import pvnames
 mypv = pvnames.updating_pv1
@@ -81,13 +82,10 @@ def test_connect_disconnect_with_two_PVs():
 
 def test_connect_disconnect_with_caget():
     pv = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
-
     pv.wait_for_connection()
 
-    # check that the PV is connected
+    # check that the PV is connected and  data is received
     assert pv.connected is True
-
-    # check that data is received
     assert pv.get() is not None
 
     # use caget to get data from the same PV
@@ -102,6 +100,70 @@ def test_connect_disconnect_with_caget():
 
     # check that you can still use caget to get data from the same PV
     assert caget(mypv) is not None
+
+
+def test_connect_disconnect_with_caget_nomonitor():
+    pv = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
+    pv.wait_for_connection()
+
+    # check that the PV is connected and  data is received
+    assert pv.connected is True
+    assert pv.get() is not None
+
+    # use caget to get data from the same PV
+    assert caget(mypv, use_monitor=False) is not None
+
+    # disconnect PV object
+    pv.disconnect()
+
+    # check that the PV is disconnected and doesn't receive data
+    assert pv.connected is False
+    assert pv.get() is None
+
+    # check that you can still use caget to get data from the same PV
+    assert caget(mypv, use_monitor=False) is not None
+
+
+def test_connect_disconnect_with_camonitor():
+    pv = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
+    pv.wait_for_connection()
+
+    # check that the PV is connected and  data is received
+    assert pv.connected is True
+    assert pv.get() is not None
+
+    # use camonitor
+    received = {'flag': False}
+
+    def callback(**args):
+        received['flag'] = True
+    camonitor(mypv, callback=callback)
+    time.sleep(1)
+
+    # check that the monitor receives data
+    assert received['flag'] is True
+
+    # disconnect PV object
+    pv.disconnect()
+    time.sleep(1)
+
+    # check that the PV is disconnected and doesn't receive data
+    assert pv.connected is False
+    assert pv.get() is None
+
+    # reset the flag to check that new data is received by camonitor
+    received['flag'] = False
+    time.sleep(1)
+    assert received['flag'] is True
+
+    # clear the monitor
+    camonitor_clear(mypv)
+    time.sleep(1)
+
+    # reset the flag to check that no new data is received by camonitor
+    received['flag'] = False
+    time.sleep(1)
+    assert received['flag'] is False
 
 
 @pytest.mark.skip(reason="disabled until memleak is fixed")
