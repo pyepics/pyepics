@@ -40,11 +40,10 @@ def test_reconnect():
     pv.disconnect()
 
     # try to reconnect to the same PV
-    pv.reconnect()
-    pv.wait_for_connection()
+    connected = pv.reconnect()
 
     # check that PV is connected
-    assert pv.connect() is True
+    assert connected is True
 
     # check that data is received
     value = pv.get()
