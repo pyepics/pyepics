@@ -5,7 +5,6 @@ from epics import PV, get_pv, caget, camonitor, camonitor_clear
 
 import os
 import psutil
-import pytest
 import time
 
 import pvnames
@@ -34,7 +33,6 @@ def test_connect_disconnect():
     assert value is None
 
 
-@pytest.mark.skip(reason="disabled until disconnect() is fixed")
 def test_reconnect():
     # connect and disconnect
     pv = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
@@ -226,7 +224,6 @@ def test_with_camonitor():
     assert received['flag'] is False
 
 
-@pytest.mark.skip(reason="disabled until memleak is fixed")
 def test_memleak_disconnect():
     # try to connect multiple times to the same PV
     mem = []
