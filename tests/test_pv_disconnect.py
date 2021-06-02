@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # test of simplest device
-from epics import PV
+from epics import PV, caget
 
 import os
 import psutil
@@ -77,6 +77,31 @@ def test_connect_disconnect_with_two_PVs():
     # check that the other PV is connected and still receives data
     assert pv2.connected is True
     assert pv2.get() is not None
+
+
+def test_connect_disconnect_with_caget():
+    pv = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
+
+    pv.wait_for_connection()
+
+    # check that the PV is connected
+    assert pv.connected is True
+
+    # check that data is received
+    assert pv.get() is not None
+
+    # use caget to get data from the same PV
+    assert caget(mypv) is not None
+
+    # disconnect PV object
+    pv.disconnect()
+
+    # check that the PV is disconnected and doesn't receive data
+    assert pv.connected is False
+    assert pv.get() is None
+
+    # check that you can still use caget to get data from the same PV
+    assert caget(mypv) is not None
 
 
 @pytest.mark.skip(reason="disabled until memleak is fixed")
