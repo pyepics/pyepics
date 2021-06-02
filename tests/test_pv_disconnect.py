@@ -51,6 +51,34 @@ def test_reconnect():
     assert value is not None
 
 
+def test_connect_disconnect_with_two_PVs():
+    # create 2 PV objects connecting to the same PV signal
+    pv1 = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
+    pv2 = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
+
+    pv1.wait_for_connection()
+    pv2.wait_for_connection()
+
+    # check that both PVs are connected
+    assert pv1.connect() is True
+    assert pv2.connect() is True
+
+    # check that data is received
+    assert pv1.get() is not None
+    assert pv2.get() is not None
+
+    # disconnect 1 PV
+    pv1.disconnect()
+
+    # check that the first PV is disconnected and doesn't receive data
+    assert pv1.connect() is False
+    assert pv1.get() is None
+
+    # check that the other PV is connected and still receives data
+    assert pv2.connect() is True
+    assert pv2.get() is not None
+
+
 @pytest.mark.skip(reason="disabled until memleak is fixed")
 def test_memleak_disconnect():
     # try to connect multiple times to the same PV
