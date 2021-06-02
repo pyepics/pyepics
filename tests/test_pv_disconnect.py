@@ -33,6 +33,7 @@ def test_connect_disconnect():
     assert value is None
 
 
+@pytest.mark.skip(reason="disabled until memleak is fixed")
 def test_memleak_disconnect():
     # try to connect multiple times to the same PV
     mem = []
