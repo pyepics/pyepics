@@ -11,7 +11,6 @@ import pvnames
 mypv = pvnames.updating_pv1
 
 
-@pytest.mark.skip(reason="disabled until memleak is fixed")
 def test_memleak_disconnect():
     # try to connect multiple times to the same PV
     mem = []
