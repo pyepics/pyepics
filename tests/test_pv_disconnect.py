@@ -11,6 +11,27 @@ import pvnames
 mypv = pvnames.updating_pv1
 
 
+def test_connect_disconnect():
+    pv = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
+
+    pv.wait_for_connection()
+
+    # check that PV is connected
+    assert pv.connect() is True
+
+    # check that data is received
+    value = pv.get()
+    assert value is not None
+
+    pv.disconnect()
+
+    # check that PV is disconnected
+    assert pv.connect() is False
+
+    # check that no data is received after disconnect
+    value = pv.get()
+    assert value is None
+
 
 def test_memleak_disconnect():
     # try to connect multiple times to the same PV
