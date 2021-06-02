@@ -52,7 +52,7 @@ def test_reconnect():
     assert value is not None
 
 
-def test_connect_disconnect_with_two_PVs():
+def test_with_two_PVs():
     # create 2 PV objects connecting to the same PV signal
     pv1 = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
     pv2 = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
@@ -80,7 +80,7 @@ def test_connect_disconnect_with_two_PVs():
     assert pv2.get() is not None
 
 
-def test_connect_disconnect_with_PV_and_getPV():
+def test_with_PV_and_getPV():
     # create 2 PV objects connecting to the same PV signal, one using PV class and the other one using get_pv()
     pv1 = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
     pv2 = get_pv(mypv)
@@ -110,7 +110,7 @@ def test_connect_disconnect_with_PV_and_getPV():
     assert pv2.get() is not None
 
 
-def test_connect_disconnect_with_getPV():
+def test_with_getPV():
     # create 2 PV objects connecting to the same PV signal using get_pv()
     pv1 = get_pv(mypv)
     pv2 = get_pv(mypv)
@@ -140,7 +140,7 @@ def test_connect_disconnect_with_getPV():
     assert pv2.get() is None
 
 
-def test_connect_disconnect_with_caget():
+def test_with_caget():
     pv = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
     pv.wait_for_connection()
 
@@ -162,7 +162,7 @@ def test_connect_disconnect_with_caget():
     assert caget(mypv) is not None
 
 
-def test_connect_disconnect_with_caget_nomonitor():
+def test_with_caget_nomonitor():
     pv = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
     pv.wait_for_connection()
 
@@ -184,7 +184,7 @@ def test_connect_disconnect_with_caget_nomonitor():
     assert caget(mypv, use_monitor=False) is not None
 
 
-def test_connect_disconnect_with_camonitor():
+def test_with_camonitor():
     pv = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
     pv.wait_for_connection()
 
