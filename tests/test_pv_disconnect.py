@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # test of simplest device
-from epics import PV, caget, camonitor, camonitor_clear
+from epics import PV, get_pv, caget, camonitor, camonitor_clear
 
 import os
 import psutil
@@ -78,6 +78,66 @@ def test_connect_disconnect_with_two_PVs():
     # check that the other PV is connected and still receives data
     assert pv2.connected is True
     assert pv2.get() is not None
+
+
+def test_connect_disconnect_with_PV_and_getPV():
+    # create 2 PV objects connecting to the same PV signal, one using PV class and the other one using get_pv()
+    pv1 = PV(mypv, auto_monitor=True, callback=lambda **args: ...)
+    pv2 = get_pv(mypv)
+
+    pv1.wait_for_connection()
+    pv2.wait_for_connection()
+
+    # check that both PVs are connected
+    assert pv1.connected is True
+    assert pv2.connected is True
+
+    # check that data is received
+    assert pv1.get() is not None
+    assert pv2.get() is not None
+
+    # disconnect 1 PV
+    pv1.disconnect()
+
+    time.sleep(1)
+
+    # check that the first PV is disconnected and doesn't receive data
+    assert pv1.connected is False
+    assert pv1.get() is None
+
+    # check that the other PV is connected and still receives data
+    assert pv2.connected is True
+    assert pv2.get() is not None
+
+
+def test_connect_disconnect_with_getPV():
+    # create 2 PV objects connecting to the same PV signal using get_pv()
+    pv1 = get_pv(mypv)
+    pv2 = get_pv(mypv)
+
+    pv1.wait_for_connection()
+    pv2.wait_for_connection()
+
+    # check that both PVs are connected
+    assert pv1.connected is True
+    assert pv2.connected is True
+
+    # check that data is received
+    assert pv1.get() is not None
+    assert pv2.get() is not None
+
+    # disconnect 1 PV
+    pv1.disconnect()
+
+    time.sleep(1)
+
+    # check that the first PV is disconnected and doesn't receive data
+    assert pv1.connected is False
+    assert pv1.get() is None
+
+    # check that the other PV is also disconnected and doesn't receive data either
+    assert pv2.connected is False
+    assert pv2.get() is None
 
 
 def test_connect_disconnect_with_caget():
