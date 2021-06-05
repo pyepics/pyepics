@@ -1110,7 +1110,12 @@ class PV(object):
 
     @_ensure_context
     def disconnect(self):
-        "disconnect PV"
+        """
+        disconnect PV
+
+        this method clears all the callbacks so that this PV object does not receive further update events, but the connection is kept open and cached by ca._cache
+        all the references to this object are cleared so that it can be garbage-collected
+        """
         self.connected = False
 
         ctx = ca.current_context()
@@ -1118,14 +1123,18 @@ class PV(object):
         if pvid in _PVcache_:
             _PVcache_.pop(pvid)
 
-        cache_item = ca._cache[ctx].pop(self.pvname, None)
+        cache_item = ca._cache[ctx].get(self.pvname, None)
         if cache_item is not None:
+            # removing references from ca._cache to this object, so that it can be garbage-collected
+            if cache_item.callbacks.count(self.__on_connect):
+                cache_item.callbacks.remove(self.__on_connect)
+            if cache_item.access_event_callback.count(self.__on_access_rights_event):
+                cache_item.access_event_callback.remove(
+                    self.__on_access_rights_event)
+
             if self._monref is not None:
                 # atexit may have already cleared the subscription
                 self._clear_auto_monitor_subscription()
-
-            # TODO: clear channel should be called as well
-            # ca.clear_channel(cache_item.chid)
 
         self._monref = None
         self._monref_mask = None
