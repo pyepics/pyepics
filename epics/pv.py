@@ -1126,11 +1126,12 @@ class PV(object):
         cache_item = ca._cache[ctx].get(self.pvname, None)
         if cache_item is not None:
             # removing references from ca._cache to this object, so that it can be garbage-collected
-            if cache_item.callbacks.count(self.__on_connect):
-                cache_item.callbacks.remove(self.__on_connect)
-            if cache_item.access_event_callback.count(self.__on_access_rights_event):
-                cache_item.access_event_callback.remove(
-                    self.__on_access_rights_event)
+            for cb_cache, cb_ref in ((cache_item.callbacks,
+                                      self.__on_connect),
+                                     (cache_item.access_event_callback,
+                                      self.__on_access_rights_event)):
+                while cb_cache.count(cb_ref) > 0:
+                    cb_cache.remove(cb_ref)
 
             if self._monref is not None:
                 # atexit may have already cleared the subscription
