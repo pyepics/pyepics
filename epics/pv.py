@@ -1132,7 +1132,7 @@ class PV(object):
         if pvid in _PVcache_:
             _PVcache_.pop(pvid)
 
-        if deep_clean:
+        if deepclean:
             cache_item = ca._cache[ctx].get(self.pvname, None)
             if cache_item is not None:
                 # removing all references from ca._cache to this object,
