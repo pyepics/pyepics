@@ -1109,12 +1109,21 @@ class PV(object):
             return False
 
     @_ensure_context
-    def disconnect(self):
+    def disconnect(self, deepclean=True):
         """
         disconnect PV
 
-        this method clears all the callbacks so that this PV object does not receive further update events, but the connection is kept open and cached by ca._cache
-        all the references to this object are cleared so that it can be garbage-collected
+        this method clears all the user-defined callbacks for a PV and removes
+        it from _PVcache_, so that subsequent connection to this PV will almost
+        always make a completely new connection.
+
+        Arguments
+        -----------
+        deepclean, bool  removal all cache connection and access-rights callbacks [True]
+
+
+        With deepclean=False, references to callbacks for connection and access-rights
+        events will not be removed from the ca _cache for the current context.
         """
         self.connected = False
 
@@ -1123,18 +1132,21 @@ class PV(object):
         if pvid in _PVcache_:
             _PVcache_.pop(pvid)
 
-        cache_item = ca._cache[ctx].get(self.pvname, None)
-        if cache_item is not None:
-            # removing references from ca._cache to this object, so that it can be garbage-collected
-            if cache_item.callbacks.count(self.__on_connect):
-                cache_item.callbacks.remove(self.__on_connect)
-            if cache_item.access_event_callback.count(self.__on_access_rights_event):
-                cache_item.access_event_callback.remove(
-                    self.__on_access_rights_event)
+        if deepclean:
+            cache_item = ca._cache[ctx].get(self.pvname, None)
+            if cache_item is not None:
+                # removing all references from ca._cache to this object,
+                # so that it can be garbage-collected
+                for cb_cache, cb_ref in ((cache_item.callbacks,
+                                          self.__on_connect),
+                                         (cache_item.access_event_callback,
+                                          self.__on_access_rights_event)):
+                    while cb_cache.count(cb_ref) > 0:
+                        cb_cache.remove(cb_ref)
 
-            if self._monref is not None:
-                # atexit may have already cleared the subscription
-                self._clear_auto_monitor_subscription()
+        if self._monref is not None:
+            # atexit may have already cleared the subscription
+            self._clear_auto_monitor_subscription()
 
         self._monref = None
         self._monref_mask = None
