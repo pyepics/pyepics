@@ -61,7 +61,9 @@ setup(name = 'pyepics',
       packages = ['epics','epics.wx','epics.devices', 'epics.compat',
                   'epics.autosave', 'epics.clibs'],
       package_data = {'epics.clibs': ['darwin64/*', 'linux64/*', 'linux32/*',
-                                      'linuxarm/*', 'win32/*', 'win64/*']})
+                                      'linuxarm/*', 'win32/*', 'win64/*']},
+      install_requires = ['setuptools']
+      )
 
 try:
     libca = epics.ca.find_libca()
