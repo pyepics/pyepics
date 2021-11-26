@@ -18,5 +18,11 @@ if ! command -v $PROCSERV &> /dev/null ; then
     fi
 fi
 
+if ! test -f ./st.cmd; then
+    echo 'Error -- st.cmd not found at the current directory'
+    echo 'Run the script with pwd at <repo>/tests/Setup/st.cmd'
+    exit 1
+fi
+
 OPTS='-P 9230 -n pyepics_testioc -L pyepics_testioc.log --noautorestart'
 $PROCSERV $OPTS -e $SOFTIOC ./st.cmd

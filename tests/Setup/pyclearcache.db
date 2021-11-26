@@ -1,0 +1,89 @@
+##
+## DB generating frequent changes for testing concurrency issues
+## in test_ca_clearcache.py
+record(bi,"$(P)enabled") {
+       field(DESC,"Enable beacons")
+       field(ZNAM,"enabled")
+       field(ONAM,"disabled")
+       field(VAL,0)
+}
+
+record(calc,"$(P)1") {
+       field(SCAN,".1 second")
+       field(INPA,"$(P)1")
+       field(CALC,"A+1")
+       field(SDIS,"$(P)enabled")
+       field(DISV,0)
+}
+
+record(calc,"$(P)2") {
+       field(SCAN,".1 second")
+       field(INPA,"$(P)2")
+       field(CALC,"A+1")
+       field(SDIS,"$(P)enabled")
+       field(DISV,0)
+}
+
+record(calc,"$(P)3") {
+       field(SCAN,".1 second")
+       field(INPA,"$(P)3")
+       field(CALC,"A+1")
+       field(SDIS,"$(P)enabled")
+       field(DISV,0)
+}
+
+record(calc,"$(P)4") {
+       field(SCAN,".1 second")
+       field(INPA,"$(P)4")
+       field(CALC,"A+1")
+       field(SDIS,"$(P)enabled")
+       field(DISV,0)
+}
+
+record(calc,"$(P)5") {
+       field(SCAN,".1 second")
+       field(INPA,"$(P)5")
+       field(CALC,"A+1")
+       field(SDIS,"$(P)enabled")
+       field(DISV,0)
+}
+
+record(calc,"$(P)6") {
+       field(SCAN,".1 second")
+       field(INPA,"$(P)6")
+       field(CALC,"A+1")
+       field(SDIS,"$(P)enabled")
+       field(DISV,0)
+}
+
+record(calc,"$(P)7") {
+       field(SCAN,".1 second")
+       field(INPA,"$(P)7")
+       field(CALC,"A+1")
+       field(SDIS,"$(P)enabled")
+       field(DISV,0)
+}
+
+record(calc,"$(P)8") {
+       field(SCAN,".1 second")
+       field(INPA,"$(P)8")
+       field(CALC,"A+1")
+       field(SDIS,"$(P)enabled")
+       field(DISV,0)
+}
+
+record(calc,"$(P)9") {
+       field(SCAN,".1 second")
+       field(INPA,"$(P)9")
+       field(CALC,"A+1")
+       field(SDIS,"$(P)enabled")
+       field(DISV,0)
+}
+
+record(calc,"$(P)10") {
+       field(SCAN,".1 second")
+       field(INPA,"$(P)10")
+       field(CALC,"A+1")
+       field(SDIS,"$(P)enabled")
+       field(DISV,0)
+}

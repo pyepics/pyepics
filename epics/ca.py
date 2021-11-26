@@ -362,7 +362,7 @@ def initialize_libca():
     This function must be called prior to any real CA calls.
 
     See the `withCA`  decorator to ensure CA is initialized
-    
+
     """
     if 'EPICS_CA_MAX_ARRAY_BYTES' not in os.environ:
         os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = "%i" %  2**24
@@ -501,6 +501,12 @@ def clear_cache():
     multiprocessing (and is done internally by CAProcess),
     but can be useful to fully reset a Channel Access session.
     """
+    # Unregister callbacks (if any)
+    for chid, entry in list(_chid_cache.items()):
+        try:
+            clear_channel(chid)
+        except ChannelAccessException:
+            pass
 
     # Clear global state variables
     _cache.clear()

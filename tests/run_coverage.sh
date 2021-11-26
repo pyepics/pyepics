@@ -10,6 +10,7 @@ coverage run --source=epics -a --timid  -m pytest test_threading.py
 coverage run --source=epics -a --timid  -m pytest test_aodevice.py
 coverage run --source=epics -a --timid  -m pytest test_ca_unittests.py
 coverage run --source=epics -a --timid  -m pytest test_ca_subscribe.py
+coverage run --source=epics -a --timid  -m pytest test_ca_clearcache.py
 coverage run --source=epics -a --timid  -m pytest test_pv_unittests.py
 coverage run --source=epics -a --timid  -m pytest test_pv_typeconversion.py
 coverage combine

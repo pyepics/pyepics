@@ -10,6 +10,7 @@ cd ..
 coverage erase
 coverage run --source=epics -a  --timid  test_camonitor_func.py
 coverage run --source=epics -a  --timid  test_ca_subscribe.py
+coverage run --source=epics -a  --timid  test_ca_clearcache.py
 coverage run --source=epics -a  --timid  test_cathread.py
 coverage run --source=epics -a  --timid  test_ca_typeconversion.py
 coverage run --source=epics -a  --timid  test_ca_unittests.py
