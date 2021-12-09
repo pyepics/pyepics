@@ -70,3 +70,8 @@ subarr2       = 'PyTest:subArr2'
 subarr3       = 'PyTest:subArr3'
 subarr4       = 'PyTest:subArr4'
 zero_len_subarr1 = 'PyTest:ZeroLenSubArr1'
+
+
+#### clear cache tests
+clear_cache_enabled = 'PyTestClearCache:enabled'
+clear_cache_beacons = ['PyTestClearCache:{}'.format(i) for i in range(1, 10)]
