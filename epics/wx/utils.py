@@ -30,9 +30,9 @@ except ImportError:
 RIGHT = wx.ALIGN_RIGHT
 LEFT  = wx.ALIGN_LEFT
 CEN   = wx.ALIGN_CENTER
-LCEN  = wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT
-RCEN  = wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT
-CCEN  = wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_CENTER
+LCEN  = wx.ALIGN_LEFT
+RCEN  = wx.ALIGN_RIGHT
+CCEN  = wx.ALIGN_CENTER
 LTEXT = wx.ST_NO_AUTORESIZE|wx.ALIGN_CENTER
 
 
@@ -447,11 +447,10 @@ class NumericCombo(wx.ComboBox):
 class SimpleText(wx.StaticText):
     "simple static text wrapper"
     def __init__(self, parent, label, minsize=None,
-                 font=None, colour=None, bgcolour=None,
-                 style=wx.ALIGN_CENTRE,  **kws):
+                 font=None, colour=None, bgcolour=None,  **kws):
 
         wx.StaticText.__init__(self, parent, -1,
-                               label=label, style=style, **kws)
+                               label=label, **kws)
 
         if minsize is not None:
             self.SetMinSize(minsize)
@@ -506,7 +505,7 @@ class DateTimeCtrl(object):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         sizer.Add(self.datectrl, 0, wx.ALIGN_CENTER)
         sizer.Add(self.timectrl, 0, wx.ALIGN_CENTER)
-        sizer.Add(spinner, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_LEFT)
+        sizer.Add(spinner, 0, wx.ALIGN_LEFT)
         panel.SetSizer(sizer)
         sizer.Fit(panel)
         if use_now:

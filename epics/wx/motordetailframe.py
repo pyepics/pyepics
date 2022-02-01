@@ -396,7 +396,7 @@ class MotorDetailPanel(ScrolledPanel):
         "PVText for a Motor attribute"
         pv = self.motor.PV(attr)
         return PVText(panel,  pv=pv, as_string=True,
-                      size=size, style=wx.ALIGN_CENTER|wx.CENTER)
+                      size=size, style=wx.CENTER)
 
     def MotorTextCtrl(self, panel, attr, size=(80, -1)):
         "PVTextCtrl for a Motor attribute"
