@@ -67,6 +67,11 @@ CTRL_CHAR    = 32
 CTRL_LONG    = 33
 CTRL_DOUBLE  = 34
 
+PUT_ACKT     = 35
+PUT_ACKS     = 36
+STSACK_STRING = 37
+CLASS_NAME   = 38
+
 MAX_STRING_SIZE      = 40
 MAX_UNITS_SIZE       =  8
 MAX_ENUM_STRING_SIZE = 26
@@ -406,5 +411,3 @@ class AlarmSeverity(DefaultIntEnum):
     MINOR = 1
     MAJOR = 2
     INVALID = 3
-
-
