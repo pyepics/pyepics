@@ -90,9 +90,6 @@ if __name__ == '__main__':
     if len(sys.argv)>1:
         motors = sys.argv[1:]
 
-    print("M ", motors)
     app = wx.App()
     SimpleMotorFrame(motors=motors).Show()
-    print("App  ", time.ctime())
-
     app.MainLoop()
