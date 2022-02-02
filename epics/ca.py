@@ -1616,7 +1616,7 @@ def _as_string(val, chid, count, ftype):
 
 @withConnectedCHID
 def put(chid, value, wait=False, timeout=30, callback=None,
-        callback_data=None):
+        callback_data=None, ftype=None):
     """sets the Channel to a value, with options to either wait
     (block) for the processing to complete, or to execute a
     supplied callback function when the process has completed.
@@ -1635,6 +1635,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         user-supplied function to run when processing has completed.
     callback_data :  object
         extra data to pass on to a user-supplied callback function.
+    ftype : ``None`` or int (valid dbr type)
+        force field type to be a non-native form (None will use native form)
 
     Returns
     -------
@@ -1649,7 +1651,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         pvname=pvname, data=callback_data
 
     """
-    ftype = field_type(chid)
+    if ftype is None:
+        ftype = field_type(chid)
     count = nativecount = element_count(chid)
     if count > 1:
         # check that data for array PVS is a list, array, or string
