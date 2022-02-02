@@ -5,11 +5,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Alarms: respond when a PV goes out of range &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/epicsdoc.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -57,8 +58,9 @@
 
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Alarms: respond when a PV goes out of range</a><ul>
 <li><a class="reference internal" href="#module-alarm">Overview</a></li>
 <li><a class="reference internal" href="#alarm-example">Alarm Example</a></li>
@@ -66,12 +68,17 @@
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="devices.html"
-                        title="previous chapter">Devices: collections of PVs</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="autosave.html"
-                        title="next chapter">Auto-saving: simple save/restore of PVs</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="devices.html"
+                          title="previous chapter">Devices: collections of PVs</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="autosave.html"
+                          title="next chapter">Auto-saving: simple save/restore of PVs</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -83,7 +90,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -97,15 +104,15 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="alarms-respond-when-a-pv-goes-out-of-range">
+  <section id="alarms-respond-when-a-pv-goes-out-of-range">
 <h1>Alarms: respond when a PV goes out of range<a class="headerlink" href="#alarms-respond-when-a-pv-goes-out-of-range" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-alarm">
+<section id="module-alarm">
 <span id="overview"></span><h2>Overview<a class="headerlink" href="#module-alarm" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference internal" href="#module-alarm" title="alarm: respond when a PV goes out of range by running user-supplied code"><code class="xref py py-mod docutils literal notranslate"><span class="pre">alarm</span></code></a> module provides an Alarm object to specify an alarm
 condition and what to do when that condition is met.</p>
 <dl class="py class">
-<dt id="alarm.Alarm">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">alarm.</span></code><code class="sig-name descname"><span class="pre">Alarm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">pvname</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">comparison=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">trip_point=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">callback=None</span></em><span class="optional">[</span>, <em class="sig-param"><span class="pre">alert_delay=10</span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#alarm.Alarm" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="alarm.Alarm">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">alarm.</span></span><span class="sig-name descname"><span class="pre">Alarm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">comparison=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">trip_point=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">callback=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">alert_delay=10</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#alarm.Alarm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>creates an alarm object.</p>
@@ -186,8 +193,8 @@ again to a violating value, it may not be desirable to send repeated,
 identical messages.   To prevent this situation, the alarm callback will be
 called when the alarm condition is met <strong>and</strong> the callback was not called
 within the time specified by  <code class="xref py py-attr docutils literal notranslate"><span class="pre">alert_delay</span></code>.</p>
-</div>
-<div class="section" id="alarm-example">
+</section>
+<section id="alarm-example">
 <h2>Alarm Example<a class="headerlink" href="#alarm-example" title="Permalink to this headline">¶</a></h2>
 <p>An epics Alarm is very easy to use.  Here is an alarm set to print a
 message when a PV’s value reaches a certain value:</p>
@@ -205,8 +212,8 @@ message when a PV’s value reaches a certain value:</p>
     <span class="n">poll</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -246,7 +253,7 @@ message when a PV’s value reaches a certain value:</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>
