@@ -588,19 +588,19 @@ def test_force_connect():
 
     print("Disconnecting")
     pv.disconnect()
-    print("Reconnecting")
-
-    pv.force_connect()
-    assert pv.wait_for_connection(5.0)
 
     called = {'called': False}
-
     def callback(value=None, **kwargs):
         called['called'] = True
         print("update", value.sum())
 
     pv.add_callback(callback)
 
-    time.sleep(1)
+    print("Reconnecting")
+    pv.force_connect()
+
+    assert pv.wait_for_connection(5.0)
+
+    time.sleep(2.0)
     assert pv.get() is not None
     assert called['called']

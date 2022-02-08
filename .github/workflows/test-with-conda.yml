@@ -1,4 +1,4 @@
-name: Test with Conda
+name: Test with Conda, Py3.7 to 3.10
 
 on: [push]
 
@@ -9,7 +9,7 @@ jobs:
       max-parallel: 5
       fail-fast: false
       matrix:
-        python-version: ['3.7.10', '3.8.10', '3.9.4', '3.10.0-beta.1']
+        python-version: ['3.7', '3.8', '3.9', '3.10']
 
     steps:
     - uses: actions/checkout@v2
@@ -42,9 +42,9 @@ jobs:
         export EPICS_CA_MAX_ARRAY_BYTES=20100300
         printenv
         bash start_ioc.sh
-        sleep 1
+        sleep 2
         python simulator.py &
-        sleep 1
+        sleep 2
         cd ..
         coverage erase
         coverage run --source=epics -a --timid  -m pytest test_camonitor_func.py
