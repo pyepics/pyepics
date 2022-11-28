@@ -7,24 +7,25 @@ try:
 except:
     from PyQt4.QtGui import QWidget, QLabel, QLineEdit, QGridLayout, QApplication
 
-from epics.utils import BYTES2STR
+from epics.utils import bytes2str
+
 class PVText(QLabel):
     def __init__(self, pvname,  **kws):
         QLabel.__init__(self, '', **kws)
         self.pv = None
-        self.cb_index = None        
-        
+        self.cb_index = None
+
     def SetPV(self, pvname):
         if self.pv is not None and self.cb_index is not None:
             self.pv.remove_callback(self.cb_index)
-        
-        self.pv = epics.PV(BYTES2STR(pvname))
+
+        self.pv = epics.PV(bytes2str(pvname))
         self.setText(self.pv.get(as_string=True))
         self.cb_index = self.pv.add_callback(self.onPVChange)
 
     def onPVChange(self, pvname=None, char_value=None, **kws):
         self.setText(char_value)
-        
+
 class PVLineEdit(QLineEdit):
     def __init__(self, pvname=None,  **kws):
         QLineEdit.__init__(self, **kws)
@@ -33,20 +34,20 @@ class PVLineEdit(QLineEdit):
         self.cb_index = None
         if pvname is not None:
             self.SetPV(pvname)
-        
+
     def SetPV(self, pvname):
         if self.pv is not None and self.cb_index is not None:
             self.pv.remove_callback(self.cb_index)
-            
-        self.pv = epics.PV(BYTES2STR(pvname))
+
+        self.pv = epics.PV(bytes2str(pvname))
         self.cb_index = self.pv.add_callback(self.onPVChange)
 
     def onPVChange(self, pvname=None, char_value=None, **kws):
         self.setText(char_value)
 
     def onReturn(self):
-        self.pv.put(BYTES2STR(self.text()))
-        
+        self.pv.put(bytes2str(self.text()))
+
 class PVProbe(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -56,7 +57,7 @@ class PVProbe(QWidget):
         self.pv2name = QLineEdit()
         self.value   = PVText(None)
         self.pvedit  = PVLineEdit()
-        
+
         grid = QGridLayout()
         grid.addWidget(QLabel("PV1 Name (Read-only):"),   0, 0)
         grid.addWidget(QLabel("PV1 Value (Read-only):"),  1, 0)
@@ -74,10 +75,10 @@ class PVProbe(QWidget):
 
     def onPV1NameReturn(self):
         self.value.SetPV(self.pv1name.text())
-        
+
     def onPV2NameReturn(self):
         self.pvedit.SetPV(self.pv2name.text())
-        
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     probe = PVProbe()

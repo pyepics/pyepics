@@ -13,10 +13,9 @@ See doc/  for user documentation.
 documentation here is developer documentation.
 """
 import ctypes
-import ctypes.util
+from ctypes.util import find_library
 
 import atexit
-import collections
 import functools
 import os
 import sys
@@ -24,21 +23,10 @@ import threading
 import time
 import warnings
 
+from collections import defaultdict
 from math import log10
 from pkg_resources import resource_filename
 from copy import deepcopy
-
-from .utils import (str2bytes, bytes2str, strjoin, EPICS_STR_ENCODING,
-                    clib_search_path)
-
-# legacy imports in case someone was importing them from here..
-from .utils import (STR2BYTES, BYTES2STR, NULLCHAR_2, memcopy, is_string,
-                    is_string_or_bytes, ascii_string)
-
-# ignore warning about item size... for now??
-warnings.filterwarnings('ignore',
-                        'Item size computed from the PEP 3118*',
-                        RuntimeWarning)
 
 HAS_NUMPY = False
 try:
@@ -47,8 +35,15 @@ try:
 except ImportError:
     pass
 
+from .utils import (str2bytes, bytes2str, strjoin, IOENCODING,
+                    clib_search_path)
+
 from . import dbr
-from .dbr import native_type
+
+# ignore warning about item size...
+warnings.filterwarnings('ignore', 'Item size computed from the PEP 3118*',
+                        RuntimeWarning)
+
 
 ## print to stdout
 def write(msg, newline=True, flush=True):
@@ -84,7 +79,7 @@ DEFAULT_CONNECTION_TIMEOUT = 2.0
 
 ## Cache of existing channel IDs:
 # Keyed on context, then on pv name (e.g., _cache[ctx][pvname])
-_cache = collections.defaultdict(dict)
+_cache = defaultdict(dict)
 _chid_cache = {}
 
 # Puts with completion in progress:
@@ -182,7 +177,7 @@ class _CacheItem:
         self.ts = ts
         self.failures = 0
 
-        self.get_results = collections.defaultdict(lambda: [None])
+        self.get_results = defaultdict(lambda: [None])
 
         if callbacks is None:
             callbacks = []
@@ -326,7 +321,7 @@ def _find_lib(inp_lib_name):
     os.environ['PATH'] = path_sep.join(search_path)
     # with PATH set above, the ctypes utility, find_library *should*
     # find the dll....
-    dllpath = ctypes.util.find_library(inp_lib_name)
+    dllpath = find_library(inp_lib_name)
     if dllpath is not None:
         return dllpath
 
@@ -1275,7 +1270,7 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     if ftype is None:
         ftype = dbr.INT
 
-    ntype = native_type(ftype)
+    ntype = dbr.native_type(ftype)
     elem_count = element_count(chid)
     use_numpy = (HAS_NUMPY and as_numpy and ntype != dbr.STRING and count != 1)
     return unpack(data, count, ntype, use_numpy, elem_count)
@@ -1674,7 +1669,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
 
     # if needed convert to basic string/bytes git stform
     if isinstance(value, str):
-        value = bytes(value, EPICS_STR_ENCODING)
+        value = bytes(value, IOENCODING)
 
     data = (count*dbr.Map[ftype])()
     if ftype == dbr.STRING:
@@ -1682,7 +1677,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
             data[0].value = value
         else:
             for elem in range(min(count, len(value))):
-                data[elem].value = bytes(str(value[elem]), EPICS_STR_ENCODING)
+                data[elem].value = bytes(str(value[elem]), IOENCODING)
     elif nativecount == 1:
         if ftype == dbr.CHAR:
             if isinstance(value, (str, bytes)):

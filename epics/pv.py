@@ -661,7 +661,7 @@ class PV(object):
             self._args['char_value'] = 'None'
             return 'None'
         ftype = self._args['ftype']
-        ntype = ca.native_type(ftype)
+        ntype = dbr.native_type(ftype)
         if ntype == dbr.STRING:
             self._args['char_value'] = val
             return val
