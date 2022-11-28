@@ -1,28 +1,21 @@
 #!/bin/bash
+# run softIoc, either on linux with procserv from conda-forge
+# or on darwin with screen
 
-SOFTIOC=softIoc
-if ! command -v $SOFTIOC &> /dev/null ; then
-    if [[ -z "${CONDA}" ]]; then
-	echo 'Warning -- cannot find softIoc'
-    else
-	SOFTIOC=$CONDA/epics/bin/linux-x86_64/softIoc
-    fi
+
+export EPICS_CA_ADDR_LIST=localhost
+export EPICS_CA_AUTO_ADDR_LIST=NO
+export EPICS_CA_MAX_ARRAY_BYTES=20100300
+
+PROCSERV=$CONDA_PREFIX/bin/procServ
+PROCSERV_OPTS='-P 9230 -n pyepics_testioc -L pyepics_testioc.log --noautorestart'
+
+uname=`uname`
+if [ $uname == Darwin ]; then
+    SOFTIOC=$CONDA_PREFIX/epics/bin/darwin-x86/softIoc
+    /usr/bin/screen -d -m $SOFTIOC ./st.cmd
+
+else
+    SOFTIOC=$CONDA_PREFIX/epics/bin/linux-x86_64/softIoc
+    $PROCSERV -e $PROCSERV_OPTS -e $SOFTIOC ./st.cmd
 fi
-
-PROCSERV=procServ
-if ! command -v $PROCSERV &> /dev/null ; then
-    if [[ -z "${CONDA}" ]]; then
-	echo 'Warning -- cannot find procServ'
-    else
-	SOFTIOC=$CONDA/bin/procServ
-    fi
-fi
-
-if ! test -f ./st.cmd; then
-    echo 'Error -- st.cmd not found at the current directory'
-    echo 'Run the script with pwd at <repo>/tests/Setup/st.cmd'
-    exit 1
-fi
-
-OPTS='-P 9230 -n pyepics_testioc -L pyepics_testioc.log --noautorestart'
-$PROCSERV $OPTS -e $SOFTIOC ./st.cmd
