@@ -17,11 +17,8 @@ uname=`uname`
 if [ $uname == Darwin ]; then
     SOFTIOC=$CONDA/epics/bin/darwin-x86/softIoc
     /usr/bin/screen -d -m $SOFTIOC ./st.cmd
-
 else
     SOFTIOC=$CONDA/epics/bin/linux-x86_64/softIoc
-
-
-echo 'Running ioc with ' $PROCSERV $PROCSERV_OPTS -e $SOFTIOC ./st.cmd
-
-$PROCSERV $PROCSERV_OPTS -e $SOFTIOC ./st.cmd
+    echo 'Running ioc with ' $PROCSERV $PROCSERV_OPTS -e $SOFTIOC ./st.cmd
+    $PROCSERV $PROCSERV_OPTS -e $SOFTIOC ./st.cmd
+fi
