@@ -1,4 +1,3 @@
-
 ====================================
 Downloading and Installation
 ====================================
@@ -6,9 +5,9 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-PyEpics works with Python version 3.6 and higher.  At this writing,
-automated testing is done with versions 3.7, 3.8, 3.9, and 3.10.0-beta.1,
-though no problems are expected for Python 3.6.  Pyepics version 3.4.3 was
+PyEpics works with Python version 3.7 and higher.  At this writing,
+automated testing is done with versions 3.7, 3.8, 3.9, and 3.10,
+though no problems are expected if using Python 3.6  Pyepics version 3.4.3 was
 the final version to work with Python 2.7 or Python 3.5.
 
 Pyepics is supported and regularly used on 64-bit Linux, 64-bit Mac OSX,
@@ -18,7 +17,7 @@ for Linux64.  Pyepics may still work on 32-bit Windows and Linux, but these
 systems are not tested regularly.
 
 The EPICS Channel Access library Version 3.14.12 or higher is required for
-pyepics, and versions 3.15 or 7.0 or higher are strongly recommended.  More
+pyepics, and versions 7.0.3 or higher are strongly recommended.  More
 specifically, pyepics requires the shared libraries *libca* and *libCom*
 (*libca.so* and *libCom.so* on Linux, *libca.dylib* and *libCom.dylib* on
 Mac OSX, or *ca.dll* and *Com.dll* on Windows) from *Epics Base*.
@@ -124,7 +123,7 @@ If you have `procServ` installed, you can do::
 which will put the IOC properly as a background process. Second, run the
 simulator (also in `tests/Setup`) so that Epics channels are changing::
 
-     ~> python simulator.py 
+     ~> python simulator.py
 
 Again, these do not have to be run on the same machine as your tests, but
 the PVs here will need to be discoverable by all the processes involved.
@@ -139,15 +138,15 @@ test will change underlying threading contexts, a simple ::
 
 will show many failures.  Instead you should run each test as a separate
 run of `pytest`::
- 
+
      ~> for testfile in test_*.py; do  pytest $testfile ; done
-     
+
 
 The automated testing process also uses the `coverage` tool to help
 identify which parts of the code is actually run by the tests.
 Unfortunately, the code for using GUI are not easily tested by the
 automated procedures.  In addition, a softIoc would need to support all of
-the subclasses of Device, which cannot be gauranteed.  
+the subclasses of Device, which cannot be gauranteed.
 
 Development Version
 ~~~~~~~~~~~~~~~~~~~~~~~~
