@@ -1,6 +1,4 @@
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
+from .version import __version__
 
 __doc__ = """
    Epics Channel Access Python module
@@ -22,8 +20,6 @@ __doc__ = """
 
 
 import time
-import sys
-import threading
 from . import ca
 from . import dbr
 from . import pv

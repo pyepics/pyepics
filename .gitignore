@@ -1,6 +1,7 @@
 *.pyc
 *~
 *#
+epics/version.py
 doc/_build
 doc/*.pdf
 tests/.coverage*
@@ -12,4 +13,4 @@ NonGit
 venv
 .vscode
 pyepics.egg-info
-
+epics.egg-info
