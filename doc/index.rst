@@ -4,7 +4,7 @@ Epics Channel Access for Python
 =====================================
 
 PyEpics is an interface for the Channel Access (CA) library of the `Epics
-Control System <https://www.aps.anl.gov/epics/>`_ to the Python Programming
+Control System <https://epics-controls.org/>`_ to the Python Programming
 language.  The pyepics package provides an :mod:`epics` module to python,
 with methods for reading from and writing to Epics Process Variables (PVs)
 via the CA protocol.  The package includes a thin and fairly complete layer
