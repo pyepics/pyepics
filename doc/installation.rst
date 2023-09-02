@@ -31,9 +31,9 @@ libraries or any other packages to use pyepics.  For Epics experts who may
 want to use their own versions the *libca* from Epics base, instructions
 for how to do this are given below.
 
-The Python `numpy <https://numpy.scipy.org/>`_ module is highly
-recommended. and will be used to automatically convert between EPICS
-waveforms and numpy arrays if available.
+The Python `numpy <https://numpy.org/>`_ module is highly recommended. and will
+be used to automatically convert between EPICS waveforms and numpy arrays if
+available.
 
 The `autosave` module requires the `pyparsing` package, which is widely
 available and often installed by default with many Python distributions.
@@ -45,7 +45,6 @@ Downloads and Installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _pyepics github repository:    https://github.com/pyepics/pyepics
-.. _Python Setup Tools:           https://pypi.python.org/pypi/setuptools
 .. _pyepics PyPi:                 https://pypi.python.org/pypi/pyepics/
 
 The latest stable version of the pyepics package is |release| which can be
