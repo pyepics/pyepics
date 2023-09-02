@@ -1200,7 +1200,7 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
     it will be necessary why using :func:`sg_get`.
 
     Parameters
-    ------------
+    ----------
     chid  :  ctypes.c_long or ``None``
         channel ID (if not None, used for determining count and ftype)
     data  :  object
@@ -1828,7 +1828,7 @@ def create_subscription(chid, use_time=False, use_ctrl=False, ftype=None,
     callback function to be called on any changes to the channel.
 
     Parameters
-    -----------
+    ----------
     chid  : ctypes.c_long
         channel ID
     use_time : bool
