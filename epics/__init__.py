@@ -20,13 +20,8 @@ __doc__ = """
 
 
 import time
-from . import ca
-from . import dbr
-from . import pv
-from . import alarm
-from . import device
-from . import motor
-from . import multiproc
+from . import ca, dbr, pv, alarm, autosave, device, motor, multiproc
+
 
 PV    = pv.PV
 Alarm = alarm.Alarm
