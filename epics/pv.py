@@ -101,7 +101,7 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
     """
 
     if form not in ('native', 'time', 'ctrl'):
-        form = 'native'
+        form = 'time'
 
     if context is not None:
         warnings.warn(
@@ -114,17 +114,20 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
         context = ca.current_context()
 
     pvid = (pvname, form, context)
+    if isinstance(pvname, default_pv_class):
+        pvid = (pvname.pvname, form, context)
+
     thispv = _PVcache_.get(pvid, None)
 
     if thispv is None:
         if context != ca.current_context():
             raise RuntimeError('PV is not in cache for user-requested context')
 
-        thispv = default_pv_class(
-            pvname, form=form, callback=callback,
-            connection_callback=connection_callback,
-            access_callback=access_callback, connection_timeout=timeout,
-            count=count, verbose=verbose, auto_monitor=auto_monitor)
+        thispv = default_pv_class(pvname, form=form, callback=callback,
+                                  connection_callback=connection_callback,
+                                  access_callback=access_callback,
+                                  connection_timeout=timeout, count=count,
+                                  verbose=verbose, auto_monitor=auto_monitor)
 
         # Update the cache with this new instance:
         _PVcache_[pvid] = thispv
@@ -850,25 +853,27 @@ class PV():
         if '_' in xtype:
             mod, xtype = xtype.split('_')
 
-        fmt = '%i'
+        fmt = '{val:i}'
         if   xtype in ('float','double'):
-            fmt = '%g'
+            fmt = '{val:g}'
         elif xtype in ('string','char'):
-            fmt = '%s'
+            fmt = '{val:s}'
 
         self._set_charval(self._args['value'], call_ca=False)
         out.append(f"== {self.pvname}  ({mod}_{xtype}) ==")
+        fields = {}
         if self.count == 1:
-            val = fmt % self._args['value']
-            out.append(f"   value      = {val}")
+            fields['value'] = fmt.format(val=self._args['value'])
         else:
-            ext  = {True:'...', False:''}[self.count > 10]
+            ext  = {True:',....', False:''}[self.count > 10]
             elems = range(min(5, self.count))
+            aval = ('unknown',)
             try:
-                aval = [fmt % self._args['value'][i] for i in elems]
+                aval = [fmt.format(val=self._args['value'][i]) for i in elems]
             except TypeError:
-                aval = ('unknown',)
-            out.append("   value      = array  [%s%s]" % (",".join(aval), ext))
+                pass
+            aval = ','.join(aval)
+            fields['value'] = f" array  [{aval}{ext}]"
         for nam in ('char_value', 'count', 'nelm', 'type', 'units',
                     'precision', 'host', 'access',
                     'status', 'char_status', 'severity', 'char_severity',
@@ -884,19 +889,20 @@ class PV():
                         att = f"{att:.3f} ({fmt_time(att)})"
                     elif nam == 'char_value':
                         att = f"'{att}'"
-                    if len(nam) < 12:
-                        out.append('   %.11s= %s' % (nam+' '*12, str(att)))
-                    else:
-                        out.append('   %.20s= %s' % (nam+' '*20, str(att)))
+                    fields[nam] = str(att)
+        for key, val in fields.items():
+            if len(key) > 14:
+                out.append(f"   {key:20s} = {val}")
+            else:
+                out.append(f"   {key:15s} = {val}")
         if xtype == 'enum':  # list enum strings
             out.append('   enum strings: ')
             for index, nam in enumerate(self.enum_strs):
-                out.append("       %i = %s " % (index, nam))
+                out.append(f"       {index} = {nam}")
 
         if self._monref is not None:
-            msg = 'PV is internally monitored'
-            out.append('   %s, with %i user-defined callbacks:' % (msg,
-                                                         len(self.callbacks)))
+            cbmsg = f"with {len(self.callbacks)} user-defined callbacks"
+            out.append(f"   PV is internally monitored, {cbmsg}")
             if len(self.callbacks) > 0:
                 for nam in sorted(self.callbacks.keys()):
                     cback = self.callbacks[nam][0]
@@ -907,7 +913,7 @@ class PV():
                     if cbcode is None:
                         cbcode = getattr(cback, '__code__', None)
                     cbfile = getattr(cbcode, 'co_filename', '?')
-                    out.append('      %s in file %s' % (cbname, cbfile))
+                    out.append(f"      {cbname} in file '{cbfile}'")
         else:
             out.append('   PV is NOT internally monitored')
         out.append('=============================')
@@ -972,8 +978,7 @@ class PV():
         this is equivalent to the .NORD field.  See also 'nelm' property"""
         if self._args['count'] is not None:
             return self._args['count']
-        else:
-            return self._getarg('count')
+        return self._getarg('count')
 
     @property
     @_ensure_context
@@ -1093,14 +1098,11 @@ class PV():
 
     def __repr__(self):
         "string representation"
-
+        out = f"<PV '{self.pvname}': not connected>"
         if self.connected:
-            if self.count == 1:
-                return self._fmtsca % self._args
-            else:
-                return self._fmtarr % self._args
-        else:
-            return f"<PV '{self.pvname}': not connected>"
+            fmt = self._fmtsca if self.count == 1 else self._fmtarr
+            out = fmt % self._args
+        return out
 
     def __eq__(self, other):
         "test for equality"
