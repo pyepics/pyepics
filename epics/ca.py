@@ -399,7 +399,6 @@ def initialize_libca():
     # save value offests used for unpacking
     # TIME and CTRL data as an array in dbr module
     dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
-    print("VAL OFF ", dbr.value_offset)
 
     initial_context = current_context()
     if AUTO_CLEANUP:
