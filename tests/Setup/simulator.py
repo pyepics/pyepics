@@ -27,41 +27,43 @@ def onConnect(pvname=None, conn=None, **kws):
 def make_pvs(*args, **kwds):
     # print "Make PVS '  ", prefix,  args
     # print  [("%s%s" % (prefix, name)) for name in args]
-    pvlist = [epics.PV("%s%s" % (prefix, name)) for name in args]
+    pvlist = [epics.get_pv("%s%s" % (prefix, name)) for name in args]
     for pv in pvlist:
-        pv.connect()
         pv.connection_callbacks.append(onConnect)
     return pvlist
+
 
 mbbos    = make_pvs("mbbo1","mbbo2")
 pause_pv = make_pvs("pause",)[0]
 longs    = make_pvs("long1", "long2", "long3", "long4")
 strs     = make_pvs("str1", "str2")
-analogs  =  make_pvs("ao1", "ai1", "ao2", "ao3")
+analogs  = make_pvs("ao1", "ai1", "ao2", "ao3")
 binaries = make_pvs("bo1", "bi1")
 
-char_waves = make_pvs("char128", "char256", "char2k", "char64k")
+char_waves   = make_pvs("char128", "char256", "char2k", "char64k")
 double_waves = make_pvs("double128", "double2k", "double64k")
-long_waves = make_pvs("long128", "long2k", "long64k")
-str_waves = make_pvs("string128", "string2k", "string64k")
-
-subarrays =  make_pvs("subArr1", "subArr2", "subArr3", "subArr4" )
+long_waves   = make_pvs("long128", "long2k", "long64k")
+str_waves    = make_pvs("string128", "string2k", "string64k")
+subarrays    = make_pvs("subArr1", "subArr2", "subArr3", "subArr4" )
 subarray_driver = make_pvs("wave_test",)[0]
 
 
 def initialize_data():
     subarray_driver.put(numpy.arange(64)/12.0)
-
     for p in mbbos:
         p.put(1)
 
-    for i, p in enumerate(longs):    p.put((i+1))
+    for i, p in enumerate(longs):
+        p.put((i+1))
 
-    for i, p in enumerate(strs):     p.put("String %s" % (i+1))
+    for i, p in enumerate(strs):
+        p.put("String %s" % (i+1))
 
-    for i, p in enumerate(binaries):   p.put((i+1))
+    for i, p in enumerate(binaries):
+        p.put((i+1))
 
-    for i, p in enumerate(analogs):   p.put((i+1)*1.7135000 )
+    for i, p in enumerate(analogs):
+        p.put((i+1)*1.7135000 )
 
     epics.caput('%sao1.EGU' % prefix, 'microns')
     epics.caput('%sao1.PREC' % prefix, 4)
