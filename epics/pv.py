@@ -7,7 +7,6 @@
   Epics Process Variable
 """
 import time
-import ctypes
 import copy
 import functools
 import warnings
@@ -43,7 +42,7 @@ def _ensure_context(func):
         expected_context = self.context
         if expected_context is None:
             raise RuntimeError('Expected CA context is unset')
-        elif expected_context == initial_context:
+        if expected_context == initial_context:
             return func(self, *args, **kwargs)
 
         # If not using the expected context, switch to it here:
@@ -152,7 +151,7 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
 
     if connect:
         if not thispv.wait_for_connection(timeout=timeout):
-            ca.write('cannot connect to %s' % pvname)
+            ca.write(f'cannot connect to {pvname}')
     return thispv
 
 
@@ -166,7 +165,7 @@ def fmt_time(tstamp=None):
                          round(1.e5*frac))
 
 
-class PV(object):
+class PV():
     """Epics Process Variable
 
     A PV encapsulates an Epics Process Variable.
@@ -258,7 +257,8 @@ class PV(object):
 
     @_ensure_context
     def force_connect(self, pvname=None, chid=None, conn=True, **kws):
-        if chid is None: chid = self.chid
+        if chid is None:
+            chid = self.chid
         if hasattr(chid, 'value'):
             chid = chid.value
         self._args['chid'] = self.chid = chid
@@ -272,8 +272,8 @@ class PV(object):
         at least on initial connection on Windows 64-bit.
         """
         self._args['access'] = ca.access(self.chid)
-        self._args['read_access'] = (1 == ca.read_access(self.chid))
-        self._args['write_access'] = (1 == ca.write_access(self.chid))
+        self._args['read_access'] = 1 == ca.read_access(self.chid)
+        self._args['write_access'] = 1 == ca.write_access(self.chid)
 
     @_ensure_context
     def __on_access_rights_event(self, read_access, write_access):
@@ -284,9 +284,9 @@ class PV(object):
         access_strs = ('no access', 'read-only', 'write-only', 'read/write')
         self._args['access'] = access_strs[acc]
 
-        for cb in self.access_callbacks:
-            if callable(cb):
-                cb(read_access, write_access, pv=self)
+        for callb in self.access_callbacks:
+            if callable(callb):
+                callb(read_access, write_access, pv=self)
 
     @_ensure_context
     def __on_connect(self, pvname=None, chid=None, conn=True):
@@ -297,6 +297,8 @@ class PV(object):
         if self.chid is None and chid is None:
             ca.poll(5.e-4)
             return
+        if pvname is not None and self.pvname is None:
+            self.pvname = pvname
         if conn:
             ca.poll()
             self.chid = self._args['chid'] = dbr.chid_t(chid)
@@ -323,7 +325,7 @@ class PV(object):
             if callable(conn_cb):
                 conn_cb(pvname=self.pvname, conn=conn, pv=self)
             elif not conn and self.verbose:
-                ca.write("PV '%s' disconnected." % pvname)
+                ca.write(f"PV '{self.pvname}' disconnected.")
 
         # pv end of connect, force a read of access rights
         self.force_read_access_rights()
@@ -341,7 +343,7 @@ class PV(object):
         if self._monref is None:
             return
 
-        cback, uarg, evid = self._monref
+        _, _, evid = self._monref
 
         self._monref = None
         self._monref_mask = None
@@ -560,31 +562,31 @@ class PV(object):
             # ca.get_with_metadata will handle multiple requests for the same
             # PV internally, so there is no need to change between
             # `get_with_metadata` and `get_complete_with_metadata` here.
-            md = ca.get_with_metadata(
+            metad = ca.get_with_metadata(
                 self.chid, ftype=ftype, count=count, timeout=timeout,
                 as_numpy=as_numpy)
-            if md is None:
+            if metad is None:
                 # Get failed. Indicate with a `None` as the return value
                 return
 
             # Update value and all included metadata. Depending on the PV
             # form, this could include timestamp, alarm information,
             # ctrlvars, and so on.
-            self._args.update(**md)
+            self._args.update(**metad)
 
             if with_ctrlvars and form != 'ctrl':
                 # If the user requested ctrlvars and they were not included in
                 # the request, return all metadata.
-                md = self._args.copy()
+                metad = self._args.copy()
 
-            val = md['value']
+            val = metad['value']
         else:
-            md = self._args.copy()
+            metad = self._args.copy()
             val = self._args['value']
 
         if as_string:
             char_value = self._set_charval(val, force_long_string=as_string)
-            md['value'] = char_value
+            metad['value'] = char_value
         elif self.nelm <= 1 or val is None:
             pass
         else:
@@ -612,11 +614,11 @@ class PV(object):
                 val = val[:count]
 
             # Update based on the requested type:
-            md['value'] = val
+            metad['value'] = val
 
         if as_namespace:
-            return Namespace(**md)
-        return md
+            return Namespace(**metad)
+        return metad
 
     @_ensure_context
     def put(self, value, wait=False, timeout=30.0,
@@ -702,8 +704,8 @@ class PV(object):
                 length = len(val)
             except TypeError:
                 length = 1
-            cval = '<array size=%d, type=%s>' % (length,
-                                                 dbr.Name(ftype).lower())
+            cval = f'<array size={length}, type={dbr.Name(ftype).lower()}>'
+
         elif ntype in (dbr.FLOAT, dbr.DOUBLE):
             if call_ca and self._args['precision'] is None:
                 self.get_ctrlvars()
@@ -761,8 +763,7 @@ class PV(object):
         self._set_charval(self._args['value'], call_ca=False)
         if self.verbose:
             now = fmt_time(self._args['timestamp'])
-            ca.write('%s: %s (%s)'% (self.pvname,
-                                     self._args['char_value'], now))
+            ca.write(f"{self.pvname}: {self._args['char_value']} ({now})")
         self.run_callbacks()
 
     @_ensure_context
@@ -856,10 +857,10 @@ class PV(object):
             fmt = '%s'
 
         self._set_charval(self._args['value'], call_ca=False)
-        out.append("== %s  (%s_%s) ==" % (self.pvname, mod, xtype))
+        out.append(f"== {self.pvname}  ({mod}_{xtype}) ==")
         if self.count == 1:
-            val = self._args['value']
-            out.append('   value      = %s' % fmt % val)
+            val = fmt % self._args['value']
+            out.append(f"   value      = {val}")
         else:
             ext  = {True:'...', False:''}[self.count > 10]
             elems = range(min(5, self.count))
@@ -880,9 +881,9 @@ class PV(object):
                 att = getattr(self, nam)
                 if att is not None:
                     if nam == 'timestamp':
-                        att = "%.3f (%s)" % (att, fmt_time(att))
+                        att = f"{att:.3f} ({fmt_time(att)})"
                     elif nam == 'char_value':
-                        att = "'%s'" % att
+                        att = f"'{att}'"
                     if len(nam) < 12:
                         out.append('   %.11s= %s' % (nam+' '*12, str(att)))
                     else:
@@ -1099,12 +1100,12 @@ class PV(object):
             else:
                 return self._fmtarr % self._args
         else:
-            return "<PV '%s': not connected>" % self.pvname
+            return f"<PV '{self.pvname}': not connected>"
 
     def __eq__(self, other):
         "test for equality"
         try:
-            return (self.chid  == other.chid)
+            return self.chid  == other.chid
         except AttributeError:
             return False
 

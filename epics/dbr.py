@@ -12,7 +12,6 @@ This is mostly copied from CA header files
 import ctypes
 import functools
 import os
-import sys
 import platform
 import enum
 
@@ -108,7 +107,8 @@ char_p   = ctypes.c_char_p
 void_p   = ctypes.c_void_p
 py_obj   = ctypes.py_object
 
-value_offset = None
+
+value_offset = [39*ctypes.c_short]
 
 # extended DBR types:
 class TimeStamp(ctypes.Structure):
@@ -122,7 +122,7 @@ _UNITS       = ('units', char_t * MAX_UNITS_SIZE)
 
 def make_unixtime(stamp):
     "UNIX timestamp (seconds) from Epics TimeStamp structure"
-    return (EPICS2UNIX_EPOCH + stamp.secs + 1.e-6*int(1.e-3*stamp.nsec))
+    return EPICS2UNIX_EPOCH + stamp.secs + 1.e-6*int(1.e-3*stamp.nsec)
 
 
 class time_string(ctypes.Structure):
@@ -296,7 +296,6 @@ def Name(ftype, reverse=False):
 
 def cast_args(args):
     """returns casted array contents
-
     returns: [dbr_ctrl or dbr_time struct,
               count * native_type structs]
 
@@ -320,13 +319,9 @@ def cast_args(args):
         return [ctypes.cast(args.raw_dbr,
                             ctypes.POINTER(Map[ftype])).contents,
                 ctypes.cast(native_start,
-                            ctypes.POINTER(args.count * Map[ntype])).contents
-                ]
-    else:
-        return [None,
-                ctypes.cast(args.raw_dbr,
-                            ctypes.POINTER(args.count * Map[ftype])).contents
-                ]
+                            ctypes.POINTER(args.count * Map[ntype])).contents]
+    return [None, ctypes.cast(args.raw_dbr,
+                          ctypes.POINTER(args.count * Map[ftype])).contents]
 
 
 if PY64_WINDOWS:

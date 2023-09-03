@@ -1,9 +1,11 @@
+import time
+from . import ca, dbr, pv, alarm, autosave, device, motor, multiproc
 from .version import __version__
 
-__doc__ = """
+__doc__ = f"""
    Epics Channel Access Python module
 
-   version: %s
+   version: {__version__}
    Principal Authors:
       Matthew Newville <newville@cars.uchicago.edu> CARS, University of Chicago
       Ken Lauer, David Chabot, Angus Gratton
@@ -15,19 +17,13 @@ __doc__ = """
 
 == Overview:
    Python Interface to the Epics Channel Access protocol of the Epics control system.
+"""
 
-""" % (__version__)
-
-
-import time
-from . import ca, dbr, pv, alarm, autosave, device, motor, multiproc
-
-
-PV    = pv.PV
+PV = pv.PV
 Alarm = alarm.Alarm
 Motor = motor.Motor
 Device = device.Device
-poll  = ca.poll
+poll = ca.poll
 
 get_pv = pv.get_pv
 
@@ -91,9 +87,12 @@ def caput(pvname, value, wait=False, timeout=60.0, connection_timeout=5.0):
     """
     start_time = time.time()
     thispv = get_pv(pvname, timeout=connection_timeout, connect=True)
+    out = None
     if thispv.connected:
-        timeout -= (time.time() - start_time)
-        return thispv.put(value, wait=wait, timeout=timeout)
+        timeout -= time.time() - start_time
+        out = thispv.put(value, wait=wait, timeout=timeout)
+    return out
+
 
 def caget(pvname, as_string=False, count=None, as_numpy=True,
           use_monitor=True, timeout=5.0, connection_timeout=5.0):
@@ -149,16 +148,17 @@ def caget(pvname, as_string=False, count=None, as_numpy=True,
     """
     start_time = time.time()
     thispv = get_pv(pvname, timeout=connection_timeout, connect=True)
+    val = None
     if thispv.connected:
         if as_string:
             thispv.get_ctrlvars()
-        timeout -= (time.time() - start_time)
+        timeout -= time.time() - start_time
         val = thispv.get(count=count, timeout=timeout,
                          use_monitor=use_monitor,
                          as_string=as_string,
                          as_numpy=as_numpy)
         poll()
-        return val
+    return val
 
 def cainfo(pvname, print_out=True, timeout=5.0, connection_timeout=5.0):
     """cainfo(pvname,print_out=True,timeout=5.0, connection_timeout=5.0)
@@ -197,6 +197,7 @@ def cainfo(pvname, print_out=True, timeout=5.0, connection_timeout=5.0):
     """
     start_time = time.time()
     thispv = get_pv(pvname, timeout=connection_timeout, connect=True)
+    out = None
     if thispv.connected:
         conn_time = time.time() - start_time
         thispv.get(timeout=timeout-conn_time)
@@ -205,7 +206,8 @@ def cainfo(pvname, print_out=True, timeout=5.0, connection_timeout=5.0):
         if print_out:
             ca.write(thispv.info)
         else:
-            return thispv.info
+            out = thispv.info
+    return out
 
 def camonitor_clear(pvname):
     """clear monitors on a PV"""
@@ -251,7 +253,7 @@ def camonitor(pvname, writer=None, callback=None, connection_timeout=5.0):
             "generic monitor callback"
             if char_value is None:
                 char_value = repr(value)
-            writer("%.32s %s %s" % (pvname, pv.fmt_time(), char_value))
+            writer(f"{pvname:.32s} {pv.fmt_time()} {char_value}")
 
     thispv = get_pv(pvname, timeout=connection_timeout, connect=True)
     if thispv.connected:
@@ -349,20 +351,24 @@ def caput_many(pvlist, values, wait=False, connection_timeout=5.0,
     """
     if len(pvlist) != len(values):
         raise ValueError("List of PV names must be equal to list of values.")
-    out = []
-    pvs = [PV(name, auto_monitor=False, connection_timeout=connection_timeout) for name in pvlist]
-    conns = [p.connected for p in pvs]
-    wait_all = (wait == 'all')
-    wait_each = (wait == 'each')
-    for p, v in zip(pvs, values):
-        out.append(p.put(v, wait=wait_each, timeout=put_timeout, use_complete=wait_all))
+    kwargs = {'auto_monitor': False, 'timeout': connection_timeout}
+    pvs = [get_pv(name, **kwargs) for name in pvlist]
+
+    wait_all = wait=='all'
+    put_kws = {'wait': (wait=='each'), 'timeout': put_timeout,
+               'use_complete': wait_all}
+    put_ret = []
+    for pvo, val in zip(pvs, values):
+        put_ret.append(pvo.put(val, **put_kws))
+    out = None
     if wait_all:
         start_time = time.time()
-        while not all([(p.connected and p.put_complete) for p in pvs]):
+        while not all(((pv.connected and pv.put_complete) for pv in pvs)):
             ca.poll()
             elapsed_time = time.time() - start_time
             if elapsed_time > put_timeout:
                 break
-        return [1 if (p.connected and p.put_complete) else -1 for p in pvs]
+        out = [1 if (pv.connected and pv.put_complete) else -1 for pv in pvs]
     else:
-        return [o if o == 1 else -1 for o in out]
+        out = [val if val == 1 else -1 for val in put_ret]
+    return out
