@@ -2,17 +2,9 @@
 import sys
 import time
 import numpy as np
+from configparser import  ConfigParser
+
 from .. import Device, get_pv, poll, caput, caget
-
-try:
-    from collections import OrderedDict
-except:
-    from ordereddict import OrderedDict
-
-if sys.version[0] == '2':
-    from ConfigParser import  ConfigParser
-elif sys.version[0] == '3':
-    from configparser import  ConfigParser
 
 MAX_ROIS = 32
 class DXP(Device):

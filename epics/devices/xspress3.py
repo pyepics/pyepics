@@ -2,13 +2,10 @@
 import sys
 import os
 import time
-if sys.version[0] == '2':
-    from ConfigParser import  ConfigParser
-elif sys.version[0] == '3':
-    from configparser import  ConfigParser
+from configparser import  ConfigParser
 
 from epics import Device, caget, caput, poll
-from epics.devices.mca import MCA, ROI, OrderedDict
+from epics.devices.mca import MCA, ROI
 from epics.devices.ad_mca import ADMCA, ADMCAROI
 
 MAX_ROIS = 32
