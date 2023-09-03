@@ -1,17 +1,18 @@
 coverage erase
-coverage run --source=epics -a --timid  -m pytest test_camonitor_func.py
-coverage run --source=epics -a --timid  -m pytest test_ca_typeconversion.py
-coverage run --source=epics -a --timid  -m pytest test_pv_callback.py
-coverage run --source=epics -a --timid  -m pytest test_pv_initcallbacks.py
-coverage run --source=epics -a --timid  -m pytest test_pvsubarray.py
-coverage run --source=epics -a --timid  -m pytest test_cathread.py
-coverage run --source=epics -a --timid  -m pytest test_multiprocessing.py
-coverage run --source=epics -a --timid  -m pytest test_threading.py
-coverage run --source=epics -a --timid  -m pytest test_aodevice.py
-coverage run --source=epics -a --timid  -m pytest test_ca_unittests.py
-coverage run --source=epics -a --timid  -m pytest test_ca_subscribe.py
-coverage run --source=epics -a --timid  -m pytest test_ca_clearcache.py
-coverage run --source=epics -a --timid  -m pytest test_pv_unittests.py
-coverage run --source=epics -a --timid  -m pytest test_pv_typeconversion.py
+pytest test_camonitor_func.py
+pytest test_ca_subscribe.py
+pytest test_ca_clearcache.py
+pytest test_cathread.py
+pytest test_ca_typeconversion.py
+pytest test_ca_unittests.py
+pytest test_multiprocessing.py
+pytest test_aodevice.py
+pytest test_pv_callback.py
+pytest test_pv_initcallbacks.py
+pytest test_pvsubarray.py
+pytest test_pv_typeconversion.py
+pytest test_pv_unittests.py
+pytest test_threading.py
 coverage combine
-coverage report -m
+coverage report -m --omit "wxlib*,ogl*,motor*,mca*,ad*,struck*,transform*,scan*,scal*,xspress*"
+coverage html --omit "wxlib*,ogl*,motor*,mca*,ad*,struck*,transform*,scan*,scal*,xspress*"
