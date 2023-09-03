@@ -7,4 +7,4 @@ sleep 2
 python simulator.py &
 sleep 2
 cd ..
-sh run_tests.sh
+sh run_coverage.sh
