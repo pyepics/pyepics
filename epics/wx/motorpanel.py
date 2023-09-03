@@ -10,12 +10,7 @@ provides two classes:
 """
 #  Aug 21 2004 M Newville:  initial working version.
 #
-import six
 import wx
-try:
-    from wx._core import PyDeadObjectError
-except:
-    PyDeadObjectError = Exception
 
 import epics
 from epics.wx.wxlib import PVText, PVFloatCtrl, PVButton, PVComboBox, \
@@ -23,7 +18,7 @@ from epics.wx.wxlib import PVText, PVFloatCtrl, PVButton, PVComboBox, \
 
 from epics.wx.motordetailframe  import MotorDetailFrame
 
-from epics.wx.utils import LCEN, RCEN, CEN, LTEXT, RIGHT, pack, add_button
+from epics.wx.wxutils import LCEN, RCEN, CEN, LTEXT, RIGHT, pack, add_button
 
 class MotorPanel(wx.Panel):
     """ MotorPanel  a simple wx windows panel for controlling an Epics Motor
@@ -57,7 +52,7 @@ class MotorPanel(wx.Panel):
         if motor is not None:
             try:
                 self.SelectMotor(motor)
-            except PyDeadObjectError:
+            except:
                 pass
 
 
@@ -73,10 +68,10 @@ class MotorPanel(wx.Panel):
             if self.motor is not None:
                 for i in self.__motor_fields:
                     self.motor.clear_callback(attr=i)
-        except PyDeadObjectError:
+        except:
             return
 
-        if isinstance(motor, six.string_types):
+        if isinstance(motor, str):
             self.motor = epics.Motor(motor)
         elif isinstance(motor, epics.Motor):
             self.motor = motor
@@ -99,7 +94,7 @@ class MotorPanel(wx.Panel):
         try:
             if self.motor is None:
                 return
-        except PyDeadObjectError:
+        except:
             return
 
         self.drive.SetPV(self.motor.PV('VAL'))
@@ -145,7 +140,7 @@ class MotorPanel(wx.Panel):
 
         try:
             self.FillPanelComponents()
-        except PyDeadObjectError:
+        except:
             return
 
         spacer = wx.StaticText(self, label=' ', size=(5, 5), style=RIGHT)
@@ -193,7 +188,7 @@ class MotorPanel(wx.Panel):
             if self._size == 'full':
                 self.twk_list = self.make_step_list()
                 self.UpdateStepList()
-        except PyDeadObjectError:
+        except:
             pass
 
     @EpicsFunction
@@ -290,7 +285,7 @@ class MotorPanel(wx.Panel):
             if val not in self.twk_list:
                 self.UpdateStepList(value=val)
             self.__twkbox.SetValue(val)
-        except PyDeadObjectError:
+        except:
             pass
 
     def make_step_list(self):

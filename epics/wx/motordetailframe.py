@@ -6,12 +6,9 @@ import time
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
 
-from epics.wx.wxlib import (PVText, PVFloatCtrl, PVTextCtrl,
-                            PVEnumButtons, PVEnumChoice,
-                            DelayedEpicsCallback, EpicsFunction)
-
-
-from .utils import set_sizer, LCEN, RCEN, CEN, FileSave
+from .wxlib import (PVText, PVFloatCtrl, PVTextCtrl, PVEnumButtons,
+                    PVEnumChoice, DelayedEpicsCallback, EpicsFunction)
+from .wxutils import set_sizer, LCEN, RCEN, CEN, FileSave
 
 TMPL_TOP = '''file "$(CARS)/CARSApp/Db/motor.db"
 {

@@ -4,7 +4,7 @@ Epics Controls.  In general,  these controls combine a wx widget with
 an Epics PV, and allow automatic updating of the widget when the
 associated PV changes.
 """
-from . import motorpanel, motordetailframe, wxlib, ogllib, utils
+from . import motorpanel, motordetailframe, wxlib, ogllib, wxutils
 
 MotorPanel    = motorpanel.MotorPanel
 MotorDetailPanel  = motordetailframe.MotorDetailPanel
@@ -32,11 +32,11 @@ PVCollapsiblePane = pvCollapsiblePane = wxlib.PVCollapsiblePane
 PVRectangle   = pvRectangle   = ogllib.PVRectangle
 PVCircle      = pvCircle      = ogllib.PVCircle
 
-set_sizer = utils.set_sizer
-set_float = utils.set_float
+set_sizer = wxutils.set_sizer
+set_float = wxutils.set_float
 
-Closure   = utils.Closure
-FloatCtrl = utils.FloatCtrl
+Closure   = wxutils.Closure
+FloatCtrl = wxutils.FloatCtrl
 
 DelayedEpicsCallback = wxlib.DelayedEpicsCallback
 EpicsFunction  = wxlib.EpicsFunction
