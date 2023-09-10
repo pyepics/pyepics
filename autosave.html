@@ -1,19 +1,17 @@
 
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Auto-saving: simple save/restore of PVs &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
+    <script src="_static/documentation_options.js?v=52b624fa"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="wx: wxPython Widgets for Epics" href="wx.html" />
@@ -62,7 +60,14 @@
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Auto-saving: simple save/restore of PVs</a><ul>
-<li><a class="reference internal" href="#autosaver-class"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code> class</a></li>
+<li><a class="reference internal" href="#autosave.save_pvs"><code class="docutils literal notranslate"><span class="pre">save_pvs()</span></code></a></li>
+<li><a class="reference internal" href="#autosave.restore_pvs"><code class="docutils literal notranslate"><span class="pre">restore_pvs()</span></code></a></li>
+<li><a class="reference internal" href="#autosaver-class"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code> class</a><ul>
+<li><a class="reference internal" href="#autosave.AutoSaver"><code class="docutils literal notranslate"><span class="pre">AutoSaver</span></code></a></li>
+<li><a class="reference internal" href="#autosave.read_request_file"><code class="docutils literal notranslate"><span class="pre">read_request_file()</span></code></a></li>
+<li><a class="reference internal" href="#autosave.save"><code class="docutils literal notranslate"><span class="pre">save()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#supported-data-types">Supported Data Types</a><ul>
 <li><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
@@ -98,7 +103,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -108,7 +113,7 @@
           <div class="body" role="main">
             
   <section id="module-autosave">
-<span id="auto-saving-simple-save-restore-of-pvs"></span><h1>Auto-saving: simple save/restore of PVs<a class="headerlink" href="#module-autosave" title="Permalink to this headline">¶</a></h1>
+<span id="auto-saving-simple-save-restore-of-pvs"></span><h1>Auto-saving: simple save/restore of PVs<a class="headerlink" href="#module-autosave" title="Link to this heading">¶</a></h1>
 <p>The <a class="reference internal" href="#module-autosave" title="autosave: simple save/restore of PVs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">autosave</span></code></a> module provides simple save/restore functionality for
 PVs, with the functions <a class="reference internal" href="#autosave.save_pvs" title="autosave.save_pvs"><code class="xref py py-func docutils literal notranslate"><span class="pre">save_pvs()</span></code></a> and <a class="reference internal" href="#autosave.restore_pvs" title="autosave.restore_pvs"><code class="xref py py-func docutils literal notranslate"><span class="pre">restore_pvs()</span></code></a>, and an
 <a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code></a> class.  These are similar to the autosave module from
@@ -157,10 +162,10 @@ Using the functions here will really do a <code class="xref py py-func docutils 
 values.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="autosave.save_pvs">
-<span class="sig-prename descclassname"><span class="pre">autosave.</span></span><span class="sig-name descname"><span class="pre">save_pvs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autosave.save_pvs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">autosave.</span></span><span class="sig-name descname"><span class="pre">save_pvs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autosave.save_pvs" title="Link to this definition">¶</a></dt>
 <dd><p>saves current value of PVs listed in <em>request_file</em> to the <em>save_file</em></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>request_file</strong> – name of Request file to read PVs to save.</p></li>
 <li><p><strong>save_file</strong> – name of file to save values to write values to</p></li>
@@ -173,10 +178,10 @@ autosave module from synApps.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="autosave.restore_pvs">
-<span class="sig-prename descclassname"><span class="pre">autosave.</span></span><span class="sig-name descname"><span class="pre">restore_pvs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autosave.restore_pvs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">autosave.</span></span><span class="sig-name descname"><span class="pre">restore_pvs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autosave.restore_pvs" title="Link to this definition">¶</a></dt>
 <dd><p>reads values from <em>save_file</em> and restores them for the corresponding PVs</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>save_file</strong> – name of file to save values to read data from.</p>
 </dd>
 </dl>
@@ -185,7 +190,7 @@ over any values that it cannot restore.</p>
 </dd></dl>
 
 <section id="autosaver-class">
-<h2><a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code></a> class<a class="headerlink" href="#autosaver-class" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code></a> class<a class="headerlink" href="#autosaver-class" title="Link to this heading">¶</a></h2>
 <p>The <a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code></a> class provides a convenient way to repeatedly save
 PVs listed in a request file without having to re-connect all of the PVs.
 The <a class="reference internal" href="#autosave.AutoSaver" title="autosave.AutoSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code></a> retains the PV connections, and provides a simple
@@ -212,10 +217,10 @@ allows you to do something like this:</p>
 <p>This will save PVs to files with names like <em>My_2017Oct02_141800.sav</em></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="autosave.AutoSaver">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autosave.</span></span><span class="sig-name descname"><span class="pre">AutoSaver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autosave.AutoSaver" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autosave.</span></span><span class="sig-name descname"><span class="pre">AutoSaver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autosave.AutoSaver" title="Link to this definition">¶</a></dt>
 <dd><p>create an Automatic Saver based on a request file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>request_file</strong> – name of request file</p>
 </dd>
 </dl>
@@ -225,10 +230,10 @@ allows you to do something like this:</p>
 request file,  and <a class="reference internal" href="#autosave.save" title="autosave.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save()</span></code></a> to save the results.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="autosave.read_request_file">
-<span class="sig-prename descclassname"><span class="pre">autosave.</span></span><span class="sig-name descname"><span class="pre">read_request_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autosave.read_request_file" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">autosave.</span></span><span class="sig-name descname"><span class="pre">read_request_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autosave.read_request_file" title="Link to this definition">¶</a></dt>
 <dd><p>read and parse request file, begin making PV connections</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>request_file</strong> – name of request file</p>
 </dd>
 </dl>
@@ -236,10 +241,10 @@ request file,  and <a class="reference internal" href="#autosave.save" title="au
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autosave.save">
-<span class="sig-prename descclassname"><span class="pre">autosave.</span></span><span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autosave.save" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">autosave.</span></span><span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autosave.save" title="Link to this definition">¶</a></dt>
 <dd><p>read current PV values, write save file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>save_file</strong> – name of save file or <cite>None</cite>.  If <cite>None</cite>, the name of
 the request file and timestamp (to seconds) will be
@@ -253,7 +258,7 @@ check for overwriting files.</p></li>
 
 </section>
 <section id="supported-data-types">
-<h2>Supported Data Types<a class="headerlink" href="#supported-data-types" title="Permalink to this headline">¶</a></h2>
+<h2>Supported Data Types<a class="headerlink" href="#supported-data-types" title="Link to this heading">¶</a></h2>
 <p>All scalar PV values can be saved and restored with the <a class="reference internal" href="#module-autosave" title="autosave: simple save/restore of PVs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">autosave</span></code></a>
 routines.  There is some support for waveform (array) data.  For example,
 character waveforms containing for long strings can be saved and restored.
@@ -261,7 +266,7 @@ In addition, numerical arrays in waveform can be saved and restored.  For
 array data, the results may not be fully compatible with the autosave
 module.</p>
 <section id="examples">
-<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h3>
 <p>A simple example using the autosave module:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics.autosave</span>
 <span class="c1"># save values</span>
@@ -316,8 +321,8 @@ module.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    &#169; Copyright 2021, Matthew Newville.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

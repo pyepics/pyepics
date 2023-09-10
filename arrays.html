@@ -1,19 +1,17 @@
 
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Working with waveform / array data &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
+    <script src="_static/documentation_options.js?v=52b624fa"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Devices: collections of PVs" href="devices.html" />
@@ -100,7 +98,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -110,14 +108,14 @@
           <div class="body" role="main">
             
   <section id="working-with-waveform-array-data">
-<span id="arrays-label"></span><h1>Working with waveform / array data<a class="headerlink" href="#working-with-waveform-array-data" title="Permalink to this headline">¶</a></h1>
+<span id="arrays-label"></span><h1>Working with waveform / array data<a class="headerlink" href="#working-with-waveform-array-data" title="Link to this heading">¶</a></h1>
 <p>Though most EPICS Process Variables hold single values, PVs can hold array
 data from EPICS waveform records.  These are always data of a homogenous
 data type, and have a fixed maximum element count (defined when the
 waveform is created from the host EPICS process).  Epics waveforms are
 most naturally mapped to Arrays from the <a class="reference external" href="https://numpy.scipy.org/">numpy module</a>, and this is strongly encouraged.</p>
 <section id="arrays-without-numpy">
-<h2>Arrays without Numpy<a class="headerlink" href="#arrays-without-numpy" title="Permalink to this headline">¶</a></h2>
+<h2>Arrays without Numpy<a class="headerlink" href="#arrays-without-numpy" title="Link to this heading">¶</a></h2>
 <p>If you have numpy installed, and use the default <em>as_numpy=True</em> in
 <a class="reference internal" href="ca.html#epics.ca.get" title="epics.ca.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.ca.get()</span></code></a>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pv.get()</span></code></a> or <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>, you will get a
 numpy array for the value of a waveform PV.  If you do <em>not</em> have numpy
@@ -138,7 +136,7 @@ Python list with something like:</p>
 <p>Note that this conversion to a list can be very slow for large arrays.</p>
 </section>
 <section id="variable-length-arrays-nord-and-nelm">
-<h2>Variable Length Arrays:  NORD  and NELM<a class="headerlink" href="#variable-length-arrays-nord-and-nelm" title="Permalink to this headline">¶</a></h2>
+<h2>Variable Length Arrays:  NORD  and NELM<a class="headerlink" href="#variable-length-arrays-nord-and-nelm" title="Link to this heading">¶</a></h2>
 <p>While the maximum length of an array is fixed, the length of data you get
 back from a monitor, <a class="reference internal" href="ca.html#epics.ca.get" title="epics.ca.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.ca.get()</span></code></a>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pv.get()</span></code></a>, or <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>
 may be shorter than the maximum length, reflecting the most recent data
@@ -161,7 +159,7 @@ For example:</p>
 data from IOCs running extremely old versions of Epics base.</p>
 </section>
 <section id="character-arrays">
-<h2>Character Arrays<a class="headerlink" href="#character-arrays" title="Permalink to this headline">¶</a></h2>
+<h2>Character Arrays<a class="headerlink" href="#character-arrays" title="Link to this heading">¶</a></h2>
 <p>As noted in other sections, character waveforms can be used to hold strings
 longer than 40 characters, which is otherwise a fundamental limit for
 native Epics strings.  Character waveforms shorter than
@@ -205,7 +203,7 @@ Python3):</p>
 </pre></div>
 </div>
 <section id="strategies-for-working-with-large-arrays">
-<span id="arrays-large-label"></span><h3>Strategies for working with large arrays<a class="headerlink" href="#strategies-for-working-with-large-arrays" title="Permalink to this headline">¶</a></h3>
+<span id="arrays-large-label"></span><h3>Strategies for working with large arrays<a class="headerlink" href="#strategies-for-working-with-large-arrays" title="Link to this heading">¶</a></h3>
 <p>EPICS Channels / Process Variables usually have values that can be stored
 with a small number of bytes.  This means that their storage and transfer
 speeds over real networks is not a significant concern.  However, some
@@ -248,7 +246,7 @@ unless explicitly set. Auto-monitoring of PVs can be be explicitly set with</p>
 </section>
 </section>
 <section id="example-handling-large-arrays">
-<h2>Example handling Large Arrays<a class="headerlink" href="#example-handling-large-arrays" title="Permalink to this headline">¶</a></h2>
+<h2>Example handling Large Arrays<a class="headerlink" href="#example-handling-large-arrays" title="Link to this heading">¶</a></h2>
 <p>Here is an example reading data from an <a class="reference external" href="https://millenia.cars.aps.anl.gov/software/epics/areaDetector.html">EPICS areaDetector</a>, as if it
 were an image from a digital camera.  This uses the common third-party
 library called <cite>Python Imaging Library</cite> or <cite>pillow</cite> for much of the image
@@ -258,7 +256,7 @@ processing.  This library can be installed with <cite>pip install pillow</cite> 
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">Image</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pvname</span> <span class="o">=</span> <span class="s1">&#39;13IDCPS1:image1:ArrayData&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">img_pv</span>  <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">raw_image</span> <span class="o">=</span> <span class="n">img_pv</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">im_mode</span> <span class="o">=</span> <span class="s1">&#39;RGB&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">im_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1360</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
@@ -311,8 +309,8 @@ Area Detectors is included  at <a class="reference external" href="https://githu
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    &#169; Copyright 2021, Matthew Newville.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

@@ -1,19 +1,17 @@
 
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Advanced Topic with Python Channel Access &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
+    <script src="_static/documentation_options.js?v=52b624fa"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="wx: wxPython Widgets for Epics" href="wx.html" /> 
@@ -67,7 +65,11 @@
 <li><a class="reference internal" href="#thread-examples">Thread Examples</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#using-multiprocessing-with-pyepics">Using Multiprocessing with PyEpics</a></li>
+<li><a class="reference internal" href="#using-multiprocessing-with-pyepics">Using Multiprocessing with PyEpics</a><ul>
+<li><a class="reference internal" href="#CAProcess"><code class="docutils literal notranslate"><span class="pre">CAProcess</span></code></a></li>
+<li><a class="reference internal" href="#CAPool"><code class="docutils literal notranslate"><span class="pre">CAPool</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -94,7 +96,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -104,12 +106,12 @@
           <div class="body" role="main">
             
   <section id="advanced-topic-with-python-channel-access">
-<h1>Advanced Topic with Python Channel Access<a class="headerlink" href="#advanced-topic-with-python-channel-access" title="Permalink to this headline">¶</a></h1>
+<h1>Advanced Topic with Python Channel Access<a class="headerlink" href="#advanced-topic-with-python-channel-access" title="Link to this heading">¶</a></h1>
 <p>This chapter contains a variety of “usage notes” and implementation
 details that may help in getting the best performance from the
 pyepics module.</p>
 <section id="the-wait-and-timeout-options-for-get-ca-get-complete">
-<span id="advanced-get-timeouts-label"></span><h2>The wait and timeout options for get(), ca.get_complete()<a class="headerlink" href="#the-wait-and-timeout-options-for-get-ca-get-complete" title="Permalink to this headline">¶</a></h2>
+<span id="advanced-get-timeouts-label"></span><h2>The wait and timeout options for get(), ca.get_complete()<a class="headerlink" href="#the-wait-and-timeout-options-for-get-ca-get-complete" title="Link to this heading">¶</a></h2>
 <p>The <em>get</em> functions, <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>, <a class="reference internal" href="pv.html#pv.get" title="pv.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">pv.get()</span></code></a> and <a class="reference internal" href="ca.html#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.ca.get()</span></code></a>
 all ask for data to be transferred over the network.  For large data arrays
 or slow networks, this can can take a noticeable amount of time.  For PVs
@@ -164,7 +166,7 @@ get functions) will be set to:</p>
 received faster than that, the <em>get</em> will return as soon as it can.</p>
 </section>
 <section id="strategies-for-connecting-to-a-large-number-of-pvs">
-<span id="advanced-connecting-many-label"></span><h2>Strategies for connecting to a large number of PVs<a class="headerlink" href="#strategies-for-connecting-to-a-large-number-of-pvs" title="Permalink to this headline">¶</a></h2>
+<span id="advanced-connecting-many-label"></span><h2>Strategies for connecting to a large number of PVs<a class="headerlink" href="#strategies-for-connecting-to-a-large-number-of-pvs" title="Link to this heading">¶</a></h2>
 <p>Occasionally, you may find that you need to quickly connect to a large
 number of PVs, say to write values to disk.  The most straightforward way
 to do this, say:</p>
@@ -311,7 +313,7 @@ your use-case and have demonstrated that <a class="reference internal" href="ove
 your needs.</p>
 </section>
 <section id="time-sleep-or-epics-poll">
-<span id="advanced-sleep-label"></span><h2>time.sleep() or epics.poll()?<a class="headerlink" href="#time-sleep-or-epics-poll" title="Permalink to this headline">¶</a></h2>
+<span id="advanced-sleep-label"></span><h2>time.sleep() or epics.poll()?<a class="headerlink" href="#time-sleep-or-epics-poll" title="Link to this heading">¶</a></h2>
 <p>In order for a program to communicate with Epics devices, it needs to allow
 some time for this communication to happen.   With
 <a class="reference internal" href="ca.html#epics.ca.PREEMPTIVE_CALLBACK" title="epics.ca.PREEMPTIVE_CALLBACK"><code class="xref py py-data docutils literal notranslate"><span class="pre">epics.ca.PREEMPTIVE_CALLBACK</span></code></a> set to  <code class="docutils literal notranslate"><span class="pre">True</span></code>, this communication  will
@@ -338,7 +340,7 @@ loop of:</p>
 <p>as the loop will be run more often than using <code class="xref py py-meth docutils literal notranslate"><span class="pre">time.sleep()</span></code>.</p>
 </section>
 <section id="using-python-threads">
-<span id="advanced-threads-label"></span><span id="index-0"></span><h2>Using Python Threads<a class="headerlink" href="#using-python-threads" title="Permalink to this headline">¶</a></h2>
+<span id="advanced-threads-label"></span><span id="index-0"></span><h2>Using Python Threads<a class="headerlink" href="#using-python-threads" title="Link to this heading">¶</a></h2>
 <p>An important feature of the PyEpics package is that it can be used with
 Python threads, as Epics 3.14 supports threads for client code.  Even in
 the best of cases, working with threads can be somewhat tricky and lead to
@@ -356,7 +358,7 @@ the complications below are mostly hidden from you.   If you’re writing
 threaded code, it’s probably a good idea to read this just to understand
 what the issues are.</p>
 <section id="channel-access-contexts">
-<h3>Channel Access Contexts<a class="headerlink" href="#channel-access-contexts" title="Permalink to this headline">¶</a></h3>
+<h3>Channel Access Contexts<a class="headerlink" href="#channel-access-contexts" title="Link to this heading">¶</a></h3>
 <p>The Channel Access library uses a concept of <em>contexts</em> for its own thread
 model, with contexts holding sets of threads as well as Channels and
 Process Variables.  For non-threaded work, a process will use a single
@@ -400,7 +402,7 @@ explicitly set the context, but still ensures that the initial context is
 used in all functions.</p>
 </section>
 <section id="how-to-work-with-ca-and-threads">
-<h3>How to work with CA and Threads<a class="headerlink" href="#how-to-work-with-ca-and-threads" title="Permalink to this headline">¶</a></h3>
+<h3>How to work with CA and Threads<a class="headerlink" href="#how-to-work-with-ca-and-threads" title="Link to this heading">¶</a></h3>
 <p>Summarizing the discussion above, to use threads you must use run in
 PREEMPTIVE_CALLBACK mode.  Furthermore, it is recommended that you use a
 single context, and that you initialize CA in the main program thread so
@@ -426,7 +428,7 @@ you try to do something fancier.</p>
 </div></blockquote>
 </section>
 <section id="thread-examples">
-<h3>Thread Examples<a class="headerlink" href="#thread-examples" title="Permalink to this headline">¶</a></h3>
+<h3>Thread Examples<a class="headerlink" href="#thread-examples" title="Link to this heading">¶</a></h3>
 <p>This is a simplified version of test code using Python threads.  It is
 based on code originally from Friedrich Schotte, NIH, and included as
 <cite>thread_test.py</cite> in the <cite>tests</cite> directory of the source distribution.</p>
@@ -560,7 +562,7 @@ thread has completed!</p>
 </section>
 </section>
 <section id="using-multiprocessing-with-pyepics">
-<span id="advanced-multiprocessing-label"></span><span id="index-1"></span><h2>Using Multiprocessing with PyEpics<a class="headerlink" href="#using-multiprocessing-with-pyepics" title="Permalink to this headline">¶</a></h2>
+<span id="advanced-multiprocessing-label"></span><span id="index-1"></span><h2>Using Multiprocessing with PyEpics<a class="headerlink" href="#using-multiprocessing-with-pyepics" title="Link to this heading">¶</a></h2>
 <p>An alternative to Python threads that has some very interesting and
 important features is to use multiple <em>processes</em>, as with the standard
 Python <code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code> module.  While using multiple processes has
@@ -576,7 +578,7 @@ between processes.  This means that you will have to create PV objects for
 each process (even if they point to the same PV).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="CAProcess">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CAProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CAProcess" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CAProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CAProcess" title="Link to this definition">¶</a></dt>
 <dd><p>a subclass of <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.Process</span></code> that clears the global
 Channel Access context before running you target function in its own
 process.</p>
@@ -584,7 +586,7 @@ process.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="CAPool">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CAPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxtasksperchild</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CAPool" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CAPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxtasksperchild</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CAPool" title="Link to this definition">¶</a></dt>
 <dd><p>a subclass of <code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.pool.Pool</span></code>, creating a Pool of
 <a class="reference internal" href="#CAProcess" title="CAProcess"><code class="xref py py-class docutils literal notranslate"><span class="pre">CAProcess</span></code></a> instances.</p>
 </dd></dl>
@@ -676,8 +678,8 @@ been done on using multiprocessing Managers.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    &#169; Copyright 2021, Matthew Newville.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>

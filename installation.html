@@ -1,19 +1,17 @@
 
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Downloading and Installation &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
+    <script src="_static/documentation_options.js?v=52b624fa"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PyEpics Overview" href="overview.html" />
@@ -101,7 +99,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -111,12 +109,12 @@
           <div class="body" role="main">
             
   <section id="downloading-and-installation">
-<h1>Downloading and Installation<a class="headerlink" href="#downloading-and-installation" title="Permalink to this headline">¶</a></h1>
+<h1>Downloading and Installation<a class="headerlink" href="#downloading-and-installation" title="Link to this heading">¶</a></h1>
 <section id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>PyEpics works with Python version 3.6 and higher.  At this writing,
-automated testing is done with versions 3.7, 3.8, 3.9, and 3.10.0-beta.1,
-though no problems are expected for Python 3.6.  Pyepics version 3.4.3 was
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<p>PyEpics works with Python version 3.7 and higher.  At this writing,
+automated testing is done with versions 3.7, 3.8, 3.9, and 3.10,
+though no problems are expected if using Python 3.6  Pyepics version 3.4.3 was
 the final version to work with Python 2.7 or Python 3.5.</p>
 <p>Pyepics is supported and regularly used on 64-bit Linux, 64-bit Mac OSX,
 and 64-bit Windows.  It is known to work on Linux with ARM processors
@@ -124,7 +122,7 @@ including raspberry Pi. As of this writing, automated testing is done only
 for Linux64.  Pyepics may still work on 32-bit Windows and Linux, but these
 systems are not tested regularly.</p>
 <p>The EPICS Channel Access library Version 3.14.12 or higher is required for
-pyepics, and versions 3.15 or 7.0 or higher are strongly recommended.  More
+pyepics, and versions 7.0.3 or higher are strongly recommended.  More
 specifically, pyepics requires the shared libraries <em>libca</em> and <em>libCom</em>
 (<em>libca.so</em> and <em>libCom.so</em> on Linux, <em>libca.dylib</em> and <em>libCom.dylib</em> on
 Mac OSX, or <em>ca.dll</em> and <em>Com.dll</em> on Windows) from <em>Epics Base</em>.</p>
@@ -136,17 +134,17 @@ used by default.  This means that you do not need to install Epics base
 libraries or any other packages to use pyepics.  For Epics experts who may
 want to use their own versions the <em>libca</em> from Epics base, instructions
 for how to do this are given below.</p>
-<p>The Python <a class="reference external" href="https://numpy.scipy.org/">numpy</a> module is highly
-recommended. and will be used to automatically convert between EPICS
-waveforms and numpy arrays if available.</p>
+<p>The Python <a class="reference external" href="https://numpy.org/">numpy</a> module is highly recommended. and will
+be used to automatically convert between EPICS waveforms and numpy arrays if
+available.</p>
 <p>The <cite>autosave</cite> module requires the <cite>pyparsing</cite> package, which is widely
 available and often installed by default with many Python distributions.
 The <cite>wx</cite> module requires the <cite>wxPython</cite> package, and the <cite>qt</cite> module
 requires <cite>PyQt</cite> or <cite>PySide</cite>.</p>
 </section>
 <section id="downloads-and-installation">
-<h2>Downloads and Installation<a class="headerlink" href="#downloads-and-installation" title="Permalink to this headline">¶</a></h2>
-<p>The latest stable version of the pyepics package is 3.5.1 which can be
+<h2>Downloads and Installation<a class="headerlink" href="#downloads-and-installation" title="Link to this heading">¶</a></h2>
+<p>The latest stable version of the pyepics package is 3.5.2 which can be
 installed with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyepics</span>
 </pre></div>
@@ -160,7 +158,7 @@ it, and install with:</p>
 </div>
 </section>
 <section id="getting-started-setting-up-the-epics-environment">
-<h2>Getting Started, Setting up the Epics Environment<a class="headerlink" href="#getting-started-setting-up-the-epics-environment" title="Permalink to this headline">¶</a></h2>
+<h2>Getting Started, Setting up the Epics Environment<a class="headerlink" href="#getting-started-setting-up-the-epics-environment" title="Link to this heading">¶</a></h2>
 <p>Pyepics will find and load the Channel Access dynamic library (<em>libca.so</em>,
 <em>libca.dylib</em>, or <em>ca.dll</em> depending on the system) at runtime in order to
 actually work.  For the most commonly used operating systems and
@@ -191,7 +189,7 @@ your immediate subnet, you may need to set the environmental variable
 <code class="docutils literal notranslate"><span class="pre">EPICS_CA_ADDR_LIST</span></code> to specify which networks to search for PVs.</p>
 </section>
 <section id="testing">
-<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<h2>Testing<a class="headerlink" href="#testing" title="Link to this heading">¶</a></h2>
 <p>Automated and continuous unit-testing is done with the Github actions, for
 Python 3.7. 3.8, 3.9, and 3.10.0-beta.1.  This uses an ubuntu-linux
 enviroment.</p>
@@ -239,7 +237,7 @@ automated procedures.  In addition, a softIoc would need to support all of
 the subclasses of Device, which cannot be gauranteed.</p>
 </section>
 <section id="development-version">
-<h2>Development Version<a class="headerlink" href="#development-version" title="Permalink to this headline">¶</a></h2>
+<h2>Development Version<a class="headerlink" href="#development-version" title="Link to this heading">¶</a></h2>
 <p>Development of pyepics is done through the <a class="reference external" href="https://github.com/pyepics/pyepics">pyepics github
 repository</a>.  To get a copy of the latest version do:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pyepics</span><span class="o">/</span><span class="n">pyepics</span><span class="o">.</span><span class="n">git</span>
@@ -247,7 +245,7 @@ repository</a>.  To get a copy of the latest version do:</p>
 </div>
 </section>
 <section id="getting-help">
-<h2>Getting Help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h2>
+<h2>Getting Help<a class="headerlink" href="#getting-help" title="Link to this heading">¶</a></h2>
 <p>For questions, bug reports, feature request, please consider using the
 following methods:</p>
 <blockquote>
@@ -269,7 +267,7 @@ making a Pull Request on <a class="reference external" href="https://github.com/
 </div></blockquote>
 </section>
 <section id="license">
-<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
 <p>The pyepics source code, this documentation, and all material
 associated with it are distributed under the Epics Open License:</p>
 <p>The epics python module was orignally written by</p>
@@ -352,7 +350,7 @@ it endorse your use of the code. Unless you’re the US government, in which
 case you can probably do whatever you want.</p>
 </section>
 <section id="acknowledgments">
-<h2>Acknowledgments<a class="headerlink" href="#acknowledgments" title="Permalink to this headline">¶</a></h2>
+<h2>Acknowledgments<a class="headerlink" href="#acknowledgments" title="Link to this heading">¶</a></h2>
 <p>pyepics was originally written and is maintained by Matt Newville
 &lt;<a class="reference external" href="mailto:newville&#37;&#52;&#48;cars&#46;uchicago&#46;ed">newville<span>&#64;</span>cars<span>&#46;</span>uchicago<span>&#46;</span>ed</a>&gt;.  Many important contributions to the library
 have come from Angus Gratton while at the Australian National University,
@@ -404,8 +402,8 @@ Vigder, Steve Wasserman, and Glen Wright.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+    &#169; Copyright 2021, Matthew Newville.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
     </div>
   </body>
 </html>
