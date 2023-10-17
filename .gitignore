@@ -12,5 +12,6 @@ dist
 NonGit
 venv
 .vscode
+.coverage
 pyepics.egg-info
 epics.egg-info

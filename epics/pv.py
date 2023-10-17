@@ -1120,6 +1120,11 @@ class PV():
         it from _PVcache_, so that subsequent connection to this PV will almost
         always make a completely new connection.
 
+        However, this method keeps the EPICS channel ID alive
+        so that it can be re-used later. This may block some resources.
+        Use `ca.clear_channel()` to clear the channel ID if needed
+        only after disconnecting the PV.
+
         Arguments
         -----------
         deepclean, bool  removal all cache connection and access-rights callbacks [True]

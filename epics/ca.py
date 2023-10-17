@@ -494,6 +494,16 @@ def clear_cache():
     multiprocessing (and is done internally by CAProcess),
     but can be useful to fully reset a Channel Access session.
     """
+    # Clear the cache of PVs used by epics.caget()-like functions
+    # by disconnecting PVs so that all subscriptions are released
+    # prior clearing channels.
+    from . import pv
+    pv_cache = pv._PVcache_
+    pv._PVcache_ = {}
+    for pv in pv_cache.values():
+        pv.disconnect()
+    pv_cache.clear()
+
     # Unregister callbacks (if any)
     for chid, entry in list(_chid_cache.items()):
         try:
@@ -504,10 +514,6 @@ def clear_cache():
     # Clear global state variables
     _cache.clear()
     _chid_cache.clear()
-
-    # Clear the cache of PVs used by epics.caget()-like functions
-    from . import pv
-    pv._PVcache_ = {}
 
     # The old context is copied directly from the old process
     # in systems with proper fork() implementations
