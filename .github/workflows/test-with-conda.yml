@@ -1,6 +1,8 @@
 name: Test with Conda, Py3.7 to 3.11
 
-on: [push]
+on:
+  push:
+  pull_request:
 
 jobs:
   build-linux:
