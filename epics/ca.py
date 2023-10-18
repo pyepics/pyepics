@@ -493,16 +493,20 @@ def clear_cache():
     detaches from the CA context.  This is important when doing
     multiprocessing (and is done internally by CAProcess),
     but can be useful to fully reset a Channel Access session.
+
+    Any class `PV` created prior this call without using `get_pv()`
+    have to be disconnected (use `PV.disconnect()`) explicitly
+    because disconnection clears subscriptions to events of
+    Epics CA connection which are to be cleared here.
+    No instance of the class `PV` created prior this call should be
+    used after because underlaying Epics CA connections are cleared here.
+    Failing to follow these rules may cause your application to experience
+    a random SIGSEGV from inside Epics binaries.
     """
     # Clear the cache of PVs used by epics.caget()-like functions
-    # by disconnecting PVs so that all subscriptions are released
-    # prior clearing channels.
+    # before clear channels references from the cache.
     from . import pv
-    pv_cache = pv._PVcache_
-    pv._PVcache_ = {}
-    for pv in pv_cache.values():
-        pv.disconnect()
-    pv_cache.clear()
+    pv.clear_pvcache()
 
     # Unregister callbacks (if any)
     for chid, entry in list(_chid_cache.items()):

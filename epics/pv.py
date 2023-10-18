@@ -168,6 +168,22 @@ def fmt_time(tstamp=None):
                          round(1.e5*frac))
 
 
+def clear_pvcache():
+    """Clear an internal cache containing instances of the class `PV`
+    retrieved through `get_pv()`. This is used by `ca*()` functions
+    such as `caget()`.
+    Any instance found in the cache is disconnected.
+    However, the underlaying cache (of `ca`) is kept intact.
+    Use `ca.clear_cache()` to release remaining resources for proper clean-up.
+    """
+    global _PVcache_
+    pv_cache = _PVcache_
+    _PVcache_ = {}
+    for pv in pv_cache.values():
+        pv.disconnect()
+    pv_cache.clear()
+
+
 class PV():
     """Epics Process Variable
 
