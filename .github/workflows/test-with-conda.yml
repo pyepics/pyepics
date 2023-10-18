@@ -1,9 +1,14 @@
 name: Test with Conda, Py3.7 to 3.11
 
-on: [push]
+on:
+  push:
+  pull_request:
 
 jobs:
   build-linux:
+    if: >
+      github.event_name == 'push'
+      || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork)
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 5
