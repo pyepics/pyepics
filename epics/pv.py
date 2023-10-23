@@ -174,7 +174,9 @@ def clear_pvcache():
     such as `caget()`.
     Any instance found in the cache is disconnected.
     However, the underlaying cache (of `ca`) is kept intact.
-    Use `ca.clear_cache()` to release remaining resources for proper clean-up.
+    This function will be called by `ca.clear_cache()` automatically.
+
+    This function is not thread safe.
     """
     global _PVcache_
     pv_cache = _PVcache_
@@ -182,6 +184,9 @@ def clear_pvcache():
     for pv in pv_cache.values():
         pv.disconnect()
     pv_cache.clear()
+
+
+ca.register_clear_cache(clear_pvcache)
 
 
 class PV():
