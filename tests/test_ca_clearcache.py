@@ -1,9 +1,8 @@
 import epics
-from epics import ca
+import epics.ca
+import epics.pv
 
-import os
 import time
-import sys
 import subprocess
 import pvnames
 enabledpv = pvnames.clear_cache_enabled
@@ -24,7 +23,22 @@ def run():
         assert value is not None, \
             "PV {} is offline".format(beaconpv)
     time.sleep(0.2)
-    ca.clear_cache()
+    epics.ca.clear_cache()
+
+
+def test_use_monitor():
+    # This test verifies that clear_cache clears subscriptions created by
+    # use_monitor=True prior clearing channels.
+    # Otherwise, EPICS will crash on an attempt to clear subscription
+    # on a cleared channel.
+    assert epics.caget(enabledpv, use_monitor=True) is not None, \
+        "PV {} is offline".format(enabledpv)
+
+    pv = epics.pv.get_pv(enabledpv)
+
+    epics.ca.clear_cache()
+
+    pv.disconnect()
 
 
 def test_subscribe():

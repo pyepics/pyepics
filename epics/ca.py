@@ -12,6 +12,8 @@ See doc/  for user documentation.
 
 documentation here is developer documentation.
 """
+from typing import Callable, Dict
+
 import ctypes
 from ctypes.util import find_library
 
@@ -487,13 +489,36 @@ def show_cache(print_out=True):
     else:
         return out
 
+
+_clear_cache_callbacks: Dict[int, Callable[[], None]] = {}
+
+
 def clear_cache():
     """
     Clears global caches of Epics CA connections, and fully
     detaches from the CA context.  This is important when doing
     multiprocessing (and is done internally by CAProcess),
     but can be useful to fully reset a Channel Access session.
+
+    Any class `PV` created prior this call without using `get_pv()`
+    have to be disconnected (use `PV.disconnect()`) explicitly
+    because disconnection clears subscriptions to events of
+    Epics CA connection which are to be cleared here.
+    No instance of the class `PV` created prior this call should be
+    used after because underlaying Epics CA connections are cleared here.
+    Failing to follow these rules may cause your application to experience
+    a random SIGSEGV from inside Epics binaries.
+
+    Use `register_clear_cache()` to register a function which will be
+    called before Epics CA connections are cleared.
+
+    This function is not thread safe.
     """
+    # Clear any cache of CA users so there are not references
+    # to the Epics CA connections which are to be cleared next.
+    for clear_other_cache in _clear_cache_callbacks.values():
+        clear_other_cache()
+
     # Unregister callbacks (if any)
     for chid, entry in list(_chid_cache.items()):
         try:
@@ -505,14 +530,31 @@ def clear_cache():
     _cache.clear()
     _chid_cache.clear()
 
-    # Clear the cache of PVs used by epics.caget()-like functions
-    from . import pv
-    pv._PVcache_ = {}
-
     # The old context is copied directly from the old process
     # in systems with proper fork() implementations
     detach_context()
     create_context()
+
+
+def register_clear_cache(callback: Callable[[], None]):
+    """
+    Register a function which is to be called right before
+    the Epics CA connections are removed. The purpose of the callback
+    is to disconnect from Epics CA connections created through `ca.py`
+    before they are cleared. Im summary, the function should:
+    * Remove any reference to any Epics CA connection created
+      through `ca.py`.
+    * Remove any subscription fom any Epics CA connection created
+      through `ca.py`.
+
+    Failing to do so may result into a random SIGSEGV after using
+    `ca.clear_cache`.
+    """
+    global _clear_cache_callbacks
+    if callable(callback):
+        _clear_cache_callbacks[id(callback)] = callback
+    elif callback is not None:
+        raise RuntimeError(f"Cannot register type {type(callback)}. Callable required.")
 
 
 ## decorator functions for ca functionality:

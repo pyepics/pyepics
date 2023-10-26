@@ -168,6 +168,27 @@ def fmt_time(tstamp=None):
                          round(1.e5*frac))
 
 
+def clear_pvcache():
+    """Clear an internal cache containing instances of the class `PV`
+    retrieved through `get_pv()`. This is used by `ca*()` functions
+    such as `caget()`.
+    Any instance found in the cache is disconnected.
+    However, the underlaying cache (of `ca`) is kept intact.
+    This function will be called by `ca.clear_cache()` automatically.
+
+    This function is not thread safe.
+    """
+    global _PVcache_
+    pv_cache = _PVcache_
+    _PVcache_ = {}
+    for pv in pv_cache.values():
+        pv.disconnect()
+    pv_cache.clear()
+
+
+ca.register_clear_cache(clear_pvcache)
+
+
 class PV():
     """Epics Process Variable
 
@@ -1119,6 +1140,11 @@ class PV():
         this method clears all the user-defined callbacks for a PV and removes
         it from _PVcache_, so that subsequent connection to this PV will almost
         always make a completely new connection.
+
+        However, this method keeps corresponding Epics CA connection intact
+        so that it can be re-used later. This may block some resources.
+        Use `ca.clear_channel()` to clear Epics CA connection if needed.
+        Use it only after disconnecting the PV.
 
         Arguments
         -----------
