@@ -874,7 +874,7 @@ class PV():
         if '_' in xtype:
             mod, xtype = xtype.split('_')
 
-        fmt = '{val:i}'
+        fmt = '{val:d}'
         if   xtype in ('float','double'):
             fmt = '{val:g}'
         elif xtype in ('string','char'):
