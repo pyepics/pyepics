@@ -13,7 +13,7 @@ class SRS570(Device):
     """
 
     attrs = ('sens_num', 'sens_unit', 'offset_num', 'offset_unit',
-             'offset_sign', 'offset_on' 'off_u_put', 'bias_put',
+             'offset_sign', 'offset_on', 'off_u_put', 'bias_put',
              'gain_mode', 'filter_type', 'invert_on', 'init.PROC')
     
     _nonpvs = ('_prefix', '_pvs', '_delim', '_nchan', '_chans')
