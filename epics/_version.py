@@ -15,6 +15,7 @@ import os
 import re
 import subprocess
 import sys
+from epics.utils import IOENCODING
 
 
 def get_keywords():
@@ -138,7 +139,7 @@ def git_get_keywords(versionfile_abs):
     # _version.py.
     keywords = {}
     try:
-        f = open(versionfile_abs, "r")
+        f = open(versionfile_abs, "r", encoding=IOENCODING)
         for line in f.readlines():
             if line.strip().startswith("git_refnames ="):
                 mo = re.search(r'=\s*"(.*)"', line)

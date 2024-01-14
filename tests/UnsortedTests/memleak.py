@@ -3,6 +3,8 @@ import gc
 import os
 
 import epics
+from epics.utils import IOENCODING
+
 import pvnames
 
 pvlist = pvnames.updating_pvlist
@@ -11,7 +13,7 @@ def show_memory():
     gc.collect()
     if os.name == 'nt':
         return 'Windows memory usage?? pid=%i' % os.getpid()
-    f = open("/proc/%i/statm" % os.getpid())
+    f = open("/proc/%i/statm" % os.getpid(), encoding=IOENCODING)
     mem = f.readline().split()
     f.close()
     return 'Memory: VmSize = %i kB  /  VmRss = %i kB' %( int(mem[0])*4 , int(mem[1])*4)
@@ -20,7 +22,7 @@ N_new = 0
 def get_callback(pvname=None,value=None,**kw):
     global N_new
     N_new = N_new + 1
-    
+
 def monitor_events(t = 60.0):
     print( 'Processing PV requests:')
     t0 = time.time()
@@ -40,7 +42,7 @@ def run(t=10.0):
     for p in pvs: p.get()
     print( 'Monitoring %i PVs'  % len(pvs))
     monitor_events(t=t)
-    
+
     print( 'Destroying PVs: ')
     for i in pvs:
         i.disconnect()
@@ -48,11 +50,9 @@ def run(t=10.0):
     epics.ca.show_cache()
     epics.ca.poll(0.01, 10.0)
     time.sleep(1.0)
-    
+
 for i in range(4):
     print( "==run #  ", i+1)
     run(t=15)
 
 print( 'memory leak test complete.')
-
-

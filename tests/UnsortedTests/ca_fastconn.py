@@ -1,4 +1,5 @@
 from epics import ca, dbr
+from epics.utils import IOENCODING
 import time
 import debugtime
 try:
@@ -17,7 +18,7 @@ results = OrderedDict()
 
 MAX_PVS = 12500
 
-for line  in open('fastconn_pvlist.txt','r').readlines():
+for line  in open('fastconn_pvlist.txt','r', encoding=IOENCODING).readlines():
     if not line.startswith('#'):
         pvnames.append(line.strip())
 

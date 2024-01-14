@@ -6,6 +6,7 @@ import numpy
 from .. import Device
 from .scaler import Scaler
 from .mca import MCA
+from epics.utils import IOENCODING
 
 HEADER = '''# Struck MCA data: %s
 # Nchannels, Nmca = %i, %i
@@ -151,7 +152,7 @@ class Struck(Device):
         names = ' | '.join(names)
         formt = '%9i ' * nmca + '\n'
 
-        fout = open(fname, 'w')
+        fout = open(fname, 'w', encoding=IOENCODING)
         fout.write(HEADER % (self._prefix, npts, nmca, addrs, names))
         for i in range(npts):
             fout.write(formt % tuple(sdata[i]))

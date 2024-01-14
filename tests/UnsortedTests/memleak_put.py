@@ -4,6 +4,7 @@ import time
 import gc
 import os
 import epics
+from epics.utils import IOENCODING
 
 # a test for possible memory leaks on put()
 import pvnames
@@ -14,7 +15,7 @@ def show_memory():
     gc.collect()
     if os.name == 'nt':
         return 'Windows memory usage?? pid=%i' % os.getpid()
-    f = open("/proc/%i/statm" % os.getpid())
+    f = open("/proc/%i/statm" % os.getpid(), encoding=IOENCODING)
     mem = f.readline().split()
     f.close()
     return 'Memory: VmSize = %i kB  /  VmRss = %i kB' %( int(mem[0])*4 , int(mem[1])*4)
@@ -24,7 +25,7 @@ def get_callback(pv=None, **kws):
     global N_new
     N_new = N_new + 1
     # print( 'New value: ', pv.pvname, pv.char_value)
-    
+
 def monitor_events(t = 600.0):
     print('Processing PV requests:')
     t0 = time.time()
@@ -50,8 +51,7 @@ for i in range(500):
     if i%20 == 0:
         print("==run #  ", i,  show_memory())
     time.sleep(0.02)
-    
+
 epics.ca.pend_io(1.0)
 
 print('really done.')
-
