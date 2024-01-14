@@ -9,6 +9,7 @@ from wx.lib.scrolledpanel import ScrolledPanel
 from .wxlib import (PVText, PVFloatCtrl, PVTextCtrl, PVEnumButtons,
                     PVEnumChoice, DelayedEpicsCallback, EpicsFunction)
 from .wxutils import set_sizer, LCEN, RCEN, CEN, FileSave
+from epics.utils import IOENCODING
 
 TMPL_TOP = '''file "$(CARS)/CARSApp/Db/motor.db"
 {
@@ -87,7 +88,7 @@ class MotorDetailFrame(wx.Frame):
                          wildcard='INI (*.template)|*.template|All files (*.*)|*.*',
                          default_file='Motor_%s.template' % name)
         if fname is not None:
-            fout = open(fname, 'w+')
+            fout = open(fname, 'w+', encoding=IOENCODING)
             fout.write("%s\n" % self.MakeTemplate())
             fout.close()
 

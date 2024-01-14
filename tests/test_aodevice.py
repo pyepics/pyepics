@@ -5,6 +5,7 @@
 from epics.devices import ao
 import sys
 import time
+from epics.utils import IOENCODING
 
 def test_aodevice():
     myao = ao('PyTest:ao1')
@@ -14,6 +15,6 @@ def test_aodevice():
 
     time.sleep(0.5)
     flines = []
-    with open('tmp_aostate.txt') as fh:
+    with open('tmp_aostate.txt', encoding=IOENCODING) as fh:
         flines.extend( fh.readlines())
     assert len(flines) > 10

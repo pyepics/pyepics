@@ -8,6 +8,8 @@ basic device object defined
 from .ca import poll
 from .pv  import get_pv
 import time
+from epics.utils import IOENCODING
+
 
 class Device(object):
     """A simple collection of related PVs, sharing a common prefix
@@ -220,14 +222,14 @@ class Device(object):
                 (1 == self._pvs[key].count or
                  'char' == self._pvs[key].type)):
                 out.append("%s  %s\n" % (key, state[key]))
-        fout = open(fname, 'w')
+        fout = open(fname, 'w', encoding=IOENCODING)
         fout.writelines(out)
         fout.close()
 
 
     def read_state(self, fname, restore=False):
         """read state from file, optionally restore it"""
-        finp = open(fname, 'r')
+        finp = open(fname, 'r', encoding=IOENCODING)
         textlines = finp.readlines()
         finp.close()
         state = {}

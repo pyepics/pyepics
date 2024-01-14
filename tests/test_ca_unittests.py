@@ -8,6 +8,7 @@ import numpy
 import ctypes
 from contextlib import contextmanager
 from epics import ca, dbr, caput
+from epics.utils import IOENCODING
 
 import pvnames
 
@@ -280,7 +281,7 @@ def test_Values():
             chid = ca.create_channel(pvn)
             ca.connect_channel(chid)
             vals[pvn] = ca.get(chid)
-        rlines = open('./caget.tst', 'r').readlines()
+        rlines = open('./caget.tst', 'r', encoding=IOENCODING).readlines()
         for line in rlines:
             pvn, sval = [i.strip() for i in line[:-1].split(' ', 1)]
             tval = str(vals[pvn])

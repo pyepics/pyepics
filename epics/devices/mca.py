@@ -3,6 +3,7 @@ import sys
 import time
 import numpy as np
 from configparser import  ConfigParser
+from epics.utils import IOENCODING
 
 from .. import Device, get_pv, poll, caput, caget
 
@@ -413,7 +414,7 @@ class MultiXMAP(Device):
 
         buff = '\n'.join(buff)
         if filename is not None:
-            fh = open(filename,'w')
+            fh = open(filename,'w', encoding=IOENCODING)
             fh.write(buff)
             fh.close()
         d.add('wrote file')

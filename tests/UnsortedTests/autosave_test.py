@@ -1,12 +1,12 @@
+from epics.utils import IOENCODING
 import epics.autosave
 import time
 epics.autosave.save_pvs('AutoSaveTest.req', 'tmp.sav')
 
 time.sleep(0.5)
-f = open('tmp.sav','r')
+f = open('tmp.sav','r', encoding=IOENCODING)
 
 data  = f.read()
 
 if len(data) > 50:
     print("AutoSave worked... data written to file 'tmp.sav'")
-    

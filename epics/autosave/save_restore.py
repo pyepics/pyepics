@@ -30,6 +30,8 @@ import os
 import datetime
 import json
 from epics.pv import get_pv
+from epics.utils import IOENCODING
+
 
 def restore_pvs(filepath, debug=False):
     """
@@ -42,7 +44,7 @@ def restore_pvs(filepath, debug=False):
     pv_vals = []
     failures = []
     # preload PV names and values, hoping PV connections happen in background
-    with open(filepath, 'r') as fh:
+    with open(filepath, 'r', encoding=IOENCODING) as fh:
         for line in fh.readlines():
             if len(line) < 2 or  line.startswith('<END') or line.startswith('#'):
                 continue
@@ -131,7 +133,7 @@ class AutoSaver(object):
 
 
         buff.append("<END>\n")
-        with open(save_file, 'w') as fh:
+        with open(save_file, 'w', encoding=IOENCODING) as fh:
             fh.write("\n".join(buff))
         print("wrote %s"% save_file)
 
