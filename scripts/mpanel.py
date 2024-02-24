@@ -16,7 +16,6 @@ try:
 except:
     PyDeadObjectError = Exception
 
-import six
 import epics
 from epics.wx.wxlib import PVText, PVFloatCtrl, PVButton, PVComboBox, \
      DelayedEpicsCallback, EpicsFunction
@@ -77,7 +76,7 @@ class MotorPanel(wx.Panel):
             return
         dt.add('clear callbacks')
 
-        if isinstance(motor, six.string_types):
+        if isinstance(motor, str):
             self.motor = epics.Motor(motor)
             dt.add('create motor (name)')
         elif isinstance(motor, epics.Motor):
