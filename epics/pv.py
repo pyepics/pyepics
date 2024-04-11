@@ -735,9 +735,9 @@ class PV():
                 self.get_ctrlvars()
             try:
                 prec = self._args['precision']
-                fmt  = "%%.%if"
+                fmt  = "%%.%df"
                 if 4 < abs(int(log10(abs(val + 1.e-9)))):
-                    fmt = "%%.%ig"
+                    fmt = "%%.%dg"
                 cval = (fmt %  prec) % val
             except (ValueError, TypeError, ArithmeticError):
                 cval = str(val)

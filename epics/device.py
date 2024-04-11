@@ -317,7 +317,7 @@ class Device(object):
         pref = self._prefix
         if pref.endswith('.'):
             pref = pref[:-1]
-        return "<Device '%s' %i attributes>" % (pref, len(self._pvs))
+        return "<Device '%s' %d attributes>" % (pref, len(self._pvs))
 
 
     def pv_property(attr, as_string=False, wait=False, timeout=10.0):
