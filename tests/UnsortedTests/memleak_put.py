@@ -4,7 +4,6 @@ import time
 import gc
 import os
 import epics
-from epics.utils import IOENCODING
 
 # a test for possible memory leaks on put()
 import pvnames
@@ -15,7 +14,7 @@ def show_memory():
     gc.collect()
     if os.name == 'nt':
         return 'Windows memory usage?? pid=%i' % os.getpid()
-    f = open("/proc/%i/statm" % os.getpid(), encoding=IOENCODING)
+    f = open("/proc/%i/statm" % os.getpid())
     mem = f.readline().split()
     f.close()
     return 'Memory: VmSize = %i kB  /  VmRss = %i kB' %( int(mem[0])*4 , int(mem[1])*4)
