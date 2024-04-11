@@ -361,7 +361,7 @@ def initialize_libca():
 
     """
     if 'EPICS_CA_MAX_ARRAY_BYTES' not in os.environ:
-        os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = "%i" %  2**24
+        os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = "%d" %  2**24
 
     global libca, initial_context
 
@@ -967,7 +967,7 @@ def poll(evt=1.e-5, iot=1.0):
 @withCA
 def test_io():
     """test if IO is complete: returns True if it is"""
-    return (dbr.ECA_IODONE ==  libca.ca_test_io())
+    return dbr.ECA_IODONE == libca.ca_test_io()
 
 ## create channel
 @withCA
@@ -1085,7 +1085,8 @@ def connect_channel(chid, timeout=None, verbose=False):
 
     Notes
     -----
-    1. If *timeout* is ``None``, the value of :data:`DEFAULT_CONNECTION_TIMEOUT` is used (defaults to 2.0 seconds).
+    1. If *timeout* is ``None``, the value of :data:`DEFAULT_CONNECTION_TIMEOUT`
+       is used (defaults to 2.0 seconds).
 
     2. Normally, channels will connect in milliseconds, and the connection
     callback will succeed on the first attempt.
@@ -1099,7 +1100,7 @@ def connect_channel(chid, timeout=None, verbose=False):
     if verbose:
         write(' connect channel -> %s %s %s ' %
                (repr(chid), repr(state(chid)), repr(dbr.CS_CONN)))
-    conn = (state(chid) == dbr.CS_CONN)
+    conn = state(chid) == dbr.CS_CONN
     if not conn:
         # not connected yet, either indicating a slow network
         # or a truly un-connnectable channel.
@@ -1111,7 +1112,7 @@ def connect_channel(chid, timeout=None, verbose=False):
 
         while (not conn and ((time.time()-start_time) < timeout)):
             poll()
-            conn = (state(chid) == dbr.CS_CONN)
+            conn = state(chid) == dbr.CS_CONN
         if not conn:
             entry = _cache[ctx][pvname]
             with entry.lock:
@@ -1282,13 +1283,13 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
         "simple, native data type"
         if data is None:
             return None
-        elif ntype == dbr.CHAR and elem_count > 1:
+        if ntype == dbr.CHAR and elem_count > 1:
             return array_cast(data, count, ntype, use_numpy)
-        elif count == 1 and ntype != dbr.STRING:
+        if count == 1 and ntype != dbr.STRING:
             return data[0]
-        elif ntype == dbr.STRING:
+        if ntype == dbr.STRING:
             return scan_string(data, count)
-        elif count != 1:
+        if count != 1:
             return array_cast(data, count, ntype, use_numpy)
         return data
 
@@ -1764,7 +1765,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     # wait with callback (or put_complete)
     pvname = name(chid)
     start_time = time.time()
-    completed = dict(status=False)
+    completed = {'status': False}
 
     def put_completed():
         completed['status'] = True
@@ -1775,7 +1776,7 @@ def put(chid, value, wait=False, timeout=30, callback=None,
         if isinstance(callback_data, dict):
             kwargs = callback_data
         else:
-            kwargs = dict(data=callback_data)
+            kwargs = {'data': callback_data}
 
         callback(pvname=pvname, **kwargs)
 
