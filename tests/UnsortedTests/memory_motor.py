@@ -2,7 +2,7 @@ import time
 import sys
 
 import epics
-from epics.utils import IOENCODING
+
 import gc
 
 import pvnames
@@ -13,7 +13,7 @@ def show_memory():
     if os.name == 'nt':
         return 'Windows memory usage?? pid=%i' % os.getpid()
 
-    f = open("/proc/%i/statm" % os.getpid(), encoding=IOENCODING)
+    f = open("/proc/%i/statm" % os.getpid())
     mem = f.readline().split()
     f.close()
     sys.stdout.write('Memory: VmSize = %i kB  /  VmRss = %i kB\n' %( int(mem[0])*4 , int(mem[1])*4))
@@ -26,7 +26,7 @@ def monitor_events(t = 10.0):
     t0 = time.time()
     while time.time()-t0 < t :
         epics.ca.poll()
-
+x
 def round():
     sys.stdout.write('== Creating some PVs\n ')
     pvs = []
