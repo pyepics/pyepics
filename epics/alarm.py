@@ -117,7 +117,7 @@ class Alarm(object):
         self.check_alarm()
 
     def __repr__(self):
-        return "<Alarm '%s', comp=%s, trip_point=%s >" % (self.pv.name,
+        return "<Alarm '%s', comp=%s, trip_point=%s >" % (self.pv.pvname,
                                                           self.comp_name,
                                                           self.trip_point)
     def reset(self):
