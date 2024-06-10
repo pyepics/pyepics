@@ -1,0 +1,16 @@
+These shared libraries were built using
+
+Epics Base 7.0.7 on Mac OS X 14.4.1
+
+Readline support was turned off by setting
+   COMMANDLINE_LIBRARY =
+
+in
+   CONFIG_SITE.darwinCommon.darwinCommon
+
+and then
+   mv libCom.dylib libComPYEPICS.dylib
+   install_name_tool -id libca.dylib  libca.dylib
+   install_name_tool -id libComPYEPICS.dylib  libComPYEPICS.dylib
+   install_name_tool -add_rpath . libca.dylib
+   install_name_tool -change libComPYEPICS.dylib @loader_path/./libComPYEPICS.dylib libca.dylib
