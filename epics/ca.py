@@ -27,7 +27,7 @@ import warnings
 from copy import deepcopy
 from collections import defaultdict
 from math import log10
-from pkg_resources import resource_filename
+from importlib import resources
 
 HAS_NUMPY = False
 try:
@@ -280,7 +280,7 @@ def _find_lib(inp_lib_name):
         return dllpath
 
     # Test 2: look in installed python location for dll
-    dllpath = resource_filename('epics.clibs', clib_search_path(inp_lib_name))
+    dllpath = resources.files('epics.clibs') / clib_search_path(inp_lib_name)
 
     if (os.path.exists(dllpath) and os.path.isfile(dllpath)):
         return dllpath
