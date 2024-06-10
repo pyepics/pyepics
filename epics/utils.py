@@ -77,6 +77,8 @@ def clib_search_path(lib):
         libfmt = '%s.dll'
     elif sys.platform == 'darwin':
         libsrc = 'darwin'
+        if platform.machine() == 'arm64':
+            libsrc, nbits = 'darwinarm', '64'
         libfmt = 'lib%s.dylib'
     elif sys.platform.startswith('linux'):
         libsrc = 'linux'
