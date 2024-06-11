@@ -10,10 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }} from Miniconda/conda
+    - name: Set up miniconda Python ${{ matrix.python-version }}
       uses: conda-incubator/setup-miniconda@v2.2.0
       with:
         miniconda-version: latest
@@ -22,8 +21,7 @@ jobs:
         channel-priority: true
         activate-environment: anaconda-client-env
         python-version: ${{ matrix.python-version }}
-
-    - name: Install conda and dependencies
+    - name: Install conda packages for dependencies
       run: |
         conda install numpy pip setuptools pyparsing pytest pytest-cov coverage
         conda update -n base -c defaults conda
@@ -36,9 +34,6 @@ jobs:
         tar xf procServ-2.8.0.tar.gz
         cd procServ-2.8.0 && sh ./configure && make -j2
         cp procServ $CONDA/epics/bin/linux-x86_64/.
-        echo '>>>CONDA=' $CONDA
-        echo '>>> after procServ build'
-        ls -latr $CONDA/epics/bin/linux-x86_64/
     - name: Install pyepics
       run: |
         python -m pip install --upgrade pip
@@ -46,14 +41,12 @@ jobs:
 
     - name: Run test suite
       run: |
-        python -m pip install psutil
         cd tests/Setup
         export EPICS_CA_ADDR_LIST=localhost
         export EPICS_CA_AUTO_ADDR_LIST=NO
         export EPICS_CA_MAX_ARRAY_BYTES=20100300
         export EPICS_HOST_ARCH=linux-x86_64
         export PATH=$CONDA/epics/bin/$EPICS_HOST_ARCH:$PATH
-        printenv
         bash start_ioc.sh
         sleep 2
         python simulator.py &

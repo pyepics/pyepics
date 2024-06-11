@@ -28,7 +28,7 @@ fi
 
 export PATH=$EPICS_ROOT/bin/$EPICS_HOST_ARCH:$PATH
 
-echo "starting IOC with: $EPICS_BASE/bin/$EPICS_HOST_ARCH/softIoc ./st.cmd"
-echo "starting IOC using procServ opts $PROCSERV_OPTS"
+echo "#starting IOC with: $EPICS_BASE/bin/$EPICS_HOST_ARCH/softIoc ./st.cmd"
+echo " using procServ opts: $PROCSERV_OPTS"
 
 $EPICS_BASE/bin/$EPICS_HOST_ARCH/procServ $PROCSERV_OPTS $EPICS_BASE/bin/$EPICS_HOST_ARCH/softIoc ./st.cmd
