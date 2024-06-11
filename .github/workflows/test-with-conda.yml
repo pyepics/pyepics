@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
     steps:
     - uses: actions/checkout@v4
@@ -52,6 +52,7 @@ jobs:
         export EPICS_CA_AUTO_ADDR_LIST=NO
         export EPICS_CA_MAX_ARRAY_BYTES=20100300
         export EPICS_HOST_ARCH=linux-x86_64
+        export PATH=$CONDA/epics/bin/$EPICS_HOST_ARCH:$PATH
         printenv
         bash start_ioc.sh
         sleep 2
@@ -74,4 +75,5 @@ jobs:
         coverage run --source=epics --append --timid  -m pytest test_pv_typeconversion.py
         coverage run --source=epics --append --timid  -m pytest test_pv_disconnect.py
         coverage report -m --omit "wxlib*,wxutils*,ogl*,motor*,mca*,ad*,struck*,transform*,scan*,scal*,xspress*"
-        bash <(curl -s https://codecov.io/bash)
+    - name: upload coverage report to codecov
+      uses: codecov/codecov-action@v2
