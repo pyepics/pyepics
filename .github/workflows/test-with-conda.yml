@@ -14,8 +14,7 @@ jobs:
       max-parallel: 5
       fail-fast: false
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
-
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -31,13 +30,12 @@ jobs:
         conda install numpy pip setuptools pyparsing pytest pytest-cov coverage
         conda update -n base -c defaults conda
         conda install -y -c conda-forge epics-base
-        conda install -y -c lcls-ii procserv
         conda info
         conda list
     - name: Install pyepics
       run: |
         python -m pip install --upgrade pip
-        python setup.py install
+        python -m pip install ".[all]"
     - name: Run test suite
       run: |
         python -m pip install psutil
@@ -45,8 +43,9 @@ jobs:
         export EPICS_CA_ADDR_LIST=localhost
         export EPICS_CA_AUTO_ADDR_LIST=NO
         export EPICS_CA_MAX_ARRAY_BYTES=20100300
+        export EPICS_HOST_ARCH=linux-x86_64
         printenv
-        bash start_ioc.sh
+        bash start_ioc.sh &
         sleep 2
         python simulator.py &
         sleep 2
