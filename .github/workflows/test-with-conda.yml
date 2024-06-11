@@ -1,17 +1,18 @@
-name: Test with Conda, Py3.8 to 3.11
+name: Test with Conda, Py3.8 to 3.12
 
 on:
   push:
+    branches: [ master ]
   pull_request:
+    branches: [ master ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 5
       fail-fast: false
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
@@ -42,7 +43,7 @@ jobs:
         export EPICS_CA_MAX_ARRAY_BYTES=20100300
         export EPICS_HOST_ARCH=linux-x86_64
         printenv
-        bash start_ioc.sh &
+        bash start_ioc.sh
         sleep 2
         python simulator.py &
         sleep 2
