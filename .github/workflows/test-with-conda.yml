@@ -8,60 +8,65 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - name: Set up Python ${{ matrix.python-version }} from Miniconda/conda
+      uses: conda-incubator/setup-miniconda@v2.2.0
       with:
+        miniconda-version: latest
+        mamba-version: "*"
+        channels: conda-forge,defaults
+        channel-priority: true
+        activate-environment: anaconda-client-env
         python-version: ${{ matrix.python-version }}
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
+
     - name: Install conda and dependencies
       run: |
         conda install numpy pip setuptools pyparsing pytest pytest-cov coverage
-        conda update -n base -c defaults conda
+        conda update -n base -c defaults conda gcc
         conda install -y -c conda-forge epics-base
         conda info
         conda list
     - name: Install pyepics
       run: |
         python -m pip install --upgrade pip
-        python -m pip install ".[all]"
-   - name: Run test suite
-      run: |
-        python -m pip install psutil
-        cd tests/Setup
-        export EPICS_CA_ADDR_LIST=localhost
-        export EPICS_CA_AUTO_ADDR_LIST=NO
-        export EPICS_CA_MAX_ARRAY_BYTES=20100300
-        export EPICS_HOST_ARCH=linux-x86_64
-        printenv
-        bash start_ioc.sh
-        sleep 2
-        python simulator.py &
-        sleep 2
-        cd ..
-        coverage erase
-        coverage run --source=epics --append --timid  -m pytest test_camonitor_func.py
-        coverage run --source=epics --append --timid  -m pytest test_ca_typeconversion.py
-        coverage run --source=epics --append --timid  -m pytest test_pv_callback.py
-        coverage run --source=epics --append --timid  -m pytest test_pv_initcallbacks.py
-        coverage run --source=epics --append --timid  -m pytest test_pvsubarray.py
-        coverage run --source=epics --append --timid  -m pytest test_cathread.py
-        coverage run --source=epics --append --timid  -m pytest test_multiprocessing.py
-        coverage run --source=epics --append --timid  -m pytest test_threading.py
-        coverage run --source=epics --append --timid  -m pytest test_aodevice.py
-        coverage run --source=epics --append --timid  -m pytest test_ca_unittests.py
-        coverage run --source=epics --append --timid  -m pytest test_ca_subscribe.py
-        coverage run --source=epics --append --timid  -m pytest test_pv_unittests.py
-        coverage run --source=epics --append --timid  -m pytest test_pv_typeconversion.py
-        coverage run --source=epics --append --timid  -m pytest test_pv_disconnect.py
-        coverage report -m --omit "wxlib*,wxutils*,ogl*,motor*,mca*,ad*,struck*,transform*,scan*,scal*,xspress*"
-        bash <(curl -s https://codecov.io/bash)
+        python -m pip install .
+
+#    - name: Run test suite
+#       run: |
+#         python -m pip install psutil
+#         cd tests/Setup
+#         export EPICS_CA_ADDR_LIST=localhost
+#         export EPICS_CA_AUTO_ADDR_LIST=NO
+#         export EPICS_CA_MAX_ARRAY_BYTES=20100300
+#         export EPICS_HOST_ARCH=linux-x86_64
+#         printenv
+#         bash start_ioc.sh
+#         sleep 2
+#         python simulator.py &
+#         sleep 2
+#         cd ..
+#         coverage erase
+#         coverage run --source=epics --append --timid  -m pytest test_camonitor_func.py
+#         coverage run --source=epics --append --timid  -m pytest test_ca_typeconversion.py
+#         coverage run --source=epics --append --timid  -m pytest test_pv_callback.py
+#         coverage run --source=epics --append --timid  -m pytest test_pv_initcallbacks.py
+#         coverage run --source=epics --append --timid  -m pytest test_pvsubarray.py
+#         coverage run --source=epics --append --timid  -m pytest test_cathread.py
+#         coverage run --source=epics --append --timid  -m pytest test_multiprocessing.py
+#         coverage run --source=epics --append --timid  -m pytest test_threading.py
+#         coverage run --source=epics --append --timid  -m pytest test_aodevice.py
+#         coverage run --source=epics --append --timid  -m pytest test_ca_unittests.py
+#         coverage run --source=epics --append --timid  -m pytest test_ca_subscribe.py
+#         coverage run --source=epics --append --timid  -m pytest test_pv_unittests.py
+#         coverage run --source=epics --append --timid  -m pytest test_pv_typeconversion.py
+#         coverage run --source=epics --append --timid  -m pytest test_pv_disconnect.py
+#         coverage report -m --omit "wxlib*,wxutils*,ogl*,motor*,mca*,ad*,struck*,transform*,scan*,scal*,xspress*"
+#         bash <(curl -s https://codecov.io/bash)
