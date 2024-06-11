@@ -639,9 +639,9 @@ of channels is handled in the background::
     chid  = ca.create_channel('XXX:m1.VAL')
     count = ca.element_count(chid)
     ftype = ca.field_type(chid)
-    print "Channel ", chid, count, ftype
+    print("Channel ", chid, count, ftype)
     value = ca.get()
-    print value
+    print(value)
 
 Put, waiting for completion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -670,9 +670,9 @@ standard output::
     # define a callback function.  Note that this should
     # expect certain keyword arguments, including 'pvname' and 'value'
     def onChanges(pvname=None, value=None, **kw):
-	fmt = 'New Value: %s  value=%s, kw=%s\n'
-	sys.stdout.write(fmt % (pvname, str(value), repr(kw)))
-	sys.stdout.flush()
+        fmt = 'New Value: %s  value=%s, kw=%s\n'
+        sys.stdout.write(fmt % (pvname, str(value), repr(kw)))
+        sys.stdout.flush()
 
     # create the channel
     mypv = 'XXX.VAL'
@@ -684,7 +684,7 @@ standard output::
     # now we simply wait for changes
     t0 = time.time()
     while time.time()-t0 < 10.0:
-	time.sleep(0.001)
+        time.sleep(0.001)
 
 It is **vital** that the return value from :func:`create_subscription` is
 kept in a variable so that it cannot be garbage collected.  Failure to keep
@@ -702,16 +702,16 @@ initial connection::
     import time
 
     def onConnectionChange(pvname=None, conn=None, chid=None):
-	print 'ca connection status changed:  ', pvname,  conn, chid
+        print(f'ca connection status changed:  {pvname},  {conn}, {chid}')
 
     # create channel, provide connection callback
     motor1 = '13IDC:m1'
     chid = epics.ca.create_channel(motor1, callback=onConnectionChange)
 
-    print 'Now waiting, watching values and connection changes:'
+    print('Now waiting, watching values and connection changes:')
     t0 = time.time()
     while time.time()-t0 < 30:
-	time.sleep(0.001)
+        time.sleep(0.001)
 
 This will run the supplied callback soon after the channel has been
 created, when a successful connection has been made.  Note that the
@@ -730,7 +730,7 @@ called immediately after successful installation::
     import time
 
     def on_access_rights_change(read_access, write_access):
-	print 'read access = %s, write access = %s' % (read_access, write_access)
+        print(f'read access={read_access}, write access={write_access}')
 
     # create a channel and attach the above function for access rights events
     chid = epics.ca.create_channel('pv_name')
@@ -740,7 +740,7 @@ called immediately after successful installation::
     # Affecting the channel's access rights, (for example, by enabling/disabling
     # CA Security rules), should produce additional console messages
     try:
-	while True:
-	    time.sleep(0.25)
+        while True:
+            time.sleep(0.25)
     except KeyboardInterrupt:
-	pass
+        pass

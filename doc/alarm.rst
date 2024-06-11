@@ -69,7 +69,7 @@ message when a PV's value reaches a certain value::
     from epics import Alarm, poll
 
     def alertMe(pvname=None, char_value=None, **kw):
-        print "Soup's on!   %s = %s" % (pvname, char_value)
+        print(f"Soup's on!  {pvname}= {char_value}")
 
     my_alarm = Alarm(pvname = 'WaterTemperature.VAL',
                      comparison = '>',
@@ -78,7 +78,3 @@ message when a PV's value reaches a certain value::
                      alert_delay = 600)
     while True:
         poll()
-
-
-
-

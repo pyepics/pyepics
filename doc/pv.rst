@@ -42,8 +42,8 @@ connect and be ready to use.
 
       >>> from epics import PV
       >>> p = PV('XX:m1.VAL')
-      >>> print p.get()
-      >>> print p.count, p.type
+      >>> print(p.get())
+      >>> print(p.count, p.type)
 
 
 The *pvname* is required, and is the name of an existing Process Variable.
@@ -327,7 +327,7 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 
    >>> from epics import PV
    >>> p1 = PV('xxx.VAL')
-   >>> print p1.value
+   >>> print(p1.value)
    1.00
    >>> p1.value = 2.00
 
@@ -463,7 +463,7 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
    keyword_arguments)`.
 
    **Note**: The :attr:`callbacks` attribute can be assigned to or
-    	  manipulated directly.  This is not recommended. Use the
+          manipulated directly.  This is not recommended. Use the
           methods :meth:`add_callback`, :meth:`remove_callback`, and
           :meth:`clear_callbacks` instead of altering this dictionary directly.
 
@@ -707,7 +707,7 @@ the processing is done::
     import epics
     p = epics.PV('XXX')
     p.put(1.0, wait=True)
-    print 'Done'
+    print('Done')
 
 This will hang until the processing of the PV completes (motor moving, etc)
 before printing 'Done'.   You can also specify a maximum time to wait -- a
@@ -743,7 +743,7 @@ multiple PVs to complete with python's built-in *all* function, as with::
     while waiting:
         time.sleep(0.001)
         waiting = not all([pv.put_complete for pv in pvgroup])
-    print 'All puts are done!'
+    print('All puts are done!')
 
 For maximum flexibility, one can all define a *put callback*, a function to
 be run when the :meth:`put` has completed.   This function requires a
@@ -753,7 +753,7 @@ data with the *callback_data* argument (which should be dict-like) to
 
     pv = epics.PV('XXX')
     def onPutComplete(pvname=None, **kws):
-        print 'Put done for %s' % pvname
+        print(f'Put done for {pvname}')
 
     pv.put(1.0, callback=onPutComplete)
 
@@ -811,7 +811,7 @@ attribute:
 
    >>> from epics import PV
    >>> p1 = PV('xxx.VAL')
-   >>> print p1.value
+   >>> print(p1.value)
    1.00
    >>> p1.value = 2.00
 
@@ -823,18 +823,18 @@ The above example is equivalent to
 
    >>> from epics import PV
    >>> p1 = PV('xxx.VAL')
-   >>> print p1.get()
+   >>> print(p1.get())
    1.00
    >>> p1.put(value = 2.00)
 
 To get a string representation of the value, you can use either
 
-   >>> print p1.get(as_string=True)
+   >>> print(p1.get(as_string=True))
    '1.000'
 
 or, equivalently
 
-   >>> print p1.char_value
+   >>> print(p1.char_value)
    '1.000'
 
 Requests including Metadata
@@ -879,8 +879,8 @@ Example of using info and more properties examples
 A PV has many attributes.  This can be seen from its *info* paragraph:
 
 >>> import epics
->>> p = epics.PV('13IDA:m3')
->>> print p.info
+>>> p = epics.get_pv('13IDA:m3')
+>>> print(p.info)
 == 13IDA:m3  (native_double) ==
    value      = 0.2
    char_value = '0.200'
@@ -909,9 +909,9 @@ The individual attributes can also be accessed as below.  Many of these
 <ctrlvars_table>`) will not be filled in until either the :attr:`info`
 attribute is accessed or until :meth:`get_ctrlvars` is called.
 
->>>  print p.type
+>>>  print(p.type)
 double
->>> print p.units, p.precision, p.lower_disp_limit
+>>> print(p.units, p.precision, p.lower_disp_limit)
 mm 3 -14.5060658455
 
 
@@ -958,23 +958,9 @@ it would be inconvenient (and possibly inefficient) to have to continually
 ask if a PVs value has changed.  Instead, it is better to set a *callback*
 function: a function to be run when the value has changed.
 
-A simple example of this would be::
+A simple example of this would be:
 
-    import epics
-    import time
-    def onChanges(pvname=None, value=None, char_value=None, **kw):
-        print 'PV Changed! ', pvname, char_value, time.ctime()
-
-
-    mypv = epics.PV(pvname)
-    mypv.add_callback(onChanges)
-
-    print 'Now wait for changes'
-
-    t0 = time.time()
-    while time.time() - t0 < 60.0:
-        time.sleep(1.e-3)
-    print 'Done.'
+.. literalinclude:: examples/pv_added_callback.py
 
 This first defines a *callback function* called `onChanges()` and then
 simply waits for changes to happen.  Note that the callback function should
@@ -986,25 +972,29 @@ Example of connection callback
 
 A connection callback:
 
-.. literalinclude:: ../tests/UnsortedTests/pv_connection_callback.py
+.. literalinclude:: examples/pv_connection_callback.py
+
 
 Example of an access rights callback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Associating an access rights callback with a PV::
+Associating an access rights callback with a PV:
 
-    import epics
-    import time
+.. literalinclude:: examples/pv_access_callback.py
 
-    def access_rights_callback(read_access, write_access, pv=None):
-        print "%s - read=%s, write=%s" % (pv.pvname, read_access, write_access)
 
-    # should immediately see the message upon connection
-    apv = epics.PV('pvname', access_callback=access_rights_callback)
 
-    try:
-        start = time.time()
-        while (time.time() - start) < 30:
-            time.sleep(0.25)
-    except KeyboardInterrupt:
-        pass
+Example of a property callback
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Callbacks can be set up to receive events not only when a PVs value changes,
+but also when certain of the PVs properties such as units or limits change.
+To get such callbacks, subscribe with `auto_monitor` set to both Value and
+Property changes, as with:
+
+.. literalinclude:: examples/pv_property_callback.py
+
+note that in this example `form='ctrl'` is used.  If the default form of 'time'
+(or 'native') had been used, the callback would be called when the property
+changed, but the value of that property (or even which property changed) would
+not be included in the callback arguments.

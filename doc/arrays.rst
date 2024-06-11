@@ -46,11 +46,11 @@ For example::
 
     >>> import epics
     >>> p = epics.PV('Py:double2k')
-    >>> print p
+    >>> print(p)
     <PV 'Py:double2k', count=2048/2048, type=double, access=read/write>
     >>> import numpy
     >>> p.put(numpy.arange(10)/5.0)
-    >>> print p.get()
+    >>> print(p.get())
     array([ 0. ,  0.2,  0.4,  0.6,  0.8,  1. ,  1.2,  1.4,  1.6,  1.8])
 
 To be clear, the :meth:`pv.put` above could be done in a separate process
@@ -82,15 +82,15 @@ Then you can use this record with:
     >>> import epics
     >>> pvname = 'PREFIX:filename.VAL'
     >>> pv  = epics.PV(pvname)
-    >>> print pv.info
+    >>> print(pv.info)
     ....
     >>> plain_val = pv.get()
-    >>> print plain_val
+    >>> print(plain_val)
     array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 101, 114,  92,  77,
          97, 114,  99, 104,  50,  48,  49,  48,  92,  70,  97, 115, 116,
          77,  97, 112])
     >>> char_val = pv.get(as_string=True)
-    >>> print char_val
+    >>> print(char_val)
     'T:\\xas_user\\March2010\\FastMap'
 
 This example uses :meth:`pv.get` but :meth:`epics.ca.get` is essentially
