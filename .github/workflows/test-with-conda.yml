@@ -1,10 +1,6 @@
 name: Test with Conda, Py3.8 to 3.12
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push]
 
 jobs:
   build:
@@ -30,7 +26,7 @@ jobs:
     - name: Install conda and dependencies
       run: |
         conda install numpy pip setuptools pyparsing pytest pytest-cov coverage
-        conda update -n base -c defaults conda gcc
+        conda update -n base -c defaults conda
         conda install -y -c conda-forge epics-base
         conda info
         conda list
