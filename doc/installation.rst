@@ -5,31 +5,31 @@ Downloading and Installation
 Prerequisites
 ~~~~~~~~~~~~~~~
 
-PyEpics works with Python version 3.7 and higher.  At this writing,
-automated testing is done with versions 3.7, 3.8, 3.9, and 3.10,
-though no problems are expected if using Python 3.6  Pyepics version 3.4.3 was
-the final version to work with Python 2.7 or Python 3.5.
+PyEpics works with Python version 3.8 and higher.  At this writing,
+automated testing is done with versions 3.8 through 3.12,
+PyEpics may still work with Python 3.7 or even 3.6, but no testing or support
+is available for these.
 
-Pyepics is supported and regularly used on 64-bit Linux, 64-bit Mac OSX,
-and 64-bit Windows.  It is known to work on Linux with ARM processors
-including raspberry Pi. As of this writing, automated testing is done only
-for Linux64.  Pyepics may still work on 32-bit Windows and Linux, but these
-systems are not tested regularly.
+Pyepics is supported and regularly used on 64-bit Linux, 64-bit Windows, 64-bit
+Mac OSX with both Intel and Arm processors.  PyEpics should also work on Linux
+with ARM processors including raspberry Pi and may still work on 32-bit Windows
+and Linux, though these systems are not tested regularly. As of this writing,
+automated testing is done only for Linux64.
 
 The EPICS Channel Access library Version 3.14.12 or higher is required for
-pyepics, and versions 7.0.3 or higher are strongly recommended.  More
+pyepics, and versions 7.0.4 or higher are strongly recommended.  More
 specifically, pyepics requires the shared libraries *libca* and *libCom*
 (*libca.so* and *libCom.so* on Linux, *libca.dylib* and *libCom.dylib* on
 Mac OSX, or *ca.dll* and *Com.dll* on Windows) from *Epics Base*.
 
-For Linux64, Linux32, LinuxArm, Windows64, Windows32, and Darwin64 (MacOS),
-pre-built versions of *libca* (and *libCom*) built with 3.16.2 or 7.0.4 are
-provided (details of how these were built are in the `clibs` folder of the
-source kit), and will be installed into the python packages directory and
-used by default.  This means that you do not need to install Epics base
-libraries or any other packages to use pyepics.  For Epics experts who may
-want to use their own versions the *libca* from Epics base, instructions
-for how to do this are given below.
+For Linux64, Linux32, LinuxArm, Windows64, Windows32, Darwin64 (MacOS) on
+x86-64, and Darwin64 (MacOS) on arm64, pre-built versions of *libca* (and
+*libCom*) are provided and will be installed into the python packages directory
+and used by default. This means that you do not need to install Epics base
+libraries or any other packages to use pyepics.  These libraries have been
+built with 3.16.2 or 7.0.7 - further details are given in the `clibs` folder of
+the source kit.  For Epics experts who may want to use their own versions the
+*libca* from Epics base, instructions for how to do this are given below.
 
 The Python `numpy <https://numpy.org/>`_ module is highly recommended. and will
 be used to automatically convert between EPICS waveforms and numpy arrays if
@@ -57,7 +57,7 @@ provide the latest versions, but the version on `PyPI` should be considered
 the reference version.  You can also download the source package, unpack
 it, and install with::
 
-     python setup.py install
+     pip install .
 
 
 Getting Started, Setting up the Epics Environment
@@ -86,21 +86,20 @@ find out which CA library will be used by pyepics, use:
 
 which will print out the full path of the CA dynamic library that will be used.
 
-With the Epics CA library loaded, you will need to be able to connect to
-Epics Process Variables. Generally, these variables are provided by Epics
-I/O controllers (IOCs) that are processes running on some device on the
-network.  If you are connecting to PVs provided by IOCs on your local
-subnet, you should have no trouble.  If trying to reach IOCs outside of
-your immediate subnet, you may need to set the environmental variable
-``EPICS_CA_ADDR_LIST`` to specify which networks to search for PVs.
+With the Epics CA library loaded, you will need to be able to connect to Epics
+Process Variables. Generally, these variables are provided by Epics I/O
+controllers (IOCs) that are processes running on some device on the network.
+If you are connecting to PVs provided by IOCs on your local subnet, you should
+have no trouble.  If trying to reach IOCs outside of your immediate subnet, you
+may need to set the environmental variable ``EPICS_CA_ADDR_LIST`` to specify
+which networks to search for PVs.
 
 
 Testing
 ~~~~~~~~~~~~~
 
-Automated and continuous unit-testing is done with the Github actions, for
-Python 3.7. 3.8, 3.9, and 3.10.0-beta.1.  This uses an ubuntu-linux
-enviroment.
+Automated testing of PyEpics is done with the Github actions, for Python 3.8,
+3.9, 3.10, 3.11, and 3.12.  This uses an ubuntu-linux environment.
 
 To run these tests yourself, you will need the `pytest` python module. You
 will also need to run an Epics softIOC as a separate process, and a
