@@ -1,56 +1,53 @@
-name: Test with Conda, Py3.7 to 3.11
+name: Test with Conda, Py3.8 to 3.12
 
-on:
-  push:
-  pull_request:
+on: [push]
 
 jobs:
-  build-linux:
-    if: >
-      github.event_name == 'push'
-      || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork)
+  build:
+
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 5
       fail-fast: false
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
+    - uses: actions/checkout@v4
+    - name: Set up miniconda Python ${{ matrix.python-version }}
+      uses: conda-incubator/setup-miniconda@v2.2.0
       with:
+        miniconda-version: latest
+        mamba-version: "*"
+        channels: conda-forge,defaults
+        channel-priority: true
+        activate-environment: anaconda-client-env
         python-version: ${{ matrix.python-version }}
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-    - name: Install conda and dependencies
+    - name: Install conda packages for dependencies
       run: |
         conda install numpy pip setuptools pyparsing pytest pytest-cov coverage
         conda update -n base -c defaults conda
-        conda install -y -c conda-forge epics-base
+        conda install -y -c conda-forge epics-base gcc_linux-64 tar autoconf wget
         conda info
         conda list
+    - name: download and install procServ
+      run: |
+        wget https://millenia.cars.aps.anl.gov/software/xspress3/sources/procServ-2.8.0.tar.gz
+        tar xf procServ-2.8.0.tar.gz
+        cd procServ-2.8.0 && sh ./configure && make -j2
+        cp procServ $CONDA/epics/bin/linux-x86_64/.
     - name: Install pyepics
       run: |
         python -m pip install --upgrade pip
         python -m pip install ".[all]"
-    - name: install and run procserv
+
+    - name: Run test suite
       run: |
-        wget https://millenia.cars.aps.anl.gov/software/xspress3/sources/procServ-2.8.0.tar.gz
-        tar xf procServ-2.8.0.tar.gz
-        cd procServ-2.8.0 && sh ./configure && make -j2 && cp procServ $CONDA/bin/.
-   - name: Run test suite
-      run: |
-        python -m pip install psutil
         cd tests/Setup
         export EPICS_CA_ADDR_LIST=localhost
         export EPICS_CA_AUTO_ADDR_LIST=NO
         export EPICS_CA_MAX_ARRAY_BYTES=20100300
         export EPICS_HOST_ARCH=linux-x86_64
-        printenv
-        bash start_ioc.sh &
+        export PATH=$CONDA/epics/bin/$EPICS_HOST_ARCH:$PATH
+        bash start_ioc.sh
         sleep 2
         python simulator.py &
         sleep 2
@@ -71,4 +68,5 @@ jobs:
         coverage run --source=epics --append --timid  -m pytest test_pv_typeconversion.py
         coverage run --source=epics --append --timid  -m pytest test_pv_disconnect.py
         coverage report -m --omit "wxlib*,wxutils*,ogl*,motor*,mca*,ad*,struck*,transform*,scan*,scal*,xspress*"
-        bash <(curl -s https://codecov.io/bash)
+    - name: upload coverage report to codecov
+      uses: codecov/codecov-action@v2
