@@ -34,8 +34,11 @@ jobs:
       run: |
         wget https://millenia.cars.aps.anl.gov/software/xspress3/sources/procServ-2.8.0.tar.gz
         tar xf procServ-2.8.0.tar.gz
-        cd procServ-2.8.0 && sh ./configure && make -j2 && cp procServ $CONDA/bin/.
-
+        cd procServ-2.8.0 && sh ./configure && make -j2
+        cp procServ $CONDA/epics/bin/linux-x86_64/.
+        echo '>>> ' $CONDA
+        echo '>>> ls after procServ build"
+        ls -latr $CONDA/epics/bin/linux-x86_64/
     - name: Install pyepics
       run: |
         python -m pip install --upgrade pip
