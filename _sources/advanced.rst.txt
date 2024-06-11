@@ -80,7 +80,7 @@ Strategies for connecting to a large number of PVs
 
 Occasionally, you may find that you need to quickly connect to a large
 number of PVs, say to write values to disk.  The most straightforward way
-to do this, say::
+to do this might be::
 
     import epics
 
@@ -88,30 +88,32 @@ to do this, say::
     pv_vals = {}
     for name in pvnamelist:
         pv = epics.PV(name)
-	pv_vals[name] = pv.get()
+        pv_vals[name] = pv.get()
 
 or even just::
 
     values = [epics.caget(name) for name in pvnamelist]
 
 
-does incur some performance penalty. To minimize the penalty, we need to
-understand its cause.
+Though convenient, this does incur some performance penalty that you may
+sometimes wish to avoid. To minimize the penalty, we need to understand its
+cause.
 
-Creating a `PV` object (using any of :class:`pv.PV`, or :func:`pv.get_pv`,
-or :func:`epics.caget`) will automatically use connection and event
-callbacks in an attempt to keep the `PV` alive and up-to-date during the
-seesion.  Normally, this is an advantage, as you don't need to explicitly
-deal with many aspects of Channel Access.  But creating a `PV` does request
-some network traffic, and the `PV` will not be "fully connected" and ready
-to do a :meth:`PV.get` until all the connection and event callbacks are
-established.  In fact, :meth:`PV.get` will not run until those connections
-are all established.  This takes very close to 30 milliseconds for each PV.
-That is, for 1000 PVs, the above approach will take about 30 seconds.
+Creating a `PV` object (using any of :class:`pv.PV`, or :func:`pv.get_pv`, or
+:func:`epics.caget`) will automatically use connection and event callbacks in
+an attempt to keep the `PV` alive and up-to-date during the seesion.  This is
+usually an advantage, as you don't need to explicitly deal with many aspects of
+Channel Access.  But creating a `PV` does request some network traffic, and the
+`PV` will not be "fully connected" and ready to do a :meth:`PV.get` until all
+the connection and event callbacks are established.  In fact, :meth:`PV.get`
+will not run until those connections are all established.  For any individual
+PV, this takes very close to 30 milliseconds for each PV.  That is, for 1000
+PVs, the above approach will take about 30 seconds.
 
-The simplest remedy is to allow all those connections to happen in parallel
-and in the background by first creating all the PVs and then getting their
-values.  That would look like::
+But that time to wait for PV connections does not need to be done one at a time
+and in series.  The simplest way to speed up the above task would allow all
+those connections to happen in parallel and in the background by first creating
+all the PVs and then getting their values.  That would look like::
 
     # improve time to get multiple PVs:  Method 1
     import epics
@@ -124,10 +126,10 @@ Though it doesn't look that different, this improves performance by a
 factor of 100, so that getting 1000 PV values will take around 0.4 seconds.
 
 Can it be improved further?  The answer is Yes, but at a price.  For the
-discussion here, we'll can the original version "Method 0" and the method
-of creating all the PVs then getting their values "Method 1".  With both of
-these approaches, the script has fully connected PV objects for all PVs
-named, so that subsequent use of these PVs will be very efficient.
+discussion here, we'll call the original version "Method 0" and the method of
+creating all the PVs then getting their values "Method 1".  With both of these
+approaches, the script has fully connected PV objects for all PVs named, so
+that subsequent use of these PVs will be very efficient.
 
 But this can be made even faster by turning off any connection or event
 callbacks, avoiding `PV` objects altogether, and using the `epics.ca`
@@ -154,7 +156,7 @@ complete version of this looks like this::
     # create, don't connect or create callbacks
     for name in pvnamelist:
         chid = ca.create_channel(name, connect=False, auto_cb=False) # note 1
-	pvchids.append(chid)
+        pvchids.append(chid)
 
     # connect
     for chid in pvchids:
@@ -204,7 +206,7 @@ a minute, then Method 1 will actually be faster.  That is doing
     pvnamelist = read_list_pvs()
     for i in range(10):
         values = epics.caget_many(pvlist)
-	time.sleep(0.01)
+        time.sleep(0.01)
 
 will take around considerably *longer* than creating the PVs once and
 getting their values in a loop with::
@@ -216,7 +218,7 @@ getting their values in a loop with::
     pvs = [epics.PV(name) for name in pvnamelist]
     for i in range(10):
         values = [p.get() for p in pvs]
-	time.sleep(0.01)
+        time.sleep(0.01)
 
 In tests with 1000 PVs, looping with :func:`epics.caget_many` took about
 1.5 seconds, while the version looping over :meth:`PV.get()` took about 0.5
@@ -383,7 +385,7 @@ they change.  Two threads are created and run concurrently, with
 overlapping PV lists, though one thread is run for a shorter time than the
 other.
 
-.. literalinclude:: ../tests/test_threading.py
+.. literalinclude:: examples/test_threading.py
 
 In light of the long discussion above, a few remarks are in order: This
 code uses the standard Thread library and explicitly calls
@@ -473,8 +475,7 @@ each process (even if they point to the same PV).
 
 A simple example of using multiprocessing successfully is given:
 
-
-.. literalinclude:: ../tests/test_multiprocessing.py
+.. literalinclude:: examples/test_multiprocessing.py
 
 here, the main process and the subprocess can each interact with the same
 PV, though they need to create a separate connection (here, using :class:`PV`)

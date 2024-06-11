@@ -9,7 +9,7 @@
     <title>ca: Low-level Channel Access module &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=52b624fa"></script>
+    <script src="_static/documentation_options.js?v=f6cea0e3"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -594,7 +594,8 @@ when needed in most cases.</p>
 </dl>
 <p class="rubric">Notes</p>
 <ol class="arabic simple">
-<li><p>If <em>timeout</em> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, the value of <a class="reference internal" href="#epics.ca.DEFAULT_CONNECTION_TIMEOUT" title="epics.ca.DEFAULT_CONNECTION_TIMEOUT"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEFAULT_CONNECTION_TIMEOUT</span></code></a> is used (defaults to 2.0 seconds).</p></li>
+<li><p>If <em>timeout</em> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, the value of <a class="reference internal" href="#epics.ca.DEFAULT_CONNECTION_TIMEOUT" title="epics.ca.DEFAULT_CONNECTION_TIMEOUT"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEFAULT_CONNECTION_TIMEOUT</span></code></a>
+is used (defaults to 2.0 seconds).</p></li>
 </ol>
 <p>2. Normally, channels will connect in milliseconds, and the connection
 callback will succeed on the first attempt.</p>
@@ -708,6 +709,17 @@ returned the listing instead of having it printed out.</p>
 detaches from the CA context.  This is important when doing
 multiprocessing (and is done internally by CAProcess),
 but can be useful to fully reset a Channel Access session.</p>
+<p>Any class <cite>PV</cite> created prior this call without using <cite>get_pv()</cite>
+have to be disconnected (use <cite>PV.disconnect()</cite>) explicitly
+because disconnection clears subscriptions to events of
+Epics CA connection which are to be cleared here.
+No instance of the class <cite>PV</cite> created prior this call should be
+used after because underlaying Epics CA connections are cleared here.
+Failing to follow these rules may cause your application to experience
+a random SIGSEGV from inside Epics binaries.</p>
+<p>Use <cite>register_clear_cache()</cite> to register a function which will be
+called before Epics CA connections are cleared.</p>
+<p>This function is not thread safe.</p>
 </dd></dl>
 
 </section>
@@ -1615,9 +1627,9 @@ of channels is handled in the background:</p>
 <span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="n">count</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">element_count</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
 <span class="n">ftype</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">field_type</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
-<span class="nb">print</span> <span class="s2">&quot;Channel &quot;</span><span class="p">,</span> <span class="n">chid</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">ftype</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Channel &quot;</span><span class="p">,</span> <span class="n">chid</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">ftype</span><span class="p">)</span>
 <span class="n">value</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="nb">print</span> <span class="n">value</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -1676,13 +1688,13 @@ initial connection:</p>
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="k">def</span> <span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="nb">print</span> <span class="s1">&#39;ca connection status changed:  &#39;</span><span class="p">,</span> <span class="n">pvname</span><span class="p">,</span>  <span class="n">conn</span><span class="p">,</span> <span class="n">chid</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ca connection status changed:  </span><span class="si">{</span><span class="n">pvname</span><span class="si">}</span><span class="s1">,  </span><span class="si">{</span><span class="n">conn</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">chid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="c1"># create channel, provide connection callback</span>
 <span class="n">motor1</span> <span class="o">=</span> <span class="s1">&#39;13IDC:m1&#39;</span>
 <span class="n">chid</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="n">motor1</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onConnectionChange</span><span class="p">)</span>
 
-<span class="nb">print</span> <span class="s1">&#39;Now waiting, watching values and connection changes:&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Now waiting, watching values and connection changes:&#39;</span><span class="p">)</span>
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
@@ -1703,7 +1715,7 @@ called immediately after successful installation:</p>
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="k">def</span> <span class="nf">on_access_rights_change</span><span class="p">(</span><span class="n">read_access</span><span class="p">,</span> <span class="n">write_access</span><span class="p">):</span>
-    <span class="nb">print</span> <span class="s1">&#39;read access = </span><span class="si">%s</span><span class="s1">, write access = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">read_access</span><span class="p">,</span> <span class="n">write_access</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;read access=</span><span class="si">{</span><span class="n">read_access</span><span class="si">}</span><span class="s1">, write access=</span><span class="si">{</span><span class="n">write_access</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="c1"># create a channel and attach the above function for access rights events</span>
 <span class="n">chid</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s1">&#39;pv_name&#39;</span><span class="p">)</span>
@@ -1761,7 +1773,7 @@ called immediately after successful installation:</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
   </body>
 </html>

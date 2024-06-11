@@ -9,7 +9,7 @@
     <title>Working with waveform / array data &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=52b624fa"></script>
+    <script src="_static/documentation_options.js?v=f6cea0e3"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -145,11 +145,11 @@ its maximum length, monitors on that PV may receive only the changed data.
 For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;Py:double2k&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">p</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 <span class="go">&lt;PV &#39;Py:double2k&#39;, count=2048/2048, type=double, access=read/write&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">/</span><span class="mf">5.0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
 <span class="go">array([ 0. ,  0.2,  0.4,  0.6,  0.8,  1. ,  1.2,  1.4,  1.6,  1.8])</span>
 </pre></div>
 </div>
@@ -178,15 +178,15 @@ optional <em>as_string=True</em> to <a class="reference internal" href="ca.html#
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pvname</span> <span class="o">=</span> <span class="s1">&#39;PREFIX:filename.VAL&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pv</span>  <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="n">pvname</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">pv</span><span class="o">.</span><span class="n">info</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
 <span class="go">....</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plain_val</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">plain_val</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">plain_val</span><span class="p">)</span>
 <span class="go">array([ 84,  58,  92, 120,  97, 115,  95, 117, 115, 101, 114,  92,  77,</span>
 <span class="go">     97, 114,  99, 104,  50,  48,  49,  48,  92,  70,  97, 115, 116,</span>
 <span class="go">     77,  97, 112])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">char_val</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">as_string</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">char_val</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">char_val</span><span class="p">)</span>
 <span class="go">&#39;T:\\xas_user\\March2010\\FastMap&#39;</span>
 </pre></div>
 </div>
@@ -310,7 +310,7 @@ Area Detectors is included  at <a class="reference external" href="https://githu
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
   </body>
 </html>

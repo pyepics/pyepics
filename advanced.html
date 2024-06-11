@@ -9,7 +9,7 @@
     <title>Advanced Topic with Python Channel Access &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=52b624fa"></script>
+    <script src="_static/documentation_options.js?v=f6cea0e3"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -169,7 +169,7 @@ received faster than that, the <em>get</em> will return as soon as it can.</p>
 <span id="advanced-connecting-many-label"></span><h2>Strategies for connecting to a large number of PVs<a class="headerlink" href="#strategies-for-connecting-to-a-large-number-of-pvs" title="Link to this heading">¶</a></h2>
 <p>Occasionally, you may find that you need to quickly connect to a large
 number of PVs, say to write values to disk.  The most straightforward way
-to do this, say:</p>
+to do this might be:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
 
 <span class="n">pvnamelist</span> <span class="o">=</span> <span class="n">read_list_pvs</span><span class="p">()</span>
@@ -183,21 +183,23 @@ to do this, say:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">epics</span><span class="o">.</span><span class="n">caget</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">pvnamelist</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>does incur some performance penalty. To minimize the penalty, we need to
-understand its cause.</p>
-<p>Creating a <cite>PV</cite> object (using any of <a class="reference internal" href="pv.html#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">pv.PV</span></code></a>, or <a class="reference internal" href="pv.html#pv.get_pv" title="pv.get_pv"><code class="xref py py-func docutils literal notranslate"><span class="pre">pv.get_pv()</span></code></a>,
-or <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>) will automatically use connection and event
-callbacks in an attempt to keep the <cite>PV</cite> alive and up-to-date during the
-seesion.  Normally, this is an advantage, as you don’t need to explicitly
-deal with many aspects of Channel Access.  But creating a <cite>PV</cite> does request
-some network traffic, and the <cite>PV</cite> will not be “fully connected” and ready
-to do a <code class="xref py py-meth docutils literal notranslate"><span class="pre">PV.get()</span></code> until all the connection and event callbacks are
-established.  In fact, <code class="xref py py-meth docutils literal notranslate"><span class="pre">PV.get()</span></code> will not run until those connections
-are all established.  This takes very close to 30 milliseconds for each PV.
-That is, for 1000 PVs, the above approach will take about 30 seconds.</p>
-<p>The simplest remedy is to allow all those connections to happen in parallel
-and in the background by first creating all the PVs and then getting their
-values.  That would look like:</p>
+<p>Though convenient, this does incur some performance penalty that you may
+sometimes wish to avoid. To minimize the penalty, we need to understand its
+cause.</p>
+<p>Creating a <cite>PV</cite> object (using any of <a class="reference internal" href="pv.html#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">pv.PV</span></code></a>, or <a class="reference internal" href="pv.html#pv.get_pv" title="pv.get_pv"><code class="xref py py-func docutils literal notranslate"><span class="pre">pv.get_pv()</span></code></a>, or
+<a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>) will automatically use connection and event callbacks in
+an attempt to keep the <cite>PV</cite> alive and up-to-date during the seesion.  This is
+usually an advantage, as you don’t need to explicitly deal with many aspects of
+Channel Access.  But creating a <cite>PV</cite> does request some network traffic, and the
+<cite>PV</cite> will not be “fully connected” and ready to do a <code class="xref py py-meth docutils literal notranslate"><span class="pre">PV.get()</span></code> until all
+the connection and event callbacks are established.  In fact, <code class="xref py py-meth docutils literal notranslate"><span class="pre">PV.get()</span></code>
+will not run until those connections are all established.  For any individual
+PV, this takes very close to 30 milliseconds for each PV.  That is, for 1000
+PVs, the above approach will take about 30 seconds.</p>
+<p>But that time to wait for PV connections does not need to be done one at a time
+and in series.  The simplest way to speed up the above task would allow all
+those connections to happen in parallel and in the background by first creating
+all the PVs and then getting their values.  That would look like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># improve time to get multiple PVs:  Method 1</span>
 <span class="kn">import</span> <span class="nn">epics</span>
 
@@ -209,10 +211,10 @@ values.  That would look like:</p>
 <p>Though it doesn’t look that different, this improves performance by a
 factor of 100, so that getting 1000 PV values will take around 0.4 seconds.</p>
 <p>Can it be improved further?  The answer is Yes, but at a price.  For the
-discussion here, we’ll can the original version “Method 0” and the method
-of creating all the PVs then getting their values “Method 1”.  With both of
-these approaches, the script has fully connected PV objects for all PVs
-named, so that subsequent use of these PVs will be very efficient.</p>
+discussion here, we’ll call the original version “Method 0” and the method of
+creating all the PVs then getting their values “Method 1”.  With both of these
+approaches, the script has fully connected PV objects for all PVs named, so
+that subsequent use of these PVs will be very efficient.</p>
 <p>But this can be made even faster by turning off any connection or event
 callbacks, avoiding <cite>PV</cite> objects altogether, and using the <cite>epics.ca</cite>
 interface.  This has been encapsulated into <a class="reference internal" href="overview.html#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.caget_many()</span></code></a> which
@@ -679,7 +681,7 @@ been done on using multiprocessing Managers.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
   </body>
 </html>

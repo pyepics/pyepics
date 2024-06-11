@@ -20,10 +20,10 @@ Epics Record as it can actually hold PVs from several different records.::
     motor1 = epics.Device('XXX:motor1.', attrs=('VAL', 'RBV', 'DESC', 'RVAL',
                                                'LVIO', 'HLS', 'LLS'))
     motor1.put('VAL', 1)
-    print 'Motor %s = %f' % ( motor1.get('DESC'), motor1.get('RBV'))
+    print(f"Motor {motor1.get('DESC')} = {motor1.get('RBV')}")
 
     motor1.VAL = 0
-    print 'Motor %s = %f' % ( motor1.DESC, motor1.RBV )
+    print(f'Motor {motor1.DESC} = {motor1.RBV}')
 
 While useful on its own like this, the real point of a *device* is as a
 base class, to be inherited and extended.  In fact, there is a more
@@ -74,8 +74,8 @@ In general, PV names will be mapped as prefix+delim+attr.  See
     import epics
     m1 = epics.Device('XXX:m1', delim='.')
     m1.add_pv('XXX:m2.VAL', attr='other')
-    print m1.VAL     # print value of XXX:m1.VAL
-    print m1.other   # prints value of XXX:m2.VAL
+    print(m1.VAL)     # print value of XXX:m1.VAL
+    print(m1.other)   # prints value of XXX:m2.VAL
 
 
 .. method:: save_state()
@@ -124,15 +124,15 @@ A simple example use would be::
     import epics
     m1 = epics.Motor('XXX:m1')
 
-    print 'Motor:  ', m1.DESC , ' Currently at ', m1.RBV
+    print(f'Motor: {m1.DESC} Currently at {m1.RBV}')
 
     m1.tweak_val = 0.10
     m1.move(0.0, dial=True, wait=True)
 
     for i in range(10):
         m1.tweak(direction='forward', wait=True)
-	time.sleep(1.0)
-        print 'Motor:  ', m1.DESC , ' Currently at ', m1.RBV
+        time.sleep(1.0)
+        print(f'Motor: {m1.DESC} Currently at {m1.RBV}')
 
 Which will step the motor through a set of positions.    You'll notice a
 few features for Motor:
@@ -162,9 +162,9 @@ Once created, a Motor should be ready to use.
 
       >>> from epics import Motor
       >>> m = Motor('XX:m1')
-      >>> print m.drive, m.description, m.slew_speed
+      >>> print(m.drive, m.description, m.slew_speed)
       1.030 Fine X 5.0
-      >>> print m.get('device_type', as_string=True)
+      >>> print(m.get('device_type', as_string=True))
       'asynMotor'
 
 
@@ -289,9 +289,9 @@ Note that :meth:`get` can return the string value, while fetching the
 attribute cannot do so::
 
     >>> m = epics.Motor('XXX:m1')
-    >>> print m.device_type
+    >>> print(m.device_type)
     0
-    >>> print m.get('device_type', as_string=True)
+    >>> print(m.get('device_type', as_string=True))
     'asynMotor'
 
 .. method:: put(attr, value[, wait=False[, timeout=30]])
@@ -456,7 +456,7 @@ no requirement to share a common prefix in such a collection of PVs::
     p2 = dev.PV('13IDC:m2.VAL')
     dev.put('13IDC:m1.VAL', 2.8)
     dev.put('13IDC:m2.VAL', 3.0)
-    print dev.PV('13IDC:m3.DIR').get(as_string=True)
+    print(dev.PV('13IDC:m3.DIR').get(as_string=True))
 
 Note that this device cannot use the attributes based on field names.
 
@@ -484,8 +484,8 @@ be used simply and cleanly as::
 
     from epics.devices import ai
     This_ai = ai('XXX.PRES')
-    print 'Value: ', This_ai.VAL
-    print 'Units: ', This_ai.EGU
+    print(f'Value: {This_ai.VAL}')
+    print(f'Units: {This_ai.EGU}')
 
 Of course, you can also use the :meth:`get`, :meth:`put` methods above for a
 basic :class:`Device`::
@@ -516,9 +516,9 @@ directly invoking epics calls::
    s1.enableCalcs()
    s1.OneShotMode()
    s1.Count(t=5.0, wait=True)
-   print 'Names:       ', s1.getNames()
-   print 'Raw  values: ', s1.Read(use_calc=False)
-   print 'Calc values: ', s1.Read(use_calc=True)
+   print(f'Names:    {s1.getNames()}')
+   print(f'Raw  values: {s1.Read(use_calc=False)}')
+   print(f'Calc values: {s1.Read(use_calc=True)}')
 
 
 Other Devices included in PyEpics
