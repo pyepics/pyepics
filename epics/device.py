@@ -5,13 +5,12 @@
 """
 basic device object defined
 """
+import time
+from .utils import IOENCODING
 from .ca import poll
 from .pv  import get_pv
-import time
-from epics.utils import IOENCODING
 
-
-class Device(object):
+class Device:
     """A simple collection of related PVs, sharing a common prefix
     string for their names, but having many 'attributes'.
 
@@ -27,8 +26,8 @@ class Device(object):
       >>> dev.put('OFF',0 )
       >>> dev.put('VAL', 0.25)
       >>> dev.get('RBV')
-      >>> print dev.FOFF
-      >>> print dev.get('FOFF', as_string=True)
+      >>> print(dev.FOFF)
+      >>> print(dev.get('FOFF', as_string=True))
 
     This will put a 0 to XX:m1.OFF, a 0.25 to XX:m1.VAL, and then
     get XX:m1.RBV and XX.m1.FOFF.
@@ -36,8 +35,8 @@ class Device(object):
     Note access to the underlying PVs can either be with get()/put()
     methods or with attributes derived from the Attribute (Suffix) for
     that PV.  Thus
-      >>> print dev.FOFF
-      >>> print dev.get('FOFF')
+      >>> print(dev.FOFF)
+      >>> print(dev.get('FOFF'))
 
     are equivalent, as are:
       >>> dev.VAL = 1
@@ -62,7 +61,7 @@ class Device(object):
       >>> struck = epics.Device('13IDC:str:',
       ...                       attrs=('ChannelAdvance',
       ...                              'EraseStart','StopAll'))
-      >>> print struck.PV('ChannelAdvance').char_value
+      >>> print(struck.PV('ChannelAdvance').char_value)
       'External'
 
     The prefix is optional, and when left off, this class can
@@ -76,15 +75,15 @@ class Device(object):
       >>> x = MyClass()
       >>> pv_m1 = x.PV('13IDC:m1.VAL')
       >>> x.put('13IDC:m3.VAL', 2)
-      >>> print x.PV('13IDC:m3.DIR').get(as_string=True)
+      >>> print(x.PV('13IDC:m3.DIR').get(as_string=True))
 
     Attribute aliases can also be used to be make the device
     more user-friendly:
 
       >>> dev = epics.Device('IOC:m1', delim='.',
       ...                    aliases={'readback': 'RBV'})
-      >>> print 'rbv is', dev.RBV  # IOC:m1.RBV
-      >>> print 'readback is', dev.readback  # also IOC:m1.RBV
+      >>> print('rbv is', dev.RBV)  # IOC:m1.RBV
+      >>> print('readback is', dev.readback)  # also IOC:m1.RBV
 
     If you encounter issues with introspection (with IPython,
     for example), and your device has a well-defined list of
@@ -94,7 +93,7 @@ class Device(object):
 
       >>> dev = epics.Device('IOC:m1', delim='.', mutable=False,
       ...                    aliases={'readback': 'RBV'})
-      >>> print dev.foobar
+      >>> print(dev.foobar)
       Traceback (most recent call last):
           ...
       AttributeError: Device has no attribute foobar
@@ -146,7 +145,7 @@ class Device(object):
         if attr not in self._pvs:
             pvname = attr
             if self._prefix is not None:
-                pvname = "%s%s" % (self._prefix, attr)
+                pvname = f"{self._prefix}{attr}"
             self._pvs[attr] = get_pv(pvname, **kw)
         if connect and not self._pvs[attr].connected:
             self._pvs[attr].wait_for_connection()
@@ -211,19 +210,23 @@ class Device(object):
         """write save state  to external file.
         If state is not provided, the current state is used
 
-        Note that this only writes data for PVs with write-access, and count=1 (except CHAR """
+        Note that this only writes data for PVs with write-access,
+        and count=1 (except CHAR)"""
         if state is None:
             state = self.save_state()
-        out = ["#Device Saved State for %s, prefx='%s': %s\n" % (self.__class__.__name__,
-                                                                 self._prefix, time.ctime())]
+        parts = [f"{self.__class__.__name__}",
+                 f"prefix='{self._prefix}'",
+                 f"time={time.ctime()}"]
+        out = [f"#Device Saved State for {','.join(parts)}"]
         for key in sorted(state.keys()):
             if (key in self._pvs and
                 'write' in self._pvs[key].access and
                 (1 == self._pvs[key].count or
                  'char' == self._pvs[key].type)):
-                out.append("%s  %s\n" % (key, state[key]))
+                out.append(f"{key} {state[key]}")
+        out.append('')
         fout = open(fname, 'w', encoding=IOENCODING)
-        fout.writelines(out)
+        fout.writelines('\n'.join(out))
         fout.close()
 
 
@@ -281,8 +284,7 @@ class Device(object):
             if pv.connected:
                 return pv.get()
 
-        raise AttributeError('%s has no attribute %s' % (self.__class__.__name__,
-                                                         attr))
+        raise AttributeError(f'{self.__class__.__name__} has no attribute {attr}')
 
     def __setattr__(self, attr, val):
         if attr in self._aliases:
@@ -297,13 +299,12 @@ class Device(object):
                 self.PV(attr)
                 self.put(attr, val)
             except:
-                raise AttributeError('%s has no attribute %s' % (self.__class__.__name__,
-                                                                 attr))
+                raise AttributeError(f'{self.__class__.__name__} has no attribute {attr}')
+
         elif attr in self.__dict__:
             self.__dict__[attr] = val
         elif self._init:
-            raise AttributeError('%s has no attribute %s' % (self.__class__.__name__,
-                                                             attr))
+            raise AttributeError(f'{self.__class__.__name__} has no attribute {attr}')
 
     def __dir__(self):
         # there's no cleaner method to do this until Python 3.3
@@ -317,7 +318,7 @@ class Device(object):
         pref = self._prefix
         if pref.endswith('.'):
             pref = pref[:-1]
-        return "<Device '%s' %d attributes>" % (pref, len(self._pvs))
+        return f"<Device '{pref}' len(self._pvs) attributes>")
 
 
     def pv_property(attr, as_string=False, wait=False, timeout=10.0):

@@ -10,11 +10,11 @@
 #       API Change, fuller inttegration with epics.Device,
 #       much simpler interface
 #              m = Motor('XXX:m1')
-#              print m.get_field('drive')  # mapped to .VAL
+#              print(m.get_field('drive'))  # mapped to .VAL
 #       becomes
 #              m = Motor('XXX:m1')
-#              print m.VAL
-#              print m.drive     # now an alias to 'VAL'
+#              print(m.VAL)
+#              print(m.drive)     # now an alias to 'VAL'
 #
 #   Jun 14, 2010  MN
 #       migrated more fully to pyepics3, using epics.Device
@@ -280,7 +280,6 @@ class Motor(device.Device):
             return self._pvs[attr]
 
     def __setattr__(self, attr, val):
-        # print 'SET ATTR ', attr, val
         if attr in ('name', '_prefix', '_pvs', '_delim', '_init',
                     '_alias', '_nonpvs', '_extra', '_callbacks'):
             self.__dict__[attr] = val
@@ -632,7 +631,6 @@ class Motor(device.Device):
             if value is None:
                 value = 'Not Connected??'
             value = value + ' '*(18-min(18, len(value)))
-            # print " %s  %s  %s" % (label, value, pvname)
             add(" %s  %s  %s" % (label, value, pvname))
 
         ca.write("\n".join(out))

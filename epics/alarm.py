@@ -10,7 +10,7 @@ import time
 import operator
 from . import pv
 
-class Alarm(object):
+class Alarm:
     """ alarm class for a PV:
     run a user-supplied callback when a PV's value goes out of range
 
@@ -117,9 +117,11 @@ class Alarm(object):
         self.check_alarm()
 
     def __repr__(self):
-        return "<Alarm '%s', comp=%s, trip_point=%s >" % (self.pv.pvname,
-                                                          self.comp_name,
-                                                          self.trip_point)
+        parts = [f"pvname='{self.pv.pvname}'",
+                 f"comp='{self.comp_name}'",
+                 f"'trip_point={self.trip_point}"]
+        return f"<Alarm {','.join(parts)}>"
+
     def reset(self):
         "resets the alarm state"
         self.last_alert = 0

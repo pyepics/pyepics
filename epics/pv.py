@@ -11,14 +11,9 @@ import copy
 import functools
 import warnings
 from math import log10
-
+from types import SimpleNamespace
 from . import ca
 from . import dbr
-
-try:
-    from types import SimpleNamespace as Namespace
-except ImportError:
-    from argparse import Namespace
 
 _PVcache_ = {}
 
@@ -641,7 +636,7 @@ class PV():
             metad['value'] = val
 
         if as_namespace:
-            return Namespace(**metad)
+            return SimpleNamespace(**metad)
         return metad
 
     @_ensure_context

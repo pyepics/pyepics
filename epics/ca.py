@@ -38,8 +38,8 @@ except ImportError:
 
 from .utils import (str2bytes, bytes2str, strjoin, IOENCODING,
                     clib_search_path)
-
 from . import dbr
+
 
 # ignore warning about item size...
 warnings.filterwarnings('ignore', 'Item size computed from the PEP 3118*',
@@ -443,7 +443,7 @@ def finalize_libca(maxtime=10.0):
             flush_count += 1
         context_destroy()
         libca = _LIBCA_FINALIZED
-    except:
+    except Exception:
         pass
     time.sleep(0.01)
 
@@ -910,7 +910,8 @@ def replace_printf_handler(fcn=None):
 def current_context():
     "return the current context"
     ctx = libca.ca_current_context()
-    if isinstance(ctx, ctypes.c_long): ctx = ctx.value
+    if isinstance(ctx, ctypes.c_long):
+        ctx = ctx.value
     return ctx
 
 @withCA
@@ -1295,11 +1296,11 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
 
     # Grab the native-data-type data
     try:
-        extended_data, data = data
+        _, data = data
     except (TypeError, IndexError):
         return None
     except ValueError:
-        extended_data = None
+        pass
 
     if count == 0 or count is None:
         count = len(data)
@@ -1992,7 +1993,7 @@ def sg_get(gid, chid, ftype=None, as_numpy=True, as_string=True):
     >>> sg = epics.ca.sg_create()
     >>> data = epics.ca.sg_get(sg, chid)
     >>> epics.ca.sg_block(sg)
-    >>> print epics.ca._unpack(data, chid=chid)
+    >>> print(epics.ca._unpack(data, chid=chid))
 
     """
     if not isinstance(chid, dbr.chid_t):
