@@ -7,21 +7,21 @@ To install the epics module, use
 
 Or download the source kit from PyPI or Github, unpack that, and use
 
-   python setup.py install
+   pip install .
 
-PyEpics requires Python 3.6 or higher.  
+PyEpics requires Python 3.8 or higher.
 
 
 Epics CA Shared Libraries, and using alternate versions of these
 =====================================================================
 
-Pyepics needs to find and load shared object libraries (DLLs) for Epics
-Channel Access (libca and libCom) at runtime.  Recently-compiled versions of
-these shared object libraries are included with this distribution for
-Windows64, MacOS, Linux64, and LinuxArm and will be installed into the
-pyepics installation folder and used by default.  These are located under the
-epics/clibs folder of the source folder.  Legacy DLLs for 32-bit Windows and
-Linux are also included, but should be used with caution.
+Pyepics needs to find and load shared object libraries (DLLs) for Epics Channel
+Access (libca and libCom) at runtime.  Recently-compiled versions of these
+shared object libraries are included with this distribution for Windows64,
+MacOS (both x86_64 and arm64), Linux64, and LinuxArm and will be installed into
+the pyepics installation folder and used by default.  These are located under
+the epics/clibs folder of the source folder.  Legacy DLLs for 32-bit Windows
+and Linux are also included, but should be used with caution.
 
 By providing and using these shared libraries, pyepics will work "out of the
 box" on most OSes and systems without any other Epics libraries installed.
@@ -42,10 +42,10 @@ before any real Channel Access is done -- this can be set after importing the
 pyepics module.   So, for example, you could do
 
 
-    >>> import pyepics
+    >>> import epics
     >>> import os
     >>> os.environ['PYEPCICS_LIBCA']='/usr/local/epics/base-7.0.4/lib/linux-x86_64/libca.so'
-    >>> print( epics.caget('XXX:m1'))
+    >>> print(epics.caget('XXX:m1'))
     -0.2500
 
 You can also test which exact 'libca' was used.  For the example above
@@ -58,4 +58,4 @@ whereas by default this will point to something like
 
 
 Matt Newville <newville@cars.uchicago.edu>
-Last Update:  2021-05-22
+Last Update:  2024-June-12

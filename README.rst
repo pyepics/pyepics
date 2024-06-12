@@ -6,7 +6,7 @@ PyEpics:  Epics Channel Access for Python
 
 .. image:: https://codecov.io/gh/pyepics/pyepics/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/pyepics/pyepics
-	    
+
 .. image:: https://img.shields.io/pypi/v/pyepics.svg
    :target: https://pypi.org/project/pyepics
 
@@ -30,9 +30,10 @@ thread-safety, and easier installation on multiple platforms.
 Installation
 ===========
 
-This package requires python3.6 or higher.  The EPICS Channel Access
-library v 3.14.8 or higher is also required. Shared libraries are provided
-and will be installed for Windows, MacOS, and Linux, and used by default.
+This package is supported on Python 3.8 and higher.  Shared libraries needed
+for Epics Channel Access are provided for for Windows, MacOS, and Linux, and
+used by default. If you wish to use your own versions of the CA shared
+libraries, that can be controlled with an environmental variable.
 
 To install the package, use::
 
@@ -42,7 +43,7 @@ To install from source, download the source kit for the latest release from
 PyPI (https://pypi.org/project/pyepics/) or Github
 (https://github.com/pyepics/pyepics/releases), unpack that and use::
 
-    python setup.py install
+    pip install .
 
 
 For additional installation details, see the INSTALL file. Binary installers
@@ -115,7 +116,7 @@ Python PV object, which provides a natural way to interact with EPICS.
    3.14
    >>> pv.put(2.71)
 
-   
+
 Channel Access features that are included here:
 
 * user callbacks - user-supplied Python function(s) that are run when a PV's
@@ -133,4 +134,4 @@ Features that you won't have to worry about:
 
 
 Matt Newville <newville@cars.uchicago.edu>
-Last Update:  18-May-2021
+Last Update:  2024-June-12
