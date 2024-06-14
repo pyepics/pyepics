@@ -14,3 +14,8 @@ and then
    install_name_tool -id libComPYEPICS.dylib  libComPYEPICS.dylib
    install_name_tool -add_rpath . libca.dylib
    install_name_tool -change <FULLPATH_TO_BUILD_OF_EPICS/lib/darwin-aarch64/libCom.3.22.0.dylib  @loader_path/./libComPYEPICS.dylib libca.dylib
+
+
+> shasum libca.dylib libComPYEPICS.dylib
+7e9534ebac3db7ebd2c13b73d0aec655f6271e69  libca.dylib
+8e1ebf9ebf863d36112e0271b64f7a265357c787  libComPYEPICS.dylib
