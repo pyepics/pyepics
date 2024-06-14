@@ -263,7 +263,7 @@ class _CacheItem:
                 callback(pvname=self.pvname, chid=chid_int, conn=self.conn)
 
 
-def _find_lib(inp_lib_name):
+def find_lib(inp_lib_name='ca'):
     """
     find location of ca dynamic library
     """
@@ -330,10 +330,11 @@ def _find_lib(inp_lib_name):
 
 
 def find_libca():
-    return _find_lib('ca')
+    return str(find_lib('ca'))
 
 def find_libCom():
-    return _find_lib('Com')
+    libname = 'Com' if os.name == 'nt' else 'ComPYEPICS'
+    return str(find_lib(libname))
 
 def initialize_libca():
     """Initialize the Channel Access library.
