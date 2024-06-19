@@ -28,18 +28,9 @@ jobs:
       run: |
         mamba install -y -c conda-forge python=${{ matrix.python-version }} numpy pip setuptools
         mamba install -y -c conda-forge epics-base gcc_linux-64 tar autoconf wget
-    - name: show status and environment
-      run: |
-        which python
-        which pip
-        echo $CONDA
-        python -VV
-        $CONDA/bin/python -VV
         printenv
-        ls $CONDA_PREFIX
-        ls $CONDA_PREFIX/epics
-        ls $CONDA_PREFIX/epics/bin
-        ls $CONDA_PREFIX/epics/bin/linux-x86_64
+        which python
+        python -VV
     - name: download and install procServ
       run: |
         wget https://millenia.cars.aps.anl.gov/software/xspress3/sources/procServ-2.8.0.tar.gz
@@ -48,13 +39,9 @@ jobs:
         cp procServ $CONDA_PREFIX/epics/bin/linux-x86_64/.
     - name: Install pyepics
       run: |
-        which python
-        python -VV
-        $CONDA/bin/python -VV
         python -m pip install setuptools pyparsing pytest pytest-cov coverage codecov
         python -m pip install --upgrade pip
         python -m pip install ".[all]"
-        python -VV
     - name: Run test suite
       run: |
         cd tests/Setup
@@ -62,7 +49,7 @@ jobs:
         export EPICS_CA_AUTO_ADDR_LIST=NO
         export EPICS_CA_MAX_ARRAY_BYTES=20100300
         export EPICS_HOST_ARCH=linux-x86_64
-        export PATH=$CONDA/epics/bin/$EPICS_HOST_ARCH:$PATH
+        export PATH=$CONDA_PREFIX/epics/bin/$EPICS_HOST_ARCH:$PATH
         bash start_ioc.sh
         sleep 2
         python simulator.py &
