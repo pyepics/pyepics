@@ -23,10 +23,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install conda packages for dependencies
       run: |
-        conda install python=${{ matrix.python-version }} numpy pip setuptools epics-base gcc_linux-64 tar autoconf wget
-        conda update -n base -c defaults conda
-        conda info
-        conda list
+        mamba install python=${{ matrix.python-version }} numpy pip setuptools epics-base gcc_linux-64 tar autoconf wget
+        mamba info
+        mamba list
+        which python
     - name: download and install procServ
       run: |
         wget https://millenia.cars.aps.anl.gov/software/xspress3/sources/procServ-2.8.0.tar.gz
@@ -35,6 +35,8 @@ jobs:
         cp procServ $CONDA/epics/bin/linux-x86_64/.
     - name: Install pyepics
       run: |
+        which python
+        python -VV
         python -m pip install setuptools pyparsing pytest pytest-cov coverage codecov
         python -m pip install --upgrade pip
         python -m pip install ".[all]"
