@@ -29,6 +29,7 @@ jobs:
         conda install -y -c conda-forge python=${{ matrix.python-version }} numpy pip setuptools
         conda install -y -c conda-forge epics-base gcc_linux-64 tar autoconf wget
     - name: show status and environment
+      run: |
         conda init
         conda activate base
         conda list
