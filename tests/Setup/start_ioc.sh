@@ -12,10 +12,10 @@ export EPICS_CA_MAX_ARRAY_BYTES=20100300
 export EPICS_HOST_ARCH=linux-x86_64
 
 if [ -z ${EPICS_BASE+x} ] ; then
-    if [ -z ${CONDA+x} ] ; then
+    if [ -z ${CONDA_PREFIX+x} ] ; then
         EPICS_BASE=/usr/local/epics/base
     else
-        EPICS_BASE=$CONDA/epics
+        EPICS_BASE=$CONDA_PREFIX/epics
     fi
 fi
 
