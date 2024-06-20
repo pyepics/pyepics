@@ -33,10 +33,10 @@ thread-safety, and easier installation on multiple platforms.
 Installation
 ===========
 
-This package is supported and tested with Python 3.8 through 3.12.    Shared libraries
-needed for Epics Channel Access are provided for for Windows, MacOS, and Linux,
-and used by default. If you wish to use your own versions of the CA shared
-libraries, that can be controlled with an environmental variable.
+This package is supported and tested with Python 3.8 through 3.12.  Shared
+libraries needed for Epics Channel Access are provided for Windows, MacOS,
+and Linux, and used by default. If you wish to use your own versions of the CA
+shared libraries, that can be controlled with an environmental variable.
 
 To install the package, use::
 
