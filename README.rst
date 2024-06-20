@@ -4,6 +4,9 @@ PyEpics:  Epics Channel Access for Python
 .. image:: https://github.com/pyepics/pyepics/actions/workflows/test-with-conda.yml/badge.svg
    :target: https://github.com/pyepics/pyepics/actions/workflows/test-with-conda.yml/
 
+.. image:: https://github.com/pyepics/pyepics/actions/workflows/test-python38.yml/badge.svg
+   :target: https://github.com/pyepics/pyepics/actions/workflows/test-python38.yml/
+
 .. image:: https://codecov.io/gh/pyepics/pyepics/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/pyepics/pyepics
 
@@ -30,9 +33,9 @@ thread-safety, and easier installation on multiple platforms.
 Installation
 ===========
 
-This package is supported on Python 3.8 and higher.  Shared libraries needed
-for Epics Channel Access are provided for for Windows, MacOS, and Linux, and
-used by default. If you wish to use your own versions of the CA shared
+This package is supported and tested with Python 3.8 through 3.12.    Shared libraries
+needed for Epics Channel Access are provided for for Windows, MacOS, and Linux,
+and used by default. If you wish to use your own versions of the CA shared
 libraries, that can be controlled with an environmental variable.
 
 To install the package, use::
@@ -134,4 +137,4 @@ Features that you won't have to worry about:
 
 
 Matt Newville <newville@cars.uchicago.edu>
-Last Update:  2024-June-12
+Last Update:  2024-June-20
