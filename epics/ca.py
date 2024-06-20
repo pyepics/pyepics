@@ -27,7 +27,11 @@ import warnings
 from copy import deepcopy
 from collections import defaultdict
 from math import log10
-from importlib import resources
+
+try: # importlib.resources does not yet have files on python 3.8
+    from importlib.resources import files as importlib_resources_files
+except ImportError:
+    from importlib_resources import files as importlib_resources_files
 
 HAS_NUMPY = False
 try:
@@ -280,7 +284,7 @@ def find_lib(inp_lib_name='ca'):
         return dllpath
 
     # Test 2: look in installed python location for dll
-    dllpath = resources.files('epics.clibs') / clib_search_path(inp_lib_name)
+    dllpath = importlib_resources_files('epics.clibs') / clib_search_path(inp_lib_name)
 
     if (os.path.exists(dllpath) and os.path.isfile(dllpath)):
         return dllpath
