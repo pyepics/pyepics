@@ -185,8 +185,8 @@ class MotorDetailPanel(ScrolledPanel):
         twk_val = PVFloatCtrl(twk_panel, size=(110, -1), precision=prec)
         twk_val.SetPV(self.motor.PV('TWV'))
 
-        twk_left = wx.Button(twk_panel, label='<',  size=(30, 30))
-        twk_right = wx.Button(twk_panel, label='>',  size=(30, 30))
+        twk_left = wx.Button(twk_panel, label='<',  size=(35, 30))
+        twk_right = wx.Button(twk_panel, label='>',  size=(35, 30))
         twk_left.Bind(wx.EVT_BUTTON,  self.OnLeftButton)
         twk_right.Bind(wx.EVT_BUTTON, self.OnRightButton)
         twk_sizer.AddMany([(twk_left,   0, CEN),

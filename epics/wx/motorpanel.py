@@ -160,8 +160,8 @@ class MotorPanel(wx.Panel):
             self.__twkbox.Bind(wx.EVT_COMBOBOX,    self.OnTweakBoxComboEvent)
             self.__twkbox.Bind(wx.EVT_TEXT_ENTER,  self.OnTweakBoxEnterEvent)
 
-            self.twr = PVButton(self, label='<',  size=(30, 30))
-            self.twf = PVButton(self, label='>',  size=(30, 30))
+            self.twr = PVButton(self, label='<',  size=(35, 30))
+            self.twf = PVButton(self, label='>',  size=(35, 30))
 
             self.stopbtn = add_button(self, label=' Stop ', action=self.OnStopButton)
             self.morebtn = add_button(self, label=' More ', action=self.OnMoreButton)
