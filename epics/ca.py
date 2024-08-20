@@ -751,7 +751,6 @@ def _onMonitorEvent(args):
         kwds.update(**_unpack_metadata(ftype=args.type, dbr_value=value[0]))
     except IndexError:
         pass
-
     value = _unpack(args.chid, value, count=args.count, ftype=args.type)
     if callable(args.usr):
         args.usr(value=value, **kwds)
@@ -1260,7 +1259,7 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
         whether to convert to numpy array.
     """
 
-    def scan_string(data, count):
+    def scan_string(data, count, elem_count):
         """ Scan a string, or an array of strings as a list, depending on content """
         out = []
         for elem in range(min(count, len(data))):
@@ -1268,7 +1267,7 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
             if '\x00' in this:
                 this = this[:this.index('\x00')]
             out.append(this)
-        if len(out) == 1:
+        if len(out) == 1 and elem_count==1:
             out = out[0]
         return out
 
@@ -1294,7 +1293,7 @@ def _unpack(chid, data, count=None, ftype=None, as_numpy=True):
         if count == 1 and ntype != dbr.STRING:
             return data[0]
         if ntype == dbr.STRING:
-            return scan_string(data, count)
+            return scan_string(data, count, elem_count)
         if count != 1:
             return array_cast(data, count, ntype, use_numpy)
         return data
