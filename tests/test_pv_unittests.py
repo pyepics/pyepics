@@ -306,16 +306,12 @@ def test_string_waveform_lengths():
     readback = spv.get()
     nelm = spv.nelm
     with no_simulator_updates():
-        n = 0
-        for count in (nelm, nelm-2, nelm//3, 11, 8, 5, 3, 2, 1):
-            n += 5*count
-            dat = [f"str_{i+n}" for i in range(count)]
+        for count in (nelm, nelm-5, nelm//3, 11, 5, 1, 3, 7, 2, 1):
+            dat = [f"str_{count}_{i}" for i in range(count)]
             spv.put(dat)
-
             time.sleep(0.1)
             readback = spv.get()
             assert all(readback == dat)
-            #            print(count, dat, readback)
 
 
 def test_subarrays():
