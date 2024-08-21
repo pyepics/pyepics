@@ -120,9 +120,9 @@ while True:
 
     t0 = time.time()
     if pause_pv.get() == 1:
-        # pause for up to 120 seconds if pause was selected
+        # pause for up to 300 seconds if pause was selected
         t0 = time.time()
-        while time.time()-t0 < 120:
+        while time.time()-t0 < 300:
             time.sleep(SLEEP_TIME)
             if pause_pv.get() == 0:
                 break

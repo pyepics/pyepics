@@ -6,7 +6,7 @@ import time
 import numpy
 import threading
 import pytest
-
+from random import random
 from contextlib import contextmanager
 from epics import PV, get_pv, caput, caget, caget_many, caput_many, ca
 
@@ -267,7 +267,7 @@ def test_put_string_waveform_single_element():
         pv.put(put_value, wait=True)
         time.sleep(0.05)
         get_value = pv.get(use_monitor=False, as_numpy=False)
-        assert put_value[0] == get_value
+        assert put_value == get_value
 
 def test_put_string_waveform_mixed_types():
     write('String Array: put mixed types\n')
@@ -298,6 +298,21 @@ def test_put_string_waveform_zero_length_strings():
         time.sleep(0.05)
         get_value = pv.get(use_monitor=False, as_numpy=False)
         numpy.testing.assert_array_equal(get_value, put_value)
+
+
+def test_string_waveform_lengths():
+    "test string arrays with length=1 and other lengths"
+    spv = get_pv(pvnames.string_arr_pv)
+    readback = spv.get()
+    nelm = spv.nelm
+    with no_simulator_updates():
+        for count in (nelm, nelm-5, nelm//3, 11, 5, 1, 3, 7, 2, 1):
+            dat = [f"str_{count}_{i}" for i in range(count)]
+            spv.put(dat)
+            time.sleep(0.1)
+            readback = spv.get()
+            assert all(readback == dat)
+
 
 def test_subarrays():
     write("Subarray test:  dynamic length arrays\n")
