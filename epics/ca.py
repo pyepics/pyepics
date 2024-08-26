@@ -62,12 +62,16 @@ def write(msg, newline=True, flush=True):
 ## holder for shared library
 libca = None
 initial_context = None
-error_message = ''
+ca_printf = ''
 
 ## PREEMPTIVE_CALLBACK determines the CA context
 PREEMPTIVE_CALLBACK = True
 
 AUTO_CLEANUP = True
+
+# set this to control whether messages from CA
+# (about caRepeater or lost connections) are disabled at startup
+WITH_CA_MESSAGES = False
 
 # A sentinel to mark libca as going through the shutdown process
 _LIBCA_FINALIZED = object()
@@ -356,14 +360,12 @@ def initialize_libca():
     libca : object
         ca library object, used for all subsequent ca calls
 
-
-
     Notes
     -----
-    This function must be called prior to any real CA calls.
+    1. This function must be called prior to any real CA calls.
+    2. This function will disable messages from CA.
 
     See the `withCA`  decorator to ensure CA is initialized
-
     """
     if 'EPICS_CA_MAX_ARRAY_BYTES' not in os.environ:
         os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = "%d" %  2**24
@@ -408,6 +410,10 @@ def initialize_libca():
     dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
 
     initial_context = current_context()
+
+    if not WITH_CA_MESSAGES:
+        disable_ca_messages()
+
     if AUTO_CLEANUP:
         atexit.register(finalize_libca)
     return libca
@@ -901,14 +907,70 @@ def detach_context():
     return libca.ca_detach_context()
 
 @withCA
-def replace_printf_handler(fcn=None):
-    """replace the normal printf() output handler
-    with the supplied function (defaults to :func:`sys.stderr.write`)"""
-    global error_message
-    if fcn is None:
-        fcn = sys.stderr.write
-    error_message = ctypes.CFUNCTYPE(None, ctypes.c_char_p)(fcn)
-    return libca.ca_replace_printf_handler(error_message)
+def replace_printf_handler(writer=None):
+    """replace the normal printf() output handler with
+    the supplied writer function
+
+    Parameters
+    ----------
+    writer:  callable or None [default]
+         function to use for handling messages
+
+    Notes
+    -----
+    1. `writer=None` will suppress all CA messages.
+    2. `writer` should have a signature of `writer(*args)`,
+       as `sys.stderr.write` and `sys.stdout.write` do.
+    3. Due to limitations in ctypes, this will not work as well
+       as expected. Once disabled, re-enabling ca_messages will
+       receive only the first string argument, not the list of
+       strings to be formatted.
+    """
+    global ca_printf
+    def swallow(*args):  pass
+    if writer is None:
+        writer = swallow
+    if not callable(writer):
+        msg = "argument to replace_printf_handler() must be callable"
+        raise ChannelAccessException(msg)
+
+    def m_handler(*args):
+        writer(*[bytes2str(a) for a in args])
+
+    ca_printf = ctypes.CFUNCTYPE(None, ctypes.c_char_p,)(m_handler)
+    return libca.ca_replace_printf_handler(ca_printf)
+
+@withCA
+def disable_ca_messages():
+    """disable messages rom CA: `replace_printf_handler(None)`
+    """
+    replace_printf_handler(None)
+
+@withCA
+def enable_ca_messages(writer='stderr'):
+    """enable messages from CA using the supplier writer
+
+    Parameters
+    ----------
+    writer:   callable, `stderr`, `stdout`, or `None`
+         function to use for handling messages
+
+    Notes
+    -----
+    1. `writer=None` will suppress all CA messages.
+    2. `writer` should have a signature of `writer(*args)`,
+       as `sys.stderr.write` and `sys.stdout.write` do,
+       though only the first value will actually be use.
+    3. Due to limitations in ctypes, this will not work as well
+       as expected. Once disabled, re-enabling ca_messages will
+       receive only the first string argument, not the list of
+       strings to be formatted.
+    """
+    if writer == 'stderr':
+        writer = sys.stderr.write
+    elif writer == 'stdout':
+        writer = sys.stdout.write
+    replace_printf_handler(writer)
 
 @withCA
 def current_context():
