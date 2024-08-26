@@ -43,6 +43,41 @@ Similar name *un-mangling* also happens with the DBR prefixes for
 constants, held here in the `dbr` module.  Thus, the C constant DBR_STRING
 becomes dbr.STRING in Python.
 
+..  _ca-messages-label:
+
+Supressing Messages from libCA
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 3.5.7
+
+When using `pyepics` or any CA client, messages from libCA are sometimes seen
+to be written to a Terminal screen.  These might be messages about like::
+
+    failed to start executable - "caRepeater"
+
+or `Virtual Circuit Disconnect`  messages if an Epics IOC goes down or
+offline.  These messages are mostly informational and harmless.   But they are
+also fairly annoying.
+
+Starting with version 3.5.7, these messages are disabled by default.   You can
+re-enable these by setting::
+
+   from epics import ca
+   ca.WITH_CA_MESSAGES = True
+
+
+before initializing CA (say, creating any PVs or Channels).
+
+You can also run the functions :func:`disable_ca_messages()` or
+:func:`enable_ca_messages()` at runtime.  However, due to limitaions in Python
+ctypes modules, re-enabling messages once disabled does not fully work: The
+messages from CA will often including multiple values that should be formatted
+as with C's `printf` function.  But, when re-enabled, only the first formatting
+string will be received through the ctypes interface.
+
+Setting `ca.WITH_CA_MESSAGES` before CA is initialized will correctly receive
+the full messages.
+
 
 Other Changes and Omissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -134,6 +169,15 @@ initialization and finalization tasks are handled in the following way:
 
    :ref:`arrays-label` and :ref:`arrays-large-label` for more details.
 
+.. data:: WITH_CA_MESSAGES
+
+   whether to enable message from CA (default is `False`, set to `True` to
+   enable messages.
+
+   :ref:`ca-messages-label` for more details.
+
+
+
 Using the CA module
 ====================
 
@@ -170,17 +214,11 @@ threading contexts are very close to the C library:
 
 .. autofunction:: flush_io()
 
-.. autofunction:: replace_printf_handler(fcn=None)
+.. autofunction:: replace_printf_handler(writer=None)
 
-.. warning::
+.. autofunction:: disable_ca_messages()
 
-    `replace_printf_handler()` appears to not actually work.
-
-    We think this is due to a real limitation of Python's `ctypes` module
-    not supporting the mapping of C *va_list* function arguments to Python.
-    If you are interested in this or have ideas of how to fix it, please
-    let us know.
-
+.. autofunction:: enable_ca_messages(writer='stderr')
 
 
 Creating and Connecting to Channels

@@ -9,7 +9,7 @@
     <title>ca: Low-level Channel Access module &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=aec73e5d"></script>
+    <script src="_static/documentation_options.js?v=0abfba44"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -24,7 +24,7 @@
   </font>
 </div>
 
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -54,7 +54,7 @@
       </ul>
     </div>
 
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
   <div>
     <h3><a href="index.html">Table of Contents</a></h3>
@@ -62,6 +62,7 @@
 <li><a class="reference internal" href="#">ca: Low-level Channel Access module</a><ul>
 <li><a class="reference internal" href="#general-description-difference-with-c-library">General description, difference with C library</a><ul>
 <li><a class="reference internal" href="#name-mangling">Name Mangling</a></li>
+<li><a class="reference internal" href="#supressing-messages-from-libca">Supressing Messages from libCA</a></li>
 <li><a class="reference internal" href="#other-changes-and-omissions">Other Changes and Omissions</a></li>
 </ul>
 </li>
@@ -69,6 +70,7 @@
 <li><a class="reference internal" href="#epics.ca.PREEMPTIVE_CALLBACK"><code class="docutils literal notranslate"><span class="pre">PREEMPTIVE_CALLBACK</span></code></a></li>
 <li><a class="reference internal" href="#epics.ca.DEFAULT_CONNECTION_TIMEOUT"><code class="docutils literal notranslate"><span class="pre">DEFAULT_CONNECTION_TIMEOUT</span></code></a></li>
 <li><a class="reference internal" href="#epics.ca.AUTOMONITOR_MAXLENGTH"><code class="docutils literal notranslate"><span class="pre">AUTOMONITOR_MAXLENGTH</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.WITH_CA_MESSAGES"><code class="docutils literal notranslate"><span class="pre">WITH_CA_MESSAGES</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#using-the-ca-module">Using the CA module</a><ul>
@@ -88,6 +90,8 @@
 <li><a class="reference internal" href="#epics.ca.message"><code class="docutils literal notranslate"><span class="pre">message()</span></code></a></li>
 <li><a class="reference internal" href="#epics.ca.flush_io"><code class="docutils literal notranslate"><span class="pre">flush_io()</span></code></a></li>
 <li><a class="reference internal" href="#epics.ca.replace_printf_handler"><code class="docutils literal notranslate"><span class="pre">replace_printf_handler()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.disable_ca_messages"><code class="docutils literal notranslate"><span class="pre">disable_ca_messages()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.enable_ca_messages"><code class="docutils literal notranslate"><span class="pre">enable_ca_messages()</span></code></a></li>
 <li><a class="reference internal" href="#creating-and-connecting-to-channels">Creating and Connecting to Channels</a><ul>
 <li><a class="reference internal" href="#epics.ca.create_channel"><code class="docutils literal notranslate"><span class="pre">create_channel()</span></code></a></li>
 <li><a class="reference internal" href="#epics.ca.connect_channel"><code class="docutils literal notranslate"><span class="pre">connect_channel()</span></code></a></li>
@@ -254,6 +258,35 @@ they are used.</p>
 constants, held here in the <cite>dbr</cite> module.  Thus, the C constant DBR_STRING
 becomes dbr.STRING in Python.</p>
 </section>
+<section id="supressing-messages-from-libca">
+<span id="ca-messages-label"></span><h3>Supressing Messages from libCA<a class="headerlink" href="#supressing-messages-from-libca" title="Link to this heading">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 3.5.7.</span></p>
+</div>
+<p>When using <cite>pyepics</cite> or any CA client, messages from libCA are sometimes seen
+to be written to a Terminal screen.  These might be messages about like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">failed</span> <span class="n">to</span> <span class="n">start</span> <span class="n">executable</span> <span class="o">-</span> <span class="s2">&quot;caRepeater&quot;</span>
+</pre></div>
+</div>
+<p>or <cite>Virtual Circuit Disconnect</cite>  messages if an Epics IOC goes down or
+offline.  These messages are mostly informational and harmless.   But they are
+also fairly annoying.</p>
+<p>Starting with version 3.5.7, these messages are disabled by default.   You can
+re-enable these by setting:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
+<span class="n">ca</span><span class="o">.</span><span class="n">WITH_CA_MESSAGES</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p>before initializing CA (say, creating any PVs or Channels).</p>
+<p>You can also run the functions <a class="reference internal" href="#epics.ca.disable_ca_messages" title="epics.ca.disable_ca_messages"><code class="xref py py-func docutils literal notranslate"><span class="pre">disable_ca_messages()</span></code></a> or
+<a class="reference internal" href="#epics.ca.enable_ca_messages" title="epics.ca.enable_ca_messages"><code class="xref py py-func docutils literal notranslate"><span class="pre">enable_ca_messages()</span></code></a> at runtime.  However, due to limitaions in Python
+ctypes modules, re-enabling messages once disabled does not fully work: The
+messages from CA will often including multiple values that should be formatted
+as with C’s <cite>printf</cite> function.  But, when re-enabled, only the first formatting
+string will be received through the ctypes interface.</p>
+<p>Setting <cite>ca.WITH_CA_MESSAGES</cite> before CA is initialized will correctly receive
+the full messages.</p>
+</section>
 <section id="other-changes-and-omissions">
 <h3>Other Changes and Omissions<a class="headerlink" href="#other-changes-and-omissions" title="Link to this heading">¶</a></h3>
 <p>Several function in the C version of the CA library are not implemented in
@@ -341,6 +374,14 @@ monitored.</p>
 <p><a class="reference internal" href="arrays.html#arrays-label"><span class="std std-ref">Working with waveform / array data</span></a> and <a class="reference internal" href="arrays.html#arrays-large-label"><span class="std std-ref">Strategies for working with large arrays</span></a> for more details.</p>
 </dd></dl>
 
+<dl class="py data">
+<dt class="sig sig-object py" id="epics.ca.WITH_CA_MESSAGES">
+<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">WITH_CA_MESSAGES</span></span><a class="headerlink" href="#epics.ca.WITH_CA_MESSAGES" title="Link to this definition">¶</a></dt>
+<dd><p>whether to enable message from CA (default is <cite>False</cite>, set to <cite>True</cite> to
+enable messages.</p>
+<p><a class="reference internal" href="#ca-messages-label"><span class="std std-ref">Supressing Messages from libCA</span></a> for more details.</p>
+</dd></dl>
+
 </section>
 <section id="using-the-ca-module">
 <h2>Using the CA module<a class="headerlink" href="#using-the-ca-module" title="Link to this heading">¶</a></h2>
@@ -369,7 +410,10 @@ you should not need to call this directly from most real programs.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>This function must be called prior to any real CA calls.</p>
+<ol class="arabic simple">
+<li><p>This function must be called prior to any real CA calls.</p></li>
+<li><p>This function will disable messages from CA.</p></li>
+</ol>
 <p>See the <cite>withCA</cite>  decorator to ensure CA is initialized</p>
 </dd></dl>
 
@@ -489,19 +533,60 @@ Currently, this should report ‘4.13’</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.ca.replace_printf_handler">
-<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">replace_printf_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fcn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.replace_printf_handler" title="Link to this definition">¶</a></dt>
-<dd><p>replace the normal printf() output handler
-with the supplied function (defaults to <code class="xref py py-func docutils literal notranslate"><span class="pre">sys.stderr.write()</span></code>)</p>
+<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">replace_printf_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.replace_printf_handler" title="Link to this definition">¶</a></dt>
+<dd><p>replace the normal printf() output handler with
+the supplied writer function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>writer:  callable or None [default]</strong></dt><dd><p>function to use for handling messages</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ol class="arabic simple">
+<li><p><cite>writer=None</cite> will suppress all CA messages.</p></li>
+<li><p><cite>writer</cite> should have a signature of <cite>writer(*args)</cite>,
+as <cite>sys.stderr.write</cite> and <cite>sys.stdout.write</cite> do.</p></li>
+<li><p>Due to limitations in ctypes, this will not work as well
+as expected. Once disabled, re-enabling ca_messages will
+receive only the first string argument, not the list of
+strings to be formatted.</p></li>
+</ol>
 </dd></dl>
 
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p><cite>replace_printf_handler()</cite> appears to not actually work.</p>
-<p>We think this is due to a real limitation of Python’s <cite>ctypes</cite> module
-not supporting the mapping of C <em>va_list</em> function arguments to Python.
-If you are interested in this or have ideas of how to fix it, please
-let us know.</p>
-</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="epics.ca.disable_ca_messages">
+<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">disable_ca_messages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.disable_ca_messages" title="Link to this definition">¶</a></dt>
+<dd><p>disable messages rom CA: <cite>replace_printf_handler(None)</cite></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="epics.ca.enable_ca_messages">
+<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">enable_ca_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stderr'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.enable_ca_messages" title="Link to this definition">¶</a></dt>
+<dd><p>enable messages from CA using the supplier writer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>writer:   callable, `stderr`, `stdout`, or `None`</strong></dt><dd><p>function to use for handling messages</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ol class="arabic simple">
+<li><p><cite>writer=None</cite> will suppress all CA messages.</p></li>
+<li><p><cite>writer</cite> should have a signature of <cite>writer(*args)</cite>,
+as <cite>sys.stderr.write</cite> and <cite>sys.stdout.write</cite> do,
+though only the first value will actually be use.</p></li>
+<li><p>Due to limitations in ctypes, this will not work as well
+as expected. Once disabled, re-enabling ca_messages will
+receive only the first string argument, not the list of
+strings to be formatted.</p></li>
+</ol>
+</dd></dl>
+
 <section id="creating-and-connecting-to-channels">
 <h3>Creating and Connecting to Channels<a class="headerlink" href="#creating-and-connecting-to-channels" title="Link to this heading">¶</a></h3>
 <p>The basic channel object is the Channel ID or <code class="docutils literal notranslate"><span class="pre">chid</span></code>.  With the CA
@@ -1742,7 +1827,7 @@ called immediately after successful installation:</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -1773,7 +1858,7 @@ called immediately after successful installation:</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.6.
     </div>
   </body>
 </html>
