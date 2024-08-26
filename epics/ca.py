@@ -69,6 +69,10 @@ PREEMPTIVE_CALLBACK = True
 
 AUTO_CLEANUP = True
 
+# set this to control whether messages from CA
+# (about caRepeater or lost connections) are disabled at startup
+WITH_CA_MESSAGES = False
+
 # A sentinel to mark libca as going through the shutdown process
 _LIBCA_FINALIZED = object()
 
@@ -356,14 +360,12 @@ def initialize_libca():
     libca : object
         ca library object, used for all subsequent ca calls
 
-
-
     Notes
     -----
-    This function must be called prior to any real CA calls.
+    1. This function must be called prior to any real CA calls.
+    2. This function will disable messages from CA.
 
     See the `withCA`  decorator to ensure CA is initialized
-
     """
     if 'EPICS_CA_MAX_ARRAY_BYTES' not in os.environ:
         os.environ['EPICS_CA_MAX_ARRAY_BYTES'] = "%d" %  2**24
@@ -408,6 +410,10 @@ def initialize_libca():
     dbr.value_offset = (39*ctypes.c_short).in_dll(libca,'dbr_value_offset')
 
     initial_context = current_context()
+
+    if not WITH_CA_MESSAGES:
+        disable_ca_messages()
+
     if AUTO_CLEANUP:
         atexit.register(finalize_libca)
     return libca
@@ -910,6 +916,18 @@ def replace_printf_handler(fcn=None):
         fcn = sys.stderr.write
     error_message = ctypes.CFUNCTYPE(None, ctypes.c_char_p)(fcn)
     return libca.ca_replace_printf_handler(error_message)
+
+@withCA
+def disable_ca_messages():
+    def no_ca_messages(*args):    pass
+    replace_printf_handler(no_ca_messages)
+
+@withCA
+def enable_ca_messages(out='stderr'):
+    """enable messages from CA (disabled by default)
+    """
+    fcn = sys.stdout.write if out == 'stdout' else sys.stderr.write
+    replace_printf_handler(fcn)
 
 @withCA
 def current_context():
