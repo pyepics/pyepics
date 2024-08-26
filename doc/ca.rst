@@ -43,6 +43,32 @@ Similar name *un-mangling* also happens with the DBR prefixes for
 constants, held here in the `dbr` module.  Thus, the C constant DBR_STRING
 becomes dbr.STRING in Python.
 
+..  _ca-messages-label:
+
+Supressing Messages from libCA
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 3.6.0
+
+When using `pyepics` or any CA client, messages from libCA are sometimes seen
+to be written to a Terminal screen.  These might be messages about like
+
+     failed to start executable - "caRepeater"
+
+or `Virtual Circuit Disconnect`  messages if an Epics IOC goes down or
+offline.  These messages are mostly informational and harmless.   But they are
+also fairly annoying.
+
+Starting with version 3.6.0, these messages are disabled by default.   You can
+re-enable these by setting
+
+   from epics import ca
+   ca.WITH_CA_MESSAGES = True
+
+ before initializing CA (say, creating any PVs or Channels).  You can also run
+ the functions :ref:`disable_ca_messages()` or   :ref:`enable_ca_messages()` at
+ runtime.
+
 
 Other Changes and Omissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -181,6 +207,9 @@ threading contexts are very close to the C library:
     If you are interested in this or have ideas of how to fix it, please
     let us know.
 
+.. autofunction:: disable_ca_messages()
+
+.. autofunction:: enable_ca_messages()
 
 
 Creating and Connecting to Channels
