@@ -912,15 +912,20 @@ def replace_printf_handler(writer=None):
     """replace the normal printf() output handler with
     the supplied writer function
 
-    Arguments
-    ---------
-    writer      callable or None [default]
+    Parameters
+    ----------
+    writer:  callable or None [default]
+         function to use for handling messages
 
     Notes
-    -------
+    -----
     1. `writer=None` will suppress all CA messages.
     2. `writer` should have a signature of `writer(*args)`,
        as `sys.stderr.write` and `sys.stdout.write` do.
+    3. Due to limitations in ctypes, this will not work as well
+       as expected. Once disabled, re-enabling ca_messages will
+       receive only the first string argument, not the list of
+       strings to be formatted.
     """
     global ca_printf
     def swallow(*args):  pass
@@ -933,13 +938,12 @@ def replace_printf_handler(writer=None):
     def m_handler(*args):
         writer(*[bytes2str(a) for a in args])
 
-    ca_printf = ctypes.CFUNCTYPE(None, ctypes.c_char_p)(m_handler)
+    ca_printf = ctypes.CFUNCTYPE(None, ctypes.c_char_p,)(m_handler)
     return libca.ca_replace_printf_handler(ca_printf)
 
 @withCA
 def disable_ca_messages():
-    """disable messages rom CA
-         `replace_printf_handler(None)`
+    """disable messages rom CA: `replace_printf_handler(None)`
     """
     replace_printf_handler(None)
 
@@ -947,14 +951,21 @@ def disable_ca_messages():
 def enable_ca_messages(writer='stderr'):
     """enable messages from CA using the supplier writer
 
-    Arguments
-    ---------
-    writer   callable, `stderr`, `stdout`, or `None`
+    Parameters
+    ----------
+    writer:   callable, `stderr`, `stdout`, or `None`
+         function to use for handling messages
 
+    Notes
+    -----
     1. `writer=None` will suppress all CA messages.
     2. `writer` should have a signature of `writer(*args)`,
-       as `sys.stderr.write` and `sys.stdout.write` do.
-
+       as `sys.stderr.write` and `sys.stdout.write` do,
+       though only the first value will actually be use.
+    3. Due to limitations in ctypes, this will not work as well
+       as expected. Once disabled, re-enabling ca_messages will
+       receive only the first string argument, not the list of
+       strings to be formatted.
     """
     if writer == 'stderr':
         writer = sys.stderr.write
