@@ -46,7 +46,8 @@ def restore_pvs(filepath, debug=False):
     # preload PV names and values, hoping PV connections happen in background
     with open(filepath, 'r', encoding=IOENCODING) as fh:
         for line in fh.readlines():
-            if len(line) < 2 or  line.startswith('<END') or line.startswith('#'):
+            if (len(line) < 2 or line.startswith('<END') or line.startswith('#')
+                or len(line[:-1].split(' ', 1))<2):
                 continue
             pvname, value = [w.strip() for w in line[:-1].split(' ', 1)]
             if value.startswith('@array@'):
@@ -160,7 +161,11 @@ def _parse_request_file(request_file, macro_values={}):
             subfile = n[1]
             subfile = os.path.normpath(os.path.join(os.path.dirname(request_file), subfile))
             sub_macro_vals = macro_values.copy()
-            sub_macro_vals.update(dict(n[2:]))
+
+            for m, v in n[2:]:
+                if v != '$({})'.format(m):
+                    #Allows propagation of macro values in the usual way
+                    sub_macro_vals[m] = v
             result += _parse_request_file(subfile, sub_macro_vals)
         else:
             raise Exception("Unexpected entry parsed from request file: %s" % n)
@@ -182,7 +187,7 @@ float_number = Combine( integer +
 
 # PV names according to app developer guide and tech-talk email thread at:
 # https://epics.anl.gov/tech-talk/2019/msg01429.php
-pv_name = Combine(Word(alphanums+'_-+:[]<>;{}')
+pv_name = Combine(Word(alphanums+'$()_-+:[]<>;{}')
                   + Optional(Combine('.') + Word(printables)))
 pv_value = (float_number | Word(printables))
 
