@@ -281,7 +281,7 @@ class PVCtrlMixin(PVMixin):
             if fg   is not None:
                 self.SetForegroundColour(fg)
             if bg   is not None:
-                self.SetBackgroundColour(fg)
+                self.SetBackgroundColour(bg)
         except:
             pass
         self._connect_bgcol = self.GetBackgroundColour()
