@@ -1039,7 +1039,6 @@ class PVButton(wx.Button, PVCtrlMixin):
             enableValue = False
         if self.pv is not None and (self.pv.get() == self.pushValue):
             enableValue = False
-        wx.Button.Enable(self, enableValue)
 
     @DelayedEpicsCallback
     def _disableEvent(self, **kw):
