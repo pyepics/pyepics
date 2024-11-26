@@ -527,8 +527,7 @@ class Motor(device.Device):
          """
 
         # Put the motor in "SET" mode
-        self.put('SET', 1)
-
+        self.put('SET', 1, wait=True)
         # determine which drive value to use
         drv = 'VAL'
         if dial:
@@ -536,7 +535,7 @@ class Motor(device.Device):
         elif step or raw:
             drv = 'RVAL'
 
-        self.put(drv, position)
+        self.put(drv, position, wait=True)
 
         # Put the motor back in "Use" mode
         self.put('SET', 0)
