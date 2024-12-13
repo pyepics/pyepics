@@ -886,9 +886,12 @@ class PV():
             aval = ('unknown',)
             try:
                 aval = [fmt.format(val=self._args['value'][i]) for i in elems]
+            except ValueError:
+                aval = [repr(self._args['value'][i]) for i in elems]
             except TypeError:
                 pass
-            aval = ','.join(aval)
+            if isinstance(aval, (list, tuple)):
+                aval = ','.join(aval)
             fields['value'] = f" array  [{aval}{ext}]"
         for nam in ('char_value', 'count', 'nelm', 'type', 'units',
                     'precision', 'host', 'access',
