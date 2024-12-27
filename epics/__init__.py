@@ -215,7 +215,8 @@ def camonitor_clear(pvname):
         _PVmonitors_[pvname].remove_callback(index=-999)
         _PVmonitors_.pop(pvname)
 
-def camonitor(pvname, writer=None, callback=None, connection_timeout=5.0):
+def camonitor(pvname, writer=None, callback=None, connection_timeout=5.0,
+                  monitor_delta-None):
     """ camonitor(pvname, writer=None, callback=None, connection_timeout=5)
 
     sets a monitor on a PV.
@@ -226,7 +227,7 @@ def camonitor(pvname, writer=None, callback=None, connection_timeout=5.0):
      writer (callable or None): function used to send monitor messages [None]
      callback (callback or None): custom callback function [None]
      connection_timeout (float): maximum time to wait for connection [5]
-
+     monitor_delta (float or None): minimum change in value to monitor [None]
 
     Notes
     ------
@@ -238,6 +239,12 @@ def camonitor(pvname, writer=None, callback=None, connection_timeout=5.0):
      3. A custom callback can be provieded.  This will be sent keyword
         arguments for pvname, value, char_value, and more.
         Important: use **kws!!
+     4. monitor_delta will set a value below which changes in the PV value
+        will not generate an event.  This will try to set the MDEL field for
+        a PV, limiting events from being sent from the PV server.  If MDEL
+        cannot be set, this will be simulated in pyepics code on the client
+        side. The default `None` will leave the current value unchanged.
+
 
     Examples
     --------
@@ -255,7 +262,8 @@ def camonitor(pvname, writer=None, callback=None, connection_timeout=5.0):
                 char_value = repr(value)
             writer(f"{pvname:.32s} {pv.fmt_time()} {char_value}")
 
-    thispv = get_pv(pvname, timeout=connection_timeout, connect=True)
+    thispv = get_pv(pvname, timeout=connection_timeout, connect=True,
+                    monitor_delta=monitor_delta)
     if thispv.connected:
         thispv.get()
         thispv.add_callback(callback, index=-999, with_ctrlvars=True)
