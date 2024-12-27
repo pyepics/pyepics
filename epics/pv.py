@@ -57,7 +57,7 @@ def _ensure_context(func):
 
 def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
            connection_callback=None, access_callback=None, callback=None,
-           verbose=False, count=None, auto_monitor=None):
+           verbose=False, count=None, auto_monitor=None, monitor_delta=None):
     """
     Get a PV from PV cache or create one if needed.
 
@@ -89,6 +89,10 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
         True: auto-monitor using ca.DEFAULT_SUBSCRIPTION_MASK
         dbr.DBE_*: auto-monitor using this event mask. For example:
                    `epics.dbr.DBE_ALARM|epics.dbr.DBE_LOG`
+    monitor_delta : float or None, optional
+        None: monitor delta is not changed
+        float: try to set monitor-delta, limiting callbecks from
+           small changes in value (only valid for float/double PVs)
 
     Returns
     -------
@@ -117,12 +121,12 @@ def get_pv(pvname, form='time', connect=False, context=None, timeout=5.0,
     if thispv is None:
         if context != ca.current_context():
             raise RuntimeError('PV is not in cache for user-requested context')
-
         thispv = default_pv_class(pvname, form=form, callback=callback,
                                   connection_callback=connection_callback,
                                   access_callback=access_callback,
                                   connection_timeout=timeout, count=count,
-                                  verbose=verbose, auto_monitor=auto_monitor)
+                                  verbose=verbose, auto_monitor=auto_monitor,
+                                  monitor_delta=monitor_delta)
 
         # Update the cache with this new instance:
         _PVcache_[pvid] = thispv
@@ -209,17 +213,15 @@ class PV():
     _fields = ('pvname',  'value',  'char_value',  'status',  'ftype',  'chid',
                'host', 'count', 'access', 'write_access', 'read_access',
                'severity', 'timestamp', 'posixseconds', 'nanoseconds',
-               'precision', 'units', 'enum_strs',
+               'precision', 'units', 'enum_strs', 'monitor_delta',
                'upper_disp_limit', 'lower_disp_limit', 'upper_alarm_limit',
                'lower_alarm_limit', 'lower_warning_limit',
                'upper_warning_limit', 'upper_ctrl_limit', 'lower_ctrl_limit')
 
     def __init__(self, pvname, callback=None, form='time',
                  verbose=False, auto_monitor=None, count= None,
-                 connection_callback=None,
-                 connection_timeout=None,
-                 access_callback=None):
-
+                 connection_callback=None, connection_timeout=None,
+                 access_callback=None, monitor_delta=None):
         self.pvname     = pvname.strip()
         self.form       = form.lower()
         self.verbose    = verbose
@@ -231,13 +233,16 @@ class PV():
 
         if self.connection_timeout is None:
             self.connection_timeout = ca.DEFAULT_CONNECTION_TIMEOUT
-        self._args      = {}.fromkeys(self._fields)
+        self._args = {}.fromkeys(self._fields)
         self._args['pvname'] = self.pvname
         self._args['count'] = count
         self._args['nelm']  = -1
         self._args['type'] = 'unknown'
         self._args['typefull'] = 'unknown'
         self._args['access'] = 'unknown'
+        self._args['monitor_delta'] = monitor_delta
+        self._monitor_delta_local = False # whether to simulate MDEL here (MDEL could not be set)
+        self._monitor_last_value = None
         self.connection_callbacks = []
 
         if connection_callback is not None:
@@ -403,9 +408,20 @@ class PV():
             # New mask.
             self._clear_auto_monitor_subscription()
 
+        mon_del = self._args.get('_monitor_delta', None)
+        ntype = dbr.native_type(self._args.get('ftype', 0))
+        if (mon_del is not None and self.count==1 and ntype in (2, 6)): # float, double
+            put_success = None
+            pref = self.pvname.split('.', maxsplit=1)[0]
+            mon_chid = ca.create_channel(f"{pref}.MDEL")
+            ca.poll()
+            mon_conn = ca.connect_channel(mon_chid, timeout=self.connection_timeout)
+            if mon_conn and (1 == ca.write_access(mon_chid) ):
+                put_success = ca.put(mon_chid, float(mon_del), timeout=0.5)
+            self._monitor_delta_local = (put_success != 1)
+
         self._monref_mask = mask
-        self._monref = ca.create_subscription(
-            self.chid,
+        self._monref = ca.create_subscription(self.chid,
             use_ctrl=(self.form == 'ctrl'),
             use_time=(self.form == 'time'),
             callback=self.__on_changes,
@@ -506,9 +522,7 @@ class PV():
                                       as_numpy=as_numpy, timeout=timeout,
                                       with_ctrlvars=with_ctrlvars,
                                       use_monitor=use_monitor)
-        return (data['value']
-                if data is not None
-                else None)
+        return (data['value'] if data is not None else None)
 
     @_ensure_context
     def get_with_metadata(self, count=None, as_string=False, as_numpy=True,
@@ -774,6 +788,18 @@ class PV():
         To have user-defined code run when the PV value changes,
         use add_callback()
         """
+        skip = False
+        if self._monitor_delta_local:  # monitor_delta locally, simulated MDEL
+            try:
+                skip = abs(value-self._monitor_last_value) < self.monitor_delta
+            except:
+                pass
+        if skip:
+            return
+
+        if self._monitor_delta_local:
+            self._monitor_last_value = value
+
         self._args.update(kwd)
         self._args['value']  = value
         self._args['timestamp'] = kwd.get('timestamp', time.time())
@@ -813,11 +839,11 @@ class PV():
             fcn, kwargs = self.callbacks[index]
         except KeyError:
             return
-        kwd = copy.copy(self._args)
-        kwd.update(kwargs)
-        kwd['cb_info'] = (index, self)
+        kwds = copy.copy(self._args)
+        kwds.update(kwargs)
+        kwds['cb_info'] = (index, self)
         if callable(fcn):
-            fcn(**kwd)
+            fcn(**kwds)
 
     def add_callback(self, callback=None, index=None, run_now=False,
                      with_ctrlvars=True, **kw):
@@ -894,7 +920,7 @@ class PV():
                 aval = ','.join(aval)
             fields['value'] = f" array  [{aval}{ext}]"
         for nam in ('char_value', 'count', 'nelm', 'type', 'units',
-                    'precision', 'host', 'access',
+                    'precision', 'host', 'access', 'monitor_delta',
                     'status', 'char_status', 'severity', 'char_severity',
                     'timestamp', 'posixseconds', 'nanoseconds',
                     'upper_ctrl_limit', 'lower_ctrl_limit',
@@ -1023,6 +1049,11 @@ class PV():
     def access(self):
         "read/write access as string"
         return self._getarg('access')
+
+    @property
+    def monitor_delta(self):
+        "monitor delta"
+        return self._getarg('monitor_delta')
 
     @property
     def severity(self):
