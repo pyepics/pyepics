@@ -29,6 +29,7 @@ import sys
 import os
 import datetime
 import json
+import time
 from epics.pv import get_pv
 from epics.utils import IOENCODING
 
@@ -61,6 +62,8 @@ def restore_pvs(filepath, debug=False):
     for thispv, value in pv_vals:
         thispv.connect()
         pvname = thispv.pvname
+        if not thispv.connected:
+            time.sleep(0.1)
         if not thispv.connected:
             print("Cannot connect to %s" % (pvname))
         elif not thispv.write_access:
