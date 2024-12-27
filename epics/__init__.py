@@ -216,7 +216,7 @@ def camonitor_clear(pvname):
         _PVmonitors_.pop(pvname)
 
 def camonitor(pvname, writer=None, callback=None, connection_timeout=5.0,
-                  monitor_delta-None):
+                  monitor_delta=None):
     """ camonitor(pvname, writer=None, callback=None, connection_timeout=5)
 
     sets a monitor on a PV.
