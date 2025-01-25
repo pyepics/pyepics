@@ -233,7 +233,7 @@ def camonitor_clear(pvname):
 
     """
     if pvname in _PVmonitors_:
-        _PVmonitors_[pvname].remove_all_callbacks()
+        _PVmonitors_[pvname].remove_callback(index=-999)
         _PVmonitors_.pop(pvname)
 
 def camonitor(pvname, writer=None, callback=None, connection_timeout=5.0,
