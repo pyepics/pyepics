@@ -1,4 +1,3 @@
-
 ============================================
 PyEpics Overview
 ============================================
@@ -214,35 +213,16 @@ getting and putting values for multiple PVs at a time.
 :func:`caget`
 ~~~~~~~~~~~~~
 
-..  function:: caget(pvname[, as_string=False[, count=None[, as_numpy=True[, timeout=None[, use_monitor=True]]]]])
+.. autofunction:: caget
 
-  retrieves and returns the value of the named PV.
+Note that the `timeout` argument sets the maximum time to wait for a
+value to be fetched over the network.  If the timeout is exceeded,
+:func:`caget` will return ``None``.  This might imply that the PV is
+not actually available, but it might also mean that the data is large
+or network slow enough that the data just hasn't been received yet,
+but may show up later.
 
-  :param pvname: name of Epics Process Variable.
-  :param as_string:  whether to return string representation of the PV value.
-  :type as_string:  ``True``/``False``
-  :param count:  number of elements to return for array data.
-  :type count:  integer or ``None``
-  :param as_numpy:  whether to return the Numerical Python representation for array data.
-  :type as_numpy:  ``True``/``False``
-  :param timeout:  maximum time to wait (in seconds) for value before returning None.
-  :type timeout:  float or ``None``
-  :param use_monitor:  whether to rely on monitor callbacks or explicitly get value now.
-  :type use_monitor: ``True``/``False``
-
-The *count* and *as_numpy* options apply only to array or waveform
-data. The default behavior is to return the full data array and convert to
-a numpy array if available.  The *count* option can be used to explicitly
-limit the number of array elements returned, and *as_numpy* can turn on or
-off conversion to a numpy array.
-
-The *timeout* argument sets the maximum time to wait for a value to be
-fetched over the network.  If the timeout is exceeded, :func:`caget` will
-return ``None``.  This might imply that the PV is not actually available,
-but it might also mean that the data is large or network slow enough that
-the data just hasn't been received yet, but may show up later.
-
-The *use_monitor* argument sets whether to rely on the monitors from the
+The `use_monitor` argument sets whether to rely on the monitors from the
 underlying PV.  The default is ``True``, so that cached values will be
 used.  Using ``False`` will make the each :func:`caget` explicitly ask the
 value to be sent instead of relying on the automatic monitoring normally
@@ -252,7 +232,7 @@ getting values with it.  If performance is a concern, using monitors is
 recommended.  For more details on making :func:`caget` more efficient, see
 :ref:`pv-automonitor-label` and :ref:`advanced-get-timeouts-label`.
 
-The *as_string* argument tells the function to return the **string
+The `as_string` argument tells the function to return the **string
 representation** of the value.  The details of the string representation
 depends on the variable type of the PV.  For integer (short or long) and
 string PVs, the string representation is pretty easy: 0 will become '0',
@@ -312,25 +292,17 @@ devices.
 :func:`caput`
 ~~~~~~~~~~~~~~~~
 
-..  function:: caput(pvname, value[, wait=False[, timeout=60]])
+.. autofunction:: caput
 
-  set the value of the named PV.
 
-  :param pvname: name of Epics Process Variable
-  :param value:  value to send.
-  :param wait:  whether to wait until the processing has completed.
-  :type wait: ``True``/``False``
-  :param timeout:  how long to wait (in seconds) for put to complete before giving up.
-  :type timeout: double
-  :rtype: integer
 
-The optional *wait* argument tells the function to wait until the
-processing completes.  This can be useful for PVs which take significant
-time to complete, either because it causes a physical device (motor, valve,
-etc) to move or because it triggers a complex calculation or data
-processing sequence.  The *timeout* argument gives the maximum time to
-wait, in seconds.  The function will return after this (approximate) time
-even if the :func:`caput` has not completed.
+The optional `wait=True` argument tells the function to wait until the
+processing completes.  This can be useful for PVs which take
+significant time to complete, either because it causes a physical
+device (motor, valve, etc) to move or because it triggers a complex
+calculation or data processing sequence.  The `timeout` argument gives
+the maximum time to wait, in seconds.  The function will return after
+this (approximate) time even if the :func:`caput` has not completed.
 
 This function returns 1 on success.  It will return ``None`` if the timeout
 has been exceeded.
@@ -340,20 +312,13 @@ has been exceeded.
     1
     >>> caput('XXX:m1.VAL',-2.30, wait=True)
     ... waits a few seconds ...
-    
+
 
 :func:`cainfo`
 ~~~~~~~~~~~~~~
 
-..  function:: cainfo(pvname[, print_out=True])
+.. autofunction:: cainfo
 
-  prints (or returns as a string) an informational paragraph about the PV,
-  including Control Settings.
-
-  :param pvname: name of Epics Process Variable
-  :param print_out:  whether to write results to standard output
-                 (otherwise the string is returned).
-  :type print_out: ``True``/``False``
 
     >>> from epics import caget, caput, cainfo
     >>> cainfo('XXX.m1.VAL')
@@ -383,19 +348,14 @@ has been exceeded.
 :func:`camonitor`
 ~~~~~~~~~~~~~~~~~
 
+.. autofunction:: camonitor
 
-..  function:: camonitor(pvname[, writer=None[, callback=None]])
 
-  This `sets a monitor` on the named PV, which will cause *something* to be
-  done each time the value changes.  By default the PV name, time, and
-  value will be printed out (to standard output) when the value changes,
-  but the action that actually happens can be customized.
-
-  :param pvname: name of Epics Process Variable
-  :param writer:  where to write results to standard output .
-  :type writer: ``None`` or a callable function that takes a string argument.
-  :param callback:  user-supplied function to receive result
-  :type callback: ``None`` or callable function
+This sets a simple "monitor" on the named PV, which will cause
+*something* to be done each time the value changes.  By default the PV
+name, time, and value will be printed out (to standard output) when
+the value changes, but the action that actually happens can be
+customized.
 
 One can specify any function that can take a string as *writer*, such as
 the :meth:`write` method of an open file that has been open for writing.
@@ -417,11 +377,8 @@ should take keyword arguments for *pvname*, *value*, and *char_value*.  See
 :func:`camonitor_clear`
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-..  function:: camonitor_clear(pvname)
+..  autofunction:: camonitor_clear
 
-  clears a monitor set on the named PV by :func:`camonitor`.
-
-  :param pvname: name of Epics Process Variable
 
 This simple example monitors a PV with :func:`camonitor` for while, with
 changes being saved to a log file.   After a while, the monitor is cleared
@@ -448,53 +405,16 @@ and the log file is inspected::
 :func:`caget_many`
 ~~~~~~~~~~~~~~~~~~
 
-..  function:: caget_many(pvlist[, as_string=False[, count=None[, as_numpy=True[, timeout=None]]]])
+..  autofunction:: caget_many
 
-  get a list of PVs as quickly as possible.  Returns a list of values for
-  each PV in the list.  Unlike :func:`caget`, this method does not use
-  automatic monitoring (see :ref:`pv-automonitor-label`).
-
-  :param pvlist: A list of process variable names.
-  :type pvlist:  ``list`` or ``tuple`` of ``str``
-  :param as_string:  whether to return string representation of the PV values.
-  :type as_string:  ``True``/``False``
-  :param count:  number of elements to return for array data.
-  :type count:  integer or ``None``
-  :param as_numpy:  whether to return the Numerical Python representation for array data.
-  :type as_numpy:  ``True``/``False``
-  :param timeout:  maximum time to wait (in seconds) for value before returning None.
-  :type timeout:  float or ``None``
-
-For detailed information about the arguments, see the documentation for
-:func:`caget`. Also see :ref:`advanced-connecting-many-label` for more
-discussion.
+For more detailed information about the arguments, see the
+documentation for :func:`caget`. Also see
+:ref:`advanced-connecting-many-label` for more discussion.
 
 :func:`caput_many`
 ~~~~~~~~~~~~~~~~~~
 
-..  function:: caput_many(pvlist, values[, wait=False[, connection_timeout=None[, put_timeout=60]]])
-
-  put values to a list of PVs as quickly as possible.  Returns a list of ints
-  for each PV in the list: 1 if the put was successful, -1 if it timed out.
-  Unlike :func:`caput`, this method does not use automatic monitoring (see
-  :ref:`pv-automonitor-label`).
-
-  :param pvlist: A list of process variable names.
-  :type pvlist:  ``list`` or ``tuple`` of ``str``
-  :param values: values to put to each PV.
-  :type values: ``list`` or ``tuple``
-  :param wait:  if ``'each'``, :func:`caput_many` will wait for each
-    PV to process before starting the next.  If ``'all'``,
-    :func:`caput_many` will issue puts for all PVs immediately, then
-    wait for all of them to complete.  If any other value,
-    :func:`caput_many` will not wait for put processing to complete.
-  :param connection_timeout:  maximum time to wait (in seconds) for
-    a connection to be established to each PV.
-  :type connection_timeout:  float or ``None``
-  :param put_timeout: maximum time to wait (in seconds) for processing
-   to complete for each PV (if ``wait`` is ``'each'``), or for processing
-   to complete for all PVs (if ``wait`` is ``'all'``).
-  :type put_timeout: float or ``None``
+..  autofunction:: caput_many
 
 Because connections to channels normally connect very quickly (less than a
 second), but processing a put may take a significant amount of time (due to
@@ -532,7 +452,7 @@ underlying C library is automatically made thread-aware without explicit
 code.  Finally, by avoiding the C API altogether, supporting both Python2
 and Python3 is greatly simplified.
 
-Status 
+Status
 ==============
 
 The PyEpics package is actively maintained, but the core library is
@@ -541,4 +461,3 @@ added slowly, and testing is integrated into development so that the chance
 of introducing bugs into existing codes is minimized.  The package is
 targeted and tested to work on all supported versions of Python, currently
 Python 3.6 and higher.
-
