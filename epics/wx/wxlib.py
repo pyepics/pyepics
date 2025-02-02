@@ -1054,6 +1054,10 @@ class PVButton(wx.Button, PVCtrlMixin):
         "button press event handler"
         self.pv.put(self.pushValue)
 
+    @DelayedEpicsCallback
+    def OnEpicsConnect(self, pvname=None, conn=None, pv=None):
+        pass
+
 class PVBitmapButton(wx.BitmapButton, PVCtrlMixin):
     """ A Button linked to a PV. When the button is pressed, a certain value
         is written to the PV (useful for momentary PVs with HIGH= set.)
