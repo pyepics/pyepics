@@ -3,6 +3,7 @@ String and data utils
 """
 import sys
 import os
+import platform
 
 try:
     from charset_normalizer import from_bytes
@@ -70,7 +71,6 @@ def clib_search_path(lib):
 
     # determine which libca / libCom dll is appropriate
     try:
-        import platform
         nbits = platform.architecture()[0]
         mach = platform.machine()
     except:
