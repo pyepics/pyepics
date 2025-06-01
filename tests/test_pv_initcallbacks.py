@@ -44,17 +44,22 @@ def test_initial_callbacks():
     assert mypv.connected
     assert got_callback_a
     assert got_callback_b
+    mypv.clear_callbacks()
 
 def test_multiple_callbacks():
     global got_callback_a, got_callback_b
     got_callback_a =  got_callback_b = False
     mypv = epics.PV(pvnames.double_pv)
+    mypv.clear_callbacks()
     mypv.add_callback(callback_a)
 
     wait(2)
     assert got_callback_a
     assert not got_callback_b
 
+    mypv.clear_callbacks()
+
+    wait(1)
     mypv.add_callback(callback_b)
     wait(2)
     assert got_callback_b
