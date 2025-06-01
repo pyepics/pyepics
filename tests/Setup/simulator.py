@@ -37,7 +37,7 @@ mbbos    = make_pvs("mbbo1","mbbo2")
 pause_pv = make_pvs("pause",)[0]
 longs    = make_pvs("long1", "long2", "long3", "long4")
 strs     = make_pvs("str1", "str2")
-analogs  = make_pvs("ao1", "ai1", "ao2", "ao3")
+analogs  = make_pvs("ao1", "ai1", "ao2", "ao3", "ao4")
 binaries = make_pvs("bo1", "bi1")
 
 char_waves   = make_pvs("char128", "char256", "char2k", "char64k")
@@ -69,6 +69,8 @@ def initialize_data():
     epics.caput('%sao1.PREC' % prefix, 4)
     epics.caput('%sai1.PREC' % prefix, 2)
     epics.caput('%sao2.PREC' % prefix, 3)
+    epics.caput('%sao3.PREC' % prefix, 3)
+    epics.caput('%sao4.PREC' % prefix, 3)
 
     char_waves[0].put([60+random.randrange(30) for i in range(128)])
     char_waves[1].put([random.randrange(256) for i in range(256)])
@@ -129,15 +131,14 @@ while True:
         pause_pv.put(0)
     noise = numpy.random.normal
 
-    analogs[0].put( 100*(random.random()-0.5))
+    analogs[0].put( 0.99*((time.time()-start_time)%200)  + 3*(random.random()-0.5))
     analogs[1].put( 76.54321*(time.time()-start_time))
-    analogs[2].put( 0.3*numpy.sin(time.time() / 2.302) + noise(scale=0.4)  )
+    analogs[2].put( 0.3*numpy.sin(time.time() / 2.302) + noise(scale=0.2)  )
+    analogs[3].put( 2+3.5*numpy.cos(time.time() / 160) + noise(scale=0.2)  )
+    analogs[4].put( noise(scale=0.25) + 0.2*((time.time() - start_time) % 50))
     char_waves[0].put([45+random.randrange(64) for i in range(128)])
 
-    if count % 3 == 0:
-        analogs[3].put( numpy.exp((max(0.001,  noise(scale=0.03)
-                                       + numpy.sqrt((count/16.0) % 87.)))))
-
+    if count % 30 == 0:
         long_waves[1].put([i+random.randrange(128) for i in range(2048)])
         str_waves[0].put(["Str%i_%.3f" % (i+1, 100*random.random()) for i in range(128)])
 
