@@ -5,3 +5,66 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 write_to = "epics/version.py"
 version_scheme = "post-release"
+
+[tool.setuptools.packages.find]
+include = ["epics"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=epics --cov-append --cov-report html"
+
+[project]
+name = "pyepics"
+dynamic = ["version"]
+# provides = ["epics"]
+requires-python = ">=3.9"
+description = "Epics Channel Access for Python"
+readme = "README.rst"
+authors = [{name="Matthew Newville", email="newville@cars.uchicago.edu"}]
+license = {file = "LICENSE"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    ]
+keywords = ["epics"]
+dependencies = ["numpy>=1.23", "pyparsing"]
+
+[project.urls]
+Homepage = "https://github.com/pyepics/pyepics/"
+Documentation = "https://pyepics.github.io/pyepics/"
+
+[project.optional-dependencies]
+doc = ["Sphinx", "numpydoc"]
+test = ["coverage", "pytest", "pytest-cov", "psutil; platform_system=='Linux'"]
+all = ["pyepics[test, doc]"]
+
+
+# [options]
+
+# include_package_data = True
+# packages =
+#     epics
+#     epics.autosave
+#     epics.compat
+#     epics.clibs
+#     epics.devices
+#     epics.qt
+#     epics.wx
+#     epics.clibs.darwin64
+#     epics.clibs.darwinarm64
+#     epics.clibs.linux64
+#     epics.clibs.linux32
+#     epics.clibs.linuxarm
+#     epics.clibs.win64
+#     epics.clibs.win32
+
+# [options.extras_require]
