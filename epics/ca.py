@@ -27,11 +27,7 @@ import warnings
 from copy import deepcopy
 from collections import defaultdict
 from math import log10
-
-try: # importlib.resources does not yet have files on python 3.8
-    from importlib.resources import files as importlib_resources_files
-except ImportError:
-    from importlib_resources import files as importlib_resources_files
+from importlib.resources import files as importlib_resources_files
 
 HAS_NUMPY = False
 try:
