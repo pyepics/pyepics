@@ -4,6 +4,11 @@ String and data utils
 import sys
 import os
 
+try:
+    from charset_normalizer import from_bytes
+except ImportError:
+    from_bytes = None
+
 IOENCODING =  os.environ.get('PYEPICS_ENCODING',
               os.environ.get('PYTHONIOENCODING',
                              'utf-8'))
@@ -18,8 +23,13 @@ def bytes2str(st1):
     'byte to string conversion'
     if isinstance(st1, str):
         return st1
-    elif isinstance(st1, bytes):
-        return str(st1, IOENCODING)
+    if isinstance(st1, bytes):
+        try:
+            return str(st1, IOENCODING)
+        except UnicodeDecodeError:
+            if from_bytes is None:
+                raise
+            return str(from_bytes(st1).best())
     else:
         return str(st1)
 
