@@ -7,10 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>PyEpics Overview &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=0abfba44"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/documentation_options.js?v=e2a51986"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -147,7 +147,7 @@ top-level <cite>epics</cite> module to get and put values of Epics Process Varia
 These functions are similar to the standard command line utilities and the
 EZCA library interface, and are described in more detail below.</p>
 <p>To use the <a class="reference internal" href="#module-epics" title="epics: top-level epics module, and container for simplest CA functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code></a> package, import it with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
 </pre></div>
 </div>
 <p>The main components of this module include</p>
@@ -198,7 +198,7 @@ discussions.</p>
 <section id="procedural-approach-caget-caput">
 <h3>Procedural Approach: caget(), caput()<a class="headerlink" href="#procedural-approach-caget-caput" title="Link to this heading">¶</a></h3>
 <p>To get values from PVs, you can use the <code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code> function:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span> <span class="o">=</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">m1</span><span class="p">)</span>
 <span class="go">1.2001</span>
@@ -248,7 +248,7 @@ uses.</p>
 <p>If you are repeatedly referencing the same PV, you may find it more
 convenient to create a PV object and use it in a more object-oriented
 manner.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">PV</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pv1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -336,33 +336,72 @@ getting and putting values for multiple PVs at a time.</p>
 <h3><a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a><a class="headerlink" href="#caget" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.caget">
-<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">as_string=False</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">count=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">as_numpy=True</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">timeout=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">use_monitor=True</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget" title="Link to this definition">¶</a></dt>
-<dd><p>retrieves and returns the value of the named PV.</p>
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_numpy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_monitor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget" title="Link to this definition">¶</a></dt>
+<dd><p>get the current value to an epics Process Variable (PV).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pvname</strong> – name of Epics Process Variable.</p></li>
-<li><p><strong>as_string</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to return string representation of the PV value.</p></li>
-<li><p><strong>count</strong> (integer or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – number of elements to return for array data.</p></li>
-<li><p><strong>as_numpy</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to return the Numerical Python representation for array data.</p></li>
-<li><p><strong>timeout</strong> (float or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for value before returning None.</p></li>
-<li><p><strong>use_monitor</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to rely on monitor callbacks or explicitly get value now.</p></li>
-</ul>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pvname</strong><span class="classifier">str</span></dt><dd><p>name of PV</p>
+</dd>
+<dt><strong>as_string</strong><span class="classifier">bool, optional</span></dt><dd><p>whether to get the string representation [False]</p>
+</dd>
+<dt><strong>count</strong><span class="classifier">int or None</span></dt><dd><p>maximum number of elements for waveform data [None]</p>
+</dd>
+<dt><strong>as_numpy</strong><span class="classifier">bool, optional</span></dt><dd><p>whether to return waveform data as a numpy array [True]</p>
+</dd>
+<dt><strong>use_monitor</strong><span class="classifier">bool, optional</span></dt><dd><p>whether to use the value cached by the monitor [True]</p>
+</dd>
+<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for the processing to complete [60]</p>
+</dd>
+<dt><strong>connection_timeout :float</strong></dt><dd><p>maximum time (in seconds) to wait for connection [5]</p>
 </dd>
 </dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">object</span></dt><dd><p>value of PV value on success, or <code class="docutils literal notranslate"><span class="pre">None</span></code> on a failure.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ol class="arabic simple">
+<li><p>If not already connected, the PV will first attempt to connect to
+the networked variable. As the initial connection can take some time
+(typically 30 msec or so), if a successful connection is made, a rich
+PV object with will be stored internally for later use.</p></li>
+<li><p><cite>as_string=True</cite> will return a string: float values will formatted
+according to the PVs precision, enum values will return the approriate
+enum string, etc.</p></li>
+<li><p><cite>use_monitor=True</cite> will return the most recently cached value from the
+internal monitor placed on the PV. This will be the latest value unless
+the value is changing very rapidly. <cite>use_monitor=False</cite> will ignore the
+cached value and ask for an explicit value.  Of course, if a PV is
+changing rapidly enough for that to make a difference, it may also
+change between getting the value and downstream code using it.</p></li>
+</ol>
+<p class="rubric">Examples</p>
+<p>to get the value of a PV:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;xx.VAL&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>to get the character string representation (formatted double, enum string, etc):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;xx.VAL&#39;</span><span class="p">,</span> <span class="n">as_string</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>to get a truncated amount of data from an array, you can specify the count:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">caget</span><span class="p">(</span><span class="s1">&#39;MyArray.VAL&#39;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
-<p>The <em>count</em> and <em>as_numpy</em> options apply only to array or waveform
-data. The default behavior is to return the full data array and convert to
-a numpy array if available.  The <em>count</em> option can be used to explicitly
-limit the number of array elements returned, and <em>as_numpy</em> can turn on or
-off conversion to a numpy array.</p>
-<p>The <em>timeout</em> argument sets the maximum time to wait for a value to be
-fetched over the network.  If the timeout is exceeded, <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> will
-return <code class="docutils literal notranslate"><span class="pre">None</span></code>.  This might imply that the PV is not actually available,
-but it might also mean that the data is large or network slow enough that
-the data just hasn’t been received yet, but may show up later.</p>
-<p>The <em>use_monitor</em> argument sets whether to rely on the monitors from the
+<p>Note that the <cite>timeout</cite> argument sets the maximum time to wait for a
+value to be fetched over the network.  If the timeout is exceeded,
+<a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> will return <code class="docutils literal notranslate"><span class="pre">None</span></code>.  This might imply that the PV is
+not actually available, but it might also mean that the data is large
+or network slow enough that the data just hasn’t been received yet,
+but may show up later.</p>
+<p>The <cite>use_monitor</cite> argument sets whether to rely on the monitors from the
 underlying PV.  The default is <code class="docutils literal notranslate"><span class="pre">True</span></code>, so that cached values will be
 used.  Using <code class="docutils literal notranslate"><span class="pre">False</span></code> will make the each <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> explicitly ask the
 value to be sent instead of relying on the automatic monitoring normally
@@ -371,14 +410,14 @@ command-line tools, and slightly less efficient than creating a PV and
 getting values with it.  If performance is a concern, using monitors is
 recommended.  For more details on making <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a> more efficient, see
 <a class="reference internal" href="pv.html#pv-automonitor-label"><span class="std std-ref">Automatic Monitoring of a PV</span></a> and <a class="reference internal" href="advanced.html#advanced-get-timeouts-label"><span class="std std-ref">The wait and timeout options for get(), ca.get_complete()</span></a>.</p>
-<p>The <em>as_string</em> argument tells the function to return the <strong>string
+<p>The <cite>as_string</cite> argument tells the function to return the <strong>string
 representation</strong> of the value.  The details of the string representation
 depends on the variable type of the PV.  For integer (short or long) and
 string PVs, the string representation is pretty easy: 0 will become ‘0’,
 for example.  For float and doubles, the internal precision of the PV is
 used to format the string value.  For enum types, the name of the enum
 state is returned:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">caget</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">))</span>     <span class="c1"># A double PV</span>
 <span class="go">0.10000000000000001</span>
 
@@ -432,33 +471,73 @@ devices.</p>
 <h3><a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a><a class="headerlink" href="#caput" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.caput">
-<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">wait=False</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">timeout=60</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caput" title="Link to this definition">¶</a></dt>
-<dd><p>set the value of the named PV.</p>
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.caput" title="Link to this definition">¶</a></dt>
+<dd><p>put a value to an epics Process Variable (PV).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pvname</strong> – name of Epics Process Variable</p></li>
-<li><p><strong>value</strong> – value to send.</p></li>
-<li><p><strong>wait</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to wait until the processing has completed.</p></li>
-<li><p><strong>timeout</strong> (<em>double</em>) – how long to wait (in seconds) for put to complete before giving up.</p></li>
-</ul>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pvname</strong><span class="classifier">str</span></dt><dd><p>name of PV</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>integer</p>
+<dt><strong>value</strong><span class="classifier">object</span></dt><dd><p>value to put to PV (see notes)</p>
+</dd>
+<dt><strong>wait</strong><span class="classifier">bool, optional</span></dt><dd><p>whether to wait for processing to complete [False]</p>
+</dd>
+<dt><strong>timeout</strong><span class="classifier">float, optional</span></dt><dd><p>maximum time (in seconds) to wait for the processing to complete [60]</p>
+</dd>
+<dt><strong>connection_timeout</strong><span class="classifier">float, optional</span></dt><dd><p>maximum time (in seconds) to wait for connection [5]</p>
 </dd>
 </dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>int or <code class="docutils literal notranslate"><span class="pre">None</span></code></dt><dd><ul class="simple">
+<li><p>1  on succesful completion</p></li>
+<li><p>-1 or other negative value on failure of the low-level CA put.</p></li>
+<li><p>None  on a failure to connect to the PV.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ol class="arabic simple">
+<li><p>Epics PVs are typically limited to an appropriate Epics data type,
+int, float, str, and enums or homogeneously typed lists or arrays.
+Numpy arrays or Python strings are generally coeced as appropriate,
+but care may be needed when mapping Python objects to Epics PV values.</p></li>
+<li><p>If not already connected, the PV will first attempt to connect to
+the networked variable. As the initial connection can take some time
+(typically 30 msec or so), if a successful connection is made, a rich
+PV object with will be stored internally for later use.  Use
+connection_timeout to control how long to wait before declaring that
+the PV cannot be connected (mispelled name, inactive IOC, improper
+network configuration)</p></li>
+<li><p>Since some PVs can take a long time to process (perhaps physically
+moving a motor or telling a detector to collect and not return until
+done), it is impossible to tell what a “reasonable” timeout for a put
+should be.</p></li>
+</ol>
+<p class="rubric">Examples</p>
+<p>to put a value to a PV and return as soon as possible:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;xx.VAL&#39;</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>to wait for processing to finish, use ‘wait=True’:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;xx.VAL&#39;</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
-<p>The optional <em>wait</em> argument tells the function to wait until the
-processing completes.  This can be useful for PVs which take significant
-time to complete, either because it causes a physical device (motor, valve,
-etc) to move or because it triggers a complex calculation or data
-processing sequence.  The <em>timeout</em> argument gives the maximum time to
-wait, in seconds.  The function will return after this (approximate) time
-even if the <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a> has not completed.</p>
+<p>The optional <cite>wait=True</cite> argument tells the function to wait until the
+processing completes.  This can be useful for PVs which take
+significant time to complete, either because it causes a physical
+device (motor, valve, etc) to move or because it triggers a complex
+calculation or data processing sequence.  The <cite>timeout</cite> argument gives
+the maximum time to wait, in seconds.  The function will return after
+this (approximate) time even if the <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a> has not completed.</p>
 <p>This function returns 1 on success.  It will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the timeout
 has been exceeded.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span><span class="mf">2.30</span><span class="p">)</span>
 <span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">caput</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">,</span><span class="o">-</span><span class="mf">2.30</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -470,18 +549,67 @@ has been exceeded.</p>
 <h3><a class="reference internal" href="#epics.cainfo" title="epics.cainfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">cainfo()</span></code></a><a class="headerlink" href="#cainfo" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.cainfo">
-<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">cainfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">print_out=True</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.cainfo" title="Link to this definition">¶</a></dt>
-<dd><p>prints (or returns as a string) an informational paragraph about the PV,
-including Control Settings.</p>
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">cainfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.cainfo" title="Link to this definition">¶</a></dt>
+<dd><p>return printable information about PV</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pvname</strong> – name of Epics Process Variable</p></li>
-<li><p><strong>print_out</strong> – whether to write results to standard output
-(otherwise the string is returned).</p></li>
-</ul>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pvname</strong><span class="classifier">str</span></dt><dd><p>name of PV</p>
+</dd>
+<dt><strong>print_out</strong><span class="classifier">bool, optional</span></dt><dd><p>whether to print the info to standard out [True]</p>
+</dd>
+<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for the processing to complete [60]</p>
+</dd>
+<dt><strong>connection_timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for connection [5]</p>
 </dd>
 </dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">None</span></code> or string</dt><dd><p>if <cite>print_out=False</cite>, the text is returned, but not printed.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ol class="arabic simple">
+<li><p>If not already connected, the PV will first attempt to connect to
+the networked variable. As the initial connection can take some time
+(typically 30 msec or so), if a successful connection is made, a rich
+PV object with will be stored internally for later use.</p></li>
+<li><p>All time in seconds.</p></li>
+</ol>
+<p class="rubric">Examples</p>
+<p>to print a status report for the PV:</p>
+<p>&gt;&gt;&gt;cainfo(‘xx.VAL’)</p>
+<p>to get the multiline text, use</p>
+<p>&gt;&gt;&gt;txt = cainfo(‘xx.VAL’, print_out=False)</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">caget</span><span class="p">,</span> <span class="n">caput</span><span class="p">,</span> <span class="n">cainfo</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cainfo</span><span class="p">(</span><span class="s1">&#39;XXX.m1.VAL&#39;</span><span class="p">)</span>
+<span class="go">== XXX:m1.VAL  (double) ==</span>
+<span class="go">   value      = 2.3</span>
+<span class="go">   char_value = 2.3000</span>
+<span class="go">   count      = 1</span>
+<span class="go">   units      = mm</span>
+<span class="go">   precision  = 4</span>
+<span class="go">   host       = xxx.aps.anl.gov:5064</span>
+<span class="go">   access     = read/write</span>
+<span class="go">   status     = 1</span>
+<span class="go">   severity   = 0</span>
+<span class="go">   timestamp  = 1265996455.417 (2010-Feb-12 11:40:55.417)</span>
+<span class="go">   upper_ctrl_limit    = 200.0</span>
+<span class="go">   lower_ctrl_limit    = -200.0</span>
+<span class="go">   upper_disp_limit    = 200.0</span>
+<span class="go">   lower_disp_limit    = -200.0</span>
+<span class="go">   upper_alarm_limit   = 0.0</span>
+<span class="go">   lower_alarm_limit   = 0.0</span>
+<span class="go">   upper_warning_limit = 0.0</span>
+<span class="go">   lower_warning       = 0.0</span>
+<span class="go">   PV is monitored internally</span>
+<span class="go">   no user callbacks defined.</span>
+<span class="go">=============================</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -489,22 +617,48 @@ including Control Settings.</p>
 <h3><a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a><a class="headerlink" href="#camonitor" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.camonitor">
-<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">camonitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">writer=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">callback=None</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.camonitor" title="Link to this definition">¶</a></dt>
-<dd><p>This <cite>sets a monitor</cite> on the named PV, which will cause <em>something</em> to be
-done each time the value changes.  By default the PV name, time, and
-value will be printed out (to standard output) when the value changes,
-but the action that actually happens can be customized.</p>
-<dl class="field-list simple">
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">camonitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.camonitor" title="Link to this definition">¶</a></dt>
+<dd><p>sets a monitor on a PV.</p>
+<dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pvname</strong> – name of Epics Process Variable</p></li>
-<li><p><strong>writer</strong> (<code class="docutils literal notranslate"><span class="pre">None</span></code> or a callable function that takes a string argument.) – where to write results to standard output .</p></li>
-<li><p><strong>callback</strong> (<code class="docutils literal notranslate"><span class="pre">None</span></code> or callable function) – user-supplied function to receive result</p></li>
-</ul>
+<dd class="field-odd"><dl>
+<dt><strong>pvname</strong><span class="classifier">str</span></dt><dd><p>name of PV</p>
+</dd>
+<dt><strong>writer</strong><span class="classifier">callable or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>function used to send monitor messages [None]</p>
+</dd>
+<dt><strong>callback</strong><span class="classifier">callback or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>custom callback function [None]</p>
+</dd>
+<dt><strong>connection_timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for connection [5]</p>
+</dd>
+<dt><strong>monitor_delta</strong><span class="classifier">float or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>minimum change in value to monitor [None]</p>
 </dd>
 </dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ol class="arabic simple">
+<li><p>To write the result to a file, provide the <cite>writer</cite> option, such as a write
+method to an open file or some other callable that accepts a string.</p></li>
+<li><p>To completely control where the output goes, provide a <cite>callback</cite>
+method and you can do whatever you’d like with them.  This callback will be
+sent keyword arguments for pvname, value, char_value, and more. Use <cite>**kws</cite>!</p></li>
+<li><p><cite>monitor_delta</cite> will set a value below which changes in the PV value
+will not generate an event.  This will try to set the <cite>MDEL</cite> field for
+a PV, limiting events from being sent from the PV server.  If MDEL
+cannot be set (perhaps due to write-access), this will be simulated in the
+client code. The default <cite>None</cite> will leave the current value unchanged.</p></li>
+</ol>
+<p class="rubric">Examples</p>
+<p>to write a message with the latest value for that PV each time the value changes and
+when ca.poll() is called.</p>
+<p>&gt;&gt;&gt;camonitor(‘xx.VAL’)</p>
 </dd></dl>
 
+<p>This sets a simple “monitor” on the named PV, which will cause
+<em>something</em> to be done each time the value changes.  By default the PV
+name, time, and value will be printed out (to standard output) when
+the value changes, but the action that actually happens can be
+customized.</p>
 <p>One can specify any function that can take a string as <em>writer</em>, such as
 the <code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code> method of an open file that has been open for writing.
 If left as <code class="docutils literal notranslate"><span class="pre">None</span></code>, messages of changes will be sent to
@@ -513,7 +667,7 @@ If left as <code class="docutils literal notranslate"><span class="pre">None</sp
 should take keyword arguments for <em>pvname</em>, <em>value</em>, and <em>char_value</em>.  See
 <a class="reference internal" href="pv.html#pv-callbacks-label"><span class="std std-ref">User-supplied Callback functions</span></a> for information on writing callback functions for
 <a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">camonitor</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">camonitor</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">camonitor</span><span class="p">(</span><span class="s1">&#39;XXX.m1.VAL&#39;</span><span class="p">)</span>
 <span class="go">XXX.m1.VAL 2010-08-01 10:34:15.822452 1.3</span>
 <span class="go">XXX.m1.VAL 2010-08-01 10:34:16.823233 1.2</span>
@@ -527,10 +681,13 @@ should take keyword arguments for <em>pvname</em>, <em>value</em>, and <em>char_
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.camonitor_clear">
 <span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">camonitor_clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.camonitor_clear" title="Link to this definition">¶</a></dt>
-<dd><p>clears a monitor set on the named PV by <a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a>.</p>
+<dd><p>clear monitors on a PV</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>pvname</strong> – name of Epics Process Variable</p>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pvname</strong><span class="classifier">str</span></dt><dd><p>name of PV</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -538,7 +695,7 @@ should take keyword arguments for <em>pvname</em>, <em>value</em>, and <em>char_
 <p>This simple example monitors a PV with <a class="reference internal" href="#epics.camonitor" title="epics.camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a> for while, with
 changes being saved to a log file.   After a while, the monitor is cleared
 and the log file is inspected:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fh</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;PV1.log&#39;</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">epics</span><span class="o">.</span><span class="n">camonitor</span><span class="p">(</span><span class="s1">&#39;XXX:DMM1Ch2_calc.VAL&#39;</span><span class="p">,</span><span class="n">writer</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="o">....</span> <span class="n">wait</span> <span class="k">for</span> <span class="n">changes</span> <span class="o">...</span>
@@ -562,54 +719,80 @@ and the log file is inspected:</p>
 <h3><a class="reference internal" href="#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget_many()</span></code></a><a class="headerlink" href="#caget-many" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.caget_many">
-<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caget_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvlist</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">as_string=False</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">count=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">as_numpy=True</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">timeout=None</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget_many" title="Link to this definition">¶</a></dt>
-<dd><p>get a list of PVs as quickly as possible.  Returns a list of values for
-each PV in the list.  Unlike <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a>, this method does not use
-automatic monitoring (see <a class="reference internal" href="pv.html#pv-automonitor-label"><span class="std std-ref">Automatic Monitoring of a PV</span></a>).</p>
-<dl class="field-list simple">
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caget_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_numpy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget_many" title="Link to this definition">¶</a></dt>
+<dd><p>get values for a list of PVs, working as fast as possible</p>
+<dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pvlist</strong> (<code class="docutils literal notranslate"><span class="pre">list</span></code> or <code class="docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="docutils literal notranslate"><span class="pre">str</span></code>) – A list of process variable names.</p></li>
-<li><p><strong>as_string</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to return string representation of the PV values.</p></li>
-<li><p><strong>count</strong> (integer or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – number of elements to return for array data.</p></li>
-<li><p><strong>as_numpy</strong> (<code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>) – whether to return the Numerical Python representation for array data.</p></li>
-<li><p><strong>timeout</strong> (float or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for value before returning None.</p></li>
-</ul>
+<dd class="field-odd"><dl>
+<dt><strong>pvlist</strong><span class="classifier">list of strings</span></dt><dd><p>list of pv names to fetch</p>
+</dd>
+<dt><strong>as_string</strong><span class="classifier">bool</span></dt><dd><p>whether to get values as strings [False]</p>
+</dd>
+<dt><strong>as_numpy</strong><span class="classifier">bool</span></dt><dd><p>whether to get values as numpy arrys [True]</p>
+</dd>
+<dt><strong>count</strong><span class="classifier">int or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>maximum number of elements to get [None]</p>
+</dd>
+<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for <em>each</em> get()  [1.0]</p>
+</dd>
+<dt><strong>connection_timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for <em>all</em> pvs to connect [5.0]</p>
+</dd>
+<dt><strong>conn_timeout :float</strong></dt><dd><p>back-compat alias or connection_timeout</p>
 </dd>
 </dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>list of values, with <cite>None</cite> signifying ‘not connected’ or ‘timed out’.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>this does not cache PV objects.</p>
 </dd></dl>
 
-<p>For detailed information about the arguments, see the documentation for
-<a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a>. Also see <a class="reference internal" href="advanced.html#advanced-connecting-many-label"><span class="std std-ref">Strategies for connecting to a large number of PVs</span></a> for more
-discussion.</p>
+<p>For more detailed information about the arguments, see the
+documentation for <a class="reference internal" href="#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a>. Also see
+<a class="reference internal" href="advanced.html#advanced-connecting-many-label"><span class="std std-ref">Strategies for connecting to a large number of PVs</span></a> for more discussion.</p>
 </section>
 <section id="caput-many">
 <h3><a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a><a class="headerlink" href="#caput-many" title="Link to this heading">¶</a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.caput_many">
-<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caput_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">wait=False</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">connection_timeout=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">put_timeout=60</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.caput_many" title="Link to this definition">¶</a></dt>
-<dd><p>put values to a list of PVs as quickly as possible.  Returns a list of ints
-for each PV in the list: 1 if the put was successful, -1 if it timed out.
-Unlike <a class="reference internal" href="#epics.caput" title="epics.caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a>, this method does not use automatic monitoring (see
-<a class="reference internal" href="pv.html#pv-automonitor-label"><span class="std std-ref">Automatic Monitoring of a PV</span></a>).</p>
+<span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caput_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">put_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.caput_many" title="Link to this definition">¶</a></dt>
+<dd><p>put values to a list of PVs, as quickly as possible</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pvlist</strong> (<code class="docutils literal notranslate"><span class="pre">list</span></code> or <code class="docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="docutils literal notranslate"><span class="pre">str</span></code>) – A list of process variable names.</p></li>
-<li><p><strong>values</strong> (<code class="docutils literal notranslate"><span class="pre">list</span></code> or <code class="docutils literal notranslate"><span class="pre">tuple</span></code>) – values to put to each PV.</p></li>
-<li><p><strong>wait</strong> – if <code class="docutils literal notranslate"><span class="pre">'each'</span></code>, <a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a> will wait for each
-PV to process before starting the next.  If <code class="docutils literal notranslate"><span class="pre">'all'</span></code>,
-<a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a> will issue puts for all PVs immediately, then
-wait for all of them to complete.  If any other value,
-<a class="reference internal" href="#epics.caput_many" title="epics.caput_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a> will not wait for put processing to complete.</p></li>
-<li><p><strong>connection_timeout</strong> (float or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for
-a connection to be established to each PV.</p></li>
-<li><p><strong>put_timeout</strong> (float or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – maximum time to wait (in seconds) for processing
-to complete for each PV (if <code class="docutils literal notranslate"><span class="pre">wait</span></code> is <code class="docutils literal notranslate"><span class="pre">'each'</span></code>), or for processing
-to complete for all PVs (if <code class="docutils literal notranslate"><span class="pre">wait</span></code> is <code class="docutils literal notranslate"><span class="pre">'all'</span></code>).</p></li>
-</ul>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pvlist</strong><span class="classifier">list or iterable</span></dt><dd><p>list of PV names</p>
+</dd>
+<dt><strong>values</strong><span class="classifier">list or iterable</span></dt><dd><p>list of values for corresponding PVs</p>
+</dd>
+<dt><strong>wait</strong><span class="classifier">bool or string</span></dt><dd><p>whether to wait for puts (see notes) [False]</p>
+</dd>
+<dt><strong>put_timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for the put to complete [60]</p>
+</dd>
+<dt><strong>connection_timeout :float</strong></dt><dd><p>maximum time (in seconds) to wait for connection [5]</p>
 </dd>
 </dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>a list of ints or <cite>None</cite>, with values of 1 if the put was successful,</dt><dd></dd>
+<dt>or a negative number if the put failed (say, the timeout was exceeded),</dt><dd></dd>
+<dt>or <cite>None</cite> if the connection failed.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ol class="arabic simple">
+<li><p>This does not maintain the PV objects.</p></li>
+<li><p>With <cite>wait=’each’</cite>, <em>each</em> put operation will block until it is
+complete or until the put_timeout duration expires.
+With <cite>wait=’all’</cite>, this method will block until <em>all</em> put
+operations are complete, or until the put_timeout expires.
+This <cite>wait</cite> only applies to the put timeout, not the
+connection timeout.</p></li>
+</ol>
 </dd></dl>
 
 <p>Because connections to channels normally connect very quickly (less than a
@@ -656,7 +839,7 @@ reasonably stable and ready to use in production code.  Features are being
 added slowly, and testing is integrated into development so that the chance
 of introducing bugs into existing codes is minimized.  The package is
 targeted and tested to work on all supported versions of Python, currently
-Python 3.6 and higher.</p>
+Python 3.9 and higher.</p>
 </section>
 </section>
 
@@ -698,7 +881,7 @@ Python 3.6 and higher.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>
 </html>

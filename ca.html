@@ -7,10 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>ca: Low-level Channel Access module &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=0abfba44"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/documentation_options.js?v=e2a51986"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -247,7 +247,7 @@ the functions are meant to do.</p>
 <p>As a general rule, a CA function named <cite>ca_XXX</cite> in the C library will have the
 equivalent function called <cite>XXX</cite> in the <cite>ca</cite> module.  This is because the
 intention is that one will import the <cite>ca</cite> module with</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ca</span>
 </pre></div>
 </div>
 <p>so that the Python function <code class="xref py py-func docutils literal notranslate"><span class="pre">ca.XXX()</span></code> will corresponds to the C
@@ -273,7 +273,7 @@ offline.  These messages are mostly informational and harmless.   But they are
 also fairly annoying.</p>
 <p>Starting with version 3.5.7, these messages are disabled by default.   You can
 re-enable these by setting:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ca</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">WITH_CA_MESSAGES</span> <span class="o">=</span> <span class="kc">True</span>
 </pre></div>
 </div>
@@ -1443,7 +1443,7 @@ those looking to translate lower-level C or Python code to this module.</p>
 <h3><cite>PySEVCHK</cite> and ChannelAccessExcepction: checking CA return codes<a class="headerlink" href="#pysevchk-and-channelaccessexcepction-checking-ca-return-codes" title="Link to this heading">¶</a></h3>
 <dl class="py exception">
 <dt class="sig sig-object py" id="epics.ca.ChannelAccessException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">ChannelAccessException</span></span><a class="headerlink" href="#epics.ca.ChannelAccessException" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">ChannelAccessException</span></span><a class="headerlink" href="#epics.ca.ChannelAccessException" title="Link to this definition">¶</a></dt>
 <dd><p>This exception is raised when the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module experiences
 unexpected behavior and must raise an exception</p>
 </dd></dl>
@@ -1690,7 +1690,7 @@ not supported, as they are needed only to dynamically allocate memory.</p>
 <h2><a class="reference internal" href="#epics.ca.CAThread" title="epics.ca.CAThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">CAThread</span></code></a> class<a class="headerlink" href="#cathread-class" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="epics.ca.CAThread">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">CAThread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">target=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">args=()</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">kwargs={}</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.CAThread" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">CAThread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">target=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">args=()</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">kwargs={}</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.CAThread" title="Link to this definition">¶</a></dt>
 <dd><p>create a CA-aware subclass of a standard Python <code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code>.  See the
 standard library documentation for further information on how to use Thread objects.</p>
 <p>A <cite>CAThread</cite> simply runs <a class="reference internal" href="#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">use_initial_context()</span></code></a> prior to running each target
@@ -1708,7 +1708,7 @@ the target function.</p>
 <p>Note here that several things have been simplified compare to using CA in C:
 initialization and creating a main-thread context are handled, and connection
 of channels is handled in the background:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ca</span>
 <span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="n">count</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">element_count</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
 <span class="n">ftype</span> <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">field_type</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
@@ -1721,7 +1721,7 @@ of channels is handled in the background:</p>
 <section id="put-waiting-for-completion">
 <h3>Put, waiting for completion<a class="headerlink" href="#put-waiting-for-completion" title="Link to this heading">¶</a></h3>
 <p>Here we set a PVs value, waiting for it to complete:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ca</span>
 <span class="n">chid</span>  <span class="o">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">create_channel</span><span class="p">(</span><span class="s1">&#39;XXX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="n">ca</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span>  <span class="mf">1.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -1735,13 +1735,13 @@ complete.</p>
 callback function to be called whenever the PV value changes.   In the case
 below, the function to be called will simply write the latest value out to
 standard output:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">ca</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ca</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
 <span class="c1"># define a callback function.  Note that this should</span>
 <span class="c1"># expect certain keyword arguments, including &#39;pvname&#39; and &#39;value&#39;</span>
-<span class="k">def</span> <span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
     <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;New Value: </span><span class="si">%s</span><span class="s1">  value=</span><span class="si">%s</span><span class="s1">, kw=</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">kw</span><span class="p">)))</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
@@ -1769,10 +1769,10 @@ faults (on Windows) or seemingly inexplicable crashes later (on linux).</p>
 <p>Here, we define a connection callback – a function to be called when the
 connection status of the PV changes. Note that this will be called on
 initial connection:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
-<span class="k">def</span> <span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ca connection status changed:  </span><span class="si">{</span><span class="n">pvname</span><span class="si">}</span><span class="s1">,  </span><span class="si">{</span><span class="n">conn</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">chid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="c1"># create channel, provide connection callback</span>
@@ -1796,10 +1796,10 @@ callback should be prepared to accept keyword arguments of <cite>pvname</cite>,
 <p>The following example demonstrates the addition of a function to be
 called when the access rights of a channel changes. Note this will be
 called immediately after successful installation:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
-<span class="k">def</span> <span class="nf">on_access_rights_change</span><span class="p">(</span><span class="n">read_access</span><span class="p">,</span> <span class="n">write_access</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">on_access_rights_change</span><span class="p">(</span><span class="n">read_access</span><span class="p">,</span> <span class="n">write_access</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;read access=</span><span class="si">{</span><span class="n">read_access</span><span class="si">}</span><span class="s1">, write access=</span><span class="si">{</span><span class="n">write_access</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="c1"># create a channel and attach the above function for access rights events</span>
@@ -1858,7 +1858,7 @@ called immediately after successful installation:</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>
 </html>

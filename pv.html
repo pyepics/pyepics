@@ -7,10 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>PV: Epics Process Variables &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=0abfba44"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/documentation_options.js?v=e2a51986"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -190,7 +190,7 @@ both methods and attributes for accessing it’s properties.</p>
 <h2>The <a class="reference internal" href="#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code></a> class<a class="headerlink" href="#the-pv-class" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pv.PV">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pv.</span></span><span class="sig-name descname"><span class="pre">PV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">callback=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">form='time'</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">verbose=False</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">auto_monitor=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">count=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">connection_callback=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">connection_timeout=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">access_callback=None</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.PV" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pv.</span></span><span class="sig-name descname"><span class="pre">PV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">callback=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">form='time'</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">verbose=False</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">auto_monitor=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">count=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">connection_callback=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">connection_timeout=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">access_callback=None</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#pv.PV" title="Link to this definition">¶</a></dt>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">create</span> <span class="pre">a</span> <span class="pre">PV</span> <span class="pre">object</span> <span class="pre">for</span> <span class="pre">a</span> <span class="pre">named</span> <span class="pre">Epics</span> <span class="pre">Process</span> <span class="pre">Variable.</span></span></dt>
 <dd><dl class="field-list simple">
@@ -212,7 +212,7 @@ both methods and attributes for accessing it’s properties.</p>
 
 <p>Once created, a PV should (barring any network issues) automatically
 connect and be ready to use.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">PV</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XX:m1.VAL&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
@@ -513,7 +513,7 @@ When read, the latest value will be returned, even if that means a
 <a class="reference internal" href="#pv.get" title="pv.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a> needs to be called.</p>
 <p>Assigning to <a class="reference internal" href="#pv.value" title="pv.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code></a> is equivalent to setting the value with the
 <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-meth docutils literal notranslate"><span class="pre">put()</span></code></a> method.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">PV</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;xxx.VAL&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 <span class="go">1.00</span>
@@ -976,7 +976,7 @@ be run on access rights events.</p>
 sometimes you want to wait until the processing completes before going on.
 There are a few ways to accomplish this.  First, one can simply wait until
 the processing is done:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
 <span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">)</span>
 <span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Done&#39;</span><span class="p">)</span>
@@ -1023,7 +1023,7 @@ be run when the <a class="reference internal" href="#pv.put" title="pv.put"><cod
 data with the <em>callback_data</em> argument (which should be dict-like) to
 <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-meth docutils literal notranslate"><span class="pre">put()</span></code></a>.   A simple example would be:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">onPutComplete</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">onPutComplete</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Put done for </span><span class="si">{</span><span class="n">pvname</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="n">pv</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onPutComplete</span><span class="p">)</span>
@@ -1075,7 +1075,7 @@ highly recommended.</p>
 <h3>Basic Use<a class="headerlink" href="#basic-use" title="Link to this heading">¶</a></h3>
 <p>The simplest approach is to simply create a PV and use its <a class="reference internal" href="#pv.value" title="pv.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code></a>
 attribute:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">PV</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;xxx.VAL&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 <span class="go">1.00</span>
@@ -1086,7 +1086,7 @@ attribute:</p>
 <em>p1.value = 2.00</em> line does a <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-func docutils literal notranslate"><span class="pre">put()</span></code></a> to set the value, causing any
 necessary processing over the network.</p>
 <p>The above example is equivalent to</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">PV</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;xxx.VAL&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
 <span class="go">1.00</span>
@@ -1108,7 +1108,7 @@ necessary processing over the network.</p>
 <h3>Requests including Metadata<a class="headerlink" href="#requests-including-metadata" title="Link to this heading">¶</a></h3>
 <p>It is also possible to get the metadata associated with a single Channel Access
 request using <a class="reference internal" href="#pv.get_with_metadata" title="pv.get_with_metadata"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_with_metadata()</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">PV</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">PV</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">PV</span><span class="p">(</span><span class="s1">&#39;xxx.VAL&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
@@ -1142,7 +1142,7 @@ request using <a class="reference internal" href="#pv.get_with_metadata" title="
 <section id="example-of-using-info-and-more-properties-examples">
 <h3>Example of using info and more properties examples<a class="headerlink" href="#example-of-using-info-and-more-properties-examples" title="Link to this heading">¶</a></h3>
 <p>A PV has many attributes.  This can be seen from its <em>info</em> paragraph:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">get_pv</span><span class="p">(</span><span class="s1">&#39;13IDA:m3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
 <span class="go">== 13IDA:m3  (native_double) ==</span>
@@ -1196,13 +1196,13 @@ value.</p>
 <h3>Example of <a class="reference internal" href="#pv.put" title="pv.put"><code class="xref py py-meth docutils literal notranslate"><span class="pre">put()</span></code></a><a class="headerlink" href="#example-of-put" title="Link to this heading">¶</a></h3>
 <p>To put a new value to a variable, either of these two approaches can be
 used:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Or (equivalently):</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">epics</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;XXX&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">1.0</span>
 </pre></div>
@@ -1216,9 +1216,9 @@ it would be inconvenient (and possibly inefficient) to have to continually
 ask if a PVs value has changed.  Instead, it is better to set a <em>callback</em>
 function: a function to be run when the value has changed.</p>
 <p>A simple example of this would be:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="k">def</span> <span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">onChanges</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">char_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;PV Changed! &#39;</span><span class="p">,</span> <span class="n">pvname</span><span class="p">,</span> <span class="n">char_value</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">())</span>
 
 <span class="n">mypv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">get_pv</span><span class="p">(</span><span class="s1">&#39;PyTest:ao1.VAL&#39;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">onChanges</span><span class="p">)</span>
@@ -1238,13 +1238,13 @@ See <a class="reference internal" href="#pv-callbacks-label"><span class="std st
 <section id="example-of-connection-callback">
 <h3>Example of connection callback<a class="headerlink" href="#example-of-connection-callback" title="Link to this heading">¶</a></h3>
 <p>A connection callback:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
-<span class="k">def</span> <span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">onConnectionChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conn</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;PV connection status changed: </span><span class="si">{</span><span class="n">pvname</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">conn</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">onValueChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">onValueChange</span><span class="p">(</span><span class="n">pvname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;PV value changed: </span><span class="si">{</span><span class="n">pvname</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s1">)  </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="n">mypv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">get_pv</span><span class="p">(</span><span class="s1">&#39;PyTest:ao1.VAL&#39;</span><span class="p">,</span>
@@ -1264,10 +1264,10 @@ See <a class="reference internal" href="#pv-callbacks-label"><span class="std st
 <section id="example-of-an-access-rights-callback">
 <h3>Example of an access rights callback<a class="headerlink" href="#example-of-an-access-rights-callback" title="Link to this heading">¶</a></h3>
 <p>Associating an access rights callback with a PV:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
-<span class="k">def</span> <span class="nf">access_rights_callback</span><span class="p">(</span><span class="n">read_access</span><span class="p">,</span> <span class="n">write_access</span><span class="p">,</span> <span class="n">pv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">access_rights_callback</span><span class="p">(</span><span class="n">read_access</span><span class="p">,</span> <span class="n">write_access</span><span class="p">,</span> <span class="n">pv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">pv</span><span class="o">.</span><span class="n">pvname</span><span class="si">}</span><span class="s1">: read=</span><span class="si">{</span><span class="n">read_access</span><span class="si">}</span><span class="s1">, write=</span><span class="si">{</span><span class="n">write_access</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="n">mypv</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">get_pv</span><span class="p">(</span><span class="s1">&#39;PyTest:ao1.VAL&#39;</span><span class="p">,</span> <span class="n">access_callback</span><span class="o">=</span><span class="n">access_rights_callback</span><span class="p">)</span>
@@ -1286,9 +1286,9 @@ See <a class="reference internal" href="#pv-callbacks-label"><span class="std st
 but also when certain of the PVs properties such as units or limits change.
 To get such callbacks, subscribe with <cite>auto_monitor</cite> set to both Value and
 Property changes, as with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="k">def</span> <span class="nf">onChange</span><span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">onChange</span><span class="p">(</span><span class="n">pvname</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;PV changed: </span><span class="si">{</span><span class="n">pvname</span><span class="si">}</span><span class="s1">, value=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">, units=</span><span class="si">{</span><span class="n">units</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="n">mypc</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">get_pv</span><span class="p">(</span><span class="s1">&#39;PyTest:ao1.VAL&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="s1">&#39;ctrl&#39;</span><span class="p">,</span>
@@ -1348,7 +1348,7 @@ not be included in the callback arguments.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>
 </html>

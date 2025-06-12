@@ -7,10 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Devices: collections of PVs &#8212; Epics Channel Access for Python</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=0abfba44"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/documentation_options.js?v=e2a51986"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -169,7 +169,7 @@ base class, to be inherited and extended.  In fact, there is a more
 sophisticated   Motor device described below at <a class="reference internal" href="#device-motor-label"><span class="std std-ref">Epics Motor Device</span></a></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="device.Device">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">Device</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">delim=''</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">attrs=None</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.Device" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">device.</span></span><span class="sig-name descname"><span class="pre">Device</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">delim=''</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">attrs=None</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#device.Device" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>The attribute PVs are built as needed and held in an internal buffer
@@ -216,7 +216,7 @@ function will be run when the at tribute’s value changes</p>
 <dd><p>adds an explicitly names <code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.PV()</span></code> to the device even though it
 may violate the normal naming rules (in which <cite>attr</cite> is mapped to
 <cite>epics.PV(prefix+delim+attr)</cite>.   That is, one can say:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
 <span class="n">m1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="s1">&#39;XXX:m1&#39;</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
 <span class="n">m1</span><span class="o">.</span><span class="n">add_pv</span><span class="p">(</span><span class="s1">&#39;XXX:m2.VAL&#39;</span><span class="p">,</span> <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;other&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">VAL</span><span class="p">)</span>     <span class="c1"># print value of XXX:m1.VAL</span>
@@ -270,7 +270,7 @@ drive position, but a fully enabled Motor should allow the use to change
 and read many of the Motor parameters.</p>
 <p>The  <a class="reference internal" href="#motor.Motor" title="motor.Motor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Motor</span></code></a> class helps the user create and use Epics motors.
 A simple example use would be:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">epics</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">epics</span>
 <span class="n">m1</span> <span class="o">=</span> <span class="n">epics</span><span class="o">.</span><span class="n">Motor</span><span class="p">(</span><span class="s1">&#39;XXX:m1&#39;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Motor: </span><span class="si">{</span><span class="n">m1</span><span class="o">.</span><span class="n">DESC</span><span class="si">}</span><span class="s1"> Currently at </span><span class="si">{</span><span class="n">m1</span><span class="o">.</span><span class="n">RBV</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -298,7 +298,7 @@ coordinate system, and can wait for completion.</p>
 <h3>The <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code> class<a class="headerlink" href="#the-epics-motor-class" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="motor.Motor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">Motor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">timeout=30.</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.Motor" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">motor.</span></span><span class="sig-name descname"><span class="pre">Motor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">timeout=30.</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#motor.Motor" title="Link to this definition">¶</a></dt>
 <dd><p>create a Motor object for a named Epics Process Variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -311,7 +311,7 @@ coordinate system, and can wait for completion.</p>
 </dd></dl>
 
 <p>Once created, a Motor should be ready to use.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">Motor</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s1">&#39;XX:m1&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">drive</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">slew_speed</span><span class="p">)</span>
 <span class="go">1.030 Fine X 5.0</span>
@@ -840,7 +840,7 @@ build your own device classes.</p>
 This is not much more than a collection of PVs.  Since there is no prefix
 given, all PVs in the device must be <em>fully qualified</em>.  Note that there is
 no requirement to share a common prefix in such a collection of PVs:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics</span> <span class="kn">import</span> <span class="n">Device</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">epics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Device</span>
 <span class="n">dev</span> <span class="o">=</span> <span class="n">Device</span><span class="p">()</span>
 <span class="n">p1</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;13IDC:m1.VAL&#39;</span><span class="p">)</span>
 <span class="n">p2</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">PV</span><span class="p">(</span><span class="s1">&#39;13IDC:m2.VAL&#39;</span><span class="p">)</span>
@@ -862,9 +862,9 @@ includes a Device for an Epics ai (analog input record).  The full
 implementation of this device is:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="sd">&quot;&quot;&quot;Epics analog input record&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">Device</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">Device</span>
 
-<span class="k">class</span> <span class="nc">ai</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ai</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="s2">&quot;Simple analog input device&quot;</span>
 
     <span class="n">attrs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;VAL&#39;</span><span class="p">,</span> <span class="s1">&#39;EGU&#39;</span><span class="p">,</span> <span class="s1">&#39;HOPR&#39;</span><span class="p">,</span> <span class="s1">&#39;LOPR&#39;</span><span class="p">,</span> <span class="s1">&#39;PREC&#39;</span><span class="p">,</span> <span class="s1">&#39;NAME&#39;</span><span class="p">,</span> <span class="s1">&#39;DESC&#39;</span><span class="p">,</span>
@@ -872,7 +872,7 @@ implementation of this device is:</p>
              <span class="s1">&#39;AOFF&#39;</span><span class="p">,</span> <span class="s1">&#39;ASLO&#39;</span><span class="p">,</span> <span class="s1">&#39;ESLO&#39;</span><span class="p">,</span> <span class="s1">&#39;EOFF&#39;</span><span class="p">,</span> <span class="s1">&#39;SMOO&#39;</span><span class="p">,</span> <span class="s1">&#39;HIHI&#39;</span><span class="p">,</span> <span class="s1">&#39;LOLO&#39;</span><span class="p">,</span>
              <span class="s1">&#39;HIGH&#39;</span><span class="p">,</span> <span class="s1">&#39;LOW&#39;</span><span class="p">,</span> <span class="s1">&#39;HHSV&#39;</span><span class="p">,</span> <span class="s1">&#39;LLSV&#39;</span><span class="p">,</span> <span class="s1">&#39;HSV&#39;</span><span class="p">,</span> <span class="s1">&#39;LSV&#39;</span><span class="p">,</span> <span class="s1">&#39;HYST&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">prefix</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
             <span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">Device</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -883,7 +883,7 @@ input record, and subclasses <code class="xref py py-class docutils literal notr
 corresponding PVs.  For most record suffixes, these will be available as
 attributes of the Device object.  For example, the <code class="xref py py-class docutils literal notranslate"><span class="pre">ai</span></code> class above can
 be used simply and cleanly as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">epics.devices</span> <span class="kn">import</span> <span class="n">ai</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">epics.devices</span><span class="w"> </span><span class="kn">import</span> <span class="n">ai</span>
 <span class="n">This_ai</span> <span class="o">=</span> <span class="n">ai</span><span class="p">(</span><span class="s1">&#39;XXX.PRES&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Value: </span><span class="si">{</span><span class="n">This_ai</span><span class="o">.</span><span class="n">VAL</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Units: </span><span class="si">{</span><span class="n">This_ai</span><span class="o">.</span><span class="n">EGU</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -906,9 +906,9 @@ of the Scaler Record from synApps, including methods for changing modes, and
 reading and writing data.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python </span>
 <span class="sd">&quot;&quot;&quot;Epics Scaler&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">poll</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">poll</span>
 
-<span class="k">class</span> <span class="nc">Scaler</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Scaler</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">    Simple implementation of SynApps Scaler Record.   </span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -918,7 +918,7 @@ reading and writing data.</p>
     <span class="n">calc_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;calc</span><span class="si">%i</span><span class="s1">&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_calc</span><span class="si">%i</span><span class="s1">.VAL&#39;</span><span class="p">,</span> <span class="s1">&#39;expr</span><span class="si">%i</span><span class="s1">&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_calc</span><span class="si">%i</span><span class="s1">.CALC&#39;</span><span class="p">}</span>
     <span class="n">_nonpvs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_prefix&#39;</span><span class="p">,</span> <span class="s1">&#39;_pvs&#39;</span><span class="p">,</span> <span class="s1">&#39;_delim&#39;</span><span class="p">,</span> <span class="s1">&#39;_nchan&#39;</span><span class="p">,</span> <span class="s1">&#39;_chans&#39;</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">nchan</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nchan</span>  <span class="o">=</span> <span class="n">nchan</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_chans</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nchan</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
         
@@ -937,39 +937,39 @@ reading and writing data.</p>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_pv</span><span class="p">(</span><span class="n">val</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span> <span class="n">attr</span> <span class="o">=</span> <span class="n">key</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mutable</span> <span class="o">=</span> <span class="kc">False</span>
         
-    <span class="k">def</span> <span class="nf">AutoCountMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">AutoCountMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="s2">&quot;set to autocount mode&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;CONT&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">OneShotMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">OneShotMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="s2">&quot;set to one shot mode&quot;</span>        
         <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;CONT&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">CountTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctime</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">CountTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctime</span><span class="p">):</span>
         <span class="s2">&quot;set count time&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;TP&#39;</span><span class="p">,</span> <span class="n">ctime</span><span class="p">)</span>
         
-    <span class="k">def</span> <span class="nf">Count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="s2">&quot;set count, with optional counttime&quot;</span>
         <span class="k">if</span> <span class="n">ctime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">CountTime</span><span class="p">(</span><span class="n">ctime</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;CNT&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="n">wait</span><span class="p">)</span>
         <span class="n">poll</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">EnableCalcs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">EnableCalcs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="s2">&quot; enable calculations&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;calc_enable&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">setCalc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">calc</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setCalc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">calc</span><span class="p">):</span>
         <span class="s2">&quot;set the calculation for scaler i&quot;</span>
         <span class="n">attr</span> <span class="o">=</span> <span class="s1">&#39;expr</span><span class="si">%i</span><span class="s1">&#39;</span>  <span class="o">%</span> <span class="n">i</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">calc</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">getNames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getNames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="s2">&quot;get all names&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;NM</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chans</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">Read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_calc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_calc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="s2">&quot;read all values&quot;</span>
         <span class="n">attr</span> <span class="o">=</span> <span class="s1">&#39;S</span><span class="si">%i</span><span class="s1">&#39;</span>
         <span class="k">if</span> <span class="n">use_calc</span><span class="p">:</span>
@@ -1129,7 +1129,7 @@ specific use of that Device.</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2021, Matthew Newville.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.6.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>
 </html>
