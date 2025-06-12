@@ -7,7 +7,12 @@ write_to = "epics/version.py"
 version_scheme = "post-release"
 
 [tool.setuptools.packages.find]
-include = ["epics"]
+include = ["epics", "epics.autosave", "epics.compat", "epics.devices",
+           "epics.qt", "epics.wx", "epics.wx", "epics.clibs",
+           "epics.clibs.darwin64", "epics.clibs.darwinarm64",
+           "epics.clibs.linux64", "epics.clibs.linux32",
+           "epics.clibs.linuxarm", "epics.clibs.win64",
+           "epics.clibs.win32"]
 
 [tool.pytest.ini_options]
 addopts = "--cov=epics --cov-append --cov-report html"
@@ -20,7 +25,7 @@ requires-python = ">=3.9"
 description = "Epics Channel Access for Python"
 readme = "README.rst"
 authors = [{name="Matthew Newville", email="newville@cars.uchicago.edu"}]
-license = {file = "LICENSE"}
+license-files = ["LICENSE"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
@@ -46,25 +51,3 @@ Documentation = "https://pyepics.github.io/pyepics/"
 doc = ["Sphinx", "numpydoc"]
 test = ["coverage", "pytest", "pytest-cov", "psutil; platform_system=='Linux'"]
 all = ["pyepics[test, doc]"]
-
-
-# [options]
-
-# include_package_data = True
-# packages =
-#     epics
-#     epics.autosave
-#     epics.compat
-#     epics.clibs
-#     epics.devices
-#     epics.qt
-#     epics.wx
-#     epics.clibs.darwin64
-#     epics.clibs.darwinarm64
-#     epics.clibs.linux64
-#     epics.clibs.linux32
-#     epics.clibs.linuxarm
-#     epics.clibs.win64
-#     epics.clibs.win32
-
-# [options.extras_require]
