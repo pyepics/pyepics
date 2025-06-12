@@ -1,5 +1,5 @@
 PyEpics:  Epics Channel Access for Python
-================================
+==============================================
 
 .. image:: https://github.com/pyepics/pyepics/actions/workflows/test-with-conda.yml/badge.svg
    :target: https://github.com/pyepics/pyepics/actions/workflows/test-with-conda.yml/
@@ -31,7 +31,7 @@ advantages including no need for extension code written in C, better
 thread-safety, and easier installation on multiple platforms.
 
 Installation
-===========
+===============
 
 This package is supported and tested with Python 3.8 through 3.12.  Shared
 libraries needed for Epics Channel Access are provided for Windows, MacOS,
@@ -53,7 +53,7 @@ For additional installation details, see the INSTALL file. Binary installers
 for Windows are available.
 
 License
-----------
+-------------
 
 This code is distributed under the Epics Open License
 
@@ -67,7 +67,7 @@ via CA, and special widget classes for using EPICS PVs with wxPython.
 
 
 caget(), caput() and cainfo()
-----------------------------
+--------------------------------
 
 The simplest interface to EPICS Channel Access provides functions caget(),
 caput(), and cainfo(), similar to the EZCA interface and to the
@@ -134,7 +134,3 @@ Features that you won't have to worry about:
 
 * connection management (unless you choose to worry about this)
 * PV record types - this is handled automatically.
-
-
-Matt Newville <newville@cars.uchicago.edu>
-Last Update:  2024-June-20
