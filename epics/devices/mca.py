@@ -68,7 +68,7 @@ class ROI(Device):
                         with_poll=False)
         if data_pv is None:
             data_pv = self.address
-        if isinstance(data_pv, basestring):
+        if isinstance(data_pv, str):
             data_pv = get_pv(data_pv)
         self._pvs['_dat_'] = data_pv
         self._pvs['_net_'] = get_pv(self.address + 'N')
