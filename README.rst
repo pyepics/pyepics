@@ -2,13 +2,7 @@ PyEpics:  Epics Channel Access for Python
 ==============================================
 
 .. image:: https://github.com/pyepics/pyepics/actions/workflows/test-with-conda.yml/badge.svg
-   :target: https://github.com/pyepics/pyepics/actions/workflows/test-with-conda.yml/
-
-.. image:: https://github.com/pyepics/pyepics/actions/workflows/test-python38.yml/badge.svg
-   :target: https://github.com/pyepics/pyepics/actions/workflows/test-python38.yml/
-
-.. image:: https://codecov.io/gh/pyepics/pyepics/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/pyepics/pyepics
+  :target: https://github.com/pyepics/pyepics/actions/workflows/test-with-conda.yml/
 
 .. image:: https://img.shields.io/pypi/v/pyepics.svg
    :target: https://pypi.org/project/pyepics
