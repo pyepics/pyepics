@@ -21,7 +21,7 @@ addopts = "--cov=epics --cov-append --cov-report html"
 name = "pyepics"
 dynamic = ["version"]
 # provides = ["epics"]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 description = "Epics Channel Access for Python"
 readme = "README.rst"
 authors = [{name="Matthew Newville", email="newville@cars.uchicago.edu"}]
@@ -33,15 +33,15 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: Implementation :: CPython",
     ]
 keywords = ["epics"]
-dependencies = ["numpy>=1.23", "pyparsing"]
+dependencies = ["numpy>=1.26", "pyparsing"]
 
 [project.urls]
 Homepage = "https://github.com/pyepics/pyepics/"
