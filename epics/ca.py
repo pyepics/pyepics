@@ -1629,7 +1629,7 @@ def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
 
     full_value, = get_result
 
-    # print("Get Complete> Unpack ", ncache['value'], count, ftype)
+    # print(f"Get Complete> Unpack {count=}, {ftype}", _cache['value'])
 
     if isinstance(full_value, Exception):
         get_failure_reason = full_value
@@ -1641,8 +1641,8 @@ def get_complete_with_metadata(chid, ftype=None, count=None, timeout=None,
     metadata = _unpack_metadata(ftype=ftype, dbr_value=extended_data)
     val = _unpack(chid, full_value, count=count,
                   ftype=ftype, as_numpy=as_numpy)
-    # print("Get Complete unpacked to ", val)
 
+    # print(f"Get Complete {as_string=}, {count=}, {ftype=}")
     if as_string:
         val = _as_string(val, chid, count, ftype)
     elif isinstance(val, ctypes.Array) and HAS_NUMPY and as_numpy:
@@ -1703,7 +1703,12 @@ def _as_string(val, chid, count, ftype):
     try:
         if (ftype in (dbr.CHAR, dbr.TIME_CHAR, dbr.CTRL_CHAR) and
             count < AUTOMONITOR_MAXLENGTH):
-            val = strjoin('',   [chr(i) for i in val if i>0]).strip()
+            bdat = []
+            for i in val:
+                if i == 0:
+                    break
+                bdat.append(chr(i))
+            val = strjoin('', bdat).strip()
         elif ftype == dbr.ENUM and count == 1:
             val = get_enum_strings(chid)[val]
         elif count > 1:
