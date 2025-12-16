@@ -242,7 +242,6 @@ class Device:
             key, strval =  line[:-1].split(' ', 1)
             if key in self._pvs:
                 dtype = self._pvs[key].type
-                count = self._pvs[key].count
                 val = strval
                 if dtype in ('double', 'float'):
                     val = float(val)

@@ -63,17 +63,17 @@ def set_float(val):
     """ utility to set a floating value,
     useful for converting from strings """
     out = None
-    if not val in (None, ''):
+    if val not in (None, ''):
         try:
             out = float(val)
         except ValueError:
             return None
         if HAS_NUMPY:
             if numpy.isnan(out):
-                out = default
+                out = 0
         else:
             if not(out > 0) and not(out<0) and not(out==0):
-                out = default
+                out = 0
     return out
 
 def pack(window, sizer):
@@ -117,7 +117,7 @@ def fix_filename(fname):
     fix string to be a 'good' filename. This may be a more
     restrictive than the OS, but avoids nasty cases.
     """
-    out = str(s).translate(TRANS_FILE)
+    out = str(fname).translate(TRANS_FILE)
     if out[0] in '-,;[]{}()~`@#':
         out = '_%s' % out
     return out

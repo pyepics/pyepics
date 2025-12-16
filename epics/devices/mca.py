@@ -1,5 +1,4 @@
 #!/usr/bin/python
-import sys
 import time
 import numpy as np
 from configparser import  ConfigParser

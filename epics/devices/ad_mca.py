@@ -1,7 +1,6 @@
 import numpy as np
-import time
 
-from epics import PV, caget, caput, poll, Device, get_pv
+from epics import PV, caput, poll, Device, get_pv
 
 MAX_CHAN = 4096
 MAX_ROIS = 48

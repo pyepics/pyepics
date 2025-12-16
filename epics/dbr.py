@@ -291,7 +291,8 @@ def Name(ftype, reverse=False):
         name = ftype.upper()
         if name in list(m.values()):
             for key, val in m.items():
-                if name == val: return key
+                if name == val:
+                    return key
     return m.get(ftype, 'unknown')
 
 def cast_args(args):

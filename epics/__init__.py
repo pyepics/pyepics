@@ -1,5 +1,5 @@
 import time
-from . import ca, dbr, pv, alarm, autosave, device, motor, multiproc
+from . import ca, dbr, pv, alarm, device, motor, multiproc
 from .version import __version__
 
 __doc__ = f"""

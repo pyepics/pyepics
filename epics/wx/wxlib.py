@@ -1,16 +1,12 @@
 """
 wx utility functions for Epics and wxPython interaction
 """
-import wx
-
-import time
 import sys
 import epics
+
+import wx
 import wx.lib.buttons as buttons
 import wx.lib.agw.floatspin as floatspin
-
-PyDeadObjectError = Exception
-
 from .wxutils import Closure, FloatCtrl, set_float
 
 def EpicsFunction(f):
@@ -24,7 +20,7 @@ def EpicsFunction(f):
         "callafter wrapper"
         try:
             wx.CallAfter(f, *args, **kwargs)
-        except PyDeadObjectError:
+        except Exception:
             pass
     return wrapper
 
@@ -40,7 +36,7 @@ def DelayedEpicsCallback(fcn):
             "default callback"
             try:
                 fcn(*args, **kw)
-            except PyDeadObjectError:
+            except Exception:
                 cb_index, pv =  kw.get('cb_info', (None, None))
                 if hasattr(pv, 'remove_callback'):
                     try:
@@ -448,7 +444,7 @@ class PVCtrlMixin(PVMixin):
                 self._SetValue(self._translations.get(raw_value, raw_value))
             except TypeError:
                 pass
-        except PyDeadObjectError:
+        except Exception:
             pass
 
 
@@ -774,7 +770,7 @@ class PVFloatCtrl(FloatCtrl, PVCtrlMixin):
 
         if self.pv.type in ('string', 'char'):
             try:
-                x = float(self.pv.value)
+                _ = float(self.pv.value)
             except:
                 self._warn('pvFloatCtrl needs a double or float PV')
 
@@ -1040,6 +1036,7 @@ class PVButton(wx.Button, PVCtrlMixin):
             enableValue = False
         if self.pv is not None and (self.pv.get() == self.pushValue):
             enableValue = False
+        wx.Button.Enable(self, enableValue)
 
     @DelayedEpicsCallback
     def _disableEvent(self, **kw):
@@ -1281,7 +1278,7 @@ class PVCollapsiblePane(wx.CollapsiblePane, PVCtrlMixin):
             epics.MAJOR_ALARM : major_alarm,
             epics.INVALID_ALARM : invalid_alarm }
         if self.pv:
-            _SetValue(self.pv.value)
+            self._SetValue(self.pv.value)
 
     def _SetValue(self, value):
         if value:

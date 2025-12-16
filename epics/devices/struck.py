@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
 import time
-import copy
 import numpy
 from .. import Device
 from .scaler import Scaler

@@ -131,7 +131,8 @@ class Alarm:
         """checks alarm status, act if needed.
         """
         if (pvname is None or value is None or
-            self.cmp is None or self.trip_point is None): return
+            self.cmp is None or self.trip_point is None):
+            return
 
         val = value
         if char_value is None:

@@ -13,7 +13,7 @@ provides two classes:
 import wx
 
 import epics
-from epics.wx.wxlib import PVText, PVFloatCtrl, PVButton, PVComboBox, \
+from epics.wx.wxlib import PVText, PVFloatCtrl, PVButton, \
      DelayedEpicsCallback, EpicsFunction
 
 from epics.wx.motordetailframe  import MotorDetailFrame

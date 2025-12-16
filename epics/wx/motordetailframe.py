@@ -2,7 +2,6 @@
 wxFrame for Detailed Motor Settings, ala medm More (+Setup) screen
 """
 
-import time
 import wx
 from wx.lib.scrolledpanel import ScrolledPanel
 
@@ -70,7 +69,7 @@ class MotorDetailFrame(wx.Frame):
                      "Copy Motor Template to Clipboard")
 
         menuBar = wx.MenuBar()
-        menuBar.Append(fmenu, "&File");
+        menuBar.Append(fmenu, "&File")
 
         self.SetMenuBar(menuBar)
         self.Bind(wx.EVT_MENU,  self._onSaveTemplate, id=id_save)

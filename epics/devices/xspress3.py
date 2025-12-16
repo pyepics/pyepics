@@ -1,12 +1,11 @@
 #!/usr/bin/python
-import sys
 import os
 import time
 from configparser import  ConfigParser
 
 from epics import Device, caget, caput, poll
 from epics.devices.mca import MCA, ROI
-from epics.devices.ad_mca import ADMCA, ADMCAROI
+from epics.devices.ad_mca import ADMCA
 
 MAX_ROIS = 32
 

@@ -11,10 +11,7 @@ provides two classes:
 #  Aug 21 2004 M Newville:  initial working version.
 #
 import wx
-try:
-    from wx._core import PyDeadObjectError
-except:
-    PyDeadObjectError = Exception
+PyDeadObjectError = Exception
 
 import epics
 from epics.wx.wxlib import PVText, PVFloatCtrl, PVButton, PVComboBox, \
@@ -22,7 +19,7 @@ from epics.wx.wxlib import PVText, PVFloatCtrl, PVButton, PVComboBox, \
 
 from epics.wx.motordetailframe  import MotorDetailFrame
 
-from epics.wx.utils import LCEN, RCEN, CEN, LTEXT, RIGHT, pack, add_button
+from wxutils import LCEN, RCEN, CEN, LTEXT, RIGHT, pack, add_button
 
 from larch.utils import debugtime
 
