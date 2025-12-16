@@ -1,35 +1,55 @@
+.. _pyepics github repository:    https://github.com/pyepics/pyepics
+.. _pyepics PyPi:  https://pypi.python.org/pypi/pyepics/
+
+
 ====================================
 Downloading and Installation
 ====================================
 
-Prerequisites
-~~~~~~~~~~~~~~~
 
-PyEpics works with Python version 3.8 and higher.  At this writing,
-automated testing is done with versions 3.8 through 3.12,
-PyEpics may still work with Python 3.7 or even 3.6, but no testing or support
-is available for these.
+Installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyepics is supported and regularly used on 64-bit Linux, 64-bit Windows, 64-bit
-Mac OSX with both Intel and Arm processors.  PyEpics should also work on Linux
-with ARM processors including raspberry Pi and may still work on 32-bit Windows
-and Linux, though these systems are not tested regularly. As of this writing,
-automated testing is done only for Linux64.
+The latest stable version of the pyepics package is |release| which can be
+installed with::
 
-The EPICS Channel Access library Version 3.14.12 or higher is required for
-pyepics, and versions 7.0.4 or higher are strongly recommended.  More
-specifically, pyepics requires the shared libraries *libca* and *libCom*
-(*libca.so* and *libCom.so* on Linux, *libca.dylib* and *libCom.dylib* on
-Mac OSX, or *ca.dll* and *Com.dll* on Windows) from *Epics Base*.
+     pip install pyepics
 
-For Linux64, Linux32, LinuxArm, Windows64, Windows32, Darwin64 (MacOS) on
-x86-64, and Darwin64 (MacOS) on arm64, pre-built versions of *libca* (and
-*libCom*) are provided and will be installed into the python packages directory
-and used by default. This means that you do not need to install Epics base
-libraries or any other packages to use pyepics.  These libraries have been
-built with 3.16.2 or 7.0.7 - further details are given in the `clibs` folder of
-the source kit.  For Epics experts who may want to use their own versions the
-*libca* from Epics base, instructions for how to do this are given below.
+If you're using Anaconda Python, there are a few conda channels that
+provide the latest versions, but the version on `PyPI` should be considered
+the reference version.
+
+PyEpics |release| works with Python version 3.10 and higher.  It may
+still work with older versions of Python, but no testing or support is
+available for these.  At this writing, automated testing is done with
+versions 3.10 through 3.14 on 64-bit Linux, though Pyepics is
+supported and regularly used on 64-bit Linux, 64-bit Windows, 64-bit
+Mac OSX with both Intel and Arm processors.  PyEpics should also work
+on Linux with ARM processors including raspberry Pi and may still work
+on 32-bit Windows and Linux, though these systems are not tested
+regularly.
+
+
+Prerequisites and Dependencies, Supported Systems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Pyepics requires the EPICS Channel Access library Version 3.14.12 or
+higher, and versions 7.0.4 or higher are strongly recommended.  More
+specifically, pyepics requires the shared libraries *libca* and
+*libCom* (*libca.so* and *libCom.so* on Linux, *libca.dylib* and
+*libCom.dylib* on Mac OSX, or *ca.dll* and *Com.dll* on Windows) from
+*Epics Base*.
+
+For Linux64, Linux32, LinuxArm, Windows64, Windows32, Darwin64 (MacOS)
+on x86-64, and Darwin64 (MacOS) on arm64, pre-built versions of
+*libca* (and *libCom*) are provided.  These will be installed into the
+python packages directory and will used by default. This means that
+you do not need to install Epics base libraries or any other packages
+to use pyepics.  These libraries have been built with 3.16.2 or
+7.0.7 - further details are given in the `clibs` folder of the source
+kit.  For Epics experts who may want to use their own versions the
+*libca* from Epics base, instructions for how to do this are given
+below.
 
 The Python `numpy <https://numpy.org/>`_ module is highly recommended. and will
 be used to automatically convert between EPICS waveforms and numpy arrays if
@@ -41,33 +61,15 @@ The `wx` module requires the `wxPython` package, and the `qt` module
 requires `PyQt` or `PySide`.
 
 
-Downloads and Installation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _pyepics github repository:    https://github.com/pyepics/pyepics
-.. _pyepics PyPi:                 https://pypi.python.org/pypi/pyepics/
-
-The latest stable version of the pyepics package is |release| which can be
-installed with::
-
-     pip install pyepics
-
-If you're using Anaconda Python, there are a few conda channels that
-provide the latest versions, but the version on `PyPI` should be considered
-the reference version.  You can also download the source package, unpack
-it, and install with::
-
-     pip install .
-
-
 Getting Started, Setting up the Epics Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyepics will find and load the Channel Access dynamic library (*libca.so*,
-*libca.dylib*, or *ca.dll* depending on the system) at runtime in order to
-actually work.  For the most commonly used operating systems and
-architectures, modern version of these libraries are provided, and will be
-installed and used with pyepics.  We strongly recommend using these.
+Pyepics will find and load the Channel Access dynamic library
+(*libca.so*, *libca.dylib*, or *ca.dll* depending on the system) at
+runtime in order to actually do Channel Access communication.  For the
+most commonly used operating systems and architectures, modern version
+of these libraries are provided, and will be installed and used with
+pyepics.  We strongly recommend using these.
 
 If these provided versions of *libca* do not work for you, please let us know.
 If you need to or wish to use a different version of *libca*, you can set the
@@ -86,29 +88,31 @@ find out which CA library will be used by pyepics, use:
 
 which will print out the full path of the CA dynamic library that will be used.
 
-With the Epics CA library loaded, you will need to be able to connect to Epics
-Process Variables. Generally, these variables are provided by Epics I/O
-controllers (IOCs) that are processes running on some device on the network.
-If you are connecting to PVs provided by IOCs on your local subnet, you should
-have no trouble.  If trying to reach IOCs outside of your immediate subnet, you
-may need to set the environmental variable ``EPICS_CA_ADDR_LIST`` to specify
-which networks to search for PVs.
+With the Epics CA library loaded, you will need to be able to connect
+to Epics Process Variables. Generally, these variables are provided by
+Epics I/O controllers (IOCs) that are processes running on some device
+on the network.  If you are connecting to PVs provided by IOCs on your
+local subnet, you should have no trouble.  If you are trying to reach
+IOCs outside of your immediate subnet, you may need to set the
+environmental variable ``EPICS_CA_ADDR_LIST`` to specify which
+networks to search for PVs.
 
 
 Testing
 ~~~~~~~~~~~~~
 
-Automated testing of PyEpics is done with the Github actions, for Python 3.8,
-3.9, 3.10, 3.11, and 3.12.  This uses an ubuntu-linux environment.
+Automated testing of PyEpics is done with the Github actions, for
+Python 3.10 through 3.14, using an ubuntu-linux environment.
 
-To run these tests yourself, you will need the `pytest` python module. You
-will also need to run an Epics softIOC as a separate process, and a
-simulator that updates PV values as a separate process.  These can all run
-on the same machine or different machines on your network as long as all
-processes can see all the PVs (all using a prefix of `PyTest:`).  The
-softIoc cannot be run in a separate terminal process or using the
-`procServ` program.  To setup the testing environment, first start the
-testing softIoc in one shell, with::
+To run these tests yourself, you will need the `pytest` python
+module. You will also need to run an Epics softIOC as a separate
+process, and a simulator that updates PV values as a separate process.
+These can all run on the same machine or different machines on your
+network as long as all processes can see all the PVs (all using a
+prefix of `PyTest:`).  The softIoc cannot be run in a separate
+terminal process or using the `procServ` program.  To setup the
+testing environment, first start the testing softIoc in one shell,
+with::
 
      ~> cd tests/Setup
      ~> softIoc ./st.cmd

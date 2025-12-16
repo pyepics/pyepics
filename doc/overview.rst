@@ -459,5 +459,4 @@ The PyEpics package is actively maintained, but the core library is
 reasonably stable and ready to use in production code.  Features are being
 added slowly, and testing is integrated into development so that the chance
 of introducing bugs into existing codes is minimized.  The package is
-targeted and tested to work on all supported versions of Python, currently
-Python 3.9 and higher.
+targeted and tested to work on all supported versions of Python.
