@@ -101,7 +101,7 @@ cause.
 
 Creating a `PV` object (using any of :class:`pv.PV`, or :func:`pv.get_pv`, or
 :func:`epics.caget`) will automatically use connection and event callbacks in
-an attempt to keep the `PV` alive and up-to-date during the seesion.  This is
+an attempt to keep the `PV` alive and up-to-date during the session.  This is
 usually an advantage, as you don't need to explicitly deal with many aspects of
 Channel Access.  But creating a `PV` does request some network traffic, and the
 `PV` will not be "fully connected" and ready to do a :meth:`PV.get` until all
@@ -225,7 +225,7 @@ In tests with 1000 PVs, looping with :func:`epics.caget_many` took about
 seconds.
 
 To be clear, it is **connecting** to Epics PVs that is expensive, not the
-retreiving of data from connected PVs.  You can lower the connection
+retrieving of data from connected PVs.  You can lower the connection
 expense by not retaining the connection or creating monitors on the PVs,
 but if you are going to re-use the PVs, that savings will be lost quickly.
 In short, use Method 1 over :func:`epics.caget_many` unless you've benchmarked
@@ -254,7 +254,7 @@ in order for events to be processed.  The simplest way to do this is with
 Unfortunately, the :meth:`time.sleep` method is not a very high-resolution
 clock, with typical resolutions of 1 to 10 ms, depending on the system.
 Thus, even though events will be asynchronously generated and epics with
-pre-emptive callbacks does not *require* :meth:`epics.ca.pend_event` or
+preemptive callbacks does not *require* :meth:`epics.ca.pend_event` or
 :meth:`epics.ca.poll` to be run, better performance may be achieved with an event
 loop of::
 

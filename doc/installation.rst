@@ -7,8 +7,8 @@ Downloading and Installation
 ====================================
 
 
-Installation (X)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installation
+~~~~~~~~~~~~~~~~~~~~~~~
 
 The latest stable version of the pyepics package is |release| which can be
 installed with::
