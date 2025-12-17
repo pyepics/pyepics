@@ -41,19 +41,19 @@ the remote channel.  For larger applications where you find yourself
 working with sets of related PVs, you may find the :class:`Device` class
 helpful.
 
-The lowest-level CA functionality is exposed in the :mod:`ca` module, and
-companion :mod:`dbr` module.  While not necessary recommended for most use
-cases, this module does provide a fairly complete wrapping of the basic
-EPICS CA library.  For people who have used CA from C or other languages,
-this module should be familiar and seem quite usable, if a little more
-verbose and C-like than using PV objects.
+The lowest-level CA functionality is exposed in the :mod:`ca` module,
+and companion :mod:`dbr` module.  While the :class:`PV` module is
+recommended for most use cases, :mod:`ca` module does provide a fairly
+complete wrapping of the basic EPICS CA library.  For people who have
+used CA from C or other languages this module should be familiar, if a
+little more verbose and C-like than using PV objects.
 
 In addition, the `epics` package contains more specialized modules for
 alarms, Epics motors, and several other *devices* (collections of PVs), and
 a set of wxPython widget classes for using EPICS PVs with wxPython.
 
 The `epics` package is supported and well-tested on Linux, Mac OS X, and
-Windows with Python versions 2.7, and 3.5 and above.
+Windows with Python versions 3.10 and above.
 
 
 Quick Start
@@ -110,8 +110,7 @@ function:
        PV is internally monitored, with 0 user-defined callbacks:
     =============================
 
-The simplicity and clarity of these functions make them ideal for many
-uses.
+These functions are very simple to use, making them ideal for many uses.
 
 Creating and Using PV Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

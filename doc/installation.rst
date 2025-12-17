@@ -1,5 +1,5 @@
 .. _pyepics github repository:    https://github.com/pyepics/pyepics
-.. _pyepics PyPi:  https://pypi.python.org/pypi/pyepics/
+.. _PyPi:  https://pypi.python.org/pypi/pyepics/
 
 
 ====================================
@@ -7,7 +7,7 @@ Downloading and Installation
 ====================================
 
 
-Installation
+Installation (X)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The latest stable version of the pyepics package is |release| which can be
@@ -16,7 +16,7 @@ installed with::
      pip install pyepics
 
 If you're using Anaconda Python, there are a few conda channels that
-provide the latest versions, but the version on `PyPI` should be considered
+provide the latest versions, but the version on `PyPI`_ should be considered
 the reference version.
 
 PyEpics |release| works with Python version 3.10 and higher.  It may
@@ -33,27 +33,27 @@ regularly.
 Prerequisites and Dependencies, Supported Systems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyepics requires the EPICS Channel Access library Version 3.14.12 or
-higher, and versions 7.0.4 or higher are strongly recommended.  More
-specifically, pyepics requires the shared libraries *libca* and
-*libCom* (*libca.so* and *libCom.so* on Linux, *libca.dylib* and
-*libCom.dylib* on Mac OSX, or *ca.dll* and *Com.dll* on Windows) from
-*Epics Base*.
+Pyepics requires the EPICS Channel Access library from Epics Base
+Version 3.14.12 or higher.  Using Epics Base 7.0.4 or higher is
+strongly recommended.  More specifically, pyepics needs only to be
+able to find the shared libraries *libca* and *libCom* (*libca.so* and
+*libCom.so* on Linux, *libca.dylib* and *libCom.dylib* on Mac OSX, or
+*ca.dll* and *Com.dll* on Windows) from *Epics Base*.
 
 For Linux64, Linux32, LinuxArm, Windows64, Windows32, Darwin64 (MacOS)
 on x86-64, and Darwin64 (MacOS) on arm64, pre-built versions of
-*libca* (and *libCom*) are provided.  These will be installed into the
-python packages directory and will used by default. This means that
-you do not need to install Epics base libraries or any other packages
-to use pyepics.  These libraries have been built with 3.16.2 or
-7.0.7 - further details are given in the `clibs` folder of the source
-kit.  For Epics experts who may want to use their own versions the
-*libca* from Epics base, instructions for how to do this are given
-below.
+*libca* (and *libCom*) are provided with pyepics.  These will be
+installed with the python packages directory and will used by
+default. This means that you do not need to separately install Epics
+base libraries or any other packages to use pyepics.  These libraries
+have been built with 3.16.2 or 7.0.7 - further details are given in
+the `clibs` folder of the source kit. For Epics experts who may want
+to use their own versions the *libca* from Epics base, instructions
+for how to do this are given below.
 
-The Python `numpy <https://numpy.org/>`_ module is highly recommended. and will
-be used to automatically convert between EPICS waveforms and numpy arrays if
-available.
+The Python `numpy <https://numpy.org/>`_ module is highly
+recommended. and will be used to automatically convert between EPICS
+waveforms and numpy arrays if available.
 
 The `autosave` module requires the `pyparsing` package, which is widely
 available and often installed by default with many Python distributions.
@@ -66,36 +66,39 @@ Getting Started, Setting up the Epics Environment
 
 Pyepics will find and load the Channel Access dynamic library
 (*libca.so*, *libca.dylib*, or *ca.dll* depending on the system) at
-runtime in order to actually do Channel Access communication.  For the
+runtime to do Channel Access communication.  As said above, for the
 most commonly used operating systems and architectures, modern version
 of these libraries are provided, and will be installed and used with
-pyepics.  We strongly recommend using these.
+pyepics by default.  We recommend using these.
 
-If these provided versions of *libca* do not work for you, please let us know.
-If you need to or wish to use a different version of *libca*, you can set the
-environmental variable ``PYEPICS_LIBCA`` to the full path of the dynamic
-library to use as *libca*, for example::
+If these provided versions of *libca* do not work for you, please let
+us know.  If you need to or wish to use a different version of
+*libca*, you can set the environmental variable ``PYEPICS_LIBCA`` to
+the full path of the dynamic library to use as *libca*, for example::
 
    > export PYEPICS_LIBCA=/usr/local/epics/base-7.0.4/lib/linux-x86_64/libca.so
 
-Note that *libca* will need to find another Epics CA library *libCom*.  This
-is almost always in the same folder as *libca*, but you may need to make sure
-that the *libca* you are pointing to can find the required *libCom*. To
-find out which CA library will be used by pyepics, use:
+Note that *libca* will need to find the library *libCom*, also created
+with Epics Base. This is almost always in the same folder as *libca*
+and can be found without trouble, but you may need to make sure that
+the *libca* you are pointing to can find the required *libCom*.
+
+To find out which CA library will be used by pyepics, use:
 
     >>> import epics
     >>> epics.ca.find_libca()
 
 which will print out the full path of the CA dynamic library that will be used.
 
-With the Epics CA library loaded, you will need to be able to connect
-to Epics Process Variables. Generally, these variables are provided by
-Epics I/O controllers (IOCs) that are processes running on some device
-on the network.  If you are connecting to PVs provided by IOCs on your
-local subnet, you should have no trouble.  If you are trying to reach
-IOCs outside of your immediate subnet, you may need to set the
-environmental variable ``EPICS_CA_ADDR_LIST`` to specify which
-networks to search for PVs.
+With the Epics CA library loaded, you will also need to be able to
+connect to Epics Process Variables. Generally, these variables are
+provided by Epics I/O controllers (IOCs) that are processes running on
+some device on the network.  If you are connecting to PVs provided by
+IOCs on your local subnet, you should have no trouble.  If you are
+trying to reach IOCs outside of your immediate subnet, you may need to
+set the environmental variable ``EPICS_CA_ADDR_LIST`` to specify which
+networks to search for PVs.  Consult your local Epics expert if you
+are having trouble connecting to PVs that you think should be reachable.
 
 
 Testing
@@ -148,7 +151,7 @@ The automated testing process also uses the `coverage` tool to help
 identify which parts of the code is actually run by the tests.
 Unfortunately, the code for using GUI are not easily tested by the
 automated procedures.  In addition, a softIoc would need to support all of
-the subclasses of Device, which cannot be gauranteed.
+the subclasses of Device, which cannot be guaranteed.
 
 Development Version
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -165,21 +168,24 @@ Getting Help
 For questions, bug reports, feature request, please consider using the
 following methods:
 
- 1.  Send email to the Epics Tech Talk mailing list.  You can send mail
-     directly to Matt Newville <newville@cars.uchicago.ed>, but the mailing
-     list has many Epics experts reading it, so someone else interested or
+ 1.  Send email to the Epics Tech Talk mailing list.  You can send
+     mail directly to the lead author, Matt Newville
+     <newville@cars.uchicago.ed>.  The Epics Tech Talk mailing list
+     has many Epics experts reading it, so someone else interested or
      knowledgeable about the topic might provide an answer. Since the
-     mailing list is archived and the main mailing list for Epics work, a
-     question to the mailing list has a better chance of helping someone
-     else.
+     mailing list is archived and the main mailing list for Epics
+     work, a question to the mailing list has a better chance of
+     helping someone else.
 
- 2.  Create an Issue on https://github.com/pyepics/pyepics.  Though the
-     github Issues seem to be intended for bug tracking, they are a fine
-     way to catalog various kinds of questions and feature requests.
+ 2.  Create an Issue or Discussion on
+     https://github.com/pyepics/pyepics.  Github Issues are usually
+     intended for bug tracking, but the traffic for bug reports and
+     discussions about PyEpics is generally very low, so using either
+     is fine.
 
- 3.  If you are sure you have found a bug in existing code, or have
-     some code you think would be useful to add to pyepics, consider
-     making a Pull Request on https://github.com/pyepics/pyepics.
+ 3.  If you think you have found a bug in existing code, or have some
+     code you think would be useful to add to pyepics, consider making
+     a Pull Request on https://github.com/pyepics/pyepics.
 
 
 License
