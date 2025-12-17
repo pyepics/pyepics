@@ -3,6 +3,9 @@ name: Test with Conda, Py3.10 to 3.14
 on: [push]
 
 jobs:
+  permissions:
+    contents: read
+    pull-requests: write
   build:
     runs-on: ubuntu-latest
     strategy:
