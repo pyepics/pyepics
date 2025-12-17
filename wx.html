@@ -8,14 +8,23 @@
 
     <title>wx: wxPython Widgets for Epics &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=e2a51986"></script>
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    
+    <script src="_static/documentation_options.js?v=46dd9d9f"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Advanced Topic with Python Channel Access" href="advanced.html" />
-    <link rel="prev" title="Auto-saving: simple save/restore of PVs" href="autosave.html" /> 
+    <link rel="prev" title="Auto-saving: simple save/restore of PVs" href="autosave.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
   </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
@@ -31,162 +40,16 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="advanced.html" title="Advanced Topic with Python Channel Access"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="autosave.html" title="Auto-saving: simple save/restore of PVs"
              accesskey="P">previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="#">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">wx: wxPython Widgets for Epics</a></li> 
       </ul>
     </div>
-
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">wx: wxPython Widgets for Epics</a><ul>
-<li><a class="reference internal" href="#pv-aware-widgets">PV-aware Widgets</a><ul>
-<li><a class="reference internal" href="#pvmixin">PVMixin</a><ul>
-<li><a class="reference internal" href="#wx.PVMixin"><code class="docutils literal notranslate"><span class="pre">PVMixin</span></code></a></li>
-<li><a class="reference internal" href="#wx.SetPV"><code class="docutils literal notranslate"><span class="pre">SetPV()</span></code></a></li>
-<li><a class="reference internal" href="#wx.Update"><code class="docutils literal notranslate"><span class="pre">Update()</span></code></a></li>
-<li><a class="reference internal" href="#wx.GetValue"><code class="docutils literal notranslate"><span class="pre">GetValue()</span></code></a></li>
-<li><a class="reference internal" href="#wx.OnEpicsConnect"><code class="docutils literal notranslate"><span class="pre">OnEpicsConnect()</span></code></a></li>
-<li><a class="reference internal" href="#wx.OnPVChange"><code class="docutils literal notranslate"><span class="pre">OnPVChange()</span></code></a></li>
-<li><a class="reference internal" href="#wx.GetEnumStrings"><code class="docutils literal notranslate"><span class="pre">GetEnumStrings()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvctrlmixin">PVCtrlMixin</a><ul>
-<li><a class="reference internal" href="#wx.PVCtrlMixin"><code class="docutils literal notranslate"><span class="pre">PVCtrlMixin</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvtext">PVText</a><ul>
-<li><a class="reference internal" href="#wx.PVText"><code class="docutils literal notranslate"><span class="pre">PVText</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvtextctrl">PVTextCtrl</a><ul>
-<li><a class="reference internal" href="#wx.PVTextCtrl"><code class="docutils literal notranslate"><span class="pre">PVTextCtrl</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvfloatctrl">PVFloatCtrl</a><ul>
-<li><a class="reference internal" href="#wx.PVFloatCtrl"><code class="docutils literal notranslate"><span class="pre">PVFloatCtrl</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvbitmap">PVBitmap</a><ul>
-<li><a class="reference internal" href="#wx.PVBitmap"><code class="docutils literal notranslate"><span class="pre">PVBitmap</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvcheckbox">PVCheckBox</a><ul>
-<li><a class="reference internal" href="#wx.PVCheckBox"><code class="docutils literal notranslate"><span class="pre">PVCheckBox</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvfloatspin">PVFloatSpin</a><ul>
-<li><a class="reference internal" href="#wx.PVFloatSpin"><code class="docutils literal notranslate"><span class="pre">PVFloatSpin</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvbutton">PVButton</a></li>
-<li><a class="reference internal" href="#pvbitmapbutton">PVBitmapButton</a></li>
-<li><a class="reference internal" href="#pvradiobutton">PVRadioButton</a><ul>
-<li><a class="reference internal" href="#wx.PVRadioButton"><code class="docutils literal notranslate"><span class="pre">PVRadioButton</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvcombobox">PVComboBox</a><ul>
-<li><a class="reference internal" href="#wx.PVComboBox"><code class="docutils literal notranslate"><span class="pre">PVComboBox</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvenumcombobox">PVEnumComboBox</a><ul>
-<li><a class="reference internal" href="#wx.PVEnumComboBox"><code class="docutils literal notranslate"><span class="pre">PVEnumComboBox</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvenumbuttons">PVEnumButtons</a><ul>
-<li><a class="reference internal" href="#wx.PVEnumButtons"><code class="docutils literal notranslate"><span class="pre">PVEnumButtons</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvenumchoice">PVEnumChoice</a><ul>
-<li><a class="reference internal" href="#wx.PVEnumChoice"><code class="docutils literal notranslate"><span class="pre">PVEnumChoice</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvalarm">PVAlarm</a><ul>
-<li><a class="reference internal" href="#wx.PVAlarm"><code class="docutils literal notranslate"><span class="pre">PVAlarm</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvcollapsiblepane">PVCollapsiblePane</a><ul>
-<li><a class="reference internal" href="#wx.PVCollapsiblePane"><code class="docutils literal notranslate"><span class="pre">PVCollapsiblePane</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#decorators-and-other-utility-functions">Decorators and other Utility Functions</a><ul>
-<li><a class="reference internal" href="#wx.DelayedEpicsCallback"><code class="docutils literal notranslate"><span class="pre">DelayedEpicsCallback()</span></code></a></li>
-<li><a class="reference internal" href="#wx.EpicsFunction"><code class="docutils literal notranslate"><span class="pre">EpicsFunction()</span></code></a></li>
-<li><a class="reference internal" href="#wx.finalize_epics"><code class="docutils literal notranslate"><span class="pre">finalize_epics()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#wxmotorpanel-widget">wxMotorPanel Widget</a></li>
-<li><a class="reference internal" href="#ogl-classes">OGL Classes</a><ul>
-<li><a class="reference internal" href="#pvshapemixin">PVShapeMixin</a><ul>
-<li><a class="reference internal" href="#wx.PVShapeMixin"><code class="docutils literal notranslate"><span class="pre">PVShapeMixin</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvrectangle">PVRectangle</a><ul>
-<li><a class="reference internal" href="#wx.PVRectangle"><code class="docutils literal notranslate"><span class="pre">PVRectangle</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pvcircle">PVCircle</a><ul>
-<li><a class="reference internal" href="#wx.PVCircle"><code class="docutils literal notranslate"><span class="pre">PVCircle</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-  </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="autosave.html"
-                          title="previous chapter">Auto-saving: simple save/restore of PVs</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="advanced.html"
-                          title="next chapter">Advanced Topic with Python Channel Access</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/wx.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -448,7 +311,7 @@ changes.</p>
 <dt class="sig sig-object py" id="wx.PVEnumComboBox">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">wx.</span></span><span class="sig-name descname"><span class="pre">PVEnumComboBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#wx.PVEnumComboBox" title="Link to this definition">¶</a></dt>
 <dd><dl>
-<dt>A ComboBox linked to an “enum” type PV (such as bi,bo,mbbi,mbbo.) The ComboBox</dt><dd><p>is automatically populated with a non-editable list of the PV enum values, allowing
+<dt>A ComboBox linked to an “enum” type PV (such as bi, bo, mbbi, mbbo.) The ComboBox</dt><dd><p>is automatically populated with a non-editable list of the PV enum values, allowing
 the user to select them from the dropdown.</p>
 <p>Both reads/writes the combo value on changes.</p>
 </dd>
@@ -648,6 +511,139 @@ as it changes.</p>
           </div>
         </div>
       </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">wx: wxPython Widgets for Epics</a><ul>
+<li><a class="reference internal" href="#pv-aware-widgets">PV-aware Widgets</a><ul>
+<li><a class="reference internal" href="#pvmixin">PVMixin</a><ul>
+<li><a class="reference internal" href="#wx.PVMixin"><code class="docutils literal notranslate"><span class="pre">PVMixin</span></code></a></li>
+<li><a class="reference internal" href="#wx.SetPV"><code class="docutils literal notranslate"><span class="pre">SetPV()</span></code></a></li>
+<li><a class="reference internal" href="#wx.Update"><code class="docutils literal notranslate"><span class="pre">Update()</span></code></a></li>
+<li><a class="reference internal" href="#wx.GetValue"><code class="docutils literal notranslate"><span class="pre">GetValue()</span></code></a></li>
+<li><a class="reference internal" href="#wx.OnEpicsConnect"><code class="docutils literal notranslate"><span class="pre">OnEpicsConnect()</span></code></a></li>
+<li><a class="reference internal" href="#wx.OnPVChange"><code class="docutils literal notranslate"><span class="pre">OnPVChange()</span></code></a></li>
+<li><a class="reference internal" href="#wx.GetEnumStrings"><code class="docutils literal notranslate"><span class="pre">GetEnumStrings()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvctrlmixin">PVCtrlMixin</a><ul>
+<li><a class="reference internal" href="#wx.PVCtrlMixin"><code class="docutils literal notranslate"><span class="pre">PVCtrlMixin</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvtext">PVText</a><ul>
+<li><a class="reference internal" href="#wx.PVText"><code class="docutils literal notranslate"><span class="pre">PVText</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvtextctrl">PVTextCtrl</a><ul>
+<li><a class="reference internal" href="#wx.PVTextCtrl"><code class="docutils literal notranslate"><span class="pre">PVTextCtrl</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvfloatctrl">PVFloatCtrl</a><ul>
+<li><a class="reference internal" href="#wx.PVFloatCtrl"><code class="docutils literal notranslate"><span class="pre">PVFloatCtrl</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvbitmap">PVBitmap</a><ul>
+<li><a class="reference internal" href="#wx.PVBitmap"><code class="docutils literal notranslate"><span class="pre">PVBitmap</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvcheckbox">PVCheckBox</a><ul>
+<li><a class="reference internal" href="#wx.PVCheckBox"><code class="docutils literal notranslate"><span class="pre">PVCheckBox</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvfloatspin">PVFloatSpin</a><ul>
+<li><a class="reference internal" href="#wx.PVFloatSpin"><code class="docutils literal notranslate"><span class="pre">PVFloatSpin</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvbutton">PVButton</a></li>
+<li><a class="reference internal" href="#pvbitmapbutton">PVBitmapButton</a></li>
+<li><a class="reference internal" href="#pvradiobutton">PVRadioButton</a><ul>
+<li><a class="reference internal" href="#wx.PVRadioButton"><code class="docutils literal notranslate"><span class="pre">PVRadioButton</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvcombobox">PVComboBox</a><ul>
+<li><a class="reference internal" href="#wx.PVComboBox"><code class="docutils literal notranslate"><span class="pre">PVComboBox</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvenumcombobox">PVEnumComboBox</a><ul>
+<li><a class="reference internal" href="#wx.PVEnumComboBox"><code class="docutils literal notranslate"><span class="pre">PVEnumComboBox</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvenumbuttons">PVEnumButtons</a><ul>
+<li><a class="reference internal" href="#wx.PVEnumButtons"><code class="docutils literal notranslate"><span class="pre">PVEnumButtons</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvenumchoice">PVEnumChoice</a><ul>
+<li><a class="reference internal" href="#wx.PVEnumChoice"><code class="docutils literal notranslate"><span class="pre">PVEnumChoice</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvalarm">PVAlarm</a><ul>
+<li><a class="reference internal" href="#wx.PVAlarm"><code class="docutils literal notranslate"><span class="pre">PVAlarm</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvcollapsiblepane">PVCollapsiblePane</a><ul>
+<li><a class="reference internal" href="#wx.PVCollapsiblePane"><code class="docutils literal notranslate"><span class="pre">PVCollapsiblePane</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#decorators-and-other-utility-functions">Decorators and other Utility Functions</a><ul>
+<li><a class="reference internal" href="#wx.DelayedEpicsCallback"><code class="docutils literal notranslate"><span class="pre">DelayedEpicsCallback()</span></code></a></li>
+<li><a class="reference internal" href="#wx.EpicsFunction"><code class="docutils literal notranslate"><span class="pre">EpicsFunction()</span></code></a></li>
+<li><a class="reference internal" href="#wx.finalize_epics"><code class="docutils literal notranslate"><span class="pre">finalize_epics()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wxmotorpanel-widget">wxMotorPanel Widget</a></li>
+<li><a class="reference internal" href="#ogl-classes">OGL Classes</a><ul>
+<li><a class="reference internal" href="#pvshapemixin">PVShapeMixin</a><ul>
+<li><a class="reference internal" href="#wx.PVShapeMixin"><code class="docutils literal notranslate"><span class="pre">PVShapeMixin</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvrectangle">PVRectangle</a><ul>
+<li><a class="reference internal" href="#wx.PVRectangle"><code class="docutils literal notranslate"><span class="pre">PVRectangle</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pvcircle">PVCircle</a><ul>
+<li><a class="reference internal" href="#wx.PVCircle"><code class="docutils literal notranslate"><span class="pre">PVCircle</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="autosave.html"
+                          title="previous chapter">Auto-saving: simple save/restore of PVs</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="advanced.html"
+                          title="next chapter">Advanced Topic with Python Channel Access</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/wx.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
       <div class="clearer"></div>
     </div>
     <div class="related" role="navigation" aria-label="Related">
@@ -657,30 +653,17 @@ as it changes.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="advanced.html" title="Advanced Topic with Python Channel Access"
              >next</a> |</li>
         <li class="right" >
           <a href="autosave.html" title="Auto-saving: simple save/restore of PVs"
              >previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="#">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">wx: wxPython Widgets for Epics</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2021, Matthew Newville.
+    &#169; Copyright 2025, Matthew Newville, The University of Chicago.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>

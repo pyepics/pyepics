@@ -8,14 +8,23 @@
 
     <title>Devices: collections of PVs &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=e2a51986"></script>
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    
+    <script src="_static/documentation_options.js?v=46dd9d9f"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Alarms: respond when a PV goes out of range" href="alarm.html" />
-    <link rel="prev" title="Working with waveform / array data" href="arrays.html" /> 
+    <link rel="prev" title="Working with waveform / array data" href="arrays.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
   </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
@@ -31,112 +40,16 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="alarm.html" title="Alarms: respond when a PV goes out of range"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="arrays.html" title="Working with waveform / array data"
              accesskey="P">previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="#">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Devices: collections of PVs</a></li> 
       </ul>
     </div>
-
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Devices: collections of PVs</a><ul>
-<li><a class="reference internal" href="#module-device">Overview</a><ul>
-<li><a class="reference internal" href="#device.Device"><code class="docutils literal notranslate"><span class="pre">Device</span></code></a></li>
-<li><a class="reference internal" href="#device.PV"><code class="docutils literal notranslate"><span class="pre">PV()</span></code></a></li>
-<li><a class="reference internal" href="#device.put"><code class="docutils literal notranslate"><span class="pre">put()</span></code></a></li>
-<li><a class="reference internal" href="#device.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
-<li><a class="reference internal" href="#device.add_callback"><code class="docutils literal notranslate"><span class="pre">add_callback()</span></code></a></li>
-<li><a class="reference internal" href="#device.add_pv"><code class="docutils literal notranslate"><span class="pre">add_pv()</span></code></a></li>
-<li><a class="reference internal" href="#device.save_state"><code class="docutils literal notranslate"><span class="pre">save_state()</span></code></a></li>
-<li><a class="reference internal" href="#device.restore_state"><code class="docutils literal notranslate"><span class="pre">restore_state()</span></code></a></li>
-<li><a class="reference internal" href="#device.write_state"><code class="docutils literal notranslate"><span class="pre">write_state()</span></code></a></li>
-<li><a class="reference internal" href="#device.read_state"><code class="docutils literal notranslate"><span class="pre">read_state()</span></code></a></li>
-<li><a class="reference internal" href="#device._pvs"><code class="docutils literal notranslate"><span class="pre">_pvs</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-motor">Epics Motor Device</a><ul>
-<li><a class="reference internal" href="#the-epics-motor-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code> class</a><ul>
-<li><a class="reference internal" href="#motor.Motor"><code class="docutils literal notranslate"><span class="pre">Motor</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#methods-for-epics-motor">methods for <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code></a><ul>
-<li><a class="reference internal" href="#motor.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
-<li><a class="reference internal" href="#motor.put"><code class="docutils literal notranslate"><span class="pre">put()</span></code></a></li>
-<li><a class="reference internal" href="#motor.check_limits"><code class="docutils literal notranslate"><span class="pre">check_limits()</span></code></a></li>
-<li><a class="reference internal" href="#motor.within_limits"><code class="docutils literal notranslate"><span class="pre">within_limits()</span></code></a></li>
-<li><a class="reference internal" href="#motor.move"><code class="docutils literal notranslate"><span class="pre">move()</span></code></a></li>
-<li><a class="reference internal" href="#motor.tweak"><code class="docutils literal notranslate"><span class="pre">tweak()</span></code></a></li>
-<li><a class="reference internal" href="#motor.get_position"><code class="docutils literal notranslate"><span class="pre">get_position()</span></code></a></li>
-<li><a class="reference internal" href="#motor.set_position"><code class="docutils literal notranslate"><span class="pre">set_position()</span></code></a></li>
-<li><a class="reference internal" href="#motor.get_pv"><code class="docutils literal notranslate"><span class="pre">get_pv()</span></code></a></li>
-<li><a class="reference internal" href="#motor.set_callback"><code class="docutils literal notranslate"><span class="pre">set_callback()</span></code></a></li>
-<li><a class="reference internal" href="#motor.clear_callback"><code class="docutils literal notranslate"><span class="pre">clear_callback()</span></code></a></li>
-<li><a class="reference internal" href="#motor.show_info"><code class="docutils literal notranslate"><span class="pre">show_info()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#other-device-examples">Other Device Examples</a><ul>
-<li><a class="reference internal" href="#a-basic-device-without-a-prefix">A basic Device without a prefix</a></li>
-<li><a class="reference internal" href="#epics-ai-record-as-device">Epics ai record as Device</a></li>
-<li><a class="reference internal" href="#epics-scaler-record-as-device">Epics Scaler Record as Device</a></li>
-<li><a class="reference internal" href="#other-devices-included-in-pyepics">Other Devices included in PyEpics</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-  </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="arrays.html"
-                          title="previous chapter">Working with waveform / array data</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="alarm.html"
-                          title="next chapter">Alarms: respond when a PV goes out of range</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/devices.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -1096,6 +1009,89 @@ specific use of that Device.</p>
           </div>
         </div>
       </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Devices: collections of PVs</a><ul>
+<li><a class="reference internal" href="#module-device">Overview</a><ul>
+<li><a class="reference internal" href="#device.Device"><code class="docutils literal notranslate"><span class="pre">Device</span></code></a></li>
+<li><a class="reference internal" href="#device.PV"><code class="docutils literal notranslate"><span class="pre">PV()</span></code></a></li>
+<li><a class="reference internal" href="#device.put"><code class="docutils literal notranslate"><span class="pre">put()</span></code></a></li>
+<li><a class="reference internal" href="#device.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
+<li><a class="reference internal" href="#device.add_callback"><code class="docutils literal notranslate"><span class="pre">add_callback()</span></code></a></li>
+<li><a class="reference internal" href="#device.add_pv"><code class="docutils literal notranslate"><span class="pre">add_pv()</span></code></a></li>
+<li><a class="reference internal" href="#device.save_state"><code class="docutils literal notranslate"><span class="pre">save_state()</span></code></a></li>
+<li><a class="reference internal" href="#device.restore_state"><code class="docutils literal notranslate"><span class="pre">restore_state()</span></code></a></li>
+<li><a class="reference internal" href="#device.write_state"><code class="docutils literal notranslate"><span class="pre">write_state()</span></code></a></li>
+<li><a class="reference internal" href="#device.read_state"><code class="docutils literal notranslate"><span class="pre">read_state()</span></code></a></li>
+<li><a class="reference internal" href="#device._pvs"><code class="docutils literal notranslate"><span class="pre">_pvs</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-motor">Epics Motor Device</a><ul>
+<li><a class="reference internal" href="#the-epics-motor-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code> class</a><ul>
+<li><a class="reference internal" href="#motor.Motor"><code class="docutils literal notranslate"><span class="pre">Motor</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#methods-for-epics-motor">methods for <code class="xref py py-class docutils literal notranslate"><span class="pre">epics.Motor</span></code></a><ul>
+<li><a class="reference internal" href="#motor.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
+<li><a class="reference internal" href="#motor.put"><code class="docutils literal notranslate"><span class="pre">put()</span></code></a></li>
+<li><a class="reference internal" href="#motor.check_limits"><code class="docutils literal notranslate"><span class="pre">check_limits()</span></code></a></li>
+<li><a class="reference internal" href="#motor.within_limits"><code class="docutils literal notranslate"><span class="pre">within_limits()</span></code></a></li>
+<li><a class="reference internal" href="#motor.move"><code class="docutils literal notranslate"><span class="pre">move()</span></code></a></li>
+<li><a class="reference internal" href="#motor.tweak"><code class="docutils literal notranslate"><span class="pre">tweak()</span></code></a></li>
+<li><a class="reference internal" href="#motor.get_position"><code class="docutils literal notranslate"><span class="pre">get_position()</span></code></a></li>
+<li><a class="reference internal" href="#motor.set_position"><code class="docutils literal notranslate"><span class="pre">set_position()</span></code></a></li>
+<li><a class="reference internal" href="#motor.get_pv"><code class="docutils literal notranslate"><span class="pre">get_pv()</span></code></a></li>
+<li><a class="reference internal" href="#motor.set_callback"><code class="docutils literal notranslate"><span class="pre">set_callback()</span></code></a></li>
+<li><a class="reference internal" href="#motor.clear_callback"><code class="docutils literal notranslate"><span class="pre">clear_callback()</span></code></a></li>
+<li><a class="reference internal" href="#motor.show_info"><code class="docutils literal notranslate"><span class="pre">show_info()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-device-examples">Other Device Examples</a><ul>
+<li><a class="reference internal" href="#a-basic-device-without-a-prefix">A basic Device without a prefix</a></li>
+<li><a class="reference internal" href="#epics-ai-record-as-device">Epics ai record as Device</a></li>
+<li><a class="reference internal" href="#epics-scaler-record-as-device">Epics Scaler Record as Device</a></li>
+<li><a class="reference internal" href="#other-devices-included-in-pyepics">Other Devices included in PyEpics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="arrays.html"
+                          title="previous chapter">Working with waveform / array data</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="alarm.html"
+                          title="next chapter">Alarms: respond when a PV goes out of range</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/devices.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
       <div class="clearer"></div>
     </div>
     <div class="related" role="navigation" aria-label="Related">
@@ -1105,30 +1101,17 @@ specific use of that Device.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="alarm.html" title="Alarms: respond when a PV goes out of range"
              >next</a> |</li>
         <li class="right" >
           <a href="arrays.html" title="Working with waveform / array data"
              >previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="#">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Devices: collections of PVs</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2021, Matthew Newville.
+    &#169; Copyright 2025, Matthew Newville, The University of Chicago.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>

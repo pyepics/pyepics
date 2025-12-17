@@ -8,14 +8,23 @@
 
     <title>Auto-saving: simple save/restore of PVs &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=e2a51986"></script>
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    
+    <script src="_static/documentation_options.js?v=46dd9d9f"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="wx: wxPython Widgets for Epics" href="wx.html" />
-    <link rel="prev" title="Alarms: respond when a PV goes out of range" href="alarm.html" /> 
+    <link rel="prev" title="Alarms: respond when a PV goes out of range" href="alarm.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
   </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
@@ -31,81 +40,16 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="wx.html" title="wx: wxPython Widgets for Epics"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="alarm.html" title="Alarms: respond when a PV goes out of range"
              accesskey="P">previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="#">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Auto-saving: simple save/restore of PVs</a></li> 
       </ul>
     </div>
-
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Auto-saving: simple save/restore of PVs</a><ul>
-<li><a class="reference internal" href="#autosave.save_pvs"><code class="docutils literal notranslate"><span class="pre">save_pvs()</span></code></a></li>
-<li><a class="reference internal" href="#autosave.restore_pvs"><code class="docutils literal notranslate"><span class="pre">restore_pvs()</span></code></a></li>
-<li><a class="reference internal" href="#autosaver-class"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code> class</a><ul>
-<li><a class="reference internal" href="#autosave.AutoSaver"><code class="docutils literal notranslate"><span class="pre">AutoSaver</span></code></a></li>
-<li><a class="reference internal" href="#autosave.read_request_file"><code class="docutils literal notranslate"><span class="pre">read_request_file()</span></code></a></li>
-<li><a class="reference internal" href="#autosave.save"><code class="docutils literal notranslate"><span class="pre">save()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#supported-data-types">Supported Data Types</a><ul>
-<li><a class="reference internal" href="#examples">Examples</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-  </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="alarm.html"
-                          title="previous chapter">Alarms: respond when a PV goes out of range</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="wx.html"
-                          title="next chapter">wx: wxPython Widgets for Epics</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/autosave.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -289,6 +233,58 @@ module.</p>
           </div>
         </div>
       </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Auto-saving: simple save/restore of PVs</a><ul>
+<li><a class="reference internal" href="#autosave.save_pvs"><code class="docutils literal notranslate"><span class="pre">save_pvs()</span></code></a></li>
+<li><a class="reference internal" href="#autosave.restore_pvs"><code class="docutils literal notranslate"><span class="pre">restore_pvs()</span></code></a></li>
+<li><a class="reference internal" href="#autosaver-class"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoSaver</span></code> class</a><ul>
+<li><a class="reference internal" href="#autosave.AutoSaver"><code class="docutils literal notranslate"><span class="pre">AutoSaver</span></code></a></li>
+<li><a class="reference internal" href="#autosave.read_request_file"><code class="docutils literal notranslate"><span class="pre">read_request_file()</span></code></a></li>
+<li><a class="reference internal" href="#autosave.save"><code class="docutils literal notranslate"><span class="pre">save()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#supported-data-types">Supported Data Types</a><ul>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="alarm.html"
+                          title="previous chapter">Alarms: respond when a PV goes out of range</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="wx.html"
+                          title="next chapter">wx: wxPython Widgets for Epics</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/autosave.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
       <div class="clearer"></div>
     </div>
     <div class="related" role="navigation" aria-label="Related">
@@ -298,30 +294,17 @@ module.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="wx.html" title="wx: wxPython Widgets for Epics"
              >next</a> |</li>
         <li class="right" >
           <a href="alarm.html" title="Alarms: respond when a PV goes out of range"
              >previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="#">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Auto-saving: simple save/restore of PVs</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2021, Matthew Newville.
+    &#169; Copyright 2025, Matthew Newville, The University of Chicago.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>

@@ -8,14 +8,23 @@
 
     <title>PV: Epics Process Variables &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=e2a51986"></script>
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    
+    <script src="_static/documentation_options.js?v=46dd9d9f"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ca: Low-level Channel Access module" href="ca.html" />
-    <link rel="prev" title="PyEpics Overview" href="overview.html" /> 
+    <link rel="prev" title="PyEpics Overview" href="overview.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
   </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
@@ -31,150 +40,16 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="ca.html" title="ca: Low-level Channel Access module"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="overview.html" title="PyEpics Overview"
              accesskey="P">previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="#">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">PV: Epics Process Variables</a></li> 
       </ul>
     </div>
-
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">PV: Epics Process Variables</a><ul>
-<li><a class="reference internal" href="#the-pv-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code> class</a><ul>
-<li><a class="reference internal" href="#pv.PV"><code class="docutils literal notranslate"><span class="pre">PV</span></code></a></li>
-<li><a class="reference internal" href="#methods">methods</a><ul>
-<li><a class="reference internal" href="#pv.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
-<li><a class="reference internal" href="#pv.get_with_metadata"><code class="docutils literal notranslate"><span class="pre">get_with_metadata()</span></code></a></li>
-<li><a class="reference internal" href="#pv.put"><code class="docutils literal notranslate"><span class="pre">put()</span></code></a></li>
-<li><a class="reference internal" href="#pv.get_ctrlvars"><code class="docutils literal notranslate"><span class="pre">get_ctrlvars()</span></code></a></li>
-<li><a class="reference internal" href="#pv.get_timevars"><code class="docutils literal notranslate"><span class="pre">get_timevars()</span></code></a></li>
-<li><a class="reference internal" href="#pv.poll"><code class="docutils literal notranslate"><span class="pre">poll()</span></code></a></li>
-<li><a class="reference internal" href="#pv.connect"><code class="docutils literal notranslate"><span class="pre">connect()</span></code></a></li>
-<li><a class="reference internal" href="#pv.wait_for_connection"><code class="docutils literal notranslate"><span class="pre">wait_for_connection()</span></code></a></li>
-<li><a class="reference internal" href="#pv.disconnect"><code class="docutils literal notranslate"><span class="pre">disconnect()</span></code></a></li>
-<li><a class="reference internal" href="#pv.reconnect"><code class="docutils literal notranslate"><span class="pre">reconnect()</span></code></a></li>
-<li><a class="reference internal" href="#pv.clear_auto_monitor"><code class="docutils literal notranslate"><span class="pre">clear_auto_monitor()</span></code></a></li>
-<li><a class="reference internal" href="#pv.add_callback"><code class="docutils literal notranslate"><span class="pre">add_callback()</span></code></a></li>
-<li><a class="reference internal" href="#pv.remove_callback"><code class="docutils literal notranslate"><span class="pre">remove_callback()</span></code></a></li>
-<li><a class="reference internal" href="#pv.clear_callbacks"><code class="docutils literal notranslate"><span class="pre">clear_callbacks()</span></code></a></li>
-<li><a class="reference internal" href="#pv.run_callbacks"><code class="docutils literal notranslate"><span class="pre">run_callbacks()</span></code></a></li>
-<li><a class="reference internal" href="#pv.run_callback"><code class="docutils literal notranslate"><span class="pre">run_callback()</span></code></a></li>
-<li><a class="reference internal" href="#pv.force_read_access_rights"><code class="docutils literal notranslate"><span class="pre">force_read_access_rights()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#attributes">attributes</a><ul>
-<li><a class="reference internal" href="#pv.value"><code class="docutils literal notranslate"><span class="pre">value</span></code></a></li>
-<li><a class="reference internal" href="#pv.char_value"><code class="docutils literal notranslate"><span class="pre">char_value</span></code></a></li>
-<li><a class="reference internal" href="#pv.status"><code class="docutils literal notranslate"><span class="pre">status</span></code></a></li>
-<li><a class="reference internal" href="#pv.type"><code class="docutils literal notranslate"><span class="pre">type</span></code></a></li>
-<li><a class="reference internal" href="#pv.ftype"><code class="docutils literal notranslate"><span class="pre">ftype</span></code></a></li>
-<li><a class="reference internal" href="#pv.host"><code class="docutils literal notranslate"><span class="pre">host</span></code></a></li>
-<li><a class="reference internal" href="#pv.count"><code class="docutils literal notranslate"><span class="pre">count</span></code></a></li>
-<li><a class="reference internal" href="#pv.nelm"><code class="docutils literal notranslate"><span class="pre">nelm</span></code></a></li>
-<li><a class="reference internal" href="#pv.read_access"><code class="docutils literal notranslate"><span class="pre">read_access</span></code></a></li>
-<li><a class="reference internal" href="#pv.write_access"><code class="docutils literal notranslate"><span class="pre">write_access</span></code></a></li>
-<li><a class="reference internal" href="#pv.access"><code class="docutils literal notranslate"><span class="pre">access</span></code></a></li>
-<li><a class="reference internal" href="#pv.severity"><code class="docutils literal notranslate"><span class="pre">severity</span></code></a></li>
-<li><a class="reference internal" href="#pv.timestamp"><code class="docutils literal notranslate"><span class="pre">timestamp</span></code></a></li>
-<li><a class="reference internal" href="#pv.posixseconds"><code class="docutils literal notranslate"><span class="pre">posixseconds</span></code></a></li>
-<li><a class="reference internal" href="#pv.nanoseconds"><code class="docutils literal notranslate"><span class="pre">nanoseconds</span></code></a></li>
-<li><a class="reference internal" href="#pv.precision"><code class="docutils literal notranslate"><span class="pre">precision</span></code></a></li>
-<li><a class="reference internal" href="#pv.units"><code class="docutils literal notranslate"><span class="pre">units</span></code></a></li>
-<li><a class="reference internal" href="#pv.enum_strs"><code class="docutils literal notranslate"><span class="pre">enum_strs</span></code></a></li>
-<li><a class="reference internal" href="#pv.info"><code class="docutils literal notranslate"><span class="pre">info</span></code></a></li>
-<li><a class="reference internal" href="#pv.upper_disp_limit"><code class="docutils literal notranslate"><span class="pre">upper_disp_limit</span></code></a></li>
-<li><a class="reference internal" href="#pv.lower_disp_limit"><code class="docutils literal notranslate"><span class="pre">lower_disp_limit</span></code></a></li>
-<li><a class="reference internal" href="#pv.upper_alarm_limit"><code class="docutils literal notranslate"><span class="pre">upper_alarm_limit</span></code></a></li>
-<li><a class="reference internal" href="#pv.lower_alarm_limit"><code class="docutils literal notranslate"><span class="pre">lower_alarm_limit</span></code></a></li>
-<li><a class="reference internal" href="#pv.lower_warning_limit"><code class="docutils literal notranslate"><span class="pre">lower_warning_limit</span></code></a></li>
-<li><a class="reference internal" href="#pv.upper_warning_limit"><code class="docutils literal notranslate"><span class="pre">upper_warning_limit</span></code></a></li>
-<li><a class="reference internal" href="#pv.upper_ctrl_limit"><code class="docutils literal notranslate"><span class="pre">upper_ctrl_limit</span></code></a></li>
-<li><a class="reference internal" href="#pv.lower_ctrl_limit"><code class="docutils literal notranslate"><span class="pre">lower_ctrl_limit</span></code></a></li>
-<li><a class="reference internal" href="#pv.put_complete"><code class="docutils literal notranslate"><span class="pre">put_complete</span></code></a></li>
-<li><a class="reference internal" href="#pv.callbacks"><code class="docutils literal notranslate"><span class="pre">callbacks</span></code></a></li>
-<li><a class="reference internal" href="#pv.connection_callbacks"><code class="docutils literal notranslate"><span class="pre">connection_callbacks</span></code></a></li>
-<li><a class="reference internal" href="#pv.access_callbacks"><code class="docutils literal notranslate"><span class="pre">access_callbacks</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#string-representation-for-a-pv">String representation for a PV</a></li>
-<li><a class="reference internal" href="#automatic-monitoring-of-a-pv">Automatic Monitoring of a PV</a></li>
-<li><a class="reference internal" href="#user-supplied-callback-functions">User-supplied Callback functions</a></li>
-<li><a class="reference internal" href="#user-supplied-connection-callback-functions">User-supplied Connection Callback functions</a></li>
-<li><a class="reference internal" href="#user-supplied-access-rights-callback-functions">User-supplied Access Rights Callback functions</a></li>
-<li><a class="reference internal" href="#put-with-wait-put-callbacks-and-put-complete">Put with wait, put callbacks, and  put_complete</a></li>
-<li><a class="reference internal" href="#the-get-pv-function-and-pvcache-cache-of-pvs">The <code class="xref py py-func docutils literal notranslate"><span class="pre">get_pv()</span></code> function and <code class="xref py py-attr docutils literal notranslate"><span class="pre">_PVcache_</span></code> cache of PVs</a><ul>
-<li><a class="reference internal" href="#pv.get_pv"><code class="docutils literal notranslate"><span class="pre">get_pv()</span></code></a></li>
-<li><a class="reference internal" href="#pv._PVcache_"><code class="docutils literal notranslate"><span class="pre">_PVcache_</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#examples">Examples</a><ul>
-<li><a class="reference internal" href="#basic-use">Basic Use</a></li>
-<li><a class="reference internal" href="#requests-including-metadata">Requests including Metadata</a></li>
-<li><a class="reference internal" href="#example-of-using-info-and-more-properties-examples">Example of using info and more properties examples</a></li>
-<li><a class="reference internal" href="#getting-a-string-value">Getting a string value</a></li>
-<li><a class="reference internal" href="#example-of-put">Example of <code class="xref py py-meth docutils literal notranslate"><span class="pre">put()</span></code></a></li>
-<li><a class="reference internal" href="#example-of-simple-callback">Example of simple callback</a></li>
-<li><a class="reference internal" href="#example-of-connection-callback">Example of connection callback</a></li>
-<li><a class="reference internal" href="#example-of-an-access-rights-callback">Example of an access rights callback</a></li>
-<li><a class="reference internal" href="#example-of-a-property-callback">Example of a property callback</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-  </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="overview.html"
-                          title="previous chapter">PyEpics Overview</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="ca.html"
-                          title="next chapter">ca: Low-level Channel Access module</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/pv.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -1315,6 +1190,127 @@ not be included in the callback arguments.</p>
           </div>
         </div>
       </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">PV: Epics Process Variables</a><ul>
+<li><a class="reference internal" href="#the-pv-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code> class</a><ul>
+<li><a class="reference internal" href="#pv.PV"><code class="docutils literal notranslate"><span class="pre">PV</span></code></a></li>
+<li><a class="reference internal" href="#methods">methods</a><ul>
+<li><a class="reference internal" href="#pv.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
+<li><a class="reference internal" href="#pv.get_with_metadata"><code class="docutils literal notranslate"><span class="pre">get_with_metadata()</span></code></a></li>
+<li><a class="reference internal" href="#pv.put"><code class="docutils literal notranslate"><span class="pre">put()</span></code></a></li>
+<li><a class="reference internal" href="#pv.get_ctrlvars"><code class="docutils literal notranslate"><span class="pre">get_ctrlvars()</span></code></a></li>
+<li><a class="reference internal" href="#pv.get_timevars"><code class="docutils literal notranslate"><span class="pre">get_timevars()</span></code></a></li>
+<li><a class="reference internal" href="#pv.poll"><code class="docutils literal notranslate"><span class="pre">poll()</span></code></a></li>
+<li><a class="reference internal" href="#pv.connect"><code class="docutils literal notranslate"><span class="pre">connect()</span></code></a></li>
+<li><a class="reference internal" href="#pv.wait_for_connection"><code class="docutils literal notranslate"><span class="pre">wait_for_connection()</span></code></a></li>
+<li><a class="reference internal" href="#pv.disconnect"><code class="docutils literal notranslate"><span class="pre">disconnect()</span></code></a></li>
+<li><a class="reference internal" href="#pv.reconnect"><code class="docutils literal notranslate"><span class="pre">reconnect()</span></code></a></li>
+<li><a class="reference internal" href="#pv.clear_auto_monitor"><code class="docutils literal notranslate"><span class="pre">clear_auto_monitor()</span></code></a></li>
+<li><a class="reference internal" href="#pv.add_callback"><code class="docutils literal notranslate"><span class="pre">add_callback()</span></code></a></li>
+<li><a class="reference internal" href="#pv.remove_callback"><code class="docutils literal notranslate"><span class="pre">remove_callback()</span></code></a></li>
+<li><a class="reference internal" href="#pv.clear_callbacks"><code class="docutils literal notranslate"><span class="pre">clear_callbacks()</span></code></a></li>
+<li><a class="reference internal" href="#pv.run_callbacks"><code class="docutils literal notranslate"><span class="pre">run_callbacks()</span></code></a></li>
+<li><a class="reference internal" href="#pv.run_callback"><code class="docutils literal notranslate"><span class="pre">run_callback()</span></code></a></li>
+<li><a class="reference internal" href="#pv.force_read_access_rights"><code class="docutils literal notranslate"><span class="pre">force_read_access_rights()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#attributes">attributes</a><ul>
+<li><a class="reference internal" href="#pv.value"><code class="docutils literal notranslate"><span class="pre">value</span></code></a></li>
+<li><a class="reference internal" href="#pv.char_value"><code class="docutils literal notranslate"><span class="pre">char_value</span></code></a></li>
+<li><a class="reference internal" href="#pv.status"><code class="docutils literal notranslate"><span class="pre">status</span></code></a></li>
+<li><a class="reference internal" href="#pv.type"><code class="docutils literal notranslate"><span class="pre">type</span></code></a></li>
+<li><a class="reference internal" href="#pv.ftype"><code class="docutils literal notranslate"><span class="pre">ftype</span></code></a></li>
+<li><a class="reference internal" href="#pv.host"><code class="docutils literal notranslate"><span class="pre">host</span></code></a></li>
+<li><a class="reference internal" href="#pv.count"><code class="docutils literal notranslate"><span class="pre">count</span></code></a></li>
+<li><a class="reference internal" href="#pv.nelm"><code class="docutils literal notranslate"><span class="pre">nelm</span></code></a></li>
+<li><a class="reference internal" href="#pv.read_access"><code class="docutils literal notranslate"><span class="pre">read_access</span></code></a></li>
+<li><a class="reference internal" href="#pv.write_access"><code class="docutils literal notranslate"><span class="pre">write_access</span></code></a></li>
+<li><a class="reference internal" href="#pv.access"><code class="docutils literal notranslate"><span class="pre">access</span></code></a></li>
+<li><a class="reference internal" href="#pv.severity"><code class="docutils literal notranslate"><span class="pre">severity</span></code></a></li>
+<li><a class="reference internal" href="#pv.timestamp"><code class="docutils literal notranslate"><span class="pre">timestamp</span></code></a></li>
+<li><a class="reference internal" href="#pv.posixseconds"><code class="docutils literal notranslate"><span class="pre">posixseconds</span></code></a></li>
+<li><a class="reference internal" href="#pv.nanoseconds"><code class="docutils literal notranslate"><span class="pre">nanoseconds</span></code></a></li>
+<li><a class="reference internal" href="#pv.precision"><code class="docutils literal notranslate"><span class="pre">precision</span></code></a></li>
+<li><a class="reference internal" href="#pv.units"><code class="docutils literal notranslate"><span class="pre">units</span></code></a></li>
+<li><a class="reference internal" href="#pv.enum_strs"><code class="docutils literal notranslate"><span class="pre">enum_strs</span></code></a></li>
+<li><a class="reference internal" href="#pv.info"><code class="docutils literal notranslate"><span class="pre">info</span></code></a></li>
+<li><a class="reference internal" href="#pv.upper_disp_limit"><code class="docutils literal notranslate"><span class="pre">upper_disp_limit</span></code></a></li>
+<li><a class="reference internal" href="#pv.lower_disp_limit"><code class="docutils literal notranslate"><span class="pre">lower_disp_limit</span></code></a></li>
+<li><a class="reference internal" href="#pv.upper_alarm_limit"><code class="docutils literal notranslate"><span class="pre">upper_alarm_limit</span></code></a></li>
+<li><a class="reference internal" href="#pv.lower_alarm_limit"><code class="docutils literal notranslate"><span class="pre">lower_alarm_limit</span></code></a></li>
+<li><a class="reference internal" href="#pv.lower_warning_limit"><code class="docutils literal notranslate"><span class="pre">lower_warning_limit</span></code></a></li>
+<li><a class="reference internal" href="#pv.upper_warning_limit"><code class="docutils literal notranslate"><span class="pre">upper_warning_limit</span></code></a></li>
+<li><a class="reference internal" href="#pv.upper_ctrl_limit"><code class="docutils literal notranslate"><span class="pre">upper_ctrl_limit</span></code></a></li>
+<li><a class="reference internal" href="#pv.lower_ctrl_limit"><code class="docutils literal notranslate"><span class="pre">lower_ctrl_limit</span></code></a></li>
+<li><a class="reference internal" href="#pv.put_complete"><code class="docutils literal notranslate"><span class="pre">put_complete</span></code></a></li>
+<li><a class="reference internal" href="#pv.callbacks"><code class="docutils literal notranslate"><span class="pre">callbacks</span></code></a></li>
+<li><a class="reference internal" href="#pv.connection_callbacks"><code class="docutils literal notranslate"><span class="pre">connection_callbacks</span></code></a></li>
+<li><a class="reference internal" href="#pv.access_callbacks"><code class="docutils literal notranslate"><span class="pre">access_callbacks</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#string-representation-for-a-pv">String representation for a PV</a></li>
+<li><a class="reference internal" href="#automatic-monitoring-of-a-pv">Automatic Monitoring of a PV</a></li>
+<li><a class="reference internal" href="#user-supplied-callback-functions">User-supplied Callback functions</a></li>
+<li><a class="reference internal" href="#user-supplied-connection-callback-functions">User-supplied Connection Callback functions</a></li>
+<li><a class="reference internal" href="#user-supplied-access-rights-callback-functions">User-supplied Access Rights Callback functions</a></li>
+<li><a class="reference internal" href="#put-with-wait-put-callbacks-and-put-complete">Put with wait, put callbacks, and  put_complete</a></li>
+<li><a class="reference internal" href="#the-get-pv-function-and-pvcache-cache-of-pvs">The <code class="xref py py-func docutils literal notranslate"><span class="pre">get_pv()</span></code> function and <code class="xref py py-attr docutils literal notranslate"><span class="pre">_PVcache_</span></code> cache of PVs</a><ul>
+<li><a class="reference internal" href="#pv.get_pv"><code class="docutils literal notranslate"><span class="pre">get_pv()</span></code></a></li>
+<li><a class="reference internal" href="#pv._PVcache_"><code class="docutils literal notranslate"><span class="pre">_PVcache_</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#basic-use">Basic Use</a></li>
+<li><a class="reference internal" href="#requests-including-metadata">Requests including Metadata</a></li>
+<li><a class="reference internal" href="#example-of-using-info-and-more-properties-examples">Example of using info and more properties examples</a></li>
+<li><a class="reference internal" href="#getting-a-string-value">Getting a string value</a></li>
+<li><a class="reference internal" href="#example-of-put">Example of <code class="xref py py-meth docutils literal notranslate"><span class="pre">put()</span></code></a></li>
+<li><a class="reference internal" href="#example-of-simple-callback">Example of simple callback</a></li>
+<li><a class="reference internal" href="#example-of-connection-callback">Example of connection callback</a></li>
+<li><a class="reference internal" href="#example-of-an-access-rights-callback">Example of an access rights callback</a></li>
+<li><a class="reference internal" href="#example-of-a-property-callback">Example of a property callback</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="overview.html"
+                          title="previous chapter">PyEpics Overview</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="ca.html"
+                          title="next chapter">ca: Low-level Channel Access module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pv.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
       <div class="clearer"></div>
     </div>
     <div class="related" role="navigation" aria-label="Related">
@@ -1324,30 +1320,17 @@ not be included in the callback arguments.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="ca.html" title="ca: Low-level Channel Access module"
              >next</a> |</li>
         <li class="right" >
           <a href="overview.html" title="PyEpics Overview"
              >previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="#">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">PV: Epics Process Variables</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2021, Matthew Newville.
+    &#169; Copyright 2025, Matthew Newville, The University of Chicago.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>

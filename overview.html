@@ -8,14 +8,23 @@
 
     <title>PyEpics Overview &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=e2a51986"></script>
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    
+    <script src="_static/documentation_options.js?v=46dd9d9f"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PV: Epics Process Variables" href="pv.html" />
-    <link rel="prev" title="Downloading and Installation" href="installation.html" /> 
+    <link rel="prev" title="Downloading and Installation" href="installation.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
   </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
@@ -31,107 +40,16 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="pv.html" title="PV: Epics Process Variables"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="installation.html" title="Downloading and Installation"
              accesskey="P">previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="#">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">PyEpics Overview</a></li> 
       </ul>
     </div>
-
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">PyEpics Overview</a><ul>
-<li><a class="reference internal" href="#quick-start">Quick Start</a><ul>
-<li><a class="reference internal" href="#procedural-approach-caget-caput">Procedural Approach: caget(), caput()</a></li>
-<li><a class="reference internal" href="#creating-and-using-pv-objects">Creating and Using PV Objects</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-epics">Simple <code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code> functions: caget(), caput(), etc.</a><ul>
-<li><a class="reference internal" href="#caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a><ul>
-<li><a class="reference internal" href="#epics.caget"><code class="docutils literal notranslate"><span class="pre">caget()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a><ul>
-<li><a class="reference internal" href="#epics.caput"><code class="docutils literal notranslate"><span class="pre">caput()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#cainfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">cainfo()</span></code></a><ul>
-<li><a class="reference internal" href="#epics.cainfo"><code class="docutils literal notranslate"><span class="pre">cainfo()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a><ul>
-<li><a class="reference internal" href="#epics.camonitor"><code class="docutils literal notranslate"><span class="pre">camonitor()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#camonitor-clear"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor_clear()</span></code></a><ul>
-<li><a class="reference internal" href="#epics.camonitor_clear"><code class="docutils literal notranslate"><span class="pre">camonitor_clear()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#caget-many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget_many()</span></code></a><ul>
-<li><a class="reference internal" href="#epics.caget_many"><code class="docutils literal notranslate"><span class="pre">caget_many()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#caput-many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a><ul>
-<li><a class="reference internal" href="#epics.caput_many"><code class="docutils literal notranslate"><span class="pre">caput_many()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#motivation-and-design-concepts">Motivation and design concepts</a></li>
-<li><a class="reference internal" href="#status">Status</a></li>
-</ul>
-</li>
-</ul>
-
-  </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="installation.html"
-                          title="previous chapter">Downloading and Installation</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="pv.html"
-                          title="next chapter">PV: Epics Process Variables</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/overview.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -178,17 +96,17 @@ change the PV, and attributes that are kept automatically synchronized with
 the remote channel.  For larger applications where you find yourself
 working with sets of related PVs, you may find the <code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code> class
 helpful.</p>
-<p>The lowest-level CA functionality is exposed in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module, and
-companion <code class="xref py py-mod docutils literal notranslate"><span class="pre">dbr</span></code> module.  While not necessary recommended for most use
-cases, this module does provide a fairly complete wrapping of the basic
-EPICS CA library.  For people who have used CA from C or other languages,
-this module should be familiar and seem quite usable, if a little more
-verbose and C-like than using PV objects.</p>
+<p>The lowest-level CA functionality is exposed in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module,
+and companion <code class="xref py py-mod docutils literal notranslate"><span class="pre">dbr</span></code> module.  While the <code class="xref py py-class docutils literal notranslate"><span class="pre">PV</span></code> module is
+recommended for most use cases, <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module does provide a fairly
+complete wrapping of the basic EPICS CA library.  For people who have
+used CA from C or other languages this module should be familiar, if a
+little more verbose and C-like than using PV objects.</p>
 <p>In addition, the <cite>epics</cite> package contains more specialized modules for
 alarms, Epics motors, and several other <em>devices</em> (collections of PVs), and
 a set of wxPython widget classes for using EPICS PVs with wxPython.</p>
 <p>The <cite>epics</cite> package is supported and well-tested on Linux, Mac OS X, and
-Windows with Python versions 2.7, and 3.5 and above.</p>
+Windows with Python versions 3.10 and above.</p>
 <section id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
 <p>Whether you’re familiar with Epics Channel Access or not, start here.
@@ -240,8 +158,7 @@ function:</p>
 <span class="go">=============================</span>
 </pre></div>
 </div>
-<p>The simplicity and clarity of these functions make them ideal for many
-uses.</p>
+<p>These functions are very simple to use, making them ideal for many uses.</p>
 </section>
 <section id="creating-and-using-pv-objects">
 <h3>Creating and Using PV Objects<a class="headerlink" href="#creating-and-using-pv-objects" title="Link to this heading">¶</a></h3>
@@ -340,28 +257,21 @@ getting and putting values for multiple PVs at a time.</p>
 <dd><p>get the current value to an epics Process Variable (PV).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>pvname</strong><span class="classifier">str</span></dt><dd><p>name of PV</p>
-</dd>
-<dt><strong>as_string</strong><span class="classifier">bool, optional</span></dt><dd><p>whether to get the string representation [False]</p>
-</dd>
-<dt><strong>count</strong><span class="classifier">int or None</span></dt><dd><p>maximum number of elements for waveform data [None]</p>
-</dd>
-<dt><strong>as_numpy</strong><span class="classifier">bool, optional</span></dt><dd><p>whether to return waveform data as a numpy array [True]</p>
-</dd>
-<dt><strong>use_monitor</strong><span class="classifier">bool, optional</span></dt><dd><p>whether to use the value cached by the monitor [True]</p>
-</dd>
-<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for the processing to complete [60]</p>
-</dd>
-<dt><strong>connection_timeout :float</strong></dt><dd><p>maximum time (in seconds) to wait for connection [5]</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pvname</strong> (<em>str</em>) – name of PV</p></li>
+<li><p><strong>as_string</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to get the string representation [False]</p></li>
+<li><p><strong>count</strong> (<em>int</em><em> or </em><em>None</em>) – maximum number of elements for waveform data [None]</p></li>
+<li><p><strong>as_numpy</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to return waveform data as a numpy array [True]</p></li>
+<li><p><strong>use_monitor</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to use the value cached by the monitor [True]</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – maximum time (in seconds) to wait for the processing to complete [60]</p></li>
+<li><p><strong>connection_timeout</strong> (<em>float</em>) – maximum time (in seconds) to wait for connection [5]</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>data</strong><span class="classifier">object</span></dt><dd><p>value of PV value on success, or <code class="docutils literal notranslate"><span class="pre">None</span></code> on a failure.</p>
+<dd class="field-even"><p><strong>data</strong> – value of PV value on success, or <code class="docutils literal notranslate"><span class="pre">None</span></code> on a failure.</p>
 </dd>
-</dl>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -475,28 +385,24 @@ devices.</p>
 <dd><p>put a value to an epics Process Variable (PV).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>pvname</strong><span class="classifier">str</span></dt><dd><p>name of PV</p>
-</dd>
-<dt><strong>value</strong><span class="classifier">object</span></dt><dd><p>value to put to PV (see notes)</p>
-</dd>
-<dt><strong>wait</strong><span class="classifier">bool, optional</span></dt><dd><p>whether to wait for processing to complete [False]</p>
-</dd>
-<dt><strong>timeout</strong><span class="classifier">float, optional</span></dt><dd><p>maximum time (in seconds) to wait for the processing to complete [60]</p>
-</dd>
-<dt><strong>connection_timeout</strong><span class="classifier">float, optional</span></dt><dd><p>maximum time (in seconds) to wait for connection [5]</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pvname</strong> (<em>str</em>) – name of PV</p></li>
+<li><p><strong>value</strong> (<em>object</em>) – value to put to PV (see notes)</p></li>
+<li><p><strong>wait</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to wait for processing to complete [False]</p></li>
+<li><p><strong>timeout</strong> (<em>float</em><em>, </em><em>optional</em>) – maximum time (in seconds) to wait for the processing to complete [60]</p></li>
+<li><p><strong>connection_timeout</strong> (<em>float</em><em>, </em><em>optional</em>) – maximum time (in seconds) to wait for connection [5]</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>int or <code class="docutils literal notranslate"><span class="pre">None</span></code></dt><dd><ul class="simple">
+<dd class="field-even"><p><ul class="simple">
 <li><p>1  on succesful completion</p></li>
 <li><p>-1 or other negative value on failure of the low-level CA put.</p></li>
 <li><p>None  on a failure to connect to the PV.</p></li>
 </ul>
+</p>
 </dd>
-</dl>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int or <code class="docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -553,22 +459,18 @@ has been exceeded.</p>
 <dd><p>return printable information about PV</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>pvname</strong><span class="classifier">str</span></dt><dd><p>name of PV</p>
-</dd>
-<dt><strong>print_out</strong><span class="classifier">bool, optional</span></dt><dd><p>whether to print the info to standard out [True]</p>
-</dd>
-<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for the processing to complete [60]</p>
-</dd>
-<dt><strong>connection_timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for connection [5]</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pvname</strong> (<em>str</em>) – name of PV</p></li>
+<li><p><strong>print_out</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to print the info to standard out [True]</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – maximum time (in seconds) to wait for the processing to complete [60]</p></li>
+<li><p><strong>connection_timeout</strong> (<em>float</em>) – maximum time (in seconds) to wait for connection [5]</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">None</span></code> or string</dt><dd><p>if <cite>print_out=False</cite>, the text is returned, but not printed.</p>
+<dd class="field-even"><p>if <cite>print_out=False</cite>, the text is returned, but not printed.</p>
 </dd>
-</dl>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">None</span></code> or string</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -619,20 +521,15 @@ PV object with will be stored internally for later use.</p></li>
 <dt class="sig sig-object py" id="epics.camonitor">
 <span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">camonitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.camonitor" title="Link to this definition">¶</a></dt>
 <dd><p>sets a monitor on a PV.</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>pvname</strong><span class="classifier">str</span></dt><dd><p>name of PV</p>
-</dd>
-<dt><strong>writer</strong><span class="classifier">callable or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>function used to send monitor messages [None]</p>
-</dd>
-<dt><strong>callback</strong><span class="classifier">callback or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>custom callback function [None]</p>
-</dd>
-<dt><strong>connection_timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for connection [5]</p>
-</dd>
-<dt><strong>monitor_delta</strong><span class="classifier">float or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>minimum change in value to monitor [None]</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pvname</strong> (<em>str</em>) – name of PV</p></li>
+<li><p><strong>writer</strong> (callable or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – function used to send monitor messages [None]</p></li>
+<li><p><strong>callback</strong> (callback or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – custom callback function [None]</p></li>
+<li><p><strong>connection_timeout</strong> (<em>float</em>) – maximum time (in seconds) to wait for connection [5]</p></li>
+<li><p><strong>monitor_delta</strong> (float or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – minimum change in value to monitor [None]</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -684,10 +581,7 @@ should take keyword arguments for <em>pvname</em>, <em>value</em>, and <em>char_
 <dd><p>clear monitors on a PV</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>pvname</strong><span class="classifier">str</span></dt><dd><p>name of PV</p>
-</dd>
-</dl>
+<dd class="field-odd"><p><strong>pvname</strong> (<em>str</em>) – name of PV</p>
 </dd>
 </dl>
 </dd></dl>
@@ -721,29 +615,20 @@ and the log file is inspected:</p>
 <dt class="sig sig-object py" id="epics.caget_many">
 <span class="sig-prename descclassname"><span class="pre">epics.</span></span><span class="sig-name descname"><span class="pre">caget_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pvlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_numpy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.caget_many" title="Link to this definition">¶</a></dt>
 <dd><p>get values for a list of PVs, working as fast as possible</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>pvlist</strong><span class="classifier">list of strings</span></dt><dd><p>list of pv names to fetch</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pvlist</strong> (<em>list</em><em> of </em><em>strings</em>) – list of pv names to fetch</p></li>
+<li><p><strong>as_string</strong> (<em>bool</em>) – whether to get values as strings [False]</p></li>
+<li><p><strong>as_numpy</strong> (<em>bool</em>) – whether to get values as numpy arrys [True]</p></li>
+<li><p><strong>count</strong> (int or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – maximum number of elements to get [None]</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – maximum time (in seconds) to wait for <em>each</em> get()  [1.0]</p></li>
+<li><p><strong>connection_timeout</strong> (<em>float</em>) – maximum time (in seconds) to wait for <em>all</em> pvs to connect [5.0]</p></li>
+<li><p><strong>conn_timeout</strong> (<em>float</em>) – back-compat alias or connection_timeout</p></li>
+</ul>
 </dd>
-<dt><strong>as_string</strong><span class="classifier">bool</span></dt><dd><p>whether to get values as strings [False]</p>
-</dd>
-<dt><strong>as_numpy</strong><span class="classifier">bool</span></dt><dd><p>whether to get values as numpy arrys [True]</p>
-</dd>
-<dt><strong>count</strong><span class="classifier">int or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>maximum number of elements to get [None]</p>
-</dd>
-<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for <em>each</em> get()  [1.0]</p>
-</dd>
-<dt><strong>connection_timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for <em>all</em> pvs to connect [5.0]</p>
-</dd>
-<dt><strong>conn_timeout :float</strong></dt><dd><p>back-compat alias or connection_timeout</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>list of values, with <cite>None</cite> signifying ‘not connected’ or ‘timed out’.</dt><dd></dd>
-</dl>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of values, with <cite>None</cite> signifying ‘not connected’ or ‘timed out’.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -762,25 +647,21 @@ documentation for <a class="reference internal" href="#epics.caget" title="epics
 <dd><p>put values to a list of PVs, as quickly as possible</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>pvlist</strong><span class="classifier">list or iterable</span></dt><dd><p>list of PV names</p>
-</dd>
-<dt><strong>values</strong><span class="classifier">list or iterable</span></dt><dd><p>list of values for corresponding PVs</p>
-</dd>
-<dt><strong>wait</strong><span class="classifier">bool or string</span></dt><dd><p>whether to wait for puts (see notes) [False]</p>
-</dd>
-<dt><strong>put_timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time (in seconds) to wait for the put to complete [60]</p>
-</dd>
-<dt><strong>connection_timeout :float</strong></dt><dd><p>maximum time (in seconds) to wait for connection [5]</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pvlist</strong> (<em>list</em><em> or </em><em>iterable</em>) – list of PV names</p></li>
+<li><p><strong>values</strong> (<em>list</em><em> or </em><em>iterable</em>) – list of values for corresponding PVs</p></li>
+<li><p><strong>wait</strong> (<em>bool</em><em> or </em><em>string</em>) – whether to wait for puts (see notes) [False]</p></li>
+<li><p><strong>put_timeout</strong> (<em>float</em>) – maximum time (in seconds) to wait for the put to complete [60]</p></li>
+<li><p><strong>connection_timeout</strong> (<em>float</em>) – maximum time (in seconds) to wait for connection [5]</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>a list of ints or <cite>None</cite>, with values of 1 if the put was successful,</dt><dd></dd>
-<dt>or a negative number if the put failed (say, the timeout was exceeded),</dt><dd></dd>
-<dt>or <cite>None</cite> if the connection failed.</dt><dd></dd>
-</dl>
+<dd class="field-even"><p><ul class="simple">
+<li><p>a list of ints or <cite>None</cite>, with values of 1 if the put was successful,</p></li>
+<li><p><em>or a negative number if the put failed (say, the timeout was exceeded),</em></p></li>
+<li><p>or <cite>None</cite> if the connection failed.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -838,14 +719,91 @@ and Python3 is greatly simplified.</p>
 reasonably stable and ready to use in production code.  Features are being
 added slowly, and testing is integrated into development so that the chance
 of introducing bugs into existing codes is minimized.  The package is
-targeted and tested to work on all supported versions of Python, currently
-Python 3.9 and higher.</p>
+targeted and tested to work on all supported versions of Python.</p>
 </section>
 </section>
 
 
             <div class="clearer"></div>
           </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">PyEpics Overview</a><ul>
+<li><a class="reference internal" href="#quick-start">Quick Start</a><ul>
+<li><a class="reference internal" href="#procedural-approach-caget-caput">Procedural Approach: caget(), caput()</a></li>
+<li><a class="reference internal" href="#creating-and-using-pv-objects">Creating and Using PV Objects</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-epics">Simple <code class="xref py py-mod docutils literal notranslate"><span class="pre">epics</span></code> functions: caget(), caput(), etc.</a><ul>
+<li><a class="reference internal" href="#caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget()</span></code></a><ul>
+<li><a class="reference internal" href="#epics.caget"><code class="docutils literal notranslate"><span class="pre">caget()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#caput"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput()</span></code></a><ul>
+<li><a class="reference internal" href="#epics.caput"><code class="docutils literal notranslate"><span class="pre">caput()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cainfo"><code class="xref py py-func docutils literal notranslate"><span class="pre">cainfo()</span></code></a><ul>
+<li><a class="reference internal" href="#epics.cainfo"><code class="docutils literal notranslate"><span class="pre">cainfo()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#camonitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor()</span></code></a><ul>
+<li><a class="reference internal" href="#epics.camonitor"><code class="docutils literal notranslate"><span class="pre">camonitor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#camonitor-clear"><code class="xref py py-func docutils literal notranslate"><span class="pre">camonitor_clear()</span></code></a><ul>
+<li><a class="reference internal" href="#epics.camonitor_clear"><code class="docutils literal notranslate"><span class="pre">camonitor_clear()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#caget-many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caget_many()</span></code></a><ul>
+<li><a class="reference internal" href="#epics.caget_many"><code class="docutils literal notranslate"><span class="pre">caget_many()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#caput-many"><code class="xref py py-func docutils literal notranslate"><span class="pre">caput_many()</span></code></a><ul>
+<li><a class="reference internal" href="#epics.caput_many"><code class="docutils literal notranslate"><span class="pre">caput_many()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#motivation-and-design-concepts">Motivation and design concepts</a></li>
+<li><a class="reference internal" href="#status">Status</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="installation.html"
+                          title="previous chapter">Downloading and Installation</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="pv.html"
+                          title="next chapter">PV: Epics Process Variables</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/overview.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -857,30 +815,17 @@ Python 3.9 and higher.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="pv.html" title="PV: Epics Process Variables"
              >next</a> |</li>
         <li class="right" >
           <a href="installation.html" title="Downloading and Installation"
              >previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="#">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">PyEpics Overview</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2021, Matthew Newville.
+    &#169; Copyright 2025, Matthew Newville, The University of Chicago.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>

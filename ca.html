@@ -8,14 +8,23 @@
 
     <title>ca: Low-level Channel Access module &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=e2a51986"></script>
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    
+    <script src="_static/documentation_options.js?v=46dd9d9f"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Working with waveform / array data" href="arrays.html" />
-    <link rel="prev" title="PV: Epics Process Variables" href="pv.html" /> 
+    <link rel="prev" title="PV: Epics Process Variables" href="pv.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
   </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
@@ -31,196 +40,16 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="arrays.html" title="Working with waveform / array data"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="pv.html" title="PV: Epics Process Variables"
              accesskey="P">previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="#">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">ca: Low-level Channel Access module</a></li> 
       </ul>
     </div>
-
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">ca: Low-level Channel Access module</a><ul>
-<li><a class="reference internal" href="#general-description-difference-with-c-library">General description, difference with C library</a><ul>
-<li><a class="reference internal" href="#name-mangling">Name Mangling</a></li>
-<li><a class="reference internal" href="#supressing-messages-from-libca">Supressing Messages from libCA</a></li>
-<li><a class="reference internal" href="#other-changes-and-omissions">Other Changes and Omissions</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#initialization-finalization-and-life-cycle">Initialization, Finalization, and Life-cycle</a><ul>
-<li><a class="reference internal" href="#epics.ca.PREEMPTIVE_CALLBACK"><code class="docutils literal notranslate"><span class="pre">PREEMPTIVE_CALLBACK</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.DEFAULT_CONNECTION_TIMEOUT"><code class="docutils literal notranslate"><span class="pre">DEFAULT_CONNECTION_TIMEOUT</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.AUTOMONITOR_MAXLENGTH"><code class="docutils literal notranslate"><span class="pre">AUTOMONITOR_MAXLENGTH</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.WITH_CA_MESSAGES"><code class="docutils literal notranslate"><span class="pre">WITH_CA_MESSAGES</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#using-the-ca-module">Using the CA module</a><ul>
-<li><a class="reference internal" href="#epics.ca.initialize_libca"><code class="docutils literal notranslate"><span class="pre">initialize_libca()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.finalize_libca"><code class="docutils literal notranslate"><span class="pre">finalize_libca()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.pend_io"><code class="docutils literal notranslate"><span class="pre">pend_io()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.pend_event"><code class="docutils literal notranslate"><span class="pre">pend_event()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.poll"><code class="docutils literal notranslate"><span class="pre">poll()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.create_context"><code class="docutils literal notranslate"><span class="pre">create_context()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.destroy_context"><code class="docutils literal notranslate"><span class="pre">destroy_context()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.current_context"><code class="docutils literal notranslate"><span class="pre">current_context()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.attach_context"><code class="docutils literal notranslate"><span class="pre">attach_context()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.detach_context"><code class="docutils literal notranslate"><span class="pre">detach_context()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.use_initial_context"><code class="docutils literal notranslate"><span class="pre">use_initial_context()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.client_status"><code class="docutils literal notranslate"><span class="pre">client_status()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.version"><code class="docutils literal notranslate"><span class="pre">version()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.message"><code class="docutils literal notranslate"><span class="pre">message()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.flush_io"><code class="docutils literal notranslate"><span class="pre">flush_io()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.replace_printf_handler"><code class="docutils literal notranslate"><span class="pre">replace_printf_handler()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.disable_ca_messages"><code class="docutils literal notranslate"><span class="pre">disable_ca_messages()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.enable_ca_messages"><code class="docutils literal notranslate"><span class="pre">enable_ca_messages()</span></code></a></li>
-<li><a class="reference internal" href="#creating-and-connecting-to-channels">Creating and Connecting to Channels</a><ul>
-<li><a class="reference internal" href="#epics.ca.create_channel"><code class="docutils literal notranslate"><span class="pre">create_channel()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.connect_channel"><code class="docutils literal notranslate"><span class="pre">connect_channel()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.name"><code class="docutils literal notranslate"><span class="pre">name()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.host_name"><code class="docutils literal notranslate"><span class="pre">host_name()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.element_count"><code class="docutils literal notranslate"><span class="pre">element_count()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.replace_access_rights_event"><code class="docutils literal notranslate"><span class="pre">replace_access_rights_event()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.read_access"><code class="docutils literal notranslate"><span class="pre">read_access()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.write_access"><code class="docutils literal notranslate"><span class="pre">write_access()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.field_type"><code class="docutils literal notranslate"><span class="pre">field_type()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.clear_channel"><code class="docutils literal notranslate"><span class="pre">clear_channel()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.state"><code class="docutils literal notranslate"><span class="pre">state()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.isConnected"><code class="docutils literal notranslate"><span class="pre">isConnected()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.access"><code class="docutils literal notranslate"><span class="pre">access()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.promote_type"><code class="docutils literal notranslate"><span class="pre">promote_type()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca._cache"><code class="docutils literal notranslate"><span class="pre">_cache</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.show_cache"><code class="docutils literal notranslate"><span class="pre">show_cache()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.clear_cache"><code class="docutils literal notranslate"><span class="pre">clear_cache()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#interacting-with-connected-channels">Interacting with Connected Channels</a><ul>
-<li><a class="reference internal" href="#epics.ca.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.get_with_metadata"><code class="docutils literal notranslate"><span class="pre">get_with_metadata()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.get_complete"><code class="docutils literal notranslate"><span class="pre">get_complete()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.get_complete_with_metadata"><code class="docutils literal notranslate"><span class="pre">get_complete_with_metadata()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.put"><code class="docutils literal notranslate"><span class="pre">put()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.create_subscription"><code class="docutils literal notranslate"><span class="pre">create_subscription()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.DEFAULT_SUBSCRIPTION_MASK"><code class="docutils literal notranslate"><span class="pre">DEFAULT_SUBSCRIPTION_MASK</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.clear_subscription"><code class="docutils literal notranslate"><span class="pre">clear_subscription()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.get_timestamp"><code class="docutils literal notranslate"><span class="pre">get_timestamp()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.get_severity"><code class="docutils literal notranslate"><span class="pre">get_severity()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.get_precision"><code class="docutils literal notranslate"><span class="pre">get_precision()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.get_enum_strings"><code class="docutils literal notranslate"><span class="pre">get_enum_strings()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.get_ctrlvars"><code class="docutils literal notranslate"><span class="pre">get_ctrlvars()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.get_timevars"><code class="docutils literal notranslate"><span class="pre">get_timevars()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#synchronous-groups">Synchronous Groups</a><ul>
-<li><a class="reference internal" href="#epics.ca.sg_create"><code class="docutils literal notranslate"><span class="pre">sg_create()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.sg_delete"><code class="docutils literal notranslate"><span class="pre">sg_delete()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.sg_block"><code class="docutils literal notranslate"><span class="pre">sg_block()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.sg_get"><code class="docutils literal notranslate"><span class="pre">sg_get()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.sg_put"><code class="docutils literal notranslate"><span class="pre">sg_put()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.sg_test"><code class="docutils literal notranslate"><span class="pre">sg_test()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.sg_reset"><code class="docutils literal notranslate"><span class="pre">sg_reset()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
-<li><a class="reference internal" href="#dbr-data-types">DBR data types</a></li>
-<li><a class="reference internal" href="#pysevchk-and-channelaccessexcepction-checking-ca-return-codes"><cite>PySEVCHK</cite> and ChannelAccessExcepction: checking CA return codes</a><ul>
-<li><a class="reference internal" href="#epics.ca.ChannelAccessException"><code class="docutils literal notranslate"><span class="pre">ChannelAccessException</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.PySEVCHK"><code class="docutils literal notranslate"><span class="pre">PySEVCHK()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.withSEVCHK"><code class="docutils literal notranslate"><span class="pre">withSEVCHK()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#function-decorators">Function Decorators</a><ul>
-<li><a class="reference internal" href="#epics.ca.withCA"><code class="docutils literal notranslate"><span class="pre">withCA()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.withCHID"><code class="docutils literal notranslate"><span class="pre">withCHID()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.withConnectedCHID"><code class="docutils literal notranslate"><span class="pre">withConnectedCHID()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.withInitialContext"><code class="docutils literal notranslate"><span class="pre">withInitialContext()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#unpacking-data-from-callbacks">Unpacking Data from Callbacks</a><ul>
-<li><a class="reference internal" href="#epics.ca._unpack"><code class="docutils literal notranslate"><span class="pre">_unpack()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#user-supplied-callback-functions">User-supplied Callback functions</a></li>
-<li><a class="reference internal" href="#omissions">Omissions</a><ul>
-<li><a class="reference internal" href="#epics.ca.ca_add_exception_event"><code class="docutils literal notranslate"><span class="pre">ca_add_exception_event()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.ca_add_fd_registration"><code class="docutils literal notranslate"><span class="pre">ca_add_fd_registration()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.ca_client_status"><code class="docutils literal notranslate"><span class="pre">ca_client_status()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.ca_set_puser"><code class="docutils literal notranslate"><span class="pre">ca_set_puser()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.ca_puser"><code class="docutils literal notranslate"><span class="pre">ca_puser()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.ca_SEVCHK"><code class="docutils literal notranslate"><span class="pre">ca_SEVCHK()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.ca_signal"><code class="docutils literal notranslate"><span class="pre">ca_signal()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.ca_test_event"><code class="docutils literal notranslate"><span class="pre">ca_test_event()</span></code></a></li>
-<li><a class="reference internal" href="#epics.ca.ca_dump_dbr"><code class="docutils literal notranslate"><span class="pre">ca_dump_dbr()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#cathread-class"><code class="xref py py-class docutils literal notranslate"><span class="pre">CAThread</span></code> class</a><ul>
-<li><a class="reference internal" href="#epics.ca.CAThread"><code class="docutils literal notranslate"><span class="pre">CAThread</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#examples">Examples</a><ul>
-<li><a class="reference internal" href="#create-connect-get-value-of-channel">Create, Connect, Get Value of Channel</a></li>
-<li><a class="reference internal" href="#put-waiting-for-completion">Put, waiting for completion</a></li>
-<li><a class="reference internal" href="#define-a-callback-to-subscribe-to-changes">Define a callback to Subscribe to Changes</a></li>
-<li><a class="reference internal" href="#define-a-connection-callback">Define a connection callback</a></li>
-<li><a class="reference internal" href="#define-an-access-rights-change-event-callback">Define an access rights change event callback</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-  </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="pv.html"
-                          title="previous chapter">PV: Epics Process Variables</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="arrays.html"
-                          title="next chapter">Working with waveform / array data</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/ca.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -425,10 +254,7 @@ you should not need to call this directly from most real programs.</p>
 then calls <a class="reference internal" href="#epics.ca.flush_io" title="epics.ca.flush_io"><code class="xref py py-func docutils literal notranslate"><span class="pre">flush_io()</span></code></a> and <a class="reference internal" href="#epics.ca.poll" title="epics.ca.poll"><code class="xref py py-func docutils literal notranslate"><span class="pre">poll()</span></code></a> a few times.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>maxtime</strong><span class="classifier">float</span></dt><dd><p>maximimum time (in seconds) to wait for <a class="reference internal" href="#epics.ca.flush_io" title="epics.ca.flush_io"><code class="xref py py-func docutils literal notranslate"><span class="pre">flush_io()</span></code></a> and <a class="reference internal" href="#epics.ca.poll" title="epics.ca.poll"><code class="xref py py-func docutils literal notranslate"><span class="pre">poll()</span></code></a> to complete.</p>
-</dd>
-</dl>
+<dd class="field-odd"><p><strong>maxtime</strong> (<em>float</em>) – maximimum time (in seconds) to wait for <a class="reference internal" href="#epics.ca.flush_io" title="epics.ca.flush_io"><code class="xref py py-func docutils literal notranslate"><span class="pre">flush_io()</span></code></a> and <a class="reference internal" href="#epics.ca.poll" title="epics.ca.poll"><code class="xref py py-func docutils literal notranslate"><span class="pre">poll()</span></code></a> to complete.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -462,12 +288,9 @@ to set the context type. Note that both <em>context_create</em> and
 the rest of the CA library) are supported.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>ctx</strong><span class="classifier">int</span></dt><dd><p>0 – No preemptive callbacks,
+<dd class="field-odd"><p><strong>ctx</strong> (<em>int</em>) – 0 – No preemptive callbacks,
 1 – use use preemptive callbacks,
 None – use value of <a class="reference internal" href="#epics.ca.PREEMPTIVE_CALLBACK" title="epics.ca.PREEMPTIVE_CALLBACK"><code class="xref py py-data docutils literal notranslate"><span class="pre">PREEMPTIVE_CALLBACK</span></code></a></p>
-</dd>
-</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -538,10 +361,7 @@ Currently, this should report ‘4.13’</p>
 the supplied writer function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>writer:  callable or None [default]</strong></dt><dd><p>function to use for handling messages</p>
-</dd>
-</dl>
+<dd class="field-odd"><p><strong>writer</strong> (<em>callable</em><em> or </em><em>None</em><em> [</em><em>default</em><em>]</em>) – function to use for handling messages</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -568,10 +388,7 @@ strings to be formatted.</p></li>
 <dd><p>enable messages from CA using the supplier writer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>writer:   callable, `stderr`, `stdout`, or `None`</strong></dt><dd><p>function to use for handling messages</p>
-</dd>
-</dl>
+<dd class="field-odd"><p><strong>writer</strong> (callable, <cite>stderr</cite>, <cite>stdout</cite>, or <cite>None</cite>) – function to use for handling messages</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -600,25 +417,21 @@ a good idea to treat these as object instances.</p>
 <dd><p>create a Channel for a given pvname</p>
 <p>creates a channel, returning the Channel ID <code class="docutils literal notranslate"><span class="pre">chid</span></code> used by other
 functions to identify this channel.</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>pvname</strong><span class="classifier">string</span></dt><dd><p>the name of the PV for which a channel should be created.</p>
-</dd>
-<dt><strong>connect</strong><span class="classifier">bool</span></dt><dd><p>whether to (try to) connect to PV as soon as possible.</p>
-</dd>
-<dt><strong>auto_cb</strong><span class="classifier">bool</span></dt><dd><p>whether to automatically use an internal connection callback.</p>
-</dd>
-<dt><strong>callback</strong><span class="classifier">callable or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>user-defined Python function to be called when the connection
-state change s.</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pvname</strong> (<em>string</em>) – the name of the PV for which a channel should be created.</p></li>
+<li><p><strong>connect</strong> (<em>bool</em>) – whether to (try to) connect to PV as soon as possible.</p></li>
+<li><p><strong>auto_cb</strong> (<em>bool</em>) – whether to automatically use an internal connection callback.</p></li>
+<li><p><strong>callback</strong> (callable or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – user-defined Python function to be called when the connection
+state change s.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>channel ID.</p>
+<dd class="field-even"><p><strong>chid</strong> – channel ID.</p>
 </dd>
-</dl>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ctypes.c_long</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -661,20 +474,17 @@ channel to connect.  It returns the connection state,
 when needed in most cases.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>Channel ID</p>
-</dd>
-<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time to wait for connection.</p>
-</dd>
-<dt><strong>verbose</strong><span class="classifier">bool</span></dt><dd><p>whether to print out debugging information</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chid</strong> (<em>ctypes.c_long</em>) – Channel ID</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – maximum time to wait for connection.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – whether to print out debugging information</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>connection_state</strong><span class="classifier">bool</span></dt><dd><p>that is, whether the Channel is connected</p>
+<dd class="field-even"><p><strong>connection_state</strong> – that is, whether the Channel is connected</p>
 </dd>
-</dl>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -826,32 +636,25 @@ keyword arguments can be used to specify such options.</p>
 Note that there is not a separate form for array data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>Channel ID</p>
-</dd>
-<dt><strong>ftype</strong><span class="classifier">int</span></dt><dd><p>field type to use (native type is default)</p>
-</dd>
-<dt><strong>count</strong><span class="classifier">int</span></dt><dd><p>maximum element count to return (full data returned by default)</p>
-</dd>
-<dt><strong>as_string</strong><span class="classifier">bool</span></dt><dd><p>whether to return the string representation of the value.
-See notes below.</p>
-</dd>
-<dt><strong>as_numpy</strong><span class="classifier">bool</span></dt><dd><p>whether to return the Numerical Python representation
-for array / waveform data.</p>
-</dd>
-<dt><strong>wait</strong><span class="classifier">bool</span></dt><dd><p>whether to wait for the data to be received, or return immediately.</p>
-</dd>
-<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chid</strong> (<em>ctypes.c_long</em>) – Channel ID</p></li>
+<li><p><strong>ftype</strong> (<em>int</em>) – field type to use (native type is default)</p></li>
+<li><p><strong>count</strong> (<em>int</em>) – maximum element count to return (full data returned by default)</p></li>
+<li><p><strong>as_string</strong> (<em>bool</em>) – whether to return the string representation of the value.
+See notes below.</p></li>
+<li><p><strong>as_numpy</strong> (<em>bool</em>) – whether to return the Numerical Python representation
+for array / waveform data.</p></li>
+<li><p><strong>wait</strong> (<em>bool</em>) – whether to wait for the data to be received, or return immediately.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>data</strong><span class="classifier">object</span></dt><dd><p>Normally, the value of the data.  Will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the
+<dd class="field-even"><p><strong>data</strong> – Normally, the value of the data.  Will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the
 channel is not connected, <cite>wait=False</cite> was used, or the data
 transfer timed out.</p>
 </dd>
-</dl>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -889,29 +692,22 @@ later with <a class="reference internal" href="#epics.ca.get_complete" title="ep
 <dt class="sig sig-object py" id="epics.ca.get_with_metadata">
 <span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">get_with_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_numpy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.get_with_metadata" title="Link to this definition">¶</a></dt>
 <dd><p>Return the current value along with metadata for a Channel</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>Channel ID</p>
-</dd>
-<dt><strong>ftype</strong><span class="classifier">int</span></dt><dd><p>field type to use (native type is default)</p>
-</dd>
-<dt><strong>count</strong><span class="classifier">int</span></dt><dd><p>maximum element count to return (full data returned by default)</p>
-</dd>
-<dt><strong>as_string</strong><span class="classifier">bool</span></dt><dd><p>whether to return the string representation of the value.  See notes.</p>
-</dd>
-<dt><strong>as_numpy</strong><span class="classifier">bool</span></dt><dd><p>whether to return the Numerical Python representation for array /
-waveform data.</p>
-</dd>
-<dt><strong>wait</strong><span class="classifier">bool</span></dt><dd><p>whether to wait for the data to be received, or return immediately.</p>
-</dd>
-<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chid</strong> (<em>ctypes.c_long</em>) – Channel ID</p></li>
+<li><p><strong>ftype</strong> (<em>int</em>) – field type to use (native type is default)</p></li>
+<li><p><strong>count</strong> (<em>int</em>) – maximum element count to return (full data returned by default)</p></li>
+<li><p><strong>as_string</strong> (<em>bool</em>) – whether to return the string representation of the value.  See notes.</p></li>
+<li><p><strong>as_numpy</strong> (<em>bool</em>) – whether to return the Numerical Python representation for array /
+waveform data.</p></li>
+<li><p><strong>wait</strong> (<em>bool</em>) – whether to wait for the data to be received, or return immediately.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl>
-<dt><strong>data</strong><span class="classifier">dict or None</span></dt><dd><p>The dictionary of data, guaranteed to at least have the ‘value’ key.
+<dd class="field-even"><p><ul>
+<li><p><strong>data</strong> (<em>dict or None</em>) – The dictionary of data, guaranteed to at least have the ‘value’ key.
 Depending on ftype, other keys may also be present:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;severity&#39;</span><span class="p">,</span> <span class="s1">&#39;enum_strs&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">,</span>
 <span class="s1">&#39;severity&#39;</span><span class="p">,</span> <span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="s1">&#39;posixseconds&#39;</span><span class="p">,</span> <span class="s1">&#39;nanoseconds&#39;</span><span class="p">,</span>
@@ -922,9 +718,10 @@ Depending on ftype, other keys may also be present:</p>
 </div>
 <p>Returns <code class="docutils literal notranslate"><span class="pre">None</span></code> if the channel is not connected, <cite>wait=False</cite> was used,
 or the data transfer timed out.</p>
-</dd>
-<dt>See <cite>get()</cite> for additional usage notes.</dt><dd></dd>
-</dl>
+</li>
+<li><p>See <cite>get()</cite> for additional usage notes.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>
@@ -938,28 +735,22 @@ because <cite>wait=False</cite> was used or because the data transfer
 did not complete before the timeout passed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>Channel ID</p>
-</dd>
-<dt><strong>ftype</strong><span class="classifier">int</span></dt><dd><p>field type to use (native type is default)</p>
-</dd>
-<dt><strong>count</strong><span class="classifier">int</span></dt><dd><p>maximum element count to return (full data returned by default)</p>
-</dd>
-<dt><strong>as_string</strong><span class="classifier">bool</span></dt><dd><p>whether to return the string representation of the value.</p>
-</dd>
-<dt><strong>as_numpy</strong><span class="classifier">bool</span></dt><dd><p>whether to return the Numerical Python representation
-for array / waveform data.</p>
-</dd>
-<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chid</strong> (<em>ctypes.c_long</em>) – Channel ID</p></li>
+<li><p><strong>ftype</strong> (<em>int</em>) – field type to use (native type is default)</p></li>
+<li><p><strong>count</strong> (<em>int</em>) – maximum element count to return (full data returned by default)</p></li>
+<li><p><strong>as_string</strong> (<em>bool</em>) – whether to return the string representation of the value.</p></li>
+<li><p><strong>as_numpy</strong> (<em>bool</em>) – whether to return the Numerical Python representation
+for array / waveform data.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>data</strong><span class="classifier">object</span></dt><dd><p>This function will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the previous <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">get()</span></code></a>
+<dd class="field-even"><p><strong>data</strong> – This function will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the previous <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">get()</span></code></a>
 actually completed, or if this data transfer also times out.</p>
 </dd>
-</dl>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -980,29 +771,23 @@ either because <cite>wait=False</cite> was used or because the data transfer did
 complete before the timeout passed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>Channel ID</p>
-</dd>
-<dt><strong>ftype</strong><span class="classifier">int</span></dt><dd><p>field type to use (native type is default)</p>
-</dd>
-<dt><strong>count</strong><span class="classifier">int</span></dt><dd><p>maximum element count to return (full data returned by default)</p>
-</dd>
-<dt><strong>as_string</strong><span class="classifier">bool</span></dt><dd><p>whether to return the string representation of the value.</p>
-</dd>
-<dt><strong>as_numpy</strong><span class="classifier">bool</span></dt><dd><p>whether to return the Numerical Python representation
-for array / waveform data.</p>
-</dd>
-<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chid</strong> (<em>ctypes.c_long</em>) – Channel ID</p></li>
+<li><p><strong>ftype</strong> (<em>int</em>) – field type to use (native type is default)</p></li>
+<li><p><strong>count</strong> (<em>int</em>) – maximum element count to return (full data returned by default)</p></li>
+<li><p><strong>as_string</strong> (<em>bool</em>) – whether to return the string representation of the value.</p></li>
+<li><p><strong>as_numpy</strong> (<em>bool</em>) – whether to return the Numerical Python representation
+for array / waveform data.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – maximum time to wait for data before returning <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>data</strong><span class="classifier">dict or None</span></dt><dd><p>This function will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the previous <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">get()</span></code></a> actually
-completed, or if this data transfer also times out.</p>
-</dd>
-<dt>See <cite>get_complete()</cite> for additional usage notes.</dt><dd></dd>
-</dl>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>data</strong> (<em>dict or None</em>) – This function will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the previous <a class="reference internal" href="#epics.ca.get" title="epics.ca.get"><code class="xref py py-func docutils literal notranslate"><span class="pre">get()</span></code></a> actually
+completed, or if this data transfer also times out.</p></li>
+<li><p>See <cite>get_complete()</cite> for additional usage notes.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1013,29 +798,23 @@ completed, or if this data transfer also times out.</p>
 <dd><p>sets the Channel to a value, with options to either wait
 (block) for the processing to complete, or to execute a
 supplied callback function when the process has completed.</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>Channel ID</p>
-</dd>
-<dt><strong>wait</strong><span class="classifier">bool</span></dt><dd><p>whether to wait for processing to complete (or time-out)
-before returning.</p>
-</dd>
-<dt><strong>timeout</strong><span class="classifier">float</span></dt><dd><p>maximum time to wait for processing to complete before returning anyway.</p>
-</dd>
-<dt><strong>callback</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">None</span></code> or callable</span></dt><dd><p>user-supplied function to run when processing has completed.</p>
-</dd>
-<dt><strong>callback_data</strong><span class="classifier">object</span></dt><dd><p>extra data to pass on to a user-supplied callback function.</p>
-</dd>
-<dt><strong>ftype</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">None</span></code> or int (valid dbr type)</span></dt><dd><p>force field type to be a non-native form (None will use native form)</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chid</strong> (<em>ctypes.c_long</em>) – Channel ID</p></li>
+<li><p><strong>wait</strong> (<em>bool</em>) – whether to wait for processing to complete (or time-out)
+before returning.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – maximum time to wait for processing to complete before returning anyway.</p></li>
+<li><p><strong>callback</strong> (<code class="docutils literal notranslate"><span class="pre">None</span></code> or callable) – user-supplied function to run when processing has completed.</p></li>
+<li><p><strong>callback_data</strong> (<em>object</em>) – extra data to pass on to a user-supplied callback function.</p></li>
+<li><p><strong>ftype</strong> (<code class="docutils literal notranslate"><span class="pre">None</span></code> or int (valid dbr type)) – force field type to be a non-native form (None will use native form)</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>status</strong><span class="classifier">int</span></dt><dd><p>1  for success, -1 on time-out</p>
+<dd class="field-even"><p><strong>status</strong> – 1  for success, -1 on time-out</p>
 </dd>
-</dl>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -1055,38 +834,31 @@ before returning.</p>
 <span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">create_subscription</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ctrl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.create_subscription" title="Link to this definition">¶</a></dt>
 <dd><p>create a <em>subscription to changes</em>. Sets up a user-supplied
 callback function to be called on any changes to the channel.</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>chid</strong><span class="classifier">ctypes.c_long</span></dt><dd><p>channel ID</p>
-</dd>
-<dt><strong>use_time</strong><span class="classifier">bool</span></dt><dd><p>whether to use the TIME variant for the PV type</p>
-</dd>
-<dt><strong>use_ctrl</strong><span class="classifier">bool</span></dt><dd><p>whether to use the CTRL variant for the PV type</p>
-</dd>
-<dt><strong>ftype</strong><span class="classifier">integer or None</span></dt><dd><p>ftype to use, overriding native type, <cite>use_time</cite> or <cite>use_ctrl</cite>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chid</strong> (<em>ctypes.c_long</em>) – channel ID</p></li>
+<li><p><strong>use_time</strong> (<em>bool</em>) – whether to use the TIME variant for the PV type</p></li>
+<li><p><strong>use_ctrl</strong> (<em>bool</em>) – whether to use the CTRL variant for the PV type</p></li>
+<li><p><strong>ftype</strong> (<em>integer</em><em> or </em><em>None</em>) – ftype to use, overriding native type, <cite>use_time</cite> or <cite>use_ctrl</cite>
 if <code class="docutils literal notranslate"><span class="pre">None</span></code>, the native type is looked up, which requires a
-connected channel.</p>
-</dd>
-<dt><strong>mask</strong><span class="classifier">integer or None</span></dt><dd><p>bitmask combination of <code class="xref py py-data docutils literal notranslate"><span class="pre">dbr.DBE_ALARM</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">dbr.DBE_LOG</span></code>, and
+connected channel.</p></li>
+<li><p><strong>mask</strong> (<em>integer</em><em> or </em><em>None</em>) – bitmask combination of <code class="xref py py-data docutils literal notranslate"><span class="pre">dbr.DBE_ALARM</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">dbr.DBE_LOG</span></code>, and
 <code class="xref py py-data docutils literal notranslate"><span class="pre">dbr.DBE_VALUE</span></code>, to control which changes result in a callback.
-If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to <a class="reference internal" href="#epics.ca.DEFAULT_SUBSCRIPTION_MASK" title="epics.ca.DEFAULT_SUBSCRIPTION_MASK"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEFAULT_SUBSCRIPTION_MASK</span></code></a>.</p>
-</dd>
-<dt><strong>callback</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">None</span></code> or callable</span></dt><dd><p>user-supplied callback function to be called on changes</p>
-</dd>
-<dt><strong>timeout</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">None</span></code> or int</span></dt><dd><p>connection timeout used for unconnected channels.</p>
-</dd>
-</dl>
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to <a class="reference internal" href="#epics.ca.DEFAULT_SUBSCRIPTION_MASK" title="epics.ca.DEFAULT_SUBSCRIPTION_MASK"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEFAULT_SUBSCRIPTION_MASK</span></code></a>.</p></li>
+<li><p><strong>callback</strong> (<code class="docutils literal notranslate"><span class="pre">None</span></code> or callable) – user-supplied callback function to be called on changes</p></li>
+<li><p><strong>timeout</strong> (<code class="docutils literal notranslate"><span class="pre">None</span></code> or int) – connection timeout used for unconnected channels.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>(callback_ref, user_arg_ref, event_id)</dt><dd><p>The returned tuple contains <em>callback_ref</em> an <em>user_arg_ref</em> which
+<dd class="field-even"><p>The returned tuple contains <em>callback_ref</em> an <em>user_arg_ref</em> which
 are references that should be kept for as long as the subscription
 lives (otherwise they may be garbage collected, causing no end of
 trouble).  <em>event_id</em> is the id for the event (useful for clearing
 a subscription).</p>
 </dd>
-</dl>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(callback_ref, user_arg_ref, event_id)</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -1528,20 +1300,15 @@ including <cite>ca_array_get_callback</cite> or subscription callback, and retur
 the corresponding Python data</p>
 <p>Normally, users are not expected to need to access this function, but
 it will be necessary why using <a class="reference internal" href="#epics.ca.sg_get" title="epics.ca.sg_get"><code class="xref py py-func docutils literal notranslate"><span class="pre">sg_get()</span></code></a>.</p>
-<dl class="field-list">
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>chid</strong><span class="classifier">ctypes.c_long or <code class="docutils literal notranslate"><span class="pre">None</span></code></span></dt><dd><p>channel ID (if not None, used for determining count and ftype)</p>
-</dd>
-<dt><strong>data</strong><span class="classifier">object</span></dt><dd><p>raw data as returned by internal libca functions.</p>
-</dd>
-<dt><strong>count</strong><span class="classifier">integer</span></dt><dd><p>number of elements to fetch (defaults to element count of chid  or 1)</p>
-</dd>
-<dt><strong>ftype</strong><span class="classifier">integer</span></dt><dd><p>data type of channel (defaults to native type of chid)</p>
-</dd>
-<dt><strong>as_numpy</strong><span class="classifier">bool</span></dt><dd><p>whether to convert to numpy array.</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chid</strong> (ctypes.c_long or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – channel ID (if not None, used for determining count and ftype)</p></li>
+<li><p><strong>data</strong> (<em>object</em>) – raw data as returned by internal libca functions.</p></li>
+<li><p><strong>count</strong> (<em>integer</em>) – number of elements to fetch (defaults to element count of chid  or 1)</p></li>
+<li><p><strong>ftype</strong> (<em>integer</em>) – data type of channel (defaults to native type of chid)</p></li>
+<li><p><strong>as_numpy</strong> (<em>bool</em>) – whether to convert to numpy array.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1825,6 +1592,173 @@ called immediately after successful installation:</p>
           </div>
         </div>
       </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">ca: Low-level Channel Access module</a><ul>
+<li><a class="reference internal" href="#general-description-difference-with-c-library">General description, difference with C library</a><ul>
+<li><a class="reference internal" href="#name-mangling">Name Mangling</a></li>
+<li><a class="reference internal" href="#supressing-messages-from-libca">Supressing Messages from libCA</a></li>
+<li><a class="reference internal" href="#other-changes-and-omissions">Other Changes and Omissions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#initialization-finalization-and-life-cycle">Initialization, Finalization, and Life-cycle</a><ul>
+<li><a class="reference internal" href="#epics.ca.PREEMPTIVE_CALLBACK"><code class="docutils literal notranslate"><span class="pre">PREEMPTIVE_CALLBACK</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.DEFAULT_CONNECTION_TIMEOUT"><code class="docutils literal notranslate"><span class="pre">DEFAULT_CONNECTION_TIMEOUT</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.AUTOMONITOR_MAXLENGTH"><code class="docutils literal notranslate"><span class="pre">AUTOMONITOR_MAXLENGTH</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.WITH_CA_MESSAGES"><code class="docutils literal notranslate"><span class="pre">WITH_CA_MESSAGES</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-ca-module">Using the CA module</a><ul>
+<li><a class="reference internal" href="#epics.ca.initialize_libca"><code class="docutils literal notranslate"><span class="pre">initialize_libca()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.finalize_libca"><code class="docutils literal notranslate"><span class="pre">finalize_libca()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.pend_io"><code class="docutils literal notranslate"><span class="pre">pend_io()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.pend_event"><code class="docutils literal notranslate"><span class="pre">pend_event()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.poll"><code class="docutils literal notranslate"><span class="pre">poll()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.create_context"><code class="docutils literal notranslate"><span class="pre">create_context()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.destroy_context"><code class="docutils literal notranslate"><span class="pre">destroy_context()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.current_context"><code class="docutils literal notranslate"><span class="pre">current_context()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.attach_context"><code class="docutils literal notranslate"><span class="pre">attach_context()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.detach_context"><code class="docutils literal notranslate"><span class="pre">detach_context()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.use_initial_context"><code class="docutils literal notranslate"><span class="pre">use_initial_context()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.client_status"><code class="docutils literal notranslate"><span class="pre">client_status()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.version"><code class="docutils literal notranslate"><span class="pre">version()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.message"><code class="docutils literal notranslate"><span class="pre">message()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.flush_io"><code class="docutils literal notranslate"><span class="pre">flush_io()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.replace_printf_handler"><code class="docutils literal notranslate"><span class="pre">replace_printf_handler()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.disable_ca_messages"><code class="docutils literal notranslate"><span class="pre">disable_ca_messages()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.enable_ca_messages"><code class="docutils literal notranslate"><span class="pre">enable_ca_messages()</span></code></a></li>
+<li><a class="reference internal" href="#creating-and-connecting-to-channels">Creating and Connecting to Channels</a><ul>
+<li><a class="reference internal" href="#epics.ca.create_channel"><code class="docutils literal notranslate"><span class="pre">create_channel()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.connect_channel"><code class="docutils literal notranslate"><span class="pre">connect_channel()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.name"><code class="docutils literal notranslate"><span class="pre">name()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.host_name"><code class="docutils literal notranslate"><span class="pre">host_name()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.element_count"><code class="docutils literal notranslate"><span class="pre">element_count()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.replace_access_rights_event"><code class="docutils literal notranslate"><span class="pre">replace_access_rights_event()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.read_access"><code class="docutils literal notranslate"><span class="pre">read_access()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.write_access"><code class="docutils literal notranslate"><span class="pre">write_access()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.field_type"><code class="docutils literal notranslate"><span class="pre">field_type()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.clear_channel"><code class="docutils literal notranslate"><span class="pre">clear_channel()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.state"><code class="docutils literal notranslate"><span class="pre">state()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.isConnected"><code class="docutils literal notranslate"><span class="pre">isConnected()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.access"><code class="docutils literal notranslate"><span class="pre">access()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.promote_type"><code class="docutils literal notranslate"><span class="pre">promote_type()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca._cache"><code class="docutils literal notranslate"><span class="pre">_cache</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.show_cache"><code class="docutils literal notranslate"><span class="pre">show_cache()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.clear_cache"><code class="docutils literal notranslate"><span class="pre">clear_cache()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interacting-with-connected-channels">Interacting with Connected Channels</a><ul>
+<li><a class="reference internal" href="#epics.ca.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.get_with_metadata"><code class="docutils literal notranslate"><span class="pre">get_with_metadata()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.get_complete"><code class="docutils literal notranslate"><span class="pre">get_complete()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.get_complete_with_metadata"><code class="docutils literal notranslate"><span class="pre">get_complete_with_metadata()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.put"><code class="docutils literal notranslate"><span class="pre">put()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.create_subscription"><code class="docutils literal notranslate"><span class="pre">create_subscription()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.DEFAULT_SUBSCRIPTION_MASK"><code class="docutils literal notranslate"><span class="pre">DEFAULT_SUBSCRIPTION_MASK</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.clear_subscription"><code class="docutils literal notranslate"><span class="pre">clear_subscription()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.get_timestamp"><code class="docutils literal notranslate"><span class="pre">get_timestamp()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.get_severity"><code class="docutils literal notranslate"><span class="pre">get_severity()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.get_precision"><code class="docutils literal notranslate"><span class="pre">get_precision()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.get_enum_strings"><code class="docutils literal notranslate"><span class="pre">get_enum_strings()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.get_ctrlvars"><code class="docutils literal notranslate"><span class="pre">get_ctrlvars()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.get_timevars"><code class="docutils literal notranslate"><span class="pre">get_timevars()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#synchronous-groups">Synchronous Groups</a><ul>
+<li><a class="reference internal" href="#epics.ca.sg_create"><code class="docutils literal notranslate"><span class="pre">sg_create()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.sg_delete"><code class="docutils literal notranslate"><span class="pre">sg_delete()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.sg_block"><code class="docutils literal notranslate"><span class="pre">sg_block()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.sg_get"><code class="docutils literal notranslate"><span class="pre">sg_get()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.sg_put"><code class="docutils literal notranslate"><span class="pre">sg_put()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.sg_test"><code class="docutils literal notranslate"><span class="pre">sg_test()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.sg_reset"><code class="docutils literal notranslate"><span class="pre">sg_reset()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation-details">Implementation details</a><ul>
+<li><a class="reference internal" href="#dbr-data-types">DBR data types</a></li>
+<li><a class="reference internal" href="#pysevchk-and-channelaccessexcepction-checking-ca-return-codes"><cite>PySEVCHK</cite> and ChannelAccessExcepction: checking CA return codes</a><ul>
+<li><a class="reference internal" href="#epics.ca.ChannelAccessException"><code class="docutils literal notranslate"><span class="pre">ChannelAccessException</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.PySEVCHK"><code class="docutils literal notranslate"><span class="pre">PySEVCHK()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.withSEVCHK"><code class="docutils literal notranslate"><span class="pre">withSEVCHK()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#function-decorators">Function Decorators</a><ul>
+<li><a class="reference internal" href="#epics.ca.withCA"><code class="docutils literal notranslate"><span class="pre">withCA()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.withCHID"><code class="docutils literal notranslate"><span class="pre">withCHID()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.withConnectedCHID"><code class="docutils literal notranslate"><span class="pre">withConnectedCHID()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.withInitialContext"><code class="docutils literal notranslate"><span class="pre">withInitialContext()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#unpacking-data-from-callbacks">Unpacking Data from Callbacks</a><ul>
+<li><a class="reference internal" href="#epics.ca._unpack"><code class="docutils literal notranslate"><span class="pre">_unpack()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#user-supplied-callback-functions">User-supplied Callback functions</a></li>
+<li><a class="reference internal" href="#omissions">Omissions</a><ul>
+<li><a class="reference internal" href="#epics.ca.ca_add_exception_event"><code class="docutils literal notranslate"><span class="pre">ca_add_exception_event()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.ca_add_fd_registration"><code class="docutils literal notranslate"><span class="pre">ca_add_fd_registration()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.ca_client_status"><code class="docutils literal notranslate"><span class="pre">ca_client_status()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.ca_set_puser"><code class="docutils literal notranslate"><span class="pre">ca_set_puser()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.ca_puser"><code class="docutils literal notranslate"><span class="pre">ca_puser()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.ca_SEVCHK"><code class="docutils literal notranslate"><span class="pre">ca_SEVCHK()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.ca_signal"><code class="docutils literal notranslate"><span class="pre">ca_signal()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.ca_test_event"><code class="docutils literal notranslate"><span class="pre">ca_test_event()</span></code></a></li>
+<li><a class="reference internal" href="#epics.ca.ca_dump_dbr"><code class="docutils literal notranslate"><span class="pre">ca_dump_dbr()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cathread-class"><code class="xref py py-class docutils literal notranslate"><span class="pre">CAThread</span></code> class</a><ul>
+<li><a class="reference internal" href="#epics.ca.CAThread"><code class="docutils literal notranslate"><span class="pre">CAThread</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#create-connect-get-value-of-channel">Create, Connect, Get Value of Channel</a></li>
+<li><a class="reference internal" href="#put-waiting-for-completion">Put, waiting for completion</a></li>
+<li><a class="reference internal" href="#define-a-callback-to-subscribe-to-changes">Define a callback to Subscribe to Changes</a></li>
+<li><a class="reference internal" href="#define-a-connection-callback">Define a connection callback</a></li>
+<li><a class="reference internal" href="#define-an-access-rights-change-event-callback">Define an access rights change event callback</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="pv.html"
+                          title="previous chapter">PV: Epics Process Variables</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="arrays.html"
+                          title="next chapter">Working with waveform / array data</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ca.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
       <div class="clearer"></div>
     </div>
     <div class="related" role="navigation" aria-label="Related">
@@ -1834,30 +1768,17 @@ called immediately after successful installation:</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="arrays.html" title="Working with waveform / array data"
              >next</a> |</li>
         <li class="right" >
           <a href="pv.html" title="PV: Epics Process Variables"
              >previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="#">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">ca: Low-level Channel Access module</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2021, Matthew Newville.
+    &#169; Copyright 2025, Matthew Newville, The University of Chicago.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>

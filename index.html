@@ -8,13 +8,22 @@
 
     <title>Epics Channel Access for Python &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=e2a51986"></script>
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    
+    <script src="_static/documentation_options.js?v=46dd9d9f"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Downloading and Installation" href="installation.html" /> 
+    <link rel="next" title="Downloading and Installation" href="installation.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
   </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="#">
@@ -30,51 +39,13 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="installation.html" title="Downloading and Installation"
              accesskey="N">next</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="#">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Epics Channel Access for Python</a></li> 
       </ul>
     </div>
-
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper"><h3>Download</h3>
-<p>Current version: <b>3.5.8</b></p>
-
-
-<p>
-  Install: &nbsp; <tt> pip install pyepics</tt>
-
-<p>
-  Develop: &nbsp; <a href="https://github.com/pyepics/pyepics/">github.com</a>
-<br>
-
-<p>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -90,27 +61,27 @@ with methods for reading from and writing to Epics Process Variables (PVs)
 via the CA protocol.  The package includes a thin and fairly complete layer
 over the lowest-level Channel Access library in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module, and
 higher level abstractions built on top of this basic functionality.</p>
-<p>The package includes a very simple interface to CA similar to the Unix
-command-line tools with functions <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>, <a class="reference internal" href="overview.html#epics.caput" title="epics.caput"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caput()</span></code></a>,
-<a class="reference internal" href="overview.html#epics.cainfo" title="epics.cainfo"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.cainfo()</span></code></a>, and <a class="reference internal" href="overview.html#epics.camonitor" title="epics.camonitor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.camonitor()</span></code></a>.  For an object-oriented
-interface, there is also a <a class="reference internal" href="pv.html#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">pv.PV</span></code></a> class which represents an Epics
-Process Variable as a full-featured and easy-to-use Python object.
-Additional modules provide higher-level programming support to CA,
-including grouping related PVs into a <a class="reference internal" href="devices.html#device.Device" title="device.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">device.Device</span></code></a> (with a number
-of predefined devices ready to use), for creating alarms in
-<a class="reference internal" href="alarm.html#alarm.Alarm" title="alarm.Alarm"><code class="xref py py-class docutils literal notranslate"><span class="pre">alarm.Alarm</span></code></a>, and for saving PVs values in the <a class="reference internal" href="autosave.html#module-autosave" title="autosave: simple save/restore of PVs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">autosave</span></code></a>
-module.  There is also support for conveniently using epics PVs to wxPython
-widgets in the <a class="reference internal" href="wx.html#module-wx" title="wx: wxPython Widgets for Epics"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wx</span></code></a> module, and some support for using PyQt widgets in
-the <code class="xref py py-mod docutils literal notranslate"><span class="pre">qt</span></code> module.</p>
-<hr class="docutils" />
-<p>See also: Some <a class="reference external" href="https://pyepics.github.io/epicsapps/">applications</a> built
-with pyepics that are available at <a class="reference external" href="https://github.com/pyepics/epicsapps/">https://github.com/pyepics/epicsapps/</a>.</p>
+<p>The package includes a simple interface to CA similar to the Unix
+command-line tools with functions <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>,
+<a class="reference internal" href="overview.html#epics.caput" title="epics.caput"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.caput()</span></code></a>, <a class="reference internal" href="overview.html#epics.cainfo" title="epics.cainfo"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.cainfo()</span></code></a>, and
+<a class="reference internal" href="overview.html#epics.camonitor" title="epics.camonitor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.camonitor()</span></code></a>.  For an object-oriented interface, there is a
+<a class="reference internal" href="pv.html#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">pv.PV</span></code></a> class which represents an Epics Process Variable as a
+full-featured and convenient Python object.  Additional modules
+provide higher-level programming support to CA, including grouping
+related PVs into a <a class="reference internal" href="devices.html#device.Device" title="device.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">device.Device</span></code></a> (with a number of predefined
+devices ready to use), for creating alarms in <a class="reference internal" href="alarm.html#alarm.Alarm" title="alarm.Alarm"><code class="xref py py-class docutils literal notranslate"><span class="pre">alarm.Alarm</span></code></a>,
+and for saving PVs values in the <a class="reference internal" href="autosave.html#module-autosave" title="autosave: simple save/restore of PVs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">autosave</span></code></a> module.  There is
+also support for conveniently using epics PVs to wxPython widgets in
+the <a class="reference internal" href="wx.html#module-wx" title="wx: wxPython Widgets for Epics"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wx</span></code></a> module, and some support for using PyQt widgets in the
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">qt</span></code> module.</p>
+<p>Some <a class="reference external" href="https://pyepics.github.io/epicsapps/">applications</a> built with
+pyepics that are available at <a class="reference external" href="https://github.com/pyepics/epicsapps/">https://github.com/pyepics/epicsapps/</a>.</p>
 <hr class="docutils" />
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Downloading and Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#prerequisites">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#downloads-and-installation">Downloads and Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#prerequisites-and-dependencies-supported-systems">Prerequisites and Dependencies, Supported Systems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#getting-started-setting-up-the-epics-environment">Getting Started, Setting up the Epics Environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#testing">Testing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#development-version">Development Version</a></li>
@@ -198,6 +169,50 @@ with pyepics that are available at <a class="reference external" href="https://g
           </div>
         </div>
       </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><h3>Download</h3>
+
+<ul>
+  <li>Current version: <b>3.5.9</b></li>
+  <li>Install: <tt> pip install pyepics</tt></li>
+   <li>Develop: <a href="https://github.com/pyepics/pyepics/">github.com</a></li>
+ </ul>
+
+
+<p>
+<h3>Contents</h3>
+
+<ul>
+   <li>&nbsp; &nbsp;<a href="installation.html"> Install</a></li>
+   <li>&nbsp; &nbsp;<a href="overview.html"> Overview</a></li>
+   <li>&nbsp; &nbsp;<a href="pv.html">    Epics PVs</a></li>
+   <li>&nbsp; &nbsp;<a href="ca.html">    CA module</a></li>
+   <li>&nbsp; &nbsp;<a href="arrays.html"> Working with Array Data</a></li>
+   <li>&nbsp; &nbsp;<a href="devices.html"> Devices</a></li>
+   <li>&nbsp; &nbsp;<a href="alarm.html"> Alarms</a></li>
+   <li>&nbsp; &nbsp;<a href="autosave.html"> Autosave</a></li>
+   <li>&nbsp; &nbsp;<a href="wx.html"> wx widgets for PVs</a></li>
+   <li>&nbsp; &nbsp;<a href="advanced.html"> Advanced Topics</a></li>
+</ul>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
       <div class="clearer"></div>
     </div>
     <div class="related" role="navigation" aria-label="Related">
@@ -207,27 +222,14 @@ with pyepics that are available at <a class="reference external" href="https://g
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="installation.html" title="Downloading and Installation"
              >next</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="advanced.html">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="#">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Epics Channel Access for Python</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2021, Matthew Newville.
+    &#169; Copyright 2025, Matthew Newville, The University of Chicago.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>

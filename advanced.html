@@ -8,13 +8,22 @@
 
     <title>Advanced Topic with Python Channel Access &#8212; Epics Channel Access for Python</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/epicsdoc.css?v=29cb9c05" />
-    <script src="_static/documentation_options.js?v=e2a51986"></script>
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    
+    <script src="_static/documentation_options.js?v=46dd9d9f"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="wx: wxPython Widgets for Epics" href="wx.html" /> 
+    <link rel="prev" title="wx: wxPython Widgets for Epics" href="wx.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
   </head><body>
 <div style="background-color: #E7F0F3; text-align: left; padding: 8px 4px 8px 4px">
   <font size=+3><a href="index.html">
@@ -30,75 +39,13 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="wx.html" title="wx: wxPython Widgets for Epics"
              accesskey="P">previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="#">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Advanced Topic with Python Channel Access</a></li> 
       </ul>
     </div>
-
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Advanced Topic with Python Channel Access</a><ul>
-<li><a class="reference internal" href="#the-wait-and-timeout-options-for-get-ca-get-complete">The wait and timeout options for get(), ca.get_complete()</a></li>
-<li><a class="reference internal" href="#strategies-for-connecting-to-a-large-number-of-pvs">Strategies for connecting to a large number of PVs</a></li>
-<li><a class="reference internal" href="#time-sleep-or-epics-poll">time.sleep() or epics.poll()?</a></li>
-<li><a class="reference internal" href="#using-python-threads">Using Python Threads</a><ul>
-<li><a class="reference internal" href="#channel-access-contexts">Channel Access Contexts</a></li>
-<li><a class="reference internal" href="#how-to-work-with-ca-and-threads">How to work with CA and Threads</a></li>
-<li><a class="reference internal" href="#thread-examples">Thread Examples</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#using-multiprocessing-with-pyepics">Using Multiprocessing with PyEpics</a><ul>
-<li><a class="reference internal" href="#CAProcess"><code class="docutils literal notranslate"><span class="pre">CAProcess</span></code></a></li>
-<li><a class="reference internal" href="#CAPool"><code class="docutils literal notranslate"><span class="pre">CAPool</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-  </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="wx.html"
-                          title="previous chapter">wx: wxPython Widgets for Epics</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/advanced.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -188,7 +135,7 @@ sometimes wish to avoid. To minimize the penalty, we need to understand its
 cause.</p>
 <p>Creating a <cite>PV</cite> object (using any of <a class="reference internal" href="pv.html#pv.PV" title="pv.PV"><code class="xref py py-class docutils literal notranslate"><span class="pre">pv.PV</span></code></a>, or <a class="reference internal" href="pv.html#pv.get_pv" title="pv.get_pv"><code class="xref py py-func docutils literal notranslate"><span class="pre">pv.get_pv()</span></code></a>, or
 <a class="reference internal" href="overview.html#epics.caget" title="epics.caget"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.caget()</span></code></a>) will automatically use connection and event callbacks in
-an attempt to keep the <cite>PV</cite> alive and up-to-date during the seesion.  This is
+an attempt to keep the <cite>PV</cite> alive and up-to-date during the session.  This is
 usually an advantage, as you don’t need to explicitly deal with many aspects of
 Channel Access.  But creating a <cite>PV</cite> does request some network traffic, and the
 <cite>PV</cite> will not be “fully connected” and ready to do a <code class="xref py py-meth docutils literal notranslate"><span class="pre">PV.get()</span></code> until all
@@ -307,7 +254,7 @@ getting their values in a loop with:</p>
 1.5 seconds, while the version looping over <code class="xref py py-meth docutils literal notranslate"><span class="pre">PV.get()</span></code> took about 0.5
 seconds.</p>
 <p>To be clear, it is <strong>connecting</strong> to Epics PVs that is expensive, not the
-retreiving of data from connected PVs.  You can lower the connection
+retrieving of data from connected PVs.  You can lower the connection
 expense by not retaining the connection or creating monitors on the PVs,
 but if you are going to re-use the PVs, that savings will be lost quickly.
 In short, use Method 1 over <a class="reference internal" href="overview.html#epics.caget_many" title="epics.caget_many"><code class="xref py py-func docutils literal notranslate"><span class="pre">epics.caget_many()</span></code></a> unless you’ve benchmarked
@@ -332,7 +279,7 @@ in order for events to be processed.  The simplest way to do this is with
 <p>Unfortunately, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">time.sleep()</span></code> method is not a very high-resolution
 clock, with typical resolutions of 1 to 10 ms, depending on the system.
 Thus, even though events will be asynchronously generated and epics with
-pre-emptive callbacks does not <em>require</em> <a class="reference internal" href="ca.html#epics.ca.pend_event" title="epics.ca.pend_event"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.ca.pend_event()</span></code></a> or
+preemptive callbacks does not <em>require</em> <a class="reference internal" href="ca.html#epics.ca.pend_event" title="epics.ca.pend_event"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.ca.pend_event()</span></code></a> or
 <a class="reference internal" href="ca.html#epics.ca.poll" title="epics.ca.poll"><code class="xref py py-meth docutils literal notranslate"><span class="pre">epics.ca.poll()</span></code></a> to be run, better performance may be achieved with an event
 loop of:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
@@ -651,6 +598,55 @@ been done on using multiprocessing Managers.</p>
           </div>
         </div>
       </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Advanced Topic with Python Channel Access</a><ul>
+<li><a class="reference internal" href="#the-wait-and-timeout-options-for-get-ca-get-complete">The wait and timeout options for get(), ca.get_complete()</a></li>
+<li><a class="reference internal" href="#strategies-for-connecting-to-a-large-number-of-pvs">Strategies for connecting to a large number of PVs</a></li>
+<li><a class="reference internal" href="#time-sleep-or-epics-poll">time.sleep() or epics.poll()?</a></li>
+<li><a class="reference internal" href="#using-python-threads">Using Python Threads</a><ul>
+<li><a class="reference internal" href="#channel-access-contexts">Channel Access Contexts</a></li>
+<li><a class="reference internal" href="#how-to-work-with-ca-and-threads">How to work with CA and Threads</a></li>
+<li><a class="reference internal" href="#thread-examples">Thread Examples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-multiprocessing-with-pyepics">Using Multiprocessing with PyEpics</a><ul>
+<li><a class="reference internal" href="#CAProcess"><code class="docutils literal notranslate"><span class="pre">CAProcess</span></code></a></li>
+<li><a class="reference internal" href="#CAPool"><code class="docutils literal notranslate"><span class="pre">CAPool</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="wx.html"
+                          title="previous chapter">wx: wxPython Widgets for Epics</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/advanced.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
       <div class="clearer"></div>
     </div>
     <div class="related" role="navigation" aria-label="Related">
@@ -660,27 +656,14 @@ been done on using multiprocessing Managers.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="wx.html" title="wx: wxPython Widgets for Epics"
              >previous</a> |</li>
-   <li>[<a href="installation.html">install</a></li>
-   <li>|<a href="overview.html">overview</a></li>
-   <li>|<a href="pv.html">pv</a></li>
-   <li>|<a href="ca.html">ca</a></li>
-   <li>|<a href="arrays.html">arrays</a></li>
-   <li>|<a href="devices.html">devices</a></li>
-   <li>|<a href="alarm.html">alarm</a></li>
-   <li>|<a href="autosave.html">autosave</a></li>
-   <li>|<a href="wx.html">wx</a></li>
-   <li>|<a href="#">advanced</a>]</li>
-
+        <li class="nav-item nav-item-0"><a href="index.html">PyEpics</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Advanced Topic with Python Channel Access</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-    &#169; Copyright 2021, Matthew Newville.
+    &#169; Copyright 2025, Matthew Newville, The University of Chicago.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
   </body>
