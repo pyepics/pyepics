@@ -4,8 +4,8 @@ from packaging.version import parse as version_parse
 import epics
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.mathjax',
-              'sphinx.ext.napoleon', 'sphinxcontrib.video',
-              'sphinx_copybutton', 'numpydoc']
+              'sphinx.ext.napoleon', 'sphinx_copybutton',
+              'numpydoc']
 templates_path = ['_templates']
 
 
