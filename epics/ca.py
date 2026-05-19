@@ -283,13 +283,24 @@ def find_lib(inp_lib_name='ca'):
             os.path.isfile(dllpath)):
         return dllpath
 
-    # Test 2: look in installed python location for dll
+    # Test 2: if epicscorelibs has been imported (probably because
+    # another Epics client has imported that), then look for ca/Com
+    # libraries from epicscorelibs
+    if 'epicscorelibs' in sys.modules:
+        try:
+            from epicscorelibs.lib import ca_dsoinfo, Com_dsoinfo
+            return (ca_dsoinfo.filename if inp_lib_name == 'ca'
+                    else Com_dsoinfo.filename)
+        except (ImportError, AttributeError):
+            pass
+
+    # Test 3: look in installed python location for dll
     dllpath = importlib_resources_files('epics.clibs') / clib_search_path(inp_lib_name)
 
     if (os.path.exists(dllpath) and os.path.isfile(dllpath)):
         return dllpath
 
-    # Test 3: look through Python path and PATH env var for dll
+    # Test 4: look through Python path and PATH env var for dll
     path_sep = ':'
     dylib = 'lib'
     # For windows, we assume the DLLs are installed with the library
