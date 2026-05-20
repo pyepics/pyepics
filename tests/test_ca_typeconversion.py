@@ -46,14 +46,14 @@ def RunTest(pvlist, use_preempt=True, maxlen=16384,
     time.sleep(0.05)
     for (chid, eventID) in chids:
         print('=== %s   chid=%s' % (epics.ca.name(chid), repr(chid)))
-        time.sleep(0.005)
+        time.sleep(0.025)
         ntype = epics.ca.promote_type(chid, use_ctrl=use_ctrl,
                                       use_time=use_time)
         val  = epics.ca.get(chid, ftype=ntype)
         cval = epics.ca.get(chid, as_string=True)
         if epics.ca.element_count(chid) > 10:
             val = val[:10]
-        time.sleep(0.005)
+        time.sleep(0.025)
         print("%i %s %s" % (ntype, epics.dbr.Name(ntype).lower(), cval))
     time.sleep(0.5)
     print('----- finalizing CA')

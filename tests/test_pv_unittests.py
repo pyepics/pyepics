@@ -497,7 +497,7 @@ def test_type_converions_2():
             for chid, pvname in chids:
                 write('=== %s  chid=%s as %s\n' % (ca.name(chid),
                                                    repr(chid), promotion))
-                time.sleep(0.01)
+                time.sleep(0.05)
                 if promotion == 'ctrl':
                     ntype = ca.promote_type(chid, use_ctrl=True)
                 else:

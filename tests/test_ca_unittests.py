@@ -145,7 +145,7 @@ def test_putwait():
     pvn = pvnames.non_updating_pv
     chid = ca.create_channel(pvn, connect=True)
     o  = ca.put(chid, -1, wait=True)
-    time.sleep(0.01)
+    time.sleep(0.05)
     assert ca.get(chid) == -1
 
     ca.put(chid, 2, wait=True)
@@ -178,7 +178,7 @@ def test_subscription_double():
     start_time = time.time()
     global CHANGE_DAT
     while time.time()-start_time < 5.0:
-        time.sleep(0.01)
+        time.sleep(0.05)
         if CHANGE_DAT.get(pvn, None) is not None:
             break
     val = CHANGE_DAT.get(pvn, None)
@@ -201,7 +201,7 @@ def test_subscription_custom():
 
     start_time = time.time()
     while time.time()-start_time < 2.0:
-        time.sleep(0.01)
+        time.sleep(0.05)
 
     ca.clear_subscription(eventID)
     time.sleep(0.2)
@@ -216,7 +216,7 @@ def test_subscription_str():
     start_time = time.time()
     global CHANGE_DAT
     while time.time()-start_time < 3.0:
-        time.sleep(0.01)
+        time.sleep(0.05)
         ca.put(chid, "%.1f" % (time.time()-start_time) )
         if CHANGE_DAT.get(pvn, None) is not None:
             break
@@ -311,7 +311,7 @@ def test_type_converions_1():
             for chid, pvname in chids:
                 write('=== %s  chid=%s as %s' % (ca.name(chid), repr(chid),
                                                  promotion))
-                time.sleep(0.01)
+                time.sleep(0.05)
                 if promotion == 'ctrl':
                     ntype = ca.promote_type(chid, use_ctrl=True)
                 else:
@@ -344,7 +344,7 @@ def test_type_converions_2():
             for chid, pvname in chids:
                 write('=== %s  chid=%s as %s' % (ca.name(chid), repr(chid),
                                                  promotion))
-                time.sleep(0.01)
+                time.sleep(0.05)
                 if promotion == 'ctrl':
                     ntype = ca.promote_type(chid, use_ctrl=True)
                 else:
