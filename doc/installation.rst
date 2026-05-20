@@ -93,13 +93,12 @@ To find out which CA library will be used by pyepics, use:
     '/home/user/.venv/Py314/lib/python3.14/site-packages/epics/clibs/linux64/libca.so'
 
 which will print out the full path of the CA dynamic library that will be
-used.  And note that if `epicscorelibs`_ is imported, the CA library will be
+used.  And note that if `epicscorelibs`_ is imported, the CA
 
     >>> import epics
     >>> import epicscorelibs
     >>> epics.ca.find_libca()
-    '/home/user/.venv/Py314/lib/python3.14/site-packages/epicscorelibs/lib/lica.so'
-
+    '/home/user/.venv/Py314/lib/python3.14/site-packages/epicscorelibs/lib/libca.so'
 
 With the Epics CA library loaded, you will also need to be able to
 connect to Epics Process Variables. Generally, these variables are
