@@ -135,7 +135,7 @@ while True:
     analogs[1].put( 76.54321*(time.time()-start_time))
     analogs[2].put( 0.3*numpy.sin(time.time() / 2.302) + noise(scale=0.2)  )
     analogs[3].put( 2+3.5*numpy.cos(time.time() / 160) + noise(scale=0.2)  )
-    analogs[4].put( noise(scale=0.25) + 0.2*((time.time() - start_time) % 50))
+    # analogs[4].put( noise(scale=0.25) + 0.2*((time.time() - start_time) % 50))
     char_waves[0].put([45+random.randrange(64) for i in range(128)])
 
     if count % 30 == 0:
