@@ -20,26 +20,25 @@ If you're using Anaconda Python, there are a few conda channels that
 provide the latest versions, but the version on `PyPI`_ should be considered
 the reference version.
 
-PyEpics |release| works with Python version 3.10 and higher.  It may
-still work with older versions of Python, but no testing or support is
-available for these.  At this writing, automated testing is done with
-versions 3.10 through 3.14 on 64-bit Linux, though Pyepics is
-supported and regularly used on 64-bit Linux, 64-bit Windows, 64-bit
-Mac OSX with both Intel and Arm processors.  PyEpics should also work
-on Linux with ARM processors including raspberry Pi and may still work
-on 32-bit Windows and Linux, though these systems are not tested
-regularly.
+PyEpics |release| works with Python version 3.10 and higher.  It may still work
+with older versions of Python, but no testing or support is available for
+these.  At this writing (May 2026), automated testing is done with versions
+3.10 through 3.14 on 64-bit Linux.  Pyepics is supported and regularly used on
+64-bit Linux, 64-bit Windows, 64-bit Mac OSX with both Intel and Arm
+processors.  PyEpics should also work on Linux with ARM processors including
+raspberry Pi and may still work on 32-bit Windows and Linux, though these
+systems are not tested regularly.
 
 
 Prerequisites and Dependencies, Supported Systems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Pyepics requires the EPICS Channel Access library from Epics Base
-Version 3.14.12 or higher.  Using Epics Base 7.0.4 or higher is
-strongly recommended.  More specifically, pyepics needs only to be
-able to find the shared libraries *libca* and *libCom* (*libca.so* and
-*libCom.so* on Linux, *libca.dylib* and *libCom.dylib* on Mac OSX, or
-*ca.dll* and *Com.dll* on Windows) from *Epics Base*.
+Pyepics requires the EPICS Channel Access library from Epics Base Version
+3.14.12 or higher - using Epics Base 7.0.4 or higher is strongly recommended.
+More specifically, pyepics needs only to be able to find the shared libraries
+*libca* and *libCom* (*libca.so* and *libCom.so* on Linux, *libca.dylib* and
+*libCom.dylib* on Mac OSX, or *ca.dll* and *Com.dll* on Windows) from *Epics
+Base*.
 
 For Linux64, Linux32, LinuxArm, Windows64, Windows32, Darwin64 (MacOS) on
 x86-64, and Darwin64 (MacOS) on arm64, pre-built versions of *libca* (and
@@ -155,7 +154,6 @@ will show many failures.  Instead you should run each test as a separate
 run of `pytest`::
 
      ~> for testfile in test_*.py; do  pytest $testfile ; done
-
 
 The automated testing process also uses the `coverage` tool to help
 identify which parts of the code is actually run by the tests.
