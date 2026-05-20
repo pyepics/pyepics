@@ -11,9 +11,9 @@
     <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     
-    <script src="_static/documentation_options.js?v=46dd9d9f"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/documentation_options.js?v=8b5495b7"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/bizstyle.js"></script>
@@ -273,7 +273,7 @@ then calls <a class="reference internal" href="#epics.ca.flush_io" title="epics.
 
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.ca.poll">
-<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">poll</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evt=1.e-5</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">iot=1.0</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.poll" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">poll</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.e-5</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">iot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.poll" title="Link to this definition">¶</a></dt>
 <dd><p>a convenience function which is equivalent to::
 pend_event(evt)
 pend_io_(iot)</p>
@@ -575,7 +575,7 @@ library versions, and include:</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.ca.promote_type">
-<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">promote_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chid</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">use_time=False</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">use_ctrl=False</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.promote_type" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">promote_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chid</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">use_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">use_ctrl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.promote_type" title="Link to this definition">¶</a></dt>
 <dd><p>promotes the native field type of a <code class="docutils literal notranslate"><span class="pre">chid</span></code> to its TIME or CTRL variant.
 Returns the integer corresponding to the promoted field value.</p>
 </dd></dl>
@@ -1047,13 +1047,13 @@ to be passed to all other synchronous group commands.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.ca.sg_block">
-<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">sg_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">timeout=10.0</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_block" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">sg_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_block" title="Link to this definition">¶</a></dt>
 <dd><p>block for a synchronous group to complete processing</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.ca.sg_get">
-<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">sg_get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chid</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">ftype=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">as_string=False</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">as_numpy=True</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_get" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">sg_get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chid</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">ftype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">as_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">as_numpy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.sg_get" title="Link to this definition">¶</a></dt>
 <dd><p>synchronous-group get of the current value for a Channel.
 same options as get()</p>
 <p>This function will not immediately return the value, of course, but the
@@ -1215,14 +1215,14 @@ those looking to translate lower-level C or Python code to this module.</p>
 <h3><cite>PySEVCHK</cite> and ChannelAccessExcepction: checking CA return codes<a class="headerlink" href="#pysevchk-and-channelaccessexcepction-checking-ca-return-codes" title="Link to this heading">¶</a></h3>
 <dl class="py exception">
 <dt class="sig sig-object py" id="epics.ca.ChannelAccessException">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">ChannelAccessException</span></span><a class="headerlink" href="#epics.ca.ChannelAccessException" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">ChannelAccessException</span></span><a class="headerlink" href="#epics.ca.ChannelAccessException" title="Link to this definition">¶</a></dt>
 <dd><p>This exception is raised when the <code class="xref py py-mod docutils literal notranslate"><span class="pre">ca</span></code> module experiences
 unexpected behavior and must raise an exception</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.ca.PySEVCHK">
-<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">PySEVCHK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">expected=dbr.ECA_NORMAL</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.PySEVCHK" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">PySEVCHK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">dbr.ECA_NORMAL</span></span></em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.PySEVCHK" title="Link to this definition">¶</a></dt>
 <dd><p>This checks the return <em>status</em> returned from a <cite>libca.ca_***</cite> and
 raises a <a class="reference internal" href="#epics.ca.ChannelAccessException" title="epics.ca.ChannelAccessException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ChannelAccessException</span></code></a> if the value does not match the
 <em>expected</em> value (which is nornmally <code class="docutils literal notranslate"><span class="pre">dbr.ECA_NORMAL</span></code>.</p>
@@ -1294,7 +1294,7 @@ have to run this code, but there is one exception:  when using
 function.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="epics.ca._unpack">
-<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">_unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">count=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">ftype=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">as_numpy=None</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca._unpack" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">_unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">ftype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">as_numpy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca._unpack" title="Link to this definition">¶</a></dt>
 <dd><p>unpacks raw data for a Channel ID <cite>chid</cite> returned by libca functions
 including <cite>ca_array_get_callback</cite> or subscription callback, and returns
 the corresponding Python data</p>
@@ -1457,7 +1457,7 @@ not supported, as they are needed only to dynamically allocate memory.</p>
 <h2><a class="reference internal" href="#epics.ca.CAThread" title="epics.ca.CAThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">CAThread</span></code></a> class<a class="headerlink" href="#cathread-class" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="epics.ca.CAThread">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">CAThread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">target=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name=None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">args=()</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">kwargs={}</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.CAThread" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">epics.ca.</span></span><span class="sig-name descname"><span class="pre">CAThread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="optional">[</span>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#epics.ca.CAThread" title="Link to this definition">¶</a></dt>
 <dd><p>create a CA-aware subclass of a standard Python <code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code>.  See the
 standard library documentation for further information on how to use Thread objects.</p>
 <p>A <cite>CAThread</cite> simply runs <a class="reference internal" href="#epics.ca.use_initial_context" title="epics.ca.use_initial_context"><code class="xref py py-func docutils literal notranslate"><span class="pre">use_initial_context()</span></code></a> prior to running each target
@@ -1779,7 +1779,7 @@ called immediately after successful installation:</p>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Matthew Newville, The University of Chicago.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     </div>
   </body>
 </html>
