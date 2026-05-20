@@ -186,7 +186,7 @@ number = Word(nums)
 integer = Combine( Optional(minus) + number )
 float_number = Combine( integer +
                         Optional( point + Optional(number) )
-                        ).setParseAction(lambda t:float(t[0]))
+                        ).set_parse_action(lambda t:float(t[0]))
 
 # PV names according to app developer guide and tech-talk email thread at:
 # https://epics.anl.gov/tech-talk/2019/msg01429.php
