@@ -1837,6 +1837,8 @@ def put(chid, value, wait=False, timeout=30, callback=None,
     # simple put, without wait or callback
     if not (wait or callable(callback)):
         ret = libca.ca_array_put(ftype, count, chid, data)
+        if ret == dbr.ECA_NOWTACCESS:
+            return -dbr.ECA_NOWTACCESS
         PySEVCHK('put', ret)
         poll()
         return ret
@@ -1861,10 +1863,21 @@ def put(chid, value, wait=False, timeout=30, callback=None,
 
     _put_completes.append(put_completed)
 
-    ret = libca.ca_array_put_callback(ftype, count, chid, data, _CB_PUTWAIT,
-                                      ctypes.py_object(put_completed))
+    try:
+        ret = libca.ca_array_put_callback(ftype, count, chid, data, _CB_PUTWAIT,
+                                          ctypes.py_object(put_completed))
+    except:
+        _put_completes.remove(put_completed) # Just make sure we clean up
+        raise
 
-    PySEVCHK('put', ret)
+    if ret != dbr.ECA_NORMAL:
+        # the put failed, so put_completed will never run to drop itsolf
+        # from _put_completes. So we need to remove it here or it will leak
+        _put_completes.remove(put_completed)
+        if ret == dbr.ECA_NOWTACCESS:
+            return -dbr.ECA_NOWTACCESS
+        PySEVCHK('put', ret)
+
     poll(evt=1.e-4, iot=0.05)
     if wait:
         while not (completed['status'] or
