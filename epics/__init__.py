@@ -400,13 +400,29 @@ def caput_many(pvlist, values, wait=False, connection_timeout=5.0,
         put_ret.append(pvo.put(val, **put_kws))
     out = None
     if wait_all:
+        # We cannot put to a PV we have no write access to, so we
+        # never want to burn the full put_timeout waiting for it to complete.
+        # pending_pvs list only includes PVs that we have write access
+        # to, and we wait on those
+        pending_pvs = [pvo for pvo, ret in zip(pvs, put_ret)
+                       if ret != -dbr.ECA_NOWTACCESS]
         start_time = time.time()
-        while not all(((pv.connected and pv.put_complete) for pv in pvs)):
+        while not all(((pv.connected and pv.put_complete) for pv in pending_pvs)):
             ca.poll()
             elapsed_time = time.time() - start_time
             if elapsed_time > put_timeout:
                 break
-        out = [1 if (pv.connected and pv.put_complete) else -1 for pv in pvs]
+
+            out = [None] * len(pvs)
+            for idx, (pvo, ret) in enumerate(zip(pvs, put_ret)):
+                if ret == -dbr.ECA_NOWTACCESS:
+                    out[idx] = -dbr.ECA_NOWTACCESS
+                elif pvo.connected and pvo.put_complete:
+                    out[idx] = 1
+                else:
+                    # never connected, or the put_timeout above expired
+                    out[idx] = -1
     else:
-        out = [val if val == 1 else -1 for val in put_ret]
+        out = [val if val in (1, -dbr.ECA_NOWTACCESS) else -1
+               for val in put_ret]
     return out
