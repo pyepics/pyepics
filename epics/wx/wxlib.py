@@ -209,7 +209,7 @@ class PVMixin(object):
     def GetValue(self, as_string=True):
         "return value"
         val = self.pv.get(as_string=as_string)
-        result = self.translations.get(val, val)
+        result = self._translations.get(val, val)
         return result
 
     def OnPVChange(self, str_value):
