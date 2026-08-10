@@ -257,6 +257,7 @@ class PV():
         self._monref = None  # holder of data returned from create_subscription
         self._monref_mask = None
         self._conn_started = False
+        self._ctrlvars_requested = False
         if isinstance(callback, (tuple, list)):
             for i, thiscb in enumerate(callback):
                 if callable(thiscb):
@@ -819,6 +820,9 @@ class PV():
         it is provided here as a separate function for testing
         purposes.
         """
+        if self._ctrlvars_requested:
+            self.get_ctrlvars()
+            self._ctrlvars_requested = False
         for index in sorted(list(self.callbacks.keys())):
             self.run_callback(index)
 
@@ -863,6 +867,8 @@ class PV():
 
         if with_ctrlvars and self.connected:
             self.get_ctrlvars()
+        elif with_ctrlvars:
+            self._ctrlvars_requested = True
         if run_now:
             self.get(as_string=True)
             if self.connected:
