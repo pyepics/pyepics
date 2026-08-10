@@ -9,6 +9,7 @@
 import time
 import copy
 import functools
+import threading
 import warnings
 from math import log10
 from types import SimpleNamespace
@@ -257,6 +258,7 @@ class PV():
         self._monref = None  # holder of data returned from create_subscription
         self._monref_mask = None
         self._conn_started = False
+        self._ctrlvars_requested = False
         if isinstance(callback, (tuple, list)):
             for i, thiscb in enumerate(callback):
                 if callable(thiscb):
@@ -358,6 +360,11 @@ class PV():
         # threads from thinking a connection is complete when it is actually
         # still in progress.
         self.connected = conn
+        if conn and self._ctrlvars_requested:
+            # Fetch outside the CA connection callback: a blocking
+            # get_ctrlvars() here (or in a monitor callback) can time out.
+            self._ctrlvars_requested = False
+            threading.Thread(target=self.get_ctrlvars, daemon=True).start()
         if conn:
             self._check_auto_monitor()
 
@@ -863,6 +870,8 @@ class PV():
 
         if with_ctrlvars and self.connected:
             self.get_ctrlvars()
+        elif with_ctrlvars:
+            self._ctrlvars_requested = True
         if run_now:
             self.get(as_string=True)
             if self.connected:
