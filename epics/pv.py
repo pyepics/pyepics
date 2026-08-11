@@ -259,6 +259,7 @@ class PV():
         self._monref_mask = None
         self._conn_started = False
         self._ctrlvars_requested = False
+        self._ctrlvars_thread = None
         if isinstance(callback, (tuple, list)):
             for i, thiscb in enumerate(callback):
                 if callable(thiscb):
@@ -364,7 +365,8 @@ class PV():
             # Fetch outside the CA connection callback: a blocking
             # get_ctrlvars() here (or in a monitor callback) can time out.
             self._ctrlvars_requested = False
-            threading.Thread(target=self.get_ctrlvars, daemon=True).start()
+            self._ctrlvars_thread = threading.Thread(target=self.get_ctrlvars)
+            self._ctrlvars_thread.start()
         if conn:
             self._check_auto_monitor()
 
@@ -1192,6 +1194,9 @@ class PV():
         With deepclean=False, references to callbacks for connection and access-rights
         events will not be removed from the ca _cache for the current context.
         """
+        if self._ctrlvars_thread is not None:
+            self._ctrlvars_thread.join(timeout=5)
+            self._ctrlvars_thread = None
         self.connected = False
 
         ctx = ca.current_context()
