@@ -332,10 +332,15 @@ class Motor(device.Device):
     def within_limits(self, val, dial=False):
         """ returns whether a value for a motor is within drive limits
         with dial=True   dial limits are used (default is user limits)"""
-        ll_name, hl_name = 'LLM', 'HLM'
-        if dial:
-            ll_name, hl_name = 'DLLM', 'DHLM'
-        return (val <= self.get(hl_name) and val >= self.get(ll_name))
+        if (self.get('DLLM') == 0 and self.get('DHLM') == 0):
+        	# The motorRecord checks DLLM == DHLM == 0.0 and treats this
+        	# as "no softlimits"
+            return True
+        else:
+            ll_name, hl_name = 'LLM', 'HLM'
+            if dial:
+                ll_name, hl_name = 'DLLM', 'DHLM'
+            return (val <= self.get(hl_name) and val >= self.get(ll_name))
 
     def move(self, val=None, relative=False, wait=False, timeout=300.0,
              dial=False, step=False, raw=False,
