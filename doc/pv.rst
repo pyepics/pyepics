@@ -432,8 +432,10 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
    information about the PV.
 
 .. attribute:: upper_disp_limit
+               lower_disp_limit
 
-.. attribute:: lower_disp_limit
+   The display range reported by the IOC. For the value of an EPICS Base
+   ``ao`` or ``longout`` record, these are ``HOPR`` and ``LOPR``, respectively.
 
 .. attribute:: upper_alarm_limit
 
@@ -444,10 +446,13 @@ assigned to.  The exception to this rule is the :attr:`value` attribute.
 .. attribute:: upper_warning_limit
 
 .. attribute:: upper_ctrl_limit
+               lower_ctrl_limit
 
-.. attribute:: lower_ctrl_limit
-
-   These are all the various kinds of limits for a PV.
+   The control range reported by the IOC depends on the record type. For
+   example, in EPICS Base 7.0.10 an ``ao`` record reports ``DRVH`` and ``DRVL``
+   for its value. Both can be zero even when the display range is nonzero.
+   A ``longout`` record reports those drive limits when ``DRVH > DRVL`` and
+   falls back to its display range otherwise.
 
 .. attribute:: put_complete
 
