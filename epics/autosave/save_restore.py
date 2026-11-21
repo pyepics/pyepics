@@ -72,6 +72,9 @@ def restore_pvs(filepath, debug=False):
             if debug:
                 print("Setting %s to %s" % (pvname, value))
             try:
+                if value == '' and thispv.nelm > 1 and 'char' in thispv.type:
+                    # An empty long string contains just its terminating NUL.
+                    value = [0]
                 thispv.put(value, wait=False)
             except:
                 exctype, excvalue, exctrace = sys.exc_info()
@@ -123,11 +126,11 @@ class AutoSaver(object):
             pvname = thispv.pvname
             thispv.wait_for_connection()
             if thispv.connected:
-                if thispv.count == 1:
+                if thispv.nelm == 1:
                     value = str(thispv.get())
-                elif thispv.count > 1 and 'char' in thispv.type:
+                elif 'char' in thispv.type:
                     value = thispv.get(as_string=True)
-                elif thispv.count > 1 and 'char' not in thispv.type:
+                else:
                     value = '@array@ %s' % json.dumps(thispv.get().tolist())
                 buff.append("%s %s" % (pvname, value))
                 if verbose:
