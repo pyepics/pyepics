@@ -597,9 +597,9 @@ class PV():
                 (self._args['value'] is None) or
                 (count is not None and count > cached_length)):
 
-            # respect count argument on subscription also for calls to get
-            if count is None and self._args['count']!=self._args['nelm']:
-                count = self._args['count']
+            # Let CA report the current length unless the caller limited it.
+            if count is None and self._user_max_count and self._user_max_count < self.nelm:
+                count = self._user_max_count
 
             # ca.get_with_metadata will handle multiple requests for the same
             # PV internally, so there is no need to change between
