@@ -383,6 +383,25 @@ def test_waveform_get_with_count_arg():
         val=wf.get(count=wf.nelm)
         assert len(val) == wf.nelm
 
+@pytest.mark.parametrize("initial, updated", [([1, 2, 3, 4, 5, 6], [0]), ([0], [1, 2, 3])])
+def test_fresh_waveform_get_after_length_change(initial, updated):
+    with no_simulator_updates(), ExitStack() as cleanup:
+        wave = PV(pvnames.char_arr_pv, auto_monitor=False)
+        cleanup.callback(wave.disconnect)
+        cleanup.callback(wave.put, wave.get(), wait=True)
+        wave.put(initial, wait=True)
+
+        received = threading.Event()
+        wave.add_callback(lambda **kw: received.set())
+        # An alarm-only monitor gets the initial value but skips value changes.
+        wave.auto_monitor = ca.dbr.DBE_ALARM
+        assert received.wait(timeout=5)
+        numpy.testing.assert_array_equal(wave.get(), initial)
+
+        wave.put(updated, wait=True)
+        numpy.testing.assert_array_equal(wave.get(use_monitor=False), updated)
+
+
 def test_waveform_callback_with_count_arg():
     values = []
 
