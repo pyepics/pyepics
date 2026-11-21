@@ -7,8 +7,9 @@ import numpy
 import threading
 import pytest
 from random import random
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 from epics import PV, get_pv, caput, caget, caget_many, caput_many, ca
+from epics.autosave import restore_pvs, save_pvs
 
 import pvnames
 
@@ -405,6 +406,32 @@ def test_waveform_callback_with_count_arg():
     assert len(values[0]) == 32
 
     wf.clear_callbacks()
+
+
+def test_autosave_single_element_waveforms(tmp_path):
+    chars = get_pv(pvnames.char_arr_pv)
+    numbers = get_pv(pvnames.long_arr_pv)
+    request = tmp_path / "waveforms.req"
+    saved = tmp_path / "waveforms.sav"
+    request.write_text(f"{chars.pvname}\n{numbers.pvname}\n")
+
+    with no_simulator_updates(), ExitStack() as cleanup:
+        for pv in (chars, numbers):
+            cleanup.callback(pv.put, pv.get(use_monitor=False), wait=True)
+        chars.put([0], wait=True)
+        numbers.put([7], wait=True)
+        numpy.testing.assert_array_equal(chars.get(use_monitor=False), [0])
+        numpy.testing.assert_array_equal(numbers.get(use_monitor=False), [7])
+        save_pvs(str(request), str(saved))
+        lines = saved.read_text().splitlines()
+        assert f"{chars.pvname} " in lines
+        assert f"{numbers.pvname} @array@ [7]" in lines
+
+        chars.put("other", wait=True)
+        numbers.put([11, 12], wait=True)
+        assert restore_pvs(str(saved))
+        numpy.testing.assert_array_equal(chars.get(use_monitor=False), [0])
+        numpy.testing.assert_array_equal(numbers.get(use_monitor=False), [7])
 
 
 def test_emptyish_char_waveform_no_monitor():
